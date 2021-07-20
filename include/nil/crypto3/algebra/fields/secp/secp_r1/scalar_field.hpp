@@ -60,7 +60,7 @@ namespace nil {
                     constexpr static const modulus_type modulus =
                         0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551_cppui256;
 
-                    typedef typename detail::element_fp<params<nist_scalar_field<256>>> value_type;
+                    typedef typename detail::element_fp<params<secp_r1_scalar_field<256>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;

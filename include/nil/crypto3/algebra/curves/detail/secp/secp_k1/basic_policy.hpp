@@ -95,16 +95,16 @@ namespace nil {
                             g1_field_type::value_type::one()};
                     };
 
-                    constexpr typename secp_k1_basic_policy<381>::number_type const secp_k1_basic_policy<381>::a;
-                    constexpr typename secp_k1_basic_policy<381>::number_type const secp_k1_basic_policy<381>::b;
+                    constexpr typename secp_k1_basic_policy<256>::number_type const secp_k1_basic_policy<256>::a;
+                    constexpr typename secp_k1_basic_policy<256>::number_type const secp_k1_basic_policy<256>::b;
 
-                    constexpr typename secp_k1_basic_policy<381>::number_type const secp_k1_basic_policy<381>::p;
-                    constexpr typename secp_k1_basic_policy<381>::number_type const secp_k1_basic_policy<381>::q;
+                    constexpr typename secp_k1_basic_policy<256>::number_type const secp_k1_basic_policy<256>::p;
+                    constexpr typename secp_k1_basic_policy<256>::number_type const secp_k1_basic_policy<256>::q;
 
-                    constexpr std::array<typename secp_k1_basic_policy<381>::g1_field_type::value_type, 3> const
-                        secp_k1_basic_policy<381>::g1_zero_fill;
-                    constexpr std::array<typename secp_k1_basic_policy<381>::g1_field_type::value_type, 3> const
-                        secp_k1_basic_policy<381>::g1_one_fill;
+                    constexpr std::array<typename secp_k1_basic_policy<256>::g1_field_type::value_type, 3> const
+                        secp_k1_basic_policy<256>::g1_zero_fill;
+                    constexpr std::array<typename secp_k1_basic_policy<256>::g1_field_type::value_type, 3> const
+                        secp_k1_basic_policy<256>::g1_one_fill;
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

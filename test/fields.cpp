@@ -52,6 +52,10 @@
 #include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
 #include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
 #include <nil/crypto3/algebra/fields/mnt6/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/secp/secp_k1/base_field.hpp>
+#include <nil/crypto3/algebra/fields/secp/secp_k1/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/secp/secp_r1/base_field.hpp>
+#include <nil/crypto3/algebra/fields/secp/secp_r1/scalar_field.hpp>
 // #include <nil/crypto3/algebra/fields/dsa_botan.hpp>
 // #include <nil/crypto3/algebra/fields/dsa_jce.hpp>
 // #include <nil/crypto3/algebra/fields/ed25519_fe.hpp>
@@ -509,6 +513,26 @@ BOOST_DATA_TEST_CASE(field_operation_test_mnt6_fq3, string_data("field_operation
 
 BOOST_DATA_TEST_CASE(field_operation_test_mnt6_fq6, string_data("field_operation_test_mnt6_fq6"), data_set) {
     using policy_type = fields::fp6_2over3<fields::mnt6<298>>;
+
+    field_operation_test<policy_type>(data_set);
+}
+
+// BOOST_DATA_TEST_CASE(field_operation_test_secp256k1_fr, string_data("field_operation_test_secp256k1_fr"), data_set) {
+//     using policy_type = fields::secp_k1_fr<256>;
+//
+//     field_operation_test<policy_type>(data_set);
+// }
+
+// TODO: fix sqrt error
+BOOST_DATA_TEST_CASE(field_operation_test_secp256k1_fq, string_data("field_operation_test_secp256k1_fq"), data_set) {
+    using policy_type = fields::secp_k1_fq<256>;
+
+    field_operation_test<policy_type>(data_set);
+}
+
+// TODO: fix sqrt error
+BOOST_DATA_TEST_CASE(field_operation_test_secp256r1_fq, string_data("field_operation_test_secp256r1_fq"), data_set) {
+    using policy_type = fields::secp_r1_fq<256>;
 
     field_operation_test<policy_type>(data_set);
 }

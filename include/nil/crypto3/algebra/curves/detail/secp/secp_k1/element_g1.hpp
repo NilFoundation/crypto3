@@ -37,33 +37,31 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-
                     /** @brief A struct representing a group G1 of BLS12 curve.
                      *    @tparam Version version of the curve
                      *
                      */
                     template<std::size_t Version>
-                    struct secp_k1;
+                    struct secp_k1_g1;
 
                     /** @brief A struct representing an element from the group G1 of BLS12 curve.
                      *    @tparam Version version of the curve
                      *
                      */
                     template<std::size_t Version>
-                    struct element_secp_k1;
+                    struct element_secp_k1_g1;
 
-                    /** @brief A struct representing an elememnt from the group G1 of BLS12-381 curve.
+                    /** @brief A struct representing an elememnt from the group G1 of BLS12-256 curve.
                      *
                      */
                     template<>
-                    struct element_secp_k1<381> {
+                    struct element_secp_k1_g1<256> {
 
-                        using group_type = secp_k1<381>;
+                        using group_type = secp_k1_g1<256>;
 
-                        using policy_type = bls12_basic_policy<381>;
+                        using policy_type = secp_k1_basic_policy<256>;
 
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
-                        typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 
                         using underlying_field_type = typename policy_type::g1_field_type;
                         using underlying_field_value_type = underlying_field_type::value_type;
@@ -78,15 +76,18 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr element_secp_k1() : element_secp_k1(policy_type::g1_zero_fill[0], policy_type::g1_zero_fill[1], policy_type::g1_zero_fill[2]) {};
+                        constexpr element_secp_k1_g1() :
+                            element_secp_k1_g1(policy_type::g1_zero_fill[0],
+                                            policy_type::g1_zero_fill[1],
+                                            policy_type::g1_zero_fill[2]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$
                          *
                          */
-                        constexpr element_secp_k1(underlying_field_value_type X,
-                                                   underlying_field_value_type Y,
-                                                   underlying_field_value_type Z) {
+                        constexpr element_secp_k1_g1(underlying_field_value_type X,
+                                                  underlying_field_value_type Y,
+                                                  underlying_field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -95,20 +96,21 @@ namespace nil {
                         /** @brief Get the point at infinity
                          *
                          */
-                        constexpr static element_secp_k1 zero() {
-                            return element_secp_k1();
+                        constexpr static element_secp_k1_g1 zero() {
+                            return element_secp_k1_g1();
                         }
 
                         /** @brief Get the generator of group G1
                          *
                          */
-                        constexpr static element_secp_k1 one() {
-                            return element_secp_k1(policy_type::g1_one_fill[0], policy_type::g1_one_fill[1], policy_type::g1_one_fill[2]);
+                        constexpr static element_secp_k1_g1 one() {
+                            return element_secp_k1_g1(
+                                policy_type::g1_one_fill[0], policy_type::g1_one_fill[1], policy_type::g1_one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
 
-                        constexpr bool operator==(const element_secp_k1 &other) const {
+                        constexpr bool operator==(const element_secp_k1_g1 &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -143,7 +145,7 @@ namespace nil {
                             return true;
                         }
 
-                        constexpr bool operator!=(const element_secp_k1 &other) const {
+                        constexpr bool operator!=(const element_secp_k1_g1 &other) const {
                             return !(operator==(other));
                         }
                         /** @brief
@@ -192,7 +194,7 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        constexpr element_secp_k1 operator=(const element_secp_k1 &other) {
+                        constexpr element_secp_k1_g1 operator=(const element_secp_k1_g1 &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -201,7 +203,7 @@ namespace nil {
                             return *this;
                         }
 
-                        constexpr element_secp_k1 operator+(const element_secp_k1 &other) const {
+                        constexpr element_secp_k1_g1 operator+(const element_secp_k1_g1 &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -218,20 +220,20 @@ namespace nil {
                             return this->add(other);
                         }
 
-                        constexpr element_secp_k1 operator-() const {
-                            return element_secp_k1(this->X, -(this->Y), this->Z);
+                        constexpr element_secp_k1_g1 operator-() const {
+                            return element_secp_k1_g1(this->X, -(this->Y), this->Z);
                         }
 
-                        constexpr element_secp_k1 operator-(const element_secp_k1 &other) const {
+                        constexpr element_secp_k1_g1 operator-(const element_secp_k1_g1 &other) const {
                             return (*this) + (-other);
                         }
 
-                        constexpr element_secp_k1 &operator+=(const element_secp_k1 &other) {
+                        constexpr element_secp_k1_g1 &operator+=(const element_secp_k1_g1 &other) {
                             *this = *this + other;
                             return *this;
                         }
 
-                        constexpr element_secp_k1 &operator-=(const element_secp_k1 &other) {
+                        constexpr element_secp_k1_g1 &operator-=(const element_secp_k1_g1 &other) {
                             *this = *this - other;
                             return *this;
                         }
@@ -240,7 +242,7 @@ namespace nil {
                          *
                          * @return doubled element from group G1
                          */
-                        constexpr element_secp_k1 doubled() const {
+                        constexpr element_secp_k1_g1 doubled() const {
 
                             // handle point at infinity
                             if (this->is_zero()) {
@@ -268,14 +270,14 @@ namespace nil {
                             underlying_field_value_type Y1Z1 = (this->Y) * (this->Z);
                             underlying_field_value_type Z3 = Y1Z1 + Y1Z1;    // Z3 = 2 * Y1 * Z1
 
-                            return element_secp_k1(X3, Y3, Z3);
+                            return element_secp_k1_g1(X3, Y3, Z3);
                         }
                         /** @brief
                          *
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G1
                          */
-                        constexpr element_secp_k1 mixed_add(const element_secp_k1 &other) const {
+                        constexpr element_secp_k1_g1 mixed_add(const element_secp_k1_g1 &other) const {
 
                             // handle special cases having to do with O
                             if (this->is_zero()) {
@@ -331,11 +333,11 @@ namespace nil {
                             underlying_field_value_type Z3 =
                                 ((this->Z) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
 
-                            return element_secp_k1(X3, Y3, Z3);
+                            return element_secp_k1_g1(X3, Y3, Z3);
                         }
 
                     private:
-                        constexpr element_secp_k1 add(const element_secp_k1 &other) const {
+                        constexpr element_secp_k1_g1 add(const element_secp_k1_g1 &other) const {
 
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#addition-add-2007-bl
@@ -358,7 +360,7 @@ namespace nil {
                             underlying_field_value_type Z3 =
                                 ((this->Z + other.Z).squared() - Z1Z1 - Z2Z2) * H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
 
-                            return element_secp_k1(X3, Y3, Z3);
+                            return element_secp_k1_g1(X3, Y3, Z3);
                         }
 
                     public:
@@ -368,7 +370,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
-                        constexpr element_secp_k1 to_affine() const {
+                        constexpr element_secp_k1_g1 to_affine() const {
                             underlying_field_value_type p_out[3];
 
                             if (this->is_zero()) {
@@ -384,14 +386,14 @@ namespace nil {
                                 p_out[2] = underlying_field_value_type::one();
                             }
 
-                            return element_secp_k1(p_out[0], p_out[1], p_out[2]);
+                            return element_secp_k1_g1(p_out[0], p_out[1], p_out[2]);
                         }
 
                         /** @brief
                          *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
-                        constexpr element_secp_k1 to_projective() const {
+                        constexpr element_secp_k1_g1 to_projective() const {
                             return this->to_affine();
                         }
 
@@ -399,11 +401,11 @@ namespace nil {
                         constexpr static const g1_field_type_value b = policy_type::b;
                     };
 
-                    constexpr typename element_secp_k1<381>::g1_field_type_value const element_secp_k1<381>::b;
+                    constexpr typename element_secp_k1_g1<256>::g1_field_type_value const element_secp_k1_g1<256>::b;
 
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_BLS12_381_G1_ELEMENT_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_BLS12_256_G1_ELEMENT_HPP

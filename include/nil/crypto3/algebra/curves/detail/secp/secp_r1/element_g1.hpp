@@ -43,30 +43,27 @@ namespace nil {
                      *
                      */
                     template<std::size_t Version>
-                    struct secp_r1;
+                    struct secp_r1_g1;
 
-                    /** @brief A struct representing an element from the group G1 of BLS12 curve.
+                    /** @brief A struct representing an element from the group G1 of secp_r1 curve.
                      *    @tparam Version version of the curve
                      *
                      */
                     template<std::size_t Version>
-                    struct element_secp_r1;
-
-                    /** @brief A struct representing an elememnt from the group G1 of BLS12-381 curve.
+                    struct element_secp_r1_g1 { };
+                    /** @brief A struct representing an element from the group G1 of secp_r1 curve.
                      *
+                     * The size of the group G1 in bits equals 256.
                      */
                     template<>
-                    struct element_secp_r1<381> {
+                    struct element_secp_r1_g1<256> {
 
-                        using group_type = secp_r1<381>;
+                        using group_type = secp_r1_g1<256>;
 
-                        using policy_type = bls12_basic_policy<381>;
+                        using policy_type = secp_r1_basic_policy<256>;
 
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
-                        typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
-
-                        using underlying_field_type = typename policy_type::g1_field_type;
-                        using underlying_field_value_type = underlying_field_type::value_type;
+                        using underlying_field_value_type = g1_field_type_value;
 
                         underlying_field_value_type X;
                         underlying_field_value_type Y;
@@ -78,37 +75,47 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr element_secp_r1() : element_secp_r1(policy_type::g1_zero_fill[0], policy_type::g1_zero_fill[1], policy_type::g1_zero_fill[2]) {};
+                        constexpr element_secp_r1_g1() :
+                            element_secp_r1_g1(policy_type::g1_zero_fill[0], policy_type::g1_zero_fill[1],
+                                               policy_type::g1_zero_fill[2]) {};
 
                         /** @brief
-                         *    @return the selected point $(X:Y:Z)$
+                         *    @return the selected affine point $(X:Y:1)$
                          *
                          */
-                        constexpr element_secp_r1(underlying_field_value_type X,
-                                                   underlying_field_value_type Y,
-                                                   underlying_field_value_type Z) {
+                        constexpr element_secp_r1_g1(const underlying_field_value_type &X,
+                                                     const underlying_field_value_type &Y) :
+                            X(X),
+                            Y(Y), Z(underlying_field_value_type::one()) {};
+
+                        /** @brief
+                         *    @return the selected point (X:Y:Z)
+                         *
+                         */
+                        constexpr element_secp_r1_g1(underlying_field_value_type X,
+                                                     underlying_field_value_type Y,
+                                                     underlying_field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
                         };
-
                         /** @brief Get the point at infinity
                          *
                          */
-                        constexpr static element_secp_r1 zero() {
-                            return element_secp_r1();
+                        constexpr static element_secp_r1_g1 zero() {
+                            return element_secp_r1_g1();
                         }
-
                         /** @brief Get the generator of group G1
                          *
                          */
-                        constexpr static element_secp_r1 one() {
-                            return element_secp_r1(policy_type::g1_one_fill[0], policy_type::g1_one_fill[1], policy_type::g1_one_fill[2]);
+                        constexpr static element_secp_r1_g1 one() {
+                            return element_secp_r1_g1(policy_type::g1_one_fill[0], policy_type::g1_one_fill[1],
+                                                      policy_type::g1_one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
 
-                        constexpr bool operator==(const element_secp_r1 &other) const {
+                        constexpr bool operator==(const element_secp_r1_g1 &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -119,31 +126,20 @@ namespace nil {
 
                             /* now neither is O */
 
-                            // using Jacobian coordinates so:
-                            // (X1:Y1:Z1) = (X2:Y2:Z2)
-                            // iff
-                            // X1/Z1^2 == X2/Z2^2 and Y1/Z1^3 == Y2/Z2^3
-                            // iff
-                            // X1 * Z2^2 == X2 * Z1^2 and Y1 * Z2^3 == Y2 * Z1^3
-
-                            underlying_field_value_type Z1_squared = (this->Z).squared();
-                            underlying_field_value_type Z2_squared = (other.Z).squared();
-
-                            if ((this->X * Z2_squared) != (other.X * Z1_squared)) {
+                            // X1/Z1 = X2/Z2 <=> X1*Z2 = X2*Z1
+                            if ((this->X * other.Z) != (other.X * this->Z)) {
                                 return false;
                             }
 
-                            underlying_field_value_type Z1_cubed = (this->Z) * Z1_squared;
-                            underlying_field_value_type Z2_cubed = (other.Z) * Z2_squared;
-
-                            if ((this->Y * Z2_cubed) != (other.Y * Z1_cubed)) {
+                            // Y1/Z1 = Y2/Z2 <=> Y1*Z2 = Y2*Z1
+                            if ((this->Y * other.Z) != (other.Y * this->Z)) {
                                 return false;
                             }
 
                             return true;
                         }
 
-                        constexpr bool operator!=(const element_secp_r1 &other) const {
+                        constexpr bool operator!=(const element_secp_r1_g1 &other) const {
                             return !(operator==(other));
                         }
                         /** @brief
@@ -151,16 +147,15 @@ namespace nil {
                          * @return true if element from group G1 is the point at infinity
                          */
                         constexpr bool is_zero() const {
-                            return (this->Z.is_zero());
+                            return (this->X.is_zero() && this->Z.is_zero());
                         }
                         /** @brief
                          *
                          * @return true if element from group G1 in affine coordinates
                          */
                         constexpr bool is_special() const {
-                            return (this->is_zero() || this->Z == underlying_field_value_type::one());
+                            return (this->is_zero() || this->Z.is_one());
                         }
-
                         /** @brief
                          *
                          * @return true if element from group G1 lies on the elliptic curve
@@ -170,29 +165,26 @@ namespace nil {
                                 return true;
                             } else {
                                 /*
-                                  y^2 = x^3 + b
+                                  y^2 = x^3 + ax + b
 
-                                  We are using Jacobian coordinates, so equation we need to check is actually
+                                  We are using projective, so equation we need to check is actually
 
-                                  (y/z^3)^2 = (x/z^2)^3 + b
-                                  y^2 / z^6 = x^3 / z^6 + b
-                                  y^2 = x^3 + b z^6
+                                  (y/z)^2 = (x/z)^3 + a (x/z) + b
+                                  z y^2 = x^3  + a z^2 x + b z^3
+
+                                  z (y^2 - b z^2) = x ( x^2 + a z^2)
                                 */
-                                underlying_field_value_type X2 = this->X.squared();
-                                underlying_field_value_type Y2 = this->Y.squared();
-                                underlying_field_value_type Z2 = this->Z.squared();
+                                const underlying_field_value_type X2 = this->X.squared();
+                                const underlying_field_value_type Y2 = this->Y.squared();
+                                const underlying_field_value_type Z2 = this->Z.squared();
 
-                                underlying_field_value_type X3 = this->X * X2;
-                                underlying_field_value_type Z3 = this->Z * Z2;
-                                underlying_field_value_type Z6 = Z3.squared();
-
-                                return (Y2 == X3 + b * Z6);
+                                return (this->Z * (Y2 - b * Z2) == this->X * (X2 + a * Z2));
                             }
                         }
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        constexpr element_secp_r1 operator=(const element_secp_r1 &other) {
+                        constexpr element_secp_r1_g1 operator=(const element_secp_r1_g1 &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -201,7 +193,7 @@ namespace nil {
                             return *this;
                         }
 
-                        constexpr element_secp_r1 operator+(const element_secp_r1 &other) const {
+                        constexpr element_secp_r1_g1 operator+(const element_secp_r1_g1 &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -218,157 +210,124 @@ namespace nil {
                             return this->add(other);
                         }
 
-                        constexpr element_secp_r1 operator-() const {
-                            return element_secp_r1(this->X, -(this->Y), this->Z);
+                        constexpr element_secp_r1_g1 operator-() const {
+                            return element_secp_r1_g1(this->X, -this->Y, this->Z);
                         }
 
-                        constexpr element_secp_r1 operator-(const element_secp_r1 &other) const {
+                        constexpr element_secp_r1_g1 operator-(const element_secp_r1_g1 &other) const {
                             return (*this) + (-other);
                         }
-
-                        constexpr element_secp_r1 &operator+=(const element_secp_r1 &other) {
-                            *this = *this + other;
-                            return *this;
-                        }
-
-                        constexpr element_secp_r1 &operator-=(const element_secp_r1 &other) {
-                            *this = *this - other;
-                            return *this;
-                        }
-
                         /** @brief
                          *
                          * @return doubled element from group G1
                          */
-                        constexpr element_secp_r1 doubled() const {
+                        constexpr element_secp_r1_g1 doubled() const {
 
-                            // handle point at infinity
                             if (this->is_zero()) {
                                 return (*this);
+                            } else {
+                                // NOTE: does not handle O and pts of order 2,4
+                                // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#doubling-dbl-2007-bl
+
+                                const underlying_field_value_type XX = (this->X).squared();       // XX  = X1^2
+                                const underlying_field_value_type ZZ = (this->Z).squared();       // ZZ  = Z1^2
+                                const underlying_field_value_type w = a * ZZ + (XX + XX + XX);    // w   = a*ZZ + 3*XX
+                                const underlying_field_value_type Y1Z1 = (this->Y) * (this->Z);
+                                const underlying_field_value_type s = Y1Z1 + Y1Z1;      // s   = 2*Y1*Z1
+                                const underlying_field_value_type ss = s.squared();     // ss  = s^2
+                                const underlying_field_value_type sss = s * ss;         // sss = s*ss
+                                const underlying_field_value_type R = (this->Y) * s;    // R   = Y1*s
+                                const underlying_field_value_type RR = R.squared();     // RR  = R^2
+                                const underlying_field_value_type B =
+                                    ((this->X) + R).squared() - XX - RR;    // B   = (X1+R)^2 - XX - RR
+                                const underlying_field_value_type h = w.squared() - B.doubled();    // h   = w^2 - 2*B
+                                const underlying_field_value_type X3 = h * s;                       // X3  = h*s
+                                const underlying_field_value_type Y3 =
+                                    w * (B - h) - RR.doubled();                // Y3  = w*(B-h) - 2*RR
+                                const underlying_field_value_type Z3 = sss;    // Z3  = sss
+
+                                return element_secp_r1_g1(X3, Y3, Z3);
                             }
-
-                            // no need to handle points of order 2,4
-                            // (they cannot exist in a prime-order subgroup)
-
-                            // NOTE: does not handle O and pts of order 2,4
-                            // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#doubling-dbl-2009-l
-
-                            underlying_field_value_type A = (this->X).squared();    // A = X1^2
-                            underlying_field_value_type B = (this->Y).squared();    // B = Y1^2
-                            underlying_field_value_type C = B.squared();            // C = B^2
-                            underlying_field_value_type D = (this->X + B).squared() - A - C;
-                            D = D + D;                                       // D = 2 * ((X1 + B)^2 - A - C)
-                            underlying_field_value_type E = A + A + A;       // E = 3 * A
-                            underlying_field_value_type F = E.squared();     // F = E^2
-                            underlying_field_value_type X3 = F - (D + D);    // X3 = F - 2 D
-                            underlying_field_value_type eightC = C + C;
-                            eightC = eightC + eightC;
-                            eightC = eightC + eightC;
-                            underlying_field_value_type Y3 = E * (D - X3) - eightC;    // Y3 = E * (D - X3) - 8 * C
-                            underlying_field_value_type Y1Z1 = (this->Y) * (this->Z);
-                            underlying_field_value_type Z3 = Y1Z1 + Y1Z1;    // Z3 = 2 * Y1 * Z1
-
-                            return element_secp_r1(X3, Y3, Z3);
                         }
                         /** @brief
                          *
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G1
                          */
-                        constexpr element_secp_r1 mixed_add(const element_secp_r1 &other) const {
+                        constexpr element_secp_r1_g1 mixed_add(const element_secp_r1_g1 &other) const {
 
-                            // handle special cases having to do with O
+                            // NOTE: does not handle O and pts of order 2,4
+                            // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
+
                             if (this->is_zero()) {
                                 return other;
                             }
 
                             if (other.is_zero()) {
-                                return *this;
+                                return (*this);
                             }
 
-                            // no need to handle points of order 2,4
-                            // (they cannot exist in a prime-order subgroup)
+                            const underlying_field_value_type &X1Z2 =
+                                (this->X);    // X1Z2 = X1*Z2 (but other is special and not zero)
+                            const underlying_field_value_type X2Z1 = (this->Z) * (other.X);    // X2Z1 = X2*Z1
 
-                            // check for doubling case
+                            // (used both in add and double checks)
 
-                            // using Jacobian coordinates so:
-                            // (X1:Y1:Z1) = (X2:Y2:Z2)
-                            // iff
-                            // X1/Z1^2 == X2/Z2^2 and Y1/Z1^3 == Y2/Z2^3
-                            // iff
-                            // X1 * Z2^2 == X2 * Z1^2 and Y1 * Z2^3 == Y2 * Z1^3
+                            const underlying_field_value_type &Y1Z2 =
+                                (this->Y);    // Y1Z2 = Y1*Z2 (but other is special and not zero)
+                            const underlying_field_value_type Y2Z1 = (this->Z) * (other.Y);    // Y2Z1 = Y2*Z1
 
-                            // we know that Z2 = 1
-
-                            const underlying_field_value_type Z1Z1 = (this->Z).squared();
-
-                            const underlying_field_value_type &U1 = this->X;
-                            const underlying_field_value_type U2 = other.X * Z1Z1;
-
-                            const underlying_field_value_type Z1_cubed = (this->Z) * Z1Z1;
-
-                            const underlying_field_value_type &S1 = (this->Y);              // S1 = Y1 * Z2 * Z2Z2
-                            const underlying_field_value_type S2 = (other.Y) * Z1_cubed;    // S2 = Y2 * Z1 * Z1Z1
-
-                            if (U1 == U2 && S1 == S2) {
-                                // dbl case; nothing of above can be reused
+                            if (X1Z2 == X2Z1 && Y1Z2 == Y2Z1) {
                                 return this->doubled();
                             }
 
-                            // NOTE: does not handle O and pts of order 2,4
-                            // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#addition-madd-2007-bl
-                            underlying_field_value_type H = U2 - (this->X);    // H = U2-X1
-                            underlying_field_value_type HH = H.squared();      // HH = H&2
-                            underlying_field_value_type I = HH + HH;           // I = 4*HH
-                            I = I + I;
-                            underlying_field_value_type J = H * I;             // J = H*I
-                            underlying_field_value_type r = S2 - (this->Y);    // r = 2*(S2-Y1)
-                            r = r + r;
-                            underlying_field_value_type V = (this->X) * I;               // V = X1*I
-                            underlying_field_value_type X3 = r.squared() - J - V - V;    // X3 = r^2-J-2*V
-                            underlying_field_value_type Y3 = (this->Y) * J;              // Y3 = r*(V-X3)-2*Y1*J
-                            Y3 = r * (V - X3) - Y3 - Y3;
-                            underlying_field_value_type Z3 =
-                                ((this->Z) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
+                            const underlying_field_value_type u = Y2Z1 - this->Y;                // u = Y2*Z1-Y1
+                            const underlying_field_value_type uu = u.squared();                  // uu = u2
+                            const underlying_field_value_type v = X2Z1 - this->X;                // v = X2*Z1-X1
+                            const underlying_field_value_type vv = v.squared();                  // vv = v2
+                            const underlying_field_value_type vvv = v * vv;                      // vvv = v*vv
+                            const underlying_field_value_type R = vv * this->X;                  // R = vv*X1
+                            const underlying_field_value_type A = uu * this->Z - vvv - R - R;    // A = uu*Z1-vvv-2*R
+                            const underlying_field_value_type X3 = v * A;                        // X3 = v*A
+                            const underlying_field_value_type Y3 =
+                                u * (R - A) - vvv * this->Y;                         // Y3 = u*(R-A)-vvv*Y1
+                            const underlying_field_value_type Z3 = vvv * this->Z;    // Z3 = vvv*Z1
 
-                            return element_secp_r1(X3, Y3, Z3);
+                            return element_secp_r1_g1(X3, Y3, Z3);
                         }
 
                     private:
-                        constexpr element_secp_r1 add(const element_secp_r1 &other) const {
+                        constexpr element_secp_r1_g1 add(const element_secp_r1_g1 &other) const {
 
                             // NOTE: does not handle O and pts of order 2,4
-                            // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#addition-add-2007-bl
+                            // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
 
-                            underlying_field_value_type Z1Z1 = (this->Z).squared();           // Z1Z1 = Z1^2
-                            underlying_field_value_type Z2Z2 = (other.Z).squared();           // Z2Z2 = Z2^2
-                            underlying_field_value_type U1 = (this->X) * Z2Z2;                // U1 = X1 * Z2Z2
-                            underlying_field_value_type U2 = (other.X) * Z1Z1;                // U2 = X2 * Z1Z1
-                            underlying_field_value_type S1 = (this->Y) * (other.Z) * Z2Z2;    // S1 = Y1 * Z2 * Z2Z2
-                            underlying_field_value_type S2 = (other.Y) * (this->Z) * Z1Z1;    // S2 = Y2 * Z1 * Z1Z1
-                            underlying_field_value_type H = U2 - U1;                          // H = U2-U1
-                            underlying_field_value_type S2_minus_S1 = S2 - S1;
-                            underlying_field_value_type I = (H + H).squared();             // I = (2 * H)^2
-                            underlying_field_value_type J = H * I;                         // J = H * I
-                            underlying_field_value_type r = S2_minus_S1 + S2_minus_S1;     // r = 2 * (S2-S1)
-                            underlying_field_value_type V = U1 * I;                        // V = U1 * I
-                            underlying_field_value_type X3 = r.squared() - J - (V + V);    // X3 = r^2 - J - 2 * V
-                            underlying_field_value_type S1_J = S1 * J;
-                            underlying_field_value_type Y3 = r * (V - X3) - (S1_J + S1_J);    // Y3 = r * (V-X3)-2 S1 J
-                            underlying_field_value_type Z3 =
-                                ((this->Z + other.Z).squared() - Z1Z1 - Z2Z2) * H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
+                            const underlying_field_value_type Y1Z2 = (this->Y) * (other.Z);        // Y1Z2 = Y1*Z2
+                            const underlying_field_value_type X1Z2 = (this->X) * (other.Z);        // X1Z2 = X1*Z2
+                            const underlying_field_value_type Z1Z2 = (this->Z) * (other.Z);        // Z1Z2 = Z1*Z2
+                            const underlying_field_value_type u = (other.Y) * (this->Z) - Y1Z2;    // u    = Y2*Z1-Y1Z2
+                            const underlying_field_value_type uu = u.squared();                    // uu   = u^2
+                            const underlying_field_value_type v = (other.X) * (this->Z) - X1Z2;    // v    = X2*Z1-X1Z2
+                            const underlying_field_value_type vv = v.squared();                    // vv   = v^2
+                            const underlying_field_value_type vvv = v * vv;                        // vvv  = v*vv
+                            const underlying_field_value_type R = vv * X1Z2;                       // R    = vv*X1Z2
+                            const underlying_field_value_type A =
+                                uu * Z1Z2 - (vvv + R + R);                   // A    = uu*Z1Z2 - vvv - 2*R
+                            const underlying_field_value_type X3 = v * A;    // X3   = v*A
+                            const underlying_field_value_type Y3 =
+                                u * (R - A) - vvv * Y1Z2;                         // Y3   = u*(R-A) - vvv*Y1Z2
+                            const underlying_field_value_type Z3 = vvv * Z1Z2;    // Z3   = vvv*Z1Z2
 
-                            return element_secp_r1(X3, Y3, Z3);
+                            return element_secp_r1_g1(X3, Y3, Z3);
                         }
 
                     public:
                         /*************************  Reducing operations  ***********************************/
-
                         /** @brief
                          *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
-                        constexpr element_secp_r1 to_affine() const {
+                        constexpr element_secp_r1_g1 to_affine() const {
                             underlying_field_value_type p_out[3];
 
                             if (this->is_zero()) {
@@ -376,30 +335,29 @@ namespace nil {
                                 p_out[1] = underlying_field_value_type::one();
                                 p_out[2] = underlying_field_value_type::zero();
                             } else {
-                                underlying_field_value_type Z_inv = this->Z.inversed();
-                                underlying_field_value_type Z2_inv = Z_inv.squared();
-                                underlying_field_value_type Z3_inv = Z2_inv * Z_inv;
-                                p_out[0] = this->X * Z2_inv;
-                                p_out[1] = this->Y * Z3_inv;
+                                const underlying_field_value_type Z_inv = this->Z.inversed();
+                                p_out[0] = this->X * Z_inv;
+                                p_out[1] = this->Y * Z_inv;
                                 p_out[2] = underlying_field_value_type::one();
                             }
 
-                            return element_secp_r1(p_out[0], p_out[1], p_out[2]);
+                            return element_secp_r1_g1(p_out[0], p_out[1], p_out[2]);
                         }
-
                         /** @brief
                          *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
-                        constexpr element_secp_r1 to_projective() const {
+                        constexpr element_secp_r1_g1 to_projective() const {
                             return this->to_affine();
                         }
 
                     private:
+                        constexpr static const g1_field_type_value a = policy_type::a;
                         constexpr static const g1_field_type_value b = policy_type::b;
                     };
 
-                    constexpr typename element_secp_r1<381>::g1_field_type_value const element_secp_r1<381>::b;
+                    constexpr typename element_secp_r1_g1<256>::g1_field_type_value const element_secp_r1_g1<256>::a;
+                    constexpr typename element_secp_r1_g1<256>::g1_field_type_value const element_secp_r1_g1<256>::b;
 
                 }    // namespace detail
             }        // namespace curves

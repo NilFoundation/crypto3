@@ -58,9 +58,9 @@ namespace nil {
                     typedef typename policy_type::number_type number_type;
 
                     constexpr static const modulus_type modulus =
-                        0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff_cppui381;
+                        0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff_cppui256;
 
-                    typedef typename detail::element_fp<params<nist_base_field<256>>> value_type;
+                    typedef typename detail::element_fp<params<secp_r1_base_field<256>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
