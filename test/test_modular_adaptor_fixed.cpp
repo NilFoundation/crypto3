@@ -30,6 +30,7 @@
 
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(17);
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(130);
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256);
 
 using namespace nil::crypto3::multiprecision;
 
@@ -528,8 +529,18 @@ BOOST_AUTO_TEST_CASE(base_ops_odd_mod_backend_17) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
-// BOOST_AUTO_TEST_SUITE(runtime_tests)
-//
+BOOST_AUTO_TEST_SUITE(runtime_tests)
+
+BOOST_AUTO_TEST_CASE(secp256k1_incorrect_multiplication) {
+    using Backend = cpp_int_backend<256, 256>;
+    using standart_number = number<Backend>;
+    using modular_number = number<modular_adaptor<Backend>>;
+    constexpr standart_number modulus = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F_cppui256;
+    constexpr modular_number x(0xb5d724ce6f44c3c587867bbcb417e9eb6fa05e7e2ef029166568f14eb3161387_cppui256, modulus);
+    constexpr modular_number res(0xad6e1fcc680392abfb075838eafa513811112f14c593e0efacb6e9d0d7770b4_cppui256, modulus);
+    assert(x * x == res);
+}
+
 // BOOST_AUTO_TEST_CASE(base_ops_prime_mod_backend_130_mixed)
 // {
 //    using Backend         = cpp_int_backend<130, 130>;
@@ -691,5 +702,5 @@ BOOST_AUTO_TEST_SUITE_END()
 //
 //    bool res = base_operations_test_mixed(test_data);
 // }
-//
-// BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE_END()

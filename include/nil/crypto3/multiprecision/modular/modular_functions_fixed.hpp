@@ -46,9 +46,8 @@ namespace nil {
                 // function return real limb of nontrivial backend.
                 //
                 template<typename, typename Backend>
-                typename boost::enable_if_c<!is_trivial_cpp_int<Backend>::value,
-                                            limb_type>::type constexpr custom_get_limb_value(const Backend& b,
-                                                                                             const std::size_t i) {
+                constexpr typename boost::enable_if_c<!is_trivial_cpp_int<Backend>::value, limb_type>::type
+                    custom_get_limb_value(const Backend& b, const std::size_t i) {
                     return b.limbs()[i];
                 }
 
@@ -57,11 +56,12 @@ namespace nil {
                 // return value of logical limb as if trivial backend consists of several logical limbs.
                 //
                 template<typename internal_limb_type, typename Backend>
-                typename boost::enable_if_c<
+                constexpr typename boost::enable_if_c<
                     is_trivial_cpp_int<Backend>::value &&
                         sizeof(typename trivial_limb_type<max_precision<Backend>::value>::type) >=
                             sizeof(internal_limb_type),
-                    internal_limb_type>::type constexpr custom_get_limb_value(const Backend& b, const std::size_t i) {
+                    internal_limb_type>::type
+                    custom_get_limb_value(const Backend& b, const std::size_t i) {
                     return static_cast<internal_limb_type>(b.limbs()[0] >> (sizeof(internal_limb_type) * CHAR_BIT * i));
                 }
 
@@ -69,8 +69,8 @@ namespace nil {
                 // function set limb value of nontrivial backend.
                 //
                 template<typename, typename Backend>
-                typename boost::enable_if_c<!is_trivial_cpp_int<Backend>::value>::type constexpr custom_set_limb_value(
-                    Backend& b, const std::size_t i, limb_type v) {
+                constexpr typename boost::enable_if_c<!is_trivial_cpp_int<Backend>::value>::type
+                    custom_set_limb_value(Backend& b, const std::size_t i, limb_type v) {
                     b.limbs()[i] = v;
                 }
 
@@ -83,12 +83,11 @@ namespace nil {
                 // modified logical limb is supposed to have zero value.
                 //
                 template<typename internal_limb_type, typename Backend>
-                typename boost::enable_if_c<
+                constexpr typename boost::enable_if_c<
                     is_trivial_cpp_int<Backend>::value &&
                     sizeof(typename trivial_limb_type<max_precision<Backend>::value>::type) >=
-                        sizeof(internal_limb_type)>::type constexpr custom_set_limb_value(Backend& b,
-                                                                                          const std::size_t i,
-                                                                                          internal_limb_type v) {
+                        sizeof(internal_limb_type)>::type
+                    custom_set_limb_value(Backend& b, const std::size_t i, internal_limb_type v) {
                     using local_limb_type = typename trivial_limb_type<max_precision<Backend>::value>::type;
 
                     //
@@ -117,6 +116,20 @@ namespace nil {
                     //
                     // b.limbs()[0] &= mask;
                     b.limbs()[0] |= (static_cast<local_limb_type>(v) << (sizeof(internal_limb_type) * CHAR_BIT * i));
+                }
+
+                template<typename Backend>
+                constexpr typename std::enable_if<!is_trivial_cpp_int<Backend>::value>::type
+                    adjust_backend_size(Backend& b, std::size_t mod_size) {
+                    assert(mod_size + 1 <= Backend::internal_limb_count);
+                    b.resize(b.limbs()[mod_size] != 0 ? mod_size + 1 : mod_size, 1);
+                }
+
+                template<typename Backend>
+                constexpr typename std::enable_if<is_trivial_cpp_int<Backend>::value>::type
+                    adjust_backend_size(Backend& b, std::size_t mod_size) {
+                    assert(mod_size == 1);
+                    b.resize(mod_size, 1);
                 }
 
                 template<typename Backend>
@@ -526,7 +539,10 @@ namespace nil {
                                 static_cast<internal_limb_type>(tmp >>
                                                                 std::numeric_limits<internal_limb_type>::digits));
                         }
-                        A.resize(get_mod().backend().size(), 1);
+                        //
+                        // recover correct size of backend content
+                        //
+                        adjust_backend_size(A, get_mod().backend().size());
 
                         if (!eval_lt(A, get_mod().backend())) {
                             eval_subtract(A, get_mod().backend());
