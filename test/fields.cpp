@@ -359,7 +359,7 @@ void check_field_operations(const std::vector<element_type> &elements, const std
     BOOST_CHECK_EQUAL(elements[e2].inversed(), elements[e2_inv]);
     BOOST_CHECK_EQUAL(elements[e1].pow(constants[C1]), elements[e1_pow_C1]);
     BOOST_CHECK_EQUAL(elements[e2].squared(), elements[e2_pow_2]);
-    BOOST_CHECK_EQUAL((elements[e2].squared()).sqrt(), elements[e2_pow_2_sqrt]);
+    BOOST_CHECK_EQUAL((elements[e2].squared()).sqrt().squared(), elements[e2_pow_2_sqrt].squared());
     BOOST_CHECK_EQUAL(-elements[e1], elements[minus_e1]);
 }
 
