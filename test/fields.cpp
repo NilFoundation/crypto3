@@ -517,20 +517,24 @@ BOOST_DATA_TEST_CASE(field_operation_test_mnt6_fq6, string_data("field_operation
     field_operation_test<policy_type>(data_set);
 }
 
-// BOOST_DATA_TEST_CASE(field_operation_test_secp256k1_fr, string_data("field_operation_test_secp256k1_fr"), data_set) {
-//     using policy_type = fields::secp_k1_fr<256>;
-//
-//     field_operation_test<policy_type>(data_set);
-// }
+ BOOST_DATA_TEST_CASE(field_operation_test_secp256k1_fr, string_data("field_operation_test_secp256k1_fr"), data_set) {
+     using policy_type = fields::secp_k1_fr<256>;
 
-// TODO: fix sqrt error
+     field_operation_test<policy_type>(data_set);
+ }
+
+BOOST_DATA_TEST_CASE(field_operation_test_secp256r1_fr, string_data("field_operation_test_secp256r1_fr"), data_set) {
+    using policy_type = fields::secp_r1_fr<256>;
+
+    field_operation_test<policy_type>(data_set);
+}
+
 BOOST_DATA_TEST_CASE(field_operation_test_secp256k1_fq, string_data("field_operation_test_secp256k1_fq"), data_set) {
     using policy_type = fields::secp_k1_fq<256>;
 
     field_operation_test<policy_type>(data_set);
 }
 
-// TODO: fix sqrt error
 BOOST_DATA_TEST_CASE(field_operation_test_secp256r1_fq, string_data("field_operation_test_secp256r1_fq"), data_set) {
     using policy_type = fields::secp_r1_fq<256>;
 
