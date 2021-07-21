@@ -78,11 +78,6 @@ namespace nil {
                         static inline result_type process(accumulator_type &acc) {
                             typename hash_type::digest_type digest = accumulators::extract::hash<hash_type>(acc);
                             marshalling_field_element_type marshalling_field_element;
-                            // TODO: for what purpose we supply size if read() didn't use it inside
-                            // TODO: (serialization) why we need to create another object for marshalling from original
-                            //  object by copy it inside
-                            // TODO: (deserialization) why marshalling object constructor take non-ref arg, for
-                            //  multiprecision type it might cause overhead
                             auto it = digest.cbegin();
                             marshalling_field_element.read(it, digest.size());
                             return crypto3::marshalling::types::construct_field_element<field_type, endianness>(marshalling_field_element);
