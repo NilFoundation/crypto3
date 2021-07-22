@@ -48,9 +48,9 @@
 #ifndef CRYPTO3_ZK_R1CS_TO_QAP_BASIC_POLICY_HPP
 #define CRYPTO3_ZK_R1CS_TO_QAP_BASIC_POLICY_HPP
 
-#include <nil/crypto3/fft/coset.hpp>
-#include <nil/crypto3/fft/domains/evaluation_domain.hpp>
-#include <nil/crypto3/fft/make_evaluation_domain.hpp>
+#include <nil/crypto3/math/coset.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/math/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/qap.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>

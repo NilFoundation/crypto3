@@ -45,8 +45,8 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/fft/domains/evaluation_domain.hpp>
-#include <nil/crypto3/fft/make_evaluation_domain.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/math/make_evaluation_domain.hpp>
 
 namespace nil {
     namespace crypto3 {
