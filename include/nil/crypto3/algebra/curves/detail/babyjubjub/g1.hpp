@@ -24,43 +24,41 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_MNT4_G1_HPP
-#define CRYPTO3_ALGEBRA_CURVES_MNT4_G1_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_G1_HPP
+#define CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_G1_HPP
 
-#include <nil/crypto3/algebra/curves/detail/mnt4/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/mnt4/element_g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/babyjubjub/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/element_g1_affine.hpp>
+
+#include <nil/crypto3/algebra/curves/detail/forms.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
 
-                template<std::size_t Version>
-                struct mnt4;
+                struct babyjubjub;
 
                 namespace detail {
-                    /** @brief A struct representing a group G1 of mnt4 curve.
-                     *    @tparam Version version of the curve
-                     *
+                    /** @brief A struct representing a group G1 of BabyJubJub curve.
                      */
-                    template<std::size_t Version>
-                    struct mnt4_g1 {
+                    struct babyjubjub_g1 {
+                        using params_type = babyjubjub_basic_policy;
 
-                        using policy_type = mnt4_basic_policy<Version>;
-
-                        using curve_type = mnt4<Version>;
+                        using curve_type = babyjubjub;
 
                         using field_type = typename policy_type::g1_field_type;
 
                         constexpr static const std::size_t value_bits =
                             underlying_field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = element_mnt4_g1<Version>;
+                        using value_type = element_g1<params_type, 
+                            forms::twisted_edwards, twisted_edwards_coordinates::affine>;
                     };
-
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_MNT4_G1_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_G1_HPP

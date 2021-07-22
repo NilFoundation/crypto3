@@ -47,7 +47,7 @@ namespace nil {
                      *    @tparam Coordinates Representation coordinates of the group element 
                      */
                     template<typename CurveParams, 
-                             algebra::curves::detail::forms Form, 
+                             forms Form, 
                              typename Coordinates>
                     struct element_g1;
 
@@ -58,8 +58,8 @@ namespace nil {
                     template<typename CurveParams, 
                              typename Adder = add_1998_cmo_2, 
                              typename Doubler = dbl_2007_bl>
-                    struct element_g1<algebra::curves::detail::forms::short_weierstrass, 
-                                      algebra::curves::detail::short_weierstrass_coordinates::projective> {
+                    struct element_g1<forms::short_weierstrass, 
+                                      short_weierstrass_coordinates::projective> {
 
                         using field_type = typename CurveParams::g1_field_type;
                     private:
@@ -68,11 +68,11 @@ namespace nil {
                     public:
                         using group_type = typename params_type::group_type;
 
-                        constexpr static const algebra::curves::detail::forms form = 
-                            algebra::curves::detail::forms::short_weierstrass;
+                        constexpr static const forms form = 
+                            forms::short_weierstrass;
                         constexpr static const 
-                            algebra::curves::detail::short_weierstrass_coordinates coordinates = 
-                            algebra::curves::detail::short_weierstrass_coordinates::projective;
+                            short_weierstrass_coordinates coordinates = 
+                            short_weierstrass_coordinates::projective;
 
                         field_value_type X;
                         field_value_type Y;

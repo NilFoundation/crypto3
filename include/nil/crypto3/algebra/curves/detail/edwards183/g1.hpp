@@ -24,14 +24,11 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_HPP
-#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP
+#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP
 
 #include <nil/crypto3/algebra/curves/detail/edwards/edwards183/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/edwards183/element_g1.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/jubjub/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/babyjubjub/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/babyjubjub/element_g1.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -40,10 +37,6 @@ namespace nil {
 
                 template<std::size_t Version>
                 struct edwards;
-
-                struct jubjub;
-
-                struct babyjubjub;
 
                 namespace detail {
                     /** @brief A struct representing a group G1 of Edwards curve.
@@ -68,43 +61,9 @@ namespace nil {
 
                         using value_type = element_edwards_g1<version>;
                     };
-
-                    // JubJub
-                    template<>
-                    struct edwards_g1<255> {
-                        constexpr static const std::size_t version = 255;
-
-                        using policy_type = edwards_basic_policy<version>;
-
-                        using curve_type = jubjub;
-
-                        using underlying_field_type = typename policy_type::g1_field_type;
-
-                        constexpr static const std::size_t value_bits =
-                            underlying_field_type::value_bits + 1;    ///< size of the base field in bits
-
-                        using value_type = element_twisted_edwards_g1<version>;
-                    };
-
-                    // BabyJubJub
-                    template<>
-                    struct edwards_g1<254> {
-                        constexpr static const std::size_t version = 254;
-
-                        using policy_type = edwards_basic_policy<version>;
-
-                        using curve_type = babyjubjub;
-
-                        using underlying_field_type = typename policy_type::g1_field_type;
-
-                        constexpr static const std::size_t value_bits =
-                            underlying_field_type::value_bits + 1;    ///< size of the base field in bits
-
-                        using value_type = element_twisted_edwards_g1<version>;
-                    };
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP

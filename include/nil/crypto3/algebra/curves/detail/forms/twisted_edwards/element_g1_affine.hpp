@@ -30,8 +30,6 @@
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms.hpp>
 
-#include <nil/crypto3/detail/literals.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -43,7 +41,7 @@ namespace nil {
                      *    @tparam Coordinates Representation coordinates of the group element 
                      */
                     template<typename CurveParams, 
-                             algebra::curves::detail::forms Form, 
+                             forms Form, 
                              typename Coordinates>
                     struct element_g1;
                     
@@ -53,8 +51,8 @@ namespace nil {
                      *
                      */
                     template<typename CurveParams>
-                    struct element_g1<algebra::curves::detail::forms::twisted_edwards, 
-                                      algebra::curves::detail::twisted_edwards_coordinates::affine> {
+                    struct element_g1<forms::twisted_edwards, 
+                                      twisted_edwards_coordinates::affine> {
 
                         using field_type = typename CurveParams::g1_field_type;
                     private:
@@ -63,11 +61,11 @@ namespace nil {
                     public:
                         using group_type = typename params_type::group_type;
 
-                        constexpr static const algebra::curves::detail::forms form = 
-                            algebra::curves::detail::forms::twisted_edwards;
+                        constexpr static const forms form = 
+                            forms::twisted_edwards;
                         constexpr static const 
-                            algebra::curves::detail::twisted_edwards_coordinates coordinates = 
-                            algebra::curves::detail::twisted_edwards_coordinates::affine;
+                            twisted_edwards_coordinates coordinates = 
+                            twisted_edwards_coordinates::affine;
 
                         field_value_type X;
                         field_value_type Y;
@@ -90,7 +88,7 @@ namespace nil {
                         };
 
                         constexpr element_g1(element_g1<params_type, form, 
-                            algebra::curves::detail::twisted_edwards_coordinates::projective> other) {
+                            twisted_edwards_coordinates::projective> other) {
 
                             if (other.Z.is_zero()) {
                                 *this = this->zero();
@@ -248,7 +246,7 @@ namespace nil {
                         //  */
                         // // This should be moved to montgomery form element constructor
                         // element_g1<params_type, 
-                        //     algebra::curves::detail::forms::montgomery, coordinates> to_montgomery() const {
+                        //     forms::montgomery, coordinates> to_montgomery() const {
                         //     field_value_type p_out[3];
 
                         //     // The only points on the curve with x=0 or y=1 (for which birational equivalence is not valid), 
@@ -262,7 +260,7 @@ namespace nil {
                         //         (field_value_type::one() + this->Y) * 
                         //         (field_value_type::one() - this->Y).inversed();
                         //     return element_g1<params_type, 
-                        //         algebra::curves::detail::forms::montgomery, coordinates>{u, 
+                        //         forms::montgomery, coordinates>{u, 
                         //             params_type::scale * u * this->X.inversed()};
                         // }
                     };
