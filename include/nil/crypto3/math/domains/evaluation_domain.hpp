@@ -41,14 +41,24 @@ namespace nil {
                 typedef typename FieldType::value_type value_type;
 
             public:
-                const std::size_t m;
+                value_type root;
+                value_type root_inverse;
+                value_type domain;
+                value_type domain_inverse;
+                value_type generator;
+                value_type generator_inverse;
+
+                std::size_t m;
+                std::size_t log2_size;
+                std::size_t generator_size;
 
                 /**
                  * Construct an evaluation domain S of size m, if possible.
                  *
                  * (See the function get_evaluation_domain below.)
                  */
-                evaluation_domain(const std::size_t m) : m(m) {};
+                evaluation_domain(const std::size_t m) :
+                    m(m), log2_size(multiprecision::msb(size))) {};
 
                 /**
                  * Get the idx-th element in S.
@@ -91,7 +101,7 @@ namespace nil {
                  */
                 virtual void divide_by_z_on_coset(std::vector<value_type> &P) = 0;
             };
-        }    // namespace fft
+        }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
 

@@ -55,20 +55,20 @@ namespace nil {
                 std::vector<value_type> geometric_triangular_sequence;
 
                 void do_precomputation() {
-                    this->geometric_sequence = std::vector<value_type>(this->m, value_type::zero());
-                    this->geometric_sequence[0] = value_type::one();
+                    geometric_sequence = std::vector<value_type>(this->m, value_type::zero());
+                    geometric_sequence[0] = value_type::one();
 
-                    this->geometric_triangular_sequence = std::vector<value_type>(this->m, value_type::zero());
-                    this->geometric_triangular_sequence[0] = value_type::one();
+                    geometric_triangular_sequence = std::vector<value_type>(this->m, value_type::zero());
+                    geometric_triangular_sequence[0] = value_type::one();
 
                     for (std::size_t i = 1; i < this->m; i++) {
-                        this->geometric_sequence[i] =
-                            this->geometric_sequence[i - 1] * fields::arithmetic_params<FieldType>::geometric_generator;
-                        this->geometric_triangular_sequence[i] =
-                            this->geometric_triangular_sequence[i - 1] * this->geometric_sequence[i - 1];
+                        geometric_sequence[i] =
+                            geometric_sequence[i - 1] * fields::arithmetic_params<FieldType>::geometric_generator;
+                        geometric_triangular_sequence[i] =
+                            geometric_triangular_sequence[i - 1] * geometric_sequence[i - 1];
                     }
 
-                    this->precomputation_sentinel = 1;
+                    precomputation_sentinel = true;
                 }
 
                 geometric_sequence_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
@@ -90,11 +90,11 @@ namespace nil {
                     if (a.size() != this->m)
                         throw std::invalid_argument("geometric: expected a.size() == this->m");
 
-                    if (!this->precomputation_sentinel)
+                    if (!precomputation_sentinel)
                         do_precomputation();
 
-                    monomial_to_newton_basis_geometric<FieldType>(a, this->geometric_sequence,
-                                                                  this->geometric_triangular_sequence, this->m);
+                    monomial_to_newton_basis_geometric<FieldType>(a, geometric_sequence, geometric_triangular_sequence,
+                                                                  this->m);
 
                     /* Newton to Evaluation */
                     std::vector<value_type> T(this->m);
@@ -104,8 +104,8 @@ namespace nil {
                     g[0] = a[0];
 
                     for (std::size_t i = 1; i < this->m; i++) {
-                        T[i] = T[i - 1] * (this->geometric_sequence[i] - value_type::one()).inversed();
-                        g[i] = this->geometric_triangular_sequence[i] * a[i];
+                        T[i] = T[i - 1] * (geometric_sequence[i] - value_type::one()).inversed();
+                        g[i] = geometric_triangular_sequence[i] * a[i];
                     }
 
                     _polynomial_multiplication<FieldType>(a, g, T);
@@ -122,7 +122,7 @@ namespace nil {
                     if (a.size() != this->m)
                         throw std::invalid_argument("geometric: expected a.size() == this->m");
 
-                    if (!this->precomputation_sentinel)
+                    if (!precomputation_sentinel)
                         do_precomputation();
 
                     /* Interpolation to Newton */
@@ -134,10 +134,10 @@ namespace nil {
 
                     value_type prev_T = T[0];
                     for (std::size_t i = 1; i < this->m; i++) {
-                        prev_T *= (this->geometric_sequence[i] - value_type::one()).inversed();
+                        prev_T *= (geometric_sequence[i] - value_type::one()).inversed();
 
                         W[i] = a[i] * prev_T;
-                        T[i] = this->geometric_triangular_sequence[i] * prev_T;
+                        T[i] = geometric_triangular_sequence[i] * prev_T;
                         if (i % 2 == 1)
                             T[i] = -T[i];
                     }
@@ -149,11 +149,11 @@ namespace nil {
 #pragma omp parallel for
 #endif
                     for (std::size_t i = 0; i < this->m; i++) {
-                        a[i] *= this->geometric_triangular_sequence[i].inversed();
+                        a[i] *= geometric_triangular_sequence[i].inversed();
                     }
 
-                    newton_to_monomial_basis_geometric<FieldType>(a, this->geometric_sequence,
-                                                                  this->geometric_triangular_sequence, this->m);
+                    newton_to_monomial_basis_geometric<FieldType>(a, geometric_sequence, geometric_triangular_sequence,
+                                                                  this->m);
                 }
                 std::vector<value_type> evaluate_all_lagrange_polynomials(const value_type &t) {
                     /* Compute Lagrange polynomial of size m, with m+1 points (x_0, y_0), ... ,(x_m, y_m) */
@@ -162,15 +162,16 @@ namespace nil {
 
                     /* for all i: w[i] = (1 / r) * w[i-1] * (1 - a[i]^m-i+1) / (1 - a[i]^-i) */
 
-                    if (!this->precomputation_sentinel)
+                    if (!precomputation_sentinel) {
                         do_precomputation();
+                    }
 
                     /**
                      * If t equals one of the geometric progression values,
                      * then output 1 at the right place, and 0 elsewhere.
                      */
                     for (std::size_t i = 0; i < this->m; ++i) {
-                        if (this->geometric_sequence[i] == t)    // i.e., t equals a[i]
+                        if (geometric_sequence[i] == t)    // i.e., t equals a[i]
                         {
                             std::vector<value_type> res(this->m, value_type::zero());
                             res[i] = value_type::one();
@@ -183,7 +184,7 @@ namespace nil {
                      * then compute each Lagrange coefficient.
                      */
                     std::vector<value_type> l(this->m);
-                    l[0] = t - this->geometric_sequence[0];
+                    l[0] = t - geometric_sequence[0];
 
                     std::vector<value_type> g(this->m);
                     g[0] = value_type::zero();
@@ -191,14 +192,14 @@ namespace nil {
                     value_type l_vanish = l[0];
                     value_type g_vanish = value_type::one();
                     for (std::size_t i = 1; i < this->m; i++) {
-                        l[i] = t - this->geometric_sequence[i];
-                        g[i] = value_type::one() - this->geometric_sequence[i];
+                        l[i] = t - geometric_sequence[i];
+                        g[i] = value_type::one() - geometric_sequence[i];
 
                         l_vanish *= l[i];
                         g_vanish *= g[i];
                     }
 
-                    value_type r = this->geometric_sequence[this->m - 1].inversed();
+                    value_type r = geometric_sequence[this->m - 1].inversed();
                     value_type r_i = r;
 
                     std::vector<value_type> g_i(this->m);
@@ -206,7 +207,7 @@ namespace nil {
 
                     l[0] = l_vanish * l[0].inversed() * g_i[0];
                     for (std::size_t i = 1; i < this->m; i++) {
-                        g_i[i] = g_i[i - 1] * g[this->m - i] * -g[i].inversed() * this->geometric_sequence[i];
+                        g_i[i] = g_i[i - 1] * g[this->m - i] * -g[i].inversed() * geometric_sequence[i];
                         l[i] = l_vanish * r_i * l[i].inversed() * g_i[i];
                         r_i *= r;
                     }
@@ -214,20 +215,20 @@ namespace nil {
                     return l;
                 }
                 value_type get_domain_element(const std::size_t idx) {
-                    if (!this->precomputation_sentinel)
+                    if (!precomputation_sentinel)
                         do_precomputation();
 
                     return this->geometric_sequence[idx];
                 }
                 value_type compute_vanishing_polynomial(const value_type &t) {
-                    if (!this->precomputation_sentinel)
+                    if (!precomputation_sentinel)
                         do_precomputation();
 
                     /* Notes: Z = prod_{i = 0 to m} (t - a[i]) */
                     /* Better approach: Montgomery Trick + Divide&Conquer/FFT */
                     value_type Z = value_type::one();
                     for (std::size_t i = 0; i < this->m; i++) {
-                        Z *= (t - this->geometric_sequence[i]);
+                        Z *= (t - geometric_sequence[i]);
                     }
                     return Z;
                 }
@@ -235,17 +236,17 @@ namespace nil {
                     if (H.size() != this->m + 1)
                         throw std::invalid_argument("geometric: expected H.size() == this->m+1");
 
-                    if (!this->precomputation_sentinel)
+                    if (!precomputation_sentinel)
                         do_precomputation();
 
                     std::vector<value_type> x(2, value_type::zero());
-                    x[0] = -this->geometric_sequence[0];
+                    x[0] = -geometric_sequence[0];
                     x[1] = value_type::one();
 
                     std::vector<value_type> t(2, value_type::zero());
 
                     for (std::size_t i = 1; i < this->m + 1; i++) {
-                        t[0] = -this->geometric_sequence[i];
+                        t[0] = -geometric_sequence[i];
                         t[1] = value_type::one();
 
                         _polynomial_multiplication<FieldType>(x, x, t);
@@ -262,13 +263,13 @@ namespace nil {
                     const value_type coset = value_type(
                         fields::arithmetic_params<FieldType>::multiplicative_generator); /* coset in geometric
                                                                                             sequence? */
-                    const value_type Z_inverse_at_coset = this->compute_vanishing_polynomial(coset).inversed();
+                    const value_type Z_inverse_at_coset = compute_vanishing_polynomial(coset).inversed();
                     for (std::size_t i = 0; i < this->m; ++i) {
                         P[i] *= Z_inverse_at_coset;
                     }
                 }
             };
-        }    // namespace fft
+        }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
 

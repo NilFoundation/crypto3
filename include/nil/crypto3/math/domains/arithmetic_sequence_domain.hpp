@@ -58,14 +58,14 @@ namespace nil {
                 void do_precomputation() {
                     compute_subproduct_tree<FieldType>(log2(this->m), this->subproduct_tree);
 
-                    this->arithmetic_generator = value_type(fields::arithmetic_params<FieldType>::arithmetic_generator);
+                    arithmetic_generator = value_type(fields::arithmetic_params<FieldType>::arithmetic_generator);
 
-                    this->arithmetic_sequence = std::vector<value_type>(this->m);
+                    arithmetic_sequence = std::vector<value_type>(this->m);
                     for (std::size_t i = 0; i < this->m; i++) {
-                        this->arithmetic_sequence[i] = this->arithmetic_generator * value_type(i);
+                        arithmetic_sequence[i] = arithmetic_generator * value_type(i);
                     }
 
-                    this->precomputation_sentinel = 1;
+                    precomputation_sentinel = true;
                 }
 
                 arithmetic_sequence_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
@@ -92,7 +92,7 @@ namespace nil {
                     }
 
                     /* Monomial to Newton */
-                    monomial_to_newton_basis<FieldType>(a, this->subproduct_tree, this->m);
+                    monomial_to_newton_basis<FieldType>(a, subproduct_tree, this->m);
 
                     /* Newton to Evaluation */
                     std::vector<value_type> S(this->m); /* i! * arithmetic_generator */
@@ -101,7 +101,7 @@ namespace nil {
                     value_type factorial = value_type::one();
                     for (std::size_t i = 1; i < this->m; i++) {
                         factorial *= value_type(i);
-                        S[i] = (factorial * this->arithmetic_generator).inversed();
+                        S[i] = (factorial * arithmetic_generator).inversed();
                     }
 
                     _polynomial_multiplication<FieldType>(a, a, S);
@@ -132,7 +132,7 @@ namespace nil {
                     value_type factorial = value_type::one();
                     for (std::size_t i = 1; i < this->m; i++) {
                         factorial *= value_type(i);
-                        S[i] = (factorial * this->arithmetic_generator).inversed();
+                        S[i] = (factorial * arithmetic_generator).inversed();
                         W[i] = a[i] * S[i];
                         if (i % 2 == 1)
                             S[i] = -S[i];
@@ -142,7 +142,7 @@ namespace nil {
                     a.resize(this->m);
 
                     /* Newton to Monomial */
-                    newton_to_monomial_basis<FieldType>(a, this->subproduct_tree, this->m);
+                    newton_to_monomial_basis<FieldType>(a, subproduct_tree, this->m);
                 }
 
                 std::vector<value_type> evaluate_all_lagrange_polynomials(const value_type &t) {
@@ -150,7 +150,7 @@ namespace nil {
                     /* Evaluate for x = t */
                     /* Return coeffs for each l_j(x) = (l / l_i[j]) * w[j] */
 
-                    if (!this->precomputation_sentinel)
+                    if (!precomputation_sentinel)
                         do_precomputation();
 
                     /**
@@ -158,7 +158,7 @@ namespace nil {
                      * then output 1 at the right place, and 0 elsewhere.
                      */
                     for (std::size_t i = 0; i < this->m; ++i) {
-                        if (this->arithmetic_sequence[i] == t)    // i.e., t equals this->arithmetic_sequence[i]
+                        if (arithmetic_sequence[i] == t)    // i.e., t equals this->arithmetic_sequence[i]
                         {
                             std::vector<value_type> res(this->m, value_type::zero());
                             res[i] = value_type::one();
@@ -246,7 +246,7 @@ namespace nil {
                     }
                 }
             };
-        }    // namespace fft
+        }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
 

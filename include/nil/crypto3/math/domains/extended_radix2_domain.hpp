@@ -50,14 +50,14 @@ namespace nil {
                 field_value_type shift;
 
                 extended_radix2_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
-                    // if (m <= 1)
-                    //    throw std::invalid_argument("extended_radix2(): expected m > 1");
+                    if (m <= 1)
+                        throw std::invalid_argument("extended_radix2(): expected m > 1");
 
                     if (!std::is_same<field_value_type, std::complex<double>>::value) {
                         const std::size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
-                        // if (logm != (fields::arithmetic_params<FieldType>::s + 1))
-                        //    throw std::invalid_argument(
-                        //        "extended_radix2(): expected logm == fields::arithmetic_params<FieldType>::s + 1");
+                        if (logm != (fields::arithmetic_params<FieldType>::s + 1))
+                            throw std::invalid_argument(
+                                "extended_radix2(): expected logm == fields::arithmetic_params<FieldType>::s + 1");
                     }
 
                     small_m = m / 2;
@@ -185,7 +185,7 @@ namespace nil {
                     }
                 }
             };
-        }    // namespace fft
+        }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
 
