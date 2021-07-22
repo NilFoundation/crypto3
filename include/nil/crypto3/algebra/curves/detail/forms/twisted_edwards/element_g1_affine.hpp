@@ -116,7 +116,7 @@ namespace nil {
 
                         /*************************  Comparison operations  ***********************************/
 
-                        bool operator==(const element_g1 &other) const {
+                        constexpr static bool operator==(const element_g1 &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -138,14 +138,14 @@ namespace nil {
                             return true;
                         }
 
-                        bool operator!=(const element_g1 &other) const {
+                        constexpr static bool operator!=(const element_g1 &other) const {
                             return !(operator==(other));
                         }
                         /** @brief
                          *
                          * @return true if element from group G1 is the point at infinity
                          */
-                        bool is_zero() const {
+                        constexpr static bool is_zero() const {
                             return (*this) == element_g1::zero();
                         }
 
@@ -171,7 +171,7 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        element_g1 operator=(const element_g1 &other) {
+                        constexpr element_g1 operator=(const element_g1 &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -179,7 +179,7 @@ namespace nil {
                             return *this;
                         }
 
-                        element_g1 operator+(const element_g1 &other) const {
+                        constexpr element_g1 operator+(const element_g1 &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -196,18 +196,18 @@ namespace nil {
                             return this->add(other);
                         }
 
-                        element_g1 operator-() const {
+                        constexpr element_g1 operator-() const {
                             return element_g1(-(this->X), this->Y);
                         }
 
-                        element_g1 operator-(const element_g1 &B) const {
+                        constexpr element_g1 operator-(const element_g1 &B) const {
                             return (*this) + (-B);
                         }
                         /** @brief
                          *
                          * @return doubled element from group G1
                          */
-                        element_g1 doubled() const {
+                        constexpr element_g1 doubled() const {
 
                             if (this->is_zero()) {
                                 return (*this);
