@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -22,119 +23,156 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_ECDSA_KEY_HPP
-#define CRYPTO3_PUBKEY_ECDSA_KEY_HPP
+#ifndef CRYPTO3_PUBKEY_ECDSA_HPP
+#define CRYPTO3_PUBKEY_ECDSA_HPP
 
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/pkpad/algorithms/encode.hpp>
 
 #include <nil/crypto3/pubkey/private_key.hpp>
-
-#include <nil/crypto3/pubkey/detail/consistency.hpp>
-#include <nil/crypto3/pubkey/detail/modes/rfc6979.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            namespace padding {
-                template<typename Scheme, typename Hash>
-                struct emsa1;
-            }
-
-            template<typename CurveType>
+            // TODO: add distribution support
+            // TODO: review ECDSA implementation and add auxiliary functional provided by the standard
+            template<typename CurveType, typename Padding, typename GeneratorType, typename DistributionType = void,
+                     typename std::enable_if<std::is_same<typename CurveType::scalar_field_type::value_type,
+                                                          typename GeneratorType::result_type>::value,
+                                             bool>::type = true>
             struct ecdsa {
+                typedef ecdsa<CurveType, Padding, GeneratorType, DistributionType> self_type;
                 typedef CurveType curve_type;
+                typedef Padding padding_type;
+                typedef GeneratorType generator_type;
+                typedef DistributionType distribution_type;
 
-                typedef public_key<ecdsa<CurveType>> public_key_type;
-                typedef private_key<ecdsa<CurveType>> private_key_type;
-
-                template<typename Hash>
-                using padding_types = std::tuple<padding::emsa1<ecdsa<CurveType>, Hash>>;
+                typedef public_key<self_type> public_key_type;
+                typedef private_key<self_type> private_key_type;
             };
 
-            template<typename CurveType>
-            struct public_key<ecdsa<CurveType>> {
+            template<typename CurveType, typename Padding, typename GeneratorType, typename DistributionType>
+            struct public_key<ecdsa<CurveType, Padding, GeneratorType, DistributionType>> {
+                typedef ecdsa<CurveType, Padding, GeneratorType, DistributionType> policy_type;
+
                 typedef CurveType curve_type;
+                typedef Padding padding_type;
+                typedef GeneratorType generator_type;
+                typedef DistributionType distribution_type;
 
-                typedef typename curve_type::value_type value_type;
-                typedef typename curve_type::number_type number_type;
+                typedef padding::encoding_accumulator_set<padding_type> accumulator_type;
 
-                constexpr static const std::size_t key_bits = curve_type::field_type::modulus_bits;
-                typedef typename curve_type::value_type key_type;
+                typedef typename curve_type::scalar_field_type scalar_field_type;
+                typedef typename scalar_field_type::value_type scalar_field_value_type;
+                typedef typename curve_type::g1_type g1_type;
+                typedef typename g1_type::value_type g1_value_type;
+                typedef typename curve_type::base_field_type::modulus_type base_modulus_type;
+                typedef typename scalar_field_type::number_type scalar_number_type;
 
-                constexpr static const std::size_t key_schedule_bits = curve_type::field_type::modulus_bits;
-                typedef typename curve_type::value_type key_schedule_type;
+                typedef g1_value_type public_key_type;
+                typedef std::tuple<scalar_field_value_type, scalar_field_value_type> signature_type;
 
-                constexpr static const std::size_t signature_bits = curve_type::field_type::modulus_bits * 2;
-                typedef std::tuple<value_type, value_type> signature_type;
-
-                template<typename MsgRange>
-                static inline bool verify(const public_key_type &pubkey, const MsgRange &message,
-                                          const signature_type &signature) {
-                    if (sig_len != m_group.get_order_bytes() * 2)
-                        return false;
-
-                    const BigInt e(msg, msg_len, m_group.get_order_bits());
-
-                    const BigInt r(sig, sig_len / 2);
-                    const BigInt s(sig + sig_len / 2, sig_len / 2);
-
-                    if (r <= 0 || r >= m_group.get_order() || s <= 0 || s >= m_group.get_order())
-                        return false;
-
-                    const BigInt w = inverse_mod(s, m_group.get_order());
-
-                    const BigInt u1 = m_group.multiply_mod_order(e, w);
-                    const BigInt u2 = m_group.multiply_mod_order(r, w);
-                    const PointGFp R = m_gy_mul.multi_exp(u1, u2);
-
-                    if (R.is_zero())
-                        return false;
-
-                    const BigInt v = m_group.mod_order(R.get_affine_x());
-                    return (v == r);
+                public_key(const public_key_type &key) : pubkey(key) {
                 }
+
+                template<typename InputRange>
+                inline void update(accumulator_type &acc, const InputRange &range) const {
+                    encode<padding_type>(range, acc);
+                }
+
+                template<typename InputIterator>
+                inline void update(accumulator_type &acc, InputIterator first, InputIterator last) const {
+                    encode<padding_type>(first, last, acc);
+                }
+
+                inline bool verify(accumulator_type &acc, const signature_type &signature) const {
+                    scalar_field_value_type m =
+                        accumulators::extract::encode<padding::encoding_policy<padding_type>>(acc);
+
+                    scalar_field_value_type w = signature.second.inversed();
+                    g1_value_type X = (m * w) * g1_value_type::one() + (signature.first * w) * pubkey;
+                    if (X.is_zero()) {
+                        return false;
+                    }
+                    return signature.first ==
+                           scalar_field_value_type(scalar_number_type(static_cast<base_modulus_type>(X.to_affine().X)));
+                }
+
+            protected:
+                public_key_type pubkey;
             };
 
-            template<typename CurveType>
-            struct private_key<ecdsa<CurveType>> : public public_key<ecdsa<CurveType>> {
-                typedef public_key<ecdsa<CurveType>> public_key_type;
+            template<typename CurveType, typename Padding, typename GeneratorType, typename DistributionType>
+            struct private_key<ecdsa<CurveType, Padding, GeneratorType, DistributionType>>
+                : public public_key<ecdsa<CurveType, Padding, GeneratorType, DistributionType>> {
+                typedef ecdsa<CurveType, Padding, GeneratorType, DistributionType> policy_type;
+                typedef public_key<policy_type> base_type;
 
-                typedef typename public_key_type::curve_type curve_type;
+                typedef CurveType curve_type;
+                typedef Padding padding_type;
+                typedef GeneratorType generator_type;
+                typedef DistributionType distribution_type;
 
-                typedef typename curve_type::value_type value_type;
-                typedef typename curve_type::number_type number_type;
+                typedef padding::encoding_accumulator_set<padding_type> accumulator_type;
 
-                constexpr static const std::size_t key_bits = curve_type::field_type::modulus_bits;
-                typedef typename CurveType::value_type key_type;
+                typedef typename base_type::scalar_field_value_type scalar_field_value_type;
+                typedef typename base_type::g1_value_type g1_value_type;
+                typedef typename base_type::base_modulus_type base_modulus_type;
 
-                constexpr static const std::size_t key_schedule_bits = curve_type::field_type::modulus_bits;
-                typedef typename CurveType::value_type key_schedule_type;
+                typedef scalar_field_value_type private_key_type;
+                typedef typename base_type::public_key_type public_key_type;
+                typedef typename base_type::signature_type signature_type;
 
-                constexpr static const std::size_t signature_bits = curve_type::field_type::modulus_bits * 2;
-                typedef std::tuple<value_type, value_type> signature_type;
-
-                template<typename NonceGenerator>
-                inline static bool sign(signature_type &res, const number_type &val, const key_schedule_type &key) {
-                    BigInt m(msg, msg_len, m_group.get_order_bits());
-
-                    const BigInt k = NonceGenerator()(m_x, m_group.get_order(), m);
-
-                    const BigInt k_inv = inverse_mod(k, m_group.get_order());
-                    const BigInt r = m_group.mod_order(m_group.blinded_base_point_multiply_x(k, rng, m_ws));
-
-                    const BigInt xrm = m_group.mod_order(m_group.multiply_mod_order(m_x, r) + m);
-                    const BigInt s = m_group.multiply_mod_order(k_inv, xrm);
-
-                    // With overwhelming probability, a bug rather than actual zero r/s
-                    if (r.is_zero() || s.is_zero())
-                        throw Internal_Error("During ECDSA signature generated zero r/s");
-
-                    //                    return BigInt::encode_fixed_length_int_pair(r, s, m_group.get_order_bytes());
-                    res = std::make_tuple(r, s);
+                private_key(const private_key_type &key) : privkey(key), base_type(generate_public_key(key)) {
                 }
+
+                static inline public_key_type generate_public_key(const private_key_type &key) {
+                    return key * public_key_type::one();
+                }
+
+                template<typename InputRange>
+                inline void update(accumulator_type &acc, const InputRange &range) const {
+                    encode<padding_type>(range, acc);
+                }
+
+                template<typename InputIterator>
+                inline void update(accumulator_type &acc, InputIterator first, InputIterator last) const {
+                    encode<padding_type>(first, last, acc);
+                }
+
+                // TODO: review to make blind signing
+                inline signature_type sign(accumulator_type &acc) {
+                    scalar_field_value_type m =
+                        accumulators::extract::encode<padding::encoding_policy<padding_type>>(acc);
+
+                    // TODO: review behaviour if k, r or s generation produced zero, maybe return status instead cycled
+                    //  generation
+                    scalar_field_value_type k;
+                    scalar_field_value_type r;
+                    scalar_field_value_type s;
+                    do {
+                        while ((k = gen()).is_zero()) {
+                        }
+                        // TODO: review converting of kG x-coordinate to r - in case of 2^m order field procedure seems
+                        //  not to be trivial
+                        r = scalar_number_type(
+                            static_cast<base_modulus_type>((k * g1_value_type::one()).to_affine().X));
+                        s = k.inversed() * (privkey * r + m);
+                    } while (r.is_zero() || s.is_zero());
+
+                    return signature_type(r, s);
+                }
+
+                // TODO: review encapsulation of generator
+                inline generator_type &get_generator() {
+                    return gen;
+                }
+
+            protected:
+                private_key_type privkey;
+                generator_type gen;
             };
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
 
-#endif
+#endif    // CRYPTO3_PUBKEY_ECDSA_HPP
