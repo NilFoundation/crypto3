@@ -52,6 +52,10 @@
 #include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
 #include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
 #include <nil/crypto3/algebra/fields/mnt6/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/secp/secp_k1/base_field.hpp>
+#include <nil/crypto3/algebra/fields/secp/secp_k1/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/secp/secp_r1/base_field.hpp>
+#include <nil/crypto3/algebra/fields/secp/secp_r1/scalar_field.hpp>
 // #include <nil/crypto3/algebra/fields/dsa_botan.hpp>
 // #include <nil/crypto3/algebra/fields/dsa_jce.hpp>
 // #include <nil/crypto3/algebra/fields/ed25519_fe.hpp>
@@ -355,7 +359,7 @@ void check_field_operations(const std::vector<element_type> &elements, const std
     BOOST_CHECK_EQUAL(elements[e2].inversed(), elements[e2_inv]);
     BOOST_CHECK_EQUAL(elements[e1].pow(constants[C1]), elements[e1_pow_C1]);
     BOOST_CHECK_EQUAL(elements[e2].squared(), elements[e2_pow_2]);
-    BOOST_CHECK_EQUAL((elements[e2].squared()).sqrt(), elements[e2_pow_2_sqrt]);
+    BOOST_CHECK_EQUAL((elements[e2].squared()).sqrt().squared(), elements[e2_pow_2_sqrt].squared());
     BOOST_CHECK_EQUAL(-elements[e1], elements[minus_e1]);
 }
 
@@ -509,6 +513,30 @@ BOOST_DATA_TEST_CASE(field_operation_test_mnt6_fq3, string_data("field_operation
 
 BOOST_DATA_TEST_CASE(field_operation_test_mnt6_fq6, string_data("field_operation_test_mnt6_fq6"), data_set) {
     using policy_type = fields::fp6_2over3<fields::mnt6<298>>;
+
+    field_operation_test<policy_type>(data_set);
+}
+
+ BOOST_DATA_TEST_CASE(field_operation_test_secp256k1_fr, string_data("field_operation_test_secp256k1_fr"), data_set) {
+     using policy_type = fields::secp_k1_fr<256>;
+
+     field_operation_test<policy_type>(data_set);
+ }
+
+BOOST_DATA_TEST_CASE(field_operation_test_secp256r1_fr, string_data("field_operation_test_secp256r1_fr"), data_set) {
+    using policy_type = fields::secp_r1_fr<256>;
+
+    field_operation_test<policy_type>(data_set);
+}
+
+BOOST_DATA_TEST_CASE(field_operation_test_secp256k1_fq, string_data("field_operation_test_secp256k1_fq"), data_set) {
+    using policy_type = fields::secp_k1_fq<256>;
+
+    field_operation_test<policy_type>(data_set);
+}
+
+BOOST_DATA_TEST_CASE(field_operation_test_secp256r1_fq, string_data("field_operation_test_secp256r1_fq"), data_set) {
+    using policy_type = fields::secp_r1_fq<256>;
 
     field_operation_test<policy_type>(data_set);
 }
