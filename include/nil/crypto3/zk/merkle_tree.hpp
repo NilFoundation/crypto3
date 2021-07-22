@@ -236,20 +236,6 @@ namespace nil {
 
                         return result;
                     }
-
-                    void dump() const {
-                        for (std::size_t i = 0; i < 1ul << depth; ++i) {
-                            auto it = values.find(i);
-                            printf("[%zu] -> ", i);
-                            const std::vector<bool> value =
-                                (it == values.end() ? std::vector<bool>(value_size) : it->second);
-                            for (bool b : value) {
-                                printf("%d", b ? 1 : 0);
-                            }
-                            printf("\n");
-                        }
-                        printf("\n");
-                    }
                 };
             }    // namespace snark
         }        // namespace zk

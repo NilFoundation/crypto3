@@ -267,7 +267,7 @@ namespace nil {
                  * Merkle-Damagard padding. (i.e. standard sha256).
                  */
                 template<typename FieldType>
-                class sha256_hash_component : component<FieldType> {
+                class sha256_hash_component : public component<FieldType> {
                 public:
                     typedef std::vector<bool> hash_value_type;
                     typedef digest_variable<FieldType> hash_variable_type;

@@ -13,7 +13,7 @@ macro(define_blueprint_example name)
                           ${CMAKE_WORKSPACE_NAME}_blueprint
 
                           ${CMAKE_WORKSPACE_NAME}::algebra
-                          ${CMAKE_WORKSPACE_NAME}::fft
+                          ${CMAKE_WORKSPACE_NAME}::math
                           ${CMAKE_WORKSPACE_NAME}::block
                           ${CMAKE_WORKSPACE_NAME}::hash
                           ${CMAKE_WORKSPACE_NAME}::multiprecision

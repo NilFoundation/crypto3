@@ -34,10 +34,10 @@
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/components/component.hpp>
-#include <nil/crypto3/zk/components/hashes/crh_component.hpp>
+#include <nil/crypto3/zk/components/hashes/knapsack/knapsack_component.hpp>
 #include <nil/crypto3/zk/components/hashes/digest_selector_component.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
-#include <nil/crypto3/zk/components/merkle_tree/merkle_authentication_path_variable.hpp>
+#include <nil/crypto3/zk/components/merkle_tree/authentication_path.hpp>
 
 namespace nil {
     namespace crypto3 {

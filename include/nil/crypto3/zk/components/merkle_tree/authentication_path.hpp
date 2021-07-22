@@ -60,7 +60,8 @@ namespace nil {
                         }
                     }
 
-                    void generate_r1cs_witness(const std::size_t address, const merkle_authentication_path &path) {
+                    void generate_r1cs_witness(const std::size_t address,
+                                               const snark::merkle_authentication_path &path) {
                         assert(path.size() == tree_depth);
 
                         for (std::size_t i = 0; i < tree_depth; ++i) {
@@ -72,8 +73,8 @@ namespace nil {
                         }
                     }
 
-                    merkle_authentication_path get_authentication_path(const std::size_t address) const {
-                        merkle_authentication_path result;
+                    snark::merkle_authentication_path get_authentication_path(const std::size_t address) const {
+                        snark::merkle_authentication_path result;
                         for (std::size_t i = 0; i < tree_depth; ++i) {
                             if (address & (1ul << (tree_depth - 1 - i))) {
                                 result.emplace_back(left_digests[i].get_digest());
@@ -85,7 +86,6 @@ namespace nil {
                         return result;
                     }
                 };
-
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
