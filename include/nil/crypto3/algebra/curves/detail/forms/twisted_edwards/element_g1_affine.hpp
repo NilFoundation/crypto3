@@ -37,12 +37,13 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    /** @brief A struct representing a group G1 of Edwards curve.
-                     *    @tparam Version version of the curve
-                     *
+                    /** @brief A struct representing a group G1 of elliptic curve. 
+                     *    @tparam CurveParams Parameters of the group 
+                     *    @tparam Form Form of the curve 
+                     *    @tparam Coordinates Representation coordinates of the group element 
                      */
                     template<typename CurveParams, 
-                             algebra::curves::detail::forms, 
+                             algebra::curves::detail::forms Form, 
                              typename Coordinates>
                     struct element_g1;
                     
