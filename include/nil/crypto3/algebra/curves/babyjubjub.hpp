@@ -46,25 +46,10 @@ namespace nil {
                 struct babyjubjub {
                     constexpr static const std::size_t version = 254;
 
-                    using policy_type = detail::babyjubjub_basic_policy;
+                    using params_type = detail::babyjubjub_basic_params;
 
-                    typedef typename policy_type::base_field_type base_field_type;
-                    typedef typename policy_type::scalar_field_type scalar_field_type;
-                    typedef typename policy_type::number_type number_type;
-                    typedef typename policy_type::extended_number_type extended_number_type;
-
-                    constexpr static const number_type p = 
-                        policy_type::p;    ///< base field characteristic
-                    constexpr static const number_type q =
-                        policy_type::q;    ///< scalar field characteristic (order of the group of points)
-
-                    // Edwards representation constants a and d
-                    constexpr static const number_type a = policy_type::a;
-                    constexpr static const number_type d = policy_type::d;
-
-                    // Montgomery representation constants A and scale
-                    constexpr static const number_type A = policy_type::A;
-                    constexpr static const number_type scale = policy_type::scale;
+                    typedef typename params_type::base_field_type base_field_type;
+                    typedef typename params_type::scalar_field_type scalar_field_type;
 
                     typedef typename detail::babyjubjub_g1 g1_type;
 
@@ -77,13 +62,6 @@ namespace nil {
                     // constexpr static const bool has_affine_pairing = false;
                 };
 
-                constexpr typename babyjubjub::number_type const babyjubjub::a;
-                constexpr typename babyjubjub::number_type const babyjubjub::d;
-                constexpr typename babyjubjub::number_type const babyjubjub::A;
-                constexpr typename babyjubjub::number_type const babyjubjub::scale;
-
-                constexpr typename babyjubjub::number_type const babyjubjub::p;
-                constexpr typename babyjubjub::number_type const babyjubjub::q;
             }    // namespace curves
         }        // namespace algebra
     }            // namespace crypto3

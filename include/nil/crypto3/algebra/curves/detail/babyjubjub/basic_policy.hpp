@@ -37,6 +37,8 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
+                    struct babyjubjub_g1;
+
                     using namespace algebra;
                     
                     /** @brief A struct representing details about base and scalar fields of the size 183 bits and 181
@@ -44,73 +46,62 @@ namespace nil {
                      * twisted Edwards elliptic curve defined over alt_bn128 scalar field and described by equation ax^2 + y^2 = 1 + dx^2y^2
                      *
                      */
-                    struct babyjubjub_basic_policy {
-                        constexpr static const std::size_t version = 254;    ///< size of the base field in bits
-                        typedef fields::babyjubjub_fq<version> g1_field_type;
-                        typedef g1_field_type base_field_type;
-
-                        typedef typename base_field_type::modulus_type number_type;
-                        typedef typename base_field_type::extended_modulus_type extended_number_type;
-
-                        constexpr static const number_type base_field_modulus =
-                            base_field_type::modulus;    ///< characteristic of the base field
-
-                        typedef fields::babyjubjub_fr<version> scalar_field_type;
-                        constexpr static const number_type scalar_field_modulus =
-                            scalar_field_type::modulus;    ///< characteristic of the scalar field (order of the group
-                                                           ///< of points)
-
-                        constexpr static const number_type p =
-                            base_field_modulus;    ///< characteristic of the base field
-                        constexpr static const number_type q =
-                            scalar_field_modulus;    ///< characteristic of the scalar field (order of the group of
-                                                     ///< points)
-
-                        // Edwards representation constants a and d
-                        constexpr static const number_type a =              ///< twisted Edwards elliptic curve 
-                            0x292FC_cppui18;                                ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
-                        constexpr static const number_type d =
-                            0x292F8_cppui18;                                ///< twisted Edwards elliptic curve 
-                                                                            ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
-                        // Montgomery representation constants A and scale
-                        constexpr static const number_type A = 
-                            0x292FA_cppui18;
-                        constexpr static const number_type scale = 
-                            0x01;
-
-                        constexpr static const std::array<typename g1_field_type::value_type, 3> g1_zero_fill = {
-                            g1_field_type::value_type::zero(), g1_field_type::value_type::one(),
-                            g1_field_type::value_type::zero()};
-
-                        // constexpr static const std::array<typename g1_field_type::value_type, 3> g1_one_fill = {
-                        //     typename g1_field_type::value_type(0x23343E3445B673D38BCBA38F25645ADB494B1255B1162BB40F41A59F4D4B45E_cppui250),
-                        //     typename g1_field_type::value_type(0xC19139CB84C680A6E14116DA06056174A0CFA121E6E5C2450F87D64FC000001_cppui252),
-                        //     g1_field_type::value_type::one()};
-                        constexpr static const std::array<typename g1_field_type::value_type, 3> g1_one_fill = {
-                            typename g1_field_type::value_type(0xBB77A6AD63E739B4EACB2E09D6277C12AB8D8010534E0B62893F3F6BB957051_cppui252),
-                            typename g1_field_type::value_type(0x25797203F7A0B24925572E1CD16BF9EDFCE0051FB9E133774B3C257A872D7D8B_cppui254),
-                            g1_field_type::value_type::one()};
+                    struct babyjubjub_basic_params {
+                        using base_field_type = fields::babyjubjub_fq;
+                        using scalar_field_type = fields::babyjubjub_fr;
                     };
 
-                    constexpr typename babyjubjub_basic_policy::number_type const
-                        babyjubjub_basic_policy::base_field_modulus;
+                    struct babyjubjub_affine_params : public babyjubjub_basic_params {
 
-                    constexpr typename babyjubjub_basic_policy::number_type const
-                        babyjubjub_basic_policy::scalar_field_modulus;
+                        using base_field_type = typename babyjubjub_basic_params::base_field_type;
+                        using scalar_field_type = typename babyjubjub_basic_params::scalar_field_type;
 
-                    constexpr typename babyjubjub_basic_policy::number_type const babyjubjub_basic_policy::a;
-                    constexpr typename babyjubjub_basic_policy::number_type const babyjubjub_basic_policy::d;
+                        // Edwards representation constants a and d
+                        constexpr static const typename base_field_type::modulus_type a =              ///< twisted Edwards elliptic curve 
+                            0x292FC_cppui18;                                ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
+                        constexpr static const typename base_field_type::modulus_type d =
+                            0x292F8_cppui18;                                ///< twisted Edwards elliptic curve 
+                                                                            ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
+                    };
 
-                    constexpr typename babyjubjub_basic_policy::number_type const babyjubjub_basic_policy::A;
-                    constexpr typename babyjubjub_basic_policy::number_type const babyjubjub_basic_policy::scale;
+                    struct babyjubjub_montgomery_params : public babyjubjub_basic_params {
 
-                    constexpr typename babyjubjub_basic_policy::number_type const babyjubjub_basic_policy::p;
-                    constexpr typename babyjubjub_basic_policy::number_type const babyjubjub_basic_policy::q;
+                        using base_field_type = typename babyjubjub_basic_params::base_field_type;
+                        using scalar_field_type = typename babyjubjub_basic_params::scalar_field_type;
 
-                    constexpr std::array<typename babyjubjub_basic_policy::g1_field_type::value_type, 3> const
-                        babyjubjub_basic_policy::g1_zero_fill;
-                    constexpr std::array<typename babyjubjub_basic_policy::g1_field_type::value_type, 3> const
-                        babyjubjub_basic_policy::g1_one_fill;
+                        // Montgomery representation constants A and scale
+                        constexpr static const typename base_field_type::modulus_type A = 
+                            0x292FA_cppui18;
+                        constexpr static const typename base_field_type::modulus_type scale = 
+                            0x01;
+                    };
+
+                    struct babyjubjub_affine_g1_params : public babyjubjub_affine_params {
+
+                        using field_type = typename babyjubjub_basic_params::base_field_type;
+                        using group_type = babyjubjub_g1;
+
+                        constexpr static const std::array<typename base_field_type::value_type, 3> zero_fill = {
+                            base_field_type::value_type::zero(), base_field_type::value_type::one()};
+
+                        // constexpr static const std::array<typename base_field_type::value_type, 3> one_fill = {
+                        //     typename base_field_type::value_type(0x23343E3445B673D38BCBA38F25645ADB494B1255B1162BB40F41A59F4D4B45E_cppui250),
+                        //     typename base_field_type::value_type(0xC19139CB84C680A6E14116DA06056174A0CFA121E6E5C2450F87D64FC000001_cppui252)};
+                        constexpr static const std::array<typename base_field_type::value_type, 3> one_fill = {
+                            typename base_field_type::value_type(0xBB77A6AD63E739B4EACB2E09D6277C12AB8D8010534E0B62893F3F6BB957051_cppui252),
+                            typename base_field_type::value_type(0x25797203F7A0B24925572E1CD16BF9EDFCE0051FB9E133774B3C257A872D7D8B_cppui254)};
+                    };
+
+                    constexpr typename babyjubjub_affine_params::base_field_type::modulus_type const babyjubjub_affine_params::a;
+                    constexpr typename babyjubjub_affine_params::base_field_type::modulus_type const babyjubjub_affine_params::d;
+
+                    constexpr typename babyjubjub_montgomery_params::base_field_type::modulus_type const babyjubjub_montgomery_params::A;
+                    constexpr typename babyjubjub_montgomery_params::base_field_type::modulus_type const babyjubjub_montgomery_params::scale;
+
+                    constexpr std::array<typename babyjubjub_affine_g1_params::base_field_type::value_type, 3> const
+                        babyjubjub_affine_g1_params::zero_fill;
+                    constexpr std::array<typename babyjubjub_affine_g1_params::base_field_type::value_type, 3> const
+                        babyjubjub_affine_g1_params::one_fill;
 
                 }    // namespace detail
             }        // namespace curves

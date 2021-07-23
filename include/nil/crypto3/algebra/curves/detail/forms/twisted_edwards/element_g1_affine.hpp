@@ -75,8 +75,8 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr twisted_edwards_element_g1_affine() : twisted_edwards_element_g1_affine(params_type::g1_zero_fill[0], 
-                            params_type::g1_zero_fill[1]) {};
+                        constexpr twisted_edwards_element_g1_affine() : twisted_edwards_element_g1_affine(params_type::zero_fill[0], 
+                            params_type::zero_fill[1]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
@@ -108,7 +108,7 @@ namespace nil {
                          *
                          */
                         static twisted_edwards_element_g1_affine one() {
-                            return twisted_edwards_element_g1_affine(params_type::g1_one_fill[0], params_type::g1_one_fill[1]);
+                            return twisted_edwards_element_g1_affine(params_type::one_fill[0], params_type::one_fill[1]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -128,7 +128,7 @@ namespace nil {
                                 return false;
                             }
 
-                            if (this->Y  != other.Y) {
+                            if (this->Y != other.Y) {
                                 return false;
                             }
 
@@ -143,7 +143,7 @@ namespace nil {
                          * @return true if element from group G1 is the point at infinity
                          */
                         constexpr bool is_zero() const {
-                            return (*this) == twisted_edwards_element_g1_affine::zero();
+                            return X == params_type::zero_fill[0] && Y == params_type::zero_fill[0];
                         }
 
                         /** @brief

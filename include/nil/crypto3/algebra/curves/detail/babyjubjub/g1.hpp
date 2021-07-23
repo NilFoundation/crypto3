@@ -44,11 +44,11 @@ namespace nil {
                     /** @brief A struct representing a group G1 of BabyJubJub curve.
                      */
                     struct babyjubjub_g1 {
-                        using params_type = babyjubjub_basic_policy;
+                        using params_type = babyjubjub_affine_g1_params;
 
                         using curve_type = babyjubjub;
 
-                        using field_type = typename params_type::g1_field_type;
+                        using field_type = typename params_type::field_type;
 
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits
