@@ -46,7 +46,7 @@ namespace nil {
                      *
                      */
                     template<std::size_t Version = 298>
-                    struct mnt4_basic_policy { };
+                    struct mnt4_basic_policy;
 
                     /** @brief A struct representing details about base and scalar fields of the size 298 bits.
                      *

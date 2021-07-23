@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_BASIC_POLICY_HPP
-#define CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_BASIC_POLICY_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_PARAMS_HPP
+#define CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_PARAMS_HPP
 
 #include <nil/crypto3/algebra/fields/babyjubjub/base_field.hpp>
 #include <nil/crypto3/algebra/fields/babyjubjub/scalar_field.hpp>
@@ -51,7 +51,7 @@ namespace nil {
                         using scalar_field_type = fields::babyjubjub_fr;
                     };
 
-                    struct babyjubjub_affine_params : public babyjubjub_basic_params {
+                    struct babyjubjub_twisted_edwards_params : public babyjubjub_basic_params {
 
                         using base_field_type = typename babyjubjub_basic_params::base_field_type;
                         using scalar_field_type = typename babyjubjub_basic_params::scalar_field_type;
@@ -76,9 +76,9 @@ namespace nil {
                             0x01;
                     };
 
-                    struct babyjubjub_affine_g1_params : public babyjubjub_affine_params {
+                    struct babyjubjub_twisted_edwards_g1_affine_params : public babyjubjub_twisted_edwards_params {
 
-                        using field_type = typename babyjubjub_basic_params::base_field_type;
+                        using field_type = typename babyjubjub_twisted_edwards_params::base_field_type;
                         using group_type = babyjubjub_g1;
 
                         constexpr static const std::array<typename base_field_type::value_type, 3> zero_fill = {
@@ -92,16 +92,16 @@ namespace nil {
                             typename base_field_type::value_type(0x25797203F7A0B24925572E1CD16BF9EDFCE0051FB9E133774B3C257A872D7D8B_cppui254)};
                     };
 
-                    constexpr typename babyjubjub_affine_params::base_field_type::modulus_type const babyjubjub_affine_params::a;
-                    constexpr typename babyjubjub_affine_params::base_field_type::modulus_type const babyjubjub_affine_params::d;
+                    constexpr typename babyjubjub_twisted_edwards_params::base_field_type::modulus_type const babyjubjub_twisted_edwards_params::a;
+                    constexpr typename babyjubjub_twisted_edwards_params::base_field_type::modulus_type const babyjubjub_twisted_edwards_params::d;
 
                     constexpr typename babyjubjub_montgomery_params::base_field_type::modulus_type const babyjubjub_montgomery_params::A;
                     constexpr typename babyjubjub_montgomery_params::base_field_type::modulus_type const babyjubjub_montgomery_params::scale;
 
-                    constexpr std::array<typename babyjubjub_affine_g1_params::base_field_type::value_type, 3> const
-                        babyjubjub_affine_g1_params::zero_fill;
-                    constexpr std::array<typename babyjubjub_affine_g1_params::base_field_type::value_type, 3> const
-                        babyjubjub_affine_g1_params::one_fill;
+                    constexpr std::array<typename babyjubjub_twisted_edwards_g1_affine_params::base_field_type::value_type, 3> const
+                        babyjubjub_twisted_edwards_g1_affine_params::zero_fill;
+                    constexpr std::array<typename babyjubjub_twisted_edwards_g1_affine_params::base_field_type::value_type, 3> const
+                        babyjubjub_twisted_edwards_g1_affine_params::one_fill;
 
                 }    // namespace detail
             }        // namespace curves
@@ -109,4 +109,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_BASIC_POLICY_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_PARAMS_HPP

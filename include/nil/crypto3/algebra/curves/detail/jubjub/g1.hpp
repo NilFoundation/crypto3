@@ -27,11 +27,11 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_JUBJUB_G1_HPP
 #define CRYPTO3_ALGEBRA_CURVES_JUBJUB_G1_HPP
 
-#include <nil/crypto3/algebra/curves/detail/jubjub/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/element_g1_affine.hpp>
+#include <nil/crypto3/algebra/curves/detail/jubjub/params.hpp>
 
 #include <nil/crypto3/algebra/curves/detail/forms.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/element_g1_affine.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -44,7 +44,7 @@ namespace nil {
                     /** @brief A struct representing a group G1 of JubJub curve.
                      */
                     struct jubjub_g1 {
-                        using params_type = jubjub_basic_policy;
+                        using params_type = jubjub_twisted_edwards_g1_affine_params;
 
                         using curve_type = jubjub;
 

@@ -27,7 +27,7 @@
 #define CRYPTO3_ALGEBRA_CURVES_JUBJUB_HPP
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/curves/detail/jubjub/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/jubjub/params.hpp>
 #include <nil/crypto3/algebra/curves/detail/jubjub/g1.hpp>
 
 // #include <nil/crypto3/algebra/pairing/edwards.hpp>
