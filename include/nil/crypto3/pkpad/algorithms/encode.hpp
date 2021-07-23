@@ -51,8 +51,7 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename InputIterator,
-                     typename EncodingPolicy = padding::encoding_policy<Padding>,
-                     typename PaddingAccumulator = padding::encoding_accumulator_set<EncodingPolicy>,
+                     typename PaddingAccumulator = padding::encoding_accumulator_set<Padding>,
                      typename StreamPaddingImpl = padding::detail::value_padding_impl<PaddingAccumulator>,
                      typename PaddingImpl = padding::detail::range_padding_impl<StreamPaddingImpl>>
             PaddingImpl encode(InputIterator first, InputIterator last) {
@@ -72,8 +71,7 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename SinglePassRange,
-                     typename EncodingPolicy = padding::encoding_policy<Padding>,
-                     typename PaddingAccumulator = padding::encoding_accumulator_set<EncodingPolicy>,
+                     typename PaddingAccumulator = padding::encoding_accumulator_set<Padding>,
                      typename StreamPaddingImpl = padding::detail::value_padding_impl<PaddingAccumulator>,
                      typename PaddingImpl = padding::detail::range_padding_impl<StreamPaddingImpl>>
             PaddingImpl encode(const SinglePassRange &rng) {
@@ -97,8 +95,7 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename InputIterator,
-                     typename EncodingPolicy = padding::encoding_policy<Padding>,
-                     typename OutputAccumulator = padding::encoding_accumulator_set<EncodingPolicy>>
+                     typename OutputAccumulator = padding::encoding_accumulator_set<Padding>>
             typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                     OutputAccumulator>::type &
                 encode(InputIterator first, InputIterator last, OutputAccumulator &acc) {
@@ -124,8 +121,7 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename SinglePassRange,
-                     typename EncodingPolicy = padding::encoding_policy<Padding>,
-                     typename OutputAccumulator = padding::encoding_accumulator_set<EncodingPolicy>>
+                     typename OutputAccumulator = padding::encoding_accumulator_set<Padding>>
             typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                     OutputAccumulator>::type &
                 encode(const SinglePassRange &r, OutputAccumulator &acc) {
@@ -152,8 +148,7 @@ namespace nil {
              */
             template<typename Padding, typename InputIterator, typename OutputIterator>
             OutputIterator encode(InputIterator first, InputIterator last, OutputIterator out) {
-                typedef padding::encoding_policy<Padding> EncodingPolicy;
-                typedef padding::encoding_accumulator_set<EncodingPolicy> PaddingAccumulator;
+                typedef padding::encoding_accumulator_set<Padding> PaddingAccumulator;
 
                 typedef padding::detail::value_padding_impl<PaddingAccumulator> StreamPaddingImpl;
                 typedef padding::detail::itr_padding_impl<StreamPaddingImpl, OutputIterator> PaddingImpl;
@@ -177,8 +172,7 @@ namespace nil {
              */
             template<typename Padding, typename SinglePassRange, typename OutputIterator>
             OutputIterator encode(const SinglePassRange &rng, OutputIterator out) {
-                typedef padding::encoding_policy<Padding> EncodingPolicy;
-                typedef padding::encoding_accumulator_set<EncodingPolicy> PaddingAccumulator;
+                typedef padding::encoding_accumulator_set<Padding> PaddingAccumulator;
 
                 typedef padding::detail::value_padding_impl<PaddingAccumulator> StreamPaddingImpl;
                 typedef padding::detail::itr_padding_impl<StreamPaddingImpl, OutputIterator> PaddingImpl;

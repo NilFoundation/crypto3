@@ -62,25 +62,27 @@ namespace nil {
 
                     public:
                         typedef MsgReprType msg_repr_type;
-                        typedef accumulator_set<hash_type> accumulator_type;
+                        typedef accumulator_set<hash_type> internal_accumulator_type;
                         typedef msg_repr_type result_type;
 
                         template<typename InputRange>
-                        static inline void update(accumulator_type &acc, const InputRange &range) {
+                        static inline void update(internal_accumulator_type &acc, const InputRange &range) {
                             hash<hash_type>(range, acc);
                         }
 
                         template<typename InputIterator>
-                        static inline void update(accumulator_type &acc, InputIterator first, InputIterator last) {
+                        static inline void update(internal_accumulator_type &acc, InputIterator first,
+                                                  InputIterator last) {
                             hash<hash_type>(first, last, acc);
                         }
 
-                        static inline result_type process(accumulator_type &acc) {
+                        static inline result_type process(internal_accumulator_type &acc) {
                             typename hash_type::digest_type digest = accumulators::extract::hash<hash_type>(acc);
                             marshalling_field_element_type marshalling_field_element;
                             auto it = digest.cbegin();
                             marshalling_field_element.read(it, digest.size());
-                            return crypto3::marshalling::types::construct_field_element<field_type, endianness>(marshalling_field_element);
+                            return crypto3::marshalling::types::construct_field_element<field_type, endianness>(
+                                marshalling_field_element);
                         }
                     };
 
@@ -103,20 +105,22 @@ namespace nil {
 
                     public:
                         typedef MsgReprType msg_repr_type;
-                        typedef typename encoding_policy::accumulator_type accumulator_type;
+                        typedef typename encoding_policy::internal_accumulator_type internal_accumulator_type;
                         typedef bool result_type;
 
                         template<typename InputRange>
-                        static inline void update(accumulator_type &acc, const InputRange &range) {
+                        static inline void update(internal_accumulator_type &acc, const InputRange &range) {
                             encoding_policy::update(range, acc);
                         }
 
                         template<typename InputIterator>
-                        static inline void update(accumulator_type &acc, InputIterator first, InputIterator last) {
+                        static inline void update(internal_accumulator_type &acc, InputIterator first,
+                                                  InputIterator last) {
                             encoding_policy::update(first, last, acc);
                         }
 
-                        static inline result_type process(accumulator_type &acc, const msg_repr_type &msg_repr) {
+                        static inline result_type process(internal_accumulator_type &acc,
+                                                          const msg_repr_type &msg_repr) {
                             return encoding_policy::process(acc) == msg_repr;
                         }
                     };

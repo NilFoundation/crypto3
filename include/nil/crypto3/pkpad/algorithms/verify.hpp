@@ -51,8 +51,7 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename InputIterator,
-                     typename VerificationPolicy = padding::verification_policy<Padding>,
-                     typename PaddingAccumulator = padding::verification_accumulator_set<VerificationPolicy>,
+                     typename PaddingAccumulator = padding::verification_accumulator_set<Padding>,
                      typename StreamPaddingImpl = padding::detail::value_padding_impl<PaddingAccumulator>,
                      typename PaddingImpl = padding::detail::range_padding_impl<StreamPaddingImpl>>
             PaddingImpl verify(InputIterator first, InputIterator last, typename Padding::msg_repr_type &msg_repr) {
@@ -72,8 +71,7 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename SinglePassRange,
-                     typename VerificationPolicy = padding::verification_policy<Padding>,
-                     typename PaddingAccumulator = padding::verification_accumulator_set<VerificationPolicy>,
+                     typename PaddingAccumulator = padding::verification_accumulator_set<Padding>,
                      typename StreamPaddingImpl = padding::detail::value_padding_impl<PaddingAccumulator>,
                      typename PaddingImpl = padding::detail::range_padding_impl<StreamPaddingImpl>>
             PaddingImpl verify(const SinglePassRange &rng, typename Padding::msg_repr_type &msg_repr) {
@@ -97,8 +95,7 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename InputIterator,
-                     typename VerificationPolicy = padding::verification_policy<Padding>,
-                     typename OutputAccumulator = padding::verification_accumulator_set<VerificationPolicy>>
+                     typename OutputAccumulator = padding::verification_accumulator_set<Padding>>
             typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                     OutputAccumulator>::type &
                 verify(InputIterator first, InputIterator last, OutputAccumulator &acc) {
@@ -124,8 +121,7 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename SinglePassRange,
-                     typename VerificationPolicy = padding::verification_policy<Padding>,
-                     typename OutputAccumulator = padding::verification_accumulator_set<VerificationPolicy>>
+                     typename OutputAccumulator = padding::verification_accumulator_set<Padding>>
             typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                     OutputAccumulator>::type &
                 verify(const SinglePassRange &r, OutputAccumulator &acc) {
@@ -153,8 +149,7 @@ namespace nil {
             template<typename Padding, typename InputIterator, typename OutputIterator>
             OutputIterator verify(InputIterator first, InputIterator last, OutputIterator out,
                                   typename Padding::msg_repr_type &msg_repr) {
-                typedef padding::verification_policy<Padding> VerificationPolicy;
-                typedef padding::verification_accumulator_set<VerificationPolicy> PaddingAccumulator;
+                typedef padding::verification_accumulator_set<Padding> PaddingAccumulator;
 
                 typedef padding::detail::value_padding_impl<PaddingAccumulator> StreamPaddingImpl;
                 typedef padding::detail::itr_padding_impl<StreamPaddingImpl, OutputIterator> PaddingImpl;
@@ -179,8 +174,7 @@ namespace nil {
             template<typename Padding, typename SinglePassRange, typename OutputIterator>
             OutputIterator verify(const SinglePassRange &rng, OutputIterator out,
                                   typename Padding::msg_repr_type &msg_repr) {
-                typedef padding::verification_policy<Padding> VerificationPolicy;
-                typedef padding::verification_accumulator_set<VerificationPolicy> PaddingAccumulator;
+                typedef padding::verification_accumulator_set<Padding> PaddingAccumulator;
 
                 typedef padding::detail::value_padding_impl<PaddingAccumulator> StreamPaddingImpl;
                 typedef padding::detail::itr_padding_impl<StreamPaddingImpl, OutputIterator> PaddingImpl;

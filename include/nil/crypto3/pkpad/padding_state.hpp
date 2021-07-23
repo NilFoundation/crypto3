@@ -45,10 +45,10 @@ namespace nil {
                  *
                  * @tparam EncodingPolicy
                  */
-                template<typename EncodingPolicy>
+                template<typename Padding>
                 using encoding_accumulator_set = boost::accumulators::accumulator_set<
-                    typename EncodingPolicy::result_type,
-                    boost::accumulators::features<accumulators::tag::encode<EncodingPolicy>>>;
+                    typename Padding::encoding_policy::result_type,
+                    boost::accumulators::features<accumulators::tag::encode<typename Padding::encoding_policy>>>;
 
                 /*!
                  * @brief Accumulator set with pre-defined signing accumulator params.
@@ -59,10 +59,10 @@ namespace nil {
                  *
                  * @tparam VerificationPolicy
                  */
-                template<typename VerificationPolicy>
+                template<typename Padding>
                 using verification_accumulator_set = boost::accumulators::accumulator_set<
-                    typename VerificationPolicy::result_type,
-                    boost::accumulators::features<accumulators::tag::verify<VerificationPolicy>>>;
+                    typename Padding::verification_policy::result_type,
+                    boost::accumulators::features<accumulators::tag::verify<typename Padding::verification_policy>>>;
             }    // namespace padding
         }        // namespace pubkey
     }            // namespace crypto3

@@ -40,70 +40,74 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace accumulators {
-            namespace impl {
-                template<typename ProcessingPolicy, typename = void>
-                struct encode_impl;
+        namespace pubkey {
+            namespace padding {
+                namespace accumulators {
+                    namespace impl {
+                        template<typename ProcessingPolicy, typename = void>
+                        struct encode_impl;
 
-                // TODO: maybe add dependant hash accumulator instead manually work with it inside
-                template<typename ProcessingPolicy>
-                struct encode_impl<ProcessingPolicy> : boost::accumulators::accumulator_base {
-                protected:
-                    typedef ProcessingPolicy processing_policy;
-                    typedef typename processing_policy::accumulator_type accumulator_type;
+                        // TODO: maybe add dependant hash accumulator instead manually work with it inside
+                        template<typename ProcessingPolicy>
+                        struct encode_impl<ProcessingPolicy> : boost::accumulators::accumulator_base {
+                        protected:
+                            typedef ProcessingPolicy processing_policy;
+                            typedef typename processing_policy::internal_accumulator_type internal_accumulator_type;
 
-                public:
-                    typedef typename processing_policy::result_type result_type;
+                        public:
+                            typedef typename processing_policy::result_type result_type;
 
-                    template<typename Args>
-                    encode_impl(const Args &args) {
-                    }
+                            template<typename Args>
+                            encode_impl(const Args &args) {
+                            }
 
-                    template<typename Args>
-                    inline void operator()(const Args &args) {
-                        resolve_type(args[boost::accumulators::sample], args[iterator_last | nullptr]);
-                    }
+                            template<typename Args>
+                            inline void operator()(const Args &args) {
+                                resolve_type(args[boost::accumulators::sample], args[iterator_last | nullptr]);
+                            }
 
-                    inline result_type result(boost::accumulators::dont_care) const {
-                        return processing_policy::process(acc);
-                    }
+                            inline result_type result(boost::accumulators::dont_care) const {
+                                return processing_policy::process(acc);
+                            }
 
-                protected:
-                    template<typename InputRange, typename InputIterator>
-                    inline void resolve_type(const InputRange &range, InputIterator) {
-                        processing_policy::update(acc, range);
-                    }
+                        protected:
+                            template<typename InputRange, typename InputIterator>
+                            inline void resolve_type(const InputRange &range, InputIterator) {
+                                processing_policy::update(acc, range);
+                            }
 
-                    template<typename InputIterator>
-                    inline void resolve_type(InputIterator first, InputIterator last) {
-                        processing_policy::update(acc, first, last);
-                    }
+                            template<typename InputIterator>
+                            inline void resolve_type(InputIterator first, InputIterator last) {
+                                processing_policy::update(acc, first, last);
+                            }
 
-                    mutable accumulator_type acc;
-                };
-            }    // namespace impl
+                            mutable internal_accumulator_type acc;
+                        };
+                    }    // namespace impl
 
-            namespace tag {
-                template<typename ProcessingPolicy>
-                struct encode : boost::accumulators::depends_on<> {
-                    typedef ProcessingPolicy processing_policy;
+                    namespace tag {
+                        template<typename ProcessingPolicy>
+                        struct encode : boost::accumulators::depends_on<> {
+                            typedef ProcessingPolicy processing_policy;
 
-                    /// INTERNAL ONLY
-                    ///
+                            /// INTERNAL ONLY
+                            ///
 
-                    typedef boost::mpl::always<accumulators::impl::encode_impl<processing_policy>> impl;
-                };
-            }    // namespace tag
+                            typedef boost::mpl::always<accumulators::impl::encode_impl<processing_policy>> impl;
+                        };
+                    }    // namespace tag
 
-            namespace extract {
-                template<typename ProcessingPolicy, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::encode<ProcessingPolicy>>::type::result_type
-                    encode(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::encode<ProcessingPolicy>>(acc);
-                }
-            }    // namespace extract
-        }        // namespace accumulators
-    }            // namespace crypto3
+                    namespace extract {
+                        template<typename ProcessingPolicy, typename AccumulatorSet>
+                        typename boost::mpl::apply<AccumulatorSet, tag::encode<ProcessingPolicy>>::type::result_type
+                            encode(const AccumulatorSet &acc) {
+                            return boost::accumulators::extract_result<tag::encode<ProcessingPolicy>>(acc);
+                        }
+                    }    // namespace extract
+                }        // namespace accumulators
+            }            // namespace padding
+        }                // namespace pubkey
+    }                    // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ACCUMULATORS_PK_PAD_ENCODE_HPP
