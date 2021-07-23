@@ -29,9 +29,6 @@
 #include <nil/crypto3/algebra/fields/jubjub/base_field.hpp>
 #include <nil/crypto3/algebra/fields/jubjub/scalar_field.hpp>
 
-#include <nil/crypto3/algebra/fields/fp3.hpp>
-#include <nil/crypto3/algebra/fields/fp6_2over3.hpp>
-
 #include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {
@@ -41,24 +38,15 @@ namespace nil {
                 namespace detail {
 
                     using namespace algebra;
-                    /** @brief A struct representing details about base and scalar fields.
-                     *    @tparam Version version of the curve
-                     *
-                     */
-                    template<std::size_t Version>
-                    struct edwards_basic_policy;
                     /** @brief A struct representing details about base and scalar fields of the size 183 bits and 181
                      * bits respectively. Corresponds to [JubJub](https://raw.githubusercontent.com/zcash/zips/master/protocol/protocol.pdf#jubjub)
                      * twisted Edwards elliptic curve defined over Bls12-381 scalar field and described by equation ax^2 + y^2 = 1 + dx^2y^2
                      *
                      */
-                    template<>
-                    struct edwards_basic_policy<255> {
+                    struct jubjub_basic_policy {
                         constexpr static const std::size_t version = 255;    ///< size of the base field in bits
                         typedef fields::jubjub_fq<version> g1_field_type;
                         typedef g1_field_type base_field_type;
-                        typedef typename fields::fp3<base_field_type> g2_field_type;
-                        typedef typename fields::fp6_2over3<base_field_type> gt_field_type;
 
                         typedef typename base_field_type::modulus_type number_type;
                         typedef typename base_field_type::extended_modulus_type extended_number_type;
@@ -100,25 +88,25 @@ namespace nil {
                             g1_field_type::value_type::one()};    //< Third value is not correct!
                     };
 
-                    constexpr typename edwards_basic_policy<255>::number_type const
-                        edwards_basic_policy<255>::base_field_modulus;
+                    constexpr typename jubjub_basic_policy::number_type const
+                        jubjub_basic_policy::base_field_modulus;
 
-                    constexpr typename edwards_basic_policy<255>::number_type const
-                        edwards_basic_policy<255>::scalar_field_modulus;
+                    constexpr typename jubjub_basic_policy::number_type const
+                        jubjub_basic_policy::scalar_field_modulus;
 
-                    constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::a;
-                    constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::d;
+                    constexpr typename jubjub_basic_policy::number_type const jubjub_basic_policy::a;
+                    constexpr typename jubjub_basic_policy::number_type const jubjub_basic_policy::d;
 
-                    constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::A;
-                    constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::scale;
+                    constexpr typename jubjub_basic_policy::number_type const jubjub_basic_policy::A;
+                    constexpr typename jubjub_basic_policy::number_type const jubjub_basic_policy::scale;
 
-                    constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::p;
-                    constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::q;
+                    constexpr typename jubjub_basic_policy::number_type const jubjub_basic_policy::p;
+                    constexpr typename jubjub_basic_policy::number_type const jubjub_basic_policy::q;
 
-                    constexpr std::array<typename edwards_basic_policy<255>::g1_field_type::value_type, 3> const
-                        edwards_basic_policy<255>::g1_zero_fill;
-                    constexpr std::array<typename edwards_basic_policy<255>::g1_field_type::value_type, 3> const
-                        edwards_basic_policy<255>::g1_one_fill;
+                    constexpr std::array<typename jubjub_basic_policy::g1_field_type::value_type, 3> const
+                        jubjub_basic_policy::g1_zero_fill;
+                    constexpr std::array<typename jubjub_basic_policy::g1_field_type::value_type, 3> const
+                        jubjub_basic_policy::g1_one_fill;
 
                 }    // namespace detail
             }        // namespace curves

@@ -29,6 +29,7 @@
 
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -40,10 +41,10 @@ namespace nil {
                      *    @tparam Form Form of the curve 
                      *    @tparam Coordinates Representation coordinates of the group element 
                      */
-                    template<typename CurveParams, 
-                             forms Form, 
-                             typename Coordinates>
-                    struct element_g1;
+                    // template<typename CurveParams, 
+                    //          forms Form, 
+                    //          twisted_edwards_coordinates Coordinates>
+                    // struct twisted_edwards_element_g1_affine;
                     
                     /** @brief A struct representing an element from the group G1 of twisted edwards curve. 
                      *  Twisted Edwards curves introduced on https://eprint.iacr.org/2008/013.pdf
@@ -51,10 +52,9 @@ namespace nil {
                      *
                      */
                     template<typename CurveParams>
-                    struct element_g1<forms::twisted_edwards, 
-                                      twisted_edwards_coordinates::affine> {
+                    struct twisted_edwards_element_g1_affine {
 
-                        using field_type = typename CurveParams::g1_field_type;
+                        using field_type = typename CurveParams::field_type;
                     private:
                         using params_type = CurveParams;
                         using field_value_type = typename field_type::value_type;
@@ -75,46 +75,45 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr element_g1() : element_g1(params_type::g1_zero_fill[0], 
+                        constexpr twisted_edwards_element_g1_affine() : twisted_edwards_element_g1_affine(params_type::g1_zero_fill[0], 
                             params_type::g1_zero_fill[1]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
                          *
                          */
-                        constexpr element_g1(field_value_type in_X, field_value_type in_Y) {
+                        constexpr twisted_edwards_element_g1_affine(field_value_type in_X, field_value_type in_Y) {
                             this->X = in_X;
                             this->Y = in_Y;
                         };
 
-                        constexpr element_g1(element_g1<params_type, form, 
-                            twisted_edwards_coordinates::projective> other) {
+                        // constexpr twisted_edwards_element_g1_affine(twisted_edwards_element_g1_projective<params_type> other) {
 
-                            if (other.Z.is_zero()) {
-                                *this = this->zero();
-                            }
+                        //     if (other.Z.is_zero()) {
+                        //         *this = this->zero();
+                        //     }
 
-                            field_value_type Z_inv = other.Z.inversed();
-                            X[0] = other.X * Z_inv;
-                            Y[1] = other.Y * Z_inv;
-                        };
+                        //     field_value_type Z_inv = other.Z.inversed();
+                        //     X[0] = other.X * Z_inv;
+                        //     Y[1] = other.Y * Z_inv;
+                        // };
 
                         /** @brief Get the point at infinity
                          *
                          */
-                        static element_g1 zero() {
-                            return element_g1();
+                        static twisted_edwards_element_g1_affine zero() {
+                            return twisted_edwards_element_g1_affine();
                         }
                         /** @brief Get the generator of group G1
                          *
                          */
-                        static element_g1 one() {
-                            return element_g1(params_type::g1_one_fill[0], params_type::g1_one_fill[1]);
+                        static twisted_edwards_element_g1_affine one() {
+                            return twisted_edwards_element_g1_affine(params_type::g1_one_fill[0], params_type::g1_one_fill[1]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
 
-                        constexpr static bool operator==(const element_g1 &other) const {
+                        constexpr bool operator==(const twisted_edwards_element_g1_affine &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -136,15 +135,15 @@ namespace nil {
                             return true;
                         }
 
-                        constexpr static bool operator!=(const element_g1 &other) const {
+                        constexpr bool operator!=(const twisted_edwards_element_g1_affine &other) const {
                             return !(operator==(other));
                         }
                         /** @brief
                          *
                          * @return true if element from group G1 is the point at infinity
                          */
-                        constexpr static bool is_zero() const {
-                            return (*this) == element_g1::zero();
+                        constexpr bool is_zero() const {
+                            return (*this) == twisted_edwards_element_g1_affine::zero();
                         }
 
                         /** @brief
@@ -169,7 +168,7 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        constexpr element_g1 operator=(const element_g1 &other) {
+                        constexpr twisted_edwards_element_g1_affine operator=(const twisted_edwards_element_g1_affine &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -177,7 +176,7 @@ namespace nil {
                             return *this;
                         }
 
-                        constexpr element_g1 operator+(const element_g1 &other) const {
+                        constexpr twisted_edwards_element_g1_affine operator+(const twisted_edwards_element_g1_affine &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -194,18 +193,18 @@ namespace nil {
                             return this->add(other);
                         }
 
-                        constexpr element_g1 operator-() const {
-                            return element_g1(-(this->X), this->Y);
+                        constexpr twisted_edwards_element_g1_affine operator-() const {
+                            return twisted_edwards_element_g1_affine(-(this->X), this->Y);
                         }
 
-                        constexpr element_g1 operator-(const element_g1 &B) const {
+                        constexpr twisted_edwards_element_g1_affine operator-(const twisted_edwards_element_g1_affine &B) const {
                             return (*this) + (-B);
                         }
                         /** @brief
                          *
                          * @return doubled element from group G1
                          */
-                        constexpr element_g1 doubled() const {
+                        constexpr twisted_edwards_element_g1_affine doubled() const {
 
                             if (this->is_zero()) {
                                 return (*this);
@@ -221,7 +220,7 @@ namespace nil {
                          *   x3 = (x1*y2+y1*x2)/(1+d*x1*x2*y1*y2)
                          *   y3 = (y1*y2-a*x1*x2)/(1-d*x1*x2*y1*y2)
                          */
-                        element_g1 add(const element_g1 &other) const {
+                        twisted_edwards_element_g1_affine add(const twisted_edwards_element_g1_affine &other) const {
                             field_value_type XX = (this->X)*(other.X);
                             field_value_type YY = (this->Y)*(other.Y);
                             field_value_type XY = (this->X)*(other.Y);
@@ -233,7 +232,7 @@ namespace nil {
                             field_value_type Y3 = (YY - params_type::a * XX) * 
                                 (field_value_type::one() - lambda).inversed();
 
-                            return element_g1(X3, Y3);
+                            return twisted_edwards_element_g1_affine(X3, Y3);
                         }
 
                     public:
@@ -245,7 +244,7 @@ namespace nil {
                         //  * affine coordinates to montgomery form and affine coordinates
                         //  */
                         // // This should be moved to montgomery form element constructor
-                        // element_g1<params_type, 
+                        // twisted_edwards_element_g1_affine<params_type, 
                         //     forms::montgomery, coordinates> to_montgomery() const {
                         //     field_value_type p_out[3];
 
@@ -259,7 +258,7 @@ namespace nil {
                         //     field_value_type u = 
                         //         (field_value_type::one() + this->Y) * 
                         //         (field_value_type::one() - this->Y).inversed();
-                        //     return element_g1<params_type, 
+                        //     return twisted_edwards_element_g1_affine<params_type, 
                         //         forms::montgomery, coordinates>{u, 
                         //             params_type::scale * u * this->X.inversed()};
                         // }

@@ -27,11 +27,11 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_G1_HPP
 #define CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_G1_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards/babyjubjub/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/babyjubjub/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/element_g1_affine.hpp>
 
 #include <nil/crypto3/algebra/curves/detail/forms.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,13 +48,12 @@ namespace nil {
 
                         using curve_type = babyjubjub;
 
-                        using field_type = typename policy_type::g1_field_type;
+                        using field_type = typename params_type::g1_field_type;
 
                         constexpr static const std::size_t value_bits =
-                            underlying_field_type::value_bits + 1;    ///< size of the base field in bits
+                            field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = element_g1<params_type, 
-                            forms::twisted_edwards, twisted_edwards_coordinates::affine>;
+                        using value_type = twisted_edwards_element_g1_affine<params_type>;
                     };
                 }    // namespace detail
             }        // namespace curves

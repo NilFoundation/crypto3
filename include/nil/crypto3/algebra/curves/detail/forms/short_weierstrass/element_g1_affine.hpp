@@ -31,8 +31,6 @@
 #include <nil/crypto3/algebra/curves/detail/forms.hpp>
 
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/add_1998_cmo_2.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/dbl_2007_bl.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -44,22 +42,19 @@ namespace nil {
                      *    @tparam Form Form of the curve 
                      *    @tparam Coordinates Representation coordinates of the group element 
                      */
-                    template<typename CurveParams, 
-                             forms Form, 
-                             typename Coordinates>
-                    struct element_g1;
+                    // template<typename CurveParams, 
+                    //          forms Form, 
+                    //          short_weierstrass_coordinates Coordinates>
+                    // struct short_weierstrass_element_g1_affine;
 
                     /** @brief A struct representing an element from the group G1 of short Weierstrass curve.
                      *  Description: https://hyperelliptic.org/EFD/g1p/auto-shortw.html
                      *
                      */
-                    template<typename CurveParams, 
-                             typename Adder = add_1998_cmo_2, 
-                             typename Doubler = dbl_2007_bl>
-                    struct element_g1<forms::short_weierstrass, 
-                                      short_weierstrass_coordinates::projective> {
+                    template<typename CurveParams>
+                    struct short_weierstrass_element_g1_affine {
 
-                        using field_type = typename CurveParams::g1_field_type;
+                        using field_type = typename CurveParams::field_type;
                     private:
                         using params_type = CurveParams;
                         using field_value_type = typename field_type::value_type;
@@ -81,19 +76,19 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr element_g1() : element_g1(params_type::g1_zero_fill[0], 
+                        constexpr short_weierstrass_element_g1_affine() : short_weierstrass_element_g1_affine(params_type::g1_zero_fill[0], 
                             params_type::g1_zero_fill[1]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y)$ in the affine coordinates
                          *
                          */
-                        constexpr element_g1(field_value_type in_X, field_value_type in_Y) {
+                        constexpr short_weierstrass_element_g1_affine(field_value_type in_X, field_value_type in_Y) {
                             this->X = in_X;
                             this->Y = in_Y;
                         };
 
-                        constexpr element_g1(element_g1<params_type, form, 
+                        constexpr short_weierstrass_element_g1_affine(short_weierstrass_element_g1_affine<params_type, form, 
                             twisted_edwards_coordinates::projective> other) {
 
                             if (other.Z.is_zero()) {
@@ -108,20 +103,20 @@ namespace nil {
                         /** @brief Get the point at infinity
                          *
                          */
-                        constexpr static element_g1 zero() {
-                            return element_g1();
+                        constexpr static short_weierstrass_element_g1_affine zero() {
+                            return short_weierstrass_element_g1_affine();
                         }
 
                         /** @brief Get the generator of group G1
                          *
                          */
-                        constexpr static element_g1 one() {
-                            return element_g1(params_type::g1_one_fill[0], params_type::g1_one_fill[1]);
+                        constexpr static short_weierstrass_element_g1_affine one() {
+                            return short_weierstrass_element_g1_affine(params_type::g1_one_fill[0], params_type::g1_one_fill[1]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
 
-                        constexpr static bool operator==(const element_g1 &other) const {
+                        constexpr static bool operator==(const short_weierstrass_element_g1_affine &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -143,7 +138,7 @@ namespace nil {
                             return true;
                         }
 
-                        constexpr bool operator!=(const element_g1 &other) const {
+                        constexpr bool operator!=(const short_weierstrass_element_g1_affine &other) const {
                             return !(operator==(other));
                         }
 
@@ -152,12 +147,12 @@ namespace nil {
                          * @return true if element from group G1 is the point at infinity
                          */
                         constexpr bool is_zero() const {
-                            return (*this) == element_g1::zero();
+                            return (*this) == short_weierstrass_element_g1_affine::zero();
                         }
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        constexpr element_g1 operator=(const element_g1 &other) {
+                        constexpr short_weierstrass_element_g1_affine operator=(const short_weierstrass_element_g1_affine &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -165,7 +160,7 @@ namespace nil {
                             return *this;
                         }
 
-                        constexpr element_g1 operator+(const element_g1 &other) const {
+                        constexpr short_weierstrass_element_g1_affine operator+(const short_weierstrass_element_g1_affine &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -182,11 +177,11 @@ namespace nil {
                             return this->add(other);
                         }
 
-                        constexpr element_g1 operator-() const {
-                            return element_g1(this->X, -this->Y);
+                        constexpr short_weierstrass_element_g1_affine operator-() const {
+                            return short_weierstrass_element_g1_affine(this->X, -this->Y);
                         }
 
-                        constexpr element_g1 operator-(const element_g1 &other) const {
+                        constexpr short_weierstrass_element_g1_affine operator-(const short_weierstrass_element_g1_affine &other) const {
                             return (*this) + (-other);
                         }
 
@@ -196,7 +191,7 @@ namespace nil {
                          * y3 = (2*x1+x1)*(3*x12+a)/(2*y1)-(3*x12+a)3/(2*y1)3-y1
                          * @return doubled element from group G1
                          */
-                        constexpr element_g1 doubled() const {
+                        constexpr short_weierstrass_element_g1_affine doubled() const {
 
                             if (this->is_zero()) {
                                 return (*this);
@@ -220,7 +215,7 @@ namespace nil {
                          * x3 = (y2-y1)2/(x2-x1)2-x1-x2
                          * y3 = (2*x1+x2)*(y2-y1)/(x2-x1)-(y2-y1)3/(x2-x1)3-y1
                          */
-                        element_g1 add(const element_g1 &other) const {
+                        short_weierstrass_element_g1_affine add(const short_weierstrass_element_g1_affine &other) const {
                             field_value_type Y2mY1 = other.Y - this->Y;
                             field_value_type Y2mY1squared = Y2mY1.squared();
                             field_value_type X2mX1 = other.X - this->X;
@@ -232,7 +227,7 @@ namespace nil {
                                 X2mX1.inversed() - Y2mY1*Y2mY1squared * (X2mX1*X2mX1squared).inversed() - 
                                 this->Y;
 
-                            return element_g1(X3, Y3);
+                            return short_weierstrass_element_g1_affine(X3, Y3);
                         }
                     };
 

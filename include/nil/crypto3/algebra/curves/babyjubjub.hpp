@@ -27,8 +27,8 @@
 #define CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_HPP
 
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/babyjubjub/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/babyjubjub/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/babyjubjub/g1.hpp>
 
 // #include <nil/crypto3/algebra/pairing/edwards.hpp>
 // #include <nil/crypto3/algebra/pairing/detail/edwards/functions.hpp>
@@ -46,7 +46,7 @@ namespace nil {
                 struct babyjubjub {
                     constexpr static const std::size_t version = 254;
 
-                    using policy_type = detail::edwards_basic_policy<version>;
+                    using policy_type = detail::babyjubjub_basic_policy;
 
                     typedef typename policy_type::base_field_type base_field_type;
                     typedef typename policy_type::scalar_field_type scalar_field_type;
@@ -66,7 +66,7 @@ namespace nil {
                     constexpr static const number_type A = policy_type::A;
                     constexpr static const number_type scale = policy_type::scale;
 
-                    typedef typename detail::edwards_g1<version> g1_type;
+                    typedef typename detail::babyjubjub_g1 g1_type;
 
                     typedef typename curves::alt_bn128<254> chained_on_curve_type;
 

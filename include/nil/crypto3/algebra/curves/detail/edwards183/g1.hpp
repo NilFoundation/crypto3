@@ -27,8 +27,8 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP
 #define CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards/edwards183/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/edwards183/element_g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards183/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards183/element_g1.hpp>
 
 namespace nil {
     namespace crypto3 {

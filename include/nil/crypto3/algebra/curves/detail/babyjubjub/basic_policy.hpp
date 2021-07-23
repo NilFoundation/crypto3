@@ -29,9 +29,6 @@
 #include <nil/crypto3/algebra/fields/babyjubjub/base_field.hpp>
 #include <nil/crypto3/algebra/fields/babyjubjub/scalar_field.hpp>
 
-// #include <nil/crypto3/algebra/fields/fp3.hpp>
-// #include <nil/crypto3/algebra/fields/fp6_2over3.hpp>
-
 #include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {
@@ -41,24 +38,16 @@ namespace nil {
                 namespace detail {
 
                     using namespace algebra;
-                    /** @brief A struct representing details about base and scalar fields.
-                     *    @tparam Version version of the curve
-                     *
-                     */
-                    template<std::size_t Version>
-                    struct edwards_basic_policy;
+                    
                     /** @brief A struct representing details about base and scalar fields of the size 183 bits and 181
                      * bits respectively. Corresponds to [BabyJubJub](https://eips.ethereum.org/EIPS/eip-2494)
                      * twisted Edwards elliptic curve defined over alt_bn128 scalar field and described by equation ax^2 + y^2 = 1 + dx^2y^2
                      *
                      */
-                    template<>
-                    struct edwards_basic_policy<254> {
+                    struct babyjubjub_basic_policy {
                         constexpr static const std::size_t version = 254;    ///< size of the base field in bits
                         typedef fields::babyjubjub_fq<version> g1_field_type;
                         typedef g1_field_type base_field_type;
-                        // typedef typename fields::fp3<base_field_type> g2_field_type;
-                        // typedef typename fields::fp6_2over3<base_field_type> gt_field_type;
 
                         typedef typename base_field_type::modulus_type number_type;
                         typedef typename base_field_type::extended_modulus_type extended_number_type;
@@ -101,44 +90,27 @@ namespace nil {
                             typename g1_field_type::value_type(0xBB77A6AD63E739B4EACB2E09D6277C12AB8D8010534E0B62893F3F6BB957051_cppui252),
                             typename g1_field_type::value_type(0x25797203F7A0B24925572E1CD16BF9EDFCE0051FB9E133774B3C257A872D7D8B_cppui254),
                             g1_field_type::value_type::one()};
-
-                        // constexpr static const std::array<typename g2_field_type::value_type, 3> g2_zero_fill = {
-                        //     g2_field_type::value_type::zero(), g2_field_type::value_type::one(),                            // Temporary value for compiling testing
-                        //     g2_field_type::value_type::zero()};                                                             // Temporary value for compiling testing
-
-                        // constexpr static const std::array<typename g2_field_type::value_type, 3> g2_one_fill = {
-                        //     typename g2_field_type::value_type(0x2F501F9482C0D0D6E80AC55A79FD4D4594CAF187952660_cppui182,   // Temporary value for compiling testing
-                        //                                 0x37BF8F1B1CDA11A81E8BB8F41B5FF462C9A13DC7DE1578_cppui182,          // Temporary value for compiling testing
-                        //                                 0x2962F0DA0C7928B2CFBBACE3D0354652B6922A764C12D8_cppui182),         // Temporary value for compiling testing
-                        //     typename g2_field_type::value_type(0x3CE954C85AD30F53B1BB4C4F87029780F4141927FEB19_cppui178,    // Temporary value for compiling testing
-                        //                                 0x2214EB976DE3A4D9DF9C8D5F7AEDFEC337E03A20B32FFF_cppui182,          // Temporary value for compiling testing
-                        //                                 0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182),         // Temporary value for compiling testing
-                        //     g2_field_type::value_type::zero()};    //< Third value is not correct!
                     };
 
-                    constexpr typename edwards_basic_policy<254>::number_type const
-                        edwards_basic_policy<254>::base_field_modulus;
+                    constexpr typename babyjubjub_basic_policy::number_type const
+                        babyjubjub_basic_policy::base_field_modulus;
 
-                    constexpr typename edwards_basic_policy<254>::number_type const
-                        edwards_basic_policy<254>::scalar_field_modulus;
+                    constexpr typename babyjubjub_basic_policy::number_type const
+                        babyjubjub_basic_policy::scalar_field_modulus;
 
-                    constexpr typename edwards_basic_policy<254>::number_type const edwards_basic_policy<254>::a;
-                    constexpr typename edwards_basic_policy<254>::number_type const edwards_basic_policy<254>::d;
+                    constexpr typename babyjubjub_basic_policy::number_type const babyjubjub_basic_policy::a;
+                    constexpr typename babyjubjub_basic_policy::number_type const babyjubjub_basic_policy::d;
 
-                    constexpr typename edwards_basic_policy<254>::number_type const edwards_basic_policy<254>::A;
-                    constexpr typename edwards_basic_policy<254>::number_type const edwards_basic_policy<254>::scale;
+                    constexpr typename babyjubjub_basic_policy::number_type const babyjubjub_basic_policy::A;
+                    constexpr typename babyjubjub_basic_policy::number_type const babyjubjub_basic_policy::scale;
 
-                    constexpr typename edwards_basic_policy<254>::number_type const edwards_basic_policy<254>::p;
-                    constexpr typename edwards_basic_policy<254>::number_type const edwards_basic_policy<254>::q;
+                    constexpr typename babyjubjub_basic_policy::number_type const babyjubjub_basic_policy::p;
+                    constexpr typename babyjubjub_basic_policy::number_type const babyjubjub_basic_policy::q;
 
-                    constexpr std::array<typename edwards_basic_policy<254>::g1_field_type::value_type, 3> const
-                        edwards_basic_policy<254>::g1_zero_fill;
-                    constexpr std::array<typename edwards_basic_policy<254>::g1_field_type::value_type, 3> const
-                        edwards_basic_policy<254>::g1_one_fill;
-                    // constexpr std::array<typename edwards_basic_policy<254>::g2_field_type::value_type, 3> const
-                    //     edwards_basic_policy<254>::g2_zero_fill;
-                    // constexpr std::array<typename edwards_basic_policy<254>::g2_field_type::value_type, 3> const
-                    //     edwards_basic_policy<254>::g2_one_fill;
+                    constexpr std::array<typename babyjubjub_basic_policy::g1_field_type::value_type, 3> const
+                        babyjubjub_basic_policy::g1_zero_fill;
+                    constexpr std::array<typename babyjubjub_basic_policy::g1_field_type::value_type, 3> const
+                        babyjubjub_basic_policy::g1_one_fill;
 
                 }    // namespace detail
             }        // namespace curves

@@ -35,9 +35,13 @@ namespace nil {
                     /// @brief Curve group element form.
                     enum class forms {
                         edwards, 
+                        hessian, 
+                        jacobi_intersections, 
+                        jacobi_quatrics, 
                         montgomery, 
-                        weierstrass, 
-                        twisted_edwards
+                        short_weierstrass, 
+                        twisted_edwards, 
+                        twisted_hessian
                     };
                 }        // namespace detail
             }        // namespace curves

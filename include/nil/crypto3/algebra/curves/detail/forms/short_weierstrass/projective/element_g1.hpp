@@ -46,10 +46,10 @@ namespace nil {
                      *    @tparam Form Form of the curve 
                      *    @tparam Coordinates Representation coordinates of the group element 
                      */
-                    template<typename CurveParams, 
-                             forms Form, 
-                             typename Coordinates>
-                    struct element_g1;
+                    // template<typename CurveParams, 
+                    //          forms Form, 
+                    //          short_weierstrass_coordinates Coordinates>
+                    // struct short_weierstrass_element_g1;
 
                     /** @brief A struct representing an element from the group G1 of short Weierstrass curve.
                      *  Description: https://hyperelliptic.org/EFD/g1p/auto-shortw.html
@@ -58,10 +58,9 @@ namespace nil {
                     template<typename CurveParams, 
                              typename Adder = add_1998_cmo_2, 
                              typename Doubler = dbl_2007_bl>
-                    struct element_g1<forms::short_weierstrass, 
-                                      short_weierstrass_coordinates::projective> {
+                    struct short_weierstrass_element_g1_projective {
 
-                        using field_type = typename CurveParams::g1_field_type;
+                        using field_type = typename CurveParams::field_type;
                     private:
                         using params_type = CurveParams;
                         using field_value_type = typename field_type::value_type;
@@ -84,7 +83,7 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr element_g1() : element_g1(
+                        constexpr short_weierstrass_element_g1_projective() : short_weierstrass_element_g1_projective(
                             params_type::g1_zero_fill[0], 
                             params_type::g1_zero_fill[1], 
                             params_type::g1_zero_fill[2]) {};
@@ -93,7 +92,7 @@ namespace nil {
                          *    @return the selected point (X:Y:Z)
                          *
                          */
-                        constexpr element_g1(field_value_type X,
+                        constexpr short_weierstrass_element_g1_projective(field_value_type X,
                                                   field_value_type Y,
                                                   field_value_type Z) {
                             this->X = X;
@@ -104,21 +103,21 @@ namespace nil {
                         /** @brief Get the point at infinity
                          *
                          */
-                        constexpr static element_g1 zero() {
-                            return element_g1();
+                        constexpr static short_weierstrass_element_g1_projective zero() {
+                            return short_weierstrass_element_g1_projective();
                         }
 
                         /** @brief Get the generator of group G1
                          *
                          */
-                        constexpr static element_g1 one() {
-                            return element_g1(params_type::g1_one_fill[0], params_type::g1_one_fill[1], 
+                        constexpr static short_weierstrass_element_g1_projective one() {
+                            return short_weierstrass_element_g1_projective(params_type::g1_one_fill[0], params_type::g1_one_fill[1], 
                                 params_type::g1_one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
 
-                        constexpr bool operator==(const element_g1 &other) const {
+                        constexpr bool operator==(const short_weierstrass_element_g1_projective &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -142,7 +141,7 @@ namespace nil {
                             return true;
                         }
 
-                        constexpr bool operator!=(const element_g1 &other) const {
+                        constexpr bool operator!=(const short_weierstrass_element_g1_projective &other) const {
                             return !(operator==(other));
                         }
                         /** @brief
@@ -181,7 +180,7 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        constexpr element_g1 operator=(const element_g1 &other) {
+                        constexpr short_weierstrass_element_g1_projective operator=(const short_weierstrass_element_g1_projective &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -190,7 +189,7 @@ namespace nil {
                             return *this;
                         }
 
-                        constexpr element_g1 operator+(const element_g1 &other) const {
+                        constexpr short_weierstrass_element_g1_projective operator+(const short_weierstrass_element_g1_projective &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -207,18 +206,18 @@ namespace nil {
                             return Adder::process(*this, other);
                         }
 
-                        constexpr element_g1 operator-() const {
-                            return element_g1(this->X, -this->Y, this->Z);
+                        constexpr short_weierstrass_element_g1_projective operator-() const {
+                            return short_weierstrass_element_g1_projective(this->X, -this->Y, this->Z);
                         }
 
-                        constexpr element_g1 operator-(const element_g1 &other) const {
+                        constexpr short_weierstrass_element_g1_projective operator-(const short_weierstrass_element_g1_projective &other) const {
                             return (*this) + (-other);
                         }
                         /** @brief
                          *
                          * @return doubled element from group G1
                          */
-                        constexpr element_g1 doubled() const {
+                        constexpr short_weierstrass_element_g1_projective doubled() const {
                             return Doubler::process(*this);
                         }
                         /** @brief
@@ -226,7 +225,7 @@ namespace nil {
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G1
                          */
-                        constexpr element_g1 mixed_add(const element_g1 &other) const {
+                        constexpr short_weierstrass_element_g1_projective mixed_add(const short_weierstrass_element_g1_projective &other) const {
 
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
@@ -265,7 +264,7 @@ namespace nil {
                                 u * (R - A) - vvv * this->Y;                         // Y3 = u*(R-A)-vvv*Y1
                             const field_value_type Z3 = vvv * this->Z;    // Z3 = vvv*Z1
 
-                            return element_g1(X3, Y3, Z3);
+                            return short_weierstrass_element_g1_projective(X3, Y3, Z3);
                         }
                     };
 
