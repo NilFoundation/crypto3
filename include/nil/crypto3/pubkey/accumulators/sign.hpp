@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -29,11 +29,6 @@
 #include <iterator>
 #include <type_traits>
 
-#include <boost/assert.hpp>
-#include <boost/concept_check.hpp>
-
-#include <boost/range/concepts.hpp>
-
 #include <boost/parameter/value_type.hpp>
 
 #include <boost/accumulators/framework/accumulator_base.hpp>
@@ -43,109 +38,79 @@
 
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
 
-#include <nil/crypto3/pubkey/detail/modes/isomorphic.hpp>
+#include <nil/crypto3/pubkey/modes/isomorphic.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace accumulators {
-            namespace impl {
-                template<typename T>
-                struct is_isomorphic_signing {
-                    constexpr static bool value = std::is_same<
-                        typename pubkey::modes::isomorphic<typename T::scheme_type, pubkey::nop_padding>::template bind<
-                            typename pubkey::modes::isomorphic<typename T::scheme_type,
-                                                               pubkey::nop_padding>::signing_policy>::type,
-                        T>::value;
+        namespace pubkey {
+            namespace accumulators {
+                namespace impl {
+                    // TODO: consider different possible modes (aggregation)
+                    template<typename ProcessingMode, typename = void>
+                    struct sign_impl;
 
-                    typedef T type;
-                };
+                    template<typename ProcessingMode>
+                    struct sign_impl<ProcessingMode> : boost::accumulators::accumulator_base {
+                    protected:
+                        typedef ProcessingMode processing_mode;
+                        typedef typename processing_mode::key_type key_type;
+                        typedef typename processing_mode::internal_accumulator_type internal_accumulator_type;
 
-                template<typename ProcessingMode, typename = void>
-                struct sign_impl;
+                    public:
+                        typedef typename processing_mode::result_type result_type;
 
-                template<typename Mode>
-                struct sign_impl<Mode, typename std::enable_if<is_isomorphic_signing<Mode>::value>::type>
-                    : boost::accumulators::accumulator_base {
-                protected:
-                    typedef Mode mode_type;
-                    typedef typename mode_type::scheme_type scheme_type;
-                    typedef typename mode_type::padding_type padding_type;
-                    typedef typename mode_type::key_type key_type;
+                        template<typename Args>
+                        sign_impl(const Args &args) : key(args[boost::accumulators::sample]) {
+                        }
 
-                    constexpr static const auto block_bits = mode_type::input_block_bits;
-                    typedef typename mode_type::input_block_type input_block_type;
+                        template<typename Args>
+                        inline void operator()(const Args &args) {
+                            resolve_type(args[boost::accumulators::sample],
+                                         args[pubkey::accumulators::iterator_last | nullptr]);
+                        }
 
-                    constexpr static const auto value_bits = mode_type::input_value_bits;
-                    typedef typename mode_type::input_value_type input_value_type;
+                        inline result_type result(boost::accumulators::dont_care) const {
+                            return processing_mode::process(key, acc);
+                        }
 
-                public:
-                    typedef typename mode_type::result_type result_type;
+                    protected:
+                        template<typename InputRange, typename InputIterator>
+                        inline void resolve_type(const InputRange &range, InputIterator) {
+                            processing_mode::update(key, acc, range);
+                        }
 
-                    template<typename Args>
-                    sign_impl(const Args &args) : private_key(args[boost::accumulators::sample]) {
+                        template<typename InputIterator>
+                        inline void resolve_type(InputIterator first, InputIterator last) {
+                            processing_mode::update(key, acc, first, last);
+                        }
+
+                        key_type key;
+                        mutable internal_accumulator_type acc;
+                    };
+                }    // namespace impl
+
+                namespace tag {
+                    template<typename ProcessingMode>
+                    struct sign : boost::accumulators::depends_on<> {
+                        typedef ProcessingMode processing_mode;
+
+                        /// INTERNAL ONLY
+                        ///
+
+                        typedef boost::mpl::always<accumulators::impl::sign_impl<processing_mode>> impl;
+                    };
+                }    // namespace tag
+
+                namespace extract {
+                    template<typename ProcessingMode, typename AccumulatorSet>
+                    typename boost::mpl::apply<AccumulatorSet, tag::sign<ProcessingMode>>::type::result_type
+                        sign(const AccumulatorSet &acc) {
+                        return boost::accumulators::extract_result<tag::sign<ProcessingMode>>(acc);
                     }
-
-                    template<typename Args>
-                    inline void operator()(const Args &args) {
-                        resolve_type(
-                            args[boost::accumulators::sample],
-                            args[::nil::crypto3::accumulators::iterator_last | typename input_block_type::iterator()]);
-                    }
-
-                    inline result_type result(boost::accumulators::dont_care) const {
-                        return mode_type::process(private_key, cache);
-                    }
-
-                protected:
-                    template<typename InputBlock, typename InputIterator>
-                    inline void resolve_type(const InputBlock &block, InputIterator) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const InputBlock>));
-                        resolve_type(block.cbegin(), block.cend());
-                    }
-
-                    template<
-                        typename ValueType,
-                        typename InputIterator,
-                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type = true>
-                    inline void resolve_type(const ValueType &value, InputIterator) {
-                        cache.emplace_back(value);
-                    }
-
-                    template<
-                        typename InputIterator,
-                        typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
-                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type = true>
-                    inline void resolve_type(InputIterator first, InputIterator last) {
-                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
-                        std::copy(first, last, std::back_inserter(cache));
-                    }
-
-                    key_type private_key;
-                    input_block_type cache;
-                };
-            }    // namespace impl
-
-            namespace tag {
-                template<typename Mode>
-                struct sign : boost::accumulators::depends_on<> {
-                    typedef Mode mode_type;
-
-                    /// INTERNAL ONLY
-                    ///
-
-                    typedef boost::mpl::always<accumulators::impl::sign_impl<mode_type>> impl;
-                };
-            }    // namespace tag
-
-            namespace extract {
-                template<typename Mode, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::sign<Mode>>::type::result_type
-                    scheme(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::sign<Mode>>(acc);
-                }
-            }    // namespace extract
-        }        // namespace accumulators
-    }            // namespace crypto3
+                }    // namespace extract
+            }        // namespace accumulators
+        }            // namespace pubkey
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ACCUMULATORS_PUBKEY_SIGN_HPP

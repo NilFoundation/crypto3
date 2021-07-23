@@ -32,11 +32,13 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace accumulators {
-            BOOST_PARAMETER_KEYWORD(tag, threshold_value)
-            BOOST_ACCUMULATORS_IGNORE_GLOBAL(threshold_value)
-        }    // namespace accumulators
-    }        // namespace crypto3
+        namespace pubkey {
+            namespace accumulators {
+                BOOST_PARAMETER_KEYWORD(tag, threshold_value)
+                BOOST_ACCUMULATORS_IGNORE_GLOBAL(threshold_value)
+            }    // namespace accumulators
+        }        // namespace pubkey
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_PUBKEY_ACCUMULATORS_PARAMETERS_THRESHOLD_VALUE_HPP

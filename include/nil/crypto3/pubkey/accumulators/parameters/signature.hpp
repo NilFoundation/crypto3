@@ -32,11 +32,13 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace accumulators {
-            BOOST_PARAMETER_KEYWORD(tag, signature)
-            BOOST_ACCUMULATORS_IGNORE_GLOBAL(signature)
-        }    // namespace accumulators
-    }        // namespace crypto3
+        namespace pubkey {
+            namespace accumulators {
+                BOOST_PARAMETER_KEYWORD(tag, signature)
+                BOOST_ACCUMULATORS_IGNORE_GLOBAL(signature)
+            }    // namespace accumulators
+        }        // namespace pubkey
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_PUBKEY_ACCUMULATORS_PARAMETERS_SIGNATURE_HPP

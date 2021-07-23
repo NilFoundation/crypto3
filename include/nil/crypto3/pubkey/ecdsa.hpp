@@ -54,12 +54,10 @@ namespace nil {
             struct public_key<ecdsa<CurveType, Padding, GeneratorType, DistributionType>> {
                 typedef ecdsa<CurveType, Padding, GeneratorType, DistributionType> policy_type;
 
-                typedef CurveType curve_type;
-                typedef Padding padding_type;
-                typedef GeneratorType generator_type;
-                typedef DistributionType distribution_type;
+                typedef typename policy_type::curve_type curve_type;
+                typedef typename policy_type::padding_type padding_type;
 
-                typedef padding::encoding_accumulator_set<padding_type> accumulator_type;
+                typedef padding::encoding_accumulator_set<padding_type> internal_accumulator_type;
 
                 typedef typename curve_type::scalar_field_type scalar_field_type;
                 typedef typename scalar_field_type::value_type scalar_field_value_type;
@@ -75,18 +73,18 @@ namespace nil {
                 }
 
                 template<typename InputRange>
-                inline void update(accumulator_type &acc, const InputRange &range) const {
+                inline void update(internal_accumulator_type &acc, const InputRange &range) const {
                     encode<padding_type>(range, acc);
                 }
 
                 template<typename InputIterator>
-                inline void update(accumulator_type &acc, InputIterator first, InputIterator last) const {
+                inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) const {
                     encode<padding_type>(first, last, acc);
                 }
 
-                inline bool verify(accumulator_type &acc, const signature_type &signature) const {
+                inline bool verify(internal_accumulator_type &acc, const signature_type &signature) const {
                     scalar_field_value_type m =
-                        accumulators::extract::encode<padding::encoding_policy<padding_type>>(acc);
+                        padding::accumulators::extract::encode<padding::encoding_policy<padding_type>>(acc);
 
                     scalar_field_value_type w = signature.second.inversed();
                     g1_value_type X = (m * w) * g1_value_type::one() + (signature.first * w) * pubkey;
@@ -107,12 +105,12 @@ namespace nil {
                 typedef ecdsa<CurveType, Padding, GeneratorType, DistributionType> policy_type;
                 typedef public_key<policy_type> base_type;
 
-                typedef CurveType curve_type;
-                typedef Padding padding_type;
-                typedef GeneratorType generator_type;
-                typedef DistributionType distribution_type;
+                typedef typename policy_type::curve_type curve_type;
+                typedef typename policy_type::padding_type padding_type;
+                typedef typename policy_type::generator_type generator_type;
+                typedef typename policy_type::distribution_type distribution_type;
 
-                typedef padding::encoding_accumulator_set<padding_type> accumulator_type;
+                typedef padding::encoding_accumulator_set<padding_type> internal_accumulator_type;
 
                 typedef typename base_type::scalar_field_value_type scalar_field_value_type;
                 typedef typename base_type::g1_value_type g1_value_type;
@@ -130,19 +128,20 @@ namespace nil {
                 }
 
                 template<typename InputRange>
-                inline void update(accumulator_type &acc, const InputRange &range) const {
+                inline void update(internal_accumulator_type &acc, const InputRange &range) const {
                     encode<padding_type>(range, acc);
                 }
 
                 template<typename InputIterator>
-                inline void update(accumulator_type &acc, InputIterator first, InputIterator last) const {
+                inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) const {
                     encode<padding_type>(first, last, acc);
                 }
 
                 // TODO: review to make blind signing
-                inline signature_type sign(accumulator_type &acc) {
+                // TODO: add support of HMAC based generator (https://datatracker.ietf.org/doc/html/rfc6979)
+                inline signature_type sign(internal_accumulator_type &acc) {
                     scalar_field_value_type m =
-                        accumulators::extract::encode<padding::encoding_policy<padding_type>>(acc);
+                        padding::accumulators::extract::encode<padding::encoding_policy<padding_type>>(acc);
 
                     // TODO: review behaviour if k, r or s generation produced zero, maybe return status instead cycled
                     //  generation
