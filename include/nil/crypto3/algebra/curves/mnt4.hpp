@@ -27,7 +27,7 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_MNT4_HPP
 #define CRYPTO3_ALGEBRA_CURVES_MNT4_HPP
 
-#include <nil/crypto3/algebra/curves/detail/mnt4/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/mnt4/params.hpp>
 #include <nil/crypto3/algebra/curves/detail/mnt4/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/mnt4/g2.hpp>
 

@@ -27,8 +27,11 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_MNT6_G2_HPP
 #define CRYPTO3_ALGEBRA_CURVES_MNT6_G2_HPP
 
-#include <nil/crypto3/algebra/curves/detail/mnt6/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/mnt6/element_g2.hpp>
+#include <nil/crypto3/algebra/curves/detail/mnt6/params.hpp>
+
+#include <nil/crypto3/algebra/curves/detail/forms.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/element_g1.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -46,16 +49,16 @@ namespace nil {
                     template<std::size_t Version>
                     struct mnt6_g2 {
 
-                        using params_type = mnt6_basic_policy<Version>;
+                        using params_type = mnt6_short_weierstrass_g2_projective_params<Version>;
 
                         using curve_type = mnt6<Version>;
 
-                        using field_type = typename params_type::g2_field_type;
+                        using field_type = typename params_type::field_type;
 
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = element_mnt6_g2<Version>;
+                        using value_type = short_weierstrass_element_g1_projective<params_type>;
                     };
 
                 }    // namespace detail

@@ -213,6 +213,7 @@ namespace nil {
                         constexpr short_weierstrass_element_g1_projective operator-(const short_weierstrass_element_g1_projective &other) const {
                             return (*this) + (-other);
                         }
+                        
                         /** @brief
                          *
                          * @return doubled element from group G1
@@ -220,6 +221,7 @@ namespace nil {
                         constexpr short_weierstrass_element_g1_projective doubled() const {
                             return Doubler::process(*this);
                         }
+
                         /** @brief
                          *
                          * “Mixed addition” refers to the case Z2 known to be 1.

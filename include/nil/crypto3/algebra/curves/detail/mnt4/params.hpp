@@ -119,6 +119,14 @@ namespace nil {
                         using field_type = typename mnt4_basic_params<298>::g2_field_type;
                         using group_type = mnt4_g2<298>;
 
+                        constexpr static const typename field_type::value_type a =
+                            typename field_type::value_type(a * field_type::value_type::non_residue,
+                                                            g1_field_type::value_type::zero());
+
+                        constexpr static const typename field_type::value_type b =
+                            typename field_type::value_type(g1_field_type::value_type::zero(),
+                                                        b * field_type::value_type::non_residue);
+
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one(),
                             field_type::value_type::zero()};

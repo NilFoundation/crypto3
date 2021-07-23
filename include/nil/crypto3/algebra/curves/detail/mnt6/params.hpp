@@ -118,6 +118,19 @@ namespace nil {
 
                         using field_type = typename mnt6_basic_params<298>::g2_field_type;
                         using group_type = mnt6_g2<298>;
+                    private:
+                        constexpr static const typename g1_field_type::value_type g1_a = g1_field_type::value_type(a);
+                        constexpr static const typename g1_field_type::value_type g1_b = g1_field_type::value_type(b);
+                    public:
+                        constexpr static const typename field_type::value_type a =
+                            typename field_type::value_type(g1_field_type::value_type::zero(),
+                                                            g1_field_type::value_type::zero(), 
+                                                            g1_a);
+
+                        constexpr static const typename field_type::value_type b = typename field_type::value_type(
+                            g1_b * field_type::value_type::non_residue,
+                            g1_field_type::value_type::zero(), 
+                            g1_field_type::value_type::zero());
 
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one(),
