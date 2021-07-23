@@ -31,8 +31,8 @@
 #include <nil/crypto3/algebra/curves/detail/edwards183/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards183/g2.hpp>
 
-#include <nil/crypto3/algebra/pairing/edwards.hpp>
-#include <nil/crypto3/algebra/pairing/detail/edwards/functions.hpp>
+// #include <nil/crypto3/algebra/pairing/edwards.hpp>
+// #include <nil/crypto3/algebra/pairing/detail/edwards/functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -61,9 +61,9 @@ namespace nil {
                     typedef typename detail::edwards_g1<Version> g1_type;
                     typedef typename detail::edwards_g2<Version> g2_type;
 
-                    typedef typename pairing::pairing_policy<edwards<Version>,
-                                                             pairing::detail::edwards_pairing_functions<Version>>
-                        pairing;
+                    // typedef typename pairing::pairing_policy<edwards<Version>,
+                    //                                          pairing::detail::edwards_pairing_functions<Version>>
+                    //     pairing;
 
                     typedef typename policy_type::gt_field_type gt_type;
 

@@ -31,8 +31,8 @@
 #include <nil/crypto3/algebra/curves/detail/mnt6/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/mnt6/g2.hpp>
 
-#include <nil/crypto3/algebra/pairing/mnt6.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt6/functions.hpp>
+// #include <nil/crypto3/algebra/pairing/mnt6.hpp>
+// #include <nil/crypto3/algebra/pairing/detail/mnt6/functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -45,43 +45,27 @@ namespace nil {
                 template<std::size_t Version>
                 class mnt6 {
 
-                    using policy_type = detail::mnt6_basic_policy<Version>;
+                    using params_type = detail::mnt6_basic_params<Version>;
 
                 public:
-                    typedef typename policy_type::base_field_type base_field_type;
-                    typedef typename policy_type::scalar_field_type scalar_field_type;
-                    typedef typename policy_type::number_type number_type;
-                    typedef typename policy_type::extended_number_type extended_number_type;
-
-                    constexpr static const number_type p = policy_type::p;    ///< base field characteristic
-
-                    constexpr static const number_type q =
-                        policy_type::q;    ///< scalar field characteristic (order of the group of points)
+                    typedef typename params_type::base_field_type base_field_type;
+                    typedef typename params_type::scalar_field_type scalar_field_type;
 
                     typedef typename detail::mnt6_g1<Version> g1_type;
                     typedef typename detail::mnt6_g2<Version> g2_type;
 
-                    typedef typename pairing::pairing_policy<mnt6<Version>,
-                                                             pairing::detail::mnt6_pairing_functions<Version>>
-                        pairing;
+                    // typedef typename pairing::pairing_policy<mnt6<Version>,
+                    //                                          pairing::detail::mnt6_pairing_functions<Version>>
+                    //     pairing;
 
-                    typedef typename pairing::pair_curve_type chained_on_curve_type;
+                    // typedef typename pairing::pair_curve_type chained_on_curve_type;
 
-                    typedef typename policy_type::gt_field_type gt_type;
+                    typedef typename params_type::gt_field_type gt_type;
 
                     constexpr static const bool has_affine_pairing = true;
-
-                    constexpr static const number_type a = policy_type::a;
-                    constexpr static const number_type b = policy_type::b;
                 };
 
                 typedef mnt6<298> mnt6_298;
-
-                template<std::size_t Version>
-                constexpr typename mnt6<Version>::number_type const mnt6<Version>::a;
-                template<std::size_t Version>
-                constexpr typename mnt6<Version>::number_type const mnt6<Version>::b;
-
             }    // namespace curves
         }        // namespace algebra
     }            // namespace crypto3

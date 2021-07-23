@@ -33,8 +33,8 @@
 #include <nil/crypto3/algebra/curves/detail/bls12/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/bls12/g2.hpp>
 
-#include <nil/crypto3/algebra/pairing/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/functions.hpp>
+// #include <nil/crypto3/algebra/pairing/bls12.hpp>
+// #include <nil/crypto3/algebra/pairing/detail/bls12/functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -66,9 +66,9 @@ namespace nil {
 
                     constexpr static const bool has_affine_pairing = false;
 
-                    typedef typename pairing::pairing_policy<bls12<Version>,
-                                                             pairing::detail::bls12_pairing_functions<Version>>
-                        pairing;
+                    // typedef typename pairing::pairing_policy<bls12<Version>,
+                    //                                          pairing::detail::bls12_pairing_functions<Version>>
+                    //     pairing;
 
                     typedef typename policy_type::gt_field_type gt_type;
                 };

@@ -47,14 +47,14 @@ namespace nil {
                     template<std::size_t Version>
                     struct alt_bn128_g2 {
 
-                        using policy_type = alt_bn128_basic_policy<Version>;
+                        using params_type = alt_bn128_basic_policy<Version>;
 
                         using curve_type = alt_bn128<Version>;
 
-                        using underlying_field_type = typename policy_type::g2_field_type;
+                        using field_type = typename params_type::g2_field_type;
 
                         constexpr static const std::size_t value_bits =
-                            underlying_field_type::value_bits + 1;    ///< size of the base field in bits
+                            field_type::value_bits + 1;    ///< size of the base field in bits
 
                         using value_type = element_alt_bn128_g2<Version>;
                     };

@@ -60,9 +60,9 @@ namespace nil {
                              typename Doubler = dbl_2007_bl>
                     struct short_weierstrass_element_g1_projective {
 
-                        using field_type = typename CurveParams::field_type;
-                    private:
                         using params_type = CurveParams;
+                        using field_type = typename params_type::field_type;
+                    private:
                         using field_value_type = typename field_type::value_type;
                     public:
                         using group_type = typename params_type::group_type;
@@ -84,9 +84,9 @@ namespace nil {
                          *
                          */
                         constexpr short_weierstrass_element_g1_projective() : short_weierstrass_element_g1_projective(
-                            params_type::g1_zero_fill[0], 
-                            params_type::g1_zero_fill[1], 
-                            params_type::g1_zero_fill[2]) {};
+                            params_type::zero_fill[0], 
+                            params_type::zero_fill[1], 
+                            params_type::zero_fill[2]) {};
 
                         /** @brief
                          *    @return the selected point (X:Y:Z)
@@ -111,8 +111,8 @@ namespace nil {
                          *
                          */
                         constexpr static short_weierstrass_element_g1_projective one() {
-                            return short_weierstrass_element_g1_projective(params_type::g1_one_fill[0], params_type::g1_one_fill[1], 
-                                params_type::g1_one_fill[2]);
+                            return short_weierstrass_element_g1_projective(params_type::one_fill[0], params_type::one_fill[1], 
+                                params_type::one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/

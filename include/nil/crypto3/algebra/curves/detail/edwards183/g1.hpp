@@ -50,14 +50,14 @@ namespace nil {
                     struct edwards_g1<183> {
                         constexpr static const std::size_t version = 183;
 
-                        using policy_type = edwards_basic_policy<version>;
+                        using params_type = edwards_basic_policy<version>;
 
                         using curve_type = edwards<version>;
 
-                        using underlying_field_type = typename policy_type::g1_field_type;
+                        using field_type = typename params_type::g1_field_type;
 
                         constexpr static const std::size_t value_bits =
-                            underlying_field_type::value_bits + 1;    ///< size of the base field in bits
+                            field_type::value_bits + 1;    ///< size of the base field in bits
 
                         using value_type = element_edwards_g1<version>;
                     };

@@ -74,15 +74,19 @@ namespace nil {
                      */
                     template<>
                     struct mnt4_basic_params<298> {
-                        using base_field_type = fields::mnt4_base_field<version>;
-                        using scalar_field_type = fields::mnt4_scalar_field<version>;
+                        using base_field_type = fields::mnt4_base_field<298>;
+                        using scalar_field_type = fields::mnt4_scalar_field<298>;
+
+                        using g1_field_type = base_field_type;
+                        using g2_field_type = typename fields::fp2<base_field_type>;
+                        using gt_field_type = typename fields::fp4<base_field_type>;
                     };
 
                     template<>
-                    struct mnt4_short_weierstrass_params<298> : public mn4_basic_params<298> {
+                    struct mnt4_short_weierstrass_params<298> : public mnt4_basic_params<298> {
 
-                        using base_field_type = typename mn4_basic_params<298>::base_field_type;
-                        using scalar_field_type = typename mn4_basic_params<298>::scalar_field_type;
+                        using base_field_type = typename mnt4_basic_params<298>::base_field_type;
+                        using scalar_field_type = typename mnt4_basic_params<298>::scalar_field_type;
 
                         constexpr static const typename base_field_type::modulus_type a =
                             typename base_field_type::modulus_type(0x02);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
@@ -94,7 +98,7 @@ namespace nil {
                     template<>
                     struct mnt4_short_weierstrass_g1_projective_params<298> : public mnt4_short_weierstrass_params<298> {
 
-                        using field_type = typename mnt4_short_weierstrass_params<298>::base_field_type;
+                        using field_type = typename mnt4_basic_params<298>::g1_field_type;
                         using group_type = mnt4_g1<298>;
 
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
@@ -112,7 +116,7 @@ namespace nil {
                     template<>
                     struct mnt4_short_weierstrass_g2_projective_params<298> : public mnt4_short_weierstrass_params<298> {
 
-                        using field_type = typename mnt4_short_weierstrass_params<298>::base_field_type;
+                        using field_type = typename mnt4_basic_params<298>::g2_field_type;
                         using group_type = mnt4_g2<298>;
 
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {

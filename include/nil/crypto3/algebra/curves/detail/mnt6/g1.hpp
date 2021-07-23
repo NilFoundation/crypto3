@@ -48,11 +48,11 @@ namespace nil {
                      */
                     template<std::size_t Version>
                     struct mnt6_g1 {
-                        using params_type = mnt6_short_weierstrass_g1_params<Version>;
+                        using params_type = mnt6_short_weierstrass_g1_projective_params<Version>;
 
                         using curve_type = mnt6<Version>;
 
-                        using field_type = typename params_type::g1_field_type;
+                        using field_type = typename params_type::field_type;
 
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits
