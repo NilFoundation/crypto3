@@ -15,6 +15,8 @@ if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
 endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+                       ${${CURRENT_PROJECT_NAME}_INTERFACE_LIBRARIES}
+
                        ${CMAKE_WORKSPACE_NAME}::block
 
                        ${Boost_LIBRARIES})
@@ -39,9 +41,9 @@ macro(define_hash_test name)
 
     endif()
 
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         target_compile_options(hash_${name}_test PRIVATE "-fconstexpr-steps=2147483647")
-    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         target_compile_options(hash_${name}_test PRIVATE "-fconstexpr-ops-limit=4294967295")
     endif()
 
@@ -53,7 +55,6 @@ set(TESTS_NAMES
     "md4"
     "md5"
     "pack"
-    "poseidon"
     "ripemd"
     "sha"
     "sha1"
@@ -61,6 +62,10 @@ set(TESTS_NAMES
     "sha3"
     "static_digest"
     "tiger")
+
+if(CRYPTO3_HASH_POSEIDON)
+    list(APPEND TESTS_NAMES poseidon)
+endif()
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_hash_test(${TEST_NAME})

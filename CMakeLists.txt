@@ -184,6 +184,10 @@ if(CRYPTO3_HASH_POSEIDON)
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_POSEIDON)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
          ${${CURRENT_PROJECT_NAME}_POSEIDON_HEADERS})
+
+    list(APPEND ${CURRENT_PROJECT_NAME}_INTERFACE_LIBRARIES
+         ${CMAKE_WORKSPACE_NAME}::algebra
+         ${CMAKE_WORKSPACE_NAME}::multiprecision)
 endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
@@ -196,9 +200,9 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                       EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                      ${${CURRENT_PROJECT_NAME}_INTERFACE_LIBRARIES}
+
                       ${CMAKE_WORKSPACE_NAME}::block
-                      ${CMAKE_WORKSPACE_NAME}::algebra
-                      ${CMAKE_WORKSPACE_NAME}::multiprecision
 
                       ${Boost_LIBRARIES})
 
