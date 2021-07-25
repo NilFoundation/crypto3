@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_183_PARAMS_HPP
-#define CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_183_PARAMS_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_TWISTED_EDWARDS_PARAMS_HPP
+#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_TWISTED_EDWARDS_PARAMS_HPP
 
 #include <nil/crypto3/algebra/curves/detail/edwards183/edwards_params.hpp>
 
@@ -105,4 +105,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_183_PARAMS_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_TWISTED_EDWARDS_PARAMS_HPP

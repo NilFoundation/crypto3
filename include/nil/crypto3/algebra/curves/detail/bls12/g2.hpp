@@ -27,10 +27,14 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_BLS12_G2_HPP
 #define CRYPTO3_ALGEBRA_CURVES_BLS12_G2_HPP
 
-#include <nil/crypto3/algebra/curves/detail/bls12/bls12_377/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/bls12/bls12_377/element_g2.hpp>
-#include <nil/crypto3/algebra/curves/detail/bls12/bls12_381/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/bls12/bls12_381/element_g2.hpp>
+// #include <nil/crypto3/algebra/curves/detail/bls12/bls12_377/basic_policy.hpp>
+// #include <nil/crypto3/algebra/curves/detail/bls12/bls12_377/element_g2.hpp>
+#include <nil/crypto3/algebra/curves/detail/bls12/bls12_377/params.hpp>
+#include <nil/crypto3/algebra/curves/detail/bls12/bls12_381/params.hpp>
+
+#include <nil/crypto3/algebra/curves/detail/forms.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_0/element_g1.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,7 +52,8 @@ namespace nil {
                      */
                     template<std::size_t Version>
                     struct bls12_g2 {
-                        using params_type = bls12_basic_policy<Version>;
+                        
+                        using params_type = bls12_short_weierstrass_g2_jacobian_with_a4_0_params<Version>;
 
                         using curve_type = bls12<Version>;
 
@@ -57,7 +62,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = element_bls12_g2<Version>;
+                        using value_type = short_weierstrass_element_g1_jacobian_with_a4_0<params_type>;
                     };
 
                 }    // namespace detail

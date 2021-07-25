@@ -45,17 +45,13 @@ namespace nil {
                  *  An alternative to `bn128`, somewhat slower but avoids dynamic code generation.
                  */
                 template<std::size_t Version>
-                struct alt_bn128 {
+                class alt_bn128 {
 
                     using policy_type = detail::alt_bn128_basic_policy<Version>;
+                public:
 
                     typedef typename policy_type::base_field_type base_field_type;
                     typedef typename policy_type::scalar_field_type scalar_field_type;
-                    typedef typename policy_type::number_type number_type;
-                    typedef typename policy_type::extended_number_type extended_number_type;
-
-                    constexpr static const number_type p = policy_type::p;    ///< base field characteristic
-                    constexpr static const number_type q = policy_type::q;    ///< scalar field characteristic (order of the group of points)
 
                     typedef typename detail::alt_bn128_g1<Version> g1_type;
                     typedef typename detail::alt_bn128_g2<Version> g2_type;
