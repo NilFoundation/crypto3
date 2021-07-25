@@ -24,9 +24,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_HPP
-#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_HPP
+#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_HPP
 
+#include <nil/crypto3/algebra/curves/detail/edwards183/edwards_params.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards183/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards183/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards183/g2.hpp>
@@ -46,18 +47,11 @@ namespace nil {
                 template<std::size_t Version>
                 struct edwards {
 
-                    using policy_type = detail::edwards_basic_policy<Version>;
+                    using policy_type = detail::edwards_basic_params<Version>;
 
                     typedef typename policy_type::base_field_type base_field_type;
                     typedef typename policy_type::scalar_field_type scalar_field_type;
-                    typedef typename policy_type::number_type number_type;
-                    typedef typename policy_type::extended_number_type extended_number_type;
-
-                    constexpr static const number_type p = policy_type::p;    ///< base field characteristic
-
-                    constexpr static const number_type q =
-                        policy_type::q;    ///< scalar field characteristic (order of the group of points)
-
+                    
                     typedef typename detail::edwards_g1<Version> g1_type;
                     typedef typename detail::edwards_g2<Version> g2_type;
 
@@ -77,4 +71,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_HPP

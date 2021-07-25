@@ -26,24 +26,18 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_PROJECTIVE_DBL_2007_BL_HPP
 #define CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_PROJECTIVE_DBL_2007_BL_HPP
 
-#include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms.hpp>
-
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
-
-#include <nil/crypto3/detail/literals.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
                 namespace detail {
 
-                    /** @brief A struct representing element doubling from the group G1 of short Weierstrass curve.
+                    /** @brief A struct representing element doubling from the group G1 of short Weierstrass curve 
+                     *  for projective coordinates representation.
                      *  NOTE: does not handle O and pts of order 2,4
                      *  http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#doubling-dbl-2007-bl
                      */
-                    struct dbl_2007_bl {
+                    struct short_weierstrass_element_g1_projective_dbl_2007_bl {
 
                         template <typename ElementType>
                         constexpr static inline ElementType process(

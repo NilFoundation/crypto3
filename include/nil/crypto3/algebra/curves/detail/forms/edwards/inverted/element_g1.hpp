@@ -24,15 +24,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_PROJECTIVE_HPP
-#define CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_PROJECTIVE_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_INVERTED_HPP
+#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_INVERTED_HPP
 
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms.hpp>
 
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/add_1998_cmo_2.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/dbl_2007_bl.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/add_2007_bl.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/dbl_2007_bl.hpp>
 
 #include <nil/crypto3/detail/literals.hpp>
 
@@ -48,17 +48,17 @@ namespace nil {
                      */
                     // template<typename CurveParams, 
                     //          forms Form, 
-                    //          short_weierstrass_coordinates Coordinates>
-                    // struct short_weierstrass_element_g1;
+                    //          inverted_coordinates Coordinates>
+                    // struct inverted_element_g1;
 
                     /** @brief A struct representing an element from the group G1 of short Weierstrass curve.
                      *  Description: https://hyperelliptic.org/EFD/g1p/auto-shortw.html
                      *
                      */
                     template<typename CurveParams, 
-                             typename Adder = short_weierstrass_element_g1_projective_add_1998_cmo_2, 
-                             typename Doubler = short_weierstrass_element_g1_projective_dbl_2007_bl>
-                    struct short_weierstrass_element_g1_projective {
+                             typename Adder = edwards_element_g1_inverted_add_2007_bl, 
+                             typename Doubler = edwards_element_g1_inverted_dbl_2007_bl>
+                    struct edwards_element_g1_inverted {
 
                         using params_type = CurveParams;
                         using field_type = typename params_type::field_type;
@@ -68,10 +68,10 @@ namespace nil {
                         using group_type = typename params_type::group_type;
 
                         constexpr static const forms form = 
-                            forms::short_weierstrass;
+                            forms::edwards;
                         constexpr static const 
-                            short_weierstrass_coordinates coordinates = 
-                            short_weierstrass_coordinates::projective;
+                            edwards_coordinates coordinates = 
+                            edwards_coordinates::inverted;
 
                         field_value_type X;
                         field_value_type Y;
@@ -83,7 +83,7 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr short_weierstrass_element_g1_projective() : short_weierstrass_element_g1_projective(
+                        constexpr edwards_element_g1_inverted() : edwards_element_g1_inverted(
                             params_type::zero_fill[0], 
                             params_type::zero_fill[1], 
                             params_type::zero_fill[2]) {};
@@ -92,7 +92,7 @@ namespace nil {
                          *    @return the selected point (X:Y:Z)
                          *
                          */
-                        constexpr short_weierstrass_element_g1_projective(field_value_type X,
+                        constexpr edwards_element_g1_inverted(field_value_type X,
                                                   field_value_type Y,
                                                   field_value_type Z) {
                             this->X = X;
@@ -103,21 +103,21 @@ namespace nil {
                         /** @brief Get the point at infinity
                          *
                          */
-                        constexpr static short_weierstrass_element_g1_projective zero() {
-                            return short_weierstrass_element_g1_projective();
+                        constexpr static edwards_element_g1_inverted zero() {
+                            return edwards_element_g1_inverted();
                         }
 
                         /** @brief Get the generator of group G1
                          *
                          */
-                        constexpr static short_weierstrass_element_g1_projective one() {
-                            return short_weierstrass_element_g1_projective(params_type::one_fill[0], params_type::one_fill[1], 
+                        constexpr static edwards_element_g1_inverted one() {
+                            return edwards_element_g1_inverted(params_type::one_fill[0], params_type::one_fill[1], 
                                 params_type::one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
 
-                        constexpr bool operator==(const short_weierstrass_element_g1_projective &other) const {
+                        constexpr bool operator==(const edwards_element_g1_inverted &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -141,7 +141,7 @@ namespace nil {
                             return true;
                         }
 
-                        constexpr bool operator!=(const short_weierstrass_element_g1_projective &other) const {
+                        constexpr bool operator!=(const edwards_element_g1_inverted &other) const {
                             return !(operator==(other));
                         }
                         /** @brief
@@ -149,7 +149,7 @@ namespace nil {
                          * @return true if element from group G1 is the point at infinity
                          */
                         constexpr bool is_zero() const {
-                            return (this->X.is_zero() && this->Z.is_zero());
+                            return (this->Y.is_zero() && this->Z.is_zero());
                         }
                         
                         /** @brief
@@ -157,30 +157,12 @@ namespace nil {
                          * @return true if element from group G1 lies on the elliptic curve
                          */
                         constexpr bool is_well_formed() const {
-                            if (this->is_zero()) {
-                                return true;
-                            } else {
-                                /*
-                                  y^2 = x^3 + ax + b
-
-                                  We are using projective, so equation we need to check is actually
-
-                                  (y/z)^2 = (x/z)^3 + a (x/z) + b
-                                  z y^2 = x^3  + a z^2 x + b z^3
-
-                                  z (y^2 - b z^2) = x ( x^2 + a z^2)
-                                */
-                                const field_value_type X2 = this->X.squared();
-                                const field_value_type Y2 = this->Y.squared();
-                                const field_value_type Z2 = this->Z.squared();
-
-                                return (this->Z * (Y2 - params_type::b * Z2) == this->X * (X2 + params_type::a * Z2));
-                            }
+                            assert(false && "Not implemented yet.");
                         }
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        constexpr short_weierstrass_element_g1_projective operator=(const short_weierstrass_element_g1_projective &other) {
+                        constexpr edwards_element_g1_inverted operator=(const edwards_element_g1_inverted &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -189,7 +171,7 @@ namespace nil {
                             return *this;
                         }
 
-                        constexpr short_weierstrass_element_g1_projective operator+(const short_weierstrass_element_g1_projective &other) const {
+                        constexpr edwards_element_g1_inverted operator+(const edwards_element_g1_inverted &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -206,11 +188,11 @@ namespace nil {
                             return Adder::process(*this, other);
                         }
 
-                        constexpr short_weierstrass_element_g1_projective operator-() const {
-                            return short_weierstrass_element_g1_projective(this->X, -this->Y, this->Z);
+                        constexpr edwards_element_g1_inverted operator-() const {
+                            return edwards_element_g1_inverted(-(this->X), this->Y, this->Z);
                         }
 
-                        constexpr short_weierstrass_element_g1_projective operator-(const short_weierstrass_element_g1_projective &other) const {
+                        constexpr edwards_element_g1_inverted operator-(const edwards_element_g1_inverted &other) const {
                             return (*this) + (-other);
                         }
                         
@@ -218,7 +200,7 @@ namespace nil {
                          *
                          * @return doubled element from group G1
                          */
-                        constexpr short_weierstrass_element_g1_projective doubled() const {
+                        constexpr edwards_element_g1_inverted doubled() const {
                             return Doubler::process(*this);
                         }
 
@@ -227,46 +209,33 @@ namespace nil {
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G1
                          */
-                        constexpr short_weierstrass_element_g1_projective mixed_add(const short_weierstrass_element_g1_projective &other) const {
+                        edwards_element_g1_inverted mixed_add(const edwards_element_g1_inverted &other) const {
 
-                            // NOTE: does not handle O and pts of order 2,4
-                            // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
-
+                            // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
                             }
 
                             if (other.is_zero()) {
-                                return (*this);
+                                return *this;
                             }
 
-                            const field_value_type &X1Z2 =
-                                (this->X);    // X1Z2 = X1*Z2 (but other is special and not zero)
-                            const field_value_type X2Z1 = (this->Z) * (other.X);    // X2Z1 = X2*Z1
+                            // NOTE: does not handle O and pts of order 2,4
+                            // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-madd-2007-lb
 
-                            // (used both in add and double checks)
+                            field_value_type A = this->Z;                  // A = Z1
+                            field_value_type B = params_type::d * A.squared();          // B = d*A^2
+                            field_value_type C = (this->X) * (other.X);    // C = X1*X2
+                            field_value_type D = (this->Y) * (other.Y);    // D = Y1*Y2
+                            field_value_type E = C * D;                    // E = C*D
+                            field_value_type H = C - D;                    // H = C-D
+                            field_value_type I =
+                                (this->X + this->Y) * (other.X + other.Y) - C - D;    // I = (X1+Y1)*(X2+Y2)-C-D
+                            field_value_type X3 = params_type::c * (E + B) * H;             // X3 = c*(E+B)*H
+                            field_value_type Y3 = params_type::c * (E - B) * I;             // Y3 = c*(E-B)*I
+                            field_value_type Z3 = A * H * I;               // Z3 = A*H*I
 
-                            const field_value_type &Y1Z2 =
-                                (this->Y);    // Y1Z2 = Y1*Z2 (but other is special and not zero)
-                            const field_value_type Y2Z1 = (this->Z) * (other.Y);    // Y2Z1 = Y2*Z1
-
-                            if (X1Z2 == X2Z1 && Y1Z2 == Y2Z1) {
-                                return this->doubled();
-                            }
-
-                            const field_value_type u = Y2Z1 - this->Y;                // u = Y2*Z1-Y1
-                            const field_value_type uu = u.squared();                  // uu = u2
-                            const field_value_type v = X2Z1 - this->X;                // v = X2*Z1-X1
-                            const field_value_type vv = v.squared();                  // vv = v2
-                            const field_value_type vvv = v * vv;                      // vvv = v*vv
-                            const field_value_type R = vv * this->X;                  // R = vv*X1
-                            const field_value_type A = uu * this->Z - vvv - R - R;    // A = uu*Z1-vvv-2*R
-                            const field_value_type X3 = v * A;                        // X3 = v*A
-                            const field_value_type Y3 =
-                                u * (R - A) - vvv * this->Y;                         // Y3 = u*(R-A)-vvv*Y1
-                            const field_value_type Z3 = vvv * this->Z;    // Z3 = vvv*Z1
-
-                            return short_weierstrass_element_g1_projective(X3, Y3, Z3);
+                            return edwards_element_g1_inverted(X3, Y3, Z3);
                         }
                     };
 
@@ -275,4 +244,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_PROJECTIVE_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_INVERTED_HPP

@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_PROJECTIVE_ADD_1998_CMO_2_HPP
-#define CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_PROJECTIVE_ADD_1998_CMO_2_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_INVERTED_ADD_2007_BL_HPP
+#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_INVERTED_ADD_2007_BL_HPP
 
 namespace nil {
     namespace crypto3 {
@@ -32,13 +32,13 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    /** @brief A struct representing element addition from the group G1 of short Weierstrass curve 
-                     *  for projective coordinates representation.
+                    /** @brief A struct representing element addition from the group G1 of Edwards curve 
+                     *  for inversed coordinates representation.
                      *  NOTE: does not handle O and pts of order 2,4 
-                     *  http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
+                     *  http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-add-2007-bl
                      */
                     
-                    struct short_weierstrass_element_g1_projective_add_1998_cmo_2 {
+                    struct edwards_element_g1_inverted_add_2007_bl {
 
                         template <typename ElementType>
                         constexpr static inline ElementType process(
@@ -47,21 +47,17 @@ namespace nil {
 
                             using field_value_type = typename ElementType::field_type::value_type;
 
-                            const field_value_type Y1Z2 = (first.Y) * (second.Z);        // Y1Z2 = Y1*Z2
-                            const field_value_type X1Z2 = (first.X) * (second.Z);        // X1Z2 = X1*Z2
-                            const field_value_type Z1Z2 = (first.Z) * (second.Z);        // Z1Z2 = Z1*Z2
-                            const field_value_type u = (second.Y) * (first.Z) - Y1Z2;    // u    = Y2*Z1-Y1Z2
-                            const field_value_type uu = u.squared();            // uu   = u^2
-                            const field_value_type v = (second.X) * (first.Z) - X1Z2;    // v    = X2*Z1-X1Z2
-                            const field_value_type vv = v.squared();            // vv   = v^2
-                            const field_value_type vvv = v * vv;                // vvv  = v*vv
-                            const field_value_type R = vv * X1Z2;               // R    = vv*X1Z2
-                            const field_value_type A =
-                                uu * Z1Z2 - (vvv + R + R);                      // A    = uu*Z1Z2 - vvv - 2*R
-                            const field_value_type X3 = v * A;                  // X3   = v*A
-                            const field_value_type Y3 =
-                                u * (R - A) - vvv * Y1Z2;                       // Y3   = u*(R-A) - vvv*Y1Z2
-                            const field_value_type Z3 = vvv * Z1Z2;             // Z3   = vvv*Z1Z2
+                            field_value_type A = (first.Z) * (second.Z);    // A = Z1*Z2
+                            field_value_type B = ElementType::params_type::d * A.squared();          // B = d*A^2
+                            field_value_type C = (first.X) * (second.X);    // C = X1*X2
+                            field_value_type D = (first.Y) * (second.Y);    // D = Y1*Y2
+                            field_value_type E = C * D;                    // E = C*D
+                            field_value_type H = C - D;                    // H = C-D
+                            field_value_type I =
+                                (first.X + first.Y) * (second.X + second.Y) - C - D;    // I = (X1+Y1)*(X2+Y2)-C-D
+                            field_value_type X3 = ElementType::params_type::c * (E + B) * H;             // X3 = c*(E+B)*H
+                            field_value_type Y3 = ElementType::params_type::c * (E - B) * I;             // Y3 = c*(E-B)*I
+                            field_value_type Z3 = A * H * I;               // Z3 = A*H*I
 
                             return ElementType(X3, Y3, Z3);
                         }
@@ -72,4 +68,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_PROJECTIVE_ADD_1998_CMO_2_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_INVERTED_ADD_2007_BL_HPP

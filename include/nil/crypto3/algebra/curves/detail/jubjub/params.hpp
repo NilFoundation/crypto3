@@ -40,7 +40,7 @@ namespace nil {
                     struct jubjub_g1;
 
                     using namespace algebra;
-                    /** @brief A struct representing details about base and scalar fields of the size 183 bits and 181
+                    /** @brief A struct representing details about base and scalar fields of the corresponding size 183 bits and 181
                      * bits respectively. Corresponds to [JubJub](https://raw.githubusercontent.com/zcash/zips/master/protocol/protocol.pdf#jubjub)
                      * twisted Edwards elliptic curve defined over Bls12-381 scalar field and described by equation ax^2 + y^2 = 1 + dx^2y^2
                      *

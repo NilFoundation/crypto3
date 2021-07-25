@@ -69,7 +69,7 @@ namespace nil {
                     template<std::size_t Version = 298>
                     struct mnt4_short_weierstrass_g2_projective_params;
 
-                    /** @brief A struct representing details about base and scalar fields of the size 298 bits.
+                    /** @brief A struct representing details about base and scalar fields.
                      *
                      */
                     template<>
