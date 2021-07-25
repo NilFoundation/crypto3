@@ -12,7 +12,7 @@ list(APPEND CMAKE_MODULE_PATH
 include(CMConfig)
 include(CMSetupVersion)
 
-cm_workspace(nil)
+cm_workspace(marshalling)
 
 macro(cm_find_package NAME)
     if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
@@ -22,7 +22,7 @@ macro(cm_find_package NAME)
     endif()
 endmacro()
 
-cm_project(marshalling WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
+cm_project(core WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
 cm_find_package(CM)
 include(CMDeploy)
