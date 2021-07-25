@@ -47,7 +47,8 @@ namespace nil {
                     //          short_weierstrass_coordinates Coordinates>
                     // struct short_weierstrass_element_g1_affine;
 
-                    /** @brief A struct representing an element from the group G1 of short Weierstrass curve.
+                    /** @brief A struct representing an element from the group G1 of short Weierstrass curve of 
+                     *  affine coordinates representation.
                      *  Description: https://hyperelliptic.org/EFD/g1p/auto-shortw.html
                      *
                      */

@@ -34,8 +34,6 @@
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/add_1998_cmo_2.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/dbl_2007_bl.hpp>
 
-#include <nil/crypto3/detail/literals.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -51,8 +49,9 @@ namespace nil {
                     //          short_weierstrass_coordinates Coordinates>
                     // struct short_weierstrass_element_g1;
 
-                    /** @brief A struct representing an element from the group G1 of short Weierstrass curve.
-                     *  Description: https://hyperelliptic.org/EFD/g1p/auto-shortw.html
+                    /** @brief A struct representing an element from the group G1 of short Weierstrass curve of 
+                     *  projective coordinates representation.
+                     *  Description: https://hyperelliptic.org/EFD/g1p/auto-shortw-projective.html
                      *
                      */
                     template<typename CurveParams, 
@@ -239,6 +238,9 @@ namespace nil {
                             if (other.is_zero()) {
                                 return (*this);
                             }
+
+                            // Because for some reasons it's not so
+                            // assert(other.Z == field_value_type::one());
 
                             const field_value_type &X1Z2 =
                                 (this->X);    // X1Z2 = X1*Z2 (but other is special and not zero)

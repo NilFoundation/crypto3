@@ -46,7 +46,8 @@ namespace nil {
                     //          twisted_edwards_coordinates Coordinates>
                     // struct twisted_edwards_element_g1_affine;
                     
-                    /** @brief A struct representing an element from the group G1 of twisted edwards curve. 
+                    /** @brief A struct representing an element from the group G1 of twisted Edwards curve of 
+                     *  affine coordinates representation. 
                      *  Twisted Edwards curves introduced on https://eprint.iacr.org/2008/013.pdf
                      *  Description: https://hyperelliptic.org/EFD/g1p/auto-twisted.html
                      *

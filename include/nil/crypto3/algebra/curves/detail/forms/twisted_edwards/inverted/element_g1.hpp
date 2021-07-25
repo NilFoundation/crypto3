@@ -1,7 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -24,15 +23,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_INVERTED_HPP
-#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_INVERTED_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_INVERTED_HPP
+#define CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_INVERTED_HPP
 
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms.hpp>
 
-#include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/add_2007_bl.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/dbl_2007_bl.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/inverted/add_2008_bbjlp.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/inverted/dbl_2008_bbjlp.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -49,15 +48,15 @@ namespace nil {
                     //          inverted_coordinates Coordinates>
                     // struct inverted_element_g1;
 
-                    /** @brief A struct representing an element from the group G1 of Edwards curve of 
+                    /** @brief A struct representing an element from the group G1 of twisted Edwards curve of 
                      *  inverted coordinates representation.
                      *  Description: http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html
                      *
                      */
                     template<typename CurveParams, 
-                             typename Adder = edwards_element_g1_inverted_add_2007_bl, 
-                             typename Doubler = edwards_element_g1_inverted_dbl_2007_bl>
-                    struct edwards_element_g1_inverted {
+                             typename Adder = twisted_edwards_element_g1_inverted_add_2008_bbjlp, 
+                             typename Doubler = twisted_edwards_element_g1_inverted_dbl_2008_bbjlp>
+                    struct twisted_edwards_element_g1_inverted {
 
                         using params_type = CurveParams;
                         using field_type = typename params_type::field_type;
@@ -82,7 +81,7 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr edwards_element_g1_inverted() : edwards_element_g1_inverted(
+                        constexpr twisted_edwards_element_g1_inverted() : twisted_edwards_element_g1_inverted(
                             params_type::zero_fill[0], 
                             params_type::zero_fill[1], 
                             params_type::zero_fill[2]) {};
@@ -91,7 +90,7 @@ namespace nil {
                          *    @return the selected point (X:Y:Z)
                          *
                          */
-                        constexpr edwards_element_g1_inverted(field_value_type X,
+                        constexpr twisted_edwards_element_g1_inverted(field_value_type X,
                                                   field_value_type Y,
                                                   field_value_type Z) {
                             this->X = X;
@@ -102,21 +101,21 @@ namespace nil {
                         /** @brief Get the point at infinity
                          *
                          */
-                        constexpr static edwards_element_g1_inverted zero() {
-                            return edwards_element_g1_inverted();
+                        constexpr static twisted_edwards_element_g1_inverted zero() {
+                            return twisted_edwards_element_g1_inverted();
                         }
 
                         /** @brief Get the generator of group G1
                          *
                          */
-                        constexpr static edwards_element_g1_inverted one() {
-                            return edwards_element_g1_inverted(params_type::one_fill[0], params_type::one_fill[1], 
+                        constexpr static twisted_edwards_element_g1_inverted one() {
+                            return twisted_edwards_element_g1_inverted(params_type::one_fill[0], params_type::one_fill[1], 
                                 params_type::one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
 
-                        constexpr bool operator==(const edwards_element_g1_inverted &other) const {
+                        constexpr bool operator==(const twisted_edwards_element_g1_inverted &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -140,7 +139,7 @@ namespace nil {
                             return true;
                         }
 
-                        constexpr bool operator!=(const edwards_element_g1_inverted &other) const {
+                        constexpr bool operator!=(const twisted_edwards_element_g1_inverted &other) const {
                             return !(operator==(other));
                         }
                         /** @brief
@@ -161,7 +160,7 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        constexpr edwards_element_g1_inverted operator=(const edwards_element_g1_inverted &other) {
+                        constexpr twisted_edwards_element_g1_inverted operator=(const twisted_edwards_element_g1_inverted &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -170,7 +169,7 @@ namespace nil {
                             return *this;
                         }
 
-                        constexpr edwards_element_g1_inverted operator+(const edwards_element_g1_inverted &other) const {
+                        constexpr twisted_edwards_element_g1_inverted operator+(const twisted_edwards_element_g1_inverted &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -187,11 +186,11 @@ namespace nil {
                             return Adder::process(*this, other);
                         }
 
-                        constexpr edwards_element_g1_inverted operator-() const {
-                            return edwards_element_g1_inverted(-(this->X), this->Y, this->Z);
+                        constexpr twisted_edwards_element_g1_inverted operator-() const {
+                            return twisted_edwards_element_g1_inverted(-(this->X), this->Y, this->Z);
                         }
 
-                        constexpr edwards_element_g1_inverted operator-(const edwards_element_g1_inverted &other) const {
+                        constexpr twisted_edwards_element_g1_inverted operator-(const twisted_edwards_element_g1_inverted &other) const {
                             return (*this) + (-other);
                         }
                         
@@ -199,7 +198,7 @@ namespace nil {
                          *
                          * @return doubled element from group G1
                          */
-                        constexpr edwards_element_g1_inverted doubled() const {
+                        constexpr twisted_edwards_element_g1_inverted doubled() const {
                             return Doubler::process(*this);
                         }
 
@@ -208,7 +207,7 @@ namespace nil {
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G1
                          */
-                        edwards_element_g1_inverted mixed_add(const edwards_element_g1_inverted &other) const {
+                        twisted_edwards_element_g1_inverted mixed_add(const twisted_edwards_element_g1_inverted &other) const {
 
                             // handle special cases having to do with O
                             if (this->is_zero()) {
@@ -219,25 +218,23 @@ namespace nil {
                                 return *this;
                             }
 
-                            // Because for some reasons it's not so
-                            // assert(other.Z == field_value_type::one());
+                            assert(other.Z == field_value_type::one());
 
                             // NOTE: does not handle O and pts of order 2,4
-                            // www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-madd-2007-bl
+                            // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#addition-madd-2008-bbjlp
 
-                            field_value_type A = this->Z;                  // A = Z1
-                            field_value_type B = params_type::d * A.squared();          // B = d*A^2
+                            field_value_type B = params_type::d * (this->Z).squared();          // B = d*Z1^2
                             field_value_type C = (this->X) * (other.X);    // C = X1*X2
                             field_value_type D = (this->Y) * (other.Y);    // D = Y1*Y2
                             field_value_type E = C * D;                    // E = C*D
-                            field_value_type H = C - D;                    // H = C-D
+                            field_value_type H = C - params_type::a * D;                    // H = C-a*D
                             field_value_type I =
                                 (this->X + this->Y) * (other.X + other.Y) - C - D;    // I = (X1+Y1)*(X2+Y2)-C-D
-                            field_value_type X3 = params_type::c * (E + B) * H;             // X3 = c*(E+B)*H
-                            field_value_type Y3 = params_type::c * (E - B) * I;             // Y3 = c*(E-B)*I
-                            field_value_type Z3 = A * H * I;               // Z3 = A*H*I
+                            field_value_type X3 = (E + B) * H;             // X3 = (E+B)*H
+                            field_value_type Y3 = (E - B) * I;             // Y3 = (E-B)*I
+                            field_value_type Z3 = Z1 * H * I;               // Z3 = Z1*H*I
 
-                            return edwards_element_g1_inverted(X3, Y3, Z3);
+                            return twisted_edwards_element_g1_inverted(X3, Y3, Z3);
                         }
                     };
 
@@ -246,4 +243,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_INVERTED_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_INVERTED_HPP
