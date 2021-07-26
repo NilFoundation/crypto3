@@ -33,6 +33,7 @@
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_0/add_2007_bl.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_0/dbl_2009_l.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_0/madd_2007_bl.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -56,7 +57,8 @@ namespace nil {
                      */
                     template<typename CurveParams, 
                              typename Adder = short_weierstrass_element_g1_jacobian_with_a4_0_add_2007_bl, 
-                             typename Doubler = short_weierstrass_element_g1_jacobian_with_a4_0_dbl_2009_l>
+                             typename Doubler = short_weierstrass_element_g1_jacobian_with_a4_0_dbl_2009_l, 
+                             typename MixAdd = short_weierstrass_element_g1_jacobian_with_a4_0_madd_2007_bl>
                     struct short_weierstrass_element_g1_jacobian_with_a4_0 {
 
                         using params_type = CurveParams;
@@ -251,52 +253,7 @@ namespace nil {
                                 return *this;
                             }
 
-                            // no need to handle points of order 2,4
-                            // (they cannot exist in a prime-order subgroup)
-
-                            // check for doubling case
-
-                            // using Jacobian coordinates so:
-                            // (X1:Y1:Z1) = (X2:Y2:Z2)
-                            // iff
-                            // X1/Z1^2 == X2/Z2^2 and Y1/Z1^3 == Y2/Z2^3
-                            // iff
-                            // X1 * Z2^2 == X2 * Z1^2 and Y1 * Z2^3 == Y2 * Z1^3
-
-                            // we know that Z2 = 1
-
-                            const field_value_type Z1Z1 = (this->Z).squared();
-
-                            const field_value_type &U1 = this->X;
-                            const field_value_type U2 = other.X * Z1Z1;
-
-                            const field_value_type Z1_cubed = (this->Z) * Z1Z1;
-
-                            const field_value_type &S1 = (this->Y);              // S1 = Y1 * Z2 * Z2Z2
-                            const field_value_type S2 = (other.Y) * Z1_cubed;    // S2 = Y2 * Z1 * Z1Z1
-
-                            if (U1 == U2 && S1 == S2) {
-                                // dbl case; nothing of above can be reused
-                                return this->doubled();
-                            }
-
-                            // NOTE: does not handle O and pts of order 2,4
-                            // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#addition-madd-2007-bl
-                            field_value_type H = U2 - (this->X);    // H = U2-X1
-                            field_value_type HH = H.squared();      // HH = H&2
-                            field_value_type I = HH + HH;           // I = 4*HH
-                            I = I + I;
-                            field_value_type J = H * I;             // J = H*I
-                            field_value_type r = S2 - (this->Y);    // r = 2*(S2-Y1)
-                            r = r + r;
-                            field_value_type V = (this->X) * I;               // V = X1*I
-                            field_value_type X3 = r.squared() - J - V - V;    // X3 = r^2-J-2*V
-                            field_value_type Y3 = (this->Y) * J;              // Y3 = r*(V-X3)-2*Y1*J
-                            Y3 = r * (V - X3) - Y3 - Y3;
-                            field_value_type Z3 =
-                                ((this->Z) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
-
-                            return short_weierstrass_element_g1_jacobian_with_a4_0(X3, Y3, Z3);
+                            return MixAdd::process(*this, other);
                         }
                     };
 

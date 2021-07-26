@@ -33,6 +33,7 @@
 #include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/add_2007_bl.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/dbl_2007_bl.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/madd_2007_bl.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -56,7 +57,8 @@ namespace nil {
                      */
                     template<typename CurveParams, 
                              typename Adder = edwards_element_g1_inverted_add_2007_bl, 
-                             typename Doubler = edwards_element_g1_inverted_dbl_2007_bl>
+                             typename Doubler = edwards_element_g1_inverted_dbl_2007_bl, 
+                             typename MixAdd = edwards_element_g1_inverted_madd_2007_bl>
                     struct edwards_element_g1_inverted {
 
                         using params_type = CurveParams;
@@ -219,25 +221,7 @@ namespace nil {
                                 return *this;
                             }
 
-                            // Because for some reasons it's not so
-                            // assert(other.Z == field_value_type::one());
-
-                            // NOTE: does not handle O and pts of order 2,4
-                            // www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-madd-2007-bl
-
-                            field_value_type A = this->Z;                  // A = Z1
-                            field_value_type B = params_type::d * A.squared();          // B = d*A^2
-                            field_value_type C = (this->X) * (other.X);    // C = X1*X2
-                            field_value_type D = (this->Y) * (other.Y);    // D = Y1*Y2
-                            field_value_type E = C * D;                    // E = C*D
-                            field_value_type H = C - D;                    // H = C-D
-                            field_value_type I =
-                                (this->X + this->Y) * (other.X + other.Y) - C - D;    // I = (X1+Y1)*(X2+Y2)-C-D
-                            field_value_type X3 = params_type::c * (E + B) * H;             // X3 = c*(E+B)*H
-                            field_value_type Y3 = params_type::c * (E - B) * I;             // Y3 = c*(E-B)*I
-                            field_value_type Z3 = A * H * I;               // Z3 = A*H*I
-
-                            return edwards_element_g1_inverted(X3, Y3, Z3);
+                            return MixAdd::process(*this, other);
                         }
                     };
 
