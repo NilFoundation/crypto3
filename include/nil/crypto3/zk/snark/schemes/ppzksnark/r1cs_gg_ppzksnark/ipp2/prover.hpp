@@ -50,7 +50,7 @@
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/transcript.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/proof.hpp>
 
-#include <nil/crypto3/math/polynomial_arithmetic/basic_operations.hpp>
+#include <nil/crypto3/math/polynomial/basic_operations.hpp>
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
@@ -183,13 +183,14 @@ namespace nil {
 
                     // f_v(X) - f_v(z) / (X - z)
                     std::vector<typename GroupType::curve_type::scalar_field_type::value_type> f_vX_sub_f_vZ;
-                    fft::_polynomial_subtraction<typename GroupType::curve_type::scalar_field_type>(f_vX_sub_f_vZ, poly,
-                                                                                                    {{
-                                                                                                        eval_poly,
-                                                                                                    }});
+                    math::_polynomial_subtraction<typename GroupType::curve_type::scalar_field_type>(f_vX_sub_f_vZ,
+                                                                                                     poly,
+                                                                                                     {{
+                                                                                                         eval_poly,
+                                                                                                     }});
                     std::vector<typename GroupType::curve_type::scalar_field_type::value_type> quotient_polynomial,
                         remainder_polynomial;
-                    fft::_polynomial_division<typename GroupType::curve_type::scalar_field_type>(
+                    math::_polynomial_division<typename GroupType::curve_type::scalar_field_type>(
                         quotient_polynomial, remainder_polynomial, f_vX_sub_f_vZ,
                         {{
                             neg_kzg_challenge,
@@ -228,8 +229,8 @@ namespace nil {
                     std::vector<typename CurveType::scalar_field_type::value_type> vkey_poly =
                         polynomial_coefficients_from_transcript<typename CurveType::scalar_field_type>(
                             transcript_first, transcript_last, CurveType::scalar_field_type::value_type::one());
-                    fft::_condense(vkey_poly);
-                    BOOST_ASSERT(!fft::_is_zero(vkey_poly));
+                    math::_condense(vkey_poly);
+                    BOOST_ASSERT(!math::_is_zero(vkey_poly));
 
                     typename CurveType::scalar_field_type::value_type vkey_poly_z =
                         polynomial_evaluation_product_form_from_transcript<typename CurveType::scalar_field_type>(

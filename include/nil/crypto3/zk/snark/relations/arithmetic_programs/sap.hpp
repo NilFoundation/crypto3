@@ -54,7 +54,7 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                using namespace nil::crypto3::fft;
+                using namespace nil::crypto3::math;
 
                 template<typename FieldType>
                 struct sap_witness;

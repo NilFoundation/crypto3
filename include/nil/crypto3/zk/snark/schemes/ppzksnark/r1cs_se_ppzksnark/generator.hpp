@@ -74,7 +74,7 @@ namespace nil {
                          * draw random element t at which the SAP is evaluated.
                          * it should be the case that Z(t) != 0
                          */
-                        const std::shared_ptr<fft::evaluation_domain<typename CurveType::scalar_field_type>> domain =
+                        const std::shared_ptr<math::evaluation_domain<typename CurveType::scalar_field_type>> domain =
                             reductions::r1cs_to_sap<typename CurveType::scalar_field_type>::get_domain(
                                 constraint_system);
                         typename CurveType::scalar_field_type::value_type t;

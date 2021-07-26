@@ -45,15 +45,14 @@
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/multiexp/inner_product.hpp>
 
-#include <nil/crypto3/math/domains/evaluation_domain.hpp>
-#include <nil/crypto3/math/make_evaluation_domain.hpp>
+#include <nil/crypto3/math/evaluation_domain.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                using namespace nil::crypto3::fft;
+                using namespace nil::crypto3::math;
 
                 template<typename FieldType>
                 struct qap_witness;
@@ -66,7 +65,7 @@ namespace nil {
                 /**
                  * A QAP instance.
                  *
-                 * Specifically, the datastructure stores:
+                 * Specifically, the data structure stores:
                  * - a choice of domain (corresponding to a certain subset of the field);
                  * - the number of variables, the degree, and the number of inputs; and
                  * - coefficients of the A,B,C polynomials in the Lagrange basis.

@@ -50,8 +50,7 @@
 #define CRYPTO3_ZK_R1CS_TO_SAP_BASIC_POLICY_HPP
 
 #include <nil/crypto3/math/coset.hpp>
-#include <nil/crypto3/math/domains/evaluation_domain.hpp>
-#include <nil/crypto3/math/make_evaluation_domain.hpp>
+#include <nil/crypto3/math/evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/sap.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
@@ -78,7 +77,7 @@ namespace nil {
                          * Helper function to find evaluation domain that will be used by the reduction
                          * for a given R1CS instance.
                          */
-                        static std::shared_ptr<fft::evaluation_domain<FieldType>>
+                        static std::shared_ptr<math::evaluation_domain<FieldType>>
                             get_domain(const r1cs_constraint_system<FieldType> &cs) {
                             /*
                              * the SAP instance will have:
@@ -88,7 +87,7 @@ namespace nil {
                              * see comments in instance_map for details on where these
                              * constraints come from.
                              */
-                            return fft::make_evaluation_domain<FieldType>(2 * cs.num_constraints() +
+                            return math::make_evaluation_domain<FieldType>(2 * cs.num_constraints() +
                                                                           2 * cs.num_inputs() + 1);
                         }
 
@@ -96,7 +95,7 @@ namespace nil {
                          * Instance map for the R1CS-to-SAP reduction.
                          */
                         static sap_instance<FieldType> instance_map(const r1cs_constraint_system<FieldType> &cs) {
-                            const std::shared_ptr<fft::evaluation_domain<FieldType>> domain = get_domain(cs);
+                            const std::shared_ptr<math::evaluation_domain<FieldType>> domain = get_domain(cs);
 
                             std::size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
 
@@ -205,7 +204,7 @@ namespace nil {
                             instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
                                                          const typename FieldType::value_type &t) {
 
-                            const std::shared_ptr<fft::evaluation_domain<FieldType>> domain = get_domain(cs);
+                            const std::shared_ptr<math::evaluation_domain<FieldType>> domain = get_domain(cs);
 
                             std::size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
 
@@ -319,7 +318,7 @@ namespace nil {
                             /* sanity check */
                             assert(cs.is_satisfied(primary_input, auxiliary_input));
 
-                            const std::shared_ptr<fft::evaluation_domain<FieldType>> domain = get_domain(cs);
+                            const std::shared_ptr<math::evaluation_domain<FieldType>> domain = get_domain(cs);
 
                             std::size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
 
@@ -382,7 +381,7 @@ namespace nil {
                                 aA[extra_constr_offset + 2 * i] -= FieldType::value_type::one();
                             }
 
-                            domain->iFFT(aA);
+                            domain->inverse_fft(aA);
 
                             std::vector<typename FieldType::value_type> coefficients_for_H(
                                 domain->m + 1, FieldType::value_type::zero());
@@ -394,12 +393,12 @@ namespace nil {
                                 coefficients_for_H[i] = (d1 * aA[i]) + (d1 * aA[i]);
                             }
                             coefficients_for_H[0] -= d2;
-                            domain->add_poly_Z(d1 * d1, coefficients_for_H);
+                            domain->add_poly_z(d1 * d1, coefficients_for_H);
 
-                            fft::multiply_by_coset(aA,
+                            math::multiply_by_coset(aA,
                                                    typename FieldType::value_type(
                                                        fields::arithmetic_params<FieldType>::multiplicative_generator));
-                            domain->FFT(aA);
+                            domain->fft(aA);
 
                             std::vector<typename FieldType::value_type> &H_tmp =
                                 aA;    // can overwrite aA because it is not used later
@@ -431,12 +430,12 @@ namespace nil {
                                 aC[extra_constr_offset + 2 * i] += full_variable_assignment[extra_var_offset2 + i - 1];
                             }
 
-                            domain->iFFT(aC);
+                            domain->inverse_fft(aC);
 
-                            fft::multiply_by_coset(aC,
+                            math::multiply_by_coset(aC,
                                                    typename FieldType::value_type(
                                                        fields::arithmetic_params<FieldType>::multiplicative_generator));
-                            domain->FFT(aC);
+                            domain->fft(aC);
 
 #ifdef MULTICORE
 #pragma omp parallel for
@@ -445,9 +444,9 @@ namespace nil {
                                 H_tmp[i] = (H_tmp[i] - aC[i]);
                             }
 
-                            domain->divide_by_Z_on_coset(H_tmp);
+                            domain->divide_by_z_on_coset(H_tmp);
 
-                            domain->iFFT(H_tmp);
+                            domain->inverse_fft(H_tmp);
                             multiply_by_coset(H_tmp,
                                               typename FieldType::value_type(
                                                   fields::arithmetic_params<FieldType>::multiplicative_generator)
