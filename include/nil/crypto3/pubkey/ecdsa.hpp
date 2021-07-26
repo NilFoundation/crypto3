@@ -93,9 +93,9 @@ namespace nil {
                     if (X.is_zero()) {
                         return false;
                     }
-                    // TODO: review conversion
                     return signature.first ==
-                           scalar_field_value_type(static_cast<base_modulus_type>(X.to_affine().X.data));
+                           scalar_field_value_type(scalar_number_type(
+                               static_cast<base_modulus_type>(X.to_affine().X.data), scalar_field_value_type::modulus));
                 }
 
             protected:
@@ -159,8 +159,9 @@ namespace nil {
                         }
                         // TODO: review converting of kG x-coordinate to r - in case of 2^m order field procedure seems
                         //  not to be trivial
-                        r = scalar_field_value_type(
-                            static_cast<base_modulus_type>((k * g1_value_type::one()).to_affine().X.data));
+                        r = scalar_field_value_type(scalar_number_type(
+                            static_cast<base_modulus_type>((k * g1_value_type::one()).to_affine().X.data),
+                            scalar_field_value_type::modulus));
                         s = k.inversed() * (privkey * r + m);
                     } while (r.is_zero() || s.is_zero());
 
