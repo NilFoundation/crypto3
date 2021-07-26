@@ -32,8 +32,6 @@
 #include <nil/crypto3/algebra/curves/detail/secp/secp_k1/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/secp/secp_r1/g1.hpp>
 
-#include <nil/crypto3/detail/literals.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace algebra {
