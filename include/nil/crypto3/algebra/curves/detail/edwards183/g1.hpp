@@ -30,7 +30,7 @@
 #include <nil/crypto3/algebra/curves/detail/edwards183/edwards_params.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards183/twisted_edwards_params.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/element_g1.hpp>
-// #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/inverted/element_g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/inverted/element_g1.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -52,7 +52,7 @@ namespace nil {
                     struct edwards_g1<183> {
                         constexpr static const std::size_t version = 183;
 
-                        using params_type = edwards_edwards_g1_inverted_params<version>;
+                        using params_type = edwards_twisted_edwards_g1_inverted_params<version>;
 
                         using curve_type = edwards<version>;
 
@@ -61,7 +61,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = edwards_element_g1_inverted<params_type>;
+                        using value_type = twisted_edwards_element_g1_inverted<params_type>;
                     };
                 }    // namespace detail
             }        // namespace curves

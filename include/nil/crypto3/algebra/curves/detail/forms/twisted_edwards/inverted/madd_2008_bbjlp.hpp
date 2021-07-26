@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_INVERTED_DBL_2008_BBJLP_HPP
-#define CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_INVERTED_DBL_2008_BBJLP_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_INVERTED_MADD_2008_BBJLP_HPP
+#define CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_INVERTED_MADD_2008_BBJLP_HPP
 
 namespace nil {
     namespace crypto3 {
@@ -32,37 +32,35 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    /** @brief A struct representing element doubling from the group G1 of twisted Edwards curve 
+                    /** @brief A struct representing element addition from the group G1 of twisted Edwards curve 
                      *  for inversed coordinates representation.
                      *  NOTE: does not handle O and pts of order 2,4 
-                     *  http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#doubling-dbl-2008-bbjlp
+                     *  http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#addition-madd-2008-bbjlp
                      */
                     
-                    struct twisted_edwards_element_g1_inverted_dbl_2008_bbjlp {
+                    struct twisted_edwards_element_g1_inverted_madd_2008_bbjlp {
 
                         template <typename ElementType>
                         constexpr static inline ElementType process(
-                            const ElementType &first) {
+                            const ElementType &first, 
+                            const ElementType &second) {
 
                             using field_value_type = typename ElementType::field_type::value_type;
 
-                            if (first.is_zero()) {
-                                return (first);
-                            } else {
+                            // assert(second.Z == field_value_type::one());
 
-                                field_value_type A = (first.X).squared();                  // A = X1^2
-                                field_value_type B = (first.Y).squared();                  // B = Y1^2
-                                field_value_type U = ElementType::params_type::a * B;       // U = a*B
-                                field_value_type C = A + U;                                // C = A+U
-                                field_value_type D = A - U;                                // D = A-U
-                                field_value_type E = (first.X + first.Y).squared() - A - B;    // E = (X1+Y1)^2-A-B
-                                field_value_type X3 = C * D;                               // X3 = C*D
-                                field_value_type d2 = ElementType::params_type::d + ElementType::params_type::d;    // d2=2*d
-                                field_value_type Y3 = E * (C - d2 * first.Z.squared());    // Y3 = E*(C-d2*Z1^2)
-                                field_value_type Z3 = D * E;                  // Z3 = D*E
+                            field_value_type B = ElementType::params_type::d * (first.Z).squared();          // B = d*Z1^2
+                            field_value_type C = (first.X) * (second.X);    // C = X1*X2
+                            field_value_type D = (first.Y) * (second.Y);    // D = Y1*Y2
+                            field_value_type E = C * D;                    // E = C*D
+                            field_value_type H = C - ElementType::params_type::a * D;                    // H = C-a*D
+                            field_value_type I =
+                                (first.X + first.Y) * (second.X + second.Y) - C - D;    // I = (X1+Y1)*(X2+Y2)-C-D
+                            field_value_type X3 = (E + B) * H;             // X3 = (E+B)*H
+                            field_value_type Y3 = (E - B) * I;             // Y3 = (E-B)*I
+                            field_value_type Z3 = first.Z * H * I;               // Z3 = Z1*H*I
 
-                                return ElementType(X3, Y3, Z3);
-                            }
+                            return ElementType(X3, Y3, Z3);
                         }
                     };
 
@@ -71,4 +69,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_INVERTED_DBL_2008_BBJLP_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_INVERTED_MADD_2008_BBJLP_HPP
