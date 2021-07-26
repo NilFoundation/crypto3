@@ -54,9 +54,9 @@ namespace nil {
                     struct verify_impl<ProcessingMode> : boost::accumulators::accumulator_base {
                     protected:
                         typedef ProcessingMode processing_mode;
-                        typedef typename processing_mode::key_type key_type;
-                        typedef typename processing_mode::signature_type signature_type;
                         typedef typename processing_mode::internal_accumulator_type internal_accumulator_type;
+                        typedef typename processing_mode::key_type key_type;
+                        typedef typename key_type::signature_type signature_type;
 
                     public:
                         typedef typename processing_mode::result_type result_type;

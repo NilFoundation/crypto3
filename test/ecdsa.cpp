@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -24,79 +25,93 @@
 
 #define BOOST_TEST_MODULE ecdsa_test
 
-#include <nil/crypto3/pubkey/algorithm/kem_encrypt.hpp>
-#include <nil/crypto3/pubkey/algorithm/kem_decrypt.hpp>
-#include <nil/crypto3/pubkey/algorithm/encrypt.hpp>
-#include <nil/crypto3/pubkey/algorithm/decrypt.hpp>
-#include <nil/crypto3/pubkey/algorithm/sign.hpp>
-#include <nil/crypto3/pubkey/algorithm/verify.hpp>
-#include <nil/crypto3/pubkey/algorithm/agree.hpp>
-
-#include <nil/crypto3/pubkey/ecdsa.hpp>
-#include <nil/crypto3/pubkey/bls.hpp>
-#include <nil/crypto3/pubkey/blinding.hpp>
-#include <nil/crypto3/pubkey/cecpq1.hpp>
-#include <nil/crypto3/pubkey/curve25519.hpp>
-#include <nil/crypto3/pubkey/dh.hpp>
-#include <nil/crypto3/pubkey/dlies.hpp>
-#include <nil/crypto3/pubkey/dsa.hpp>
-#include <nil/crypto3/pubkey/ecc_key.hpp>
-#include <nil/crypto3/pubkey/ecdh.hpp>
-#include <nil/crypto3/pubkey/ecdsa.hpp>
-#include <nil/crypto3/pubkey/ecgdsa.hpp>
-#include <nil/crypto3/pubkey/ecies.hpp>
-#include <nil/crypto3/pubkey/eckcdsa.hpp>
-#include <nil/crypto3/pubkey/ed25519.hpp>
-#include <nil/crypto3/pubkey/elgamal.hpp>
-#include <nil/crypto3/pubkey/gost_3410.hpp>
-#include <nil/crypto3/pubkey/mceliece.hpp>
-#include <nil/crypto3/pubkey/newhope.hpp>
-#include <nil/crypto3/pubkey/pbes2.hpp>
-#include <nil/crypto3/pubkey/pem.hpp>
-#include <nil/crypto3/pubkey/pk_keys.hpp>
-#include <nil/crypto3/pubkey/pkcs8.hpp>
-#include <nil/crypto3/pubkey/scheme.hpp>
-#include <nil/crypto3/pubkey/rsa.hpp>
-#include <nil/crypto3/pubkey/sm2.hpp>
-
-#include <nil/crypto3/pubkey/detail/complexity.hpp>
-#include <nil/crypto3/pubkey/detail/rfc6979.hpp>
+#include <string>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <boost/static_assert.hpp>
+#include <nil/crypto3/pubkey/algorithm/sign.hpp>
+#include <nil/crypto3/pubkey/algorithm/verify.hpp>
 
-#include <iostream>
-#include <string>
-#include <unordered_map>
+#include <nil/crypto3/pubkey/ecdsa.hpp>
 
-#include <cstdio>
-#include <cstring>
+#include <nil/crypto3/algebra/curves/secp.hpp>
 
-using namespace nil::crypto3::pubkey;
+#include <nil/crypto3/random/algebraic_random_device.hpp>
+#include <nil/crypto3/random/algebraic_engine.hpp>
 
-typedef std::unordered_map<std::string, std::string>::value_type string_data_value;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
+#include <nil/crypto3/pkpad/emsa/emsa1.hpp>
 
-// BOOST_TEST_DONT_PRINT_LOG_VALUE(ecdsa::construction_type::digest_type)
+#include <nil/crypto3/hash/sha2.hpp>
 
-static const std::unordered_map<std::string, std::string> string_data = {
-    {"", "cdf26213a150dc3ecb610f18f6b38b46"},
-    {"a", "86be7afa339d0fc7cfc785e72f578d33"},
-    {"abc", "c14a12199c66e4ba84636b0f69144c77"},
-    {"message digest", "9e327b3d6e523062afc1132d7df9d1b8"},
-    {"abcdefghijklmnopqrstuvwxyz", "fd2aa607f71dc8f510714922b371834e"},
-    {"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", "a1aa0689d0fafa2ddc22e88b49133a06"},
-    {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "d1e959eb179c911faea4624c60c5c702"}};
+using namespace nil::crypto3;
+
+template<typename FieldParams>
+void print_field_element(std::ostream &os, const typename algebra::fields::detail::element_fp<FieldParams> &e) {
+    os << e.data;
+}
+
+template<typename FpCurveGroupElement>
+void print_fp_curve_group_element(std::ostream &os, const FpCurveGroupElement &e) {
+    os << std::hex << "( " << e.X.data << " : " << e.Y.data << " : " << e.Z.data << " )";
+}
+
+template<typename Fp2CurveGroupElement>
+void print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroupElement &e) {
+    os << std::hex << "(" << e.X.data[0].data << " , " << e.X.data[1].data << ") : (" << e.Y.data[0].data << " , "
+       << e.Y.data[1].data << ") : (" << e.Z.data[0].data << " , " << e.Z.data[1].data << ")";
+}
+
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            template<>
+            struct print_log_value<typename algebra::curves::secp256r1::g1_type::value_type> {
+                void operator()(std::ostream &os, typename algebra::curves::secp256r1::g1_type::value_type const &e) {
+                    print_fp_curve_group_element(os, e);
+                }
+            };
+
+            template<>
+            struct print_log_value<typename algebra::curves::secp256k1::g1_type::value_type> {
+                void operator()(std::ostream &os, typename algebra::curves::secp256k1::g1_type::value_type const &e) {
+                    print_fp_curve_group_element(os, e);
+                }
+            };
+
+            template<template<typename, typename> class P, typename K, typename V>
+            struct print_log_value<P<K, V>> {
+                void operator()(std::ostream &, P<K, V> const &) {
+                }
+            };
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}    // namespace boost
 
 BOOST_AUTO_TEST_SUITE(ecdsa_test_suite)
 
-BOOST_DATA_TEST_CASE(ecdsa_range_sign, boost::unit_test::data::make(string_data), array_element) {
-    std::string out = sign<ecdsa>(array_element.first);
+BOOST_AUTO_TEST_CASE(ecdsa_range_sign) {
+    using curve_type = algebra::curves::secp256r1;
+    using scalar_field_type = typename curve_type::scalar_field_type;
+    using scalar_field_value_type = typename scalar_field_type::value_type;
+    using hash_type = hashes::sha2<256>;
+    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using generator_type = random::algebraic_random_device<scalar_field_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using signature_type = typename pubkey::public_key<policy_type>::signature_type;
 
-    BOOST_CHECK_EQUAL(out, array_element.second);
+    generator_type key_gen;
+    pubkey::private_key<policy_type> privkey(key_gen());
+
+    std::string text = "Hello, world!";
+    std::vector<std::uint8_t> text_bytes(text.begin(), text.end());
+    signature_type sig = sign<policy_type>(text_bytes, privkey);
+    bool result = verify<policy_type>(text_bytes, sig, privkey);
+    std::cout << result << std::endl;
+
+    bool wrong_result = verify<policy_type>(text_bytes.begin(), text_bytes.end() - 1, sig, privkey);
+    std::cout << wrong_result << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

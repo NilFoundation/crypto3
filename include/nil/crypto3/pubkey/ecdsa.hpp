@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_PUBKEY_ECDSA_HPP
 #define CRYPTO3_PUBKEY_ECDSA_HPP
 
+#include <utility>
+
 #include <nil/crypto3/pkpad/algorithms/encode.hpp>
 
 #include <nil/crypto3/pubkey/private_key.hpp>
@@ -35,10 +37,10 @@ namespace nil {
         namespace pubkey {
             // TODO: add distribution support
             // TODO: review ECDSA implementation and add auxiliary functional provided by the standard
+            // TODO: review generator passing
             template<typename CurveType, typename Padding, typename GeneratorType, typename DistributionType = void,
-                     typename std::enable_if<std::is_same<typename CurveType::scalar_field_type::value_type,
-                                                          typename GeneratorType::result_type>::value,
-                                             bool>::type = true>
+                     typename = typename std::enable_if<std::is_same<typename CurveType::scalar_field_type::value_type,
+                                                                     typename GeneratorType::result_type>::value>::type>
             struct ecdsa {
                 typedef ecdsa<CurveType, Padding, GeneratorType, DistributionType> self_type;
                 typedef CurveType curve_type;
@@ -67,7 +69,7 @@ namespace nil {
                 typedef typename scalar_field_type::number_type scalar_number_type;
 
                 typedef g1_value_type public_key_type;
-                typedef std::tuple<scalar_field_value_type, scalar_field_value_type> signature_type;
+                typedef std::pair<scalar_field_value_type, scalar_field_value_type> signature_type;
 
                 public_key(const public_key_type &key) : pubkey(key) {
                 }
@@ -91,8 +93,9 @@ namespace nil {
                     if (X.is_zero()) {
                         return false;
                     }
+                    // TODO: review conversion
                     return signature.first ==
-                           scalar_field_value_type(scalar_number_type(static_cast<base_modulus_type>(X.to_affine().X)));
+                           scalar_field_value_type(static_cast<base_modulus_type>(X.to_affine().X.data));
                 }
 
             protected:
@@ -115,6 +118,7 @@ namespace nil {
                 typedef typename base_type::scalar_field_value_type scalar_field_value_type;
                 typedef typename base_type::g1_value_type g1_value_type;
                 typedef typename base_type::base_modulus_type base_modulus_type;
+                typedef typename base_type::scalar_number_type scalar_number_type;
 
                 typedef scalar_field_value_type private_key_type;
                 typedef typename base_type::public_key_type public_key_type;
@@ -139,7 +143,9 @@ namespace nil {
 
                 // TODO: review to make blind signing
                 // TODO: add support of HMAC based generator (https://datatracker.ietf.org/doc/html/rfc6979)
-                inline signature_type sign(internal_accumulator_type &acc) {
+                // TODO: review passing of generator seed
+                inline signature_type sign(internal_accumulator_type &acc) const {
+                    generator_type gen;
                     scalar_field_value_type m =
                         padding::accumulators::extract::encode<padding::encoding_policy<padding_type>>(acc);
 
@@ -153,22 +159,16 @@ namespace nil {
                         }
                         // TODO: review converting of kG x-coordinate to r - in case of 2^m order field procedure seems
                         //  not to be trivial
-                        r = scalar_number_type(
-                            static_cast<base_modulus_type>((k * g1_value_type::one()).to_affine().X));
+                        r = scalar_field_value_type(
+                            static_cast<base_modulus_type>((k * g1_value_type::one()).to_affine().X.data));
                         s = k.inversed() * (privkey * r + m);
                     } while (r.is_zero() || s.is_zero());
 
                     return signature_type(r, s);
                 }
 
-                // TODO: review encapsulation of generator
-                inline generator_type &get_generator() {
-                    return gen;
-                }
-
             protected:
                 private_key_type privkey;
-                generator_type gen;
             };
         }    // namespace pubkey
     }        // namespace crypto3

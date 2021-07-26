@@ -55,6 +55,11 @@ namespace nil {
                     static inline result_type process(const key_type &key, Args &...args) {
                         return key.sign(args...);
                     }
+
+                    template<typename... Args>
+                    inline static void update(const key_type &key, Args &...args) {
+                        key.update(args...);
+                    }
                 };
 
                 template<typename Scheme>
@@ -68,6 +73,11 @@ namespace nil {
                     template<typename... Args>
                     static inline result_type process(const key_type &key, Args &...args) {
                         return key.verify(args...);
+                    }
+
+                    template<typename... Args>
+                    inline static void update(const key_type &key, Args &...args) {
+                        key.update(args...);
                     }
                 };
 
@@ -84,6 +94,11 @@ namespace nil {
                     template<typename... Args>
                     inline static result_type process(Args &...args) {
                         return policy_type::process(args...);
+                    }
+
+                    template<typename... Args>
+                    inline static void update(Args &...args) {
+                        policy_type::update(args...);
                     }
                 };
             }    // namespace detail
