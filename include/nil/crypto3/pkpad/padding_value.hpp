@@ -51,8 +51,6 @@ namespace nil {
                         typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type
                             accumulator_type;
 
-                        typedef typename accumulator_type::processing_policy processing_policy;
-
                         ref_padding_impl(accumulator_set_type &&acc) : accumulator_set(acc) {
                         }
 
@@ -64,8 +62,6 @@ namespace nil {
                         typedef PaddingAccumulator accumulator_set_type;
                         typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type
                             accumulator_type;
-
-                        typedef typename accumulator_type::processing_policy processing_policy;
 
                         value_padding_impl(accumulator_set_type &&acc) :
                             accumulator_set(std::forward<accumulator_set_type>(acc)) {
@@ -80,7 +76,6 @@ namespace nil {
 
                         typedef typename padding_state_impl_type::accumulator_type accumulator_type;
                         typedef typename padding_state_impl_type::accumulator_set_type accumulator_set_type;
-                        typedef typename padding_state_impl_type::processing_policy processing_policy;
 
                         typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
                             result_type;
@@ -135,7 +130,6 @@ namespace nil {
 
                         typedef typename padding_state_impl_type::accumulator_type accumulator_type;
                         typedef typename padding_state_impl_type::accumulator_set_type accumulator_set_type;
-                        typedef typename padding_state_impl_type::processing_policy processing_policy;
 
                         typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
                             result_type;

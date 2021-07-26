@@ -147,7 +147,9 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename InputIterator, typename OutputIterator>
-            OutputIterator encode(InputIterator first, InputIterator last, OutputIterator out) {
+t             typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
+                                    OutputIterator>::type
+                encode(InputIterator first, InputIterator last, OutputIterator out) {
                 typedef padding::encoding_accumulator_set<Padding> PaddingAccumulator;
 
                 typedef padding::detail::value_padding_impl<PaddingAccumulator> StreamPaddingImpl;
@@ -171,7 +173,9 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename SinglePassRange, typename OutputIterator>
-            OutputIterator encode(const SinglePassRange &rng, OutputIterator out) {
+            typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
+                                    OutputIterator>::type
+                encode(const SinglePassRange &rng, OutputIterator out) {
                 typedef padding::encoding_accumulator_set<Padding> PaddingAccumulator;
 
                 typedef padding::detail::value_padding_impl<PaddingAccumulator> StreamPaddingImpl;

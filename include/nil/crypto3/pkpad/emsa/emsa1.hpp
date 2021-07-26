@@ -77,7 +77,8 @@ namespace nil {
                         }
 
                         static inline result_type process(internal_accumulator_type &acc) {
-                            typename hash_type::digest_type digest = accumulators::extract::hash<hash_type>(acc);
+                            typename hash_type::digest_type digest =
+                                ::nil::crypto3::accumulators::extract::hash<hash_type>(acc);
                             marshalling_field_element_type marshalling_field_element;
                             auto it = digest.cbegin();
                             marshalling_field_element.read(it, digest.size());
