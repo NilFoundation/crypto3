@@ -147,7 +147,7 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename InputIterator, typename OutputIterator>
-t             typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
+            typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
                                     OutputIterator>::type
                 encode(InputIterator first, InputIterator last, OutputIterator out) {
                 typedef padding::encoding_accumulator_set<Padding> PaddingAccumulator;
