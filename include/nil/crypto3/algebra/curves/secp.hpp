@@ -26,8 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_SECP_HPP
 #define CRYPTO3_ALGEBRA_CURVES_SECP_HPP
 
-#include <nil/crypto3/algebra/curves/detail/secp/secp_k1/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/secp/secp_r1/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/secp/secp_k1/basic_params.hpp>
+#include <nil/crypto3/algebra/curves/detail/secp/secp_r1/basic_params.hpp>
 
 #include <nil/crypto3/algebra/curves/detail/secp/secp_k1/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/secp/secp_r1/g1.hpp>
@@ -40,34 +40,22 @@ namespace nil {
             namespace curves {
                 template<std::size_t Version>
                 class secp_k1 {
-                    using policy_type = detail::secp_k1_basic_policy<Version>;
+                    using params_type = detail::secp_k1_basic_params<Version>;
 
                 public:
-                    typedef typename policy_type::base_field_type base_field_type;
-                    typedef typename policy_type::scalar_field_type scalar_field_type;
-                    typedef typename policy_type::number_type number_type;
-                    typedef typename policy_type::extended_number_type extended_number_type;
-
-                    constexpr static const number_type p = policy_type::p;    ///< base field characteristic
-                    constexpr static const number_type q =
-                        policy_type::q;    ///< scalar field characteristic (order of the group of points)
+                    typedef typename params_type::base_field_type base_field_type;
+                    typedef typename params_type::scalar_field_type scalar_field_type;
 
                     typedef typename detail::secp_k1_g1<Version> g1_type;
                 };
 
                 template<std::size_t Version>
                 class secp_r1 {
-                    using policy_type = detail::secp_r1_basic_policy<Version>;
+                    using params_type = detail::secp_r1_basic_params<Version>;
 
                 public:
-                    typedef typename policy_type::base_field_type base_field_type;
-                    typedef typename policy_type::scalar_field_type scalar_field_type;
-                    typedef typename policy_type::number_type number_type;
-                    typedef typename policy_type::extended_number_type extended_number_type;
-
-                    constexpr static const number_type p = policy_type::p;    ///< base field characteristic
-                    constexpr static const number_type q =
-                        policy_type::q;    ///< scalar field characteristic (order of the group of points)
+                    typedef typename params_type::base_field_type base_field_type;
+                    typedef typename params_type::scalar_field_type scalar_field_type;
 
                     typedef typename detail::secp_r1_g1<Version> g1_type;
                 };
@@ -75,13 +63,13 @@ namespace nil {
                 template<std::size_t Version>
                 class secp_r2;
 
-                //                typedef secp_k1<160> secp160k1;
-                //                typedef secp_r1<160> secp160r1;
-                //                typedef secp_r2<160> secp160r2;
-                //                typedef secp_k1<192> secp192k1;
-                //                typedef secp_r1<192> secp192r1;
-                //                typedef secp_k1<224> secp224k1;
-                //                typedef secp_r1<224> secp224r1;
+                typedef secp_k1<160> secp160k1;
+                typedef secp_r1<160> secp160r1;
+                // typedef secp_r2<160> secp160r2;
+                typedef secp_k1<192> secp192k1;
+                typedef secp_r1<192> secp192r1;
+                typedef secp_k1<224> secp224k1;
+                typedef secp_r1<224> secp224r1;
                 typedef secp_k1<256> secp256k1;
                 typedef secp_r1<256> secp256r1;
             }    // namespace curves

@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -23,40 +23,31 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_SECP_K1_G1_HPP
-#define CRYPTO3_ALGEBRA_CURVES_SECP_K1_G1_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_SECP_K1_BASIC_PARAMS_HPP
+#define CRYPTO3_ALGEBRA_CURVES_SECP_K1_BASIC_PARAMS_HPP
 
-#include <nil/crypto3/algebra/curves/detail/secp/secp_k1/256/params.hpp>
+#include <nil/crypto3/algebra/fields/secp/secp_k1/base_field.hpp>
+#include <nil/crypto3/algebra/fields/secp/secp_k1/scalar_field.hpp>
 
-#include <nil/crypto3/algebra/curves/detail/forms.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_0/element_g1.hpp>
+#include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                template<std::size_t Version>
-                struct secp_k1;
-
                 namespace detail {
-                    /** @brief A struct representing a group G1 of SECP curves.
+
+                    using namespace algebra;
+                    /** @brief A struct representing details about base and scalar fields.
                      *    @tparam Version version of the curve
                      *
                      */
                     template<std::size_t Version>
-                    struct secp_k1_g1 {
+                    struct secp_k1_basic_params {
+                        using base_field_type = fields::secp_k1_base_field<Version>;
+                        using scalar_field_type = fields::secp_k1_scalar_field<Version>;
 
-                        using params_type = secp_k1_short_weierstrass_g1_jacobian_with_a4_0_params<Version>;
-
-                        using curve_type = secp_k1<Version>;
-
-                        using field_type = typename params_type::g1_field_type;
-
-                        constexpr static const std::size_t value_bits =
-                            field_type::value_bits + 1;    ///< size of the base field in bits
-
-                        using value_type = short_weierstrass_element_g1_jacobian_with_a4_0<params_type>;
+                        using g1_field_type = base_field_type;
                     };
 
                 }    // namespace detail
@@ -64,4 +55,5 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_SECP_K1_G1_HPP
+
+#endif    // CRYPTO3_ALGEBRA_CURVES_SECP_K1_BASIC_PARAMS_HPP
