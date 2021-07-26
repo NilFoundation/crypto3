@@ -32,7 +32,7 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 
 #include <nil/crypto3/math/polynomial/basic_operations.hpp>
 #include <nil/crypto3/math/polynomial/xgcd.hpp>
@@ -293,7 +293,7 @@ BOOST_AUTO_TEST_CASE(extended_gcd) {
     std::vector<typename FieldType::value_type> pu(1, FieldType::value_type::zero());
     std::vector<typename FieldType::value_type> pv(1, FieldType::value_type::zero());
 
-    _polynomial_xgcd<FieldType>(a, b, pg, pu, pv);
+    extended_euclidean<FieldType>(a, b, pg, pu, pv);
 
     std::vector<typename FieldType::value_type> pv_ans = {1, 6, 25, 90};
 

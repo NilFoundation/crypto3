@@ -29,6 +29,9 @@
 #include <algorithm>
 #include <vector>
 
+#include <boost/math/tools/polynomial_gcd.hpp>
+#include <boost/integer/extended_euclidean.hpp>
+
 #include <nil/crypto3/math/polynomial/basic_operations.hpp>
 
 namespace nil {
@@ -40,13 +43,9 @@ namespace nil {
              * Input: Polynomial A, Polynomial B.
              * Output: Polynomial G, Polynomial U, Polynomial V, such that G = (A * U) + (B * V).
              */
-
-            template<typename FieldType>
-            void _polynomial_xgcd(const std::vector<typename FieldType::value_type> &a,
-                                  const std::vector<typename FieldType::value_type> &b,
-                                  std::vector<typename FieldType::value_type> &g,
-                                  std::vector<typename FieldType::value_type> &u,
-                                  std::vector<typename FieldType::value_type> &v) {
+            template<typename FieldType, typename Range1, typename Range2, typename Range3, typename Range4,
+                     typename Range5>
+            void extended_euclidean(const Range1 &a, const Range2 &b, Range3 &g, Range4 &u, Range5 &v) {
 
                 typedef typename FieldType::value_type value_type;
 
@@ -93,7 +92,7 @@ namespace nil {
                 u = U;
                 v = V1;
             }
-        }    // namespace fft
+        }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
 

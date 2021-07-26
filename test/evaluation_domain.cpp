@@ -50,9 +50,9 @@
 #include <nil/crypto3/math/domains/geometric_sequence_domain.hpp>
 #include <nil/crypto3/math/domains/step_radix2_domain.hpp>
 
-#include <nil/crypto3/math/make_evaluation_domain.hpp>
+#include <nil/crypto3/math/evaluation_domain.hpp>
 
-#include <nil/crypto3/math/polynomial/naive_evaluate.hpp>
+#include <nil/crypto3/math/polynomial/evaluate.hpp>
 
 #include <typeinfo>
 
@@ -72,17 +72,6 @@ void test_fft() {
     std::vector<value_type> f = {2, 5, 3, 8};
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
-    // for (int key = 0; key < 5; key++) {
-    /*if (key == 0)
-        domain.reset(new basic_radix2_domain<FieldType>(m));
-    else if (key == 1)
-        domain.reset(new extended_radix2_domain<FieldType>(m));
-    else if (key == 2)
-        domain.reset(new step_radix2_domain<FieldType>(m));
-    else if (key == 3)
-        domain.reset(new geometric_sequence_domain<FieldType>(m));
-    else if (key == 4)
-        domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
 
     domain = make_evaluation_domain<FieldType>(m);
 
@@ -98,13 +87,11 @@ void test_fft() {
 
     std::cout << "FFT: key = " << typeid(*domain).name() << std::endl;
     for (std::size_t i = 0; i < m; i++) {
-        value_type e = evaluate_polynomial(m, f, idx[i]);
+        value_type e = evaluate_polynomial(f, idx[i], m);
         std::cout << "idx[" << i << "] = " << idx[i].data << std::endl;
         std::cout << "e = " << e.data << std::endl;
         BOOST_CHECK_EQUAL(e.data, a[i].data);
-        // std::cout << e.data << " == " << a[i].data << std::endl;
     }
-    // }
     std::cout << "is_basic_radix2_domain = " << detail::is_basic_radix2_domain<FieldType>(m) << std::endl;
     std::cout << "is_extended_radix2_domain = " << detail::is_extended_radix2_domain<FieldType>(m) << std::endl;
     std::cout << "is_step_radix2_domain = " << detail::is_step_radix2_domain<FieldType>(m) << std::endl;
@@ -119,17 +106,6 @@ void test_inverse_fft_of_fft() {
     std::vector<value_type> f = {2, 5, 3, 8};
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
-    // for (int key = 0; key < 5; key++) {
-    /*if (key == 0)
-        domain.reset(new basic_radix2_domain<FieldType>(m));
-    else if (key == 1)
-        domain.reset(new extended_radix2_domain<FieldType>(m));
-    else if (key == 2)
-        domain.reset(new step_radix2_domain<FieldType>(m));
-    else if (key == 3)
-        domain.reset(new geometric_sequence_domain<FieldType>(m));
-    else if (key == 4)
-        domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
 
     domain = make_evaluation_domain<FieldType>(m);
 
@@ -141,9 +117,7 @@ void test_inverse_fft_of_fft() {
     for (std::size_t i = 0; i < m; i++) {
         std::cout << "a[" << i << "] = " << a[i].data << std::endl;
         BOOST_CHECK_EQUAL(f[i].data, a[i].data);
-        // std::cout << f[i].data << " == " << a[i].data << std::endl;
     }
-    // }
 }
 
 template<typename FieldType>
@@ -155,17 +129,6 @@ void test_inverse_coset_ftt_of_coset_fft() {
     value_type coset = value_type(fields::arithmetic_params<FieldType>::multiplicative_generator);
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
-    // for (int key = 0; key < 3; key++) {
-    /*if (key == 0)
-        domain.reset(new basic_radix2_domain<FieldType>(m));
-    else if (key == 1)
-        domain.reset(new extended_radix2_domain<FieldType>(m));
-    else if (key == 2)
-        domain.reset(new step_radix2_domain<FieldType>(m));
-    else if (key == 3)
-        domain.reset(new geometric_sequence_domain<FieldType>(m));
-    else if (key == 4)
-        domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
 
     domain = make_evaluation_domain<FieldType>(m);
 
@@ -177,9 +140,7 @@ void test_inverse_coset_ftt_of_coset_fft() {
 
     for (std::size_t i = 0; i < m; i++) {
         BOOST_CHECK_EQUAL(f[i].data, a[i].data);
-        // std::cout << f[i].data << " == " << a[i].data << std::endl;
     }
-    // }
 }
 
 template<typename FieldType>
@@ -190,17 +151,6 @@ void test_lagrange_coefficients() {
     value_type t = value_type(10);
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
-    // for (int key = 0; key < 5; key++) {
-    /*if (key == 0)
-        domain.reset(new basic_radix2_domain<FieldType>(m));
-    else if (key == 1)
-        domain.reset(new extended_radix2_domain<FieldType>(m));
-    else if (key == 2)
-        domain.reset(new step_radix2_domain<FieldType>(m));
-    else if (key == 3)
-        domain.reset(new geometric_sequence_domain<FieldType>(m));
-    else if (key == 4)
-        domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
 
     domain = make_evaluation_domain<FieldType>(m);
 
@@ -215,12 +165,10 @@ void test_lagrange_coefficients() {
     }
 
     for (std::size_t i = 0; i < m; i++) {
-        value_type e = evaluate_lagrange_polynomial(m, d, t, i);
-        // printf("%ld == %ld\n", e.as_ulong(), a[i].as_ulong());
+        value_type e = evaluate_lagrange_polynomial(d, t, m, i);
         BOOST_CHECK_EQUAL(e.data, a[i].data);
         std::cout << "e = " << e.data << std::endl;
     }
-    // }
 }
 
 template<typename FieldType>
@@ -231,18 +179,6 @@ void test_compute_z() {
     value_type t = value_type(10);
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
-    // for (int key = 0; key < 5; key++) {
-    /*if (key == 0)
-        domain.reset(new basic_radix2_domain<FieldType>(m));
-    else if (key == 1)
-        domain.reset(new extended_radix2_domain<FieldType>(m));
-    else if (key == 2)
-        domain.reset(new step_radix2_domain<FieldType>(m));
-    else if (key == 3)
-        domain.reset(new geometric_sequence_domain<FieldType>(m));
-    else if (key == 4)
-        domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
-
     domain = make_evaluation_domain<FieldType>(m);
 
     value_type a;
@@ -256,35 +192,33 @@ void test_compute_z() {
     }
 
     BOOST_CHECK_EQUAL(Z.data, a.data);
-    // std::cout << Z.data << " == " << a.data << std::endl;
-    // }
 }
 
 BOOST_AUTO_TEST_SUITE(fft_evaluation_domain_test_suite)
 
 BOOST_AUTO_TEST_CASE(fft) {
-    // test_fft<fields::bls12<381>>();
-    test_fft<fields::mnt4_fr<298>>();
+    test_fft<fields::bls12<381>>();
+    test_fft<fields::mnt4<298>>();
 }
 
 BOOST_AUTO_TEST_CASE(inverse_fft_to_fft) {
-    // test_inverse_fft_of_fft<fields::bls12<381>>();
-    test_inverse_fft_of_fft<fields::mnt4_fr<298>>();
+    test_inverse_fft_of_fft<fields::bls12<381>>();
+    test_inverse_fft_of_fft<fields::mnt4<298>>();
 }
 
 BOOST_AUTO_TEST_CASE(inverse_coset_ftt_to_coset_fft) {
-    // test_inverse_coset_ftt_of_coset_fft<fields::bls12<381>>();
-    test_inverse_coset_ftt_of_coset_fft<fields::mnt4_fr<298>>();
+    test_inverse_coset_ftt_of_coset_fft<fields::bls12<381>>();
+    test_inverse_coset_ftt_of_coset_fft<fields::mnt4<298>>();
 }
 
 BOOST_AUTO_TEST_CASE(lagrange_coefficients) {
-    // test_lagrange_coefficients<fields::bls12<381>>();
-    test_lagrange_coefficients<fields::mnt4_fr<298>>();
+    test_lagrange_coefficients<fields::bls12<381>>();
+    test_lagrange_coefficients<fields::mnt4<298>>();
 }
 
 BOOST_AUTO_TEST_CASE(compute_z) {
-    // test_compute_z<fields::bls12<381>>();
-    test_compute_z<fields::mnt4_fr<298>>();
+    test_compute_z<fields::bls12<381>>();
+    test_compute_z<fields::mnt4<298>>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

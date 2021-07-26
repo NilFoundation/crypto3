@@ -28,6 +28,8 @@
 
 #include <vector>
 
+#include <nil/crypto3/multiprecision/integer.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace math {
@@ -57,8 +59,7 @@ namespace nil {
                  *
                  * (See the function get_evaluation_domain below.)
                  */
-                evaluation_domain(const std::size_t m) :
-                    m(m), log2_size(multiprecision::msb(size))) {};
+                evaluation_domain(const std::size_t m) : m(m), log2_size(multiprecision::msb(m)) {};
 
                 /**
                  * Get the idx-th element in S.

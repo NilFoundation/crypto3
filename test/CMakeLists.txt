@@ -19,20 +19,20 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${Boost_LIBRARIES})
 
-macro(define_fft_test name)
-    cm_test(NAME fft_${name}_test SOURCES ${name}.cpp)
+macro(define_math_test name)
+    cm_test(NAME math_${name}_test SOURCES ${name}.cpp)
 
-    target_include_directories(fft_${name}_test PRIVATE
+    target_include_directories(math_${name}_test PRIVATE
                                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(fft_${name}_test PROPERTIES CXX_STANDARD 14)
+    set_target_properties(math_${name}_test PROPERTIES CXX_STANDARD 14)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
-        target_compile_definitions(fft_${name}_test PRIVATE BOOST_TEST_DYN_LINK)
+        target_compile_definitions(math_${name}_test PRIVATE BOOST_TEST_DYN_LINK)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
@@ -44,5 +44,5 @@ set(TESTS_NAMES
     "polynomial_arithmetic")
 
 foreach(TEST_NAME ${TESTS_NAMES})
-    define_fft_test(${TEST_NAME})
+    define_math_test(${TEST_NAME})
 endforeach()

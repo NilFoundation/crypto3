@@ -108,7 +108,7 @@ namespace nil {
                 std::vector<value_type> mod(n + 1, value_type::zero());
                 mod[n] = value_type::one();
 
-                _polynomial_xgcd<FieldType>(mod, I, mod, mod, I);
+                extended_euclidean<FieldType>(mod, I, mod, mod, I);
 
                 I.resize(n);
 
@@ -269,7 +269,7 @@ namespace nil {
                     a[i] = w[i] * z[i];
                 }
             }
-        }    // namespace fft
+        }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
 
