@@ -118,6 +118,15 @@ namespace nil {
                         using field_type = typename edwards_basic_params<183>::g2_field_type;
                         using group_type = edwards_g2<183>;
 
+                        constexpr static const typename field_type::value_type twist =
+                            typename field_type::value_type(0x00, 0x01, 0x00);
+                        constexpr static const typename field_type::value_type::underlying_type g1_a = 
+                            typename field_type::value_type::underlying_type(a);
+                        constexpr static const typename field_type::value_type a = g1_a * twist;
+                        constexpr static const typename field_type::value_type::underlying_type g1_d = 
+                            typename field_type::value_type::underlying_type(d);
+                        constexpr static const typename field_type::value_type d = g1_d * twist;
+
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::one(), 
                             field_type::value_type::zero(), 

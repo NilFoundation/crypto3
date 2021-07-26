@@ -27,7 +27,7 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_ALT_BN128_HPP
 #define CRYPTO3_ALGEBRA_CURVES_ALT_BN128_HPP
 
-#include <nil/crypto3/algebra/curves/detail/alt_bn128/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/alt_bn128/params.hpp>
 #include <nil/crypto3/algebra/curves/detail/alt_bn128/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/alt_bn128/g2.hpp>
 
@@ -47,11 +47,11 @@ namespace nil {
                 template<std::size_t Version>
                 class alt_bn128 {
 
-                    using policy_type = detail::alt_bn128_basic_policy<Version>;
+                    using params_type = detail::alt_bn128_basic_params<Version>;
                 public:
 
-                    typedef typename policy_type::base_field_type base_field_type;
-                    typedef typename policy_type::scalar_field_type scalar_field_type;
+                    typedef typename params_type::base_field_type base_field_type;
+                    typedef typename params_type::scalar_field_type scalar_field_type;
 
                     typedef typename detail::alt_bn128_g1<Version> g1_type;
                     typedef typename detail::alt_bn128_g2<Version> g2_type;
@@ -59,7 +59,7 @@ namespace nil {
                     // typedef typename pairing::pairing_policy<alt_bn128<Version>,
                     //    pairing::detail::alt_bn128_pairing_functions<Version>> pairing_policy;
 
-                    typedef typename policy_type::gt_field_type gt_type;
+                    typedef typename params_type::gt_field_type gt_type;
                 };
 
                 typedef alt_bn128<254> alt_bn128_254;

@@ -27,8 +27,11 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_ALT_BN128_G2_HPP
 #define CRYPTO3_ALGEBRA_CURVES_ALT_BN128_G2_HPP
 
-#include <nil/crypto3/algebra/curves/detail/alt_bn128/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/alt_bn128/element_g2.hpp>
+#include <nil/crypto3/algebra/curves/detail/alt_bn128/params.hpp>
+
+#include <nil/crypto3/algebra/curves/detail/forms.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_0/element_g1.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -47,7 +50,7 @@ namespace nil {
                     template<std::size_t Version>
                     struct alt_bn128_g2 {
 
-                        using params_type = alt_bn128_basic_policy<Version>;
+                        using params_type = alt_bn128_short_weierstrass_g2_jacobian_with_a4_0_params<Version>;
 
                         using curve_type = alt_bn128<Version>;
 
@@ -56,7 +59,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = element_alt_bn128_g2<Version>;
+                        using value_type = short_weierstrass_element_g1_jacobian_with_a4_0<params_type>;
                     };
 
                 }    // namespace detail
