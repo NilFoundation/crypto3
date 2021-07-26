@@ -120,9 +120,9 @@ namespace nil {
 
                         constexpr static const typename field_type::value_type twist =
                             typename field_type::value_type(0x00, 0x01, 0x00);
-                        constexpr static const typename field_type::value_type::underlying_type g1_a = 
-                            typename field_type::value_type::underlying_type(a);
-                        constexpr static const typename field_type::value_type a = g1_a * twist;
+                        constexpr static const typename field_type::value_type::underlying_type g1_c = 
+                            typename field_type::value_type::underlying_type(c);
+                        constexpr static const typename field_type::value_type c = g1_c * twist;
                         constexpr static const typename field_type::value_type::underlying_type g1_d = 
                             typename field_type::value_type::underlying_type(d);
                         constexpr static const typename field_type::value_type d = g1_d * twist;
