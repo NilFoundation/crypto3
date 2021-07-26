@@ -23,10 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_381_TYPES_POLICY_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_BLS12_381_TYPES_POLICY_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_TYPES_POLICY_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_TYPES_POLICY_HPP
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -37,9 +37,10 @@ namespace nil {
                     template<typename CurveType>
                     class types_policy;
 
+                    // Copy of the bls12<381> version
                     template<>
-                    class types_policy<curves::bls12<381>> {
-                        using curve_type = curves::bls12<381>;
+                    class types_policy<curves::edwards<183>> {
+                        using curve_type = curves::edwards<183>;
 
                     public:
 
@@ -49,42 +50,53 @@ namespace nil {
                         using g1_value_type = typename curve_type::base_field_type::value_type;
                         using g2_value_type = typename curve_type::g2_type::field_type::value_type;
 
-                        struct ate_g1_precomp {
+                        struct Fq_conic_coefficients {
 
-                            g1_value_type PX;
-                            g1_value_type PY;
+                            g1_value_type c_ZZ;
+                            g1_value_type c_XY;
+                            g1_value_type c_XZ;
+
+                            bool operator==(const Fq_conic_coefficients &other) const {
+                                return (this->c_ZZ == other.c_ZZ && this->c_XY == other.c_XY &&
+                                        this->c_XZ == other.c_XZ);
+                            }
+                        };
+
+                        struct Fq3_conic_coefficients {
+                            g2_value_type c_ZZ;
+                            g2_value_type c_XY;
+                            g2_value_type c_XZ;
+
+                            bool operator==(const Fq3_conic_coefficients &other) const {
+                                return (this->c_ZZ == other.c_ZZ && this->c_XY == other.c_XY &&
+                                        this->c_XZ == other.c_XZ);
+                            }
+                        };
+
+                        using tate_g1_precomp = std::vector<Fq_conic_coefficients>;
+                        using ate_g2_precomp = std::vector<Fq3_conic_coefficients>;
+
+                        struct ate_g1_precomp {
+                            g1_value_type P_XY;
+                            g1_value_type P_XZ;
+                            g1_value_type P_ZZplusYZ;
 
                             bool operator==(const ate_g1_precomp &other) const {
-                                return (this->PX == other.PX && this->PY == other.PY);
+                                return (this->P_XY == other.P_XY && this->P_XZ == other.P_XZ &&
+                                        this->P_ZZplusYZ == other.P_ZZplusYZ);
                             }
                         };
 
-                        struct ate_ell_coeffs {
+                        struct tate_g2_precomp {
+                            g2_value_type y0, eta;
 
-                            g2_value_type ell_0;
-                            g2_value_type ell_VW;
-                            g2_value_type ell_VV;
-
-                            bool operator==(const ate_ell_coeffs &other) const {
-                                return (this->ell_0 == other.ell_0 && this->ell_VW == other.ell_VW &&
-                                        this->ell_VV == other.ell_VV);
+                            bool operator==(const tate_g2_precomp &other) const {
+                                return (this->y0 == other.y0 && this->eta == other.eta);
                             }
                         };
 
-                        struct ate_g2_precomp {
-                            using coeffs_type = ate_ell_coeffs;
-
-                            g2_value_type QX;
-                            g2_value_type QY;
-                            std::vector<coeffs_type> coeffs;
-
-                            bool operator==(const ate_g2_precomp &other) const {
-                                return (this->QX == other.QX && this->QY == other.QY && this->coeffs == other.coeffs);
-                            }
-                        };
-
-                        typedef ate_g1_precomp g1_precomp;
-                        typedef ate_g2_precomp g2_precomp;
+                        using g1_precomp = ate_g1_precomp;
+                        using g2_precomp = ate_g2_precomp;
                     };
 
                 }    // namespace detail
@@ -93,4 +105,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_381_TYPES_POLICY_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_TYPES_POLICY_HPP

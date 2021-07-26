@@ -23,10 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_381_TYPES_POLICY_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_BLS12_381_TYPES_POLICY_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_ALT_BN128_TYPES_POLICY_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_ALT_BN128_TYPES_POLICY_HPP
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -37,9 +37,10 @@ namespace nil {
                     template<typename CurveType>
                     class types_policy;
 
+                    // Copy of the bls12<381> version
                     template<>
-                    class types_policy<curves::bls12<381>> {
-                        using curve_type = curves::bls12<381>;
+                    class types_policy<curves::alt_bn128<254>> {
+                        using curve_type = curves::alt_bn128<254>;
 
                     public:
 
@@ -93,4 +94,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_381_TYPES_POLICY_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_ALT_BN128_TYPES_POLICY_HPP

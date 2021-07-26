@@ -66,63 +66,6 @@ namespace nil {
                         // but it's better to implement a structure pairing_params with such values
 
                     private:
-                        using g1 = typename g1_type::value_type;
-                        using g2 = typename g2_type::value_type;
-                        using Fq = typename fq_type::value_type;
-                        using Fq3 = typename fqe_type::value_type;
-                        using gt = typename fqk_type::value_type;
-
-                    public:
-                        struct Fq_conic_coefficients {
-
-                            Fq c_ZZ;
-                            Fq c_XY;
-                            Fq c_XZ;
-
-                            bool operator==(const Fq_conic_coefficients &other) const {
-                                return (this->c_ZZ == other.c_ZZ && this->c_XY == other.c_XY &&
-                                        this->c_XZ == other.c_XZ);
-                            }
-                        };
-
-                        struct Fq3_conic_coefficients {
-                            Fq3 c_ZZ;
-                            Fq3 c_XY;
-                            Fq3 c_XZ;
-
-                            bool operator==(const Fq3_conic_coefficients &other) const {
-                                return (this->c_ZZ == other.c_ZZ && this->c_XY == other.c_XY &&
-                                        this->c_XZ == other.c_XZ);
-                            }
-                        };
-
-                        using tate_g1_precomp = std::vector<Fq_conic_coefficients>;
-                        using ate_g2_precomp = std::vector<Fq3_conic_coefficients>;
-
-                        struct ate_g1_precomp {
-                            Fq P_XY;
-                            Fq P_XZ;
-                            Fq P_ZZplusYZ;
-
-                            bool operator==(const ate_g1_precomp &other) const {
-                                return (this->P_XY == other.P_XY && this->P_XZ == other.P_XZ &&
-                                        this->P_ZZplusYZ == other.P_ZZplusYZ);
-                            }
-                        };
-
-                        struct tate_g2_precomp {
-                            Fq3 y0, eta;
-
-                            bool operator==(const tate_g2_precomp &other) const {
-                                return (this->y0 == other.y0 && this->eta == other.eta);
-                            }
-                        };
-
-                        using g1_precomp = ate_g1_precomp;
-
-                        using g2_precomp = ate_g2_precomp;
-
-                    private:
                         /*************************  FINAL EXPONENTIATIONS  ***********************************/
 
                         static gt final_exponentiation_last_chunk(const gt &elt, const gt &elt_inv) {

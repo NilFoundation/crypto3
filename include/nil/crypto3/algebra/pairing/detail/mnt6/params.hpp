@@ -23,10 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_381_BASIC_PARAMS_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_BLS12_381_BASIC_PARAMS_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT6_298_PAIRING_PARAMS_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_MNT6_298_PAIRING_PARAMS_HPP
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -38,8 +38,8 @@ namespace nil {
                     class pairing_params;
 
                     template<>
-                    class pairing_params<curves::bls12<381>> {
-                        using curve_type = curves::bls12<381>;
+                    class pairing_params<curves::mnt6<298>> {
+                        using curve_type = curves::mnt6<298>;
 
                     public:
 
@@ -49,22 +49,28 @@ namespace nil {
                         constexpr static const std::size_t number_type_max_bits = 
                             curve_type::base_field_type::modulus_bits;
 
-                        constexpr static const number_type ate_loop_count = 0xD201000000010000_cppui64;
+                        constexpr static const number_type ate_loop_count =
+                            0x1EEF5546609756BEC2A33F0DC9A1B671660000_cppui149;
                         constexpr static const bool ate_is_loop_count_neg = true;
-                        // constexpr static const extended_number_type final_exponent = extended_number_type(
-                        //    0x2EE1DB5DCC825B7E1BDA9C0496A1C0A89EE0193D4977B3F7D4507D07363BAA13F8D14A917848517BADC3A43D1073776AB353F2C30698E8CC7DEADA9C0AADFF5E9CFEE9A074E43B9A660835CC872EE83FF3A0F0F1C0AD0D6106FEAF4E347AA68AD49466FA927E7BB9375331807A0DCE2630D9AA4B113F414386B0E8819328148978E2B0DD39099B86E1AB656D2670D93E4D7ACDD350DA5359BC73AB61A0C5BF24C374693C49F570BCD2B01F3077FFB10BF24DDE41064837F27611212596BC293C8D4C01F25118790F4684D0B9C40A68EB74BB22A40EE7169CDC1041296532FEF459F12438DFC8E2886EF965E61A474C5C85B0129127A1B5AD0463434724538411D1676A53B5A62EB34C05739334F46C02C3F0BD0C55D3109CD15948D0A1FAD20044CE6AD4C6BEC3EC03EF19592004CEDD556952C6D8823B19DADD7C2498345C6E5308F1C511291097DB60B1749BF9B71A9F9E0100418A3EF0BC627751BBD81367066BCA6A4C1B6DCFC5CCEB73FC56947A403577DFA9E13C24EA820B09C1D9F7C31759C3635DE3F7A3639991708E88ADCE88177456C49637FD7961BE1A4C7E79FB02FAA732E2F3EC2BEA83D196283313492CAA9D4AFF1C910E9622D2A73F62537F2701AAEF6539314043F7BBCE5B78C7869AEB2181A67E49EEED2161DAF3F881BD88592D767F67C4717489119226C2F011D4CAB803E9D71650A6F80698E2F8491D12191A04406FBC8FBD5F48925F98630E68BFB24C0BCB9B55DF57510_cppui4314);
+                        constexpr static const extended_number_type final_exponent = extended_number_type(
+                            0x2D9F068E10293574745C62CB0EE7CF1D27F98BA7E8F16BB1CB498038B1B0B4D7EA28C42575093726D5E360818F2DD5B39038CFF6405359561DD2F2F0627F9264724E069A7198C17873F7F54D8C7CE3D5DAED1AC5E87C26C03B1F481813BB668B6FEDC7C2AAA83936D8BC842F74C66E7A13921F7D91474B3981D3A3B3B40537720C84FE27E3E90BB29DB12DFFE17A286C150EF5071B3087765F9454046ECBDD3B014FF91A1C18D55DB868E841DBF82BCCEFB4233833BD800000000_cppui1490);
 
-                        constexpr static const number_type final_exponent_z = 0xD201000000010000_cppui64;
-                        constexpr static const bool final_exponent_is_z_neg = true;
+                        constexpr static const number_type final_exponent_last_chunk_abs_of_w0 =
+                            0x1EEF5546609756BEC2A33F0DC9A1B671660000_cppui149;    // same as ate_loop_count?
+                        constexpr static const bool final_exponent_last_chunk_is_w0_neg = true;
+                        constexpr static const number_type final_exponent_last_chunk_w1 = number_type(0x1);
                     };
 
-                    constexpr
-                        typename pairing_params<curves::bls12<381>>::number_type const pairing_params<curves::bls12<381>>::ate_loop_count;
+                    constexpr typename pairing_params<mnt6<298>>::number_type const pairing_params<mnt6<298>>::ate_loop_count;
+                    constexpr typename pairing_params<mnt6<298>>::number_type const
+                        pairing_params<mnt6<298>>::final_exponent_last_chunk_abs_of_w0;
+                    constexpr typename pairing_params<mnt6<298>>::number_type const
+                        pairing_params<mnt6<298>>::final_exponent_last_chunk_w1;
+                    constexpr typename pairing_params<mnt6<298>>::extended_number_type const
+                        pairing_params<mnt6<298>>::final_exponent;
 
-                    constexpr
-                        typename pairing_params<curves::bls12<381>>::number_type const pairing_params<curves::bls12<381>>::final_exponent_z;
-
-                    constexpr bool const pairing_params<curves::bls12<381>>::final_exponent_is_z_neg;
+                    constexpr bool const pairing_params<mnt6<298>>::ate_is_loop_count_neg;
+                    constexpr bool const pairing_params<mnt6<298>>::final_exponent_last_chunk_is_w0_neg;
 
                 }    // namespace detail
             }        // namespace pairing
@@ -72,4 +78,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_381_BASIC_PARAMS_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT6_298_PAIRING_PARAMS_HPP
