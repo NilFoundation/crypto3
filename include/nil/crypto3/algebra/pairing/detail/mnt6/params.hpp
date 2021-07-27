@@ -59,6 +59,18 @@ namespace nil {
                             0x1EEF5546609756BEC2A33F0DC9A1B671660000_cppui149;    // same as ate_loop_count?
                         constexpr static const bool final_exponent_last_chunk_is_w0_neg = true;
                         constexpr static const number_type final_exponent_last_chunk_w1 = number_type(0x1);
+
+
+                        using g2_field_type_value = typename curve_type::g2_type::field_type::value_type;
+
+                        constexpr static const g2_field_type_value twist = 
+                            g2_type::params_type::twist;
+
+                        constexpr static const g2_field_type_value twist_coeff_a = 
+                            g2_type::params_type::a * twist;
+                        constexpr static const g2_field_type_value twist_coeff_d = 
+                            g2_type::params_type::d * twist;
+
                     };
 
                     constexpr typename pairing_params<mnt6<298>>::number_type const pairing_params<mnt6<298>>::ate_loop_count;

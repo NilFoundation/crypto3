@@ -71,7 +71,7 @@ namespace nil {
                         const g2_field_type_value C = Y.squared();                            // C = Y1^2
                         const g2_field_type_value D = C.squared();                            // D = C^2
                         const g2_field_type_value E = (X + C).squared() - B - D;              // E = (X1+C)^2-B-D
-                        const g2_field_type_value F = (B + B + B) + g2::twist_coeff_a * A;    // F = 3*B +  a  *A
+                        const g2_field_type_value F = (B + B + B) + params_type::twist_coeff_a * A;    // F = 3*B +  a  *A
 
                         const g2_field_type_value G = F.squared();    // G = F^2
 

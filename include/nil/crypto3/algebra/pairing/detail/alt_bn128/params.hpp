@@ -56,6 +56,11 @@ namespace nil {
 
                         constexpr static const number_type final_exponent_z = number_type(0x44E992B44A6909F1);
                         constexpr static const number_type final_exponent_is_z_neg = false;
+
+                        using g2_field_type_value = typename curve_type::g2_type::field_type::value_type;
+
+                        constexpr static const g2_field_type_value twist = 
+                            g2_type::params_type::twist;
                     };
 
                     constexpr
