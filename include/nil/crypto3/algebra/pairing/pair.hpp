@@ -23,27 +23,29 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT4_298_PAIR_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_MNT4_298_PAIR_HPP
-
-#include <nil/crypto3/algebra/curves/mnt4.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt4/298/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt4/298/types.hpp>
-#include <nil/crypto3/algebra/pairing/mnt4/298/ate_precompute_g1.hpp>
-#include <nil/crypto3/algebra/pairing/mnt4/298/ate_precompute_g2.hpp>
-#include <nil/crypto3/algebra/pairing/mnt4/298/ate_miller_loop.hpp>
+#ifndef CRYPTO3_ALGEBRA_PAIRING_PAIR_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_PAIR_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<std::size_t Version = 298, 
-                         typename PrecomputeG1 = ate_precompute_g1<Version>, 
-                         typename PrecomputeG2 = ate_precompute_g2<Version>, 
-                         typename MillerLoop = ate_miller_loop<Version>>
-                class mnt4_pair {
-                    using curve_type = curves::mnt4<298>;
+                template<typename PairingCurveType>
+                struct ate_precompute_g1;
+
+                template<typename PairingCurveType>
+                struct ate_precompute_g2;
+
+                template<typename PairingCurveType>
+                struct ate_miller_loop;
+
+                template<typename PairingCurveType, 
+                         typename PrecomputeG1 = ate_precompute_g1<PairingCurveType>, 
+                         typename PrecomputeG2 = ate_precompute_g2<PairingCurveType>, 
+                         typename MillerLoop = ate_miller_loop<PairingCurveType>>
+                class pair {
+                    using curve_type = PairingCurveType;
 
                     using params_type = detail::params_type<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
@@ -68,4 +70,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT4_298_PAIR_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_PAIR_HPP

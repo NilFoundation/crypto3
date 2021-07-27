@@ -23,42 +23,40 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PAIR_REDUCED_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PAIR_REDUCED_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT6_298_ATE_PRECOMPUTE_G1_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_MNT6_298_ATE_PRECOMPUTE_G1_HPP
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/pair.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/final_exponentiation.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/pairing/detail/mnt6/298/types.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<std::size_t Version = 381, 
-                         typename Pair = bls12_pair<Version>, 
-                         typename FinalExponentiation = final_exponentiation<Version>>
-                class bls12_pair_reduced;
+                template<std::size_t Version = 298>
+                class mnt6_ate_precompute_g1;
 
-                template<typename Pair, 
-                         typename FinalExponentiation>
-                class bls12_pair_reduced<381, Pair, FinalExponentiation> {
-                    using curve_type = curves::bls12<381>;
-
+                template<>
+                class mnt6_ate_precompute_g1<298> {
+                    using curve_type = curves::mnt6<298>;
+                    using types_policy = detail::types_policy<curve_type>;
                     using g1_type = typename curve_type::g1_type;
-                    using g2_type = typename curve_type::g2_type;
-                    using gt_type = typename curve_type::gt_type;
                 public:
 
-                    static typename gt_type::value_type process(
-                        const typename g1_type::value_type &P, 
-                        const typename g2_type::value_type &Q) {
+                    using g1_precomputed_type = typename types_policy::ate_g1_precomp;
 
-                        const typename gt_type::value_type f = Pair::process(P, Q);
-                        const typename gt_type::value_type result = 
-                            FinalExponentiation::process(f);
+                    static g1_precomputed_type process(
+                        const typename g1_type::value_type &P) {
+
+                        typename g1_type::value_type Pcopy = P.to_affine();
+
+                        g1_precomputed_type result;
+                        result.PX = Pcopy.X;
+                        result.PY = Pcopy.Y;
+                        result.PX_twist = Pcopy.X * g2::twist;
+                        result.PY_twist = Pcopy.Y * g2::twist;
+
                         return result;
                     }
                 };
@@ -66,4 +64,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PAIR_REDUCED_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT6_298_ATE_PRECOMPUTE_G1_HPP

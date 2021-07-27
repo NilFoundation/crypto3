@@ -23,15 +23,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT4_298_AFFINE_ATE_PRECOMPUTE_G2_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_MNT4_298_AFFINE_ATE_PRECOMPUTE_G2_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT6_298_AFFINE_ATE_PRECOMPUTE_G2_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_MNT6_298_AFFINE_ATE_PRECOMPUTE_G2_HPP
 
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
-#include <nil/crypto3/algebra/curves/mnt4.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt4/298/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt4/298/types.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/pairing/detail/mnt6/298/params.hpp>
+#include <nil/crypto3/algebra/pairing/detail/mnt6/298/types.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -39,11 +39,12 @@ namespace nil {
             namespace pairing {
 
                 template<std::size_t Version = 298>
-                class mnt4_affine_ate_precompute_g2;
+                class mnt6_affine_ate_precompute_g2;
 
+                // Totally the same as for mnt6<298>
                 template<>
-                class mnt4_affine_ate_precompute_g2<298> {
-                    using curve_type = curves::mnt4<298>;
+                class mnt6_affine_ate_precompute_g2<298> {
+                    using curve_type = curves::mnt6<298>;
 
                     using params_type = detail::params_type<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
@@ -102,7 +103,7 @@ namespace nil {
                                 } else {
                                     c.gamma = (c.old_RY + result.QY) * (c.old_RX - result.QX).inversed();
                                 }
-                                c.gamma_twist = c.gamma * g2_type::value_type::twist;
+                                c.gamma_twist = c.gamma * g2::twist;
 
                                 c.gamma_X = c.gamma * result.QX;
                                 result.coeffs.push_back(c);
@@ -119,4 +120,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT4_298_AFFINE_ATE_PRECOMPUTE_G2_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT6_298_AFFINE_ATE_PRECOMPUTE_G2_HPP

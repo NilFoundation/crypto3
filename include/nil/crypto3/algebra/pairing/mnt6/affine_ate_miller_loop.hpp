@@ -23,15 +23,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT4_298_AFFINE_ATE_PRECOMPUTE_G2_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_MNT4_298_AFFINE_ATE_PRECOMPUTE_G2_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT4_298_AFFINE_ATE_MILLER_LOOP_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_MNT4_298_AFFINE_ATE_MILLER_LOOP_HPP
 
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
-#include <nil/crypto3/algebra/curves/mnt4.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt4/298/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt4/298/types.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/pairing/detail/mnt6/298/params.hpp>
+#include <nil/crypto3/algebra/pairing/detail/mnt6/298/types.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -39,35 +39,33 @@ namespace nil {
             namespace pairing {
 
                 template<std::size_t Version = 298>
-                class mnt4_affine_ate_precompute_g2;
+                class mnt6_affine_ate_miller_loop;
 
+                // The only difference between this and mnt4<298> is that they use mul_by_2345 and mul_by_023
                 template<>
-                class mnt4_affine_ate_precompute_g2<298> {
-                    using curve_type = curves::mnt4<298>;
+                class mnt6_affine_ate_miller_loop<298> {
+                    using curve_type = curves::mnt6<298>;
 
                     using params_type = detail::params_type<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
+                    using gt_type = typename curve_type::gt_type;
 
                     using base_field_type = typename curve_type::base_field_type;
+                    using g1_type = typename curve_type::g1_type;
                     using g2_type = typename curve_type::g2_type;
 
+                    using g1_field_type_value = typename g1_type::field_type::value_type;
                     using g2_field_type_value = typename g2_type::field_type::value_type;
-
                 public:
 
-                    using g2_precomputed_type = typename types_policy::affine_ate_g2_precomputation;
+                    static typename gt_type::value_type process(
+                        const typename types_policy::affine_ate_g1_precomputation &prec_P,
+                        const typename types_policy::affine_ate_g2_precomputation &prec_Q) {
 
-                    static g2_precomputed_type process(const typename g2_type::value_type &Q) {
+                        typename gt_type::value_type f = typename gt_type::value_type::one();
 
-                        typename g2_type::value_type Qcopy = Q.to_affine();
-
-                        g2_precomputed_type result;
-                        result.QX = Qcopy.X;
-                        result.QY = Qcopy.Y;
-
-                        g2_field_type_value RX = Qcopy.X;
-                        g2_field_type_value RY = Qcopy.Y;
                         bool found_nonzero = false;
+                        std::size_t idx = 0;
 
                         std::vector<long> NAF = multiprecision::find_wnaf(1, policy_type::ate_loop_count);
 
@@ -78,45 +76,35 @@ namespace nil {
                                 continue;
                             }
 
-                            typename types_policy::affine_ate_coeffs c;
-                            c.old_RX = RX;
-                            c.old_RY = RY;
-                            g2_field_type_value old_RX_2 = c.old_RX.squared();
-                            c.gamma = (old_RX_2 + old_RX_2 + old_RX_2 + 
-                                       g2_type::value_type::twist_coeff_a) *
-                                      (c.old_RY + c.old_RY).inversed();
-                            c.gamma_twist = c.gamma * g2_type::value_type::twist;
+                            /* code below gets executed for all bits (EXCEPT the MSB itself) of
+                               param_p (skipping leading zeros) in MSB to LSB
+                               order */
+                            typename types_policy::affine_ate_coeffs c = prec_Q.coeffs[idx++];
 
-                            c.gamma_X = c.gamma * c.old_RX;
-                            result.coeffs.push_back(c);
-
-                            RX = c.gamma.squared() - (c.old_RX + c.old_RX);
-                            RY = c.gamma * (c.old_RX - RX) - c.old_RY;
+                            typename gt_type::value_type g_RR_at_P =
+                                typename gt_type::value_type(prec_P.PY_twist_squared, 
+                                        -prec_P.PX * c.gamma_twist + c.gamma_X - c.old_RY);
+                            f = f.squared().mul_by_2345(g_RR_at_P);
 
                             if (NAF[i] != 0) {
-                                typename types_policy::affine_ate_coeffs c;
-                                c.old_RX = RX;
-                                c.old_RY = RY;
+                                typename types_policy::affine_ate_coeffs c = prec_Q.coeffs[idx++];
+                                typename gt_type::value_type g_RQ_at_P;
                                 if (NAF[i] > 0) {
-                                    c.gamma = (c.old_RY - result.QY) * (c.old_RX - result.QX).inversed();
+                                    g_RQ_at_P = typename gt_type::value_type(prec_P.PY_twist_squared,
+                                                       -prec_P.PX * c.gamma_twist + c.gamma_X - prec_Q.QY);
                                 } else {
-                                    c.gamma = (c.old_RY + result.QY) * (c.old_RX - result.QX).inversed();
+                                    g_RQ_at_P = typename gt_type::value_type(prec_P.PY_twist_squared,
+                                                       -prec_P.PX * c.gamma_twist + c.gamma_X + prec_Q.QY);
                                 }
-                                c.gamma_twist = c.gamma * g2_type::value_type::twist;
-
-                                c.gamma_X = c.gamma * result.QX;
-                                result.coeffs.push_back(c);
-
-                                RX = c.gamma.squared() - (c.old_RX + result.QX);
-                                RY = c.gamma * (c.old_RX - RX) - c.old_RY;
+                                f = f.mul_by_2345(g_RQ_at_P);
                             }
                         }
 
-                        return result;
+                        return f;
                     }
                 };
             }        // namespace pairing
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT4_298_AFFINE_ATE_PRECOMPUTE_G2_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT6_298_AFFINE_ATE_MILLER_LOOP_HPP

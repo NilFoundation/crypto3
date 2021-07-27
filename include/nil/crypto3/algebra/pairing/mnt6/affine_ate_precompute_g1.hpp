@@ -23,44 +23,40 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PAIR_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PAIR_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT6_298_AFFINE_ATE_PRECOMPUTE_G1_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_MNT6_298_AFFINE_ATE_PRECOMPUTE_G1_HPP
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/ate_precompute_g1.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/ate_precompute_g2.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/ate_miller_loop.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/pairing/detail/mnt6/298/types.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<std::size_t Version = 381, 
-                         typename PrecomputeG1 = ate_precompute_g1<Version>, 
-                         typename PrecomputeG2 = ate_precompute_g2<Version>, 
-                         typename MillerLoop = ate_miller_loop<Version>>
-                class bls12_ate_pair {
-                    using curve_type = curves::bls12<381>;
+                template<std::size_t Version = 298>
+                class mnt6_affine_ate_precompute_g1;
 
-                    using params_type = detail::params_type<curve_type>;
+                // Totally the same as for mnt4<298>
+                template<>
+                class mnt6_affine_ate_precompute_g1<298> {
+                    using curve_type = curves::mnt6<298>;
                     using types_policy = detail::types_policy<curve_type>;
-
-                    using gt_type = typename curve_type::gt_type;
+                    using g1_type = typename curve_type::g1_type;
                 public:
 
-                    static typename gt_type::value_type process(
-                        const typename g1_type::value_type &P, 
-                        const typename g2_type::value_type &Q) {
+                    using g1_precomputed_type = typename types_policy::affine_ate_g1_precomputation;
 
-                        typename PrecomputeG1::g1_precomputed_type prec_P = 
-                            PrecomputeG1::process(P);
-                        typename PrecomputeG2::g2_precomputed_type prec_Q = 
-                            PrecomputeG2::process(Q);
-                        typename gt_type::value_type result = 
-                            MillerLoop::process(prec_P, prec_Q);
+                    static g1_precomputed_type process(
+                        const typename g1_type::value_type &P) {
+
+                        typename g1_type::value_type Pcopy = P.to_affine();
+
+                        g1_precomputed_type result;
+                        result.PX = Pcopy.X;
+                        result.PY = Pcopy.Y;
+                        result.PY_twist_squared = Pcopy.Y * g2::twist.squared();
+
                         return result;
                     }
                 };
@@ -68,4 +64,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PAIR_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT6_298_AFFINE_ATE_PRECOMPUTE_G1_HPP
