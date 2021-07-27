@@ -23,31 +23,30 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_MILLER_LOOP_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_MILLER_LOOP_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_ATE_MILLER_LOOP_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_ATE_MILLER_LOOP_HPP
 
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
+#include <nil/crypto3/algebra/pairing/detail/edwards/183/params.hpp>
+#include <nil/crypto3/algebra/pairing/detail/edwards/183/types.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<std::size_t Version = 381>
-                class bls12_ate_miller_loop;
+                template<std::size_t Version = 183>
+                class edwards_ate_miller_loop;
 
                 template<>
-                class bls12_ate_miller_loop<381> {
-                    using curve_type = curves::bls12<381>;
+                class edwards_ate_miller_loop<183> {
+                    using curve_type = curves::edwards<183>;
 
                     using params_type = detail::params_type<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
-
                     using gt_type = typename curve_type::gt_type;
                 public:
 
@@ -60,12 +59,11 @@ namespace nil {
                         bool found_one = false;
                         std::size_t idx = 0;
 
-                        const typename types_policy::number_type &loop_count = params_type::ate_loop_count;
+                        const typename types_policy::number_type &loop_count = 
+                            params_type::ate_loop_count;
 
-                        typename types_policy::ate_ell_coeffs c;
-
-                        for (long i = params_type::number_type_max_bits; i >= 0; --i) {
-                            const bool bit = multiprecision::bit_test(loop_count, i);
+                        for (long i = number_type_max_bits - 1; i >= 0; --i) {
+                            const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
                                 found_one |= bit;
@@ -75,19 +73,19 @@ namespace nil {
                             /* code below gets executed for all bits (EXCEPT the MSB itself) of
                                param_p (skipping leading zeros) in MSB to LSB
                                order */
+                            typename types_policy::Fq3_conic_coefficients cc = prec_Q[idx++];
 
-                            c = prec_Q.coeffs[idx++];
-                            f = f.squared();
-                            f = f.mul_by_045(c.ell_0, prec_P.PY * c.ell_VW, prec_P.PX * c.ell_VV);
-
+                            typename gt_type::value_type g_RR_at_P =
+                                typename gt_type::value_type(prec_P.P_XY * cc.c_XY + 
+                                    prec_P.P_XZ * cc.c_XZ, prec_P.P_ZZplusYZ * cc.c_ZZ);
+                            f = f.squared() * g_RR_at_P;
                             if (bit) {
-                                c = prec_Q.coeffs[idx++];
-                                f = f.mul_by_045(c.ell_0, prec_P.PY * c.ell_VW, prec_P.PX * c.ell_VV);
+                                cc = prec_Q[idx++];
+                                typename gt_type::value_type g_RQ_at_P =
+                                    typename gt_type::value_type(prec_P.P_ZZplusYZ * cc.c_ZZ, 
+                                        prec_P.P_XY * cc.c_XY + prec_P.P_XZ * cc.c_XZ);
+                                f = f * g_RQ_at_P;
                             }
-                        }
-
-                        if (params_type::ate_is_loop_count_neg) {
-                            f = f.inversed();
                         }
 
                         return f;
@@ -97,4 +95,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_MILLER_LOOP_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_ATE_MILLER_LOOP_HPP

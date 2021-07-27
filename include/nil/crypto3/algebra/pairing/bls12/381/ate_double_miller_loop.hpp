@@ -26,11 +26,12 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_DOUBLE_MILLER_LOOP_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_DOUBLE_MILLER_LOOP_HPP
 
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
-
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
+
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
+#include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
 
 namespace nil {
     namespace crypto3 {

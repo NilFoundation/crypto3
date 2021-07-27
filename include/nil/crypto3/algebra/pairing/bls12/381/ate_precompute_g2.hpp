@@ -26,11 +26,12 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G2_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G2_HPP
 
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
-
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
+
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
+#include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -51,7 +52,6 @@ namespace nil {
                     using g2_type = typename curve_type::g2_type;
 
                     using g2_field_type_value = typename g2_type::field_type::value_type;
-                private:
 
                     static void doubling_step_for_miller_loop(
                         const typename base_field_type::value_type &two_inv, 

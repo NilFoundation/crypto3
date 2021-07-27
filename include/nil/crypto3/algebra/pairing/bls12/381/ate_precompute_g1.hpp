@@ -26,11 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G1_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G1_HPP
 
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
-
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -43,10 +40,7 @@ namespace nil {
                 template<>
                 class bls12_ate_precompute_g1<381> {
                     using curve_type = curves::bls12<381>;
-
-                    using params_type = detail::params_type<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
-
                     using g1_type = typename curve_type::g1_type;
                 public:
 

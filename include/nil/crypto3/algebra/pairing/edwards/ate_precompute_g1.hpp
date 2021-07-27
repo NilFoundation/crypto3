@@ -23,44 +23,40 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PAIR_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PAIR_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_ATE_PRECOMPUTE_G1_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_ATE_PRECOMPUTE_G1_HPP
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/ate_precompute_g1.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/ate_precompute_g2.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/ate_miller_loop.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
+#include <nil/crypto3/algebra/pairing/detail/edwards/183/types.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<std::size_t Version = 381, 
-                         typename AtePrecomputeG1 = ate_precompute_g1<Version>, 
-                         typename AtePrecomputeG2 = ate_precompute_g2<Version>, 
-                         typename AteMillerLoop = ate_miller_loop<Version>>
-                class bls12_ate_pair {
-                    using curve_type = curves::bls12<381>;
+                template<std::size_t Version = 183>
+                class edwards_ate_precompute_g1;
 
-                    using params_type = detail::params_type<curve_type>;
+                template<>
+                class edwards_ate_precompute_g1<183> {
+                    using curve_type = curves::edwards<183>;
+
                     using types_policy = detail::types_policy<curve_type>;
 
-                    using gt_type = typename curve_type::gt_type;
+                    using g1_type = typename curve_type::g1_type;
                 public:
 
-                    static typename gt_type::value_type process(
-                        const typename g1_type::value_type &P, 
-                        const typename g2_type::value_type &Q) {
+                    using g1_precomputed_type = typename types_policy::ate_g1_precomp;
 
-                        typename types_policy::ate_g1_precomp prec_P = 
-                            AtePrecomputeG1::process(P);
-                        typename types_policy::ate_g2_precomp prec_Q = 
-                            AtePrecomputeG2::process(Q);
-                        typename gt_type::value_type result = 
-                            AteMillerLoop::process(prec_P, prec_Q);
+                    static typename types_policy::ate_g1_precomp  process(
+                        const typename g1_type::value_type &P) {
+
+                        typename g1_type::value_type Pcopy = P.to_affine();
+                        typename types_policy::ate_g1_precomp result;
+                        result.P_XY = Pcopy.X * Pcopy.Y;
+                        result.P_XZ = Pcopy.X;                        // P.X * P.Z but P.Z = 1
+                        result.P_ZZplusYZ = (Fq::one() + Pcopy.Y);    // (P.Z + P.Y) * P.Z but P.Z =
+
                         return result;
                     }
                 };
@@ -68,4 +64,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PAIR_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_ATE_PRECOMPUTE_G1_HPP
