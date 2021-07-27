@@ -159,12 +159,12 @@ namespace nil {
 
                 public:
 
-                    using g2_precomputed_type = typename types_policy::tate_g2_precomp;
+                    using g2_precomputed_type = typename types_policy::ate_g2_precomp;
 
-                    static typename types_policy::ate_g2_precomp process(
+                    static g2_precomputed_type process(
                         const typename g2_type::value_type &Q) {
 
-                        typename types_policy::ate_g2_precomp result;
+                        g2_precomputed_type result;
                         typename g2_type::value_type Qcopy = Q.to_affine();
                         extended_g2_projective Q_ext;
                         Q_ext.X = Qcopy.X;

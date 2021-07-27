@@ -29,7 +29,7 @@
 #include <nil/crypto3/algebra/curves/edwards.hpp>
 #include <nil/crypto3/algebra/pairing/detail/edwards/183/params.hpp>
 #include <nil/crypto3/algebra/pairing/detail/edwards/183/types.hpp>
-#include <nil/crypto3/algebra/pairing/edwards/183/ate_pair.hpp>
+#include <nil/crypto3/algebra/pairing/edwards/183/pair.hpp>
 #include <nil/crypto3/algebra/pairing/edwards/183/final_exponentiation.hpp>
 
 namespace nil {
@@ -38,7 +38,7 @@ namespace nil {
             namespace pairing {
 
                 template<std::size_t Version = 183, 
-                         typename Pair = ate_pair<Version>, 
+                         typename Pair = edwards_pair<Version>, 
                          typename FinalExponentiation = final_exponentiation<Version>>
                 class edwards_pair_reduced {
                     using curve_type = curves::edwards<183>;

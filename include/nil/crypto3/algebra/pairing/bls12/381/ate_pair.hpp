@@ -39,9 +39,9 @@ namespace nil {
             namespace pairing {
 
                 template<std::size_t Version = 381, 
-                         typename AtePrecomputeG1 = ate_precompute_g1<Version>, 
-                         typename AtePrecomputeG2 = ate_precompute_g2<Version>, 
-                         typename AteMillerLoop = ate_miller_loop<Version>>
+                         typename PrecomputeG1 = ate_precompute_g1<Version>, 
+                         typename PrecomputeG2 = ate_precompute_g2<Version>, 
+                         typename MillerLoop = ate_miller_loop<Version>>
                 class bls12_ate_pair {
                     using curve_type = curves::bls12<381>;
 
@@ -55,12 +55,12 @@ namespace nil {
                         const typename g1_type::value_type &P, 
                         const typename g2_type::value_type &Q) {
 
-                        typename types_policy::ate_g1_precomp prec_P = 
-                            AtePrecomputeG1::process(P);
-                        typename types_policy::ate_g2_precomp prec_Q = 
-                            AtePrecomputeG2::process(Q);
+                        typename PrecomputeG1::g1_precomputed_type prec_P = 
+                            PrecomputeG1::process(P);
+                        typename PrecomputeG2::g2_precomputed_type prec_Q = 
+                            PrecomputeG2::process(Q);
                         typename gt_type::value_type result = 
-                            AteMillerLoop::process(prec_P, prec_Q);
+                            MillerLoop::process(prec_P, prec_Q);
                         return result;
                     }
                 };

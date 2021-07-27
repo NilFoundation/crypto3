@@ -44,12 +44,14 @@ namespace nil {
                     using g1_type = typename curve_type::g1_type;
                 public:
 
-                    static typename types_policy::ate_g1_precomp  process(
+                    using g1_precomputed_type = typename types_policy::ate_g1_precomp;
+
+                    static g1_precomputed_type process(
                         const typename g1_type::value_type &P) {
 
                         typename g1_type::value_type Pcopy = P.to_affine();
 
-                        typename types_policy::ate_g1_precomp result;
+                        g1_precomputed_type result;
                         result.PX = Pcopy.X;
                         result.PY = Pcopy.Y;
 

@@ -107,14 +107,16 @@ namespace nil {
 
                 public:
 
-                    static typename types_policy::ate_g2_precomp process(const typename g2_type::value_type &Q) {
+                    using g2_precomputed_type = typename types_policy::ate_g2_precomp;
+
+                    static g2_precomputed_type process(const typename g2_type::value_type &Q) {
 
                         typename g2_type::value_type Qcopy(Q.to_affine());
 
                         typename base_field_type::value_type two_inv = 
                             (typename base_field_type::value_type(0x02).inversed());
 
-                        typename types_policy::ate_g2_precomp result;
+                        g2_precomputed_type result;
                         result.QX = Qcopy.X;
                         result.QY = Qcopy.Y;
 

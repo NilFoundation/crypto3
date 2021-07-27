@@ -23,29 +23,25 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PAIR_REDUCED_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PAIR_REDUCED_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT4_298_PAIR_REDUCED_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_MNT4_298_PAIR_REDUCED_HPP
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/pair.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/final_exponentiation.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/pairing/detail/mnt4/298/params.hpp>
+#include <nil/crypto3/algebra/pairing/detail/mnt4/298/types.hpp>
+#include <nil/crypto3/algebra/pairing/mnt4/298/pair.hpp>
+#include <nil/crypto3/algebra/pairing/mnt4/298/final_exponentiation.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<std::size_t Version = 381, 
-                         typename Pair = bls12_pair<Version>, 
+                template<std::size_t Version = 298, 
+                         typename Pair = mnt4_pair<Version>, 
                          typename FinalExponentiation = final_exponentiation<Version>>
-                class bls12_pair_reduced;
-
-                template<typename Pair, 
-                         typename FinalExponentiation>
-                class bls12_pair_reduced<381, Pair, FinalExponentiation> {
-                    using curve_type = curves::bls12<381>;
+                class mnt4_pair_reduced {
+                    using curve_type = curves::mnt4<298>;
 
                     using g1_type = typename curve_type::g1_type;
                     using g2_type = typename curve_type::g2_type;
@@ -66,4 +62,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PAIR_REDUCED_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT4_298_PAIR_REDUCED_HPP

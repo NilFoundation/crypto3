@@ -23,24 +23,24 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_FINAL_EXPONENTIATION_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_FINAL_EXPONENTIATION_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT4_298_FINAL_EXPONENTIATION_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_MNT4_298_FINAL_EXPONENTIATION_HPP
 
-#include <nil/crypto3/algebra/curves/edwards.hpp>
-#include <nil/crypto3/algebra/pairing/detail/edwards/183/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/edwards/183/types.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/pairing/detail/mnt4/298/params.hpp>
+#include <nil/crypto3/algebra/pairing/detail/mnt4/298/types.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<std::size_t Version = 183>
-                class edwards_final_exponentiation;
+                template<std::size_t Version = 298>
+                class mnt4_final_exponentiation;
 
                 template<>
-                class edwards_final_exponentiation<183> {
-                    using curve_type = curves::edwards<183>;
+                class mnt4_final_exponentiation<298> {
+                    using curve_type = curves::mnt4<298>;
 
                     using params_type = detail::params_type<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
@@ -56,40 +56,30 @@ namespace nil {
                         const typename gt_type::value_type &elt_inv) {
 
                         const typename gt_type::value_type elt_q = elt.Frobenius_map(1);
-
-                        typename gt_type::value_type w1_part = 
-                            elt_q.cyclotomic_exp(
-                                params_type::final_exponent_last_chunk_w1);
-                        typename gt_type::value_type w0_part = 
-                            gt_type::value_type::zero();
-
+                        typename gt_type::value_type w1_part = elt_q.cyclotomic_exp(params_type::final_exponent_last_chunk_w1);
+                        typename gt_type::value_type w0_part;
                         if (params_type::final_exponent_last_chunk_is_w0_neg) {
-                            w0_part = elt_inv.cyclotomic_exp(
-                                params_type::final_exponent_last_chunk_abs_of_w0);
+                            w0_part = elt_inv.cyclotomic_exp(params_type::final_exponent_last_chunk_abs_of_w0);
                         } else {
-                            w0_part = elt.cyclotomic_exp(
-                                params_type::final_exponent_last_chunk_abs_of_w0);
+                            w0_part = elt.cyclotomic_exp(params_type::final_exponent_last_chunk_abs_of_w0);
                         }
+                        typename gt_type::value_type result = w1_part * w0_part;
 
-                        return w1_part * w0_part;
+                        return result;
                     }
 
                     static typename gt_type::value_type final_exponentiation_first_chunk(
                         const typename gt_type::value_type &elt, 
                         const typename gt_type::value_type &elt_inv) {
 
-                        /* (q^3-1)*(q+1) */
+                        /* (q^2-1) */
 
-                        /* elt_q3 = elt^(q^3) */
-                        const typename gt_type::value_type elt_q3 = elt.Frobenius_map(3);
-                        /* elt_q3_over_elt = elt^(q^3-1) */
-                        const typename gt_type::value_type elt_q3_over_elt = elt_q3 * elt_inv;
-                        /* alpha = elt^((q^3-1) * q) */
-                        const typename gt_type::value_type alpha = elt_q3_over_elt.Frobenius_map(1);
-                        /* beta = elt^((q^3-1)*(q+1) */
-                        const typename gt_type::value_type beta = alpha * elt_q3_over_elt;
+                        /* elt_q2 = elt^(q^2) */
+                        const typename gt_type::value_type elt_q2 = elt.Frobenius_map(2);
+                        /* elt_q3_over_elt = elt^(q^2-1) */
+                        const typename gt_type::value_type elt_q2_over_elt = elt_q2 * elt_inv;
 
-                        return beta;
+                        return elt_q2_over_elt;
                     }
 
                 public:
@@ -100,10 +90,11 @@ namespace nil {
                         const typename gt_type::value_type elt_to_first_chunk = final_exponentiation_first_chunk(elt, elt_inv);
                         const typename gt_type::value_type elt_inv_to_first_chunk = final_exponentiation_first_chunk(elt_inv, elt);
                         return final_exponentiation_last_chunk(elt_to_first_chunk, elt_inv_to_first_chunk);
+
                     }
                 };
             }        // namespace pairing
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_FINAL_EXPONENTIATION_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT4_298_FINAL_EXPONENTIATION_HPP
