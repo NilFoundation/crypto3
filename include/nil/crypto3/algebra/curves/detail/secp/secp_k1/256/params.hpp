@@ -28,6 +28,9 @@
 
 #include <nil/crypto3/algebra/curves/detail/secp/secp_k1/basic_params.hpp>
 
+#include <nil/crypto3/algebra/curves/forms.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
+
 #include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {
@@ -35,12 +38,6 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-
-                    template<std::size_t Version>
-                    struct secp_k1_g1;
-
-                    template<std::size_t Version>
-                    struct secp_k1_g2;
 
                     template<std::size_t Version = 256>
                     struct secp_k1_short_weierstrass_params;
@@ -70,7 +67,8 @@ namespace nil {
                     struct secp_k1_short_weierstrass_g1_jacobian_with_a4_0_params<256> : public secp_k1_short_weierstrass_params<256> {
 
                         using field_type = typename secp_k1_basic_params<256>::g1_field_type;
-                        using group_type = secp_k1_g1<256>;
+                        using group_type = secp_k1_g1<256, forms::short_weierstrass,  
+                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
 
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one(),

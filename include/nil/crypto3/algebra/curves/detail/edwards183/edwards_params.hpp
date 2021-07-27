@@ -32,6 +32,9 @@
 #include <nil/crypto3/algebra/fields/fp3.hpp>
 #include <nil/crypto3/algebra/fields/fp6_2over3.hpp>
 
+#include <nil/crypto3/algebra/curves/forms.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
+
 #include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {
@@ -40,10 +43,14 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    template<std::size_t Version>
+                    template<std::size_t Version, 
+                             typename Form, 
+                             typename Coordinates>
                     struct edwards_g1;
 
-                    template<std::size_t Version>
+                    template<std::size_t Version, 
+                             typename Form, 
+                             typename Coordinates>
                     struct edwards_g2;
 
                     using namespace algebra;
@@ -57,17 +64,13 @@ namespace nil {
                     template<std::size_t Version = 183>
                     struct edwards_edwards_params;
 
-                    template<std::size_t Version = 183>
-                    struct edwards_edwards_g1_affine_params;
+                    template<std::size_t Version, 
+                             typename Coordinates>
+                    struct edwards_edwards_g1_params;
 
-                    template<std::size_t Version = 183>
-                    struct edwards_edwards_g2_affine_params;
-
-                    template<std::size_t Version = 183>
-                    struct edwards_edwards_g1_inverted_params;
-
-                    template<std::size_t Version = 183>
-                    struct edwards_edwards_g2_inverted_params;
+                    template<std::size_t Version, 
+                             typename Coordinates>
+                    struct edwards_edwards_g2_params;
 
                     /** @brief A struct representing details about base and scalar fields.
                      *
@@ -96,10 +99,12 @@ namespace nil {
                     };
 
                     template<>
-                    struct edwards_edwards_g1_inverted_params<183> : public edwards_edwards_params<183> {
+                    struct edwards_edwards_g1_params<183, coordinates<forms::edwards>::inverted> : 
+                        public edwards_edwards_params<183> {
 
                         using field_type = typename edwards_basic_params<183>::g1_field_type;
-                        using group_type = edwards_g1<183>;
+                        using group_type = edwards_g1<183, forms::edwards,  
+                            coordinates<forms::edwards>::inverted>;
 
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::one(), 
@@ -113,10 +118,12 @@ namespace nil {
                     };
 
                     template<>
-                    struct edwards_edwards_g2_inverted_params<183> : public edwards_edwards_params<183> {
+                    struct edwards_edwards_g2_params<183, coordinates<forms::edwards>::inverted> : 
+                        public edwards_edwards_params<183> {
 
                         using field_type = typename edwards_basic_params<183>::g2_field_type;
-                        using group_type = edwards_g2<183>;
+                        using group_type = edwards_g2<183, forms::edwards, 
+                            coordinates<forms::edwards>::inverted>;
 
                         constexpr static const typename field_type::value_type twist =
                             typename field_type::value_type(0x00, 0x01, 0x00);
@@ -147,14 +154,14 @@ namespace nil {
                     constexpr typename edwards_edwards_params<183>::base_field_type::modulus_type const edwards_edwards_params<183>::c;
                     constexpr typename edwards_edwards_params<183>::base_field_type::modulus_type const edwards_edwards_params<183>::d;
 
-                    constexpr std::array<typename edwards_edwards_g1_inverted_params<183>::field_type::value_type, 3> const
-                        edwards_edwards_g1_inverted_params<183>::zero_fill;
-                    constexpr std::array<typename edwards_edwards_g1_inverted_params<183>::field_type::value_type, 3> const
-                        edwards_edwards_g1_inverted_params<183>::one_fill;
-                    constexpr std::array<typename edwards_edwards_g2_inverted_params<183>::field_type::value_type, 3> const
-                        edwards_edwards_g2_inverted_params<183>::zero_fill;
-                    constexpr std::array<typename edwards_edwards_g2_inverted_params<183>::field_type::value_type, 3> const
-                        edwards_edwards_g2_inverted_params<183>::one_fill;
+                    constexpr std::array<typename edwards_edwards_g1_params<183, coordinates<forms::edwards>::inverted>::field_type::value_type, 3> const
+                        edwards_edwards_g1_params<183, coordinates<forms::edwards>::inverted>::zero_fill;
+                    constexpr std::array<typename edwards_edwards_g1_params<183, coordinates<forms::edwards>::inverted>::field_type::value_type, 3> const
+                        edwards_edwards_g1_params<183, coordinates<forms::edwards>::inverted>::one_fill;
+                    constexpr std::array<typename edwards_edwards_g2_params<183, coordinates<forms::edwards>::inverted>::field_type::value_type, 3> const
+                        edwards_edwards_g2_params<183, coordinates<forms::edwards>::inverted>::zero_fill;
+                    constexpr std::array<typename edwards_edwards_g2_params<183, coordinates<forms::edwards>::inverted>::field_type::value_type, 3> const
+                        edwards_edwards_g2_params<183, coordinates<forms::edwards>::inverted>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves

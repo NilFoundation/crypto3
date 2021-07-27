@@ -32,6 +32,9 @@
 #include <nil/crypto3/algebra/fields/fp2.hpp>
 #include <nil/crypto3/algebra/fields/fp12_2over3over2.hpp>
 
+#include <nil/crypto3/algebra/curves/forms.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
+
 #include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {
@@ -40,10 +43,14 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    template<std::size_t Version>
+                    template<std::size_t Version, 
+                             typename Form, 
+                             typename Coordinates>
                     struct bls12_g1;
 
-                    template<std::size_t Version>
+                    template<std::size_t Version, 
+                             typename Form, 
+                             typename Coordinates>
                     struct bls12_g2;
 
                     using namespace algebra;
@@ -104,7 +111,8 @@ namespace nil {
                     struct bls12_short_weierstrass_g1_jacobian_with_a4_0_params<381> : public bls12_short_weierstrass_params<381> {
 
                         using field_type = typename bls12_basic_params<381>::g1_field_type;
-                        using group_type = bls12_g1<381>;
+                        using group_type = bls12_g1<381, forms::short_weierstrass,  
+                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
 
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one(),
@@ -122,7 +130,8 @@ namespace nil {
                     struct bls12_short_weierstrass_g2_jacobian_with_a4_0_params<381> : public bls12_short_weierstrass_params<381> {
 
                         using field_type = typename bls12_basic_params<381>::g2_field_type;
-                        using group_type = bls12_g2<381>;
+                        using group_type = bls12_g2<381, forms::short_weierstrass,  
+                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
 
                         constexpr static const typename field_type::value_type twist =
                             typename field_type::value_type(field_type::value_type::underlying_type::one(),

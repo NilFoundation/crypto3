@@ -32,6 +32,9 @@
 #include <nil/crypto3/algebra/fields/fp3.hpp>
 #include <nil/crypto3/algebra/fields/fp6_2over3.hpp>
 
+#include <nil/crypto3/algebra/curves/forms.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
+
 #include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {
@@ -40,10 +43,14 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    template<std::size_t Version>
+                    template<std::size_t Version, 
+                             typename Form, 
+                             typename Coordinates>
                     struct mnt6_g1;
 
-                    template<std::size_t Version>
+                    template<std::size_t Version, 
+                             typename Form, 
+                             typename Coordinates>
                     struct mnt6_g2;
 
                     using namespace algebra;
@@ -99,7 +106,8 @@ namespace nil {
                     struct mnt6_short_weierstrass_g1_projective_params<298> : public mnt6_short_weierstrass_params<298> {
 
                         using field_type = typename mnt6_basic_params<298>::g1_field_type;
-                        using group_type = mnt6_g1<298>;
+                        using group_type = mnt6_g1<298, forms::short_weierstrass,  
+                            coordinates<forms::short_weierstrass>::projective>;
 
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one(),
@@ -117,7 +125,8 @@ namespace nil {
                     struct mnt6_short_weierstrass_g2_projective_params<298> : public mnt6_short_weierstrass_params<298> {
 
                         using field_type = typename mnt6_basic_params<298>::g2_field_type;
-                        using group_type = mnt6_g2<298>;
+                        using group_type = mnt6_g2<298, forms::short_weierstrass,  
+                            coordinates<forms::short_weierstrass>::projective>;
                     private:
                         constexpr static const typename g1_field_type::value_type g1_a = g1_field_type::value_type(a);
                         constexpr static const typename g1_field_type::value_type g1_b = g1_field_type::value_type(b);

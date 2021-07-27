@@ -51,8 +51,12 @@ namespace nil {
                     typedef typename params_type::base_field_type base_field_type;
                     typedef typename params_type::scalar_field_type scalar_field_type;
 
-                    typedef typename detail::mnt6_g1<Version> g1_type;
-                    typedef typename detail::mnt6_g2<Version> g2_type;
+                    typedef typename detail::mnt6_g1<Version, 
+                        forms::short_weierstrass,  
+                        coordinates<forms::short_weierstrass>::projective> g1_type;
+                    typedef typename detail::mnt6_g2<Version, 
+                        forms::short_weierstrass,  
+                        coordinates<forms::short_weierstrass>::projective> g2_type;
 
                     // typedef typename pairing::pairing_policy<mnt6<Version>,
                     //                                          pairing::detail::mnt6_pairing_functions<Version>>

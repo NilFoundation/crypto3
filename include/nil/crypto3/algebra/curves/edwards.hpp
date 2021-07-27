@@ -32,6 +32,9 @@
 #include <nil/crypto3/algebra/curves/detail/edwards183/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards183/g2.hpp>
 
+#include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
+
 // #include <nil/crypto3/algebra/pairing/edwards.hpp>
 // #include <nil/crypto3/algebra/pairing/detail/edwards/functions.hpp>
 
@@ -52,8 +55,12 @@ namespace nil {
                     typedef typename policy_type::base_field_type base_field_type;
                     typedef typename policy_type::scalar_field_type scalar_field_type;
                     
-                    typedef typename detail::edwards_g1<Version> g1_type;
-                    typedef typename detail::edwards_g2<Version> g2_type;
+                    typedef typename detail::edwards_g1<Version, 
+                        forms::twisted_edwards,  
+                        coordinates<forms::twisted_edwards>::inverted> g1_type;
+                    typedef typename detail::edwards_g2<Version, 
+                        forms::twisted_edwards,  
+                        coordinates<forms::twisted_edwards>::inverted> g2_type;
 
                     // typedef typename pairing::pairing_policy<edwards<Version>,
                     //                                          pairing::detail::edwards_pairing_functions<Version>>

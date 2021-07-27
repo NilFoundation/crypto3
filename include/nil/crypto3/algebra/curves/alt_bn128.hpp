@@ -53,8 +53,12 @@ namespace nil {
                     typedef typename params_type::base_field_type base_field_type;
                     typedef typename params_type::scalar_field_type scalar_field_type;
 
-                    typedef typename detail::alt_bn128_g1<Version> g1_type;
-                    typedef typename detail::alt_bn128_g2<Version> g2_type;
+                    typedef typename detail::alt_bn128_g1<Version, 
+                        forms::short_weierstrass,  
+                        coordinates<forms::short_weierstrass>::jacobian_with_a4_0> g1_type;
+                    typedef typename detail::alt_bn128_g2<Version, 
+                        forms::short_weierstrass,  
+                        coordinates<forms::short_weierstrass>::jacobian_with_a4_0> g2_type;
 
                     // typedef typename pairing::pairing_policy<alt_bn128<Version>,
                     //    pairing::detail::alt_bn128_pairing_functions<Version>> pairing_policy;

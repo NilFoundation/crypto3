@@ -411,75 +411,75 @@ void curve_operation_test_twisted_edwards(const TestSet &test_set,
 
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 
-BOOST_DATA_TEST_CASE(curve_operation_test_jubjub_g1, string_data("curve_operation_test_jubjub_g1"), data_set) {
-    using policy_type = curves::jubjub::g1_type;
+// BOOST_DATA_TEST_CASE(curve_operation_test_jubjub_g1, string_data("curve_operation_test_jubjub_g1"), data_set) {
+//     using policy_type = curves::jubjub::g1_type;
 
-    curve_operation_test_twisted_edwards<policy_type>(data_set, fp_curve_twisted_edwards_test_init<policy_type>);
-}
+//     curve_operation_test_twisted_edwards<policy_type>(data_set, fp_curve_twisted_edwards_test_init<policy_type>);
+// }
 
-BOOST_AUTO_TEST_CASE(curve_operation_test_babyjubjub_g1) {
-    using policy_type = curves::babyjubjub::g1_type;
+// BOOST_AUTO_TEST_CASE(curve_operation_test_babyjubjub_g1) {
+//     using policy_type = curves::babyjubjub::g1_type;
 
-    typename policy_type::value_type P1(
-        typename policy_type::field_type::value_type(
-            0x274DBCE8D15179969BC0D49FA725BDDF9DE555E0BA6A693C6ADB52FC9EE7A82C_cppui254),
-        typename policy_type::field_type::value_type(
-            0x5CE98C61B05F47FE2EAE9A542BD99F6B2E78246231640B54595FEBFD51EB853_cppui251)),
-        P2(typename policy_type::field_type::value_type(
-               0x2491ABA8D3A191A76E35BC47BD9AFE6CC88FEE14D607CBE779F2349047D5C157_cppui254),
-           typename policy_type::field_type::value_type(
-               0x2E07297F8D3C3D7818DBDDFD24C35583F9A9D4ED0CB0C1D1348DD8F7F99152D7_cppui254)),
-        P3(typename policy_type::field_type::value_type(
-               0x11805510440A3488B3B811EAACD0EC7C72DDED51978190E19067A2AFAEBAF361_cppui253),
-           typename policy_type::field_type::value_type(
-               0x1F07AA1B3C598E2FF9FF77744A39298A0A89A9027777AF9FA100DD448E072C13_cppui253));
+//     typename policy_type::value_type P1(
+//         typename policy_type::field_type::value_type(
+//             0x274DBCE8D15179969BC0D49FA725BDDF9DE555E0BA6A693C6ADB52FC9EE7A82C_cppui254),
+//         typename policy_type::field_type::value_type(
+//             0x5CE98C61B05F47FE2EAE9A542BD99F6B2E78246231640B54595FEBFD51EB853_cppui251)),
+//         P2(typename policy_type::field_type::value_type(
+//                0x2491ABA8D3A191A76E35BC47BD9AFE6CC88FEE14D607CBE779F2349047D5C157_cppui254),
+//            typename policy_type::field_type::value_type(
+//                0x2E07297F8D3C3D7818DBDDFD24C35583F9A9D4ED0CB0C1D1348DD8F7F99152D7_cppui254)),
+//         P3(typename policy_type::field_type::value_type(
+//                0x11805510440A3488B3B811EAACD0EC7C72DDED51978190E19067A2AFAEBAF361_cppui253),
+//            typename policy_type::field_type::value_type(
+//                0x1F07AA1B3C598E2FF9FF77744A39298A0A89A9027777AF9FA100DD448E072C13_cppui253));
 
-    typename policy_type::value_type P1pP2 = P1 + P2;
+//     typename policy_type::value_type P1pP2 = P1 + P2;
 
-    BOOST_CHECK(P1 + P2 == P3);
+//     BOOST_CHECK(P1 + P2 == P3);
 
-    typename policy_type::value_type P4(
-        typename policy_type::field_type::value_type(
-            0xF3C160E26FC96C347DD9E705EB5A3E8D661502728609FF95B3B889296901AB5_cppui252),
-        typename policy_type::field_type::value_type(
-            0x9979273078B5C735585107619130E62E315C5CAFE683A064F79DFED17EB14E1_cppui252));
+//     typename policy_type::value_type P4(
+//         typename policy_type::field_type::value_type(
+//             0xF3C160E26FC96C347DD9E705EB5A3E8D661502728609FF95B3B889296901AB5_cppui252),
+//         typename policy_type::field_type::value_type(
+//             0x9979273078B5C735585107619130E62E315C5CAFE683A064F79DFED17EB14E1_cppui252));
 
-    BOOST_CHECK(P1.doubled() == P4);
+//     BOOST_CHECK(P1.doubled() == P4);
 
-    typename policy_type::value_type P5(
-        typename policy_type::field_type::value_type(
-            0x274dbce8d15179969bc0d49fa725bddf9de555e0ba6a693c6adb52fc9ee7a82c_cppui252),
-        typename policy_type::field_type::value_type(
-            0x5ce98c61b05f47fe2eae9a542bd99f6b2e78246231640b54595febfd51eb853_cppui252)),
-        et_s1P5(typename policy_type::field_type::value_type(
-                    0x2ad46cbfb78773b6254adc1d80c6efa02f3bf948c37e5a2222136421d7bec942_cppui252),
-                typename policy_type::field_type::value_type(
-                    0x14e9693f16d75f7065ce51e1f46ae6c60841ca1e0cf264eda26398e36ca2ed69_cppui252)),
-        et_s2P5(typename policy_type::field_type::value_type(
-                    0x25bd7aefee96617d4f715ecf8e50ef9fa102eeb452642c6322d38aa9b32c2ca5_cppui252),
-                typename policy_type::field_type::value_type(
-                    0x8e043ec729eedea414b63de474c8f0930ea966733ae283e01f348ca3c35e3ab_cppui252)),
-        P6(typename policy_type::field_type::value_type(
-               0xf3c160e26fc96c347dd9e705eb5a3e8d661502728609ff95b3b889296901ab5_cppui252),
-           typename policy_type::field_type::value_type(
-               0x9979273078b5c735585107619130e62e315c5cafe683a064f79dfed17eb14e1_cppui252)),
-        et_s1P6(typename policy_type::field_type::value_type(
-                    0x1dfce39036af5e722b6c8a3214b93b93b2eac662ec2cf67195ef3994b944fb0f_cppui252),
-                typename policy_type::field_type::value_type(
-                    0x12aa55c3cc7ff986c520ddcae3927877e682f01bed87628f643f34905692880e_cppui252));
+//     typename policy_type::value_type P5(
+//         typename policy_type::field_type::value_type(
+//             0x274dbce8d15179969bc0d49fa725bddf9de555e0ba6a693c6adb52fc9ee7a82c_cppui252),
+//         typename policy_type::field_type::value_type(
+//             0x5ce98c61b05f47fe2eae9a542bd99f6b2e78246231640b54595febfd51eb853_cppui252)),
+//         et_s1P5(typename policy_type::field_type::value_type(
+//                     0x2ad46cbfb78773b6254adc1d80c6efa02f3bf948c37e5a2222136421d7bec942_cppui252),
+//                 typename policy_type::field_type::value_type(
+//                     0x14e9693f16d75f7065ce51e1f46ae6c60841ca1e0cf264eda26398e36ca2ed69_cppui252)),
+//         et_s2P5(typename policy_type::field_type::value_type(
+//                     0x25bd7aefee96617d4f715ecf8e50ef9fa102eeb452642c6322d38aa9b32c2ca5_cppui252),
+//                 typename policy_type::field_type::value_type(
+//                     0x8e043ec729eedea414b63de474c8f0930ea966733ae283e01f348ca3c35e3ab_cppui252)),
+//         P6(typename policy_type::field_type::value_type(
+//                0xf3c160e26fc96c347dd9e705eb5a3e8d661502728609ff95b3b889296901ab5_cppui252),
+//            typename policy_type::field_type::value_type(
+//                0x9979273078b5c735585107619130e62e315c5cafe683a064f79dfed17eb14e1_cppui252)),
+//         et_s1P6(typename policy_type::field_type::value_type(
+//                     0x1dfce39036af5e722b6c8a3214b93b93b2eac662ec2cf67195ef3994b944fb0f_cppui252),
+//                 typename policy_type::field_type::value_type(
+//                     0x12aa55c3cc7ff986c520ddcae3927877e682f01bed87628f643f34905692880e_cppui252));
 
-    BOOST_CHECK(et_s1P5 == static_cast<nil::crypto3::multiprecision::cpp_int>(3) * P5);
-    BOOST_CHECK(et_s2P5 == nil::crypto3::multiprecision::cpp_int(
-                               "14035240266687799601661095864649209771790948434046947201833777492504781204499") *
-                               P5);
-    BOOST_CHECK(et_s1P6 == nil::crypto3::multiprecision::cpp_int(
-                               "20819045374670962167435360035096875258406992893633759881276124905556507972311") *
-                               P6);
-    BOOST_CHECK(P5.is_well_formed());
-    BOOST_CHECK(P6.is_well_formed());
+//     BOOST_CHECK(et_s1P5 == static_cast<nil::crypto3::multiprecision::cpp_int>(3) * P5);
+//     BOOST_CHECK(et_s2P5 == nil::crypto3::multiprecision::cpp_int(
+//                                "14035240266687799601661095864649209771790948434046947201833777492504781204499") *
+//                                P5);
+//     BOOST_CHECK(et_s1P6 == nil::crypto3::multiprecision::cpp_int(
+//                                "20819045374670962167435360035096875258406992893633759881276124905556507972311") *
+//                                P6);
+//     BOOST_CHECK(P5.is_well_formed());
+//     BOOST_CHECK(P6.is_well_formed());
 
-    // curve_operation_test_twisted_edwards<policy_type>(data_set, fp_curve_test_init<policy_type>);
-}
+//     // curve_operation_test_twisted_edwards<policy_type>(data_set, fp_curve_test_init<policy_type>);
+// }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_edwards_g1, string_data("curve_operation_test_edwards_g1"), data_set) {
     using policy_type = curves::edwards<183>::g1_type;
@@ -553,16 +553,16 @@ BOOST_DATA_TEST_CASE(curve_operation_test_alt_bn128_g2, string_data("curve_opera
     curve_operation_test<policy_type>(data_set, fp2_curve_test_init<policy_type>);
 }
 
-BOOST_DATA_TEST_CASE(curve_operation_test_secp256_r1_g1, string_data("curve_operation_test_secp256r1"), data_set) {
-    using policy_type = curves::secp_r1<256>::g1_type;
+// BOOST_DATA_TEST_CASE(curve_operation_test_secp256_r1_g1, string_data("curve_operation_test_secp256r1"), data_set) {
+//     using policy_type = curves::secp_r1<256>::g1_type;
 
-    curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
-}
+//     curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
+// }
 
-BOOST_DATA_TEST_CASE(curve_operation_test_secp256_k1_g1, string_data("curve_operation_test_secp256k1"), data_set) {
-    using policy_type = curves::secp_k1<256>::g1_type;
+// BOOST_DATA_TEST_CASE(curve_operation_test_secp256_k1_g1, string_data("curve_operation_test_secp256k1"), data_set) {
+//     using policy_type = curves::secp_k1<256>::g1_type;
 
-    curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
-}
+//     curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
+// }
 
 BOOST_AUTO_TEST_SUITE_END()

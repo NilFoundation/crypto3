@@ -37,6 +37,11 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
+                    template<std::size_t Version, 
+                             typename Form, 
+                             typename Coordinates>
+                    struct secp_r1_g1;
+
                     using namespace algebra;
                     /** @brief A struct representing details about base and scalar fields.
                      *    @tparam Version version of the curve

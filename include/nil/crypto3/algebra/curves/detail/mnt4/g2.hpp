@@ -29,7 +29,7 @@
 
 #include <nil/crypto3/algebra/curves/detail/mnt4/params.hpp>
 
-#include <nil/crypto3/algebra/curves/detail/forms.hpp>
+#include <nil/crypto3/algebra/curves/forms.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/element_g1.hpp>
 
@@ -46,7 +46,9 @@ namespace nil {
                      *    @tparam Version version of the curve
                      *
                      */
-                    template<std::size_t Version>
+                    template<std::size_t Version, 
+                             typename Form, 
+                             typename Coordinates>
                     struct mnt4_g2 {
                         using params_type = mnt4_short_weierstrass_g2_projective_params<Version>;
 
@@ -57,7 +59,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = short_weierstrass_element_g1_projective<params_type>;
+                        using value_type = curve_element<params_type, Form, Coordinates>;
                     };
 
                 }    // namespace detail

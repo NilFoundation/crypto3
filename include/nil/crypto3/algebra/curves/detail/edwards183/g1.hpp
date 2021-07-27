@@ -32,6 +32,10 @@
 #include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/element_g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/inverted/element_g1.hpp>
 
+#include <nil/crypto3/algebra/curves/forms.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -45,23 +49,21 @@ namespace nil {
                      *    @tparam Version version of the curve
                      *
                      */
-                    template<std::size_t Version>
-                    struct edwards_g1;
+                    template<std::size_t Version, 
+                             typename Form, 
+                             typename Coordinates>
+                    struct edwards_g1 {
 
-                    template<>
-                    struct edwards_g1<183> {
-                        constexpr static const std::size_t version = 183;
+                        using params_type = edwards_twisted_edwards_g1_params<Version, Coordinates>;
 
-                        using params_type = edwards_twisted_edwards_g1_inverted_params<version>;
-
-                        using curve_type = edwards<version>;
+                        using curve_type = edwards<Version>;
 
                         using field_type = typename params_type::g1_field_type;
 
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = twisted_edwards_element_g1_inverted<params_type>;
+                        using value_type = curve_element<params_type, Form, Coordinates>;
                     };
                 }    // namespace detail
             }        // namespace curves

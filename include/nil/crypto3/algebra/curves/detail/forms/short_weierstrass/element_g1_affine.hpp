@@ -28,7 +28,7 @@
 #define CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_PROJECTIVE_HPP
 
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms.hpp>
+#include <nil/crypto3/algebra/curves/forms.hpp>
 
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
 
@@ -42,10 +42,10 @@ namespace nil {
                      *    @tparam Form Form of the curve 
                      *    @tparam Coordinates Representation coordinates of the group element 
                      */
-                    // template<typename CurveParams, 
-                    //          forms Form, 
-                    //          short_weierstrass_coordinates Coordinates>
-                    // struct short_weierstrass_element_g1_affine;
+                    template<typename CurveParams, 
+                             typename Form, 
+                             typename Coordinates>
+                    struct curve_element;
 
                     /** @brief A struct representing an element from the group G1 of short Weierstrass curve of 
                      *  affine coordinates representation.
@@ -53,7 +53,9 @@ namespace nil {
                      *
                      */
                     template<typename CurveParams>
-                    struct short_weierstrass_element_g1_affine {
+                    struct curve_element<CurveParams, 
+                                   forms::short_weierstrass, 
+                                   coordinates<forms::short_weierstrass>::affine> {
 
                         using field_type = typename CurveParams::field_type;
                     private:
@@ -62,11 +64,8 @@ namespace nil {
                     public:
                         using group_type = typename params_type::group_type;
 
-                        constexpr static const forms form = 
-                            forms::short_weierstrass;
-                        constexpr static const 
-                            short_weierstrass_coordinates coordinates = 
-                            short_weierstrass_coordinates::projective;
+                        using form = forms::short_weierstrass;
+                        using coordinates = coordinates<form>::affine;
 
                         field_value_type X;
                         field_value_type Y;
@@ -77,19 +76,19 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr short_weierstrass_element_g1_affine() : short_weierstrass_element_g1_affine(params_type::g1_zero_fill[0], 
+                        constexpr curve_element() : curve_element(params_type::g1_zero_fill[0], 
                             params_type::g1_zero_fill[1]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y)$ in the affine coordinates
                          *
                          */
-                        constexpr short_weierstrass_element_g1_affine(field_value_type in_X, field_value_type in_Y) {
+                        constexpr curve_element(field_value_type in_X, field_value_type in_Y) {
                             this->X = in_X;
                             this->Y = in_Y;
                         };
 
-                        constexpr short_weierstrass_element_g1_affine(short_weierstrass_element_g1_affine<params_type, form, 
+                        constexpr curve_element(curve_element<params_type, form, 
                             twisted_edwards_coordinates::projective> other) {
 
                             if (other.Z.is_zero()) {
@@ -104,20 +103,20 @@ namespace nil {
                         /** @brief Get the point at infinity
                          *
                          */
-                        constexpr static short_weierstrass_element_g1_affine zero() {
-                            return short_weierstrass_element_g1_affine();
+                        constexpr static curve_element zero() {
+                            return curve_element();
                         }
 
                         /** @brief Get the generator of group G1
                          *
                          */
-                        constexpr static short_weierstrass_element_g1_affine one() {
-                            return short_weierstrass_element_g1_affine(params_type::g1_one_fill[0], params_type::g1_one_fill[1]);
+                        constexpr static curve_element one() {
+                            return curve_element(params_type::g1_one_fill[0], params_type::g1_one_fill[1]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
 
-                        constexpr static bool operator==(const short_weierstrass_element_g1_affine &other) const {
+                        constexpr static bool operator==(const curve_element &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -139,7 +138,7 @@ namespace nil {
                             return true;
                         }
 
-                        constexpr bool operator!=(const short_weierstrass_element_g1_affine &other) const {
+                        constexpr bool operator!=(const curve_element &other) const {
                             return !(operator==(other));
                         }
 
@@ -153,7 +152,7 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        constexpr short_weierstrass_element_g1_affine operator=(const short_weierstrass_element_g1_affine &other) {
+                        constexpr curve_element operator=(const curve_element &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -161,7 +160,7 @@ namespace nil {
                             return *this;
                         }
 
-                        constexpr short_weierstrass_element_g1_affine operator+(const short_weierstrass_element_g1_affine &other) const {
+                        constexpr curve_element operator+(const curve_element &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -178,11 +177,11 @@ namespace nil {
                             return this->add(other);
                         }
 
-                        constexpr short_weierstrass_element_g1_affine operator-() const {
-                            return short_weierstrass_element_g1_affine(this->X, -this->Y);
+                        constexpr curve_element operator-() const {
+                            return curve_element(this->X, -this->Y);
                         }
 
-                        constexpr short_weierstrass_element_g1_affine operator-(const short_weierstrass_element_g1_affine &other) const {
+                        constexpr curve_element operator-(const curve_element &other) const {
                             return (*this) + (-other);
                         }
 
@@ -192,7 +191,7 @@ namespace nil {
                          * y3 = (2*x1+x1)*(3*x12+a)/(2*y1)-(3*x12+a)3/(2*y1)3-y1
                          * @return doubled element from group G1
                          */
-                        constexpr short_weierstrass_element_g1_affine doubled() const {
+                        constexpr curve_element doubled() const {
 
                             if (this->is_zero()) {
                                 return (*this);
@@ -216,7 +215,7 @@ namespace nil {
                          * x3 = (y2-y1)2/(x2-x1)2-x1-x2
                          * y3 = (2*x1+x2)*(y2-y1)/(x2-x1)-(y2-y1)3/(x2-x1)3-y1
                          */
-                        short_weierstrass_element_g1_affine add(const short_weierstrass_element_g1_affine &other) const {
+                        curve_element add(const curve_element &other) const {
                             field_value_type Y2mY1 = other.Y - this->Y;
                             field_value_type Y2mY1squared = Y2mY1.squared();
                             field_value_type X2mX1 = other.X - this->X;
@@ -228,7 +227,7 @@ namespace nil {
                                 X2mX1.inversed() - Y2mY1*Y2mY1squared * (X2mX1*X2mX1squared).inversed() - 
                                 this->Y;
 
-                            return short_weierstrass_element_g1_affine(X3, Y3);
+                            return curve_element(X3, Y3);
                         }
                     };
 

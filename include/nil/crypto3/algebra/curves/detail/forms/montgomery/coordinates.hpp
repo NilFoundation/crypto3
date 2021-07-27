@@ -26,20 +26,24 @@
 #ifndef CRYPTO3_ZK_ALGEBRA_CURVES_MONTGOMERY_COORDINATES_REPRESENTATIONS_HPP
 #define CRYPTO3_ZK_ALGEBRA_CURVES_MONTGOMERY_COORDINATES_REPRESENTATIONS_HPP
 
+#include <nil/crypto3/algebra/curves/forms.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                namespace detail {
 
-                    /** @brief Montgomery curve group element coordinates representation.
-                     * Description: https://hyperelliptic.org/EFD/g1p/auto-montgom.html
-                     */
-                    enum class montgomery_coordinates {
-                        affine, 
-                        xz
-                    };
-                }        // namespace detail
+                template <typename Form>
+                struct coordinates;
+
+                /** @brief Montgomery curve group element coordinates representation.
+                 * Description: https://hyperelliptic.org/EFD/g1p/auto-montgom.html
+                 */
+                template <>
+                struct coordinates<forms::montgomery> {
+                    struct affine{}; 
+                    struct xz{};
+                };
             }        // namespace curves
         }        // namespace algebra
     }            // namespace crypto3

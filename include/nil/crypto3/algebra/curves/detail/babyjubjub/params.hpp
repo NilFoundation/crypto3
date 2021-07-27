@@ -29,6 +29,9 @@
 #include <nil/crypto3/algebra/fields/babyjubjub/base_field.hpp>
 #include <nil/crypto3/algebra/fields/babyjubjub/scalar_field.hpp>
 
+#include <nil/crypto3/algebra/curves/forms.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
+
 #include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {
@@ -37,6 +40,8 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
+                    template<typename Form, 
+                             typename Coordinates>
                     struct babyjubjub_g1;
 
                     using namespace algebra;
@@ -79,7 +84,8 @@ namespace nil {
                     struct babyjubjub_twisted_edwards_g1_affine_params : public babyjubjub_twisted_edwards_params {
 
                         using field_type = typename babyjubjub_twisted_edwards_params::base_field_type;
-                        using group_type = babyjubjub_g1;
+                        using group_type = babyjubjub_g1<forms::twisted_edwards, 
+                            coordinates<forms::twisted_edwards>::affine>;
 
                         constexpr static const std::array<typename base_field_type::value_type, 3> zero_fill = {
                             base_field_type::value_type::zero(), base_field_type::value_type::one()};

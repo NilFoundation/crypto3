@@ -28,7 +28,7 @@
 #define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_INVERTED_HPP
 
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms.hpp>
+#include <nil/crypto3/algebra/curves/forms.hpp>
 
 #include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/add_2007_bl.hpp>
@@ -45,34 +45,34 @@ namespace nil {
                      *    @tparam Form Form of the curve 
                      *    @tparam Coordinates Representation coordinates of the group element 
                      */
-                    // template<typename CurveParams, 
-                    //          forms Form, 
-                    //          inverted_coordinates Coordinates>
-                    // struct inverted_element_g1;
+                    template<typename CurveParams, 
+                             typename Form, 
+                             typename Coordinates>
+                    struct curve_element;
 
                     /** @brief A struct representing an element from the group G1 of Edwards curve of 
                      *  inverted coordinates representation.
                      *  Description: http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html
                      *
                      */
-                    template<typename CurveParams, 
-                             typename Adder = edwards_element_g1_inverted_add_2007_bl, 
-                             typename Doubler = edwards_element_g1_inverted_dbl_2007_bl, 
-                             typename MixAdd = edwards_element_g1_inverted_madd_2007_bl>
-                    struct edwards_element_g1_inverted {
+                    template<typename CurveParams>
+                    struct curve_element<CurveParams, 
+                                   forms::edwards, 
+                                   coordinates<forms::edwards>::inverted> {
 
                         using params_type = CurveParams;
                         using field_type = typename params_type::field_type;
                     private:
                         using field_value_type = typename field_type::value_type;
+
+                        using common_addition_processor = edwards_element_g1_inverted_add_2007_bl; 
+                        using common_doubling_processor = edwards_element_g1_inverted_dbl_2007_bl;
+                        using mixed_addition_processor = edwards_element_g1_inverted_madd_2007_bl;
                     public:
                         using group_type = typename params_type::group_type;
 
-                        constexpr static const forms form = 
-                            forms::edwards;
-                        constexpr static const 
-                            edwards_coordinates coordinates = 
-                            edwards_coordinates::inverted;
+                        using form = forms::edwards;
+                        using coordinates = coordinates<form>::inverted;
 
                         field_value_type X;
                         field_value_type Y;
@@ -84,7 +84,7 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr edwards_element_g1_inverted() : edwards_element_g1_inverted(
+                        constexpr curve_element() : curve_element(
                             params_type::zero_fill[0], 
                             params_type::zero_fill[1], 
                             params_type::zero_fill[2]) {};
@@ -93,7 +93,7 @@ namespace nil {
                          *    @return the selected point (X:Y:Z)
                          *
                          */
-                        constexpr edwards_element_g1_inverted(field_value_type X,
+                        constexpr curve_element(field_value_type X,
                                                   field_value_type Y,
                                                   field_value_type Z) {
                             this->X = X;
@@ -104,21 +104,21 @@ namespace nil {
                         /** @brief Get the point at infinity
                          *
                          */
-                        constexpr static edwards_element_g1_inverted zero() {
-                            return edwards_element_g1_inverted();
+                        constexpr static curve_element zero() {
+                            return curve_element();
                         }
 
                         /** @brief Get the generator of group G1
                          *
                          */
-                        constexpr static edwards_element_g1_inverted one() {
-                            return edwards_element_g1_inverted(params_type::one_fill[0], params_type::one_fill[1], 
+                        constexpr static curve_element one() {
+                            return curve_element(params_type::one_fill[0], params_type::one_fill[1], 
                                 params_type::one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
 
-                        constexpr bool operator==(const edwards_element_g1_inverted &other) const {
+                        constexpr bool operator==(const curve_element &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -142,7 +142,7 @@ namespace nil {
                             return true;
                         }
 
-                        constexpr bool operator!=(const edwards_element_g1_inverted &other) const {
+                        constexpr bool operator!=(const curve_element &other) const {
                             return !(operator==(other));
                         }
                         /** @brief
@@ -163,7 +163,7 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        constexpr edwards_element_g1_inverted operator=(const edwards_element_g1_inverted &other) {
+                        constexpr curve_element operator=(const curve_element &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -172,7 +172,7 @@ namespace nil {
                             return *this;
                         }
 
-                        constexpr edwards_element_g1_inverted operator+(const edwards_element_g1_inverted &other) const {
+                        constexpr curve_element operator+(const curve_element &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -186,14 +186,14 @@ namespace nil {
                                 return this->doubled();
                             }
 
-                            return Adder::process(*this, other);
+                            return common_addition_processor::process(*this, other);
                         }
 
-                        constexpr edwards_element_g1_inverted operator-() const {
-                            return edwards_element_g1_inverted(-(this->X), this->Y, this->Z);
+                        constexpr curve_element operator-() const {
+                            return curve_element(-(this->X), this->Y, this->Z);
                         }
 
-                        constexpr edwards_element_g1_inverted operator-(const edwards_element_g1_inverted &other) const {
+                        constexpr curve_element operator-(const curve_element &other) const {
                             return (*this) + (-other);
                         }
                         
@@ -201,8 +201,8 @@ namespace nil {
                          *
                          * @return doubled element from group G1
                          */
-                        constexpr edwards_element_g1_inverted doubled() const {
-                            return Doubler::process(*this);
+                        constexpr curve_element doubled() const {
+                            return common_doubling_processor::process(*this);
                         }
 
                         /** @brief
@@ -210,7 +210,7 @@ namespace nil {
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G1
                          */
-                        edwards_element_g1_inverted mixed_add(const edwards_element_g1_inverted &other) const {
+                        curve_element mixed_add(const curve_element &other) const {
 
                             // handle special cases having to do with O
                             if (this->is_zero()) {
@@ -221,7 +221,7 @@ namespace nil {
                                 return *this;
                             }
 
-                            return MixAdd::process(*this, other);
+                            return mixed_addition_processor::process(*this, other);
                         }
                     };
 

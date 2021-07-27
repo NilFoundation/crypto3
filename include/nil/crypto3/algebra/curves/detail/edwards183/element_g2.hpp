@@ -40,7 +40,9 @@ namespace nil {
                      *    @tparam Version version of the curve
                      *
                      */
-                    template<std::size_t Version>
+                    template<std::size_t Version, 
+                             typename Form, 
+                             typename Coordinates>
                     struct edwards_g2;
                     /** @brief A struct representing an element from the group G2 of Edwards curve.
                      *    @tparam Version version of the curve
@@ -54,7 +56,8 @@ namespace nil {
                     template<>
                     struct element_edwards_g2<183> {
 
-                        using group_type = edwards_g2<183>;
+                        using group_type = edwards_g2<183, forms::twisted_edwards,  
+                            coordinates<forms::twisted_edwards>::inverted>;
 
                         using policy_type = edwards_basic_policy<183>;
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;

@@ -28,7 +28,7 @@
 #define CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_JACOBIAN_WITH_A4_0_HPP
 
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms.hpp>
+#include <nil/crypto3/algebra/curves/forms.hpp>
 
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_0/add_2007_bl.hpp>
@@ -45,34 +45,34 @@ namespace nil {
                      *    @tparam Form Form of the curve 
                      *    @tparam Coordinates Representation coordinates of the group element 
                      */
-                    // template<typename CurveParams, 
-                    //          forms Form, 
-                    //          short_weierstrass_coordinates Coordinates>
-                    // struct short_weierstrass_element_g1;
+                    template<typename CurveParams, 
+                             typename Form, 
+                             typename Coordinates>
+                    struct curve_element;
 
                     /** @brief A struct representing an element from the group G1 of short Weierstrass curve of 
                      *  jacobian_with_a4_0 coordinates representation.
                      *  Description: http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html
                      *
                      */
-                    template<typename CurveParams, 
-                             typename Adder = short_weierstrass_element_g1_jacobian_with_a4_0_add_2007_bl, 
-                             typename Doubler = short_weierstrass_element_g1_jacobian_with_a4_0_dbl_2009_l, 
-                             typename MixAdd = short_weierstrass_element_g1_jacobian_with_a4_0_madd_2007_bl>
-                    struct short_weierstrass_element_g1_jacobian_with_a4_0 {
+                    template<typename CurveParams>
+                    struct curve_element<CurveParams, 
+                                   forms::short_weierstrass, 
+                                   coordinates<forms::short_weierstrass>::jacobian_with_a4_0> {
 
                         using params_type = CurveParams;
                         using field_type = typename params_type::field_type;
                     private:
                         using field_value_type = typename field_type::value_type;
+
+                        using common_addition_processor = short_weierstrass_element_g1_jacobian_with_a4_0_add_2007_bl; 
+                        using common_doubling_processor = short_weierstrass_element_g1_jacobian_with_a4_0_dbl_2009_l;
+                        using mixed_addition_processor = short_weierstrass_element_g1_jacobian_with_a4_0_madd_2007_bl;
                     public:
                         using group_type = typename params_type::group_type;
 
-                        constexpr static const forms form = 
-                            forms::short_weierstrass;
-                        constexpr static const 
-                            short_weierstrass_coordinates coordinates = 
-                            short_weierstrass_coordinates::jacobian_with_a4_0;
+                        using form = forms::short_weierstrass;
+                        using coordinates = coordinates<form>::jacobian_with_a4_0;
 
                         field_value_type X;
                         field_value_type Y;
@@ -84,7 +84,7 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr short_weierstrass_element_g1_jacobian_with_a4_0() : short_weierstrass_element_g1_jacobian_with_a4_0(
+                        constexpr curve_element() : curve_element(
                             params_type::zero_fill[0], 
                             params_type::zero_fill[1], 
                             params_type::zero_fill[2]) {};
@@ -93,7 +93,7 @@ namespace nil {
                          *    @return the selected point (X:Y:Z)
                          *
                          */
-                        constexpr short_weierstrass_element_g1_jacobian_with_a4_0(field_value_type X,
+                        constexpr curve_element(field_value_type X,
                                                   field_value_type Y,
                                                   field_value_type Z) {
                             this->X = X;
@@ -104,21 +104,21 @@ namespace nil {
                         /** @brief Get the point at infinity
                          *
                          */
-                        constexpr static short_weierstrass_element_g1_jacobian_with_a4_0 zero() {
-                            return short_weierstrass_element_g1_jacobian_with_a4_0();
+                        constexpr static curve_element zero() {
+                            return curve_element();
                         }
 
                         /** @brief Get the generator of group G1
                          *
                          */
-                        constexpr static short_weierstrass_element_g1_jacobian_with_a4_0 one() {
-                            return short_weierstrass_element_g1_jacobian_with_a4_0(params_type::one_fill[0], params_type::one_fill[1], 
+                        constexpr static curve_element one() {
+                            return curve_element(params_type::one_fill[0], params_type::one_fill[1], 
                                 params_type::one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
 
-                        constexpr bool operator==(const short_weierstrass_element_g1_jacobian_with_a4_0 &other) const {
+                        constexpr bool operator==(const curve_element &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -153,7 +153,7 @@ namespace nil {
                             return true;
                         }
 
-                        constexpr bool operator!=(const short_weierstrass_element_g1_jacobian_with_a4_0 &other) const {
+                        constexpr bool operator!=(const curve_element &other) const {
                             return !(operator==(other));
                         }
                         /** @brief
@@ -195,7 +195,7 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        constexpr short_weierstrass_element_g1_jacobian_with_a4_0 operator=(const short_weierstrass_element_g1_jacobian_with_a4_0 &other) {
+                        constexpr curve_element operator=(const curve_element &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -204,7 +204,7 @@ namespace nil {
                             return *this;
                         }
 
-                        constexpr short_weierstrass_element_g1_jacobian_with_a4_0 operator+(const short_weierstrass_element_g1_jacobian_with_a4_0 &other) const {
+                        constexpr curve_element operator+(const curve_element &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -218,14 +218,14 @@ namespace nil {
                                 return this->doubled();
                             }
 
-                            return Adder::process(*this, other);
+                            return common_addition_processor::process(*this, other);
                         }
 
-                        constexpr short_weierstrass_element_g1_jacobian_with_a4_0 operator-() const {
-                            return short_weierstrass_element_g1_jacobian_with_a4_0(this->X, -(this->Y), this->Z);
+                        constexpr curve_element operator-() const {
+                            return curve_element(this->X, -(this->Y), this->Z);
                         }
 
-                        constexpr short_weierstrass_element_g1_jacobian_with_a4_0 operator-(const short_weierstrass_element_g1_jacobian_with_a4_0 &other) const {
+                        constexpr curve_element operator-(const curve_element &other) const {
                             return (*this) + (-other);
                         }
                         
@@ -233,8 +233,8 @@ namespace nil {
                          *
                          * @return doubled element from group G1
                          */
-                        constexpr short_weierstrass_element_g1_jacobian_with_a4_0 doubled() const {
-                            return Doubler::process(*this);
+                        constexpr curve_element doubled() const {
+                            return common_doubling_processor::process(*this);
                         }
 
                         /** @brief
@@ -242,7 +242,7 @@ namespace nil {
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G1
                          */
-                        constexpr short_weierstrass_element_g1_jacobian_with_a4_0 mixed_add(const short_weierstrass_element_g1_jacobian_with_a4_0 &other) const {
+                        constexpr curve_element mixed_add(const curve_element &other) const {
 
                             // handle special cases having to do with O
                             if (this->is_zero()) {
@@ -253,7 +253,7 @@ namespace nil {
                                 return *this;
                             }
 
-                            return MixAdd::process(*this, other);
+                            return mixed_addition_processor::process(*this, other);
                         }
                     };
 

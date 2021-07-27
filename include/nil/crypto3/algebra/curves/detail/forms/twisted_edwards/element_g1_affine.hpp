@@ -28,7 +28,7 @@
 #define CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_AFFINE_HPP
 
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms.hpp>
+#include <nil/crypto3/algebra/curves/forms.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
 
 namespace nil {
@@ -41,10 +41,10 @@ namespace nil {
                      *    @tparam Form Form of the curve 
                      *    @tparam Coordinates Representation coordinates of the group element 
                      */
-                    // template<typename CurveParams, 
-                    //          forms Form, 
-                    //          twisted_edwards_coordinates Coordinates>
-                    // struct twisted_edwards_element_g1_affine;
+                    template<typename CurveParams, 
+                             typename Form, 
+                             typename Coordinates>
+                    struct curve_element;
                     
                     /** @brief A struct representing an element from the group G1 of twisted Edwards curve of 
                      *  affine coordinates representation. 
@@ -53,7 +53,9 @@ namespace nil {
                      *
                      */
                     template<typename CurveParams>
-                    struct twisted_edwards_element_g1_affine {
+                    struct curve_element<CurveParams, 
+                                   forms::twisted_edwards, 
+                                   coordinates<forms::twisted_edwards>::affine> {
 
                         using field_type = typename CurveParams::field_type;
                     private:
@@ -62,11 +64,8 @@ namespace nil {
                     public:
                         using group_type = typename params_type::group_type;
 
-                        constexpr static const forms form = 
-                            forms::twisted_edwards;
-                        constexpr static const 
-                            twisted_edwards_coordinates coordinates = 
-                            twisted_edwards_coordinates::affine;
+                        using form = forms::twisted_edwards;
+                        using coordinates = coordinates<form>::affine;
 
                         field_value_type X;
                         field_value_type Y;
@@ -76,19 +75,19 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr twisted_edwards_element_g1_affine() : twisted_edwards_element_g1_affine(params_type::zero_fill[0], 
+                        constexpr curve_element() : curve_element(params_type::zero_fill[0], 
                             params_type::zero_fill[1]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
                          *
                          */
-                        constexpr twisted_edwards_element_g1_affine(field_value_type in_X, field_value_type in_Y) {
+                        constexpr curve_element(field_value_type in_X, field_value_type in_Y) {
                             this->X = in_X;
                             this->Y = in_Y;
                         };
 
-                        // constexpr twisted_edwards_element_g1_affine(twisted_edwards_element_g1_projective<params_type> other) {
+                        // constexpr curve_element(twisted_edwards_element_g1_projective<params_type> other) {
 
                         //     if (other.Z.is_zero()) {
                         //         *this = this->zero();
@@ -102,19 +101,19 @@ namespace nil {
                         /** @brief Get the point at infinity
                          *
                          */
-                        static twisted_edwards_element_g1_affine zero() {
-                            return twisted_edwards_element_g1_affine();
+                        static curve_element zero() {
+                            return curve_element();
                         }
                         /** @brief Get the generator of group G1
                          *
                          */
-                        static twisted_edwards_element_g1_affine one() {
-                            return twisted_edwards_element_g1_affine(params_type::one_fill[0], params_type::one_fill[1]);
+                        static curve_element one() {
+                            return curve_element(params_type::one_fill[0], params_type::one_fill[1]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
 
-                        constexpr bool operator==(const twisted_edwards_element_g1_affine &other) const {
+                        constexpr bool operator==(const curve_element &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -136,7 +135,7 @@ namespace nil {
                             return true;
                         }
 
-                        constexpr bool operator!=(const twisted_edwards_element_g1_affine &other) const {
+                        constexpr bool operator!=(const curve_element &other) const {
                             return !(operator==(other));
                         }
                         /** @brief
@@ -169,7 +168,7 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        constexpr twisted_edwards_element_g1_affine operator=(const twisted_edwards_element_g1_affine &other) {
+                        constexpr curve_element operator=(const curve_element &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -177,7 +176,7 @@ namespace nil {
                             return *this;
                         }
 
-                        constexpr twisted_edwards_element_g1_affine operator+(const twisted_edwards_element_g1_affine &other) const {
+                        constexpr curve_element operator+(const curve_element &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -194,18 +193,18 @@ namespace nil {
                             return this->add(other);
                         }
 
-                        constexpr twisted_edwards_element_g1_affine operator-() const {
-                            return twisted_edwards_element_g1_affine(-(this->X), this->Y);
+                        constexpr curve_element operator-() const {
+                            return curve_element(-(this->X), this->Y);
                         }
 
-                        constexpr twisted_edwards_element_g1_affine operator-(const twisted_edwards_element_g1_affine &B) const {
+                        constexpr curve_element operator-(const curve_element &B) const {
                             return (*this) + (-B);
                         }
                         /** @brief
                          *
                          * @return doubled element from group G1
                          */
-                        constexpr twisted_edwards_element_g1_affine doubled() const {
+                        constexpr curve_element doubled() const {
 
                             if (this->is_zero()) {
                                 return (*this);
@@ -221,7 +220,7 @@ namespace nil {
                          *   x3 = (x1*y2+y1*x2)/(1+d*x1*x2*y1*y2)
                          *   y3 = (y1*y2-a*x1*x2)/(1-d*x1*x2*y1*y2)
                          */
-                        twisted_edwards_element_g1_affine add(const twisted_edwards_element_g1_affine &other) const {
+                        curve_element add(const curve_element &other) const {
                             field_value_type XX = (this->X)*(other.X);
                             field_value_type YY = (this->Y)*(other.Y);
                             field_value_type XY = (this->X)*(other.Y);
@@ -233,7 +232,7 @@ namespace nil {
                             field_value_type Y3 = (YY - params_type::a * XX) * 
                                 (field_value_type::one() - lambda).inversed();
 
-                            return twisted_edwards_element_g1_affine(X3, Y3);
+                            return curve_element(X3, Y3);
                         }
 
                     public:
@@ -245,7 +244,7 @@ namespace nil {
                         //  * affine coordinates to montgomery form and affine coordinates
                         //  */
                         // // This should be moved to montgomery form element constructor
-                        // twisted_edwards_element_g1_affine<params_type, 
+                        // curve_element<params_type, 
                         //     forms::montgomery, coordinates> to_montgomery() const {
                         //     field_value_type p_out[3];
 
@@ -259,7 +258,7 @@ namespace nil {
                         //     field_value_type u = 
                         //         (field_value_type::one() + this->Y) * 
                         //         (field_value_type::one() - this->Y).inversed();
-                        //     return twisted_edwards_element_g1_affine<params_type, 
+                        //     return curve_element<params_type, 
                         //         forms::montgomery, coordinates>{u, 
                         //             params_type::scale * u * this->X.inversed()};
                         // }

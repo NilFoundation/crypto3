@@ -26,21 +26,25 @@
 #ifndef CRYPTO3_ZK_ALGEBRA_CURVES_HESSIAN_COORDINATES_REPRESENTATIONS_HPP
 #define CRYPTO3_ZK_ALGEBRA_CURVES_HESSIAN_COORDINATES_REPRESENTATIONS_HPP
 
+#include <nil/crypto3/algebra/curves/forms.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                namespace detail {
 
-                    /** @brief Hessian curve group element coordinates representation.
-                     * Description: https://hyperelliptic.org/EFD/g1p/auto-hessian.html
-                     */
-                    enum class hessian_coordinates {
-                        affine, 
-                        extended, 
-                        projective 
-                    };
-                }        // namespace detail
+                template <typename Form>
+                struct coordinates;
+
+                /** @brief Hessian curve group element coordinates representation.
+                 * Description: https://hyperelliptic.org/EFD/g1p/auto-hessian.html
+                 */
+                template <>
+                struct coordinates<forms::hessian> {
+                    struct affine{};
+                    struct extended{};
+                    struct projective{};
+                };
             }        // namespace curves
         }        // namespace algebra
     }            // namespace crypto3

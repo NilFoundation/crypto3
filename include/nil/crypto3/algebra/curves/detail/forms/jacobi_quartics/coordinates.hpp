@@ -26,25 +26,29 @@
 #ifndef CRYPTO3_ZK_ALGEBRA_CURVES_JACOBI_QUATRICS_COORDINATES_REPRESENTATIONS_HPP
 #define CRYPTO3_ZK_ALGEBRA_CURVES_JACOBI_QUATRICS_COORDINATES_REPRESENTATIONS_HPP
 
+#include <nil/crypto3/algebra/curves/forms.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                namespace detail {
 
-                    /** @brief Jacobi quatrics curve group element coordinates representation.
-                     * Description: https://hyperelliptic.org/EFD/g1p/auto-jquartic.html
-                     */
-                    enum class jacobi_quartics_coordinates {
-                        affine, 
-                        double_oriented_xxyzz, 
-                        doubling_oriented_xxyzzr, 
-                        double_oriented_xyz, 
-                        xxyzz, 
-                        xxyzzr, 
-                        xyz 
-                    };
-                }        // namespace detail
+                template <typename Form>
+                struct coordinates;
+
+                /** @brief Jacobi quatrics curve group element coordinates representation.
+                 * Description: https://hyperelliptic.org/EFD/g1p/auto-jquartic.html
+                 */
+                template <>
+                struct coordinates<forms::jacobi_quartics> {
+                    struct affine{}; 
+                    struct double_oriented_xxyzz{}; 
+                    struct doubling_oriented_xxyzzr{}; 
+                    struct double_oriented_xyz{}; 
+                    struct xxyzz{}; 
+                    struct xxyzzr{}; 
+                    struct xyz{}; 
+                };
             }        // namespace curves
         }        // namespace algebra
     }            // namespace crypto3

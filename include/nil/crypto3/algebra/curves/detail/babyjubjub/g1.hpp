@@ -29,7 +29,7 @@
 
 #include <nil/crypto3/algebra/curves/detail/babyjubjub/params.hpp>
 
-#include <nil/crypto3/algebra/curves/detail/forms.hpp>
+#include <nil/crypto3/algebra/curves/forms.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/element_g1_affine.hpp>
 
@@ -43,6 +43,8 @@ namespace nil {
                 namespace detail {
                     /** @brief A struct representing a group G1 of BabyJubJub curve.
                      */
+                    template<typename Form, 
+                             typename Coordinates>
                     struct babyjubjub_g1 {
                         using params_type = babyjubjub_twisted_edwards_g1_affine_params;
 
@@ -53,7 +55,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = twisted_edwards_element_g1_affine<params_type>;
+                        using value_type = curve_element<params_type, Form, Coordinates>;
                     };
                 }    // namespace detail
             }        // namespace curves

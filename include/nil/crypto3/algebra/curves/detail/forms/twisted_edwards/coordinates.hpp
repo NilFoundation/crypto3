@@ -26,23 +26,27 @@
 #ifndef CRYPTO3_ZK_ALGEBRA_CURVES_TWISTED_EDWARDS_COORDINATES_REPRESENTATIONS_HPP
 #define CRYPTO3_ZK_ALGEBRA_CURVES_TWISTED_EDWARDS_COORDINATES_REPRESENTATIONS_HPP
 
+#include <nil/crypto3/algebra/curves/forms.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                namespace detail {
 
-                    /** @brief Twisted Edwards curve group element coordinates representation.
-                     * Description: https://hyperelliptic.org/EFD/g1p/auto-twisted.html
-                     */
-                    enum class twisted_edwards_coordinates {
-                        affine, 
-                        extended, 
-                        extended_with_a_minus_1, 
-                        inverted, 
-                        projective
-                    };
-                }        // namespace detail
+                template <typename Form>
+                struct coordinates;
+
+                /** @brief Twisted Edwards curve group element coordinates representation.
+                 * Description: https://hyperelliptic.org/EFD/g1p/auto-twisted.html
+                 */
+                template <>
+                struct coordinates<forms::twisted_edwards> {
+                    struct affine{}; 
+                    struct extended{}; 
+                    struct extended_with_a_minus_1{}; 
+                    struct inverted{}; 
+                    struct projective{};
+                };
             }        // namespace curves
         }        // namespace algebra
     }            // namespace crypto3

@@ -29,7 +29,7 @@
 
 #include <nil/crypto3/algebra/curves/detail/alt_bn128/params.hpp>
 
-#include <nil/crypto3/algebra/curves/detail/forms.hpp>
+#include <nil/crypto3/algebra/curves/forms.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_0/element_g1.hpp>
 
@@ -48,7 +48,9 @@ namespace nil {
                      *
                      */
 
-                    template<std::size_t Version>
+                    template<std::size_t Version, 
+                             typename Form, 
+                             typename Coordinates>
                     struct alt_bn128_g1 {
 
                         using params_type = alt_bn128_short_weierstrass_g1_jacobian_with_a4_0_params<Version>;
@@ -60,7 +62,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = short_weierstrass_element_g1_jacobian_with_a4_0<params_type>;
+                        using value_type = curve_element<params_type, Form, Coordinates>;
                     };
 
                 }    // namespace detail
