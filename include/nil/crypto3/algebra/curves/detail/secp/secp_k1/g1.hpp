@@ -49,7 +49,7 @@ namespace nil {
                              typename Coordinates>
                     struct secp_k1_g1 {
 
-                        using params_type = secp_k1_short_weierstrass_g1_jacobian_with_a4_0_params<Version>;
+                        using params_type = secp_k1_short_weierstrass_g1_params<Version, Coordinates>;
 
                         using curve_type = secp_k1<Version>;
 

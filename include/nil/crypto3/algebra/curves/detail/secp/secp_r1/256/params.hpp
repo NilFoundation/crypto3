@@ -42,11 +42,9 @@ namespace nil {
                     template<std::size_t Version = 256>
                     struct secp_r1_short_weierstrass_params;
 
-                    template<std::size_t Version = 256>
-                    struct secp_r1_short_weierstrass_g1_affine_params;
-
-                    template<std::size_t Version = 256>
-                    struct secp_r1_short_weierstrass_g1_projective_params;
+                    template<std::size_t Version, 
+                             typename Coordinates>
+                    struct secp_r1_short_weierstrass_g1_params;
 
                     template<>
                     struct secp_r1_short_weierstrass_params<256> : public secp_r1_basic_params<256> {
@@ -63,7 +61,9 @@ namespace nil {
                     };
 
                     template<>
-                    struct secp_r1_short_weierstrass_g1_projective_params<256> : public secp_r1_short_weierstrass_params<256> {
+                    struct secp_r1_short_weierstrass_g1_params<256, 
+                        coordinates<forms::short_weierstrass>::projective> : 
+                            public secp_r1_short_weierstrass_params<256> {
 
                         using field_type = typename secp_r1_basic_params<256>::g1_field_type;
                         using group_type = secp_r1_g1<256, forms::short_weierstrass,  
@@ -84,10 +84,14 @@ namespace nil {
                     constexpr typename secp_r1_short_weierstrass_params<256>::base_field_type::modulus_type const secp_r1_short_weierstrass_params<256>::a;
                     constexpr typename secp_r1_short_weierstrass_params<256>::base_field_type::modulus_type const secp_r1_short_weierstrass_params<256>::b;
 
-                    constexpr std::array<typename secp_r1_short_weierstrass_g1_projective_params<256>::field_type::value_type, 3> const
-                        secp_r1_short_weierstrass_g1_projective_params<256>::zero_fill;
-                    constexpr std::array<typename secp_r1_short_weierstrass_g1_projective_params<256>::field_type::value_type, 3> const
-                        secp_r1_short_weierstrass_g1_projective_params<256>::one_fill;
+                    constexpr std::array<typename secp_r1_short_weierstrass_g1_params<256, 
+                        coordinates<forms::short_weierstrass>::projective>::field_type::value_type, 3> const
+                        secp_r1_short_weierstrass_g1_params<256, 
+                            coordinates<forms::short_weierstrass>::projective>::zero_fill;
+                    constexpr std::array<typename secp_r1_short_weierstrass_g1_params<256, 
+                        coordinates<forms::short_weierstrass>::projective>::field_type::value_type, 3> const
+                        secp_r1_short_weierstrass_g1_params<256, 
+                            coordinates<forms::short_weierstrass>::projective>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves

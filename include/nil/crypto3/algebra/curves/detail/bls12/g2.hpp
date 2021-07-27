@@ -55,7 +55,7 @@ namespace nil {
                              typename Coordinates>
                     struct bls12_g2 {
                         
-                        using params_type = bls12_short_weierstrass_g2_jacobian_with_a4_0_params<Version>;
+                        using params_type = bls12_short_weierstrass_g2_params<Version, Coordinates>;
 
                         using curve_type = bls12<Version>;
 

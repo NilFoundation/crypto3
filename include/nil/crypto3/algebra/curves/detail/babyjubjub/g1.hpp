@@ -46,7 +46,7 @@ namespace nil {
                     template<typename Form, 
                              typename Coordinates>
                     struct babyjubjub_g1 {
-                        using params_type = babyjubjub_twisted_edwards_g1_affine_params;
+                        using params_type = babyjubjub_twisted_edwards_g1_params<Coordinates>;
 
                         using curve_type = babyjubjub;
 

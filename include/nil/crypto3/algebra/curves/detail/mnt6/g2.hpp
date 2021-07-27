@@ -51,7 +51,7 @@ namespace nil {
                              typename Coordinates>
                     struct mnt6_g2 {
 
-                        using params_type = mnt6_short_weierstrass_g2_projective_params<Version>;
+                        using params_type = mnt6_short_weierstrass_g2_params<Version, Coordinates>;
 
                         using curve_type = mnt6<Version>;
 
