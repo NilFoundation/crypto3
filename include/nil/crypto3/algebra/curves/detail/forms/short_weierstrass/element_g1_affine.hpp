@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_PROJECTIVE_HPP
-#define CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_PROJECTIVE_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_HPP
+#define CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_HPP
 
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
 #include <nil/crypto3/algebra/curves/forms.hpp>
@@ -76,8 +76,8 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr curve_element() : curve_element(params_type::g1_zero_fill[0], 
-                            params_type::g1_zero_fill[1]) {};
+                        constexpr curve_element() : curve_element(params_type::zero_fill[0], 
+                            params_type::zero_fill[1]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y)$ in the affine coordinates
@@ -99,12 +99,12 @@ namespace nil {
                          *
                          */
                         constexpr static curve_element one() {
-                            return curve_element(params_type::g1_one_fill[0], params_type::g1_one_fill[1]);
+                            return curve_element(params_type::one_fill[0], params_type::one_fill[1]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
 
-                        constexpr static bool operator==(const curve_element &other) const {
+                        constexpr bool operator==(const curve_element &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -224,4 +224,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_PROJECTIVE_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_HPP

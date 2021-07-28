@@ -33,6 +33,7 @@
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/inverted/add_2008_bbjlp.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/inverted/dbl_2008_bbjlp.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/inverted/madd_2008_bbjlp.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/element_g1_affine.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -167,10 +168,10 @@ namespace nil {
                          * @return return the corresponding element from inverted coordinates to 
                          * affine coordinates
                          */
-                        constexpr operator curve_element<
+                        constexpr curve_element<
                             typename params_type::affine_params, 
                             form, 
-                            typename curves::coordinates::affine> () const {
+                            typename curves::coordinates::affine> to_affine () const {
 
                             using result_type = curve_element<typename params_type::affine_params, 
                                 form, typename curves::coordinates::affine>;

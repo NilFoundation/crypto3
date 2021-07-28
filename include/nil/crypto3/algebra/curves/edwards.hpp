@@ -32,7 +32,7 @@
 #include <nil/crypto3/algebra/curves/detail/edwards183/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards183/g2.hpp>
 
-#include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
+// #include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
 
 // #include <nil/crypto3/algebra/pairing/edwards.hpp>

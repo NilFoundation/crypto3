@@ -27,13 +27,13 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP
 #define CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards183/edwards_params.hpp>
+// #include <nil/crypto3/algebra/curves/detail/edwards183/edwards_params.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards183/twisted_edwards_params.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/element_g1.hpp>
+// #include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/element_g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/inverted/element_g1.hpp>
 
 #include <nil/crypto3/algebra/curves/forms.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
+// #include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
 
 namespace nil {

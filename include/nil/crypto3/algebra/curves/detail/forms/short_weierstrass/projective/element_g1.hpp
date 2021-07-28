@@ -33,6 +33,7 @@
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/add_1998_cmo_2.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/dbl_2007_bl.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/element_g1_affine.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -184,10 +185,10 @@ namespace nil {
                          * @return return the corresponding element from projective coordinates to 
                          * affine coordinates
                          */
-                        constexpr operator curve_element<
+                        constexpr curve_element<
                             typename params_type::affine_params, 
                             form, 
-                            typename curves::coordinates::affine> () const {
+                            typename curves::coordinates::affine> to_affine () const {
 
                             using result_type = curve_element<typename params_type::affine_params, 
                                 form, typename curves::coordinates::affine>;
@@ -196,7 +197,7 @@ namespace nil {
                                 return result_type::zero();
                             }
 
-                            return result_type(X/Z, Y/Z); //  x=X/Z, y=Y/Z
+                            return result_type(X*Z.inversed(), Y*Z.inversed()); //  x=X/Z, y=Y/Z
                         }
 
                         /*************************  Arithmetic operations  ***********************************/
