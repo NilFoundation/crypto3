@@ -44,9 +44,10 @@ namespace nil {
                     typedef typename params_type::base_field_type base_field_type;
                     typedef typename params_type::scalar_field_type scalar_field_type;
 
-                    typedef typename detail::secp_k1_g1<Version, 
-                        forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::jacobian_with_a4_0> g1_type;
+                    template <typename Coordinates = coordinates<forms::short_weierstrass>::jacobian_with_a4_0, 
+                              typename Form = forms::short_weierstrass>
+                    using g1_type = typename detail::secp_k1_g1<Version, 
+                        Form, Coordinates>;
                 };
 
                 template<std::size_t Version>
@@ -57,9 +58,10 @@ namespace nil {
                     typedef typename params_type::base_field_type base_field_type;
                     typedef typename params_type::scalar_field_type scalar_field_type;
 
-                    typedef typename detail::secp_r1_g1<Version, 
-                        forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::projective> g1_type;
+                    template <typename Coordinates = coordinates<forms::short_weierstrass>::projective, 
+                              typename Form = forms::short_weierstrass>
+                    using g1_type = typename detail::secp_r1_g1<Version, 
+                        Form, Coordinates>;
                 };
 
                 template<std::size_t Version>

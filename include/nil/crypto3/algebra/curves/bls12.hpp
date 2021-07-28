@@ -56,12 +56,15 @@ namespace nil {
                     typedef typename params_type::base_field_type base_field_type;
                     typedef typename params_type::scalar_field_type scalar_field_type;
 
-                    typedef typename detail::bls12_g1<Version, 
-                        forms::short_weierstrass,  
-                        coordinates<forms::short_weierstrass>::jacobian_with_a4_0> g1_type;
-                    typedef typename detail::bls12_g2<Version, 
-                        forms::short_weierstrass,  
-                        coordinates<forms::short_weierstrass>::jacobian_with_a4_0> g2_type;
+                    template <typename Coordinates = coordinates<forms::short_weierstrass>::jacobian_with_a4_0, 
+                              typename Form = forms::short_weierstrass>
+                    using g1_type = typename detail::bls12_g1<Version, 
+                        Form,  Coordinates>;
+
+                    template <typename Form = forms::short_weierstrass, 
+                             typename Coordinates = coordinates<forms::short_weierstrass>::jacobian_with_a4_0>
+                    using g2_type = typename detail::bls12_g2<Version, 
+                        Form,  Coordinates>;
 
                     constexpr static const bool has_affine_pairing = false;
 

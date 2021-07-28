@@ -51,8 +51,9 @@ namespace nil {
                     typedef typename policy_type::base_field_type base_field_type;
                     typedef typename policy_type::scalar_field_type scalar_field_type;
 
-                    typedef typename detail::jubjub_g1<forms::twisted_edwards, 
-                        coordinates<forms::twisted_edwards>::affine> g1_type;
+                    template <typename Form = forms::twisted_edwards, 
+                              typename Coordinates = coordinates<forms::twisted_edwards>::affine>
+                    using g1_type = typename detail::jubjub_g1<Form, Coordinates>;
 
                     typedef typename curves::bls12<381> chained_on_curve_type;
                     

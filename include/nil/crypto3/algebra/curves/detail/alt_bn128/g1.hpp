@@ -53,7 +53,7 @@ namespace nil {
                              typename Coordinates>
                     struct alt_bn128_g1 {
 
-                        using params_type = alt_bn128_short_weierstrass_g1_params<Version, Coordinates>;
+                        using params_type = alt_bn128_g1_params<Version, Form, Coordinates>;
 
                         using curve_type = alt_bn128<Version>;
 

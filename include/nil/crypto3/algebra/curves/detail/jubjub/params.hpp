@@ -44,8 +44,12 @@ namespace nil {
                              typename Coordinates>
                     struct jubjub_g1;
 
-                    template <typename Coordinates>
-                    struct jubjub_twisted_edwards_g1_params;
+                    template <typename Form>
+                    struct jubjub_params;
+
+                    template <typename Form, 
+                              typename Coordinates>
+                    struct jubjub_g1_params;
 
                     using namespace algebra;
                     /** @brief A struct representing details about base and scalar fields of the corresponding size 183 bits and 181
@@ -58,7 +62,8 @@ namespace nil {
                         using scalar_field_type = fields::jubjub_fr;
                     };
 
-                    struct jubjub_twisted_edwards_params : public jubjub_basic_params {
+                    template <>
+                    struct jubjub_params<forms::twisted_edwards> : public jubjub_basic_params {
 
                         using base_field_type = typename jubjub_basic_params::base_field_type;
                         using scalar_field_type = typename jubjub_basic_params::scalar_field_type;
@@ -70,7 +75,8 @@ namespace nil {
                             0x2A9318E74BFA2B48F5FD9207E6BD7FD4292D7F6D37579D2601065FD6D6343EB1_cppui254;    ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
                     };
 
-                    struct jubjub_montgomery_params : public jubjub_basic_params {
+                    template <>
+                    struct jubjub_params<forms::montgomery> : public jubjub_basic_params {
 
                         using base_field_type = typename jubjub_basic_params::base_field_type;
                         using scalar_field_type = typename jubjub_basic_params::scalar_field_type;
@@ -83,11 +89,12 @@ namespace nil {
                     };
 
                     template <>
-                    struct jubjub_twisted_edwards_g1_params<
+                    struct jubjub_g1_params<
+                        forms::twisted_edwards, 
                         coordinates<forms::twisted_edwards>::affine> : 
-                            public jubjub_twisted_edwards_params {
+                            public jubjub_params<forms::twisted_edwards> {
 
-                        using field_type = typename jubjub_twisted_edwards_params::base_field_type;
+                        using field_type = typename jubjub_params<forms::twisted_edwards>::base_field_type;
                         using group_type = jubjub_g1<forms::twisted_edwards, 
                             coordinates<forms::twisted_edwards>::affine>;
 
@@ -102,19 +109,19 @@ namespace nil {
                             field_type::value_type::one()};    //< Third value is not correct!
                     };
 
-                    constexpr typename jubjub_twisted_edwards_params::base_field_type::modulus_type const jubjub_twisted_edwards_params::a;
-                    constexpr typename jubjub_twisted_edwards_params::base_field_type::modulus_type const jubjub_twisted_edwards_params::d;
+                    constexpr typename jubjub_params<forms::twisted_edwards>::base_field_type::modulus_type const jubjub_params<forms::twisted_edwards>::a;
+                    constexpr typename jubjub_params<forms::twisted_edwards>::base_field_type::modulus_type const jubjub_params<forms::twisted_edwards>::d;
 
-                    constexpr typename jubjub_montgomery_params::base_field_type::modulus_type const jubjub_montgomery_params::A;
-                    constexpr typename jubjub_montgomery_params::base_field_type::modulus_type const jubjub_montgomery_params::scale;
+                    constexpr typename jubjub_params<forms::montgomery>::base_field_type::modulus_type const jubjub_params<forms::montgomery>::A;
+                    constexpr typename jubjub_params<forms::montgomery>::base_field_type::modulus_type const jubjub_params<forms::montgomery>::scale;
 
-                    constexpr std::array<typename jubjub_twisted_edwards_g1_params<
+                    constexpr std::array<typename jubjub_g1_params<forms::twisted_edwards, 
                         coordinates<forms::twisted_edwards>::affine>::base_field_type::value_type, 3> const
-                        jubjub_twisted_edwards_g1_params<
+                        jubjub_g1_params<forms::twisted_edwards, 
                             coordinates<forms::twisted_edwards>::affine>::zero_fill;
-                    constexpr std::array<typename jubjub_twisted_edwards_g1_params<
+                    constexpr std::array<typename jubjub_g1_params<forms::twisted_edwards, 
                         coordinates<forms::twisted_edwards>::affine>::base_field_type::value_type, 3> const
-                        jubjub_twisted_edwards_g1_params<
+                        jubjub_g1_params<forms::twisted_edwards, 
                             coordinates<forms::twisted_edwards>::affine>::one_fill;
 
                 }    // namespace detail

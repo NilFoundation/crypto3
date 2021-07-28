@@ -61,16 +61,19 @@ namespace nil {
                     template<std::size_t Version>
                     struct bls12_basic_params;
 
-                    template<std::size_t Version>
-                    struct bls12_short_weierstrass_params;
+                    template<std::size_t Version, 
+                             typename Form>
+                    struct bls12_params;
 
                     template<std::size_t Version, 
+                             typename Form, 
                              typename Coordinates>
-                    struct bls12_short_weierstrass_g1_params;
+                    struct bls12_g1_params;
 
                     template<std::size_t Version, 
+                             typename Form, 
                              typename Coordinates>
-                    struct bls12_short_weierstrass_g2_params;
+                    struct bls12_g2_params;
 
                     /** @brief A struct representing details about base and scalar fields.
                      *
@@ -86,7 +89,7 @@ namespace nil {
                     };
 
                     template<>
-                    struct bls12_short_weierstrass_params<377> : public bls12_basic_params<377> {
+                    struct bls12_params<377, forms::short_weierstrass> : public bls12_basic_params<377> {
 
                         using base_field_type = typename bls12_basic_params<377>::base_field_type;
                         using scalar_field_type = typename bls12_basic_params<377>::scalar_field_type;
@@ -98,9 +101,10 @@ namespace nil {
                     };
 
                     template<>
-                    struct bls12_short_weierstrass_g1_params<377, 
+                    struct bls12_g1_params<377, 
+                        forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::jacobian_with_a4_0> : 
-                            public bls12_short_weierstrass_params<377> {
+                            public bls12_params<377, forms::short_weierstrass> {
 
                         using field_type = typename bls12_basic_params<377>::g1_field_type;
                         using group_type = bls12_g1<377, forms::short_weierstrass,  
@@ -119,9 +123,10 @@ namespace nil {
                     };
 
                     template<>
-                    struct bls12_short_weierstrass_g2_params<377, 
+                    struct bls12_g2_params<377, 
+                        forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::jacobian_with_a4_0> : 
-                            public bls12_short_weierstrass_params<377> {
+                            public bls12_params<377, forms::short_weierstrass> {
 
                         using field_type = typename bls12_basic_params<377>::g2_field_type;
                         using group_type = bls12_g2<377, forms::short_weierstrass,  
@@ -148,24 +153,24 @@ namespace nil {
                             g2_field_type::value_type::one()};
                     };
 
-                    constexpr typename bls12_short_weierstrass_params<377>::base_field_type::modulus_type const bls12_short_weierstrass_params<377>::a;
-                    constexpr typename bls12_short_weierstrass_params<377>::base_field_type::modulus_type const bls12_short_weierstrass_params<377>::b;
+                    constexpr typename bls12_params<377, forms::short_weierstrass>::base_field_type::modulus_type const bls12_params<377, forms::short_weierstrass>::a;
+                    constexpr typename bls12_params<377, forms::short_weierstrass>::base_field_type::modulus_type const bls12_params<377, forms::short_weierstrass>::b;
 
-                    constexpr std::array<typename bls12_short_weierstrass_g1_params<377, 
+                    constexpr std::array<typename bls12_g1_params<377, forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::field_type::value_type, 3> const
-                        bls12_short_weierstrass_g1_params<377, 
+                        bls12_g1_params<377, forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::zero_fill;
-                    constexpr std::array<typename bls12_short_weierstrass_g1_params<377, 
+                    constexpr std::array<typename bls12_g1_params<377, forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::field_type::value_type, 3> const
-                        bls12_short_weierstrass_g1_params<377, 
+                        bls12_g1_params<377, forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::one_fill;
-                    constexpr std::array<typename bls12_short_weierstrass_g2_params<377, 
+                    constexpr std::array<typename bls12_g2_params<377, forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::field_type::value_type, 3> const
-                        bls12_short_weierstrass_g2_params<377, 
+                        bls12_g2_params<377, forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::zero_fill;
-                    constexpr std::array<typename bls12_short_weierstrass_g2_params<377, 
+                    constexpr std::array<typename bls12_g2_params<377, forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::field_type::value_type, 3> const
-                        bls12_short_weierstrass_g2_params<377, 
+                        bls12_g2_params<377, forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::one_fill;
 
                 }    // namespace detail

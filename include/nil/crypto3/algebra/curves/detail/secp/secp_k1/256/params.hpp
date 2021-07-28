@@ -39,15 +39,17 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    template<std::size_t Version = 256>
-                    struct secp_k1_short_weierstrass_params;
+                    template<std::size_t Version, 
+                             typename Form>
+                    struct secp_k1_params;
 
                     template<std::size_t Version, 
+                             typename Form, 
                              typename Coordinates>
-                    struct secp_k1_short_weierstrass_g1_params;
+                    struct secp_k1_g1_params;
 
                     template<>
-                    struct secp_k1_short_weierstrass_params<256> : public secp_k1_basic_params<256> {
+                    struct secp_k1_params<256, forms::short_weierstrass> : public secp_k1_basic_params<256> {
 
                         using base_field_type = typename secp_k1_basic_params<256>::base_field_type;
                         using scalar_field_type = typename secp_k1_basic_params<256>::scalar_field_type;
@@ -59,9 +61,9 @@ namespace nil {
                     };
 
                     template<>
-                    struct secp_k1_short_weierstrass_g1_params<256, 
+                    struct secp_k1_g1_params<256, forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::jacobian_with_a4_0> : 
-                            public secp_k1_short_weierstrass_params<256> {
+                            public secp_k1_params<256, forms::short_weierstrass> {
 
                         using field_type = typename secp_k1_basic_params<256>::g1_field_type;
                         using group_type = secp_k1_g1<256, forms::short_weierstrass,  
@@ -79,16 +81,16 @@ namespace nil {
                             field_type::value_type::one()};
                     };
 
-                    constexpr typename secp_k1_short_weierstrass_params<256>::base_field_type::modulus_type const secp_k1_short_weierstrass_params<256>::a;
-                    constexpr typename secp_k1_short_weierstrass_params<256>::base_field_type::modulus_type const secp_k1_short_weierstrass_params<256>::b;
+                    constexpr typename secp_k1_params<256, forms::short_weierstrass>::base_field_type::modulus_type const secp_k1_params<256, forms::short_weierstrass>::a;
+                    constexpr typename secp_k1_params<256, forms::short_weierstrass>::base_field_type::modulus_type const secp_k1_params<256, forms::short_weierstrass>::b;
 
-                    constexpr std::array<typename secp_k1_short_weierstrass_g1_params<256, 
+                    constexpr std::array<typename secp_k1_g1_params<256, forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::field_type::value_type, 3> const
-                        secp_k1_short_weierstrass_g1_params<256, 
+                        secp_k1_g1_params<256, forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::zero_fill;
-                    constexpr std::array<typename secp_k1_short_weierstrass_g1_params<256, 
+                    constexpr std::array<typename secp_k1_g1_params<256, forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::field_type::value_type, 3> const
-                        secp_k1_short_weierstrass_g1_params<256, 
+                        secp_k1_g1_params<256, forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::one_fill;
 
                 }    // namespace detail

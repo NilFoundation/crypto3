@@ -61,16 +61,19 @@ namespace nil {
                     template<std::size_t Version = 298>
                     struct mnt4_basic_params;
 
-                    template<std::size_t Version = 298>
-                    struct mnt4_short_weierstrass_params;
+                    template<std::size_t Version, 
+                             typename Form>
+                    struct mnt4_params;
 
                     template<std::size_t Version, 
+                             typename Form, 
                              typename Coordinates>
-                    struct mnt4_short_weierstrass_g1_params;
+                    struct mnt4_g1_params;
 
                     template<std::size_t Version, 
+                             typename Form, 
                              typename Coordinates>
-                    struct mnt4_short_weierstrass_g2_params;
+                    struct mnt4_g2_params;
 
                     /** @brief A struct representing details about base and scalar fields.
                      *
@@ -86,7 +89,7 @@ namespace nil {
                     };
 
                     template<>
-                    struct mnt4_short_weierstrass_params<298> : public mnt4_basic_params<298> {
+                    struct mnt4_params<298, forms::short_weierstrass> : public mnt4_basic_params<298> {
 
                         using base_field_type = typename mnt4_basic_params<298>::base_field_type;
                         using scalar_field_type = typename mnt4_basic_params<298>::scalar_field_type;
@@ -99,9 +102,10 @@ namespace nil {
                     };
 
                     template<>
-                    struct mnt4_short_weierstrass_g1_params<298, 
+                    struct mnt4_g1_params<298, 
+                        forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::projective> : 
-                            public mnt4_short_weierstrass_params<298> {
+                            public mnt4_params<298, forms::short_weierstrass> {
 
                         using field_type = typename mnt4_basic_params<298>::g1_field_type;
                         using group_type = mnt4_g1<298, forms::short_weierstrass,  
@@ -120,9 +124,10 @@ namespace nil {
                     };
 
                     template<>
-                    struct mnt4_short_weierstrass_g2_params<298, 
+                    struct mnt4_g2_params<298, 
+                        forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::projective> : 
-                            public mnt4_short_weierstrass_params<298> {
+                            public mnt4_params<298, forms::short_weierstrass> {
 
                         using field_type = typename mnt4_basic_params<298>::g2_field_type;
                         using group_type = mnt4_g2<298, forms::short_weierstrass,  
@@ -150,24 +155,24 @@ namespace nil {
                             field_type::value_type::one()};  
                     };
 
-                    constexpr typename mnt4_short_weierstrass_params<298>::base_field_type::modulus_type const mnt4_short_weierstrass_params<298>::a;
-                    constexpr typename mnt4_short_weierstrass_params<298>::base_field_type::modulus_type const mnt4_short_weierstrass_params<298>::b;
+                    constexpr typename mnt4_params<298, forms::short_weierstrass>::base_field_type::modulus_type const mnt4_params<298, forms::short_weierstrass>::a;
+                    constexpr typename mnt4_params<298, forms::short_weierstrass>::base_field_type::modulus_type const mnt4_params<298, forms::short_weierstrass>::b;
 
-                    constexpr std::array<typename mnt4_short_weierstrass_g1_params<298, 
+                    constexpr std::array<typename mnt4_g1_params<298, forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::projective>::field_type::value_type, 3> const
-                        mnt4_short_weierstrass_g1_params<298, 
+                        mnt4_g1_params<298, forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::projective>::zero_fill;
-                    constexpr std::array<typename mnt4_short_weierstrass_g1_params<298, 
+                    constexpr std::array<typename mnt4_g1_params<298, forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::projective>::field_type::value_type, 3> const
-                        mnt4_short_weierstrass_g1_params<298, 
+                        mnt4_g1_params<298, forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::projective>::one_fill;
-                    constexpr std::array<typename mnt4_short_weierstrass_g2_params<298, 
+                    constexpr std::array<typename mnt4_g2_params<298, forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::projective>::field_type::value_type, 3> const
-                        mnt4_short_weierstrass_g2_params<298, 
+                        mnt4_g2_params<298, forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::projective>::zero_fill;
-                    constexpr std::array<typename mnt4_short_weierstrass_g2_params<298, 
+                    constexpr std::array<typename mnt4_g2_params<298, forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::projective>::field_type::value_type, 3> const
-                        mnt4_short_weierstrass_g2_params<298, 
+                        mnt4_g2_params<298, forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::projective>::one_fill;
 
                 }    // namespace detail

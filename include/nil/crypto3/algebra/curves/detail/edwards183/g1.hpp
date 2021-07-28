@@ -54,7 +54,7 @@ namespace nil {
                              typename Coordinates>
                     struct edwards_g1 {
 
-                        using params_type = edwards_twisted_edwards_g1_params<Version, Coordinates>;
+                        using params_type = edwards_g1_params<Version, Form, Coordinates>;
 
                         using curve_type = edwards<Version>;
 

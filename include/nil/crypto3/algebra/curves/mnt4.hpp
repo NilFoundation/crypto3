@@ -51,12 +51,15 @@ namespace nil {
                     typedef typename params_type::base_field_type base_field_type;
                     typedef typename params_type::scalar_field_type scalar_field_type;
 
-                    typedef typename detail::mnt4_g1<Version, 
-                        forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::projective> g1_type;
-                    typedef typename detail::mnt4_g2<Version, 
-                        forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::projective> g2_type;
+                    template <typename Coordinates = coordinates<forms::short_weierstrass>::projective, 
+                              typename Form = forms::short_weierstrass>
+                    using g1_type = typename detail::mnt4_g1<Version, 
+                        Form, Coordinates>;
+
+                    template <typename Coordinates = coordinates<forms::short_weierstrass>::projective, 
+                              typename Form = forms::short_weierstrass>
+                    using g2_type = typename detail::mnt4_g2<Version, 
+                        Form, Coordinates>;
 
                     // typedef typename pairing::pairing_policy<mnt4<Version>,
                     //                                          pairing::detail::mnt4_pairing_functions<Version>>

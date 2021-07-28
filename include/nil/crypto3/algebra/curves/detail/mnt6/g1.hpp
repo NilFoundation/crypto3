@@ -50,7 +50,7 @@ namespace nil {
                              typename Form, 
                              typename Coordinates>
                     struct mnt6_g1 {
-                        using params_type = mnt6_short_weierstrass_g1_params<Version, Coordinates>;
+                        using params_type = mnt6_g1_params<Version, Form, Coordinates>;
 
                         using curve_type = mnt6<Version>;
 
