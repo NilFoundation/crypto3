@@ -111,6 +111,10 @@ namespace nil {
                         using group_type = alt_bn128_g1<254, forms::short_weierstrass,  
                             coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
 
+                        using affine_params = alt_bn128_g1_params<254, 
+                            forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>;
+
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one(),
                             field_type::value_type::zero()};
@@ -125,6 +129,31 @@ namespace nil {
                     };
 
                     template<>
+                    struct alt_bn128_g1_params<254, 
+                        forms::short_weierstrass, 
+                        coordinates<forms::short_weierstrass>::affine> : 
+                            public alt_bn128_params<254, forms::short_weierstrass> {
+
+                        using field_type = typename alt_bn128_basic_params<254>::g1_field_type;
+                        using group_type = alt_bn128_g1<254, forms::short_weierstrass,  
+                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
+
+                        using jacobian_with_a4_0_params = alt_bn128_g1_params<254, 
+                            forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
+
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
+                            jacobian_with_a4_0_params::zero_fill[0]/(jacobian_with_a4_0_params::zero_fill[2].squared()), 
+                            jacobian_with_a4_0_params::zero_fill[1]/(jacobian_with_a4_0_params::zero_fill[2].squared() * 
+                                jacobian_with_a4_0_params::zero_fill[2])};
+
+                        constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
+                            jacobian_with_a4_0_params::one_fill[0]/(jacobian_with_a4_0_params::one_fill[2].squared()), 
+                            jacobian_with_a4_0_params::one_fill[1]/(jacobian_with_a4_0_params::one_fill[2].squared() * 
+                                jacobian_with_a4_0_params::one_fill[2])};
+                    };
+
+                    template<>
                     struct alt_bn128_g2_params<254, 
                         forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::jacobian_with_a4_0> : 
@@ -133,6 +162,10 @@ namespace nil {
                         using field_type = typename alt_bn128_basic_params<254>::g2_field_type;
                         using group_type = alt_bn128_g2<254, forms::short_weierstrass,  
                             coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
+
+                        using affine_params = alt_bn128_g2_params<254, 
+                            forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>;
 
                         constexpr static const typename field_type::value_type twist =
                             typename field_type::value_type(0x09, 0x01);
@@ -152,6 +185,31 @@ namespace nil {
                                 0x12C85EA5DB8C6DEB4AAB71808DCB408FE3D1E7690C43D37B4CE6CC0166FA7DAA_cppui254,
                                 0x90689D0585FF075EC9E99AD690C3395BC4B313370B38EF355ACDADCD122975B_cppui254),
                             field_type::value_type::one()};
+                    };
+
+                    template<>
+                    struct alt_bn128_g2_params<254, 
+                        forms::short_weierstrass, 
+                        coordinates<forms::short_weierstrass>::affine> : 
+                            public alt_bn128_params<254, forms::short_weierstrass> {
+
+                        using field_type = typename alt_bn128_basic_params<254>::g2_field_type;
+                        using group_type = alt_bn128_g2<254, forms::short_weierstrass,  
+                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
+
+                        using jacobian_with_a4_0_params = alt_bn128_g2_params<254, 
+                            forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
+
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
+                            jacobian_with_a4_0_params::zero_fill[0]/(jacobian_with_a4_0_params::zero_fill[2].squared()), 
+                            jacobian_with_a4_0_params::zero_fill[1]/(jacobian_with_a4_0_params::zero_fill[2].squared() * 
+                                jacobian_with_a4_0_params::zero_fill[2])};
+
+                        constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
+                            jacobian_with_a4_0_params::one_fill[0]/(jacobian_with_a4_0_params::one_fill[2].squared()), 
+                            jacobian_with_a4_0_params::one_fill[1]/(jacobian_with_a4_0_params::one_fill[2].squared() * 
+                                jacobian_with_a4_0_params::one_fill[2])};
                     };
 
                     constexpr typename alt_bn128_params<254, forms::short_weierstrass>::base_field_type::modulus_type const alt_bn128_params<254, forms::short_weierstrass>::a;

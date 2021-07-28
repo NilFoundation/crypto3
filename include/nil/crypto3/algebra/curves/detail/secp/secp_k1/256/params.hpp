@@ -69,6 +69,10 @@ namespace nil {
                         using group_type = secp_k1_g1<256, forms::short_weierstrass,  
                             coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
 
+                        using affine_params = secp_k1_g1_params<256, 
+                            forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>;
+
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one(),
                             field_type::value_type::zero()};
@@ -79,6 +83,31 @@ namespace nil {
                             typename field_type::value_type(
                                 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8_cppui256),
                             field_type::value_type::one()};
+                    };
+
+                    template<>
+                    struct secp_k1_g1_params<256, 
+                        forms::short_weierstrass, 
+                        coordinates<forms::short_weierstrass>::affine> : 
+                            public secp_k1_params<256, forms::short_weierstrass> {
+
+                        using field_type = typename secp_k1_basic_params<256>::g1_field_type;
+                        using group_type = secp_k1_g1<256, forms::short_weierstrass,  
+                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
+
+                        using jacobian_with_a4_0_params = secp_k1_g1_params<256, 
+                            forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
+
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
+                            jacobian_with_a4_0_params::zero_fill[0]/(jacobian_with_a4_0_params::zero_fill[2].squared()), 
+                            jacobian_with_a4_0_params::zero_fill[1]/(jacobian_with_a4_0_params::zero_fill[2].squared() * 
+                                jacobian_with_a4_0_params::zero_fill[2])};
+
+                        constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
+                            jacobian_with_a4_0_params::one_fill[0]/(jacobian_with_a4_0_params::one_fill[2].squared()), 
+                            jacobian_with_a4_0_params::one_fill[1]/(jacobian_with_a4_0_params::one_fill[2].squared() * 
+                                jacobian_with_a4_0_params::one_fill[2])};
                     };
 
                     constexpr typename secp_k1_params<256, forms::short_weierstrass>::base_field_type::modulus_type const secp_k1_params<256, forms::short_weierstrass>::a;
@@ -92,6 +121,15 @@ namespace nil {
                         coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::field_type::value_type, 3> const
                         secp_k1_g1_params<256, forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::one_fill;
+
+                    constexpr std::array<typename secp_k1_g1_params<256, forms::short_weierstrass, 
+                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        secp_k1_g1_params<256, forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>::zero_fill;
+                    constexpr std::array<typename secp_k1_g1_params<256, forms::short_weierstrass, 
+                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        secp_k1_g1_params<256, forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves
