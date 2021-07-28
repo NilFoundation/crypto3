@@ -123,6 +123,31 @@ namespace nil {
                     };
 
                     template<>
+                    struct mnt6_g1_params<298, 
+                        forms::short_weierstrass, 
+                        coordinates<forms::short_weierstrass>::affine> : 
+                            public mnt6_params<298, forms::short_weierstrass> {
+
+                        using field_type = typename mnt6_basic_params<298>::g1_field_type;
+                        using group_type = mnt6_g1<298, forms::short_weierstrass,  
+                            coordinates<forms::short_weierstrass>::projective>;
+
+                    private:
+                        using projective_params = mnt6_g1_params<298, 
+                            forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::projective>;
+                    public:
+
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
+                            projective_params::zero_fill[0]/projective_params::zero_fill[2], 
+                            projective_params::zero_fill[1]/projective_params::zero_fill[2]};
+
+                        constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
+                            projective_params::one_fill[0]/projective_params::one_fill[2], 
+                            projective_params::one_fill[1]/projective_params::one_fill[2]};
+                    };
+
+                    template<>
                     struct mnt6_g2_params<298, forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::projective> : 
                             public mnt6_params<298, forms::short_weierstrass> {
@@ -160,6 +185,31 @@ namespace nil {
                             field_type::value_type::one()};
                     };
 
+                    template<>
+                    struct mnt6_g2_params<298, 
+                        forms::short_weierstrass, 
+                        coordinates<forms::short_weierstrass>::affine> : 
+                            public mnt6_params<298, forms::short_weierstrass> {
+
+                        using field_type = typename mnt6_basic_params<298>::g2_field_type;
+                        using group_type = mnt6_g2<298, forms::short_weierstrass,  
+                            coordinates<forms::short_weierstrass>::projective>;
+
+                    private:
+                        using projective_params = mnt6_g2_params<298, 
+                            forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::projective>;
+                    public:
+
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
+                            projective_params::zero_fill[0]/projective_params::zero_fill[2], 
+                            projective_params::zero_fill[1]/projective_params::zero_fill[2]};
+
+                        constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
+                            projective_params::one_fill[0]/projective_params::one_fill[2], 
+                            projective_params::one_fill[1]/projective_params::one_fill[2]};
+                    };
+
                     constexpr typename mnt6_params<298, forms::short_weierstrass>::base_field_type::modulus_type const mnt6_params<298, forms::short_weierstrass>::a;
                     constexpr typename mnt6_params<298, forms::short_weierstrass>::base_field_type::modulus_type const mnt6_params<298, forms::short_weierstrass>::b;
 
@@ -171,6 +221,16 @@ namespace nil {
                         coordinates<forms::short_weierstrass>::projective>::field_type::value_type, 3> const
                         mnt6_g1_params<298, forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::projective>::one_fill;
+
+                    constexpr std::array<typename mnt6_g1_params<298, forms::short_weierstrass, 
+                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        mnt6_g1_params<298, forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>::zero_fill;
+                    constexpr std::array<typename mnt6_g1_params<298, forms::short_weierstrass, 
+                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        mnt6_g1_params<298, forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>::one_fill;
+
                     constexpr std::array<typename mnt6_g2_params<298, forms::short_weierstrass, 
                         coordinates<forms::short_weierstrass>::projective>::field_type::value_type, 3> const
                         mnt6_g2_params<298, forms::short_weierstrass, 
@@ -179,6 +239,15 @@ namespace nil {
                         coordinates<forms::short_weierstrass>::projective>::field_type::value_type, 3> const
                         mnt6_g2_params<298, forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::projective>::one_fill;
+
+                    constexpr std::array<typename mnt6_g2_params<298, forms::short_weierstrass, 
+                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        mnt6_g2_params<298, forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>::zero_fill;
+                    constexpr std::array<typename mnt6_g2_params<298, forms::short_weierstrass, 
+                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        mnt6_g2_params<298, forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves
