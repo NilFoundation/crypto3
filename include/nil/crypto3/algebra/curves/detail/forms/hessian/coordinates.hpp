@@ -32,19 +32,16 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
+                namespace coordinates{
 
-                template <typename Form>
-                struct coordinates;
-
-                /** @brief Hessian curve group element coordinates representation.
-                 * Description: https://hyperelliptic.org/EFD/g1p/auto-hessian.html
-                 */
-                template <>
-                struct coordinates<forms::hessian> {
-                    struct affine{};
-                    struct extended{};
-                    struct projective{};
-                };
+                    /** @brief Hessian curve group element coordinates representation.
+                     * Description: https://hyperelliptic.org/EFD/g1p/auto-hessian.html
+                     */
+                    struct affine;
+                    struct extended;
+                    struct projective;
+                    
+                }        // namespace coordinates
             }        // namespace curves
         }        // namespace algebra
     }            // namespace crypto3

@@ -55,7 +55,7 @@ namespace nil {
                     template<typename CurveParams>
                     struct curve_element<CurveParams, 
                                    forms::twisted_edwards, 
-                                   coordinates<forms::twisted_edwards>::affine> {
+                                   coordinates::affine> {
 
                         using field_type = typename CurveParams::field_type;
                     private:
@@ -65,7 +65,7 @@ namespace nil {
                         using group_type = typename params_type::group_type;
 
                         using form = forms::twisted_edwards;
-                        using coordinates = coordinates<form>::affine;
+                        using coordinates = coordinates::affine;
 
                         field_value_type X;
                         field_value_type Y;

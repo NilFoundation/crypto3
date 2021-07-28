@@ -55,7 +55,7 @@ namespace nil {
                     template<typename CurveParams>
                     struct curve_element<CurveParams, 
                                    forms::short_weierstrass, 
-                                   coordinates<forms::short_weierstrass>::affine> {
+                                   coordinates::affine> {
 
                         using field_type = typename CurveParams::field_type;
                     private:
@@ -65,7 +65,7 @@ namespace nil {
                         using group_type = typename params_type::group_type;
 
                         using form = forms::short_weierstrass;
-                        using coordinates = coordinates<form>::affine;
+                        using coordinates = coordinates::affine;
 
                         field_value_type X;
                         field_value_type Y;
@@ -86,18 +86,6 @@ namespace nil {
                         constexpr curve_element(field_value_type in_X, field_value_type in_Y) {
                             this->X = in_X;
                             this->Y = in_Y;
-                        };
-
-                        constexpr curve_element(curve_element<params_type, form, 
-                            twisted_edwards_coordinates::projective> other) {
-
-                            if (other.Z.is_zero()) {
-                                *this = this->zero();
-                            }
-
-                            field_value_type Z_inv = other.Z.inversed();
-                            X[0] = other.X * Z_inv;
-                            Y[1] = other.Y * Z_inv;
                         };
 
                         /** @brief Get the point at infinity

@@ -32,18 +32,15 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
+                namespace coordinates{
 
-                template <typename Form>
-                struct coordinates;
-
-                /** @brief Montgomery curve group element coordinates representation.
-                 * Description: https://hyperelliptic.org/EFD/g1p/auto-montgom.html
-                 */
-                template <>
-                struct coordinates<forms::montgomery> {
-                    struct affine{}; 
-                    struct xz{};
-                };
+                    /** @brief Montgomery curve group element coordinates representation.
+                     * Description: https://hyperelliptic.org/EFD/g1p/auto-montgom.html
+                     */
+                    struct affine; 
+                    struct xz;
+                    
+                }        // namespace coordinates                
             }        // namespace curves
         }        // namespace algebra
     }            // namespace crypto3

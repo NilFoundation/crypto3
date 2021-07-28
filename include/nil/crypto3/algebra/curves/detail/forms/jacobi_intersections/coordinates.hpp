@@ -32,19 +32,16 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
+                namespace coordinates{
 
-                template <typename Form>
-                struct coordinates;
-
-                /** @brief Jacobi intersections curve group element coordinates representation.
-                 * Description: https://hyperelliptic.org/EFD/g1p/auto-jintersect.html
-                 */
-                template <>
-                struct coordinates<forms::jacobi_intersections> {
-                    struct affine{};
-                    struct extended{};
-                    struct projective{};
-                };
+                    /** @brief Jacobi intersections curve group element coordinates representation.
+                     * Description: https://hyperelliptic.org/EFD/g1p/auto-jintersect.html
+                     */
+                    struct affine;
+                    struct extended;
+                    struct projective;
+                
+                }        // namespace coordinates
             }        // namespace curves
         }        // namespace algebra
     }            // namespace crypto3

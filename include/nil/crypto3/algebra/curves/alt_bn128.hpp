@@ -53,13 +53,13 @@ namespace nil {
                     typedef typename params_type::base_field_type base_field_type;
                     typedef typename params_type::scalar_field_type scalar_field_type;
 
-                    template <typename Coordinates = coordinates<forms::short_weierstrass>::jacobian_with_a4_0, 
+                    template <typename Coordinates = coordinates::jacobian_with_a4_0, 
                               typename Form = forms::short_weierstrass>
                     using g1_type = typename detail::alt_bn128_g1<Version, 
                         Form, Coordinates>;
 
-                    template <typename Form = forms::short_weierstrass, 
-                             typename Coordinates = coordinates<forms::short_weierstrass>::jacobian_with_a4_0>
+                    template <typename Coordinates = coordinates::jacobian_with_a4_0, 
+                              typename Form = forms::short_weierstrass>
                     using g2_type = typename detail::alt_bn128_g2<Version, 
                         Form, Coordinates>;
 

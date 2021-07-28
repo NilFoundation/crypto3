@@ -58,7 +58,7 @@ namespace nil {
                     template<typename CurveParams>
                     struct curve_element<CurveParams, 
                                    forms::short_weierstrass, 
-                                   coordinates<forms::short_weierstrass>::jacobian_with_a4_0> {
+                                   coordinates::jacobian_with_a4_0> {
 
                         using params_type = CurveParams;
                         using field_type = typename params_type::field_type;
@@ -72,7 +72,7 @@ namespace nil {
                         using group_type = typename params_type::group_type;
 
                         using form = forms::short_weierstrass;
-                        using coordinates = coordinates<form>::jacobian_with_a4_0;
+                        using coordinates = coordinates::jacobian_with_a4_0;
 
                         field_value_type X;
                         field_value_type Y;
@@ -203,10 +203,10 @@ namespace nil {
                         constexpr operator curve_element<
                             typename params_type::affine_params, 
                             form, 
-                            typename curves::coordinates<form>::affine> () const {
+                            typename curves::coordinates::affine> () const {
 
                             using result_type = curve_element<typename params_type::affine_params, 
-                                form, typename curves::coordinates<form>::affine>;
+                                form, typename curves::coordinates::affine>;
                             
                             if (is_zero()){
                                 return result_type::zero();

@@ -32,21 +32,18 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
+                namespace coordinates{
 
-                template <typename Form>
-                struct coordinates;
-
-                /** @brief Edwards curve group element coordinates representation.
-                 * Description: https://hyperelliptic.org/EFD/g1p/auto-edwards.html
-                 */
-                template <>
-                struct coordinates<forms::edwards> {
-                    struct affine{};
-                    struct inverted{};
-                    struct projective{};
-                    struct squared_yz_squared_d{};
-                    struct yz_squared_d{};
-                };
+                    /** @brief Edwards curve group element coordinates representation.
+                     * Description: https://hyperelliptic.org/EFD/g1p/auto-edwards.html
+                     */
+                    struct affine;
+                    struct inverted;
+                    struct projective;
+                    struct squared_yz_squared_d;
+                    struct yz_squared_d;
+                        
+                }        // namespace coordinates
             }        // namespace curves
         }        // namespace algebra
     }            // namespace crypto3

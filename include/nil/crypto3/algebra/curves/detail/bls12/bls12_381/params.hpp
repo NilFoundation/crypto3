@@ -102,16 +102,16 @@ namespace nil {
 
                     template<>
                     struct bls12_g1_params<381, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::jacobian_with_a4_0> : 
+                        coordinates::jacobian_with_a4_0> : 
                             public bls12_params<381, forms::short_weierstrass> {
 
                         using field_type = typename bls12_basic_params<381>::g1_field_type;
                         using group_type = bls12_g1<381, forms::short_weierstrass,  
-                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
+                            coordinates::jacobian_with_a4_0>;
 
                         using affine_params = bls12_g1_params<381, 
                             forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::affine>;
+                            coordinates::affine>;
 
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one(),
@@ -128,16 +128,16 @@ namespace nil {
                     template<>
                     struct bls12_g1_params<381, 
                         forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::affine> : 
+                        coordinates::affine> : 
                             public bls12_params<381, forms::short_weierstrass> {
 
                         using field_type = typename bls12_basic_params<381>::g1_field_type;
                         using group_type = bls12_g1<381, forms::short_weierstrass,  
-                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
+                            coordinates::jacobian_with_a4_0>;
 
                         using jacobian_with_a4_0_params = bls12_g1_params<381, 
                             forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
+                            coordinates::jacobian_with_a4_0>;
 
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             jacobian_with_a4_0_params::zero_fill[0]/(jacobian_with_a4_0_params::zero_fill[2].squared()), 
@@ -152,16 +152,16 @@ namespace nil {
 
                     template<>
                     struct bls12_g2_params<381, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::jacobian_with_a4_0> : 
+                        coordinates::jacobian_with_a4_0> : 
                             public bls12_params<381, forms::short_weierstrass> {
 
                         using field_type = typename bls12_basic_params<381>::g2_field_type;
                         using group_type = bls12_g2<381, forms::short_weierstrass,  
-                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
+                            coordinates::jacobian_with_a4_0>;
 
                         using affine_params = bls12_g2_params<381, 
                             forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::affine>;
+                            coordinates::affine>;
 
                         constexpr static const typename field_type::value_type twist =
                             typename field_type::value_type(field_type::value_type::underlying_type::one(),
@@ -187,16 +187,16 @@ namespace nil {
                     template<>
                     struct bls12_g2_params<381, 
                         forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::affine> : 
+                        coordinates::affine> : 
                             public bls12_params<381, forms::short_weierstrass> {
 
                         using field_type = typename bls12_basic_params<381>::g2_field_type;
                         using group_type = bls12_g2<381, forms::short_weierstrass,  
-                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
+                            coordinates::jacobian_with_a4_0>;
 
                         using jacobian_with_a4_0_params = bls12_g2_params<381, 
                             forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>;
+                            coordinates::jacobian_with_a4_0>;
 
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             jacobian_with_a4_0_params::zero_fill[0]/(jacobian_with_a4_0_params::zero_fill[2].squared()), 
@@ -213,40 +213,40 @@ namespace nil {
                     constexpr typename bls12_params<381, forms::short_weierstrass>::base_field_type::modulus_type const bls12_params<381, forms::short_weierstrass>::b;
 
                     constexpr std::array<typename bls12_g1_params<381, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::field_type::value_type, 3> const
+                        coordinates::jacobian_with_a4_0>::field_type::value_type, 3> const
                         bls12_g1_params<381, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::zero_fill;
+                            coordinates::jacobian_with_a4_0>::zero_fill;
                     constexpr std::array<typename bls12_g1_params<381, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::field_type::value_type, 3> const
+                        coordinates::jacobian_with_a4_0>::field_type::value_type, 3> const
                         bls12_g1_params<381, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::one_fill;
+                            coordinates::jacobian_with_a4_0>::one_fill;
 
                     constexpr std::array<typename bls12_g1_params<381, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        coordinates::affine>::field_type::value_type, 2> const
                         bls12_g1_params<381, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::affine>::zero_fill;
+                            coordinates::affine>::zero_fill;
                     constexpr std::array<typename bls12_g1_params<381, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        coordinates::affine>::field_type::value_type, 2> const
                         bls12_g1_params<381, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::affine>::one_fill;
+                            coordinates::affine>::one_fill;
 
                     constexpr std::array<typename bls12_g2_params<381, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::field_type::value_type, 3> const
+                        coordinates::jacobian_with_a4_0>::field_type::value_type, 3> const
                         bls12_g2_params<381, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::zero_fill;
+                            coordinates::jacobian_with_a4_0>::zero_fill;
                     constexpr std::array<typename bls12_g2_params<381, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::field_type::value_type, 3> const
+                        coordinates::jacobian_with_a4_0>::field_type::value_type, 3> const
                         bls12_g2_params<381, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::jacobian_with_a4_0>::one_fill;
+                            coordinates::jacobian_with_a4_0>::one_fill;
 
                     constexpr std::array<typename bls12_g2_params<381, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        coordinates::affine>::field_type::value_type, 2> const
                         bls12_g2_params<381, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::affine>::zero_fill;
+                            coordinates::affine>::zero_fill;
                     constexpr std::array<typename bls12_g2_params<381, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        coordinates::affine>::field_type::value_type, 2> const
                         bls12_g2_params<381, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::affine>::one_fill;
+                            coordinates::affine>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves

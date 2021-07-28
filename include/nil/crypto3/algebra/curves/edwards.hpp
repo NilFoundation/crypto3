@@ -55,12 +55,12 @@ namespace nil {
                     typedef typename policy_type::base_field_type base_field_type;
                     typedef typename policy_type::scalar_field_type scalar_field_type;
 
-                    template <typename Coordinates = coordinates<forms::twisted_edwards>::inverted, 
+                    template <typename Coordinates = coordinates::inverted, 
                               typename Form = forms::twisted_edwards>
                     using g1_type = typename detail::edwards_g1<Version, 
                         Form, Coordinates>;
 
-                    template <typename Coordinates = coordinates<forms::twisted_edwards>::inverted, 
+                    template <typename Coordinates = coordinates::inverted, 
                               typename Form = forms::twisted_edwards>
                     using g2_type = typename detail::edwards_g2<Version, 
                         Form, Coordinates>;

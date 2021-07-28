@@ -57,7 +57,7 @@ namespace nil {
                     struct element_edwards_g2<183> {
 
                         using group_type = edwards_g2<183, forms::twisted_edwards,  
-                            coordinates<forms::twisted_edwards>::inverted>;
+                            coordinates::inverted>;
 
                         using policy_type = edwards_basic_policy<183>;
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;

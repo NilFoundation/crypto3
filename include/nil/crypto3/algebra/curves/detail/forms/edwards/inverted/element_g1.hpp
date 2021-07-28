@@ -58,7 +58,7 @@ namespace nil {
                     template<typename CurveParams>
                     struct curve_element<CurveParams, 
                                    forms::edwards, 
-                                   coordinates<forms::edwards>::inverted> {
+                                   coordinates::inverted> {
 
                         using params_type = CurveParams;
                         using field_type = typename params_type::field_type;
@@ -72,7 +72,7 @@ namespace nil {
                         using group_type = typename params_type::group_type;
 
                         using form = forms::edwards;
-                        using coordinates = coordinates<form>::inverted;
+                        using coordinates = coordinates::inverted;
 
                         field_value_type X;
                         field_value_type Y;
@@ -159,6 +159,28 @@ namespace nil {
                          */
                         constexpr bool is_well_formed() const {
                             assert(false && "Not implemented yet.");
+                        }
+
+                        /*************************  Reducing operations  ***********************************/
+                        
+                        /** @brief
+                         *
+                         * @return return the corresponding element from inverted coordinates to 
+                         * affine coordinates
+                         */
+                        constexpr operator curve_element<
+                            typename params_type::affine_params, 
+                            form, 
+                            typename curves::coordinates::affine> () const {
+
+                            using result_type = curve_element<typename params_type::affine_params, 
+                                form, typename curves::coordinates::affine>;
+                            
+                            if (is_zero()){
+                                return result_type::zero();
+                            }
+
+                            return result_type(Z/X, Z/Y); //  x=Z/X, y=Z/Y
                         }
 
                         /*************************  Arithmetic operations  ***********************************/

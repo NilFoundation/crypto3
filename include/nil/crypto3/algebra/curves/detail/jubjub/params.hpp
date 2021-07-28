@@ -91,12 +91,12 @@ namespace nil {
                     template <>
                     struct jubjub_g1_params<
                         forms::twisted_edwards, 
-                        coordinates<forms::twisted_edwards>::affine> : 
+                        coordinates::affine> : 
                             public jubjub_params<forms::twisted_edwards> {
 
                         using field_type = typename jubjub_params<forms::twisted_edwards>::base_field_type;
                         using group_type = jubjub_g1<forms::twisted_edwards, 
-                            coordinates<forms::twisted_edwards>::affine>;
+                            coordinates::affine>;
 
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one(),
@@ -116,13 +116,13 @@ namespace nil {
                     constexpr typename jubjub_params<forms::montgomery>::base_field_type::modulus_type const jubjub_params<forms::montgomery>::scale;
 
                     constexpr std::array<typename jubjub_g1_params<forms::twisted_edwards, 
-                        coordinates<forms::twisted_edwards>::affine>::base_field_type::value_type, 3> const
+                        coordinates::affine>::base_field_type::value_type, 3> const
                         jubjub_g1_params<forms::twisted_edwards, 
-                            coordinates<forms::twisted_edwards>::affine>::zero_fill;
+                            coordinates::affine>::zero_fill;
                     constexpr std::array<typename jubjub_g1_params<forms::twisted_edwards, 
-                        coordinates<forms::twisted_edwards>::affine>::base_field_type::value_type, 3> const
+                        coordinates::affine>::base_field_type::value_type, 3> const
                         jubjub_g1_params<forms::twisted_edwards, 
-                            coordinates<forms::twisted_edwards>::affine>::one_fill;
+                            coordinates::affine>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves

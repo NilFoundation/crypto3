@@ -32,15 +32,11 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
+                namespace coordinates{
 
-                template <typename Form>
-                struct coordinates;
-
-                /** @brief Jacobi quatrics curve group element coordinates representation.
-                 * Description: https://hyperelliptic.org/EFD/g1p/auto-jquartic.html
-                 */
-                template <>
-                struct coordinates<forms::jacobi_quartics> {
+                    /** @brief Jacobi quatrics curve group element coordinates representation.
+                     * Description: https://hyperelliptic.org/EFD/g1p/auto-jquartic.html
+                     */
                     struct affine{}; 
                     struct double_oriented_xxyzz{}; 
                     struct doubling_oriented_xxyzzr{}; 
@@ -48,7 +44,8 @@ namespace nil {
                     struct xxyzz{}; 
                     struct xxyzzr{}; 
                     struct xyz{}; 
-                };
+                
+                }        // namespace coordinates
             }        // namespace curves
         }        // namespace algebra
     }            // namespace crypto3

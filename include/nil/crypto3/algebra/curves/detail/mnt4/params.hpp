@@ -104,16 +104,16 @@ namespace nil {
                     template<>
                     struct mnt4_g1_params<298, 
                         forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::projective> : 
+                        coordinates::projective> : 
                             public mnt4_params<298, forms::short_weierstrass> {
 
                         using field_type = typename mnt4_basic_params<298>::g1_field_type;
                         using group_type = mnt4_g1<298, forms::short_weierstrass,  
-                            coordinates<forms::short_weierstrass>::projective>;
+                            coordinates::projective>;
 
                         using affine_params = mnt4_g1_params<298, 
                             forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::affine>;
+                            coordinates::affine>;
 
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one(),
@@ -130,16 +130,16 @@ namespace nil {
                     template<>
                     struct mnt4_g1_params<298, 
                         forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::affine> : 
+                        coordinates::affine> : 
                             public mnt4_params<298, forms::short_weierstrass> {
 
                         using field_type = typename mnt4_basic_params<298>::g1_field_type;
                         using group_type = mnt4_g1<298, forms::short_weierstrass,  
-                            coordinates<forms::short_weierstrass>::projective>;
+                            coordinates::projective>;
 
                         using projective_params = mnt4_g1_params<298, 
                             forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::projective>;
+                            coordinates::projective>;
 
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             projective_params::zero_fill[0]/projective_params::zero_fill[2], 
@@ -153,16 +153,16 @@ namespace nil {
                     template<>
                     struct mnt4_g2_params<298, 
                         forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::projective> : 
+                        coordinates::projective> : 
                             public mnt4_params<298, forms::short_weierstrass> {
 
                         using field_type = typename mnt4_basic_params<298>::g2_field_type;
                         using group_type = mnt4_g2<298, forms::short_weierstrass,  
-                            coordinates<forms::short_weierstrass>::projective>;
+                            coordinates::projective>;
 
                         using affine_params = mnt4_g2_params<298, 
                             forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::affine>;
+                            coordinates::affine>;
 
                         constexpr static const typename field_type::value_type a =
                             typename field_type::value_type(a * field_type::value_type::non_residue,
@@ -189,16 +189,16 @@ namespace nil {
                     template<>
                     struct mnt4_g2_params<298, 
                         forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::affine> : 
+                        coordinates::affine> : 
                             public mnt4_params<298, forms::short_weierstrass> {
 
                         using field_type = typename mnt4_basic_params<298>::g2_field_type;
                         using group_type = mnt4_g2<298, forms::short_weierstrass,  
-                            coordinates<forms::short_weierstrass>::projective>;
+                            coordinates::projective>;
 
                         using projective_params = mnt4_g2_params<298, 
                             forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::projective>;
+                            coordinates::projective>;
 
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             projective_params::zero_fill[0]/projective_params::zero_fill[2], 
@@ -213,40 +213,40 @@ namespace nil {
                     constexpr typename mnt4_params<298, forms::short_weierstrass>::base_field_type::modulus_type const mnt4_params<298, forms::short_weierstrass>::b;
 
                     constexpr std::array<typename mnt4_g1_params<298, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::projective>::field_type::value_type, 3> const
+                        coordinates::projective>::field_type::value_type, 3> const
                         mnt4_g1_params<298, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::projective>::zero_fill;
+                            coordinates::projective>::zero_fill;
                     constexpr std::array<typename mnt4_g1_params<298, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::projective>::field_type::value_type, 3> const
+                        coordinates::projective>::field_type::value_type, 3> const
                         mnt4_g1_params<298, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::projective>::one_fill;
+                            coordinates::projective>::one_fill;
 
                     constexpr std::array<typename mnt4_g1_params<298, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        coordinates::affine>::field_type::value_type, 2> const
                         mnt4_g1_params<298, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::affine>::zero_fill;
+                            coordinates::affine>::zero_fill;
                     constexpr std::array<typename mnt4_g1_params<298, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        coordinates::affine>::field_type::value_type, 2> const
                         mnt4_g1_params<298, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::affine>::one_fill;
+                            coordinates::affine>::one_fill;
 
                     constexpr std::array<typename mnt4_g2_params<298, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::projective>::field_type::value_type, 3> const
+                        coordinates::projective>::field_type::value_type, 3> const
                         mnt4_g2_params<298, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::projective>::zero_fill;
+                            coordinates::projective>::zero_fill;
                     constexpr std::array<typename mnt4_g2_params<298, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::projective>::field_type::value_type, 3> const
+                        coordinates::projective>::field_type::value_type, 3> const
                         mnt4_g2_params<298, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::projective>::one_fill;
+                            coordinates::projective>::one_fill;
 
                     constexpr std::array<typename mnt4_g2_params<298, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        coordinates::affine>::field_type::value_type, 2> const
                         mnt4_g2_params<298, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::affine>::zero_fill;
+                            coordinates::affine>::zero_fill;
                     constexpr std::array<typename mnt4_g2_params<298, forms::short_weierstrass, 
-                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        coordinates::affine>::field_type::value_type, 2> const
                         mnt4_g2_params<298, forms::short_weierstrass, 
-                            coordinates<forms::short_weierstrass>::affine>::one_fill;
+                            coordinates::affine>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves
