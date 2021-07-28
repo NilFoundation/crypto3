@@ -44,6 +44,7 @@ namespace nil {
                     using types_policy = detail::types_policy<curve_type>;
 
                     using g2_type = typename curve_type::g2_type;
+                    using g2_affine_type = typename curve_type::g2_type<curves::coordinates::affine>;
                 public:
 
                     using g2_precomputed_type = typename types_policy::tate_g2_precomp;
@@ -51,7 +52,7 @@ namespace nil {
                     static typename types_policy::tate_g2_precomp  process(
                         const typename g2_type::value_type &P) {
 
-                        typename g2_type::value_type Qcopy = Q.to_affine();
+                        typename g2_affine_type::value_type Qcopy = Q.to_affine();
                         typename types_policy::tate_g2_precomp result;
                         result.y0 = Qcopy.Y * Qcopy.Z.inversed();
                         result.eta = (Qcopy.Z + Qcopy.Y) * gt::mul_by_non_residue(Qcopy.X).inversed();

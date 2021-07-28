@@ -50,6 +50,7 @@ namespace nil {
 
                     using base_field_type = typename curve_type::base_field_type;
                     using g2_type = typename curve_type::g2_type;
+                    using g2_affine_type = typename curve_type::g2_type<curves::coordinates::affine>;
 
                     using g2_field_type_value = typename g2_type::field_type::value_type;
 
@@ -120,7 +121,7 @@ namespace nil {
 
                     static g2_precomputed_type process(const typename g2_type::value_type &Q) {
 
-                        typename g2_type::value_type Qcopy = Q.to_affine();
+                        typename g2_affine_type::value_type Qcopy = Q.to_affine();
 
                         g2_field_type_value twist_inv = g2_type::value_type::twist.inversed();    // could add to global params if needed
 

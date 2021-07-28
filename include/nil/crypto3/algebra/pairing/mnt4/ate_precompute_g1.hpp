@@ -42,6 +42,8 @@ namespace nil {
                     using curve_type = curves::mnt4<298>;
                     using types_policy = detail::types_policy<curve_type>;
                     using g1_type = typename curve_type::g1_type;
+
+                    using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
                 public:
 
                     using g1_precomputed_type = typename types_policy::ate_g1_precomp;
@@ -49,7 +51,7 @@ namespace nil {
                     static g1_precomputed_type process(
                         const typename g1_type::value_type &P) {
 
-                        typename g1_type::value_type Pcopy = P.to_affine();
+                        typename g1_affine_type::value_type Pcopy = P.to_affine();
 
                         g1_precomputed_type result;
                         result.PX = Pcopy.X;

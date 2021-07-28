@@ -50,6 +50,7 @@ namespace nil {
 
                     using base_field_type = typename curve_type::base_field_type;
                     using g1_type = typename curve_type::g1_type;
+                    using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
 
                     using g1_field_type_value = typename g1_type::field_type::value_type;
 
@@ -155,7 +156,7 @@ namespace nil {
 
                         typename types_policy::tate_g1_precomp result;
 
-                        typename g1_type::value_type Pcopy = P.to_affine();
+                        typename g1_affine_type::value_type Pcopy = P.to_affine();
 
                         extended_g1_projective P_ext;
                         P_ext.X = Pcopy.X;

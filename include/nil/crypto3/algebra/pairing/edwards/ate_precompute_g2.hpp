@@ -50,6 +50,7 @@ namespace nil {
 
                     using base_field_type = typename curve_type::base_field_type;
                     using g2_type = typename curve_type::g2_type;
+                    using g2_affine_type = typename curve_type::g2_type<curves::coordinates::affine>;
 
                     using g2_field_type_value = typename g2_type::field_type::value_type;
 
@@ -165,7 +166,7 @@ namespace nil {
                         const typename g2_type::value_type &Q) {
 
                         g2_precomputed_type result;
-                        typename g2_type::value_type Qcopy = Q.to_affine();
+                        typename g2_affine_type::value_type Qcopy = Q.to_affine();
                         extended_g2_projective Q_ext;
                         Q_ext.X = Qcopy.X;
                         Q_ext.Y = Qcopy.Y;
