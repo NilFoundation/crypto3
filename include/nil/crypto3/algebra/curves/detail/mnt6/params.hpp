@@ -110,6 +110,10 @@ namespace nil {
                         using group_type = mnt6_g1<298, forms::short_weierstrass,  
                             coordinates<forms::short_weierstrass>::projective>;
 
+                        using affine_params = mnt6_g1_params<298, 
+                            forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>;
+
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one(),
                             field_type::value_type::zero()};
@@ -132,11 +136,9 @@ namespace nil {
                         using group_type = mnt6_g1<298, forms::short_weierstrass,  
                             coordinates<forms::short_weierstrass>::projective>;
 
-                    private:
                         using projective_params = mnt6_g1_params<298, 
                             forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::projective>;
-                    public:
 
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             projective_params::zero_fill[0]/projective_params::zero_fill[2], 
@@ -155,6 +157,11 @@ namespace nil {
                         using field_type = typename mnt6_basic_params<298>::g2_field_type;
                         using group_type = mnt6_g2<298, forms::short_weierstrass,  
                             coordinates<forms::short_weierstrass>::projective>;
+
+                        using affine_params = mnt6_g2_params<298, 
+                            forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>;
+
                     private:
                         constexpr static const typename g1_field_type::value_type g1_a = g1_field_type::value_type(a);
                         constexpr static const typename g1_field_type::value_type g1_b = g1_field_type::value_type(b);
@@ -195,19 +202,17 @@ namespace nil {
                         using group_type = mnt6_g2<298, forms::short_weierstrass,  
                             coordinates<forms::short_weierstrass>::projective>;
 
-                    private:
                         using projective_params = mnt6_g2_params<298, 
                             forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::projective>;
-                    public:
 
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
-                            projective_params::zero_fill[0]/projective_params::zero_fill[2], 
-                            projective_params::zero_fill[1]/projective_params::zero_fill[2]};
+                            projective_params::zero_fill[0]*projective_params::zero_fill[2].inversed(), 
+                            projective_params::zero_fill[1]*projective_params::zero_fill[2].inversed()};
 
                         constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
-                            projective_params::one_fill[0]/projective_params::one_fill[2], 
-                            projective_params::one_fill[1]/projective_params::one_fill[2]};
+                            projective_params::one_fill[0]*projective_params::one_fill[2].inversed(), 
+                            projective_params::one_fill[1]*projective_params::one_fill[2].inversed()};
                     };
 
                     constexpr typename mnt6_params<298, forms::short_weierstrass>::base_field_type::modulus_type const mnt6_params<298, forms::short_weierstrass>::a;

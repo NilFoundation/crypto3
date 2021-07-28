@@ -177,6 +177,28 @@ namespace nil {
                             }
                         }
 
+                        /*************************  Reducing operations  ***********************************/
+                        
+                        /** @brief
+                         *
+                         * @return return the corresponding element from projective coordinates to 
+                         * affine coordinates
+                         */
+                        constexpr operator curve_element<
+                            typename params_type::affine_params, 
+                            form, 
+                            typename curves::coordinates<form>::affine> () const {
+
+                            using result_type = curve_element<typename params_type::affine_params, 
+                                form, typename curves::coordinates<form>::affine>;
+                            
+                            if (is_zero()){
+                                return result_type::zero();
+                            }
+
+                            return result_type(X/Z, Y/Z); //  x=X/Z, y=Y/Z
+                        }
+
                         /*************************  Arithmetic operations  ***********************************/
 
                         constexpr curve_element operator=(const curve_element &other) {

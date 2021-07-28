@@ -308,6 +308,7 @@ namespace nil {
 
                             return element_edwards_g2(p_out[0], p_out[1], p_out[2]);
                         }
+                        
                         /** @brief
                          *
                          * @return return the corresponding element from projective coordinates to affine coordinates

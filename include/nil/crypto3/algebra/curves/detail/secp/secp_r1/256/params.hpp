@@ -71,6 +71,10 @@ namespace nil {
                         using group_type = secp_r1_g1<256, forms::short_weierstrass,  
                             coordinates<forms::short_weierstrass>::projective>;
 
+                        using affine_params = secp_r1_g1_params<256, 
+                            forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>;
+
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one(),
                             field_type::value_type::zero()};
@@ -81,6 +85,29 @@ namespace nil {
                             typename field_type::value_type(
                                 0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5_cppui256),
                             field_type::value_type::one()};
+                    };
+
+                    template<>
+                    struct secp_r1_g1_params<256, 
+                        forms::short_weierstrass, 
+                        coordinates<forms::short_weierstrass>::affine> : 
+                            public secp_r1_params<256, forms::short_weierstrass> {
+
+                        using field_type = typename secp_r1_basic_params<256>::g1_field_type;
+                        using group_type = secp_r1_g1<256, forms::short_weierstrass,  
+                            coordinates<forms::short_weierstrass>::projective>;
+
+                        using projective_params = secp_r1_g1_params<256, 
+                            forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::projective>;
+
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
+                            projective_params::zero_fill[0]/projective_params::zero_fill[2], 
+                            projective_params::zero_fill[1]/projective_params::zero_fill[2]};
+
+                        constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
+                            projective_params::one_fill[0]/projective_params::one_fill[2], 
+                            projective_params::one_fill[1]/projective_params::one_fill[2]};
                     };
 
                     constexpr typename secp_r1_params<256, forms::short_weierstrass>::base_field_type::modulus_type const secp_r1_params<256, forms::short_weierstrass>::a;
@@ -94,6 +121,15 @@ namespace nil {
                         coordinates<forms::short_weierstrass>::projective>::field_type::value_type, 3> const
                         secp_r1_g1_params<256, forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::projective>::one_fill;
+
+                    constexpr std::array<typename secp_r1_g1_params<256, forms::short_weierstrass, 
+                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        secp_r1_g1_params<256, forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>::zero_fill;
+                    constexpr std::array<typename secp_r1_g1_params<256, forms::short_weierstrass, 
+                        coordinates<forms::short_weierstrass>::affine>::field_type::value_type, 2> const
+                        secp_r1_g1_params<256, forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves

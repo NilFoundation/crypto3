@@ -111,6 +111,10 @@ namespace nil {
                         using group_type = mnt4_g1<298, forms::short_weierstrass,  
                             coordinates<forms::short_weierstrass>::projective>;
 
+                        using affine_params = mnt4_g1_params<298, 
+                            forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>;
+
                         constexpr static const std::array<typename field_type::value_type, 3> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one(),
                             field_type::value_type::zero()};
@@ -133,11 +137,9 @@ namespace nil {
                         using group_type = mnt4_g1<298, forms::short_weierstrass,  
                             coordinates<forms::short_weierstrass>::projective>;
 
-                    private:
                         using projective_params = mnt4_g1_params<298, 
                             forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::projective>;
-                    public:
 
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             projective_params::zero_fill[0]/projective_params::zero_fill[2], 
@@ -157,6 +159,10 @@ namespace nil {
                         using field_type = typename mnt4_basic_params<298>::g2_field_type;
                         using group_type = mnt4_g2<298, forms::short_weierstrass,  
                             coordinates<forms::short_weierstrass>::projective>;
+
+                        using affine_params = mnt4_g2_params<298, 
+                            forms::short_weierstrass, 
+                            coordinates<forms::short_weierstrass>::affine>;
 
                         constexpr static const typename field_type::value_type a =
                             typename field_type::value_type(a * field_type::value_type::non_residue,
@@ -190,11 +196,9 @@ namespace nil {
                         using group_type = mnt4_g2<298, forms::short_weierstrass,  
                             coordinates<forms::short_weierstrass>::projective>;
 
-                    private:
                         using projective_params = mnt4_g2_params<298, 
                             forms::short_weierstrass, 
                             coordinates<forms::short_weierstrass>::projective>;
-                    public:
 
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             projective_params::zero_fill[0]/projective_params::zero_fill[2], 
