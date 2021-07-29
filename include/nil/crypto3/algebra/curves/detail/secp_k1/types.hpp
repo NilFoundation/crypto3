@@ -53,7 +53,7 @@ namespace nil {
                      *
                      */
                     template<std::size_t Version>
-                    struct secp_k1_basic_params {
+                    struct secp_k1_types {
                         using base_field_type = fields::secp_k1_base_field<Version>;
                         using scalar_field_type = fields::secp_k1_scalar_field<Version>;
 

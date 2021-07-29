@@ -52,11 +52,11 @@ namespace nil {
                              typename Coordinates>
                     struct alt_bn128_g1 {
 
-                        using params_type = alt_bn128_g1_params<Version, Form, Coordinates>;
+                        using params_type = alt_bn128_g1_params<Version, Form>;
 
                         using curve_type = alt_bn128<Version>;
 
-                        using field_type = typename params_type::g1_field_type;
+                        using field_type = typename params_type::field_type;
 
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits

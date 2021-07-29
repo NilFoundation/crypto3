@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_SECP_R1_HPP
 #define CRYPTO3_ALGEBRA_CURVES_SECP_R1_HPP
 
-#include <nil/crypto3/algebra/curves/detail/secp_r1/basic_params.hpp>
+#include <nil/crypto3/algebra/curves/detail/secp_r1/types.hpp>
 #include <nil/crypto3/algebra/curves/detail/secp_r1/g1.hpp>
 
 namespace nil {
@@ -36,11 +36,11 @@ namespace nil {
 
                 template<std::size_t Version>
                 class secp_r1 {
-                    using params_type = detail::secp_r1_basic_params<Version>;
+                    using types_policy = detail::secp_r1_types<Version>;
 
                 public:
-                    typedef typename params_type::base_field_type base_field_type;
-                    typedef typename params_type::scalar_field_type scalar_field_type;
+                    typedef typename types_policy::base_field_type base_field_type;
+                    typedef typename types_policy::scalar_field_type scalar_field_type;
 
                     template <typename Coordinates = coordinates::projective, 
                               typename Form = forms::short_weierstrass>
