@@ -45,7 +45,7 @@ namespace nil {
                 class edwards_ate_precompute_g1<183> {
                     using curve_type = curves::edwards<183>;
 
-                    using params_type = detail::params_type<curve_type>;
+                    using params_type = detail::pairing_params<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;

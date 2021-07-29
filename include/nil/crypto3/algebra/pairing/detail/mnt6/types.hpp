@@ -73,20 +73,20 @@ namespace nil {
 
                         /* ate pairing */
 
-                        struct ate_g1_precomp {
+                        struct ate_g1_precomputed_type {
 
                             g1_value_type PX;
                             g1_value_type PY;
                             g2_value_type PX_twist;
                             g2_value_type PY_twist;
 
-                            bool operator==(const ate_g1_precomp &other) const {
+                            bool operator==(const ate_g1_precomputed_type &other) const {
                                 return (this->PX == other.PX && this->PY == other.PY &&
                                         this->PX_twist == other.PX_twist && this->PY_twist == other.PY_twist);
                             }
                         };
 
-                        typedef ate_g1_precomp g1_precomp;
+                        typedef ate_g1_precomputed_type g1_precomputed_type;
 
                         struct ate_dbl_coeffs {
 
@@ -111,7 +111,7 @@ namespace nil {
                             }
                         };
 
-                        struct ate_g2_precomp {
+                        struct ate_g2_precomputed_type {
                             typedef ate_dbl_coeffs dbl_coeffs_type;
                             typedef ate_add_coeffs add_coeffs_type;
 
@@ -123,7 +123,7 @@ namespace nil {
                             std::vector<dbl_coeffs_type> dbl_coeffs;
                             std::vector<add_coeffs_type> add_coeffs;
 
-                            bool operator==(const ate_g2_precomp &other) const {
+                            bool operator==(const ate_g2_precomputed_type &other) const {
                                 return (this->QX == other.QX && this->QY == other.QY && this->QY2 == other.QY2 &&
                                         this->QX_over_twist == other.QX_over_twist &&
                                         this->QY_over_twist == other.QY_over_twist &&
@@ -131,7 +131,7 @@ namespace nil {
                             }
                         };
 
-                        typedef ate_g2_precomp g2_precomp;
+                        typedef ate_g2_precomputed_type g2_precomputed_type;
                     };
 
                 }    // namespace detail

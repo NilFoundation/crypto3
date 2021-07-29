@@ -23,12 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G1_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G1_HPP
-
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
-#include <nil/crypto3/algebra/pairing/ate_precompute_g1.hpp>
+#ifndef CRYPTO3_ALGEBRA_PAIRING_ATE_DOUBLE_MILLER_LOOP_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_ATE_DOUBLE_MILLER_LOOP_HPP
 
 namespace nil {
     namespace crypto3 {
@@ -36,32 +32,10 @@ namespace nil {
             namespace pairing {
 
                 template<typename CurveType>
-                class ate_precompute_g1;
+                class ate_double_miller_loop;
 
-                template<>
-                class ate_precompute_g1<curves::bls12<381>> {
-                    using curve_type = curves::bls12<381>;
-                    using types_policy = detail::types_policy<curve_type>;
-                    using g1_type = typename curve_type::g1_type<>;
-                    using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
-                public:
-
-                    using g1_precomputed_type = typename types_policy::ate_g1_precomputed_type;
-
-                    static g1_precomputed_type process(
-                        const typename g1_type::value_type &P) {
-
-                        typename g1_affine_type::value_type Pcopy = P.to_affine();
-
-                        g1_precomputed_type result;
-                        result.PX = Pcopy.X;
-                        result.PY = Pcopy.Y;
-
-                        return result;
-                    }
-                };
             }        // namespace pairing
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G1_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_ATE_DOUBLE_MILLER_LOOP_HPP

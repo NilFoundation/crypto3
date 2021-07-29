@@ -88,17 +88,6 @@ namespace nil {
                             this->Y = in_Y;
                         };
 
-                        // constexpr curve_element(twisted_edwards_element_g1_projective<params_type> other) {
-
-                        //     if (other.Z.is_zero()) {
-                        //         *this = this->zero();
-                        //     }
-
-                        //     field_value_type Z_inv = other.Z.inversed();
-                        //     X[0] = other.X * Z_inv;
-                        //     Y[1] = other.Y * Z_inv;
-                        // };
-
                         /** @brief Get the point at infinity
                          *
                          */

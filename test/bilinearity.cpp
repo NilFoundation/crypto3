@@ -82,10 +82,10 @@ void double_miller_loop_test() {
     const G2<CurveType> Q1 = (Fr<CurveType>::random_element()) * G2<CurveType>::one();
     const G2<CurveType> Q2 = (Fr<CurveType>::random_element()) * G2<CurveType>::one();
 
-    const typename CurveType::pairing::g1_precomp prec_P1 = CurveType::precompute_G1(P1);
-    const typename CurveType::pairing::g1_precomp prec_P2 = CurveType::precompute_G1(P2);
-    const typename CurveType::pairing::g2_precomp prec_Q1 = CurveType::precompute_G2(Q1);
-    const typename CurveType::pairing::g2_precomp prec_Q2 = CurveType::precompute_G2(Q2);
+    const typename CurveType::pairing::g1_precomputed_type prec_P1 = CurveType::precompute_G1(P1);
+    const typename CurveType::pairing::g1_precomputed_type prec_P2 = CurveType::precompute_G1(P2);
+    const typename CurveType::pairing::g2_precomputed_type prec_Q1 = CurveType::precompute_G2(Q1);
+    const typename CurveType::pairing::g2_precomputed_type prec_Q2 = CurveType::precompute_G2(Q2);
 
     const typename CurveType::pairing::fqk_type ans_1 = CurveType::miller_loop(prec_P1, prec_Q1);
     const typename CurveType::pairing::fqk_type ans_2 = CurveType::miller_loop(prec_P2, prec_Q2);

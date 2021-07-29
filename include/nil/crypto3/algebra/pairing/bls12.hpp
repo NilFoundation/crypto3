@@ -29,89 +29,51 @@
 #include <numeric>
 
 #include <nil/crypto3/algebra/curves/jubjub.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/bls12/381/ate_double_miller_loop.hpp>
+#include <nil/crypto3/algebra/pairing/bls12/381/ate_miller_loop.hpp>
+#include <nil/crypto3/algebra/pairing/bls12/381/ate_precompute_g1.hpp>
+#include <nil/crypto3/algebra/pairing/bls12/381/ate_precompute_g2.hpp>
+#include <nil/crypto3/algebra/pairing/bls12/381/final_exponentiation.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
-            namespace curves {
-
-                template<std::size_t Version>
-                struct bls12;
-
-                struct jubjub;
-
-            }    // namespace curves
             namespace pairing {
 
-                template<typename PairingCurveType, typename PairingFunctions>
-                struct pairing_policy;
+                template<typename PairingCurveType, 
+                         typename PrecomputeG1 = pairing::ate_precompute_g1<PairingCurveType>, 
+                         typename PrecomputeG2 = pairing::ate_precompute_g2<PairingCurveType>, 
+                         typename MillerLoop = pairing::ate_miller_loop<PairingCurveType>, 
+                         typename DoubleMillerLoop = pairing::ate_double_miller_loop<PairingCurveType>, 
+                         typename FinalExponentiation = pairing::final_exponentiation<PairingCurveType>
+                         >
+                class pairing_policy {
 
-                template<std::size_t Version, typename PairingFunctions>
-                class pairing_policy<curves::bls12<Version>, PairingFunctions> {
-                    using policy_type = PairingFunctions;
+                    using curve_type = PairingCurveType;
 
+                    using types_policy = detail::types_policy<curve_type>;
+
+                    using g1_type = typename curve_type::g1_type<>;
+                    using g2_type = typename curve_type::g2_type<>;
                 public:
                     using chained_curve_type = curves::jubjub;
 
-                    typedef typename policy_type::number_type number_type;
+                    typedef typename types_policy::integral_type integral_type;
 
-                    constexpr static const typename policy_type::number_type pairing_loop_count =
-                        policy_type::ate_loop_count;
+                    using g1_precomputed_type = typename types_policy::g1_precomputed_type;
+                    using g2_precomputed_type = typename types_policy::g2_precomputed_type;
 
-                    using fp_type = typename policy_type::fp_type;
-                    using fq_type = typename policy_type::fq_type;
-                    using fqe_type = typename policy_type::fqe_type;
-                    using fqk_type = typename policy_type::fqk_type;
-
-                    using g1_type = typename policy_type::g1_type;
-                    using g2_type = typename policy_type::g2_type;
-                    using gt_type = typename policy_type::gt_type;
-
-                    using g1_precomp = typename policy_type::g1_precomp;
-                    using g2_precomp = typename policy_type::g2_precomp;
-
-                    constexpr static const typename g2_type::underlying_field_type::value_type twist =
-                        policy_type::twist;
-
-                    static inline g1_precomp precompute_g1(const typename g1_type::value_type &P) {
-                        return policy_type::precompute_g1(P);
-                    }
-
-                    static inline g2_precomp precompute_g2(const typename g2_type::value_type &Q) {
-                        return policy_type::precompute_g2(Q);
-                    }
-
-                    static inline typename gt_type::value_type pair(const typename g1_type::value_type &P,
-                                                                       const typename g2_type::value_type &Q) {
-                        return policy_type::pair(P, Q);
-                    }
-
-                    static inline typename gt_type::value_type pair_reduced(const typename g1_type::value_type &P,
-                                                                               const typename g2_type::value_type &Q) {
-                        return policy_type::pair_reduced(P, Q);
-                    }
-
-                    static inline typename gt_type::value_type double_miller_loop(const g1_precomp &prec_P1,
-                                                                                  const g2_precomp &prec_Q1,
-                                                                                  const g1_precomp &prec_P2,
-                                                                                  const g2_precomp &prec_Q2) {
-                        return policy_type::double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
-                    }
-
-                    static inline typename gt_type::value_type
-                        final_exponentiation(const typename gt_type::value_type &elt) {
-                        return policy_type::final_exponentiation(elt);
-                    }
-
-                    static inline typename gt_type::value_type miller_loop(const g1_precomp &prec_P,
-                                                                           const g2_precomp &prec_Q) {
-                        return policy_type::miller_loop(prec_P, prec_Q);
-                    }
+                    using precompute_g1 = PrecomputeG1;
+                    using precompute_g2 = PrecomputeG2;
+                    using miller_loop = MillerLoop;
+                    using double_miller_loop = DoubleMillerLoop;
+                    using final_exponentiation = FinalExponentiation;
                 };
 
-                template<std::size_t Version, typename PairingFunctions>
-                constexpr typename pairing_policy<curves::bls12<Version>, PairingFunctions>::number_type const
-                    pairing_policy<curves::bls12<Version>, PairingFunctions>::pairing_loop_count;
+                // template<std::size_t Version, typename PairingFunctions>
+                // constexpr typename pairing_policy<curves::bls12<Version>, PairingFunctions>::number_type const
+                //     pairing_policy<curves::bls12<Version>, PairingFunctions>::pairing_loop_count;
             }    // namespace pairing
         }        // namespace algebra
     }            // namespace crypto3

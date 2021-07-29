@@ -47,13 +47,13 @@ namespace nil {
                     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
                 public:
 
-                    using g1_precomputed_type = typename types_policy::ate_g1_precomp;
+                    using g1_precomputed_type = typename types_policy::ate_g1_precomputed_type;
 
-                    static typename types_policy::ate_g1_precomp  process(
+                    static typename types_policy::ate_g1_precomputed_type  process(
                         const typename g1_type::value_type &P) {
 
                         typename g1_affine_type::value_type Pcopy = P.to_affine();
-                        typename types_policy::ate_g1_precomp result;
+                        typename types_policy::ate_g1_precomputed_type result;
                         result.P_XY = Pcopy.X * Pcopy.Y;
                         result.P_XZ = Pcopy.X;                        // P.X * P.Z but P.Z = 1
                         result.P_ZZplusYZ = (Fq::one() + Pcopy.Y);    // (P.Z + P.Y) * P.Z but P.Z =

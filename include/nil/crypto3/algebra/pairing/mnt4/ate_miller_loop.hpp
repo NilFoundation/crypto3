@@ -45,7 +45,7 @@ namespace nil {
                 class mnt4_ate_miller_loop<298> {
                     using curve_type = curves::mnt4<298>;
 
-                    using params_type = detail::params_type<curve_type>;
+                    using params_type = detail::pairing_params<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
                     using gt_type = typename curve_type::gt_type;
 
@@ -58,8 +58,8 @@ namespace nil {
                 public:
 
                     static typename gt_type::value_type process(
-                        const types_policy::ate_g1_precomp &prec_P, 
-                        const types_policy::ate_g2_precomp &prec_Q) {
+                        const types_policy::ate_g1_precomputed_type &prec_P, 
+                        const types_policy::ate_g2_precomputed_type &prec_Q) {
 
                         g2_field_type_value L1_coeff = g2_field_type_value(
                             prec_P.PX, g1_field_type_value::zero()) - prec_Q.QX_over_twist;

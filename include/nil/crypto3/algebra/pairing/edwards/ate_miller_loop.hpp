@@ -45,14 +45,14 @@ namespace nil {
                 class edwards_ate_miller_loop<183> {
                     using curve_type = curves::edwards<183>;
 
-                    using params_type = detail::params_type<curve_type>;
+                    using params_type = detail::pairing_params<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
                     using gt_type = typename curve_type::gt_type;
                 public:
 
                     static typename gt_type::value_type process(
-                        const types_policy::ate_g1_precomp &prec_P, 
-                        const types_policy::ate_g2_precomp &prec_Q) {
+                        const types_policy::ate_g1_precomputed_type &prec_P, 
+                        const types_policy::ate_g2_precomputed_type &prec_Q) {
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 

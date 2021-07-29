@@ -45,7 +45,7 @@ namespace nil {
                 class edwards_tate_miller_loop<183> {
                     using curve_type = curves::edwards<183>;
 
-                    using params_type = detail::params_type<curve_type>;
+                    using params_type = detail::pairing_params<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
                     using gt_type = typename curve_type::gt_type;
                 public:

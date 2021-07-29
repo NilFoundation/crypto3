@@ -116,7 +116,7 @@ void print_curve_group_element(std::ostream &os, const CurveGroupValue &e) {
     os << ")" << std::endl;
 }
 
-void print_g1_precomp_element(std::ostream &os, const typename curves::bls12<381>::pairing::g1_precomp &e) {
+void print_g1_precomp_element(std::ostream &os, const typename curves::bls12<381>::pairing::g1_precomputed_type &e) {
     os << "{\"PX\": ";
     print_field_element(os, e.PX);
     os << ", \"PY\": ";
@@ -124,19 +124,7 @@ void print_g1_precomp_element(std::ostream &os, const typename curves::bls12<381
     os << "}" << std::endl;
 }
 
-void print_g1_precomp_element(std::ostream &os, const typename curves::mnt4<298>::pairing::g1_precomp &e) {
-    os << "{\"PX\": ";
-    print_field_element(os, e.PX);
-    os << ", \"PY\": ";
-    print_field_element(os, e.PY);
-    os << ", \"PX_twist\": ";
-    print_field_element(os, e.PX_twist);
-    os << ", \"PY_twist\": ";
-    print_field_element(os, e.PY_twist);
-    os << "}" << std::endl;
-}
-
-void print_g1_precomp_element(std::ostream &os, const typename curves::mnt6<298>::pairing::g1_precomp &e) {
+void print_g1_precomp_element(std::ostream &os, const typename curves::mnt4<298>::pairing::g1_precomputed_type &e) {
     os << "{\"PX\": ";
     print_field_element(os, e.PX);
     os << ", \"PY\": ";
@@ -148,7 +136,19 @@ void print_g1_precomp_element(std::ostream &os, const typename curves::mnt6<298>
     os << "}" << std::endl;
 }
 
-void print_g2_precomp_element(std::ostream &os, const typename curves::bls12<381>::pairing::g2_precomp &e) {
+void print_g1_precomp_element(std::ostream &os, const typename curves::mnt6<298>::pairing::g1_precomputed_type &e) {
+    os << "{\"PX\": ";
+    print_field_element(os, e.PX);
+    os << ", \"PY\": ";
+    print_field_element(os, e.PY);
+    os << ", \"PX_twist\": ";
+    print_field_element(os, e.PX_twist);
+    os << ", \"PY_twist\": ";
+    print_field_element(os, e.PY_twist);
+    os << "}" << std::endl;
+}
+
+void print_g2_precomp_element(std::ostream &os, const typename curves::bls12<381>::pairing::g2_precomputed_type &e) {
     os << "\"coordinates\": [[" << e.QX.data[0].data << " , " << e.QX.data[1].data << "] , [" << e.QY.data[0].data
        << " , " << e.QY.data[1].data << "]]" << std::endl;
     auto print_coeff = [&os](const auto &c) {
@@ -165,7 +165,7 @@ void print_g2_precomp_element(std::ostream &os, const typename curves::bls12<381
     os << "]" << std::endl;
 }
 
-void print_g2_precomp_element(std::ostream &os, const typename curves::mnt4<298>::pairing::g2_precomp &e) {
+void print_g2_precomp_element(std::ostream &os, const typename curves::mnt4<298>::pairing::g2_precomputed_type &e) {
     os << "\"coordinates\": {\"QX\": ";
     print_field_element(os, e.QX);
     os << ", \"QY\": ";
@@ -210,7 +210,7 @@ void print_g2_precomp_element(std::ostream &os, const typename curves::mnt4<298>
     std::cout << std::endl;
 }
 
-void print_g2_precomp_element(std::ostream &os, const typename curves::mnt6<298>::pairing::g2_precomp &e) {
+void print_g2_precomp_element(std::ostream &os, const typename curves::mnt6<298>::pairing::g2_precomputed_type &e) {
     os << "\"coordinates\": {\"QX\": ";
     print_field_element(os, e.QX);
     os << ", \"QY\": ";
@@ -291,15 +291,15 @@ namespace boost {
             };
 
             template<>
-            struct print_log_value<curves::bls12<381>::pairing::g1_precomp> {
-                void operator()(std::ostream &os, const typename curves::bls12<381>::pairing::g1_precomp &e) {
+            struct print_log_value<curves::bls12<381>::pairing::g1_precomputed_type> {
+                void operator()(std::ostream &os, const typename curves::bls12<381>::pairing::g1_precomputed_type &e) {
                     print_g1_precomp_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::bls12<381>::pairing::g2_precomp> {
-                void operator()(std::ostream &os, const typename curves::bls12<381>::pairing::g2_precomp &e) {
+            struct print_log_value<curves::bls12<381>::pairing::g2_precomputed_type> {
+                void operator()(std::ostream &os, const typename curves::bls12<381>::pairing::g2_precomputed_type &e) {
                     print_g2_precomp_element(os, e);
                 }
             };
@@ -330,15 +330,15 @@ namespace boost {
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing::g1_precomp> {
-                void operator()(std::ostream &os, const typename curves::mnt4<298>::pairing::g1_precomp &e) {
+            struct print_log_value<curves::mnt4<298>::pairing::g1_precomputed_type> {
+                void operator()(std::ostream &os, const typename curves::mnt4<298>::pairing::g1_precomputed_type &e) {
                     print_g1_precomp_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing::g2_precomp> {
-                void operator()(std::ostream &os, const typename curves::mnt4<298>::pairing::g2_precomp &e) {
+            struct print_log_value<curves::mnt4<298>::pairing::g2_precomputed_type> {
+                void operator()(std::ostream &os, const typename curves::mnt4<298>::pairing::g2_precomputed_type &e) {
                     print_g2_precomp_element(os, e);
                 }
             };
@@ -369,15 +369,15 @@ namespace boost {
             };
 
             template<>
-            struct print_log_value<curves::mnt6<298>::pairing::g1_precomp> {
-                void operator()(std::ostream &os, const typename curves::mnt6<298>::pairing::g1_precomp &e) {
+            struct print_log_value<curves::mnt6<298>::pairing::g1_precomputed_type> {
+                void operator()(std::ostream &os, const typename curves::mnt6<298>::pairing::g1_precomputed_type &e) {
                     print_g1_precomp_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt6<298>::pairing::g2_precomp> {
-                void operator()(std::ostream &os, const typename curves::mnt6<298>::pairing::g2_precomp &e) {
+            struct print_log_value<curves::mnt6<298>::pairing::g2_precomputed_type> {
+                void operator()(std::ostream &os, const typename curves::mnt6<298>::pairing::g2_precomputed_type &e) {
                     print_g2_precomp_element(os, e);
                 }
             };
@@ -677,13 +677,13 @@ void pairing_test_GT_init(std::vector<typename PairingT::gt_type::value_type> &e
 }
 
 template<typename TestSet>
-void pairing_test_g1_precomp_init(std::vector<typename curves::bls12<381>::pairing::g1_precomp> &elements,
+void pairing_test_g1_precomp_init(std::vector<typename curves::bls12<381>::pairing::g1_precomputed_type> &elements,
                                   const TestSet &test_set) {
     using pairing_policy = typename curves::bls12<381>::pairing;
-    using value_type = typename pairing_policy::g1_precomp;
+    using value_type = typename pairing_policy::g1_precomputed_type;
     using element_type = value_type::value_type;
 
-    for (auto &elem : test_set.second.get_child("g1_precomp")) {
+    for (auto &elem : test_set.second.get_child("g1_precomputed_type")) {
         elements.emplace_back(
             value_type {field_element_init<element_type>::process(elem.second.get_child("PX").front()),
                         field_element_init<element_type>::process(elem.second.get_child("PY").front())});
@@ -691,14 +691,14 @@ void pairing_test_g1_precomp_init(std::vector<typename curves::bls12<381>::pairi
 }
 
 template<typename TestSet>
-void pairing_test_g1_precomp_init(std::vector<typename curves::mnt4<298>::pairing::g1_precomp> &elements,
+void pairing_test_g1_precomp_init(std::vector<typename curves::mnt4<298>::pairing::g1_precomputed_type> &elements,
                                   const TestSet &test_set) {
     using pairing_policy = typename curves::mnt4<298>::pairing;
-    using value_type = typename pairing_policy::g1_precomp;
+    using value_type = typename pairing_policy::g1_precomputed_type;
     using element_type = value_type::value_type;
     using twist_element_type = value_type::twist_value_type;
 
-    for (auto &elem : test_set.second.get_child("g1_precomp")) {
+    for (auto &elem : test_set.second.get_child("g1_precomputed_type")) {
         elements.emplace_back(
             value_type {field_element_init<element_type>::process(elem.second.get_child("PX").front()),
                         field_element_init<element_type>::process(elem.second.get_child("PY").front()),
@@ -708,14 +708,14 @@ void pairing_test_g1_precomp_init(std::vector<typename curves::mnt4<298>::pairin
 }
 
 template<typename TestSet>
-void pairing_test_g1_precomp_init(std::vector<typename curves::mnt6<298>::pairing::g1_precomp> &elements,
+void pairing_test_g1_precomp_init(std::vector<typename curves::mnt6<298>::pairing::g1_precomputed_type> &elements,
                                   const TestSet &test_set) {
     using pairing_policy = typename curves::mnt6<298>::pairing;
-    using value_type = typename pairing_policy::g1_precomp;
+    using value_type = typename pairing_policy::g1_precomputed_type;
     using element_type = value_type::value_type;
     using twist_element_type = value_type::twist_value_type;
 
-    for (auto &elem : test_set.second.get_child("g1_precomp")) {
+    for (auto &elem : test_set.second.get_child("g1_precomputed_type")) {
         elements.emplace_back(
             value_type {field_element_init<element_type>::process(elem.second.get_child("PX").front()),
                         field_element_init<element_type>::process(elem.second.get_child("PY").front()),
@@ -725,15 +725,15 @@ void pairing_test_g1_precomp_init(std::vector<typename curves::mnt6<298>::pairin
 }
 
 template<typename TestSet>
-void pairing_test_g2_precomp_init(std::vector<typename curves::bls12<381>::pairing::g2_precomp> &elements,
+void pairing_test_g2_precomp_init(std::vector<typename curves::bls12<381>::pairing::g2_precomputed_type> &elements,
                                   const TestSet &test_set) {
     using pairing_policy = typename curves::bls12<381>::pairing;
-    using value_type = typename pairing_policy::g2_precomp;
+    using value_type = typename pairing_policy::g2_precomputed_type;
     using element_type = value_type::value_type;
     using coeffs_type = value_type::coeffs_type;
     using coeffs_value_type = coeffs_type::value_type;
 
-    for (auto &elem : test_set.second.get_child("g2_precomp")) {
+    for (auto &elem : test_set.second.get_child("g2_precomputed_type")) {
         elements.emplace_back(value_type());
 
         elements.back().QX = field_element_init<element_type>::process(elem.second.get_child("QX").front());
@@ -753,17 +753,17 @@ void pairing_test_g2_precomp_init(std::vector<typename curves::bls12<381>::pairi
 }
 
 template<typename TestSet>
-void pairing_test_g2_precomp_init(std::vector<typename curves::mnt4<298>::pairing::g2_precomp> &elements,
+void pairing_test_g2_precomp_init(std::vector<typename curves::mnt4<298>::pairing::g2_precomputed_type> &elements,
                                   const TestSet &test_set) {
     using pairing_policy = typename curves::mnt4<298>::pairing;
-    using value_type = typename pairing_policy::g2_precomp;
+    using value_type = typename pairing_policy::g2_precomputed_type;
     using element_type = typename value_type::value_type;
     using dbl_coeffs_type = typename value_type::dbl_coeffs_type;
     using add_coeffs_type = typename value_type::add_coeffs_type;
     using dbl_coeffs_value_type = typename dbl_coeffs_type::value_type;
     using add_coeffs_value_type = typename add_coeffs_type::value_type;
 
-    for (auto &elem : test_set.second.get_child("g2_precomp")) {
+    for (auto &elem : test_set.second.get_child("g2_precomputed_type")) {
         elements.emplace_back(value_type());
 
         elements.back().QX = field_element_init<element_type>::process(elem.second.get_child("QX").front());
@@ -799,17 +799,17 @@ void pairing_test_g2_precomp_init(std::vector<typename curves::mnt4<298>::pairin
 }
 
 template<typename TestSet>
-void pairing_test_g2_precomp_init(std::vector<typename curves::mnt6<298>::pairing::g2_precomp> &elements,
+void pairing_test_g2_precomp_init(std::vector<typename curves::mnt6<298>::pairing::g2_precomputed_type> &elements,
                                   const TestSet &test_set) {
     using pairing_policy = typename curves::mnt6<298>::pairing;
-    using value_type = typename pairing_policy::g2_precomp;
+    using value_type = typename pairing_policy::g2_precomputed_type;
     using element_type = typename value_type::value_type;
     using dbl_coeffs_type = typename value_type::dbl_coeffs_type;
     using add_coeffs_type = typename value_type::add_coeffs_type;
     using dbl_coeffs_value_type = typename dbl_coeffs_type::value_type;
     using add_coeffs_value_type = typename add_coeffs_type::value_type;
 
-    for (auto &elem : test_set.second.get_child("g2_precomp")) {
+    for (auto &elem : test_set.second.get_child("g2_precomputed_type")) {
         elements.emplace_back(value_type());
 
         elements.back().QX = field_element_init<element_type>::process(elem.second.get_child("QX").front());
@@ -867,8 +867,8 @@ void pairing_operation_test(const TestSet &test_set) {
     std::vector<typename PairingT::g1_type::value_type> G1_elements;
     std::vector<typename PairingT::g2_type::value_type> G2_elements;
     std::vector<typename PairingT::gt_type::value_type> GT_elements;
-    std::vector<typename PairingT::g1_precomp> G1_prec_elements;
-    std::vector<typename PairingT::g2_precomp> G2_prec_elements;
+    std::vector<typename PairingT::g1_precomputed_type> G1_prec_elements;
+    std::vector<typename PairingT::g2_precomputed_type> G2_prec_elements;
 
     pairing_test_init<PairingT>(Fr_elements, G1_elements, G2_elements, GT_elements, G1_prec_elements, G2_prec_elements,
                                 test_set);

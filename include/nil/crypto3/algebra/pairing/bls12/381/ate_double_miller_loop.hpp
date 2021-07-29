@@ -32,40 +32,41 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
 #include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
+#include <nil/crypto3/algebra/pairing/ate_double_miller_loop.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<std::size_t Version = 381>
-                class bls12_ate_double_miller_loop;
+                template<typename CurveType>
+                class ate_double_miller_loop;
 
                 template<>
-                class bls12_ate_double_miller_loop<381> {
+                class ate_double_miller_loop<curves::bls12<381>> {
                     using curve_type = curves::bls12<381>;
 
-                    using params_type = detail::params_type<curve_type>;
+                    using params_type = detail::pairing_params<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
 
                     using gt_type = typename curve_type::gt_type;
                 public:
 
                     static typename gt_type::value_type process(
-                        const typename types_policy::ate_g1_precomp &prec_P1, 
-                        const typename types_policy::ate_g2_precomp &prec_Q1,
-                        const typename types_policy::ate_g1_precomp &prec_P2, 
-                        const typename types_policy::ate_g2_precomp &prec_Q2) {
+                        const typename types_policy::ate_g1_precomputed_type &prec_P1, 
+                        const typename types_policy::ate_g2_precomputed_type &prec_Q1,
+                        const typename types_policy::ate_g1_precomputed_type &prec_P2, 
+                        const typename types_policy::ate_g2_precomputed_type &prec_Q2) {
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 
                         bool found_one = false;
                         std::size_t idx = 0;
 
-                        const typename types_policy::number_type &loop_count = 
+                        const typename types_policy::integral_type &loop_count = 
                             params_type::ate_loop_count;
 
-                        for (long i = params_type::number_type_max_bits; i >= 0; --i) {
+                        for (long i = params_type::integral_type_max_bits; i >= 0; --i) {
                             const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */

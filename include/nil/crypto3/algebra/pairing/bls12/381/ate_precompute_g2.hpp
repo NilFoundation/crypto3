@@ -32,24 +32,25 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
 #include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
+#include <nil/crypto3/algebra/pairing/ate_precompute_g2.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<std::size_t Version = 381>
-                class bls12_ate_precompute_g2;
+                template<typename CurveType>
+                class ate_precompute_g2;
 
                 template<>
-                class bls12_ate_precompute_g2<381> {
+                class ate_precompute_g2<curves::bls12<381>> {
                     using curve_type = curves::bls12<381>;
 
-                    using params_type = detail::params_type<curve_type>;
+                    using params_type = detail::pairing_params<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;
-                    using g2_type = typename curve_type::g2_type;
+                    using g2_type = typename curve_type::g2_type<>;
                     using g2_affine_type = typename curve_type::g2_type<curves::coordinates::affine>;
 
                     using g2_field_type_value = typename g2_type::field_type::value_type;
@@ -65,7 +66,7 @@ namespace nil {
                         const g2_field_type_value B = Y.squared();                  // B = Y1^2
                         const g2_field_type_value C = Z.squared();                  // C = Z1^2
                         const g2_field_type_value D = 0x03 * C;                    // D = 3 * C
-                        const g2_field_type_value E = typename g2_type::value_type::twist_coeff_b * D;    // E = twist_b * D
+                        const g2_field_type_value E = params_type::twist_coeff_b * D;    // E = twist_b * D
 
                         const g2_field_type_value F = 0x03 * E;                      // F = 3 * E
                         const g2_field_type_value G = two_inv * (B + F);              // G = (B+F)/2
@@ -78,12 +79,12 @@ namespace nil {
                         current.Y = G.squared() - (0x03 * E_squared);    // Y3 = G^2 - 3*E^2
                         current.Z = B * H;                                                // Z3 = B * H
                         c.ell_0 = I;                                                      // ell_0 = xi * I
-                        c.ell_VW = -typename g2_type::value_type::twist * H;    // ell_VW = - H (later: * yP)
+                        c.ell_VW = -params_type::twist * H;    // ell_VW = - H (later: * yP)
                         c.ell_VV = 0x03 * J;         // ell_VV = 3*J (later: * xP)
                     }
 
                     static void mixed_addition_step_for_miller_loop(
-                        const typename g2_type::value_type base, 
+                        const typename g2_affine_type::value_type base, 
                         typename g2_type::value_type &current, 
                         typename types_policy::ate_ell_coeffs &c) {
 
@@ -103,12 +104,12 @@ namespace nil {
                         current.Z = Z1 * H;                    // Z3 = Z1*H
                         c.ell_0 = E * x2 - D * y2;             // ell_0 = xi * (E * X2 - D * Y2)
                         c.ell_VV = -E;                         // ell_VV = - E (later: * xP)
-                        c.ell_VW = typename g2_type::value_type::twist * D;              // ell_VW = D (later: * yP    )
+                        c.ell_VW = params_type::twist * D;              // ell_VW = D (later: * yP    )
                     }
 
                 public:
 
-                    using g2_precomputed_type = typename types_policy::ate_g2_precomp;
+                    using g2_precomputed_type = typename types_policy::ate_g2_precomputed_type;
 
                     static g2_precomputed_type process(const typename g2_type::value_type &Q) {
 
@@ -126,12 +127,12 @@ namespace nil {
                         R.Y = Qcopy.Y;
                         R.Z = g2_type::field_type::value_type::one();
 
-                        const typename types_policy::number_type &loop_count = params_type::ate_loop_count;
+                        const typename types_policy::integral_type &loop_count = params_type::ate_loop_count;
 
                         bool found_one = false;
                         typename types_policy::ate_ell_coeffs c;
 
-                        for (long i = params_type::number_type_max_bits; i >= 0; --i) {
+                        for (long i = params_type::integral_type_max_bits; i >= 0; --i) {
                             const bool bit = multiprecision::bit_test(loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */

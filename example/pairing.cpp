@@ -35,8 +35,12 @@
 #include <nil/crypto3/algebra/fields/detail/element/fp12_2over3over2.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/curves/mnt4.hpp>
-#include <nil/crypto3/algebra/curves/mnt6.hpp>
+// #include <nil/crypto3/algebra/curves/mnt4.hpp>
+// #include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/pairing/bls12.hpp>
+
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 using namespace nil::crypto3::algebra;
 
@@ -92,11 +96,11 @@ void print_curve_group_element(CurveGroupValueType e) {
     print_field_element(e.Z);
 }
 
-void print_ate_g1_precomp_element(const typename curves::bls12<381>::pairing::g1_precomp &e) {
+void print_ate_g1_precomp_element(const typename pairing::pairing_policy<curves::bls12<381>>::g1_precomputed_type &e) {
     std::cout << e.PX.data << " " << e.PY.data << std::endl;
 }
 
-void print_ate_g2_precomp_element(const typename curves::bls12<381>::pairing::g2_precomp &e) {
+void print_ate_g2_precomp_element(const pairing::pairing_policy<curves::bls12<381>>::g2_precomputed_type &e) {
     std::cout << "\"coordinates\": [[" << e.QX.data[0].data << " , " << e.QX.data[1].data << "] , ["
               << e.QY.data[0].data << " , " << e.QY.data[1].data << "]]" << std::endl;
     auto print_coeff = [](const auto &c) {
@@ -113,133 +117,141 @@ void print_ate_g2_precomp_element(const typename curves::bls12<381>::pairing::g2
     std::cout << "]" << std::endl;
 }
 
-void print_ate_g1_precomp_element(const typename curves::mnt4<298>::pairing::g1_precomp &e) {
-    std::cout << "Ate g1 precomp element:" << std::endl;
-    print_field_element(e.PX);
-    print_field_element(e.PY);
-    print_field_element(e.PX_twist);
-    print_field_element(e.PY_twist);
-}
+// void print_ate_g1_precomp_element(const typename pairing::pairing_policy<curves::mnt4<298>>::::g1_precomputed_type &e) {
+//     std::cout << "Ate g1 precomp element:" << std::endl;
+//     print_field_element(e.PX);
+//     print_field_element(e.PY);
+//     print_field_element(e.PX_twist);
+//     print_field_element(e.PY_twist);
+// }
 
-void print_ate_g2_precomp_element(const typename curves::mnt4<298>::pairing::g2_precomp &e) {
-    std::cout << "Ate g2 precomp element:" << std::endl;
+// void print_ate_g2_precomp_element(const typename pairing::pairing_policy<curves::mnt4<298>>::g2_precomputed_type &e) {
+//     std::cout << "Ate g2 precomp element:" << std::endl;
 
-    print_field_element(e.QX);
-    print_field_element(e.QY);
-    print_field_element(e.QY2);
-    print_field_element(e.QX_over_twist);
-    print_field_element(e.QY_over_twist);
+//     print_field_element(e.QX);
+//     print_field_element(e.QY);
+//     print_field_element(e.QY2);
+//     print_field_element(e.QX_over_twist);
+//     print_field_element(e.QY_over_twist);
 
-    for (auto &c : e.dbl_coeffs) {
-        std::cout << "{";
-        print_field_element(c.c_H);
-        print_field_element(c.c_4C);
-        print_field_element(c.c_J);
-        print_field_element(c.c_L);
-        std::cout << "},";
-    }
+//     for (auto &c : e.dbl_coeffs) {
+//         std::cout << "{";
+//         print_field_element(c.c_H);
+//         print_field_element(c.c_4C);
+//         print_field_element(c.c_J);
+//         print_field_element(c.c_L);
+//         std::cout << "},";
+//     }
 
-    for (auto &c : e.add_coeffs) {
-        std::cout << "{";
-        print_field_element(c.c_L1);
-        print_field_element(c.c_RZ);
-        std::cout << "},";
-    }
-}
+//     for (auto &c : e.add_coeffs) {
+//         std::cout << "{";
+//         print_field_element(c.c_L1);
+//         print_field_element(c.c_RZ);
+//         std::cout << "},";
+//     }
+// }
 
-void print_ate_g1_precomp_element(const typename curves::mnt6<298>::pairing::g1_precomp &e) {
-    std::cout << "Ate g1 precomp element:" << std::endl;
-    print_field_element(e.PX);
-    print_field_element(e.PY);
-    print_field_element(e.PX_twist);
-    print_field_element(e.PY_twist);
-}
+// void print_ate_g1_precomp_element(const typename pairing::pairing_policy<curves::mnt6<298>>::g1_precomputed_type &e) {
+//     std::cout << "Ate g1 precomp element:" << std::endl;
+//     print_field_element(e.PX);
+//     print_field_element(e.PY);
+//     print_field_element(e.PX_twist);
+//     print_field_element(e.PY_twist);
+// }
 
-void print_ate_g2_precomp_element(const typename curves::mnt6<298>::pairing::g2_precomp &e) {
-    std::cout << "Ate g2 precomp element:" << std::endl;
+// void print_ate_g2_precomp_element(const typename pairing::pairing_policy<curves::mnt6<298>>::g2_precomputed_type &e) {
+//     std::cout << "Ate g2 precomp element:" << std::endl;
 
-    print_field_element(e.QX);
-    print_field_element(e.QY);
-    print_field_element(e.QY2);
-    print_field_element(e.QX_over_twist);
-    print_field_element(e.QY_over_twist);
+//     print_field_element(e.QX);
+//     print_field_element(e.QY);
+//     print_field_element(e.QY2);
+//     print_field_element(e.QX_over_twist);
+//     print_field_element(e.QY_over_twist);
 
-    for (auto &c : e.dbl_coeffs) {
-        std::cout << "{";
-        print_field_element(c.c_H);
-        print_field_element(c.c_4C);
-        print_field_element(c.c_J);
-        print_field_element(c.c_L);
-        std::cout << "},";
-    }
+//     for (auto &c : e.dbl_coeffs) {
+//         std::cout << "{";
+//         print_field_element(c.c_H);
+//         print_field_element(c.c_4C);
+//         print_field_element(c.c_J);
+//         print_field_element(c.c_L);
+//         std::cout << "},";
+//     }
 
-    for (auto &c : e.add_coeffs) {
-        std::cout << "{";
-        print_field_element(c.c_L1);
-        print_field_element(c.c_RZ);
-        std::cout << "},";
-    }
-}
+//     for (auto &c : e.add_coeffs) {
+//         std::cout << "{";
+//         print_field_element(c.c_L1);
+//         print_field_element(c.c_RZ);
+//         std::cout << "},";
+//     }
+// }
 
-template<typename PairingT>
+template<typename CurveType>
 void pairing_example() {
-    using g1_value_type = typename PairingT::G1_type::underlying_field_value_type;
-    using g2_value_type = typename PairingT::G2_type::underlying_field_value_type;
+    using curve_type = CurveType;
 
-    g1_value_type g1_X1(123), g1_Y1(234), g1_Z1(345);
+    using g1_type = typename curve_type::g1_type<>;
+    using g2_type = typename curve_type::g2_type<>;
+    using g1_field_value_type = typename g1_type::field_type::value_type;
+    using g2_field_value_type = typename g2_type::field_type::value_type;
 
-    typename PairingT::G1_type g1_el1(g1_X1, g1_Y1, g1_Z1);
+    typename curve_type::g1_type<>::value_type g1_el1 = random_element<typename curve_type::g1_type<>>();
     std::cout << "g1_el1: ";
     print_curve_group_element(g1_el1);
-    typename PairingT::g1_precomp g1_precomp_el1 = PairingT::precompute_g1(g1_el1);
+
+    typename pairing::pairing_policy<curve_type>::g1_precomputed_type 
+        g1_precomp_el1 = precompute_g1<curve_type>(g1_el1);
     std::cout << "g1_precomp_el1: ";
     print_ate_g1_precomp_element(g1_precomp_el1);
-    typename PairingT::G1_type g1_el2 = PairingT::G1_type::one();
+
+    typename curve_type::g1_type<>::value_type g1_el2 = g1_type::value_type::one();
     std::cout << "g1_el2: ";
     print_curve_group_element(g1_el2);
-    typename PairingT::g1_precomp g1_precomp_el2 = PairingT::precompute_g1(g1_el2);
+    typename pairing::pairing_policy<curve_type>::g1_precomputed_type 
+        g1_precomp_el2 = precompute_g1<curve_type>(g1_el2);
     std::cout << "g1_precomp_el2: ";
     print_ate_g1_precomp_element(g1_precomp_el2);
 
-    typename PairingT::G2_type g2_el1 = PairingT::G2_type::one();
+    typename curve_type::g2_type<>::value_type g2_el1 = random_element<typename curve_type::g2_type<>>();
     std::cout << "g2_el1: ";
     print_curve_group_element(g2_el1);
-    typename PairingT::g2_precomp g2_precomp_el1 = PairingT::precompute_g2(g2_el1);
+    typename pairing::pairing_policy<curve_type>::g2_precomputed_type 
+        g2_precomp_el1 = precompute_g2<curve_type>(g2_el1);
     std::cout << "g2_precomp_el1: ";
     print_ate_g2_precomp_element(g2_precomp_el1);
-    typename PairingT::G2_type g2_el2 = PairingT::G2_type::one();
+    typename curve_type::g2_type<>::value_type g2_el2 = g2_type::value_type::one();
     std::cout << "g2_el2: ";
     print_curve_group_element(g2_el2);
-    typename PairingT::g2_precomp g2_precomp_el2 = PairingT::precompute_g2(g2_el2);
+    typename pairing::pairing_policy<curve_type>::g2_precomputed_type 
+        g2_precomp_el2 = precompute_g2<curve_type>(g2_el2);
     std::cout << "g2_precomp_el2: ";
     print_ate_g2_precomp_element(g2_precomp_el2);
 
-    typename PairingT::GT_type gt_el1 = PairingT::pair_reduced(g1_el1, g2_el1);
+    typename curve_type::gt_type::value_type gt_el1 = pair_reduced<curve_type>(g1_el1, g2_el1);
     std::cout << "gt_el1: ";
     print_field_element(gt_el1);
 
-    typename PairingT::GT_type gt_el2 = PairingT::pair(g1_el1, g2_el1);
+    typename curve_type::gt_type::value_type gt_el2 = pair<curve_type>(g1_el1, g2_el1);
     std::cout << "gt_el2: ";
     print_field_element(gt_el2);
 
-    typename PairingT::GT_type gt_el3 = PairingT::miller_loop(g1_precomp_el1, g2_precomp_el1);
+    typename curve_type::gt_type::value_type gt_el3 = miller_loop<curve_type>(g1_precomp_el1, g2_precomp_el1);
     std::cout << "gt_el3: ";
     print_field_element(gt_el3);
 
-    typename PairingT::GT_type gt_el4 =
-        PairingT::double_miller_loop(g1_precomp_el1, g2_precomp_el1, g1_precomp_el2, g2_precomp_el2);
+    typename curve_type::gt_type::value_type gt_el4 =
+        double_miller_loop<curve_type>(g1_precomp_el1, g2_precomp_el1, g1_precomp_el2, g2_precomp_el2);
     std::cout << "gt_el4: ";
     print_field_element(gt_el4);
 
-    typename PairingT::GT_type gt_el5 = PairingT::final_exponentiation(gt_el1);
+    typename curve_type::gt_type::value_type gt_el5 = final_exponentiation<curve_type>(gt_el4);
     std::cout << "gt_el5: ";
     print_field_element(gt_el5);
 }
 
 int main() {
-    //pairing_example<curves::bls12<381>::pairing>();
+    pairing_example<curves::bls12<381>>();
 
     //pairing_example<curves::mnt4<298>::pairing>();
 
-    pairing_example<curves::mnt6<298>::pairing>();
+    // pairing_example<curves::mnt6<298>::pairing>();
 }

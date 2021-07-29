@@ -42,7 +42,7 @@ namespace nil {
                 class mnt6_final_exponentiation<298> {
                     using curve_type = curves::mnt6<298>;
 
-                    using params_type = detail::params_type<curve_type>;
+                    using params_type = detail::pairing_params<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;
@@ -82,7 +82,7 @@ namespace nil {
 
                 public:
 
-                    static typename types_policy::ate_g2_precomp process(const typename g2_type::value_type &Q) {
+                    static typename gt_type::value_type process(const typename gt_type::value_type &Q) {
 
                         const typename gt_type::value_type elt_inv = elt.inversed();
                         const typename gt_type::value_type elt_to_first_chunk = final_exponentiation_first_chunk(elt, elt_inv);

@@ -66,17 +66,17 @@ namespace nil {
                     using g2_type = typename policy_type::g2_type;
                     using gt_type = typename policy_type::gt_type;
 
-                    using g1_precomp = typename policy_type::g1_precomp;
-                    using g2_precomp = typename policy_type::g2_precomp;
+                    using g1_precomputed_type = typename policy_type::g1_precomputed_type;
+                    using g2_precomputed_type = typename policy_type::g2_precomputed_type;
 
                     constexpr static const typename g2_type::underlying_field_type::value_type twist =
                         policy_type::twist;
 
-                    static inline g1_precomp precompute_g1(const typename g1_type::value_type &P) {
+                    static inline g1_precomputed_type precompute_g1(const typename g1_type::value_type &P) {
                         return policy_type::precompute_g1(P);
                     }
 
-                    static inline g2_precomp precompute_g2(const typename g2_type::value_type &Q) {
+                    static inline g2_precomputed_type precompute_g2(const typename g2_type::value_type &Q) {
                         return policy_type::precompute_g2(Q);
                     }
 
@@ -90,10 +90,10 @@ namespace nil {
                         return policy_type::pair_reduced(P, Q);
                     }
 
-                    static inline typename gt_type::value_type double_miller_loop(const g1_precomp &prec_P1,
-                                                                                  const g2_precomp &prec_Q1,
-                                                                                  const g1_precomp &prec_P2,
-                                                                                  const g2_precomp &prec_Q2) {
+                    static inline typename gt_type::value_type double_miller_loop(const g1_precomputed_type &prec_P1,
+                                                                                  const g2_precomputed_type &prec_Q1,
+                                                                                  const g1_precomputed_type &prec_P2,
+                                                                                  const g2_precomputed_type &prec_Q2) {
                         return policy_type::double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
                     }
 
@@ -102,8 +102,8 @@ namespace nil {
                         return policy_type::final_exponentiation(elt);
                     }
 
-                    static inline typename gt_type::value_type miller_loop(const g1_precomp &prec_P,
-                                                                           const g2_precomp &prec_Q) {
+                    static inline typename gt_type::value_type miller_loop(const g1_precomputed_type &prec_P,
+                                                                           const g2_precomputed_type &prec_Q) {
                         return policy_type::miller_loop(prec_P, prec_Q);
                     }
                 };

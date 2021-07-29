@@ -23,43 +23,19 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_PAIR_REDUCED_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_PAIR_REDUCED_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_ATE_PRECOMPUTE_G1_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_ATE_PRECOMPUTE_G1_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<typename PairingCurveType>
-                struct pair;
+                template<typename CurveType>
+                class ate_precompute_g1;
 
-                template<typename PairingCurveType>
-                struct final_exponentiation;
-
-                template<typename PairingCurveType, 
-                         typename Pair = pair<PairingCurveType>, 
-                         typename FinalExponentiation = final_exponentiation<PairingCurveType>>
-                class pair_reduced {
-                    using curve_type = PairingCurveType;
-
-                    using g1_type = typename curve_type::g1_type;
-                    using g2_type = typename curve_type::g2_type;
-                    using gt_type = typename curve_type::gt_type;
-                public:
-
-                    static typename gt_type::value_type process(
-                        const typename g1_type::value_type &P, 
-                        const typename g2_type::value_type &Q) {
-
-                        const typename gt_type::value_type f = Pair::process(P, Q);
-                        const typename gt_type::value_type result = 
-                            FinalExponentiation::process(f);
-                        return result;
-                    }
-                };
             }        // namespace pairing
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_PAIR_REDUCED_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_ATE_PRECOMPUTE_G1_HPP

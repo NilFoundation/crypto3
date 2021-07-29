@@ -45,7 +45,7 @@ namespace nil {
                 class mnt6_ate_precompute_g2<298> {
                     using curve_type = curves::mnt6<298>;
 
-                    using params_type = detail::params_type<curve_type>;
+                    using params_type = detail::pairing_params<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;
@@ -117,7 +117,7 @@ namespace nil {
 
                 public:
 
-                    using g2_precomputed_type = typename types_policy::ate_g2_precomp;
+                    using g2_precomputed_type = typename types_policy::ate_g2_precomputed_type;
 
                     static g2_precomputed_type process(const typename g2_type::value_type &Q) {
 

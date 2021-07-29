@@ -29,30 +29,28 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
 #include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
+#include <nil/crypto3/algebra/pairing/final_exponentiation.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<std::size_t Version = 381>
-                class bls12_final_exponentiation;
+                template<typename CurveType>
+                class final_exponentiation;
 
                 template<>
-                class bls12_final_exponentiation<381> {
+                class final_exponentiation<curves::bls12<381>> {
                     using curve_type = curves::bls12<381>;
 
-                    using params_type = detail::params_type<curve_type>;
+                    using params_type = detail::pairing_params<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;
-                    using g2_type = typename curve_type::g2_type;
                     using gt_type = typename curve_type::gt_type;
-
-                    using g2_field_type_value = typename g2_type::field_type::value_type;
-                private:
-                    static typename g1_type::value_type final_exponentiation_first_chunk(
-                        const typename g1_type::value_type &elt) {
+                
+                    static typename gt_type::value_type final_exponentiation_first_chunk(
+                        const typename gt_type::value_type &elt) {
 
                         /*
                           Computes result = elt^((q^6-1)*(q^2+1)).
@@ -66,19 +64,19 @@ namespace nil {
                           result = D * C
                         */
 
-                        const typename g1_type::value_type A = elt.unitary_inversed();
-                        const typename g1_type::value_type B = elt.inversed();
-                        const typename g1_type::value_type C = A * B;
-                        const typename g1_type::value_type D = C.Frobenius_map(2);
-                        const typename g1_type::value_type result = D * C;
+                        const typename gt_type::value_type A = elt.unitary_inversed();
+                        const typename gt_type::value_type B = elt.inversed();
+                        const typename gt_type::value_type C = A * B;
+                        const typename gt_type::value_type D = C.Frobenius_map(2);
+                        const typename gt_type::value_type result = D * C;
 
                         return result;
                     }
 
-                    static typename g1_type::value_type exp_by_z(
-                        const typename g1_type::value_type &elt) {
+                    static typename gt_type::value_type exp_by_z(
+                        const typename gt_type::value_type &elt) {
 
-                        typename g1_type::value_type result = elt.cyclotomic_exp(
+                        typename gt_type::value_type result = elt.cyclotomic_exp(
                             params_type::final_exponent_z);
                         if (params_type::final_exponent_is_z_neg) {
                             result = result.unitary_inversed();
@@ -87,33 +85,33 @@ namespace nil {
                         return result;
                     }
 
-                    static typename g1_type::value_type final_exponentiation_last_chunk(
-                        const typename g1_type::value_type &elt) {
+                    static typename gt_type::value_type final_exponentiation_last_chunk(
+                        const typename gt_type::value_type &elt) {
 
-                        const typename g1_type::value_type A = elt.cyclotomic_squared();    // elt^2
-                        const typename g1_type::value_type B = A.unitary_inversed();        // elt^(-2)
-                        const typename g1_type::value_type C = exp_by_z(elt);               // elt^z
-                        const typename g1_type::value_type D = C.cyclotomic_squared();      // elt^(2z)
-                        const typename g1_type::value_type E = B * C;                       // elt^(z-2)
-                        const typename g1_type::value_type F = exp_by_z(E);                 // elt^(z^2-2z)
-                        const typename g1_type::value_type G = exp_by_z(F);                 // elt^(z^3-2z^2)
-                        const typename g1_type::value_type H = exp_by_z(G);                 // elt^(z^4-2z^3)
-                        const typename g1_type::value_type I = H * D;                       // elt^(z^4-2z^3+2z)
-                        const typename g1_type::value_type J = exp_by_z(I);                 // elt^(z^5-2z^4+2z^2)
-                        const typename g1_type::value_type K = E.unitary_inversed();        // elt^(-z+2)
-                        const typename g1_type::value_type L = K * J;                       // elt^(z^5-2z^4+2z^2) * elt^(-z+2)
-                        const typename g1_type::value_type M = elt * L;                     // elt^(z^5-2z^4+2z^2) * elt^(-z+2) * elt
-                        const typename g1_type::value_type N = elt.unitary_inversed();      // elt^(-1)
-                        const typename g1_type::value_type O = F * elt;                     // elt^(z^2-2z) * elt
-                        const typename g1_type::value_type P = O.Frobenius_map(3);          // (elt^(z^2-2z) * elt)^(q^3)
-                        const typename g1_type::value_type Q = I * N;                       // elt^(z^4-2z^3+2z) * elt^(-1)
-                        const typename g1_type::value_type R = Q.Frobenius_map(1);          // (elt^(z^4-2z^3+2z) * elt^(-1))^q
-                        const typename g1_type::value_type S = C * G;                       // elt^(z^3-2z^2) * elt^z
-                        const typename g1_type::value_type T = S.Frobenius_map(2);          // (elt^(z^3-2z^2) * elt^z)^(q^2)
-                        const typename g1_type::value_type U = T * P;    // (elt^(z^2-2z) * elt)^(q^3) * (elt^(z^3-2z^2) * elt^z)^(q^2)
-                        const typename g1_type::value_type V = U * R;    // (elt^(z^2-2z) * elt)^(q^3) * (elt^(z^3-2z^2) * elt^z)^(q^2) *
+                        const typename gt_type::value_type A = elt.cyclotomic_squared();    // elt^2
+                        const typename gt_type::value_type B = A.unitary_inversed();        // elt^(-2)
+                        const typename gt_type::value_type C = exp_by_z(elt);               // elt^z
+                        const typename gt_type::value_type D = C.cyclotomic_squared();      // elt^(2z)
+                        const typename gt_type::value_type E = B * C;                       // elt^(z-2)
+                        const typename gt_type::value_type F = exp_by_z(E);                 // elt^(z^2-2z)
+                        const typename gt_type::value_type G = exp_by_z(F);                 // elt^(z^3-2z^2)
+                        const typename gt_type::value_type H = exp_by_z(G);                 // elt^(z^4-2z^3)
+                        const typename gt_type::value_type I = H * D;                       // elt^(z^4-2z^3+2z)
+                        const typename gt_type::value_type J = exp_by_z(I);                 // elt^(z^5-2z^4+2z^2)
+                        const typename gt_type::value_type K = E.unitary_inversed();        // elt^(-z+2)
+                        const typename gt_type::value_type L = K * J;                       // elt^(z^5-2z^4+2z^2) * elt^(-z+2)
+                        const typename gt_type::value_type M = elt * L;                     // elt^(z^5-2z^4+2z^2) * elt^(-z+2) * elt
+                        const typename gt_type::value_type N = elt.unitary_inversed();      // elt^(-1)
+                        const typename gt_type::value_type O = F * elt;                     // elt^(z^2-2z) * elt
+                        const typename gt_type::value_type P = O.Frobenius_map(3);          // (elt^(z^2-2z) * elt)^(q^3)
+                        const typename gt_type::value_type Q = I * N;                       // elt^(z^4-2z^3+2z) * elt^(-1)
+                        const typename gt_type::value_type R = Q.Frobenius_map(1);          // (elt^(z^4-2z^3+2z) * elt^(-1))^q
+                        const typename gt_type::value_type S = C * G;                       // elt^(z^3-2z^2) * elt^z
+                        const typename gt_type::value_type T = S.Frobenius_map(2);          // (elt^(z^3-2z^2) * elt^z)^(q^2)
+                        const typename gt_type::value_type U = T * P;    // (elt^(z^2-2z) * elt)^(q^3) * (elt^(z^3-2z^2) * elt^z)^(q^2)
+                        const typename gt_type::value_type V = U * R;    // (elt^(z^2-2z) * elt)^(q^3) * (elt^(z^3-2z^2) * elt^z)^(q^2) *
                                                // (elt^(z^4-2z^3+2z) * elt^(-1))^q
-                        const typename g1_type::value_type W =
+                        const typename gt_type::value_type W =
                             V * M;    // (elt^(z^2-2z) * elt)^(q^3) * (elt^(z^3-2z^2) * elt^z)^(q^2) *
                                       // (elt^(z^4-2z^3+2z) * elt^(-1))^q * elt^(z^5-2z^4+2z^2) * elt^(-z+2) * elt
 
@@ -122,7 +120,7 @@ namespace nil {
 
                 public:
 
-                    static typename types_policy::ate_g2_precomp process(const typename g2_type::value_type &Q) {
+                    static typename gt_type::value_type process(const typename gt_type::value_type &elt) {
 
                         /* OLD naive version:
                             typename gt_type::value_type result = 

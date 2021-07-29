@@ -45,7 +45,7 @@ namespace nil {
                     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
                 public:
 
-                    using g1_precomputed_type = typename types_policy::ate_g1_precomp;
+                    using g1_precomputed_type = typename types_policy::ate_g1_precomputed_type;
 
                     static g1_precomputed_type process(
                         const typename g1_type::value_type &P) {

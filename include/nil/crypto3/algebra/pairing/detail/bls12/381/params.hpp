@@ -43,31 +43,38 @@ namespace nil {
 
                     public:
 
-                        using number_type = typename curve_type::base_field_type::modulus_type;
-                        using extended_number_type = typename curve_type::base_field_type::extended_modulus_type;
+                        using integral_type = typename curve_type::base_field_type::modulus_type;
+                        using extended_integral_type = typename curve_type::base_field_type::extended_modulus_type;
 
-                        constexpr static const std::size_t number_type_max_bits = 
+                        constexpr static const std::size_t integral_type_max_bits = 
                             curve_type::base_field_type::modulus_bits;
 
-                        constexpr static const number_type ate_loop_count = 0xD201000000010000_cppui64;
+                        constexpr static const integral_type ate_loop_count = 0xD201000000010000_cppui64;
                         constexpr static const bool ate_is_loop_count_neg = true;
-                        // constexpr static const extended_number_type final_exponent = extended_number_type(
+                        // constexpr static const extended_integral_type final_exponent = extended_integral_type(
                         //    0x2EE1DB5DCC825B7E1BDA9C0496A1C0A89EE0193D4977B3F7D4507D07363BAA13F8D14A917848517BADC3A43D1073776AB353F2C30698E8CC7DEADA9C0AADFF5E9CFEE9A074E43B9A660835CC872EE83FF3A0F0F1C0AD0D6106FEAF4E347AA68AD49466FA927E7BB9375331807A0DCE2630D9AA4B113F414386B0E8819328148978E2B0DD39099B86E1AB656D2670D93E4D7ACDD350DA5359BC73AB61A0C5BF24C374693C49F570BCD2B01F3077FFB10BF24DDE41064837F27611212596BC293C8D4C01F25118790F4684D0B9C40A68EB74BB22A40EE7169CDC1041296532FEF459F12438DFC8E2886EF965E61A474C5C85B0129127A1B5AD0463434724538411D1676A53B5A62EB34C05739334F46C02C3F0BD0C55D3109CD15948D0A1FAD20044CE6AD4C6BEC3EC03EF19592004CEDD556952C6D8823B19DADD7C2498345C6E5308F1C511291097DB60B1749BF9B71A9F9E0100418A3EF0BC627751BBD81367066BCA6A4C1B6DCFC5CCEB73FC56947A403577DFA9E13C24EA820B09C1D9F7C31759C3635DE3F7A3639991708E88ADCE88177456C49637FD7961BE1A4C7E79FB02FAA732E2F3EC2BEA83D196283313492CAA9D4AFF1C910E9622D2A73F62537F2701AAEF6539314043F7BBCE5B78C7869AEB2181A67E49EEED2161DAF3F881BD88592D767F67C4717489119226C2F011D4CAB803E9D71650A6F80698E2F8491D12191A04406FBC8FBD5F48925F98630E68BFB24C0BCB9B55DF57510_cppui4314);
 
-                        constexpr static const number_type final_exponent_z = 0xD201000000010000_cppui64;
+                        constexpr static const integral_type final_exponent_z = 0xD201000000010000_cppui64;
                         constexpr static const bool final_exponent_is_z_neg = true;
 
-                        using g2_field_type_value = typename curve_type::g2_type::field_type::value_type;
+                        using g2_field_type_value = typename curve_type::g2_type<>::field_type::value_type;
 
                         constexpr static const g2_field_type_value twist = 
-                            g2_type::params_type::twist;
+                            curve_type::g2_type<>::params_type::twist;
+
+                        constexpr static const g2_field_type_value twist_coeff_b = 
+                            curve_type::g2_type<>::params_type::b;
                     };
 
                     constexpr
-                        typename pairing_params<curves::bls12<381>>::number_type const pairing_params<curves::bls12<381>>::ate_loop_count;
+                        typename pairing_params<curves::bls12<381>>::integral_type const pairing_params<curves::bls12<381>>::ate_loop_count;
 
                     constexpr
-                        typename pairing_params<curves::bls12<381>>::number_type const pairing_params<curves::bls12<381>>::final_exponent_z;
+                        typename pairing_params<curves::bls12<381>>::integral_type const pairing_params<curves::bls12<381>>::final_exponent_z;
+                    constexpr
+                        typename pairing_params<curves::bls12<381>>::g2_field_type_value const pairing_params<curves::bls12<381>>::twist;
+                    constexpr
+                        typename pairing_params<curves::bls12<381>>::g2_field_type_value const pairing_params<curves::bls12<381>>::twist_coeff_b;
 
                     constexpr bool const pairing_params<curves::bls12<381>>::final_exponent_is_z_neg;
 

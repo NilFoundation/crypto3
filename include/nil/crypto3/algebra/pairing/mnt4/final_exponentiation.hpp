@@ -42,14 +42,11 @@ namespace nil {
                 class mnt4_final_exponentiation<298> {
                     using curve_type = curves::mnt4<298>;
 
-                    using params_type = detail::params_type<curve_type>;
+                    using params_type = detail::pairing_params<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;
-                    using g2_type = typename curve_type::g2_type;
                     using gt_type = typename curve_type::gt_type;
-
-                    using g2_field_type_value = typename g2_type::field_type::value_type;
                 
                     static typename gt_type::value_type final_exponentiation_last_chunk(
                         const typename gt_type::value_type &elt, 
@@ -84,7 +81,7 @@ namespace nil {
 
                 public:
 
-                    static typename types_policy::ate_g2_precomp process(const typename g2_type::value_type &Q) {
+                    static typename gt_type::value_type process(const typename gt_type::value_type &elt) {
 
                         const typename gt_type::value_type elt_inv = elt.inversed();
                         const typename gt_type::value_type elt_to_first_chunk = final_exponentiation_first_chunk(elt, elt_inv);

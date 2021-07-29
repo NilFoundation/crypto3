@@ -74,14 +74,14 @@ namespace nil {
                         };
 
                         using tate_g1_precomp = std::vector<Fq_conic_coefficients>;
-                        using ate_g2_precomp = std::vector<Fq3_conic_coefficients>;
+                        using ate_g2_precomputed_type = std::vector<Fq3_conic_coefficients>;
 
-                        struct ate_g1_precomp {
+                        struct ate_g1_precomputed_type {
                             g1_value_type P_XY;
                             g1_value_type P_XZ;
                             g1_value_type P_ZZplusYZ;
 
-                            bool operator==(const ate_g1_precomp &other) const {
+                            bool operator==(const ate_g1_precomputed_type &other) const {
                                 return (this->P_XY == other.P_XY && this->P_XZ == other.P_XZ &&
                                         this->P_ZZplusYZ == other.P_ZZplusYZ);
                             }
@@ -95,8 +95,8 @@ namespace nil {
                             }
                         };
 
-                        using g1_precomp = ate_g1_precomp;
-                        using g2_precomp = ate_g2_precomp;
+                        using g1_precomputed_type = ate_g1_precomputed_type;
+                        using g2_precomputed_type = ate_g2_precomputed_type;
                     };
 
                 }    // namespace detail

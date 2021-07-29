@@ -50,12 +50,12 @@ namespace nil {
                         using g1_value_type = typename curve_type::base_field_type::value_type;
                         using g2_value_type = typename curve_type::g2_type::field_type::value_type;
 
-                        struct ate_g1_precomp {
+                        struct ate_g1_precomputed_type {
 
                             g1_value_type PX;
                             g1_value_type PY;
 
-                            bool operator==(const ate_g1_precomp &other) const {
+                            bool operator==(const ate_g1_precomputed_type &other) const {
                                 return (this->PX == other.PX && this->PY == other.PY);
                             }
                         };
@@ -72,20 +72,20 @@ namespace nil {
                             }
                         };
 
-                        struct ate_g2_precomp {
+                        struct ate_g2_precomputed_type {
                             using coeffs_type = ate_ell_coeffs;
 
                             g2_value_type QX;
                             g2_value_type QY;
                             std::vector<coeffs_type> coeffs;
 
-                            bool operator==(const ate_g2_precomp &other) const {
+                            bool operator==(const ate_g2_precomputed_type &other) const {
                                 return (this->QX == other.QX && this->QY == other.QY && this->coeffs == other.coeffs);
                             }
                         };
 
-                        typedef ate_g1_precomp g1_precomp;
-                        typedef ate_g2_precomp g2_precomp;
+                        typedef ate_g1_precomputed_type g1_precomputed_type;
+                        typedef ate_g2_precomputed_type g2_precomputed_type;
                     };
 
                 }    // namespace detail
