@@ -26,30 +26,14 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_TWISTED_EDWARDS_PARAMS_HPP
 #define CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_TWISTED_EDWARDS_PARAMS_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards183/edwards_params.hpp>
-
+#include <nil/crypto3/algebra/curves/detail/edwards/183/edwards_params.hpp>
 #include <nil/crypto3/algebra/curves/forms.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
                 namespace detail {
-
-                    template<std::size_t Version, 
-                             typename Form>
-                    struct edwards_params;
-
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
-                    struct edwards_g1_params;
-
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
-                    struct edwards_g2_params;
 
                     template<>
                     struct edwards_params<183, forms::twisted_edwards> : public edwards_basic_params<183> {
@@ -161,15 +145,6 @@ namespace nil {
                         edwards_g1_params<183, forms::twisted_edwards, 
                             coordinates::inverted>::one_fill;
 
-                    constexpr std::array<typename edwards_g1_params<183, forms::twisted_edwards, 
-                        coordinates::affine>::field_type::value_type, 2> const
-                        edwards_g1_params<183, forms::twisted_edwards, 
-                            coordinates::affine>::zero_fill;
-                    constexpr std::array<typename edwards_g1_params<183, forms::twisted_edwards, 
-                        coordinates::affine>::field_type::value_type, 2> const
-                        edwards_g1_params<183, forms::twisted_edwards, 
-                            coordinates::affine>::one_fill;
-
                     constexpr std::array<typename edwards_g2_params<183, forms::twisted_edwards, 
                         coordinates::inverted>::field_type::value_type, 3> const
                         edwards_g2_params<183, forms::twisted_edwards, 
@@ -178,15 +153,6 @@ namespace nil {
                         coordinates::inverted>::field_type::value_type, 3> const
                         edwards_g2_params<183, forms::twisted_edwards, 
                             coordinates::inverted>::one_fill;
-
-                    constexpr std::array<typename edwards_g2_params<183, forms::twisted_edwards, 
-                        coordinates::affine>::field_type::value_type, 2> const
-                        edwards_g2_params<183, forms::twisted_edwards, 
-                            coordinates::affine>::zero_fill;
-                    constexpr std::array<typename edwards_g2_params<183, forms::twisted_edwards, 
-                        coordinates::affine>::field_type::value_type, 2> const
-                        edwards_g2_params<183, forms::twisted_edwards, 
-                            coordinates::affine>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves

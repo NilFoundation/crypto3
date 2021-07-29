@@ -27,10 +27,7 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_MNT6_G2_HPP
 #define CRYPTO3_ALGEBRA_CURVES_MNT6_G2_HPP
 
-#include <nil/crypto3/algebra/curves/detail/mnt6/params.hpp>
-
-#include <nil/crypto3/algebra/curves/forms.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/mnt6/298/short_weierstrass_params.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/element_g1.hpp>
 
 namespace nil {
@@ -51,7 +48,7 @@ namespace nil {
                              typename Coordinates>
                     struct mnt6_g2 {
 
-                        using params_type = mnt6_g2_params<Version, Form, Coordinates>;
+                        using params_type = mnt6_g2_params<Version, Form>;
 
                         using curve_type = mnt6<Version>;
 

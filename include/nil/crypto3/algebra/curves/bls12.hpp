@@ -27,9 +27,7 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_BLS12_HPP
 #define CRYPTO3_ALGEBRA_CURVES_BLS12_HPP
 
-// #include <nil/crypto3/algebra/curves/detail/bls12/bls12_377/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/bls12/bls12_377/params.hpp>
-#include <nil/crypto3/algebra/curves/detail/bls12/bls12_381/params.hpp>
+#include <nil/crypto3/algebra/curves/detail/bls12/types.hpp>
 
 #include <nil/crypto3/algebra/curves/detail/bls12/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/bls12/g2.hpp>
@@ -50,11 +48,11 @@ namespace nil {
                 template<std::size_t Version>
                 class bls12 {
 
-                    using params_type = detail::bls12_basic_params<Version>;
+                    using types_policy = detail::bls12_types<Version>;
 
                 public:
-                    typedef typename params_type::base_field_type base_field_type;
-                    typedef typename params_type::scalar_field_type scalar_field_type;
+                    typedef typename types_policy::base_field_type base_field_type;
+                    typedef typename types_policy::scalar_field_type scalar_field_type;
 
                     template <typename Coordinates = coordinates::jacobian_with_a4_0, 
                               typename Form = forms::short_weierstrass>
@@ -72,7 +70,7 @@ namespace nil {
                     //                                          pairing::detail::bls12_pairing_functions<Version>>
                     //     pairing;
 
-                    typedef typename params_type::gt_field_type gt_type;
+                    typedef typename types_policy::gt_field_type gt_type;
                 };
 
                 typedef bls12<381> bls12_381;

@@ -23,13 +23,14 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_SECP_R1_BASIC_PARAMS_HPP
-#define CRYPTO3_ALGEBRA_CURVES_SECP_R1_BASIC_PARAMS_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_ALT_BN128_TYPES_HPP
+#define CRYPTO3_ALGEBRA_CURVES_ALT_BN128_TYPES_HPP
 
-#include <nil/crypto3/algebra/fields/secp/secp_r1/base_field.hpp>
-#include <nil/crypto3/algebra/fields/secp/secp_r1/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/alt_bn128/base_field.hpp>
+#include <nil/crypto3/algebra/fields/alt_bn128/scalar_field.hpp>
 
-#include <nil/crypto3/detail/literals.hpp>
+#include <nil/crypto3/algebra/fields/fp2.hpp>
+#include <nil/crypto3/algebra/fields/fp12_2over3over2.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -40,19 +41,47 @@ namespace nil {
                     template<std::size_t Version, 
                              typename Form, 
                              typename Coordinates>
-                    struct secp_r1_g1;
+                    struct alt_bn128_g1;
 
-                    using namespace algebra;
+                    template<std::size_t Version, 
+                             typename Form, 
+                             typename Coordinates>
+                    struct alt_bn128_g2;
+
+                    template<std::size_t Version, 
+                             typename Form>
+                    struct alt_bn128_params;
+
+                    template<std::size_t Version, 
+                             typename Form>
+                    struct alt_bn128_g1_params;
+
+                    template<std::size_t Version, 
+                             typename Form>
+                    struct alt_bn128_g2_params;
+
                     /** @brief A struct representing details about base and scalar fields.
                      *    @tparam Version version of the curve
                      *
                      */
                     template<std::size_t Version>
-                    struct secp_r1_basic_params {
-                        using base_field_type = fields::secp_r1_base_field<Version>;
-                        using scalar_field_type = fields::secp_r1_scalar_field<Version>;
+                    struct alt_bn128_types {
+                        using base_field_type = fields::alt_bn128_base_field<Version>;
+                        using scalar_field_type = fields::alt_bn128_scalar_field<Version>;
 
                         using g1_field_type = base_field_type;
+                        using g2_field_type = typename fields::fp2<base_field_type>;
+                        using gt_field_type = typename fields::fp12_2over3over2<base_field_type>;
+
+                        using integral_type = typename base_field_type::modulus_type;
+
+                        template<typename Form, 
+                             typename Coordinates>
+                        using g1_type = alt_bn128_g1<Version, Form, Coordinates>;
+
+                        template<typename Form, 
+                             typename Coordinates>
+                        using g2_type = alt_bn128_g2<Version, Form, Coordinates>;
                     };
 
                 }    // namespace detail
@@ -61,4 +90,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_CURVES_SECP_R1_BASIC_PARAMS_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_ALT_BN128_TYPES_HPP

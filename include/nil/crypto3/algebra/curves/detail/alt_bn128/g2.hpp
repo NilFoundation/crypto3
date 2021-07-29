@@ -27,10 +27,9 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_ALT_BN128_G2_HPP
 #define CRYPTO3_ALGEBRA_CURVES_ALT_BN128_G2_HPP
 
-#include <nil/crypto3/algebra/curves/detail/alt_bn128/params.hpp>
+#include <nil/crypto3/algebra/curves/detail/alt_bn128/254/short_weierstrass_params.hpp>
 
 #include <nil/crypto3/algebra/curves/forms.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_0/element_g1.hpp>
 
 namespace nil {

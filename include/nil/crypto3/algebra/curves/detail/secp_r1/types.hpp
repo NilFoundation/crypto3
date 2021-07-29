@@ -1,7 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -24,50 +23,54 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP
-#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_SECP_R1_BASIC_PARAMS_HPP
+#define CRYPTO3_ALGEBRA_CURVES_SECP_R1_BASIC_PARAMS_HPP
 
-// #include <nil/crypto3/algebra/curves/detail/edwards183/edwards_params.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards183/twisted_edwards_params.hpp>
-// #include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/element_g1.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/inverted/element_g1.hpp>
-
-#include <nil/crypto3/algebra/curves/forms.hpp>
-// #include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
+#include <nil/crypto3/algebra/fields/secp/secp_r1/base_field.hpp>
+#include <nil/crypto3/algebra/fields/secp/secp_r1/scalar_field.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-
-                template<std::size_t Version>
-                struct edwards;
-
                 namespace detail {
-                    /** @brief A struct representing a group G1 of Edwards curve.
-                     *    @tparam Version version of the curve
-                     *
-                     */
+
                     template<std::size_t Version, 
                              typename Form, 
                              typename Coordinates>
-                    struct edwards_g1 {
+                    struct secp_r1_g1;
 
-                        using params_type = edwards_g1_params<Version, Form, Coordinates>;
+                    template<std::size_t Version, 
+                             typename Form>
+                    struct secp_r1_params;
 
-                        using curve_type = edwards<Version>;
+                    template<std::size_t Version, 
+                             typename Form>
+                    struct secp_r1_g1_params;
 
-                        using field_type = typename params_type::g1_field_type;
+                    using namespace algebra;
+                    /** @brief A struct representing details about base and scalar fields.
+                     *    @tparam Version version of the curve
+                     *
+                     */
+                    template<std::size_t Version>
+                    struct secp_r1_basic_params {
+                        using base_field_type = fields::secp_r1_base_field<Version>;
+                        using scalar_field_type = fields::secp_r1_scalar_field<Version>;
 
-                        constexpr static const std::size_t value_bits =
-                            field_type::value_bits + 1;    ///< size of the base field in bits
+                        using g1_field_type = base_field_type;
+                        
+                        using integral_type = typename base_field_type::modulus_type;
 
-                        using value_type = curve_element<params_type, Form, Coordinates>;
+                        template<typename Form, 
+                             typename Coordinates>
+                        using g1_type = secp_r1_g1<Version, Form, Coordinates>;
                     };
+
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP
+
+#endif    // CRYPTO3_ALGEBRA_CURVES_SECP_R1_BASIC_PARAMS_HPP

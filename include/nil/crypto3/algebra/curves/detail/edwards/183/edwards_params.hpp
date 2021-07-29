@@ -26,14 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_EDWARDS_PARAMS_HPP
 #define CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_EDWARDS_PARAMS_HPP
 
-#include <nil/crypto3/algebra/fields/edwards/base_field.hpp>
-#include <nil/crypto3/algebra/fields/edwards/scalar_field.hpp>
-
-#include <nil/crypto3/algebra/fields/fp3.hpp>
-#include <nil/crypto3/algebra/fields/fp6_2over3.hpp>
-
 #include <nil/crypto3/algebra/curves/forms.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/types.hpp>
 
 #include <nil/crypto3/detail/literals.hpp>
 
@@ -42,51 +36,6 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
-                    struct edwards_g1;
-
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
-                    struct edwards_g2;
-
-                    using namespace algebra;
-                    /** @brief A struct representing details about base and scalar fields.
-                     *    @tparam Version version of the curve
-                     *
-                     */
-                    template<std::size_t Version = 183>
-                    struct edwards_basic_params;
-
-                    template<std::size_t Version, 
-                             typename Form>
-                    struct edwards_params;
-
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
-                    struct edwards_g1_params;
-
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
-                    struct edwards_g2_params;
-
-                    /** @brief A struct representing details about base and scalar fields.
-                     *
-                     */
-                    template<>
-                    struct edwards_basic_params<183> {
-                        using base_field_type = fields::edwards_base_field<183>;
-                        using scalar_field_type = fields::edwards_scalar_field<183>;
-
-                        using g1_field_type = base_field_type;
-                        using g2_field_type = typename fields::fp3<base_field_type>;
-                        using gt_field_type = typename fields::fp6_2over3<base_field_type>;
-                    };
 
                     template<>
                     struct edwards_params<183, forms::edwards> : public edwards_basic_params<183> {

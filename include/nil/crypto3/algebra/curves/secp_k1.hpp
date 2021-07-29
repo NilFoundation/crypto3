@@ -1,7 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -24,11 +23,11 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_MNT4_G1_HPP
-#define CRYPTO3_ALGEBRA_CURVES_MNT4_G1_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_SECP_K1_HPP
+#define CRYPTO3_ALGEBRA_CURVES_SECP_K1_HPP
 
-#include <nil/crypto3/algebra/curves/detail/mnt4/298/short_weierstrass_params.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/element_g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/secp_k1/basic_params.hpp>
+#include <nil/crypto3/algebra/curves/detail/secp_k1/g1.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -36,32 +35,27 @@ namespace nil {
             namespace curves {
 
                 template<std::size_t Version>
-                struct mnt4;
+                class secp_k1 {
+                    using params_type = detail::secp_k1_basic_params<Version>;
 
-                namespace detail {
-                    /** @brief A struct representing a group G1 of mnt4 curve.
-                     *    @tparam Version version of the curve
-                     *
-                     */
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
-                    struct mnt4_g1 {
-                        using params_type = mnt4_g1_params<Version, Form>;
+                public:
+                    typedef typename params_type::base_field_type base_field_type;
+                    typedef typename params_type::scalar_field_type scalar_field_type;
 
-                        using curve_type = mnt4<Version>;
+                    template <typename Coordinates = coordinates::jacobian_with_a4_0, 
+                              typename Form = forms::short_weierstrass>
+                    using g1_type = typename detail::secp_k1_g1<Version, 
+                        Form, Coordinates>;
+                };
 
-                        using field_type = typename params_type::field_type;
-
-                        constexpr static const std::size_t value_bits =
-                            field_type::value_bits + 1;    ///< size of the base field in bits
-
-                        using value_type = curve_element<params_type, Form, Coordinates>;
-                    };
-
-                }    // namespace detail
-            }        // namespace curves
-        }            // namespace algebra
-    }                // namespace crypto3
+                typedef secp_k1<160> secp160k1;
+                typedef secp_k1<192> secp192k1;
+                typedef secp_k1<224> secp224k1;
+                typedef secp_k1<256> secp256k1;
+                
+            }    // namespace curves
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_MNT4_G1_HPP
+
+#endif    // CRYPTO3_ALGEBRA_CURVES_SECP_K1_HPP

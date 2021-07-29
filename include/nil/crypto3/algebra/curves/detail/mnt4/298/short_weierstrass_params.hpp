@@ -23,11 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_MNT4_PARAMS_HPP
-#define CRYPTO3_ALGEBRA_CURVES_MNT4_PARAMS_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_MNT4_298_PARAMS_HPP
+#define CRYPTO3_ALGEBRA_CURVES_MNT4_298_PARAMS_HPP
 
 #include <nil/crypto3/algebra/curves/forms.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/mnt4/types.hpp>
 
 #include <nil/crypto3/detail/literals.hpp>
@@ -128,4 +127,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_CURVES_MNT4_PARAMS_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_MNT4_298_PARAMS_HPP

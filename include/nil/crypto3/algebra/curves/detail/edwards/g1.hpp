@@ -24,13 +24,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_ALT_BN128_G1_HPP
-#define CRYPTO3_ALGEBRA_CURVES_ALT_BN128_G1_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP
+#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP
 
-#include <nil/crypto3/algebra/curves/detail/alt_bn128/254/short_weierstrass_params.hpp>
+// #include <nil/crypto3/algebra/curves/detail/edwards/183/edwards_params.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/183/twisted_edwards_params.hpp>
+// #include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/element_g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/inverted/element_g1.hpp>
 
 #include <nil/crypto3/algebra/curves/forms.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_0/element_g1.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -38,23 +40,21 @@ namespace nil {
             namespace curves {
 
                 template<std::size_t Version>
-                struct alt_bn128;
+                struct edwards;
 
                 namespace detail {
-
-                    /** @brief A struct representing a group G1 of Barreto-Naehrig curve.
+                    /** @brief A struct representing a group G1 of Edwards curve.
                      *    @tparam Version version of the curve
                      *
                      */
-
                     template<std::size_t Version, 
                              typename Form, 
                              typename Coordinates>
-                    struct alt_bn128_g1 {
+                    struct edwards_g1 {
 
-                        using params_type = alt_bn128_g1_params<Version, Form, Coordinates>;
+                        using params_type = edwards_g1_params<Version, Form>;
 
-                        using curve_type = alt_bn128<Version>;
+                        using curve_type = edwards<Version>;
 
                         using field_type = typename params_type::g1_field_type;
 
@@ -63,10 +63,9 @@ namespace nil {
 
                         using value_type = curve_element<params_type, Form, Coordinates>;
                     };
-
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_ALT_BN128_G1_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP
