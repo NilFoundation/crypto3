@@ -27,10 +27,10 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_HPP
 #define CRYPTO3_ALGEBRA_CURVES_EDWARDS_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards183/edwards_params.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards183/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards183/g1.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards183/g2.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/types.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/g2.hpp>
 
 // #include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
@@ -48,12 +48,13 @@ namespace nil {
                  *
                  */
                 template<std::size_t Version>
-                struct edwards {
+                class edwards {
 
-                    using policy_type = detail::edwards_basic_params<Version>;
-
-                    typedef typename policy_type::base_field_type base_field_type;
-                    typedef typename policy_type::scalar_field_type scalar_field_type;
+                    using types_policy = detail::edwards_types<Version>;
+                public:
+                    
+                    typedef typename types_policy::base_field_type base_field_type;
+                    typedef typename types_policy::scalar_field_type scalar_field_type;
 
                     template <typename Coordinates = coordinates::inverted, 
                               typename Form = forms::twisted_edwards>
@@ -69,7 +70,7 @@ namespace nil {
                     //                                          pairing::detail::edwards_pairing_functions<Version>>
                     //     pairing;
 
-                    typedef typename policy_type::gt_field_type gt_type;
+                    typedef typename types_policy::gt_field_type gt_type;
 
                     constexpr static const bool has_affine_pairing = false;
                 };

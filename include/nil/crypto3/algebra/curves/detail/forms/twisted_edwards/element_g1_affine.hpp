@@ -62,10 +62,11 @@ namespace nil {
                         using params_type = CurveParams;
                         using field_value_type = typename field_type::value_type;
                     public:
-                        using group_type = typename params_type::group_type;
 
                         using form = forms::twisted_edwards;
                         using coordinates = coordinates::affine;
+
+                        using group_type = typename params_type::group_type<coordinates>;
 
                         field_value_type X;
                         field_value_type Y;
@@ -168,20 +169,46 @@ namespace nil {
 
                         /*************************  Reducing operations  ***********************************/
 
+                        // /** @brief
+                        //  *
+                        //  * @return return the corresponding element from affine coordinates to 
+                        //  * projective coordinates
+                        //  */
+                        // constexpr curve_element<
+                        //     params_type, 
+                        //     form, 
+                        //     typename curves::coordinates::projective> to_projective () const {
+
+                        //     using result_type = curve_element<params_type, 
+                        //         form, typename curves::coordinates::projective>;
+
+                        //     return result_type(X, Y, result_type::field_type::value_type::one()); // X = x, Y = y, Z = 1
+                        // }
+
                         /** @brief
                          *
                          * @return return the corresponding element from affine coordinates to 
-                         * projective coordinates
+                         * inverted coordinates
                          */
                         constexpr curve_element<
-                            typename params_type::projective_params, 
+                            params_type, 
                             form, 
-                            typename curves::coordinates::projective> to_projective () const {
+                            typename curves::coordinates::inverted> to_inverted () const {
 
-                            using result_type = curve_element<typename params_type::projective_params, 
-                                form, typename curves::coordinates::projective>;
+                            using result_type = curve_element<params_type, 
+                                form, typename curves::coordinates::inverted>;
 
-                            return result_type(X, Y, result_type::field_type::value_type::one()); // X = x, Y = y, Z = 1
+                            return result_type(X.inversed(), Y.inversed(), 
+                                result_type::field_type::value_type::one()); // X = x^(-1), Y = y^(-1), Z = 1
+                        }
+
+                        /** @brief
+                         *
+                         * @return return the corresponding element from affine coordinates to 
+                         * affine coordinates. Just for compatibility.
+                         */
+                        constexpr curve_element to_affine () const {
+                            return *this;
                         }
 
                         /*************************  Arithmetic operations  ***********************************/

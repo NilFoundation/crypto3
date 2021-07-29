@@ -30,7 +30,6 @@
 #include <nil/crypto3/algebra/curves/detail/jubjub/params.hpp>
 
 #include <nil/crypto3/algebra/curves/forms.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/element_g1_affine.hpp>
 
 namespace nil {
@@ -46,7 +45,7 @@ namespace nil {
                     template<typename Form, 
                              typename Coordinates>
                     struct jubjub_g1 {
-                        using params_type = jubjub_g1_params<Form, Coordinates>;
+                        using params_type = jubjub_g1_params<Form>;
 
                         using curve_type = jubjub;
 

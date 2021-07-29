@@ -56,7 +56,7 @@ namespace nil {
 
                         using curve_type = edwards<Version>;
 
-                        using field_type = typename params_type::g1_field_type;
+                        using field_type = typename params_type::field_type;
 
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits

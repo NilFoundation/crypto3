@@ -69,10 +69,11 @@ namespace nil {
                         using common_doubling_processor = twisted_edwards_element_g1_inverted_dbl_2008_bbjlp;
                         using mixed_addition_processor = twisted_edwards_element_g1_inverted_madd_2008_bbjlp;
                     public:
-                        using group_type = typename params_type::group_type;
 
                         using form = forms::twisted_edwards;
                         using coordinates = coordinates::inverted;
+
+                        using group_type = typename params_type::group_type<coordinates>;
 
                         field_value_type X;
                         field_value_type Y;
@@ -85,9 +86,9 @@ namespace nil {
                          *
                          */
                         constexpr curve_element() : curve_element(
-                            params_type::zero_fill[0], 
                             params_type::zero_fill[1], 
-                            params_type::zero_fill[2]) {};
+                            params_type::zero_fill[0], 
+                            field_value_type::zero()) {};
 
                         /** @brief
                          *    @return the selected point (X:Y:Z)
@@ -112,8 +113,10 @@ namespace nil {
                          *
                          */
                         constexpr static curve_element one() {
-                            return curve_element(params_type::one_fill[0], params_type::one_fill[1], 
-                                params_type::one_fill[2]);
+                            return curve_element(
+                                params_type::one_fill[0].inversed(), 
+                                params_type::one_fill[1].inversed(), 
+                                field_value_type::one());
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -169,11 +172,11 @@ namespace nil {
                          * affine coordinates
                          */
                         constexpr curve_element<
-                            typename params_type::affine_params, 
+                            params_type, 
                             form, 
                             typename curves::coordinates::affine> to_affine () const {
 
-                            using result_type = curve_element<typename params_type::affine_params, 
+                            using result_type = curve_element<params_type, 
                                 form, typename curves::coordinates::affine>;
                             
                             if (is_zero()){

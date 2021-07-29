@@ -26,8 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_JUBJUB_HPP
 #define CRYPTO3_ALGEBRA_CURVES_JUBJUB_HPP
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/curves/detail/jubjub/params.hpp>
+// #include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/curves/detail/jubjub/types.hpp>
 #include <nil/crypto3/algebra/curves/detail/jubjub/g1.hpp>
 
 // #include <nil/crypto3/algebra/pairing/edwards.hpp>
@@ -43,19 +43,19 @@ namespace nil {
                  *    @tparam Version version of the curve
                  *
                  */
-                struct jubjub {
-                    constexpr static const std::size_t version = 255;
+                class jubjub {
 
-                    using policy_type = detail::jubjub_basic_params;
+                    using types_policy = detail::jubjub_types;
+                public:
 
-                    typedef typename policy_type::base_field_type base_field_type;
-                    typedef typename policy_type::scalar_field_type scalar_field_type;
+                    typedef typename types_policy::base_field_type base_field_type;
+                    typedef typename types_policy::scalar_field_type scalar_field_type;
 
                     template <typename Coordinates = coordinates::affine, 
                               typename Form = forms::twisted_edwards>
                     using g1_type = typename detail::jubjub_g1<Form, Coordinates>;
 
-                    typedef typename curves::bls12<381> chained_on_curve_type;
+                    // typedef typename curves::bls12<381> chained_on_curve_type;
                     
                     // typedef typename pairing::pairing_policy<edwards<version>,
                     //                                          pairing::detail::edwards_pairing_functions<Version>>

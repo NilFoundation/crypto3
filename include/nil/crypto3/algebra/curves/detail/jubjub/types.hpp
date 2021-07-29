@@ -1,7 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -24,44 +23,50 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_G2_HPP
-#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G2_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_JUBJUB_TYPES_HPP
+#define CRYPTO3_ALGEBRA_CURVES_JUBJUB_TYPES_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/element_g2.hpp>
+#include <nil/crypto3/algebra/fields/jubjub/base_field.hpp>
+#include <nil/crypto3/algebra/fields/jubjub/scalar_field.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-
-                template<std::size_t Version>
-                struct edwards;
-
                 namespace detail {
-                    /** @brief A struct representing a group G2 of Edwards curve.
-                     *    @tparam Version version of the curve
+
+                    template<typename Form, 
+                             typename Coordinates>
+                    struct jubjub_g1;
+
+                    template<typename Form>
+                    struct jubjub_params;
+
+                    template<typename Form>
+                    struct jubjub_g1_params;
+
+                    /** @brief A struct representing details about base and scalar fields of the corresponding size 183 bits and 181
+                     * bits respectively. Corresponds to [JubJub](https://raw.githubusercontent.com/zcash/zips/master/protocol/protocol.pdf#jubjub)
+                     * twisted Edwards elliptic curve defined over Bls12-381 scalar field and described by equation ax^2 + y^2 = 1 + dx^2y^2
                      *
                      */
-                    template<std::size_t Version, 
-                             typename Form, 
+                    struct jubjub_types {
+                        using base_field_type = fields::jubjub_base_field;
+                        using scalar_field_type = fields::jubjub_scalar_field;
+
+                        using g1_field_type = base_field_type;
+
+                        using integral_type = typename base_field_type::modulus_type;
+
+                        template<typename Form, 
                              typename Coordinates>
-                    struct edwards_g2 {
-
-                        using params_type = edwards_basic_policy<Version>;
-
-                        using curve_type = edwards<Version>;
-
-                        using field_type = typename params_type::g2_field_type;
-
-                        constexpr static const std::size_t value_bits =
-                            field_type::value_bits + 1;    ///< size of the base field in bits
-
-                        using value_type = element_edwards_g2<Version>;
+                        using g1_type = jubjub_g1<Form, Coordinates>;
                     };
+
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_G2_HPP
+
+#endif    // CRYPTO3_ALGEBRA_CURVES_JUBJUB_TYPES_HPP

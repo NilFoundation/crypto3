@@ -36,123 +36,61 @@ namespace nil {
                 namespace detail {
 
                     template<>
-                    struct edwards_params<183, forms::twisted_edwards> : public edwards_basic_params<183> {
+                    struct edwards_params<183, forms::twisted_edwards> {
 
-                        using base_field_type = typename edwards_basic_params<183>::base_field_type;
-                        using scalar_field_type = typename edwards_basic_params<183>::scalar_field_type;
+                        using base_field_type = typename edwards_types<183>::base_field_type;
+                        using scalar_field_type = typename edwards_types<183>::scalar_field_type;
 
-                        constexpr static const typename base_field_type::modulus_type a =
-                            typename base_field_type::modulus_type(0x01);
-                        constexpr static const typename base_field_type::modulus_type d = 
+                        constexpr static const typename edwards_types<183>::integral_type a =
+                            typename edwards_types<183>::integral_type(0x01);
+                        constexpr static const typename edwards_types<183>::integral_type d = 
                             edwards_params<183, forms::edwards>::d;
                     };
 
                     template<>
-                    struct edwards_g1_params<183, forms::twisted_edwards, 
-                        coordinates::inverted> : 
+                    struct edwards_g1_params<183, forms::twisted_edwards> : 
                         public edwards_params<183, forms::twisted_edwards> {
 
-                        using field_type = typename edwards_basic_params<183>::g1_field_type;
-                        using group_type = edwards_g1<183, forms::twisted_edwards,  
-                            coordinates::inverted>;
+                        using field_type = typename edwards_types<183>::g1_field_type;
+                        
+                        template<typename Coordinates>
+                        using group_type = edwards_types<183>::g1_type<forms::twisted_edwards, Coordinates>;
 
-                        using affine_params = edwards_g1_params<183, 
-                            forms::twisted_edwards, 
-                            coordinates::affine>;
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = 
+                            edwards_g1_params<183, forms::edwards>::zero_fill;
 
-                        constexpr static const std::array<typename field_type::value_type, 3> zero_fill = 
-                            edwards_g1_params<183, forms::edwards, coordinates::inverted>::zero_fill;
-
-                        constexpr static const std::array<typename field_type::value_type, 3> one_fill = 
-                            edwards_g1_params<183, forms::edwards, coordinates::inverted>::one_fill;
+                        constexpr static const std::array<typename field_type::value_type, 2> one_fill = 
+                            edwards_g1_params<183, forms::edwards>::one_fill;
                     };
 
                     template<>
-                    struct edwards_g1_params<183, 
-                        forms::twisted_edwards, 
-                        coordinates::affine> : 
-                            public edwards_params<183, forms::twisted_edwards> {
-
-                        using field_type = typename edwards_basic_params<183>::g1_field_type;
-                        using group_type = edwards_g1<183, forms::twisted_edwards,  
-                            coordinates::inverted>;
-
-                        using inverted_params = edwards_g1_params<183, 
-                            forms::twisted_edwards, 
-                            coordinates::inverted>;
-
-                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
-                            inverted_params::zero_fill[2]/inverted_params::zero_fill[0], 
-                            inverted_params::zero_fill[2]/inverted_params::zero_fill[1]};
-
-                        constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
-                            inverted_params::one_fill[2]/inverted_params::one_fill[0], 
-                            inverted_params::one_fill[2]/inverted_params::one_fill[1]};
-                    };
-
-                    template<>
-                    struct edwards_g2_params<183, forms::twisted_edwards, 
-                        coordinates::inverted> : 
+                    struct edwards_g2_params<183, forms::twisted_edwards> : 
                         public edwards_params<183, forms::twisted_edwards> {
 
-                        using field_type = typename edwards_basic_params<183>::g2_field_type;
-                        using group_type = edwards_g2<183, forms::twisted_edwards,  
-                            coordinates::inverted>;
+                        using field_type = typename edwards_types<183>::g2_field_type;
+                        
+                        template<typename Coordinates>
+                        using group_type = edwards_types<183>::g2_type<forms::twisted_edwards, Coordinates>;
 
-                        using affine_params = edwards_g2_params<183, 
-                            forms::twisted_edwards, 
-                            coordinates::affine>;
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = 
+                            edwards_g2_params<183, forms::edwards>::zero_fill;
 
-                        constexpr static const std::array<typename field_type::value_type, 3> zero_fill = 
-                            edwards_g2_params<183, forms::edwards, coordinates::inverted>::zero_fill;
-
-                        constexpr static const std::array<typename field_type::value_type, 3> one_fill = 
-                            edwards_g2_params<183, forms::edwards, coordinates::inverted>::one_fill;
-                    };
-
-                    template<>
-                    struct edwards_g2_params<183, 
-                        forms::twisted_edwards, 
-                        coordinates::affine> : 
-                            public edwards_params<183, forms::twisted_edwards> {
-
-                        using field_type = typename edwards_basic_params<183>::g2_field_type;
-                        using group_type = edwards_g2<183, forms::twisted_edwards,  
-                            coordinates::inverted>;
-
-                        using inverted_params = edwards_g2_params<183, 
-                            forms::twisted_edwards, 
-                            coordinates::inverted>;
-
-                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
-                            inverted_params::zero_fill[2]*inverted_params::zero_fill[0].inversed(), 
-                            inverted_params::zero_fill[2]*inverted_params::zero_fill[1].inversed()};
-
-                        constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
-                            inverted_params::one_fill[2]*inverted_params::one_fill[0].inversed(), 
-                            inverted_params::one_fill[2]*inverted_params::one_fill[1].inversed()};
+                        constexpr static const std::array<typename field_type::value_type, 2> one_fill = 
+                            edwards_g2_params<183, forms::edwards>::one_fill;
                     };
 
                     constexpr typename edwards_params<183, forms::twisted_edwards>::base_field_type::modulus_type const edwards_params<183, forms::twisted_edwards>::a;
                     constexpr typename edwards_params<183, forms::twisted_edwards>::base_field_type::modulus_type const edwards_params<183, forms::twisted_edwards>::d;
 
-                    constexpr std::array<typename edwards_g1_params<183, forms::twisted_edwards, 
-                        coordinates::inverted>::field_type::value_type, 3> const
-                        edwards_g1_params<183, forms::twisted_edwards, 
-                            coordinates::inverted>::zero_fill;
-                    constexpr std::array<typename edwards_g1_params<183, forms::twisted_edwards, 
-                        coordinates::inverted>::field_type::value_type, 3> const
-                        edwards_g1_params<183, forms::twisted_edwards, 
-                            coordinates::inverted>::one_fill;
+                    constexpr std::array<typename edwards_g1_params<183, forms::twisted_edwards>::field_type::value_type, 2> const
+                        edwards_g1_params<183, forms::twisted_edwards>::zero_fill;
+                    constexpr std::array<typename edwards_g1_params<183, forms::twisted_edwards>::field_type::value_type, 2> const
+                        edwards_g1_params<183, forms::twisted_edwards>::one_fill;
 
-                    constexpr std::array<typename edwards_g2_params<183, forms::twisted_edwards, 
-                        coordinates::inverted>::field_type::value_type, 3> const
-                        edwards_g2_params<183, forms::twisted_edwards, 
-                            coordinates::inverted>::zero_fill;
-                    constexpr std::array<typename edwards_g2_params<183, forms::twisted_edwards, 
-                        coordinates::inverted>::field_type::value_type, 3> const
-                        edwards_g2_params<183, forms::twisted_edwards, 
-                            coordinates::inverted>::one_fill;
+                    constexpr std::array<typename edwards_g2_params<183, forms::twisted_edwards>::field_type::value_type, 2> const
+                        edwards_g2_params<183, forms::twisted_edwards>::zero_fill;
+                    constexpr std::array<typename edwards_g2_params<183, forms::twisted_edwards>::field_type::value_type, 2> const
+                        edwards_g2_params<183, forms::twisted_edwards>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves
