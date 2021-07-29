@@ -27,7 +27,7 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_MNT4_G2_HPP
 #define CRYPTO3_ALGEBRA_CURVES_MNT4_G2_HPP
 
-#include <nil/crypto3/algebra/curves/detail/mnt4/params.hpp>
+#include <nil/crypto3/algebra/curves/detail/mnt4/298/params.hpp>
 
 #include <nil/crypto3/algebra/curves/forms.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
@@ -50,11 +50,11 @@ namespace nil {
                              typename Form, 
                              typename Coordinates>
                     struct mnt4_g2 {
-                        using params_type = mnt4_g2_params<Version, Form, Coordinates>;
+                        using params_type = mnt4_g2_params<Version, Form>;
 
                         using curve_type = mnt4<Version>;
 
-                        using field_type = typename params_type::g2_field_type;
+                        using field_type = typename params_type::field_type;
 
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits

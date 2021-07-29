@@ -27,7 +27,7 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_MNT4_HPP
 #define CRYPTO3_ALGEBRA_CURVES_MNT4_HPP
 
-#include <nil/crypto3/algebra/curves/detail/mnt4/params.hpp>
+#include <nil/crypto3/algebra/curves/detail/mnt4/types.hpp>
 #include <nil/crypto3/algebra/curves/detail/mnt4/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/mnt4/g2.hpp>
 
@@ -45,11 +45,11 @@ namespace nil {
                 template<std::size_t Version>
                 class mnt4 {
 
-                    using params_type = detail::mnt4_basic_params<Version>;
+                    using types_policy = detail::mnt4_types<Version>;
 
                 public:
-                    typedef typename params_type::base_field_type base_field_type;
-                    typedef typename params_type::scalar_field_type scalar_field_type;
+                    typedef typename types_policy::base_field_type base_field_type;
+                    typedef typename types_policy::scalar_field_type scalar_field_type;
 
                     template <typename Coordinates = coordinates::projective, 
                               typename Form = forms::short_weierstrass>
@@ -67,7 +67,7 @@ namespace nil {
 
                     // typedef typename pairing::pair_curve_type chained_on_curve_type;
 
-                    typedef typename params_type::gt_field_type gt_type;
+                    typedef typename types_policy::gt_field_type gt_type;
 
                     constexpr static const bool has_affine_pairing = true;
                 };

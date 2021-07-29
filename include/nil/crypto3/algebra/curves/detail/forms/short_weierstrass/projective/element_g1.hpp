@@ -68,10 +68,11 @@ namespace nil {
                         using common_addition_processor = short_weierstrass_element_g1_projective_add_1998_cmo_2; 
                         using common_doubling_processor = short_weierstrass_element_g1_projective_dbl_2007_bl;
                     public:
-                        using group_type = typename params_type::group_type;
 
                         using form = forms::short_weierstrass;
                         using coordinates = coordinates::projective;
+
+                        using group_type = typename params_type::group_type<coordinates>;
 
                         field_value_type X;
                         field_value_type Y;
@@ -86,7 +87,7 @@ namespace nil {
                         constexpr curve_element() : curve_element(
                             params_type::zero_fill[0], 
                             params_type::zero_fill[1], 
-                            params_type::zero_fill[2]) {};
+                            field_value_type::zero()) {};
 
                         /** @brief
                          *    @return the selected point (X:Y:Z)
@@ -112,7 +113,7 @@ namespace nil {
                          */
                         constexpr static curve_element one() {
                             return curve_element(params_type::one_fill[0], params_type::one_fill[1], 
-                                params_type::one_fill[2]);
+                                field_value_type::one());
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -186,11 +187,11 @@ namespace nil {
                          * affine coordinates
                          */
                         constexpr curve_element<
-                            typename params_type::affine_params, 
+                            params_type, 
                             form, 
                             typename curves::coordinates::affine> to_affine () const {
 
-                            using result_type = curve_element<typename params_type::affine_params, 
+                            using result_type = curve_element<params_type, 
                                 form, typename curves::coordinates::affine>;
                             
                             if (is_zero()){

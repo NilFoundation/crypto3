@@ -70,10 +70,11 @@ namespace nil {
                         using common_doubling_processor = short_weierstrass_element_g1_jacobian_with_a4_0_dbl_2009_l;
                         using mixed_addition_processor = short_weierstrass_element_g1_jacobian_with_a4_0_madd_2007_bl;
                     public:
-                        using group_type = typename params_type::group_type;
 
                         using form = forms::short_weierstrass;
                         using coordinates = coordinates::jacobian_with_a4_0;
+
+                        using group_type = typename params_type::group_type<coordinates>;
 
                         field_value_type X;
                         field_value_type Y;
@@ -88,7 +89,7 @@ namespace nil {
                         constexpr curve_element() : curve_element(
                             params_type::zero_fill[0], 
                             params_type::zero_fill[1], 
-                            params_type::zero_fill[2]) {};
+                            field_value_type::zero()) {};
 
                         /** @brief
                          *    @return the selected point (X:Y:Z)
@@ -114,7 +115,7 @@ namespace nil {
                          */
                         constexpr static curve_element one() {
                             return curve_element(params_type::one_fill[0], params_type::one_fill[1], 
-                                params_type::one_fill[2]);
+                                field_value_type::one());
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -202,11 +203,11 @@ namespace nil {
                          * affine coordinates
                          */
                         constexpr curve_element<
-                            typename params_type::affine_params, 
+                            params_type, 
                             form, 
                             typename curves::coordinates::affine> to_affine () const {
 
-                            using result_type = curve_element<typename params_type::affine_params, 
+                            using result_type = curve_element<params_type, 
                                 form, typename curves::coordinates::affine>;
                             
                             if (is_zero()){
@@ -214,6 +215,27 @@ namespace nil {
                             }
 
                             return result_type(X/Z.squared(), Y/(Z*Z.squared())); //  x=X/Z^2, y=Y/Z^3
+                        }
+
+                        /** @brief
+                         *
+                         * @return return the corresponding element from jacobian_with_a4_0 coordinates to 
+                         * projective coordinates
+                         */
+                        constexpr curve_element<
+                            params_type, 
+                            form, 
+                            typename curves::coordinates::projective> to_projective () const {
+
+                            using result_type = curve_element<params_type, 
+                                form, typename curves::coordinates::projective>;
+                            
+                            if (is_zero()){
+                                return result_type::zero();
+                            }
+
+                            return result_type(X/Z, Y/Z.squared(), 
+                                Z); // X = X/Z, Y = Y/Z^2, Z = Z
                         }
 
                         /*************************  Arithmetic operations  ***********************************/

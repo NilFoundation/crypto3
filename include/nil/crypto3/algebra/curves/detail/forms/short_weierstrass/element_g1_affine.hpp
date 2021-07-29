@@ -62,10 +62,11 @@ namespace nil {
                         using params_type = CurveParams;
                         using field_value_type = typename field_type::value_type;
                     public:
-                        using group_type = typename params_type::group_type;
 
                         using form = forms::short_weierstrass;
                         using coordinates = coordinates::affine;
+
+                        using group_type = typename params_type::group_type<coordinates>;
 
                         field_value_type X;
                         field_value_type Y;
@@ -136,6 +137,24 @@ namespace nil {
                          */
                         constexpr bool is_zero() const {
                             return X == params_type::zero_fill[0] && Y == params_type::zero_fill[0];
+                        }
+
+                        /*************************  Reducing operations  ***********************************/
+
+                        /** @brief
+                         *
+                         * @return return the corresponding element from affine coordinates to 
+                         * projective coordinates
+                         */
+                        constexpr curve_element<
+                            params_type, 
+                            form, 
+                            typename curves::coordinates::projective> to_projective () const {
+
+                            using result_type = curve_element<params_type, 
+                                form, typename curves::coordinates::projective>;
+
+                            return result_type(X, Y, result_type::field_type::value_type::one()); // X = x, Y = y, Z = 1
                         }
 
                         /*************************  Arithmetic operations  ***********************************/

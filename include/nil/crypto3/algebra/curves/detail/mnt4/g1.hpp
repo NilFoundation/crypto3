@@ -27,7 +27,7 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_MNT4_G1_HPP
 #define CRYPTO3_ALGEBRA_CURVES_MNT4_G1_HPP
 
-#include <nil/crypto3/algebra/curves/detail/mnt4/params.hpp>
+#include <nil/crypto3/algebra/curves/detail/mnt4/298/params.hpp>
 
 #include <nil/crypto3/algebra/curves/forms.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
@@ -50,7 +50,7 @@ namespace nil {
                              typename Form, 
                              typename Coordinates>
                     struct mnt4_g1 {
-                        using params_type = mnt4_g1_params<Version, Form, Coordinates>;
+                        using params_type = mnt4_g1_params<Version, Form>;
 
                         using curve_type = mnt4<Version>;
 
