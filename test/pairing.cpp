@@ -275,24 +275,24 @@ namespace boost {
             };
 
             template<>
-            struct print_log_value<curves::bls12<381>::pairing::g1_type::value_type> {
+            struct print_log_value<curves::bls12<381>::g1_type<>::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::bls12<381>::pairing::g1_type::value_type &e) {
+                                const typename curves::bls12<381>::g1_type<>::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::bls12<381>::pairing::g2_type::value_type> {
+            struct print_log_value<curves::bls12<381>::g2_type<>::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::bls12<381>::pairing::g2_type::value_type &e) {
+                                const typename curves::bls12<381>::g2_type<>::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::bls12<381>::pairing::g1_precomputed_type> {
-                void operator()(std::ostream &os, const typename curves::bls12<381>::pairing::g1_precomputed_type &e) {
+            struct print_log_value<pairing::pairing_policy<curves::bls12<381>>::g1_precomputed_type> {
+                void operator()(std::ostream &os, const typename pairing::pairing_policy<curves::bls12<381>>::g1_precomputed_type &e) {
                     print_g1_precomp_element(os, e);
                 }
             };
@@ -314,56 +314,56 @@ namespace boost {
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing::g1_type::value_type> {
+            struct print_log_value<curves::mnt4<298>::g1_type<>::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt4<298>::pairing::g1_type::value_type &e) {
+                                const typename curves::mnt4<298>::g1_type<>::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing::g2_type::value_type> {
+            struct print_log_value<curves::mnt4<298>::g2_type<>::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt4<298>::pairing::g2_type::value_type &e) {
+                                const typename curves::mnt4<298>::g2_type<>::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing::g1_precomputed_type> {
-                void operator()(std::ostream &os, const typename curves::mnt4<298>::pairing::g1_precomputed_type &e) {
+            struct print_log_value<pairing::pairing_policy<curves::mnt4<298>>::g1_precomputed_type> {
+                void operator()(std::ostream &os, const typename pairing::pairing_policy<curves::mnt4<298>>::g1_precomputed_type &e) {
                     print_g1_precomp_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing::g2_precomputed_type> {
-                void operator()(std::ostream &os, const typename curves::mnt4<298>::pairing::g2_precomputed_type &e) {
+            struct print_log_value<pairing::pairing_policy<curves::mnt4<298>>::g2_precomputed_type> {
+                void operator()(std::ostream &os, const typename pairing::pairing_policy<curves::mnt4<298>>::g2_precomputed_type &e) {
                     print_g2_precomp_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing::gt_type::value_type> {
+            struct print_log_value<curves::mnt4<298>::gt_type::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt4<298>::pairing::gt_type::value_type &e) {
+                                const typename curves::mnt4<298>::gt_type::value_type &e) {
                     print_field_element(os, e);
                     std::cout << std::endl;
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt6<298>::pairing::g1_type::value_type> {
+            struct print_log_value<curves::mnt6<298>::g1_type<>::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt6<298>::pairing::g1_type::value_type &e) {
+                                const typename curves::mnt6<298>::g1_type<>::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt6<298>::pairing::g2_type::value_type> {
+            struct print_log_value<curves::mnt6<298>::g2_type<>::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt6<298>::pairing::g2_type::value_type &e) {
+                                const typename curves::mnt6<298>::g2_type<>::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };

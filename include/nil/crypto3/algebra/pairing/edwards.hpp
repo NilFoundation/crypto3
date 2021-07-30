@@ -26,84 +26,42 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_EDWARDS_POLICY_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_EDWARDS_POLICY_HPP
 
-#include <numeric>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
+#include <nil/crypto3/algebra/pairing/detail/edwards/183/params.hpp>
+#include <nil/crypto3/algebra/pairing/edwards/183/ate_double_miller_loop.hpp>
+#include <nil/crypto3/algebra/pairing/edwards/183/ate_miller_loop.hpp>
+#include <nil/crypto3/algebra/pairing/edwards/183/ate_precompute_g1.hpp>
+#include <nil/crypto3/algebra/pairing/edwards/183/ate_precompute_g2.hpp>
+#include <nil/crypto3/algebra/pairing/edwards/183/final_exponentiation.hpp>
+#include <nil/crypto3/algebra/pairing/pairing_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
-            namespace curves {
-
-                template<std::size_t Version>
-                struct edwards;
-
-            }    // namespace curves
             namespace pairing {
 
-                template<typename PairingCurveType, typename PairingFunctions>
-                struct pairing_policy;
+                template<>
+                struct pairing_policy<curves::edwards<183>> {
+                    using curve_type = curves::edwards<183>;
 
-                template<std::size_t Version, typename PairingFunctions>
-                class pairing_policy<curves::edwards<Version>, PairingFunctions> {
+                    using precompute_g1 = 
+                        pairing::edwards_ate_precompute_g1<183>;
+                    using precompute_g2 = 
+                        pairing::edwards_ate_precompute_g2<183>;
+                    using miller_loop = 
+                        pairing::edwards_ate_miller_loop<183>;
+                    using double_miller_loop = 
+                        pairing::edwards_ate_double_miller_loop<183>;
+                    using final_exponentiation = 
+                        pairing::edwards_final_exponentiation<183>;
 
-                    using policy_type = PairingFunctions;
-
-                public:
-                    typedef typename policy_type::number_type number_type;
-
-                    constexpr static const typename policy_type::number_type pairing_loop_count =
-                        policy_type::ate_loop_count;
-
-                    using fp_type = typename policy_type::fp_type;
-                    using fq_type = typename policy_type::fq_type;
-                    using fqe_type = typename policy_type::fqe_type;
-                    using fqk_type = typename policy_type::fqk_type;
-
-                    using g1_type = typename policy_type::g1_type;
-                    using g2_type = typename policy_type::g2_type;
-                    using gt_type = typename policy_type::gt_type;
-
-                    using g1_precomputed_type = typename policy_type::g1_precomputed_type;
-                    using g2_precomputed_type = typename policy_type::g2_precomputed_type;
-
-                    static inline g1_precomputed_type precompute_g1(const typename g1_type::value_type &P) {
-                        return policy_type::precompute_g1(P);
-                    }
-
-                    static inline g2_precomputed_type precompute_g2(const typename g2_type::value_type &Q) {
-                        return policy_type::precompute_g2(Q);
-                    }
-
-                    static inline typename gt_type::value_type pair(const typename g1_type::value_type &P,
-                                                                       const typename g2_type::value_type &Q) {
-                        return policy_type::pair(P, Q);
-                    }
-
-                    static inline typename gt_type::value_type pair_reduced(const typename g1_type::value_type &P,
-                                                                               const typename g2_type::value_type &Q) {
-                        return policy_type::pair_reduced(P, Q);
-                    }
-
-                    static inline typename gt_type::value_type double_miller_loop(const g1_precomputed_type &prec_P1,
-                                                                                  const g2_precomputed_type &prec_Q1,
-                                                                                  const g1_precomputed_type &prec_P2,
-                                                                                  const g2_precomputed_type &prec_Q2) {
-                        return policy_type::double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
-                    }
-
-                    static inline typename gt_type::value_type
-                        final_exponentiation(const typename gt_type::value_type &elt) {
-                        return policy_type::final_exponentiation(elt);
-                    }
-
-                    static inline typename gt_type::value_type miller_loop(const g1_precomputed_type &prec_P,
-                                                                           const g2_precomputed_type &prec_Q) {
-                        return policy_type::miller_loop(prec_P, prec_Q);
-                    }
+                    using g1_precomputed_type = typename precompute_g1::g1_precomputed_type;
+                    using g2_precomputed_type = typename precompute_g2::g2_precomputed_type;
                 };
 
-                template<std::size_t Version, typename PairingFunctions>
-                constexpr typename pairing_policy<curves::edwards<Version>, PairingFunctions>::number_type const
-                    pairing_policy<curves::edwards<Version>, PairingFunctions>::pairing_loop_count;
+                // template<std::size_t Version, typename PairingFunctions>
+                // constexpr typename pairing_policy<curves::edwards<Version>, PairingFunctions>::number_type const
+                //     pairing_policy<curves::edwards<Version>, PairingFunctions>::pairing_loop_count;
             }    // namespace pairing
         }        // namespace algebra
     }            // namespace crypto3

@@ -44,17 +44,17 @@ namespace nil {
 
                     public:
 
-                        using number_type = typename curve_type::base_field_type::modulus_type;
-                        using extended_number_type = typename curve_type::base_field_type::extended_modulus_type;
+                        using integral_type = typename curve_type::base_field_type::modulus_type;
+                        using extended_integral_type = typename curve_type::base_field_type::extended_modulus_type;
 
-                        using g1_value_type = typename curve_type::base_field_type::value_type;
-                        using g2_value_type = typename curve_type::g2_type::field_type::value_type;
+                        using g1_field_value_type = typename curve_type::base_field_type::value_type;
+                        using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
 
                         struct Fq_conic_coefficients {
 
-                            g1_value_type c_ZZ;
-                            g1_value_type c_XY;
-                            g1_value_type c_XZ;
+                            g1_field_value_type c_ZZ;
+                            g1_field_value_type c_XY;
+                            g1_field_value_type c_XZ;
 
                             bool operator==(const Fq_conic_coefficients &other) const {
                                 return (this->c_ZZ == other.c_ZZ && this->c_XY == other.c_XY &&
@@ -63,9 +63,9 @@ namespace nil {
                         };
 
                         struct Fq3_conic_coefficients {
-                            g2_value_type c_ZZ;
-                            g2_value_type c_XY;
-                            g2_value_type c_XZ;
+                            g2_field_value_type c_ZZ;
+                            g2_field_value_type c_XY;
+                            g2_field_value_type c_XZ;
 
                             bool operator==(const Fq3_conic_coefficients &other) const {
                                 return (this->c_ZZ == other.c_ZZ && this->c_XY == other.c_XY &&
@@ -77,9 +77,9 @@ namespace nil {
                         using ate_g2_precomputed_type = std::vector<Fq3_conic_coefficients>;
 
                         struct ate_g1_precomputed_type {
-                            g1_value_type P_XY;
-                            g1_value_type P_XZ;
-                            g1_value_type P_ZZplusYZ;
+                            g1_field_value_type P_XY;
+                            g1_field_value_type P_XZ;
+                            g1_field_value_type P_ZZplusYZ;
 
                             bool operator==(const ate_g1_precomputed_type &other) const {
                                 return (this->P_XY == other.P_XY && this->P_XZ == other.P_XZ &&
@@ -88,7 +88,7 @@ namespace nil {
                         };
 
                         struct tate_g2_precomp {
-                            g2_value_type y0, eta;
+                            g2_field_value_type y0, eta;
 
                             bool operator==(const tate_g2_precomp &other) const {
                                 return (this->y0 == other.y0 && this->eta == other.eta);

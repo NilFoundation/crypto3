@@ -49,7 +49,7 @@ namespace nil {
                     using types_policy = detail::types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;
-                    using g2_type = typename curve_type::g2_type;
+                    using g2_type = typename curve_type::g2_type<>;
                     using g2_affine_type = typename curve_type::g2_type<curves::coordinates::affine>;
 
                     using g2_field_type_value = typename g2_type::field_type::value_type;
@@ -110,13 +110,13 @@ namespace nil {
                         const g2_field_type_value E = D + C;                            // E    = D+C
                         const g2_field_type_value F = (X1 - Y1) * (X2 + Y2) + B - A;    // F    = (X1-Y1)*(X2+Y2)+B-A
                         // G = B + twisted_a * A
-                        const g2_field_type_value G = B + g2::mul_by_a(A);    // param_twist_coeff_a is 1*X for us
+                        const g2_field_type_value G = B + g2_type::value_type::mul_by_a(A);    // param_twist_coeff_a is 1*X for us
                         
                         const g2_field_type_value H = D - C;      // H    = D-C
                         const g2_field_type_value I = T1 * T2;    // I    = T1*T2
 
                         // c_ZZ = delta_3* ((T1-X1)*(T2+X2)-I+A)
-                        cc.c_ZZ = g2::mul_by_a((T1 - X1) * (T2 + X2) - I +
+                        cc.c_ZZ = g2_type::value_type::mul_by_a((T1 - X1) * (T2 + X2) - I +
                                                      A);    // param_twist_coeff_a is 1*X for us
 
                         cc.c_XY = X1 * Z2 - X2 * Z1 + F;                // c_XY = X1*Z2-X2*Z1+F
@@ -175,11 +175,11 @@ namespace nil {
 
                         extended_g2_projective R = Q_ext;
 
-                        const typename types_policy::number_type &loop_count = 
+                        const typename types_policy::integral_type &loop_count = 
                             params_type::ate_loop_count;
 
                         bool found_one = false;
-                        for (long i = params_type::number_type_max_bits - 1; i >= 0; --i) {
+                        for (long i = params_type::integral_type_max_bits - 1; i >= 0; --i) {
                             const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */

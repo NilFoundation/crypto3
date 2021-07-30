@@ -37,9 +37,11 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
 #include <nil/crypto3/algebra/pairing/bls12.hpp>
 #include <nil/crypto3/algebra/pairing/mnt4.hpp>
 #include <nil/crypto3/algebra/pairing/mnt6.hpp>
+#include <nil/crypto3/algebra/pairing/edwards.hpp>
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
@@ -203,7 +205,7 @@ void pairing_example() {
     typename pairing::pairing_policy<curve_type>::g1_precomputed_type 
         g1_precomp_el1 = precompute_g1<curve_type>(g1_el1);
     std::cout << "g1_precomp_el1: ";
-    print_ate_g1_precomp_element(g1_precomp_el1);
+    // print_ate_g1_precomp_element(g1_precomp_el1);
 
     typename curve_type::g1_type<>::value_type g1_el2 = g1_type::value_type::one();
     std::cout << "g1_el2: ";
@@ -211,7 +213,7 @@ void pairing_example() {
     typename pairing::pairing_policy<curve_type>::g1_precomputed_type 
         g1_precomp_el2 = precompute_g1<curve_type>(g1_el2);
     std::cout << "g1_precomp_el2: ";
-    print_ate_g1_precomp_element(g1_precomp_el2);
+    // print_ate_g1_precomp_element(g1_precomp_el2);
 
     typename curve_type::g2_type<>::value_type g2_el1 = random_element<typename curve_type::g2_type<>>();
     std::cout << "g2_el1: ";
@@ -219,14 +221,14 @@ void pairing_example() {
     typename pairing::pairing_policy<curve_type>::g2_precomputed_type 
         g2_precomp_el1 = precompute_g2<curve_type>(g2_el1);
     std::cout << "g2_precomp_el1: ";
-    print_ate_g2_precomp_element(g2_precomp_el1);
+    // print_ate_g2_precomp_element(g2_precomp_el1);
     typename curve_type::g2_type<>::value_type g2_el2 = g2_type::value_type::one();
     std::cout << "g2_el2: ";
     print_curve_group_element(g2_el2);
     typename pairing::pairing_policy<curve_type>::g2_precomputed_type 
         g2_precomp_el2 = precompute_g2<curve_type>(g2_el2);
     std::cout << "g2_precomp_el2: ";
-    print_ate_g2_precomp_element(g2_precomp_el2);
+    // print_ate_g2_precomp_element(g2_precomp_el2);
 
     typename curve_type::gt_type::value_type gt_el1 = pair_reduced<curve_type>(g1_el1, g2_el1);
     std::cout << "gt_el1: ";
@@ -256,4 +258,6 @@ int main() {
     pairing_example<curves::mnt4<298>>();
 
     pairing_example<curves::mnt6<298>>();
+
+    pairing_example<curves::edwards<183>>();
 }

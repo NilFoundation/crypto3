@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_ATE_MILLER_LOOP_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_ATE_MILLER_LOOP_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_ATE_DOUBLE_MILLER_LOOP_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_ATE_DOUBLE_MILLER_LOOP_HPP
 
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
@@ -39,10 +39,10 @@ namespace nil {
             namespace pairing {
 
                 template<std::size_t Version = 183>
-                class edwards_ate_miller_loop;
+                class edwards_ate_double_miller_loop;
 
                 template<>
-                class edwards_ate_miller_loop<183> {
+                class edwards_ate_double_miller_loop<183> {
                     using curve_type = curves::edwards<183>;
 
                     using params_type = detail::pairing_params<curve_type>;
@@ -51,18 +51,20 @@ namespace nil {
                 public:
 
                     static typename gt_type::value_type process(
-                        const types_policy::ate_g1_precomputed_type &prec_P, 
-                        const types_policy::ate_g2_precomputed_type &prec_Q) {
+                        const typename types_policy::ate_g1_precomputed_type &prec_P1, 
+                        const typename types_policy::ate_g2_precomputed_type &prec_Q1,
+                        const typename types_policy::ate_g1_precomputed_type &prec_P2, 
+                        const typename types_policy::ate_g2_precomputed_type &prec_Q2) {
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 
                         bool found_one = false;
                         std::size_t idx = 0;
 
-                        const typename types_policy::number_type &loop_count = 
+                        const typename types_policy::integral_type &loop_count = 
                             params_type::ate_loop_count;
 
-                        for (long i = number_type_max_bits - 1; i >= 0; --i) {
+                        for (long i = params_type::integral_type_max_bits - 1; i >= 0; --i) {
                             const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
@@ -73,18 +75,28 @@ namespace nil {
                             /* code below gets executed for all bits (EXCEPT the MSB itself) of
                                param_p (skipping leading zeros) in MSB to LSB
                                order */
-                            typename types_policy::Fq3_conic_coefficients cc = prec_Q[idx++];
+                            typename types_policy::Fq3_conic_coefficients cc1 = prec_Q1[idx];
+                            typename types_policy::Fq3_conic_coefficients cc2 = prec_Q2[idx];
+                            ++idx;
 
-                            typename gt_type::value_type g_RR_at_P =
-                                typename gt_type::value_type(prec_P.P_XY * cc.c_XY + 
-                                    prec_P.P_XZ * cc.c_XZ, prec_P.P_ZZplusYZ * cc.c_ZZ);
-                            f = f.squared() * g_RR_at_P;
+                            typename gt_type::value_type g_RR_at_P1 = typename gt_type::value_type(prec_P1.P_XY * cc1.c_XY + prec_P1.P_XZ * cc1.c_XZ,
+                                               prec_P1.P_ZZplusYZ * cc1.c_ZZ);
+
+                            typename gt_type::value_type g_RR_at_P2 = typename gt_type::value_type(prec_P2.P_XY * cc2.c_XY + prec_P2.P_XZ * cc2.c_XZ,
+                                               prec_P2.P_ZZplusYZ * cc2.c_ZZ);
+                            f = f.squared() * g_RR_at_P1 * g_RR_at_P2;
+
                             if (bit) {
-                                cc = prec_Q[idx++];
-                                typename gt_type::value_type g_RQ_at_P =
-                                    typename gt_type::value_type(prec_P.P_ZZplusYZ * cc.c_ZZ, 
-                                        prec_P.P_XY * cc.c_XY + prec_P.P_XZ * cc.c_XZ);
-                                f = f * g_RQ_at_P;
+                                cc1 = prec_Q1[idx];
+                                cc2 = prec_Q2[idx];
+                                ++idx;
+                                typename gt_type::value_type g_RQ_at_P1 = 
+                                    typename gt_type::value_type(prec_P1.P_ZZplusYZ * cc1.c_ZZ,
+                                                   prec_P1.P_XY * cc1.c_XY + prec_P1.P_XZ * cc1.c_XZ);
+                                typename gt_type::value_type g_RQ_at_P2 = 
+                                    typename gt_type::value_type(prec_P2.P_ZZplusYZ * cc2.c_ZZ,
+                                                   prec_P2.P_XY * cc2.c_XY + prec_P2.P_XZ * cc2.c_XZ);
+                                f = f * g_RQ_at_P1 * g_RQ_at_P2;
                             }
                         }
 
@@ -95,4 +107,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_ATE_MILLER_LOOP_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_ATE_DOUBLE_MILLER_LOOP_HPP

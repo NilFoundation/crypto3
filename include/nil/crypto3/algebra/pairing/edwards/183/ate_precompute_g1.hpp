@@ -43,7 +43,7 @@ namespace nil {
 
                     using types_policy = detail::types_policy<curve_type>;
 
-                    using g1_type = typename curve_type::g1_type;
+                    using g1_type = typename curve_type::g1_type<>;
                     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
                 public:
 
@@ -56,7 +56,7 @@ namespace nil {
                         typename types_policy::ate_g1_precomputed_type result;
                         result.P_XY = Pcopy.X * Pcopy.Y;
                         result.P_XZ = Pcopy.X;                        // P.X * P.Z but P.Z = 1
-                        result.P_ZZplusYZ = (Fq::one() + Pcopy.Y);    // (P.Z + P.Y) * P.Z but P.Z =
+                        result.P_ZZplusYZ = (g1_type::field_type::value_type::one() + Pcopy.Y);    // (P.Z + P.Y) * P.Z but P.Z =
 
                         return result;
                     }

@@ -43,39 +43,39 @@ namespace nil {
 
                     public:
 
-                        using number_type = typename curve_type::base_field_type::modulus_type;
-                        using extended_number_type = typename curve_type::base_field_type::extended_modulus_type;
+                        using integral_type = typename curve_type::base_field_type::modulus_type;
+                        using extended_integral_type = typename curve_type::base_field_type::extended_modulus_type;
 
-                        constexpr static const std::size_t number_type_max_bits = 
+                        constexpr static const std::size_t integral_type_max_bits = 
                             curve_type::base_field_type::modulus_bits;
 
-                        constexpr static const number_type ate_loop_count =
-                            number_type(0xE841DEEC0A9E39280000003_cppui92);
+                        constexpr static const integral_type ate_loop_count =
+                            integral_type(0xE841DEEC0A9E39280000003_cppui92);
 
-                        constexpr static const number_type final_exponent_last_chunk_abs_of_w0 =
-                            number_type(0x3A1077BB02A78E4A00000003_cppui94);
+                        constexpr static const integral_type final_exponent_last_chunk_abs_of_w0 =
+                            integral_type(0x3A1077BB02A78E4A00000003_cppui94);
                         constexpr static const bool final_exponent_last_chunk_is_w0_neg = true;
 
-                        constexpr static const number_type final_exponent_last_chunk_w1 = number_type(0x4);
+                        constexpr static const integral_type final_exponent_last_chunk_w1 = integral_type(0x4);
 
-                        constexpr static const extended_number_type final_exponent = extended_number_type(
+                        constexpr static const extended_integral_type final_exponent = extended_integral_type(
                             0x11128FF78CE1BA3ED7BDC08DC0E8027077FC9348F971A3EF1053C9D33B1AA7CEBA86030D02292F9F5E784FDE9EE9D0176DBE7DA7ECBBCB64CDC0ACD4E64D7156C2F84EE1AAFA1098707148DB1E4797E330E5D507E78D8246A4843B4A174E7CD7CA937BDC5D67A6176F9A48984764500000000_cppui913);
 
-                        using g2_field_type_value = typename curve_type::g2_type::field_type::value_type;
+                        using g2_field_type_value = typename curve_type::g2_type<>::field_type::value_type;
 
                         constexpr static const g2_field_type_value twist = 
-                            g2_type::params_type::twist;
+                            curve_type::g2_type<>::value_type::twist;
                     };
 
                     constexpr
-                        typename pairing_params<curves::edwards<183>>::number_type const pairing_params<curves::edwards<183>>::ate_loop_count;
+                        typename pairing_params<curves::edwards<183>>::integral_type const pairing_params<curves::edwards<183>>::ate_loop_count;
                     constexpr
-                        typename pairing_params<curves::edwards<183>>::number_type const pairing_params<curves::edwards<183>>::final_exponent_last_chunk_abs_of_w0;
+                        typename pairing_params<curves::edwards<183>>::integral_type const pairing_params<curves::edwards<183>>::final_exponent_last_chunk_abs_of_w0;
 
                     constexpr
-                        typename pairing_params<curves::edwards<183>>::number_type const pairing_params<curves::edwards<183>>::final_exponent_last_chunk_w1;
+                        typename pairing_params<curves::edwards<183>>::integral_type const pairing_params<curves::edwards<183>>::final_exponent_last_chunk_w1;
 
-                    constexpr typename pairing_params<curves::edwards<183>>::extended_number_type const
+                    constexpr typename pairing_params<curves::edwards<183>>::extended_integral_type const
                         pairing_params<curves::edwards<183>>::final_exponent;
 
                     constexpr bool const pairing_params<curves::edwards<183>>::final_exponent_last_chunk_is_w0_neg;

@@ -43,7 +43,7 @@ namespace nil {
 
                     using types_policy = detail::types_policy<curve_type>;
 
-                    using g2_type = typename curve_type::g2_type;
+                    using g2_type = typename curve_type::g2_type<>;
                     using g2_affine_type = typename curve_type::g2_type<curves::coordinates::affine>;
                 public:
 
