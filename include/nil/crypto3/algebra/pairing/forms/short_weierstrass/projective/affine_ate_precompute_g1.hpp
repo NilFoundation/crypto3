@@ -23,29 +23,27 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT6_298_ATE_PRECOMPUTE_G1_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_MNT6_298_ATE_PRECOMPUTE_G1_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_AFFINE_ATE_PRECOMPUTE_G1_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_AFFINE_ATE_PRECOMPUTE_G1_HPP
 
-#include <nil/crypto3/algebra/curves/mnt6.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt6/298/types.hpp>
+#include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/projective/types.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<std::size_t Version = 298>
-                class mnt6_ate_precompute_g1;
+                template<typename CurveType>
+                class short_weierstrass_projective_affine_ate_precompute_g1 {
+                    using curve_type = CurveType;
 
-                template<>
-                class mnt6_ate_precompute_g1<298> {
-                    using curve_type = curves::mnt6<298>;
-                    using types_policy = detail::types_policy<curve_type>;
-                    using g1_type = typename curve_type::g1_type;
+                    using params_type = detail::pairing_params<curve_type>;
+                    using types_policy = detail::short_weierstrass_projective_<curve_type>;
+                    using g1_type = typename curve_type::g1_type<>;
                     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
                 public:
 
-                    using g1_precomputed_type = typename types_policy::ate_g1_precomputed_type;
+                    using g1_precomputed_type = typename types_policy::affine_ate_g1_precomputation;
 
                     static g1_precomputed_type process(
                         const typename g1_type::value_type &P) {
@@ -55,8 +53,7 @@ namespace nil {
                         g1_precomputed_type result;
                         result.PX = Pcopy.X;
                         result.PY = Pcopy.Y;
-                        result.PX_twist = Pcopy.X * g2::twist;
-                        result.PY_twist = Pcopy.Y * g2::twist;
+                        result.PY_twist_squared = Pcopy.Y * params_type::twist.squared();
 
                         return result;
                     }
@@ -65,4 +62,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT6_298_ATE_PRECOMPUTE_G1_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_AFFINE_ATE_PRECOMPUTE_G1_HPP

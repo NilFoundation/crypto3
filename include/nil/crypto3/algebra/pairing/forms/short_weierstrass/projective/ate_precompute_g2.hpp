@@ -23,34 +23,28 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT4_298_ATE_PRECOMPUTE_G2_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_MNT4_298_ATE_PRECOMPUTE_G2_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_ATE_PRECOMPUTE_G2_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_ATE_PRECOMPUTE_G2_HPP
 
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
-#include <nil/crypto3/algebra/curves/mnt4.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt4/298/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt4/298/types.hpp>
+#include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/projective/types.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<std::size_t Version = 298>
-                class mnt4_ate_precompute_g2;
-
-                template<>
-                class mnt4_ate_precompute_g2<298> {
-                    using curve_type = curves::mnt4<298>;
+                template<typename CurveType>
+                class short_weierstrass_projective_ate_precompute_g2 {
+                    using curve_type = CurveType;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    using types_policy = detail::short_weierstrass_projective_types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;
-                    using g2_type = typename curve_type::g2_type;
-
+                    using g2_type = typename curve_type::g2_type<>;
                     using g2_affine_type = typename curve_type::g2_type<curves::coordinates::affine>;
 
                     using g2_field_type_value = typename g2_type::field_type::value_type;
@@ -73,11 +67,11 @@ namespace nil {
                         const g2_field_type_value C = Y.squared();                            // C = Y1^2
                         const g2_field_type_value D = C.squared();                            // D = C^2
                         const g2_field_type_value E = (X + C).squared() - B - D;              // E = (X1+C)^2-B-D
-                        const g2_field_type_value F = (B + B + B) + g2::twist_coeff_a * A;    // F = 3*B +  a  *A
+                        const g2_field_type_value F = (B + B + B) + params_type::twist_coeff_a * A;    // F = 3*B +  a  *A
                         const g2_field_type_value G = F.squared();                            // G = F^2
 
                         current.X = -E.doubled().doubled() + G;                // X3 = -4*E+G
-                        current.Y = -Fq(0x8) * D + F * (E + E - current.X);    // Y3 = -8*D+F*(2*E-X3)
+                        current.Y = -typename base_field_type::value_type(0x08) * D + F * (E + E - current.X);    // Y3 = -8*D+F*(2*E-X3)
                         current.Z = (Y + Z).squared() - C - Z.squared();       // Z3 = (Y1+Z1)^2-C-Z1^2
                         current.T = current.Z.squared();                       // T3 = Z3^2
 
@@ -123,12 +117,14 @@ namespace nil {
 
                         typename g2_affine_type::value_type Qcopy = Q.to_affine();
 
+                        g2_field_type_value twist_inv = params_type::twist.inversed();    // could add to global params if needed
+
                         g2_precomputed_type result;
                         result.QX = Qcopy.X;
                         result.QY = Qcopy.Y;
                         result.QY2 = Qcopy.Y.squared();
-                        result.QX_over_twist = Qcopy.X * g2_type::value_type::twist.inversed();
-                        result.QY_over_twist = Qcopy.Y * g2_type::value_type::twist.inversed();
+                        result.QX_over_twist = Qcopy.X * twist_inv;
+                        result.QY_over_twist = Qcopy.Y * twist_inv;
 
                         extended_g2_projective R;
                         R.X = Qcopy.X;
@@ -137,7 +133,7 @@ namespace nil {
                         R.T = g2_field_type_value::one();
                         bool found_one = false;
 
-                        for (long i = params_type::number_type_max_bits - 1; i >= 0; --i) {
+                        for (long i = params_type::integral_type_max_bits - 1; i >= 0; --i) {
                             const bool bit = multiprecision::bit_test(params_type::ate_loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
@@ -176,4 +172,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT4_298_ATE_PRECOMPUTE_G2_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_ATE_PRECOMPUTE_G2_HPP

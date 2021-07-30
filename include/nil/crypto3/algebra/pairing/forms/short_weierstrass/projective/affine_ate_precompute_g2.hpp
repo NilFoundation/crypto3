@@ -23,34 +23,28 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT6_298_AFFINE_ATE_PRECOMPUTE_G2_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_MNT6_298_AFFINE_ATE_PRECOMPUTE_G2_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_AFFINE_ATE_PRECOMPUTE_G2_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_AFFINE_ATE_PRECOMPUTE_G2_HPP
 
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
-#include <nil/crypto3/algebra/curves/mnt6.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt6/298/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt6/298/types.hpp>
+#include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/projective/types.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<std::size_t Version = 298>
-                class mnt6_affine_ate_precompute_g2;
-
-                // Totally the same as for mnt6<298>
-                template<>
-                class mnt6_affine_ate_precompute_g2<298> {
-                    using curve_type = curves::mnt6<298>;
+                template<typename CurveType>
+                class short_weierstrass_projective_affine_ate_precompute_g2 {
+                    using curve_type = CurveType;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    using types_policy = detail::short_weierstrass_projective_types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;
-                    using g2_type = typename curve_type::g2_type;
+                    using g2_type = typename curve_type::g2_type<>;
                     using g2_affine_type = typename curve_type::g2_type<curves::coordinates::affine>;
 
                     using g2_field_type_value = typename g2_type::field_type::value_type;
@@ -85,9 +79,9 @@ namespace nil {
                             c.old_RY = RY;
                             g2_field_type_value old_RX_2 = c.old_RX.squared();
                             c.gamma = (old_RX_2 + old_RX_2 + old_RX_2 + 
-                                       g2_type::value_type::twist_coeff_a) *
+                                       params_type::twist_coeff_a) *
                                       (c.old_RY + c.old_RY).inversed();
-                            c.gamma_twist = c.gamma * g2_type::value_type::twist;
+                            c.gamma_twist = c.gamma * params_type::twist;
 
                             c.gamma_X = c.gamma * c.old_RX;
                             result.coeffs.push_back(c);
@@ -104,7 +98,7 @@ namespace nil {
                                 } else {
                                     c.gamma = (c.old_RY + result.QY) * (c.old_RX - result.QX).inversed();
                                 }
-                                c.gamma_twist = c.gamma * g2::twist;
+                                c.gamma_twist = c.gamma * params_type::twist;
 
                                 c.gamma_X = c.gamma * result.QX;
                                 result.coeffs.push_back(c);
@@ -121,4 +115,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT6_298_AFFINE_ATE_PRECOMPUTE_G2_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_AFFINE_ATE_PRECOMPUTE_G2_HPP

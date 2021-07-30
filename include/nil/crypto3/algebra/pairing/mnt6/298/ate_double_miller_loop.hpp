@@ -31,7 +31,7 @@
 
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 #include <nil/crypto3/algebra/pairing/detail/mnt6/298/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt6/298/types.hpp>
+#include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/projective/types.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -46,12 +46,12 @@ namespace nil {
                     using curve_type = curves::mnt6<298>;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    using types_policy = detail::short_weierstrass_projective_types_policy<curve_type>;
 
                     using gt_type = typename curve_type::gt_type;
                     using base_field_type = typename curve_type::base_field_type;
-                    using g1_type = typename curve_type::g1_type;
-                    using g2_type = typename curve_type::g2_type;
+                    using g1_type = typename curve_type::g1_type<>;
+                    using g2_type = typename curve_type::g2_type<>;
 
                     using g1_field_type_value = typename g1_type::field_type::value_type;
                     using g2_field_type_value = typename g2_type::field_type::value_type;
@@ -70,13 +70,13 @@ namespace nil {
                             prec_P2.PX, g1_field_type_value::zero(), 
                             g1_field_type_value::zero()) - prec_Q2.QX_over_twist;
 
-                        typename gt_type::value_type f = typename gt_type::value_type::one();
+                        typename gt_type::value_type f = gt_type::value_type::one();
 
                         bool found_one = false;
                         std::size_t dbl_idx = 0;
                         std::size_t add_idx = 0;
 
-                        for (long i = params_type::number_type_max_bits - 1; i >= 0; --i) {
+                        for (long i = params_type::integral_type_max_bits - 1; i >= 0; --i) {
                             const bool bit = multiprecision::bit_test(params_type::ate_loop_count, i);
 
                             if (!found_one) {
@@ -116,7 +116,7 @@ namespace nil {
                             }
                         }
 
-                        if (ate_is_loop_count_neg) {
+                        if (params_type::ate_is_loop_count_neg) {
                             typename types_policy::ate_add_coeffs ac1 = prec_Q1.add_coeffs[add_idx];
                             typename types_policy::ate_add_coeffs ac2 = prec_Q2.add_coeffs[add_idx];
                             ++add_idx;

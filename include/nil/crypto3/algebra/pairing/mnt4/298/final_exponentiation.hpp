@@ -28,7 +28,7 @@
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/pairing/detail/mnt4/298/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt4/298/types.hpp>
+#include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/projective/types.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -43,9 +43,8 @@ namespace nil {
                     using curve_type = curves::mnt4<298>;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    using types_policy = detail::short_weierstrass_projective_types_policy<curve_type>;
 
-                    using base_field_type = typename curve_type::base_field_type;
                     using gt_type = typename curve_type::gt_type;
                 
                     static typename gt_type::value_type final_exponentiation_last_chunk(

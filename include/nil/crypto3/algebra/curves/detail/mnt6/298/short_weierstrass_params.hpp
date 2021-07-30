@@ -111,6 +111,11 @@ namespace nil {
                     constexpr typename mnt6_types<298>::integral_type const mnt6_params<298, forms::short_weierstrass>::a;
                     constexpr typename mnt6_types<298>::integral_type const mnt6_params<298, forms::short_weierstrass>::b;
 
+                    constexpr typename mnt6_g2_params<298, forms::short_weierstrass>::field_type::value_type const 
+                        mnt6_g2_params<298, forms::short_weierstrass>::a;
+                    constexpr typename mnt6_g2_params<298, forms::short_weierstrass>::field_type::value_type const 
+                        mnt6_g2_params<298, forms::short_weierstrass>::b;
+
                     constexpr std::array<typename mnt6_g1_params<298, forms::short_weierstrass>::field_type::value_type, 3> const
                         mnt6_g1_params<298, forms::short_weierstrass>::zero_fill;
                     constexpr std::array<typename mnt6_g1_params<298, forms::short_weierstrass>::field_type::value_type, 3> const

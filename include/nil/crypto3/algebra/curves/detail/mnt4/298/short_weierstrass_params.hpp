@@ -51,8 +51,7 @@ namespace nil {
                     };
 
                     template<>
-                    struct mnt4_g1_params<298, 
-                        forms::short_weierstrass> : 
+                    struct mnt4_g1_params<298, forms::short_weierstrass> : 
                             public mnt4_params<298, forms::short_weierstrass> {
 
                         using field_type = typename mnt4_types<298>::g1_field_type;
@@ -71,8 +70,7 @@ namespace nil {
                     };
 
                     template<>
-                    struct mnt4_g2_params<298, 
-                        forms::short_weierstrass> : 
+                    struct mnt4_g2_params<298, forms::short_weierstrass> : 
                             public mnt4_params<298, forms::short_weierstrass> {
 
                         using field_type = typename mnt4_types<298>::g2_field_type;
@@ -110,6 +108,11 @@ namespace nil {
 
                     constexpr typename mnt4_types<298>::integral_type const mnt4_params<298, forms::short_weierstrass>::a;
                     constexpr typename mnt4_types<298>::integral_type const mnt4_params<298, forms::short_weierstrass>::b;
+
+                    constexpr typename mnt4_g2_params<298, forms::short_weierstrass>::field_type::value_type const 
+                        mnt4_g2_params<298, forms::short_weierstrass>::a;
+                    constexpr typename mnt4_g2_params<298, forms::short_weierstrass>::field_type::value_type const 
+                        mnt4_g2_params<298, forms::short_weierstrass>::b;
 
                     constexpr std::array<typename mnt4_g1_params<298, forms::short_weierstrass>::field_type::value_type, 2> const
                         mnt4_g1_params<298, forms::short_weierstrass>::zero_fill;

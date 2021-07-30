@@ -23,15 +23,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT6_298_ATE_MILLER_LOOP_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_MNT6_298_ATE_MILLER_LOOP_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT4_298_ATE_MILLER_LOOP_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_MNT4_298_ATE_MILLER_LOOP_HPP
 
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
-#include <nil/crypto3/algebra/curves/mnt6.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt6/298/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt6/298/types.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/pairing/detail/mnt4/298/params.hpp>
+#include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/projective/types.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -39,19 +39,19 @@ namespace nil {
             namespace pairing {
 
                 template<std::size_t Version = 298>
-                class mnt6_ate_miller_loop;
+                class mnt4_ate_miller_loop;
 
                 template<>
-                class mnt6_ate_miller_loop<298> {
-                    using curve_type = curves::mnt6<298>;
+                class mnt4_ate_miller_loop<298> {
+                    using curve_type = curves::mnt4<298>;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    using types_policy = detail::short_weierstrass_projective_types_policy<curve_type>;
                     using gt_type = typename curve_type::gt_type;
 
                     using base_field_type = typename curve_type::base_field_type;
-                    using g1_type = typename curve_type::g1_type;
-                    using g2_type = typename curve_type::g2_type;
+                    using g1_type = typename curve_type::g1_type<>;
+                    using g2_type = typename curve_type::g2_type<>;
 
                     using g1_field_type_value = typename g1_type::field_type::value_type;
                     using g2_field_type_value = typename g2_type::field_type::value_type;
@@ -61,9 +61,8 @@ namespace nil {
                         const types_policy::ate_g1_precomputed_type &prec_P, 
                         const types_policy::ate_g2_precomputed_type &prec_Q) {
 
-                        g2_field_type_value L1_coeff = g2_field_type_value(prec_P.PX, 
-                            g1_field_type_value::zero(), 
-                            g1_field_type_value::zero()) - prec_Q.QX_over_twist;
+                        g2_field_type_value L1_coeff = g2_field_type_value(
+                            prec_P.PX, g1_field_type_value::zero()) - prec_Q.QX_over_twist;
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 
@@ -71,8 +70,8 @@ namespace nil {
                         std::size_t dbl_idx = 0;
                         std::size_t add_idx = 0;
 
-                        for (long i = policy_type::number_type_max_bits - 1; i >= 0; --i) {
-                            const bool bit = nil::crypto3::multiprecision::bit_test(policy_type::ate_loop_count, i);
+                        for (long i = params_type::integral_type_max_bits - 1; i >= 0; --i) {
+                            const bool bit = multiprecision::bit_test(params_type::ate_loop_count, i);
 
                             if (!found_one) {
                                 /* this skips the MSB itself */
@@ -83,14 +82,15 @@ namespace nil {
                             /* code below gets executed for all bits (EXCEPT the MSB itself) of
                                param_p (skipping leading zeros) in MSB to LSB
                                order */
-                            typename types_policy::ate_dbl_coeffs dc = prec_Q.dbl_coeffs[dbl_idx++];
+                            typename types_policy::ate_dbl_coeffs dc = 
+                                prec_Q.dbl_coeffs[dbl_idx++];
 
                             typename gt_type::value_type g_RR_at_P =
                                 typename gt_type::value_type(-dc.c_4C - dc.c_J * prec_P.PX_twist + dc.c_L, dc.c_H * prec_P.PY_twist);
                             f = f.squared() * g_RR_at_P;
-
                             if (bit) {
                                 typename types_policy::ate_add_coeffs ac = prec_Q.add_coeffs[add_idx++];
+
                                 typename gt_type::value_type g_RQ_at_P = 
                                     typename gt_type::value_type(ac.c_RZ * prec_P.PY_twist,
                                                   -(prec_Q.QY_over_twist * ac.c_RZ + L1_coeff * ac.c_L1));
@@ -100,9 +100,9 @@ namespace nil {
 
                         if (params_type::ate_is_loop_count_neg) {
                             typename types_policy::ate_add_coeffs ac = prec_Q.add_coeffs[add_idx++];
-                            typename gt_type::value_type g_RnegR_at_P = typename gt_type::value_type(
-                                ac.c_RZ * prec_P.PY_twist,
-                                -(prec_Q.QY_over_twist * ac.c_RZ + L1_coeff * ac.c_L1));
+                            typename gt_type::value_type g_RnegR_at_P = 
+                                typename gt_type::value_type(ac.c_RZ * prec_P.PY_twist,
+                                                 -(prec_Q.QY_over_twist * ac.c_RZ + L1_coeff * ac.c_L1));
                             f = (f * g_RnegR_at_P).inversed();
                         }
 
@@ -113,4 +113,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT6_298_ATE_MILLER_LOOP_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT4_298_ATE_MILLER_LOOP_HPP

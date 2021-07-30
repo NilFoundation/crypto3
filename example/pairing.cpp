@@ -35,9 +35,11 @@
 #include <nil/crypto3/algebra/fields/detail/element/fp12_2over3over2.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-// #include <nil/crypto3/algebra/curves/mnt4.hpp>
-// #include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
 #include <nil/crypto3/algebra/pairing/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/mnt4.hpp>
+#include <nil/crypto3/algebra/pairing/mnt6.hpp>
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
@@ -117,73 +119,73 @@ void print_ate_g2_precomp_element(const pairing::pairing_policy<curves::bls12<38
     std::cout << "]" << std::endl;
 }
 
-// void print_ate_g1_precomp_element(const typename pairing::pairing_policy<curves::mnt4<298>>::::g1_precomputed_type &e) {
-//     std::cout << "Ate g1 precomp element:" << std::endl;
-//     print_field_element(e.PX);
-//     print_field_element(e.PY);
-//     print_field_element(e.PX_twist);
-//     print_field_element(e.PY_twist);
-// }
+void print_ate_g1_precomp_element(const typename pairing::pairing_policy<curves::mnt4<298>>::g1_precomputed_type &e) {
+    std::cout << "Ate g1 precomp element:" << std::endl;
+    print_field_element(e.PX);
+    print_field_element(e.PY);
+    print_field_element(e.PX_twist);
+    print_field_element(e.PY_twist);
+}
 
-// void print_ate_g2_precomp_element(const typename pairing::pairing_policy<curves::mnt4<298>>::g2_precomputed_type &e) {
-//     std::cout << "Ate g2 precomp element:" << std::endl;
+void print_ate_g2_precomp_element(const typename pairing::pairing_policy<curves::mnt4<298>>::g2_precomputed_type &e) {
+    std::cout << "Ate g2 precomp element:" << std::endl;
 
-//     print_field_element(e.QX);
-//     print_field_element(e.QY);
-//     print_field_element(e.QY2);
-//     print_field_element(e.QX_over_twist);
-//     print_field_element(e.QY_over_twist);
+    print_field_element(e.QX);
+    print_field_element(e.QY);
+    print_field_element(e.QY2);
+    print_field_element(e.QX_over_twist);
+    print_field_element(e.QY_over_twist);
 
-//     for (auto &c : e.dbl_coeffs) {
-//         std::cout << "{";
-//         print_field_element(c.c_H);
-//         print_field_element(c.c_4C);
-//         print_field_element(c.c_J);
-//         print_field_element(c.c_L);
-//         std::cout << "},";
-//     }
+    for (auto &c : e.dbl_coeffs) {
+        std::cout << "{";
+        print_field_element(c.c_H);
+        print_field_element(c.c_4C);
+        print_field_element(c.c_J);
+        print_field_element(c.c_L);
+        std::cout << "},";
+    }
 
-//     for (auto &c : e.add_coeffs) {
-//         std::cout << "{";
-//         print_field_element(c.c_L1);
-//         print_field_element(c.c_RZ);
-//         std::cout << "},";
-//     }
-// }
+    for (auto &c : e.add_coeffs) {
+        std::cout << "{";
+        print_field_element(c.c_L1);
+        print_field_element(c.c_RZ);
+        std::cout << "},";
+    }
+}
 
-// void print_ate_g1_precomp_element(const typename pairing::pairing_policy<curves::mnt6<298>>::g1_precomputed_type &e) {
-//     std::cout << "Ate g1 precomp element:" << std::endl;
-//     print_field_element(e.PX);
-//     print_field_element(e.PY);
-//     print_field_element(e.PX_twist);
-//     print_field_element(e.PY_twist);
-// }
+void print_ate_g1_precomp_element(const typename pairing::pairing_policy<curves::mnt6<298>>::g1_precomputed_type &e) {
+    std::cout << "Ate g1 precomp element:" << std::endl;
+    print_field_element(e.PX);
+    print_field_element(e.PY);
+    print_field_element(e.PX_twist);
+    print_field_element(e.PY_twist);
+}
 
-// void print_ate_g2_precomp_element(const typename pairing::pairing_policy<curves::mnt6<298>>::g2_precomputed_type &e) {
-//     std::cout << "Ate g2 precomp element:" << std::endl;
+void print_ate_g2_precomp_element(const typename pairing::pairing_policy<curves::mnt6<298>>::g2_precomputed_type &e) {
+    std::cout << "Ate g2 precomp element:" << std::endl;
 
-//     print_field_element(e.QX);
-//     print_field_element(e.QY);
-//     print_field_element(e.QY2);
-//     print_field_element(e.QX_over_twist);
-//     print_field_element(e.QY_over_twist);
+    print_field_element(e.QX);
+    print_field_element(e.QY);
+    print_field_element(e.QY2);
+    print_field_element(e.QX_over_twist);
+    print_field_element(e.QY_over_twist);
 
-//     for (auto &c : e.dbl_coeffs) {
-//         std::cout << "{";
-//         print_field_element(c.c_H);
-//         print_field_element(c.c_4C);
-//         print_field_element(c.c_J);
-//         print_field_element(c.c_L);
-//         std::cout << "},";
-//     }
+    for (auto &c : e.dbl_coeffs) {
+        std::cout << "{";
+        print_field_element(c.c_H);
+        print_field_element(c.c_4C);
+        print_field_element(c.c_J);
+        print_field_element(c.c_L);
+        std::cout << "},";
+    }
 
-//     for (auto &c : e.add_coeffs) {
-//         std::cout << "{";
-//         print_field_element(c.c_L1);
-//         print_field_element(c.c_RZ);
-//         std::cout << "},";
-//     }
-// }
+    for (auto &c : e.add_coeffs) {
+        std::cout << "{";
+        print_field_element(c.c_L1);
+        print_field_element(c.c_RZ);
+        std::cout << "},";
+    }
+}
 
 template<typename CurveType>
 void pairing_example() {
@@ -251,7 +253,7 @@ void pairing_example() {
 int main() {
     pairing_example<curves::bls12<381>>();
 
-    //pairing_example<curves::mnt4<298>::pairing>();
+    pairing_example<curves::mnt4<298>>();
 
-    // pairing_example<curves::mnt6<298>::pairing>();
+    pairing_example<curves::mnt6<298>>();
 }

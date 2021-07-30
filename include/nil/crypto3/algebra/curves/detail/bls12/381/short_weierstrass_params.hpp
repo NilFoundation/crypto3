@@ -100,6 +100,9 @@ namespace nil {
                     constexpr typename bls12_types<381>::integral_type const bls12_params<381, forms::short_weierstrass>::a;
                     constexpr typename bls12_types<381>::integral_type const bls12_params<381, forms::short_weierstrass>::b;
 
+                    constexpr typename bls12_g2_params<381, forms::short_weierstrass>::field_type::value_type const 
+                        bls12_g2_params<381, forms::short_weierstrass>::b;
+
                     constexpr std::array<typename bls12_g1_params<381, forms::short_weierstrass>::field_type::value_type, 2> const
                         bls12_g1_params<381, forms::short_weierstrass>::zero_fill;
                     constexpr std::array<typename bls12_g1_params<381, forms::short_weierstrass>::field_type::value_type, 2> const

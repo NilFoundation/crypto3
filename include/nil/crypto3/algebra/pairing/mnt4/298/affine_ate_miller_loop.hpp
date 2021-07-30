@@ -31,7 +31,7 @@
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/pairing/detail/mnt4/298/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt4/298/types.hpp>
+#include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/projective/types.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -45,23 +45,15 @@ namespace nil {
                 class mnt4_affine_ate_miller_loop<298> {
                     using curve_type = curves::mnt4<298>;
 
-                    using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    using types_policy = detail::short_weierstrass_projective_types_policy<curve_type>;
                     using gt_type = typename curve_type::gt_type;
-
-                    using base_field_type = typename curve_type::base_field_type;
-                    using g1_type = typename curve_type::g1_type;
-                    using g2_type = typename curve_type::g2_type;
-
-                    using g1_field_type_value = typename g1_type::field_type::value_type;
-                    using g2_field_type_value = typename g2_type::field_type::value_type;
                 public:
 
                     static typename gt_type::value_type process(
                         const typename types_policy::affine_ate_g1_precomputation &prec_P,
                         const typename types_policy::affine_ate_g2_precomputation &prec_Q) {
 
-                        typename gt_type::value_type f = typename gt_type::value_type::one();
+                        typename gt_type::value_type f = gt_type::value_type::one();
 
                         bool found_nonzero = false;
                         std::size_t idx = 0;

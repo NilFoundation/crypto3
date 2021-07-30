@@ -43,36 +43,49 @@ namespace nil {
 
                     public:
 
-                        using number_type = typename curve_type::base_field_type::modulus_type;
-                        using extended_number_type = typename curve_type::base_field_type::extended_modulus_type;
+                        using integral_type = typename curve_type::base_field_type::modulus_type;
+                        using extended_integral_type = typename curve_type::base_field_type::extended_modulus_type;
 
-                        constexpr static const std::size_t number_type_max_bits = 
+                        constexpr static const std::size_t integral_type_max_bits = 
                             curve_type::base_field_type::modulus_bits;
 
-                        constexpr static const number_type ate_loop_count =
+                        constexpr static const integral_type ate_loop_count =
                             0x1EEF5546609756BEC2A33F0DC9A1B671660000_cppui149;
                         constexpr static const bool ate_is_loop_count_neg = false;
-                        constexpr static const extended_number_type final_exponent = extended_number_type(
+                        constexpr static const extended_integral_type final_exponent = extended_integral_type(
                             0x343C7AC3174C87A1EFE216B37AFB6D3035ACCA5A07B2394F42E0029264C0324A95E87DCB6C97234CBA7385B8D20FEA4E85074066818687634E61F58B68EA590B11CEE431BE8348DEB351384D8485E987A57004BB9A1E7A6036C7A5801F55AC8E065E41B012422619E7E69541C5980000_cppui894);
 
-                        constexpr static const number_type final_exponent_last_chunk_abs_of_w0 =
+                        constexpr static const integral_type final_exponent_last_chunk_abs_of_w0 =
                             0x1EEF5546609756BEC2A33F0DC9A1B671660001_cppui149;
                         constexpr static const bool final_exponent_last_chunk_is_w0_neg = false;
-                        constexpr static const number_type final_exponent_last_chunk_w1 = number_type(0x1);
+                        constexpr static const integral_type final_exponent_last_chunk_w1 = integral_type(0x1);
 
-                        using g2_field_type_value = typename curve_type::g2_type::field_type::value_type;
+                        using g2_field_type_value = typename curve_type::g2_type<>::field_type::value_type;
 
                         constexpr static const g2_field_type_value twist = 
-                            g2_type::params_type::twist;
+                            g2_field_type_value(g2_field_type_value::underlying_type::zero(),
+                                                g2_field_type_value::underlying_type::one());
+
+                        constexpr static const g2_field_type_value twist_coeff_a = 
+                            curve_type::g2_type<>::params_type::a;
+                        constexpr static const g2_field_type_value twist_coeff_b = 
+                            curve_type::g2_type<>::params_type::b;
                     };
 
-                    constexpr typename pairing_params<curves::mnt4<298>>::number_type const pairing_params<curves::mnt4<298>>::ate_loop_count;
-                    constexpr typename pairing_params<curves::mnt4<298>>::number_type const
+                    constexpr typename pairing_params<curves::mnt4<298>>::integral_type const pairing_params<curves::mnt4<298>>::ate_loop_count;
+                    constexpr typename pairing_params<curves::mnt4<298>>::integral_type const
                         pairing_params<curves::mnt4<298>>::final_exponent_last_chunk_abs_of_w0;
-                    constexpr typename pairing_params<curves::mnt4<298>>::number_type const
+                    constexpr typename pairing_params<curves::mnt4<298>>::integral_type const
                         pairing_params<curves::mnt4<298>>::final_exponent_last_chunk_w1;
-                    constexpr typename pairing_params<curves::mnt4<298>>::extended_number_type const
+                    constexpr typename pairing_params<curves::mnt4<298>>::extended_integral_type const
                         pairing_params<curves::mnt4<298>>::final_exponent;
+
+                    constexpr typename pairing_params<curves::mnt4<298>>::g2_field_type_value const 
+                        pairing_params<curves::mnt4<298>>::twist;
+                    constexpr typename pairing_params<curves::mnt4<298>>::g2_field_type_value const 
+                        pairing_params<curves::mnt4<298>>::twist_coeff_a;
+                    constexpr typename pairing_params<curves::mnt4<298>>::g2_field_type_value const 
+                        pairing_params<curves::mnt4<298>>::twist_coeff_b;
 
                     constexpr bool const pairing_params<curves::mnt4<298>>::ate_is_loop_count_neg;
                     constexpr bool const pairing_params<curves::mnt4<298>>::final_exponent_last_chunk_is_w0_neg;

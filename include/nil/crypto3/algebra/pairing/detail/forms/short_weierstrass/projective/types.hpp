@@ -23,10 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_MNT6_298_TYPES_POLICY_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_MNT6_298_TYPES_POLICY_HPP
-
-#include <nil/crypto3/algebra/curves/mnt6.hpp>
+#ifndef CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_TYPES_POLICY_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_TYPES_POLICY_HPP
 
 namespace nil {
     namespace crypto3 {
@@ -35,39 +33,35 @@ namespace nil {
                 namespace detail {
 
                     template<typename CurveType>
-                    class types_policy;
-
-                    // It's absolutely the same as for mnt4<298>. Maybe we can unite it.
-                    template<>
-                    class types_policy<curves::mnt6<298>> {
-                        using curve_type = curves::mnt6<298>;
+                    class short_weierstrass_projective_types_policy {
+                        using curve_type = CurveType;
 
                     public:
 
                         using number_type = typename curve_type::base_field_type::modulus_type;
                         using extended_number_type = typename curve_type::base_field_type::extended_modulus_type;
 
-                        using g1_value_type = typename curve_type::base_field_type::value_type;
-                        using g2_value_type = typename curve_type::g2_type::field_type::value_type;
+                        using g1_field_value_type = typename curve_type::base_field_type::value_type;
+                        using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
 
                         struct affine_ate_g1_precomputation {
-                            g1_value_type PX;
-                            g1_value_type PY;
-                            g2_value_type PY_twist_squared;
+                            g1_field_value_type PX;
+                            g1_field_value_type PY;
+                            g2_field_value_type PY_twist_squared;
                         };
 
                         struct affine_ate_coeffs {
                             // TODO: trim (not all of them are needed)
-                            g2_value_type old_RX;
-                            g2_value_type old_RY;
-                            g2_value_type gamma;
-                            g2_value_type gamma_twist;
-                            g2_value_type gamma_X;
+                            g2_field_value_type old_RX;
+                            g2_field_value_type old_RY;
+                            g2_field_value_type gamma;
+                            g2_field_value_type gamma_twist;
+                            g2_field_value_type gamma_X;
                         };
 
                         struct affine_ate_g2_precomputation {
-                            g2_value_type QX;
-                            g2_value_type QY;
+                            g2_field_value_type QX;
+                            g2_field_value_type QY;
                             std::vector<affine_ate_coeffs> coeffs;
                         };
 
@@ -75,10 +69,10 @@ namespace nil {
 
                         struct ate_g1_precomputed_type {
 
-                            g1_value_type PX;
-                            g1_value_type PY;
-                            g2_value_type PX_twist;
-                            g2_value_type PY_twist;
+                            g1_field_value_type PX;
+                            g1_field_value_type PY;
+                            g2_field_value_type PX_twist;
+                            g2_field_value_type PY_twist;
 
                             bool operator==(const ate_g1_precomputed_type &other) const {
                                 return (this->PX == other.PX && this->PY == other.PY &&
@@ -90,10 +84,10 @@ namespace nil {
 
                         struct ate_dbl_coeffs {
 
-                            g2_value_type c_H;
-                            g2_value_type c_4C;
-                            g2_value_type c_J;
-                            g2_value_type c_L;
+                            g2_field_value_type c_H;
+                            g2_field_value_type c_4C;
+                            g2_field_value_type c_J;
+                            g2_field_value_type c_L;
 
                             bool operator==(const ate_dbl_coeffs &other) const {
                                 return (this->c_H == other.c_H && this->c_4C == other.c_4C && this->c_J == other.c_J &&
@@ -103,8 +97,8 @@ namespace nil {
 
                         struct ate_add_coeffs {
 
-                            g2_value_type c_L1;
-                            g2_value_type c_RZ;
+                            g2_field_value_type c_L1;
+                            g2_field_value_type c_RZ;
 
                             bool operator==(const ate_add_coeffs &other) const {
                                 return (this->c_L1 == other.c_L1 && this->c_RZ == other.c_RZ);
@@ -115,11 +109,11 @@ namespace nil {
                             typedef ate_dbl_coeffs dbl_coeffs_type;
                             typedef ate_add_coeffs add_coeffs_type;
 
-                            g2_value_type QX;
-                            g2_value_type QY;
-                            g2_value_type QY2;
-                            g2_value_type QX_over_twist;
-                            g2_value_type QY_over_twist;
+                            g2_field_value_type QX;
+                            g2_field_value_type QY;
+                            g2_field_value_type QY2;
+                            g2_field_value_type QX_over_twist;
+                            g2_field_value_type QY_over_twist;
                             std::vector<dbl_coeffs_type> dbl_coeffs;
                             std::vector<add_coeffs_type> add_coeffs;
 
@@ -140,4 +134,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_PAIRING_MNT6_298_TYPES_POLICY_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_TYPES_POLICY_HPP

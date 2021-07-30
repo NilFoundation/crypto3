@@ -28,7 +28,7 @@
 
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 #include <nil/crypto3/algebra/pairing/detail/mnt6/298/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt6/298/types.hpp>
+#include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/projective/types.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -43,15 +43,15 @@ namespace nil {
                     using curve_type = curves::mnt6<298>;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    using types_policy = detail::short_weierstrass_projective_types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;
-                    using g2_type = typename curve_type::g2_type;
                     using gt_type = typename curve_type::gt_type;
-
-                    using g2_field_type_value = typename g2_type::field_type::value_type;
                 
-                    static typename gt_type::value_type final_exponentiation_last_chunk(const typename gt_type::value_type &elt, const typename gt_type::value_type &elt_inv) {
+                    static typename gt_type::value_type final_exponentiation_last_chunk(
+                        const typename gt_type::value_type &elt, 
+                        const typename gt_type::value_type &elt_inv) {
+
                         const typename gt_type::value_type elt_q = elt.Frobenius_map(1);
                         typename gt_type::value_type w1_part = elt_q.cyclotomic_exp(params_type::final_exponent_last_chunk_w1);
                         typename gt_type::value_type w0_part;
@@ -65,7 +65,9 @@ namespace nil {
                         return result;
                     }
 
-                    static typename gt_type::value_type final_exponentiation_first_chunk(const typename gt_type::value_type &elt, const typename gt_type::value_type &elt_inv) {
+                    static typename gt_type::value_type final_exponentiation_first_chunk(
+                        const typename gt_type::value_type &elt, 
+                        const typename gt_type::value_type &elt_inv) {
 
                         /* (q^3-1)*(q+1) */
 
@@ -82,7 +84,7 @@ namespace nil {
 
                 public:
 
-                    static typename gt_type::value_type process(const typename gt_type::value_type &Q) {
+                    static typename gt_type::value_type process(const typename gt_type::value_type &elt) {
 
                         const typename gt_type::value_type elt_inv = elt.inversed();
                         const typename gt_type::value_type elt_to_first_chunk = final_exponentiation_first_chunk(elt, elt_inv);
