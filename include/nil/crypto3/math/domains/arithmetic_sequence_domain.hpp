@@ -56,7 +56,7 @@ namespace nil {
                 value_type arithmetic_generator;
 
                 void do_precomputation() {
-                    compute_subproduct_tree<FieldType>(log2(this->m), this->subproduct_tree);
+                    compute_subproduct_tree<FieldType>(this->subproduct_tree, log2(this->m));
 
                     arithmetic_generator = value_type(fields::arithmetic_params<FieldType>::arithmetic_generator);
 

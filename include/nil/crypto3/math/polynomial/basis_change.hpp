@@ -43,8 +43,8 @@ namespace nil {
              * page 7.
              */
             template<typename FieldType>
-            void compute_subproduct_tree(const std::size_t &m,
-                                         std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T) {
+            void compute_subproduct_tree(std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T,
+                                         std::size_t m) {
 
                 typedef typename FieldType::value_type value_type;
 
@@ -93,7 +93,7 @@ namespace nil {
             void
                 monomial_to_newton_basis(std::vector<typename FieldType::value_type> &a,
                                          const std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T,
-                                         const std::size_t &n) {
+                                         size_t n) {
 
                 typedef typename FieldType::value_type value_type;
 
@@ -154,7 +154,7 @@ namespace nil {
             void
                 newton_to_monomial_basis(std::vector<typename FieldType::value_type> &a,
                                          const std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T,
-                                         const std::size_t &n) {
+                                         size_t n) {
 
                 typedef typename FieldType::value_type value_type;
 
@@ -184,12 +184,11 @@ namespace nil {
              * Below we make use of the psuedocode from
              * [Bostan & Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points] on page 26.
              */
-            template<typename FieldType>
-            void monomial_to_newton_basis_geometric(
-                std::vector<typename FieldType::value_type> &a,
-                const std::vector<typename FieldType::value_type> &geometric_sequence,
-                const std::vector<typename FieldType::value_type> &geometric_triangular_sequence,
-                const std::size_t &n) {
+            template<typename FieldType, typename Range1, typename Range2, typename Range3>
+            void monomial_to_newton_basis_geometric(Range1 &a,
+                                                    const Range2 &geometric_sequence,
+                                                    const Range3 &geometric_triangular_sequence,
+                                                    const std::size_t &n) {
 
                 typedef typename FieldType::value_type value_type;
 
@@ -229,12 +228,11 @@ namespace nil {
              * Below we make use of the psuedocode from
              * [Bostan & Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points] on page 26.
              */
-            template<typename FieldType>
-            void newton_to_monomial_basis_geometric(
-                std::vector<typename FieldType::value_type> &a,
-                const std::vector<typename FieldType::value_type> &geometric_sequence,
-                const std::vector<typename FieldType::value_type> &geometric_triangular_sequence,
-                const std::size_t &n) {
+            template<typename FieldType, typename Range1, typename Range2, typename Range3>
+            void newton_to_monomial_basis_geometric(Range1 &a,
+                                                    const Range2 &geometric_sequence,
+                                                    const Range3 &geometric_triangular_sequence,
+                                                    std::size_t n) {
 
                 typedef typename FieldType::value_type value_type;
 
