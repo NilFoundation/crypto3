@@ -23,10 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_381_TYPES_POLICY_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_BLS12_381_TYPES_POLICY_HPP
-
-#include <nil/crypto3/algebra/curves/bls12.hpp>
+#ifndef CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_TYPES_POLICY_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_TYPES_POLICY_HPP
 
 namespace nil {
     namespace crypto3 {
@@ -35,11 +33,8 @@ namespace nil {
                 namespace detail {
 
                     template<typename CurveType>
-                    class types_policy;
-
-                    template<>
-                    class types_policy<curves::bls12<381>> {
-                        using curve_type = curves::bls12<381>;
+                    class short_weierstrass_jacobian_with_a4_0_types_policy {
+                        using curve_type = CurveType;
 
                     public:
 
@@ -93,4 +88,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_381_TYPES_POLICY_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_TYPES_POLICY_HPP

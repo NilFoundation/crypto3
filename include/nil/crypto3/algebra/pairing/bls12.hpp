@@ -26,49 +26,40 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_POLICY_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_BLS12_POLICY_HPP
 
-#include <numeric>
-
 #include <nil/crypto3/algebra/curves/jubjub.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/ate_double_miller_loop.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/ate_miller_loop.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/ate_precompute_g1.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/ate_precompute_g2.hpp>
-#include <nil/crypto3/algebra/pairing/bls12/381/final_exponentiation.hpp>
+#include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
+#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/ate_double_miller_loop.hpp>
+#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/ate_miller_loop.hpp>
+#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/ate_precompute_g1.hpp>
+#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/ate_precompute_g2.hpp>
+#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/final_exponentiation.hpp>
+#include <nil/crypto3/algebra/pairing/pairing_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<typename PairingCurveType, 
-                         typename PrecomputeG1 = pairing::ate_precompute_g1<PairingCurveType>, 
-                         typename PrecomputeG2 = pairing::ate_precompute_g2<PairingCurveType>, 
-                         typename MillerLoop = pairing::ate_miller_loop<PairingCurveType>, 
-                         typename DoubleMillerLoop = pairing::ate_double_miller_loop<PairingCurveType>, 
-                         typename FinalExponentiation = pairing::final_exponentiation<PairingCurveType>
-                         >
-                class pairing_policy {
+                template<>
+                struct pairing_policy<curves::bls12<381>> {
+                    using curve_type = curves::bls12<381>;
 
-                    using curve_type = PairingCurveType;
-
-                    using types_policy = detail::types_policy<curve_type>;
-
-                    using g1_type = typename curve_type::g1_type<>;
-                    using g2_type = typename curve_type::g2_type<>;
-                public:
                     using chained_curve_type = curves::jubjub;
 
-                    typedef typename types_policy::integral_type integral_type;
+                    using precompute_g1 = 
+                        pairing::short_weierstrass_jacobian_with_a4_0_ate_precompute_g1<curve_type>;
+                    using precompute_g2 = 
+                        pairing::short_weierstrass_jacobian_with_a4_0_ate_precompute_g2<curve_type>;
+                    using miller_loop = 
+                        pairing::short_weierstrass_jacobian_with_a4_0_ate_miller_loop<curve_type>;
+                    using double_miller_loop = 
+                        pairing::short_weierstrass_jacobian_with_a4_0_ate_double_miller_loop<curve_type>;
+                    using final_exponentiation = 
+                        pairing::short_weierstrass_jacobian_with_a4_0_final_exponentiation<curve_type>;
 
-                    using g1_precomputed_type = typename types_policy::g1_precomputed_type;
-                    using g2_precomputed_type = typename types_policy::g2_precomputed_type;
-
-                    using precompute_g1 = PrecomputeG1;
-                    using precompute_g2 = PrecomputeG2;
-                    using miller_loop = MillerLoop;
-                    using double_miller_loop = DoubleMillerLoop;
-                    using final_exponentiation = FinalExponentiation;
+                    using g1_precomputed_type = typename precompute_g1::g1_precomputed_type;
+                    using g2_precomputed_type = typename precompute_g2::g2_precomputed_type;
                 };
 
                 // template<std::size_t Version, typename PairingFunctions>

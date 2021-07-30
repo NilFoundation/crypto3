@@ -23,13 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_FINAL_EXPONENTIATION_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_BLS12_FINAL_EXPONENTIATION_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_FINAL_EXPONENTIATION_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_FINAL_EXPONENTIATION_HPP
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
-#include <nil/crypto3/algebra/pairing/final_exponentiation.hpp>
+#include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/jacobian_with_a4_0/types.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -37,14 +34,11 @@ namespace nil {
             namespace pairing {
 
                 template<typename CurveType>
-                class final_exponentiation;
-
-                template<>
-                class final_exponentiation<curves::bls12<381>> {
-                    using curve_type = curves::bls12<381>;
+                class short_weierstrass_jacobian_with_a4_0_final_exponentiation {
+                    using curve_type = CurveType;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    using types_policy = detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;
                     using gt_type = typename curve_type::gt_type;
@@ -138,4 +132,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_FINAL_EXPONENTIATION_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_FINAL_EXPONENTIATION_HPP

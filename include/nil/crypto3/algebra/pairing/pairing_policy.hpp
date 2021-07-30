@@ -30,8 +30,9 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
-                template<typename PairingCurveType, typename PairingFunctions>
-                struct pairing_policy { };
+                
+                template<typename PairingCurveType>
+                struct pairing_policy;
             }    // namespace pairing
         }        // namespace algebra
     }            // namespace crypto3

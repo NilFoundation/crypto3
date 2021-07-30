@@ -23,16 +23,13 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G2_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G2_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_PRECOMPUTE_G2_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_PRECOMPUTE_G2_HPP
 
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
-#include <nil/crypto3/algebra/pairing/ate_precompute_g2.hpp>
+#include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/jacobian_with_a4_0/types.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -40,14 +37,11 @@ namespace nil {
             namespace pairing {
 
                 template<typename CurveType>
-                class ate_precompute_g2;
-
-                template<>
-                class ate_precompute_g2<curves::bls12<381>> {
-                    using curve_type = curves::bls12<381>;
+                class short_weierstrass_jacobian_with_a4_0_ate_precompute_g2 {
+                    using curve_type = CurveType;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    using types_policy = detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;
                     using g2_type = typename curve_type::g2_type<>;
@@ -156,4 +150,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G2_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_PRECOMPUTE_G2_HPP

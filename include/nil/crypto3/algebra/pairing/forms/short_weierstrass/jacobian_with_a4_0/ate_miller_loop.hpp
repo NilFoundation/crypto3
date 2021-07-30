@@ -23,35 +23,32 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_MILLER_LOOP_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_MILLER_LOOP_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_MILLER_LOOP_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_MILLER_LOOP_HPP
 
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
-#include <nil/crypto3/algebra/pairing/ate_miller_loop.hpp>
+#include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/jacobian_with_a4_0/types.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace pairing {
 
-                template<>
-                class ate_miller_loop<curves::bls12<381>> {
-                    using curve_type = curves::bls12<381>;
+                template<typename CurveType>
+                class short_weierstrass_jacobian_with_a4_0_ate_miller_loop {
+                    using curve_type = CurveType;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    using types_policy = detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type>;
 
                     using gt_type = typename curve_type::gt_type;
                 public:
 
                     static typename gt_type::value_type process(
-                        const types_policy::ate_g1_precomputed_type &prec_P, 
-                        const types_policy::ate_g2_precomputed_type &prec_Q) {
+                        const typename types_policy::ate_g1_precomputed_type &prec_P, 
+                        const typename types_policy::ate_g2_precomputed_type &prec_Q) {
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 
@@ -95,4 +92,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_MILLER_LOOP_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_MILLER_LOOP_HPP

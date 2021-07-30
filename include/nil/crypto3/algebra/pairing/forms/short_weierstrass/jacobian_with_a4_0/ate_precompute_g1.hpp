@@ -23,12 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G1_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G1_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_PRECOMPUTE_G1_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_PRECOMPUTE_G1_HPP
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/381/types.hpp>
-#include <nil/crypto3/algebra/pairing/ate_precompute_g1.hpp>
+#include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/jacobian_with_a4_0/types.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -36,12 +34,9 @@ namespace nil {
             namespace pairing {
 
                 template<typename CurveType>
-                class ate_precompute_g1;
-
-                template<>
-                class ate_precompute_g1<curves::bls12<381>> {
-                    using curve_type = curves::bls12<381>;
-                    using types_policy = detail::types_policy<curve_type>;
+                class short_weierstrass_jacobian_with_a4_0_ate_precompute_g1 {
+                    using curve_type = CurveType;
+                    using types_policy = detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type>;
                     using g1_type = typename curve_type::g1_type<>;
                     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
                 public:
@@ -64,4 +59,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G1_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_PRECOMPUTE_G1_HPP
