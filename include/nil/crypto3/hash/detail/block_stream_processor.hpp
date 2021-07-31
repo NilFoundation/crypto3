@@ -30,7 +30,6 @@
 #include <iterator>
 
 #include <nil/crypto3/detail/pack.hpp>
-#include <nil/crypto3/detail/pack_numeric.hpp>
 
 #include <nil/crypto3/hash/accumulators/bits_count.hpp>
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>

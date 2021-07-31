@@ -33,6 +33,8 @@
 #include <boost/range/concepts.hpp>
 #include <boost/array.hpp>
 
+#include <nil/crypto3/detail/pack.hpp>
+
 #include <nil/crypto3/hash/accumulators/hash.hpp>
 
 namespace nil {
@@ -142,6 +144,17 @@ namespace nil {
 
                     inline operator accumulator_set_type &() const {
                         return this->accumulator_set;
+                    }
+
+                    template<typename Integral,
+                             typename = typename std::enable_if<std::is_integral<Integral>::value &&
+                                                                hash_type::digest_bits <=
+                                                                    std::numeric_limits<Integral>::digits>::type>
+                    inline operator Integral() const {
+                        std::array<Integral, 1> out;
+                        result_type res = boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
+                        ::nil::crypto3::detail::pack_to<stream_endian::little_octet_big_bit>(res, out);
+                        return out[0];
                     }
 
 #ifndef CRYPTO3_RAW_HASH_STRING_OUTPUT

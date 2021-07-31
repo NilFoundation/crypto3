@@ -298,6 +298,135 @@ BOOST_AUTO_TEST_CASE(blake2b_longmsg_byte1) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(blake2b_initializer_list_test_suite)
+
+BOOST_AUTO_TEST_CASE(blake2b_224_shortmsg_byte1) {
+    // "a"
+    hashes::blake2b<224>::digest_type d = hash<hashes::blake2b<224>>({'\x61'});
+
+    BOOST_CHECK_EQUAL("c05d5ea0257c7a4604122b8e99a0093f89d0797ef06a7f0af65a3560", std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_224_shortmsg_byte2) {
+    // "abc"
+    hashes::blake2b<224>::digest_type d = hash<hashes::blake2b<224>>({'\x61', '\x62', '\x63'});
+
+    BOOST_CHECK_EQUAL("9bd237b02a29e43bdd6738afa5b53ff0eee178d6210b618e4511aec8", std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_224_shortmsg_byte3) {
+    // "message digest"
+    hashes::blake2b<224>::digest_type d =
+        hash<hashes::blake2b<224>>({'\x6d', '\x65', '\x73', '\x73', '\x61', '\x67', '\x65', '\x20', '\x64', '\x69',
+                                    '\x67', '\x65', '\x73', '\x74'});
+
+    BOOST_CHECK_EQUAL("f305a410b733771b7c5c8ad1041e356ff1da48c51792dfe319ba286b", std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_256_shortmsg_byte1) {
+    // "a"
+    hashes::blake2b<256>::digest_type d = hash<hashes::blake2b<256>>({'\x61'});
+
+    BOOST_CHECK_EQUAL("8928aae63c84d87ea098564d1e03ad813f107add474e56aedd286349c0c03ea4", std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_256_shortmsg_byte2) {
+    // "abc"
+    hashes::blake2b<256>::digest_type d = hash<hashes::blake2b<256>>({'\x61', '\x62', '\x63'});
+
+    BOOST_CHECK_EQUAL("bddd813c634239723171ef3fee98579b94964e3bb1cb3e427262c8c068d52319", std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_256_shortmsg_byte3) {
+    // "message digest"
+    hashes::blake2b<256>::digest_type d =
+        hash<hashes::blake2b<256>>({'\x6d', '\x65', '\x73', '\x73', '\x61', '\x67', '\x65', '\x20', '\x64', '\x69',
+                                    '\x67', '\x65', '\x73', '\x74'});
+
+    BOOST_CHECK_EQUAL("31a65b562925c6ffefdafa0ad830f4e33eff148856c2b4754de273814adf8b85", std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_384_shortmsg_byte1) {
+    // "a"
+    hashes::blake2b<384>::digest_type d = hash<hashes::blake2b<384>>({'\x61'});
+
+    BOOST_CHECK_EQUAL(
+        "7d40de16ff771d4595bf70cbda0c4ea0a066a6046fa73d34471cd4d93d827d7c"
+        "94c29399c50de86983af1ec61d5dcef0",
+        std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_384_shortmsg_byte2) {
+    // "abc"
+    hashes::blake2b<384>::digest_type d = hash<hashes::blake2b<384>>({'\x61', '\x62', '\x63'});
+
+    BOOST_CHECK_EQUAL(
+        "6f56a82c8e7ef526dfe182eb5212f7db9df1317e57815dbda46083fc30f54ee6"
+        "c66ba83be64b302d7cba6ce15bb556f4",
+        std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_384_shortmsg_byte3) {
+    // "message digest"
+    std::array<char, 14> a = {'\x6d', '\x65', '\x73', '\x73', '\x61', '\x67', '\x65',
+                              '\x20', '\x64', '\x69', '\x67', '\x65', '\x73', '\x74'};
+    hashes::blake2b<384>::digest_type d = hash<hashes::blake2b<384>>(a);
+
+    BOOST_CHECK_EQUAL(
+        "44c3965bd8f02ed299ad52ffb5bba7c448df242073c5520dc091a0cc55d024cd"
+        "d51569c339d0bf2b6cd746708683a0ef",
+        std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_512_shortmsg_byte1) {
+    // "a"
+    hashes::blake2b<512>::digest_type d = hash<hashes::blake2b<512>>({'\x61'});
+
+    BOOST_CHECK_EQUAL(
+        "333fcb4ee1aa7c115355ec66ceac917c8bfd815bf7587d325aec1864edd24e34"
+        "d5abe2c6b1b5ee3face62fed78dbef802f2a85cb91d455a8f5249d330853cb3c",
+        std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_512_shortmsg_byte2) {
+    // "abc"
+    hashes::blake2b<512>::digest_type d = hash<hashes::blake2b<512>>({'\x61', '\x62', '\x63'});
+
+    BOOST_CHECK_EQUAL(
+        "ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6fdbffa2d1"
+        "7d87c5392aab792dc252d5de4533cc9518d38aa8dbf1925ab92386edd4009923",
+        std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_512_shortmsg_byte3) {
+    // "message digest"
+    hashes::blake2b<512>::digest_type d =
+        hash<hashes::blake2b<512>>({'\x6d', '\x65', '\x73', '\x73', '\x61', '\x67', '\x65', '\x20', '\x64', '\x69',
+                                    '\x67', '\x65', '\x73', '\x74'});
+
+    BOOST_CHECK_EQUAL(
+        "3c26ce487b1c0f062363afa3c675ebdbf5f4ef9bdc022cfbef91e3111cdc2838"
+        "40d8331fc30a8a0906cff4bcdbcd230c61aaec60fdfad457ed96b709a382359a",
+        std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_longmsg_byte1) {
+    hashes::blake2b<224>::digest_type d = hash<hashes::blake2b<224>>({
+        '\xBE', '\xFA', '\xB5', '\x74', '\x39', '\x6D', '\x7F', '\x8B', '\x67', '\x05', '\xE2', '\xD5', '\xB5',
+        '\x8B', '\x2C', '\x1C', '\x82', '\x0B', '\xB2', '\x4E', '\x3F', '\x4B', '\xAE', '\x3E', '\x8F', '\xBC',
+        '\xD3', '\x6D', '\xBF', '\x73', '\x4E', '\xE1', '\x4E', '\x5D', '\x6A', '\xB9', '\x72', '\xAE', '\xDD',
+        '\x35', '\x40', '\x23', '\x54', '\x66', '\xE8', '\x25', '\x85', '\x0E', '\xE4', '\xC5', '\x12', '\xEA',
+        '\x97', '\x95', '\xAB', '\xFD', '\x33', '\xF3', '\x30', '\xD9', '\xFD', '\x7F', '\x79', '\xE6', '\x2B',
+        '\xBB', '\x63', '\xA6', '\xEA', '\x85', '\xDE', '\x15', '\xBE', '\xAE', '\xEA', '\x6F', '\x8D', '\x20',
+        '\x4A', '\x28', '\x95', '\x60', '\x59', '\xE2', '\x63', '\x2D', '\x11', '\x86', '\x1D', '\xFB', '\x0E',
+        '\x65', '\xBC', '\x07', '\xAC', '\x8A', '\x15', '\x93', '\x88', '\xD5', '\xC3', '\x27', '\x7E', '\x22',
+        '\x72', '\x86', '\xF6', '\x5F', '\xF5', '\xE5', '\xB5', '\xAE', '\xC1'});
+
+    BOOST_CHECK_EQUAL("3d6c866ebaa149e0c6ad8ba5e9a685e1ad56d81a00fb99d9020f11c0", std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE(blake2b_accumulator_test_suite)
 
 BOOST_FIXTURE_TEST_CASE(blake2b_224_accumulator1, fixture<224>) {

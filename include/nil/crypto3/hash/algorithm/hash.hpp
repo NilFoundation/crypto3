@@ -204,6 +204,78 @@ namespace nil {
 
             return HashImpl(r, HashAccumulator());
         }
+
+        /*!
+         * @brief
+         *
+         * @ingroup hash_algorithms
+         *
+         * @tparam Hash
+         * @tparam T
+         * @tparam OutputIterator
+         *
+         * @param rng
+         * @param out
+         *
+         * @return
+         */
+        template<typename Hash, typename T, typename OutputIterator>
+        typename std::enable_if<::nil::crypto3::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
+            hash(std::initializer_list<T> list, OutputIterator out) {
+            typedef accumulator_set<Hash> HashAccumulator;
+
+            typedef hashes::detail::value_hash_impl<HashAccumulator> StreamHashImpl;
+            typedef hashes::detail::itr_hash_impl<StreamHashImpl, OutputIterator> HashImpl;
+
+            return HashImpl(list, std::move(out), HashAccumulator());
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup hash_algorithms
+         *
+         * @tparam Hash
+         * @tparam T
+         * @tparam HashAccumulator
+         *
+         * @param rng
+         * @param sh
+         *
+         * @return
+         */
+        template<typename Hash, typename T, typename HashAccumulator = accumulator_set<Hash>>
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value,
+                                HashAccumulator>::type &
+            hash(std::initializer_list<T> rng, HashAccumulator &sh) {
+            typedef hashes::detail::ref_hash_impl<HashAccumulator> StreamHashImpl;
+            typedef hashes::detail::range_hash_impl<StreamHashImpl> HashImpl;
+
+            return HashImpl(rng, std::forward<HashAccumulator>(sh));
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup hash_algorithms
+         *
+         * @tparam Hash
+         * @tparam T
+         * @tparam HashAccumulator
+         *
+         * @param r
+         *
+         * @return
+         */
+        template<typename Hash, typename T, typename HashAccumulator = accumulator_set<Hash>>
+        hashes::detail::range_hash_impl<hashes::detail::value_hash_impl<HashAccumulator>>
+            hash(std::initializer_list<T> r) {
+
+            typedef hashes::detail::value_hash_impl<HashAccumulator> StreamHashImpl;
+            typedef hashes::detail::range_hash_impl<StreamHashImpl> HashImpl;
+
+            return HashImpl(r, HashAccumulator());
+        }
     }    // namespace crypto3
 }    // namespace nil
 

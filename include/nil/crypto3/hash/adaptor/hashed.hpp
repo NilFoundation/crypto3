@@ -56,6 +56,18 @@ namespace nil {
 
                     return HashImpl(r, HashAccumulator());
                 }
+
+                template<typename HashAccumulator, typename SinglePassRange>
+                inline detail::range_hash_impl<detail::value_hash_impl<HashAccumulator>>
+                    operator|(std::initializer_list<SinglePassRange> r,
+                              const detail::value_hash_impl<HashAccumulator> &f) {
+                    BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
+
+                    typedef detail::value_hash_impl<HashAccumulator> StreamHashImpl;
+                    typedef detail::range_hash_impl<StreamHashImpl> HashImpl;
+
+                    return HashImpl(r, HashAccumulator());
+                }
             }    // namespace detail
         }        // namespace hashes
 

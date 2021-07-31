@@ -37,10 +37,12 @@
 namespace nil {
     namespace crypto3 {
         template<typename Hash, typename = typename std::enable_if<detail::is_hash<Hash>::value>::type>
-        using accumulator_set =
-            boost::accumulators::accumulator_set<static_digest<Hash::digest_bits>,
-                                                 boost::accumulators::features<accumulators::tag::hash<Hash>>,
-                                                 std::size_t>;
+        struct accumulator_set
+            : public boost::accumulators::accumulator_set<static_digest<Hash::digest_bits>,
+                                                          boost::accumulators::features<accumulators::tag::hash<Hash>>,
+                                                          std::size_t> {
+            typedef Hash hash_type;
+        };
     }    // namespace crypto3
 }    // namespace nil
 
