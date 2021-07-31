@@ -256,11 +256,11 @@ BOOST_DATA_TEST_CASE(rijndael_128_128, string_data("key_128_block_128"), triples
     }
 }
 
- BOOST_DATA_TEST_CASE(rijndael_160_128, string_data("key_160_block_128"), triples) {
+BOOST_DATA_TEST_CASE(rijndael_160_128, string_data("key_160_block_128"), triples) {
 
     byte_string const p(triples.first);
 
-    BOOST_FOREACH(boost::property_tree::ptree::value_type pair, triples.second) {
+    BOOST_FOREACH (boost::property_tree::ptree::value_type pair, triples.second) {
         byte_string const k(pair.first);
 
         std::string out = encrypt<block::rijndael<160, 128>>(p, k);
@@ -269,12 +269,11 @@ BOOST_DATA_TEST_CASE(rijndael_128_128, string_data("key_128_block_128"), triples
     }
 }
 
-
- BOOST_DATA_TEST_CASE(rijndael_192_128, string_data("key_192_block_128"), triples) {
+BOOST_DATA_TEST_CASE(rijndael_192_128, string_data("key_192_block_128"), triples) {
 
     byte_string const p(triples.first);
 
-    BOOST_FOREACH(boost::property_tree::ptree::value_type pair, triples.second) {
+    BOOST_FOREACH (boost::property_tree::ptree::value_type pair, triples.second) {
         byte_string const k(pair.first);
 
         std::string out = encrypt<block::rijndael<192, 128>>(p, k);
@@ -283,11 +282,11 @@ BOOST_DATA_TEST_CASE(rijndael_128_128, string_data("key_128_block_128"), triples
     }
 }
 
- BOOST_DATA_TEST_CASE(rijndael_224_128, string_data("key_224_block_128"), triples) {
+BOOST_DATA_TEST_CASE(rijndael_224_128, string_data("key_224_block_128"), triples) {
 
     byte_string const p(triples.first);
 
-    BOOST_FOREACH(boost::property_tree::ptree::value_type pair, triples.second) {
+    BOOST_FOREACH (boost::property_tree::ptree::value_type pair, triples.second) {
         byte_string const k(pair.first);
 
         std::string out = encrypt<block::rijndael<224, 128>>(p, k);
@@ -296,11 +295,11 @@ BOOST_DATA_TEST_CASE(rijndael_128_128, string_data("key_128_block_128"), triples
     }
 }
 
- BOOST_DATA_TEST_CASE(rijndael_256_128, string_data("key_256_block_128"), triples) {
+BOOST_DATA_TEST_CASE(rijndael_256_128, string_data("key_256_block_128"), triples) {
 
     byte_string const p(triples.first);
 
-    BOOST_FOREACH(boost::property_tree::ptree::value_type pair, triples.second) {
+    BOOST_FOREACH (boost::property_tree::ptree::value_type pair, triples.second) {
         byte_string const k(pair.first);
 
         std::string out = encrypt<block::rijndael<256, 128>>(p, k);
@@ -382,6 +381,21 @@ BOOST_AUTO_TEST_CASE(aes_256_cipher) {
     BOOST_CHECK_EQUAL(out,
                       "f3eed1bdb5d2a03c064b5a7e3db181f8591ccb10d410ed26dc5ba74a31362870"
                       "b6ed21b99ca6f4f9f153e7b1beafed1d23304b7a39f9f3ff067d8d8f9e24ecc7");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(rijndael_initializer_list_test_suite)
+
+BOOST_AUTO_TEST_CASE(rijndael_128_128_1) {
+
+    std::string out =
+        encrypt<block::rijndael<128, 128>>({'\x00', '\x11', '\x22', '\x33', '\x44', '\x55', '\x66', '\x77', '\x88',
+                                            '\x99', '\xaa', '\xbb', '\xcc', '\xdd', '\xee', '\xff'},
+                                           {'\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08',
+                                            '\x09', '\x0a', '\x0b', '\x0c', '\x0d', '\x0e', '\x0f'});
+
+    BOOST_CHECK_EQUAL(out, "69c4e0d86a7b0430d8cdb78070b4c55a");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
