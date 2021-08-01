@@ -66,21 +66,21 @@ namespace nil {
 
                     static inline processed_verification_key_type
                         process(const verification_key_type &verification_key) {
-                        typedef typename CurveType::pairing pairing_policy;
+                        typedef typename pairing_policy<CurveType> pairing_policy;
 
-                        typename pairing_policy::g1_precomp G_alpha_pc =
-                            pairing_policy::precompute_g1(verification_key.G_alpha);
-                        typename pairing_policy::g2_precomp H_beta_pc =
-                            pairing_policy::precompute_g2(verification_key.H_beta);
+                        typename pairing_policy::g1_precomputed_type G_alpha_pc =
+                            precompute_g1<CurveType>(verification_key.G_alpha);
+                        typename pairing_policy::g2_precomputed_type H_beta_pc =
+                            precompute_g2<CurveType>(verification_key.H_beta);
 
                         processed_verification_key_type processed_verification_key;
                         processed_verification_key.G_alpha = verification_key.G_alpha;
                         processed_verification_key.H_beta = verification_key.H_beta;
                         processed_verification_key.G_alpha_H_beta_ml =
-                            pairing_policy::miller_loop(G_alpha_pc, H_beta_pc);
-                        processed_verification_key.G_gamma_pc = pairing_policy::precompute_g1(verification_key.G_gamma);
-                        processed_verification_key.H_gamma_pc = pairing_policy::precompute_g2(verification_key.H_gamma);
-                        processed_verification_key.H_pc = pairing_policy::precompute_g2(verification_key.H);
+                            miller_loop<CurveType>(G_alpha_pc, H_beta_pc);
+                        processed_verification_key.G_gamma_pc = precompute_g1<CurveType>(verification_key.G_gamma);
+                        processed_verification_key.H_gamma_pc = precompute_g2<CurveType>(verification_key.H_gamma);
+                        processed_verification_key.H_pc = precompute_g2<CurveType>(verification_key.H);
 
                         processed_verification_key.query = verification_key.query;
 
@@ -105,8 +105,6 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_se_ppzksnark_verifier_weak_input_consistency {
                     typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
-
-                    typedef typename CurveType::pairing pairing_policy;
 
                 public:
                     typedef CurveType curve_type;
@@ -167,16 +165,16 @@ namespace nil {
                                 processed_verification_key.query.begin() + 1, processed_verification_key.query.end(),
                                 primary_input.begin(), primary_input.end(), chunks);
 
-                        typename pairing_policy::fqk_type::value_type
-                            test1_l = pairing_policy::miller_loop(
-                                pairing_policy::precompute_g1(proof.A + processed_verification_key.G_alpha),
-                                pairing_policy::precompute_g2(proof.B + processed_verification_key.H_beta)),
+                        typename gt_typ::value_type
+                            test1_l = miller_loop<CurveType>(
+                                precompute_g1<CurveType>(proof.A + processed_verification_key.G_alpha),
+                                precompute_g2<CurveType>(proof.B + processed_verification_key.H_beta)),
                             test1_r1 = processed_verification_key.G_alpha_H_beta_ml,
-                            test1_r2 = pairing_policy::miller_loop(pairing_policy::precompute_g1(G_psi),
+                            test1_r2 = miller_loop<CurveType>(precompute_g1<CurveType>(G_psi),
                                                                    processed_verification_key.H_gamma_pc),
-                            test1_r3 = pairing_policy::miller_loop(pairing_policy::precompute_g1(proof.C),
+                            test1_r3 = miller_loop<CurveType>(precompute_g1<CurveType>(proof.C),
                                                                    processed_verification_key.H_pc);
-                        typename CurveType::gt_type::value_type test1 = pairing_policy::final_exponentiation(
+                        typename CurveType::gt_type::value_type test1 = final_exponentiation<CurveType>(
                             test1_l.unitary_inversed() * test1_r1 * test1_r2 * test1_r3);
 
                         if (test1 != CurveType::gt_type::value_type::one()) {
@@ -186,14 +184,14 @@ namespace nil {
                         /**
                          * e(A, H^{gamma}) = e(G^{gamma}, B)
                          */
-                        typename pairing_policy::fqk_type::value_type test2_l = pairing_policy::miller_loop(
-                                                              pairing_policy::precompute_g1(proof.A),
+                        typename gt_type::value_type test2_l = miller_loop<CurveType>(
+                                                              precompute_g1<CurveType>(proof.A),
                                                               processed_verification_key.H_gamma_pc),
-                                                          test2_r = pairing_policy::miller_loop(
+                                                          test2_r = miller_loop<CurveType>(
                                                               processed_verification_key.G_gamma_pc,
-                                                              pairing_policy::precompute_g2(proof.B));
+                                                              precompute_g2<CurveType>(proof.B));
                         typename CurveType::gt_type::value_type test2 =
-                            pairing_policy::final_exponentiation(test2_l * test2_r.unitary_inversed());
+                            final_exponentiation<CurveType>(test2_l * test2_r.unitary_inversed());
 
                         if (test2 != CurveType::gt_type::value_type::one()) {
                             result = false;

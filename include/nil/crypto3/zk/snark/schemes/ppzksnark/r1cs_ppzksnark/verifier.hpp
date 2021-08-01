@@ -46,40 +46,31 @@ namespace nil {
                 class r1cs_ppzksnark_process_verification_key {
                     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
+                    using g2_type = typename CurveType::g2_type<>;
                 public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
-                    typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::proof_type proof_type;
 
                     static inline processed_verification_key_type
                         process(const verification_key_type &verification_key) {
 
-                        typedef typename CurveType::pairing pairing_policy;
-
                         processed_verification_key_type processed_verification_key;
                         processed_verification_key.pp_G2_one_precomp =
-                            pairing_policy::precompute_g2(CurveType::g2_type::value_type::one());
+                            precompute_g2<CurveType>(g2_type::value_type::one());
                         processed_verification_key.vk_alphaA_g2_precomp =
-                            pairing_policy::precompute_g2(verification_key.alphaA_g2);
+                            precompute_g2<CurveType>(verification_key.alphaA_g2);
                         processed_verification_key.vk_alphaB_g1_precomp =
-                            pairing_policy::precompute_g1(verification_key.alphaB_g1);
+                            precompute_g1<CurveType>(verification_key.alphaB_g1);
                         processed_verification_key.vk_alphaC_g2_precomp =
-                            pairing_policy::precompute_g2(verification_key.alphaC_g2);
+                            precompute_g2<CurveType>(verification_key.alphaC_g2);
                         processed_verification_key.vk_rC_Z_g2_precomp =
-                            pairing_policy::precompute_g2(verification_key.rC_Z_g2);
+                            precompute_g2<CurveType>(verification_key.rC_Z_g2);
                         processed_verification_key.vk_gamma_g2_precomp =
-                            pairing_policy::precompute_g2(verification_key.gamma_g2);
+                            precompute_g2<CurveType>(verification_key.gamma_g2);
                         processed_verification_key.vk_gamma_beta_g1_precomp =
-                            pairing_policy::precompute_g1(verification_key.gamma_beta_g1);
+                            precompute_g1<CurveType>(verification_key.gamma_beta_g1);
                         processed_verification_key.vk_gamma_beta_g2_precomp =
-                            pairing_policy::precompute_g2(verification_key.gamma_beta_g2);
+                            precompute_g2<CurveType>(verification_key.gamma_beta_g2);
 
                         processed_verification_key.encoded_IC_query = verification_key.encoded_IC_query;
 
@@ -92,27 +83,19 @@ namespace nil {
                     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
                     using pairing_policy = typename CurveType::pairing;
-                    using g1_type = typename CurveType::g1_type;
-                    using g2_type = typename CurveType::g2_type;
+                    using g1_type = typename CurveType::g1_type<>;
+                    using g2_type = typename CurveType::g2_type<>;
                     using gt_type = typename CurveType::gt_type;
                     using g1_value_type = typename g1_type::value_type;
                     using g2_value_type = typename g2_type::value_type;
                     using gt_value_type = typename gt_type::value_type;
-                    using scalar_field_type = typename CurveType::scalar_field_type;
-                    using g1_precomp = typename pairing_policy::g1_precomp;
-                    using g2_precomp = typename pairing_policy::g2_precomp;
-                    using fqk_type = typename pairing_policy::fqk_type;
+                    using g1_precomputed_type = typename pairing_policy::g1_precomputed_type;
+                    using g2_precomputed_type = typename pairing_policy::g2_precomputed_type;
 
                 public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
                     /**
@@ -149,62 +132,62 @@ namespace nil {
                         if (!proof.is_well_formed()) {
                             result = false;
                         }
-                        g1_precomp proof_g_A_g_precomp = pairing_policy::precompute_g1(proof.g_A.g);
-                        g1_precomp proof_g_A_h_precomp = pairing_policy::precompute_g1(proof.g_A.h);
-                        typename fqk_type::value_type kc_A_1 = pairing_policy::miller_loop(
+                        g1_precomputed_type proof_g_A_g_precomp = precompute_g1<CurveType>(proof.g_A.g);
+                        g1_precomputed_type proof_g_A_h_precomp = precompute_g1<CurveType>(proof.g_A.h);
+                        typename gt_type::value_type kc_A_1 = miller_loop<CurveType>(
                             proof_g_A_g_precomp, processed_verification_key.vk_alphaA_g2_precomp);
-                        typename fqk_type::value_type kc_A_2 = pairing_policy::miller_loop(
+                        typename gt_type::value_type kc_A_2 = miller_loop<CurveType>(
                             proof_g_A_h_precomp, processed_verification_key.pp_G2_one_precomp);
-                        gt_value_type kc_A = pairing_policy::final_exponentiation(kc_A_1 * kc_A_2.unitary_inversed());
+                        gt_value_type kc_A = final_exponentiation<CurveType>(kc_A_1 * kc_A_2.unitary_inversed());
                         if (kc_A != gt_value_type::one()) {
                             result = false;
                         }
 
-                        g2_precomp proof_g_B_g_precomp = pairing_policy::precompute_g2(proof.g_B.g);
-                        g1_precomp proof_g_B_h_precomp = pairing_policy::precompute_g1(proof.g_B.h);
-                        typename fqk_type::value_type kc_B_1 = pairing_policy::miller_loop(
+                        g2_precomputed_type proof_g_B_g_precomp = precompute_g2<CurveType>(proof.g_B.g);
+                        g1_precomputed_type proof_g_B_h_precomp = precompute_g1<CurveType>(proof.g_B.h);
+                        typename gt_type::value_type kc_B_1 = miller_loop<CurveType>(
                             processed_verification_key.vk_alphaB_g1_precomp, proof_g_B_g_precomp);
-                        typename fqk_type::value_type kc_B_2 = pairing_policy::miller_loop(
+                        typename gt_type::value_type kc_B_2 = miller_loop<CurveType>(
                             proof_g_B_h_precomp, processed_verification_key.pp_G2_one_precomp);
-                        gt_value_type kc_B = pairing_policy::final_exponentiation(kc_B_1 * kc_B_2.unitary_inversed());
+                        gt_value_type kc_B = final_exponentiation<CurveType>(kc_B_1 * kc_B_2.unitary_inversed());
                         if (kc_B != gt_value_type::one()) {
                             result = false;
                         }
 
-                        g1_precomp proof_g_C_g_precomp = pairing_policy::precompute_g1(proof.g_C.g);
-                        g1_precomp proof_g_C_h_precomp = pairing_policy::precompute_g1(proof.g_C.h);
-                        typename fqk_type::value_type kc_C_1 = pairing_policy::miller_loop(
+                        g1_precomputed_type proof_g_C_g_precomp = precompute_g1<CurveType>(proof.g_C.g);
+                        g1_precomputed_type proof_g_C_h_precomp = precompute_g1<CurveType>(proof.g_C.h);
+                        typename gt_type::value_type kc_C_1 = miller_loop<CurveType>(
                             proof_g_C_g_precomp, processed_verification_key.vk_alphaC_g2_precomp);
-                        typename fqk_type::value_type kc_C_2 = pairing_policy::miller_loop(
+                        typename gt_type::value_type kc_C_2 = miller_loop<CurveType>(
                             proof_g_C_h_precomp, processed_verification_key.pp_G2_one_precomp);
-                        gt_value_type kc_C = pairing_policy::final_exponentiation(kc_C_1 * kc_C_2.unitary_inversed());
+                        gt_value_type kc_C = final_exponentiation<CurveType>(kc_C_1 * kc_C_2.unitary_inversed());
                         if (kc_C != gt_value_type::one()) {
                             result = false;
                         }
 
                         // check that g^((A+acc)*B)=g^(H*\Prod(t-\sigma)+C)
                         // equivalently, via pairings, that e(g^(A+acc), g^B) = e(g^H, g^Z) + e(g^C, g^1)
-                        g1_precomp proof_g_A_g_acc_precomp = pairing_policy::precompute_g1(proof.g_A.g + acc);
-                        g1_precomp proof_g_H_precomp = pairing_policy::precompute_g1(proof.g_H);
-                        typename fqk_type::value_type QAP_1 =
-                            pairing_policy::miller_loop(proof_g_A_g_acc_precomp, proof_g_B_g_precomp);
-                        typename fqk_type::value_type QAP_23 = pairing_policy::double_miller_loop(
+                        g1_precomputed_type proof_g_A_g_acc_precomp = precompute_g1<CurveType>(proof.g_A.g + acc);
+                        g1_precomputed_type proof_g_H_precomp = precompute_g1<CurveType>(proof.g_H);
+                        typename gt_type::value_type QAP_1 =
+                            miller_loop<CurveType>(proof_g_A_g_acc_precomp, proof_g_B_g_precomp);
+                        typename gt_type::value_type QAP_23 = double_miller_loop<CurveType>(
                             proof_g_H_precomp, processed_verification_key.vk_rC_Z_g2_precomp, proof_g_C_g_precomp,
                             processed_verification_key.pp_G2_one_precomp);
-                        gt_value_type QAP = pairing_policy::final_exponentiation(QAP_1 * QAP_23.unitary_inversed());
+                        gt_value_type QAP = final_exponentiation<CurveType>(QAP_1 * QAP_23.unitary_inversed());
                         if (QAP != gt_value_type::one()) {
                             result = false;
                         }
 
-                        g1_precomp proof_g_K_precomp = pairing_policy::precompute_g1(proof.g_K);
-                        g1_precomp proof_g_A_g_acc_C_precomp =
-                            pairing_policy::precompute_g1((proof.g_A.g + acc) + proof.g_C.g);
-                        typename fqk_type::value_type K_1 = pairing_policy::miller_loop(
+                        g1_precomputed_type proof_g_K_precomp = precompute_g1<CurveType>(proof.g_K);
+                        g1_precomputed_type proof_g_A_g_acc_C_precomp =
+                            precompute_g1<CurveType>((proof.g_A.g + acc) + proof.g_C.g);
+                        typename gt_type::value_type K_1 = miller_loop<CurveType>(
                             proof_g_K_precomp, processed_verification_key.vk_gamma_g2_precomp);
-                        typename fqk_type::value_type K_23 = pairing_policy::double_miller_loop(
+                        typename gt_type::value_type K_23 = double_miller_loop<CurveType>(
                             proof_g_A_g_acc_C_precomp, processed_verification_key.vk_gamma_beta_g2_precomp,
                             processed_verification_key.vk_gamma_beta_g1_precomp, proof_g_B_g_precomp);
-                        gt_value_type K = pairing_policy::final_exponentiation(K_1 * K_23.unitary_inversed());
+                        gt_value_type K = final_exponentiation<CurveType>(K_1 * K_23.unitary_inversed());
                         if (K != gt_value_type::one()) {
                             result = false;
                         }
@@ -218,15 +201,9 @@ namespace nil {
                     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
                 public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
                     /**
@@ -276,29 +253,22 @@ namespace nil {
                     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
                     using pairing_policy = typename CurveType::pairing;
-                    using g1_type = typename CurveType::g1_type;
-                    using g2_type = typename CurveType::g2_type;
+                    using g1_type = typename CurveType::g1_type<>;
+                    using g2_type = typename CurveType::g2_type<>;
                     using gt_type = typename CurveType::gt_type;
                     using g1_value_type = typename g1_type::value_type;
                     using g2_value_type = typename g2_type::value_type;
                     using gt_value_type = typename gt_type::value_type;
                     using scalar_field_type = typename CurveType::scalar_field_type;
-                    using g1_precomp = typename pairing_policy::g1_precomp;
-                    using g2_precomp = typename pairing_policy::g2_precomp;
+                    using g1_precomputed_type = typename pairing_policy::g1_precomputed_type;
+                    using g2_precomputed_type = typename pairing_policy::g2_precomputed_type;
                     using affine_ate_g1_precomp = typename pairing_policy::affine_ate_g1_precomp;
                     using affine_ate_g2_precomp = typename pairing_policy::affine_ate_g2_precomp;
-                    using fqk_type = typename pairing_policy::fqk_type;
 
                 public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
                     static inline bool process(const verification_key_type &vk,
@@ -309,21 +279,21 @@ namespace nil {
                         assert(vk.encoded_IC_query.domain_size() >= primary_input.size());
 
                         affine_ate_g2_precomp pvk_pp_G2_one_precomp =
-                            pairing_policy::affine_ate_precompute_g2(g2_value_type::one());
+                            affine_ate_precompute_g2<CurveType>(g2_value_type::one());
                         affine_ate_g2_precomp pvk_vk_alphaA_g2_precomp =
-                            pairing_policy::affine_ate_precompute_g2(vk.alphaA_g2);
+                            affine_ate_precompute_g2<CurveType>(vk.alphaA_g2);
                         affine_ate_g1_precomp pvk_vk_alphaB_g1_precomp =
-                            CurveType::affine_ate_precompute_g1(vk.alphaB_g1);
+                            affine_ate_precompute_g1<CurveType>(vk.alphaB_g1);
                         affine_ate_g2_precomp pvk_vk_alphaC_g2_precomp =
-                            pairing_policy::affine_ate_precompute_g2(vk.alphaC_g2);
+                            affine_ate_precompute_g2<CurveType>(vk.alphaC_g2);
                         affine_ate_g2_precomp pvk_vk_rC_Z_g2_precomp =
-                            pairing_policy::affine_ate_precompute_g2(vk.rC_Z_g2);
+                            affine_ate_precompute_g2<CurveType>(vk.rC_Z_g2);
                         affine_ate_g2_precomp pvk_vk_gamma_g2_precomp =
-                            pairing_policy::affine_ate_precompute_g2(vk.gamma_g2);
+                            affine_ate_precompute_g2<CurveType>(vk.gamma_g2);
                         affine_ate_g1_precomp pvk_vk_gamma_beta_g1_precomp =
-                            CurveType::affine_ate_precompute_g1(vk.gamma_beta_g1);
+                            affine_ate_precompute_g1<CurveType>(vk.gamma_beta_g1);
                         affine_ate_g2_precomp pvk_vk_gamma_beta_g2_precomp =
-                            pairing_policy::affine_ate_precompute_g2(vk.gamma_beta_g2);
+                            affine_ate_precompute_g2<CurveType>(vk.gamma_beta_g2);
 
                         const accumulation_vector<g1_type> accumulated_IC =
                             vk.encoded_IC_query.accumulate_chunk<scalar_field_type>(primary_input.begin(),
@@ -332,58 +302,58 @@ namespace nil {
                         const g1_value_type &acc = accumulated_IC.first;
 
                         bool result = true;
-                        affine_ate_g1_precomp proof_g_A_g_precomp = CurveType::affine_ate_precompute_g1(proof.g_A.g);
-                        affine_ate_g1_precomp proof_g_A_h_precomp = CurveType::affine_ate_precompute_g1(proof.g_A.h);
-                        typename fqk_type::value_type kc_A_miller = CurveType::affine_ate_e_over_e_miller_loop(
+                        affine_ate_g1_precomp proof_g_A_g_precomp = affine_ate_precompute_g1<CurveType>(proof.g_A.g);
+                        affine_ate_g1_precomp proof_g_A_h_precomp = affine_ate_precompute_g1<CurveType>(proof.g_A.h);
+                        typename gt_type::value_type kc_A_miller = affine_ate_e_over_e_miller_loop<CurveType>(
                             proof_g_A_g_precomp, pvk_vk_alphaA_g2_precomp, proof_g_A_h_precomp, pvk_pp_G2_one_precomp);
-                        gt_value_type kc_A = pairing_policy::final_exponentiation(kc_A_miller);
+                        gt_value_type kc_A = final_exponentiation<CurveType>(kc_A_miller);
 
                         if (kc_A != gt_value_type::one()) {
                             result = false;
                         }
 
                         affine_ate_g2_precomp proof_g_B_g_precomp =
-                            pairing_policy::affine_ate_precompute_g2(proof.g_B.g);
+                            affine_ate_precompute_g2<CurveType>(proof.g_B.g);
                         affine_ate_g1_precomp proof_g_B_h_precomp =
-                            pairing_policy::affine_ate_precompute_g1(proof.g_B.h);
-                        typename fqk_type::value_type kc_B_miller = pairing_policy::affine_ate_e_over_e_miller_loop(
+                            affine_ate_precompute_g1<CurveType>(proof.g_B.h);
+                        typename gt_type::value_type kc_B_miller = affine_ate_e_over_e_miller_loop<CurveType>(
                             pvk_vk_alphaB_g1_precomp, proof_g_B_g_precomp, proof_g_B_h_precomp, pvk_pp_G2_one_precomp);
-                        gt_value_type kc_B = pairing_policy::final_exponentiation(kc_B_miller);
+                        gt_value_type kc_B = final_exponentiation<CurveType>(kc_B_miller);
                         if (kc_B != gt_value_type::one()) {
                             result = false;
                         }
 
                         affine_ate_g1_precomp proof_g_C_g_precomp =
-                            pairing_policy::affine_ate_precompute_g1(proof.g_C.g);
+                            affine_ate_precompute_g1<CurveType>(proof.g_C.g);
                         affine_ate_g1_precomp proof_g_C_h_precomp =
-                            pairing_policy::affine_ate_precompute_g1(proof.g_C.h);
-                        typename fqk_type::value_type kc_C_miller = pairing_policy::affine_ate_e_over_e_miller_loop(
+                            affine_ate_precompute_g1<CurveType>(proof.g_C.h);
+                        typename gt_type::value_type kc_C_miller = affine_ate_e_over_e_miller_loop<CurveType>(
                             proof_g_C_g_precomp, pvk_vk_alphaC_g2_precomp, proof_g_C_h_precomp, pvk_pp_G2_one_precomp);
-                        gt_value_type kc_C = pairing_policy::final_exponentiation(kc_C_miller);
+                        gt_value_type kc_C = final_exponentiation<CurveType>(kc_C_miller);
                         if (kc_C != gt_value_type::one()) {
                             result = false;
                         }
 
                         affine_ate_g1_precomp proof_g_A_g_acc_precomp =
-                            pairing_policy::affine_ate_precompute_g1(proof.g_A.g + acc);
-                        affine_ate_g1_precomp proof_g_H_precomp = pairing_policy::affine_ate_precompute_g1(proof.g_H);
-                        typename fqk_type::value_type QAP_miller =
-                            pairing_policy::affine_ate_e_times_e_over_e_miller_loop(
+                            affine_ate_precompute_g1<CurveType>(proof.g_A.g + acc);
+                        affine_ate_g1_precomp proof_g_H_precomp = affine_ate_precompute_g1<CurveType>(proof.g_H);
+                        typename gt_type::value_type QAP_miller =
+                            affine_ate_e_times_e_over_e_miller_loop<CurveType>(
                                 proof_g_H_precomp, pvk_vk_rC_Z_g2_precomp, proof_g_C_g_precomp, pvk_pp_G2_one_precomp,
                                 proof_g_A_g_acc_precomp, proof_g_B_g_precomp);
-                        gt_value_type QAP = pairing_policy::final_exponentiation(QAP_miller);
+                        gt_value_type QAP = final_exponentiation<CurveType>(QAP_miller);
                         if (QAP != gt_value_type::one()) {
                             result = false;
                         }
 
-                        affine_ate_g1_precomp proof_g_K_precomp = pairing_policy::affine_ate_precompute_g1(proof.g_K);
+                        affine_ate_g1_precomp proof_g_K_precomp = affine_ate_precompute_g1<CurveType>(proof.g_K);
                         affine_ate_g1_precomp proof_g_A_g_acc_C_precomp =
-                            pairing_policy::affine_ate_precompute_g1((proof.g_A.g + acc) + proof.g_C.g);
-                        typename fqk_type::value_type K_miller =
-                            pairing_policy::affine_ate_e_times_e_over_e_miller_loop(
+                            affine_ate_precompute_g1<CurveType>((proof.g_A.g + acc) + proof.g_C.g);
+                        typename gt_type::value_type K_miller =
+                            affine_ate_e_times_e_over_e_miller_loop<CurveType>(
                                 proof_g_A_g_acc_C_precomp, pvk_vk_gamma_beta_g2_precomp, pvk_vk_gamma_beta_g1_precomp,
                                 proof_g_B_g_precomp, proof_g_K_precomp, pvk_vk_gamma_g2_precomp);
-                        gt_value_type K = pairing_policy::final_exponentiation(K_miller);
+                        gt_value_type K = final_exponentiation<CurveType>(K_miller);
                         if (K != gt_value_type::one()) {
                             result = false;
                         }

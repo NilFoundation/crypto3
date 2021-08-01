@@ -666,8 +666,8 @@ namespace nil {
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::g1_type g1_type;
                     typedef typename CurveType::gt_type gt_type;
-                    typedef typename pairing_policy::g1_precomp g1_precomp;
-                    typedef typename pairing_policy::g2_precomp g2_precomp;
+                    typedef typename pairing_policy::g1_precomputed_type g1_precomputed_type;
+                    typedef typename pairing_policy::g2_precomputed_type g2_precomputed_type;
                     typedef typename pairing_policy::fqk_type fqk_type;
 
                 public:

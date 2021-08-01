@@ -109,9 +109,9 @@ namespace nil {
                     typename CurveType::g1_type::value_type G_alpha;
                     typename CurveType::g2_type::value_type H_beta;
                     typename pairing_policy::fqk_type::value_type G_alpha_H_beta_ml;
-                    typename pairing_policy::g1_precomp G_gamma_pc;
-                    typename pairing_policy::g2_precomp H_gamma_pc;
-                    typename pairing_policy::g2_precomp H_pc;
+                    typename pairing_policy::g1_precomputed_type G_gamma_pc;
+                    typename pairing_policy::g2_precomputed_type H_gamma_pc;
+                    typename pairing_policy::g2_precomputed_type H_pc;
 
                     std::vector<typename CurveType::g1_type::value_type> query;
 

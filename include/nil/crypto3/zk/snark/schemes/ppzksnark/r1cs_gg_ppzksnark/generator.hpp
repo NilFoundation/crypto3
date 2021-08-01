@@ -62,7 +62,6 @@ namespace nil {
                 class r1cs_gg_ppzksnark_generator {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
-                    typedef typename CurveType::pairing pairing_policy;
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::g1_type g1_type;
                     typedef typename CurveType::g2_type g2_type;
@@ -214,7 +213,7 @@ namespace nil {
                         algebra::batch_to_special<g1_type>(L_query);
 #endif
 
-                        typename gt_type::value_type alpha_g1_beta_g2 = pairing_policy::pair_reduced(alpha_g1, beta_g2);
+                        typename gt_type::value_type alpha_g1_beta_g2 = pair_reduced<CurveType>(alpha_g1, beta_g2);
                         typename g2_type::value_type gamma_g2 = gamma * G2_gen;
 
                         typename g1_type::value_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;
