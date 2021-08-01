@@ -26,8 +26,6 @@
 #ifndef CRYPTO3_R1CS_PPZKSNARK_VERIFICATION_KEY_HPP
 #define CRYPTO3_R1CS_PPZKSNARK_VERIFICATION_KEY_HPP
 
-#include <memory>
-
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 
 namespace nil {
@@ -35,32 +33,38 @@ namespace nil {
         namespace zk {
             namespace snark {
 
+                using namespace algebra;
+
                 /**
                  * A verification key for the R1CS ppzkSNARK.
                  */
                 template<typename CurveType>
-                struct r1cs_ppzksnark_verification_key {
-                    typedef CurveType curve_type;
+                class r1cs_ppzksnark_verification_key {
 
-                    typename curve_type::g2_type::value_type alphaA_g2;
-                    typename curve_type::g1_type::value_type alphaB_g1;
-                    typename curve_type::g2_type::value_type alphaC_g2;
-                    typename curve_type::g2_type::value_type gamma_g2;
-                    typename curve_type::g1_type::value_type gamma_beta_g1;
-                    typename curve_type::g2_type::value_type gamma_beta_g2;
-                    typename curve_type::g2_type::value_type rC_Z_g2;
+                    using g1_type = typename CurveType::g1_type<>;
+                    using g2_type = typename CurveType::g2_type<>;
 
-                    accumulation_vector<typename CurveType::g1_type> encoded_IC_query;
+                public:
+
+                    typename g2_type::value_type alphaA_g2;
+                    typename g1_type::value_type alphaB_g1;
+                    typename g2_type::value_type alphaC_g2;
+                    typename g2_type::value_type gamma_g2;
+                    typename g1_type::value_type gamma_beta_g1;
+                    typename g2_type::value_type gamma_beta_g2;
+                    typename g2_type::value_type rC_Z_g2;
+
+                    accumulation_vector<g1_type> encoded_IC_query;
 
                     r1cs_ppzksnark_verification_key() = default;
-                    r1cs_ppzksnark_verification_key(const typename CurveType::g2_type::value_type &alphaA_g2,
-                                                    const typename CurveType::g1_type::value_type &alphaB_g1,
-                                                    const typename CurveType::g2_type::value_type &alphaC_g2,
-                                                    const typename CurveType::g2_type::value_type &gamma_g2,
-                                                    const typename CurveType::g1_type::value_type &gamma_beta_g1,
-                                                    const typename CurveType::g2_type::value_type &gamma_beta_g2,
-                                                    const typename CurveType::g2_type::value_type &rC_Z_g2,
-                                                    const accumulation_vector<typename CurveType::g1_type> &eIC) :
+                    r1cs_ppzksnark_verification_key(const typename g2_type::value_type &alphaA_g2,
+                                                    const typename g1_type::value_type &alphaB_g1,
+                                                    const typename g2_type::value_type &alphaC_g2,
+                                                    const typename g2_type::value_type &gamma_g2,
+                                                    const typename g1_type::value_type &gamma_beta_g1,
+                                                    const typename g2_type::value_type &gamma_beta_g2,
+                                                    const typename g2_type::value_type &rC_Z_g2,
+                                                    const accumulation_vector<g1_type> &eIC) :
                         alphaA_g2(alphaA_g2),
                         alphaB_g1(alphaB_g1), alphaC_g2(alphaC_g2), gamma_g2(gamma_g2), gamma_beta_g1(gamma_beta_g1),
                         gamma_beta_g2(gamma_beta_g2), rC_Z_g2(rC_Z_g2), encoded_IC_query(eIC) {};
@@ -74,8 +78,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return (2 * CurveType::g1_type::value_bits + encoded_IC_query.size_in_bits() +
-                                5 * CurveType::g2_type::value_bits);
+                        return (2 * g1_type::value_bits + encoded_IC_query.size_in_bits() +
+                                5 * g2_type::value_bits);
                     }
 
                     bool operator==(const r1cs_ppzksnark_verification_key &other) const {
@@ -96,10 +100,10 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class r1cs_ppzksnark_processed_verification_key {
-                    typedef typename CurveType::pairing pairing_policy;
+
+                    using pairing_policy = pairing::pairing_policy<CurveType>;
 
                 public:
-                    typedef CurveType curve_type;
 
                     typename pairing_policy::g2_precomputed_type pp_G2_one_precomp;
                     typename pairing_policy::g2_precomputed_type vk_alphaA_g2_precomp;
@@ -110,7 +114,7 @@ namespace nil {
                     typename pairing_policy::g1_precomputed_type vk_gamma_beta_g1_precomp;
                     typename pairing_policy::g2_precomputed_type vk_gamma_beta_g2_precomp;
 
-                    accumulation_vector<typename CurveType::g1_type> encoded_IC_query;
+                    accumulation_vector<typename CurveType::g1_type<>> encoded_IC_query;
 
                     bool operator==(const r1cs_ppzksnark_processed_verification_key &other) const {
                         return (this->pp_G2_one_precomp == other.pp_G2_one_precomp &&

@@ -49,15 +49,11 @@ namespace nil {
 
                 public:
                     typedef typename policy_type::circuit_type circuit_type;
-                    typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
-                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
                     typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::proof_type proof_type;
 
                     static inline keypair_type process(const circuit_type &circuit) {
                         typedef typename CurveType::scalar_field_type field_type;

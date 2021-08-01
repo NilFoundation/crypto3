@@ -26,21 +26,17 @@
 #ifndef CRYPTO3_ZK_USCS_PPZKSNARK_BASIC_PROVER_HPP
 #define CRYPTO3_ZK_USCS_PPZKSNARK_BASIC_PROVER_HPP
 
-#include <memory>
-
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
-
-#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
-#include <nil/crypto3/algebra/multiexp/policies.hpp>
-
-#include <nil/crypto3/algebra/random_element.hpp>
-
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/zk/snark/reductions/uscs_to_ssp.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
+
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp.hpp>
+#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
+#include <nil/crypto3/zk/snark/reductions/uscs_to_ssp.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
@@ -60,16 +56,12 @@ namespace nil {
                 class uscs_ppzksnark_prover {
                     typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
 
+                    using g1_type = typename CurveType::g1_type<>;
+                    using g2_type = typename CurveType::g2_type<>;
                 public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
-                    typedef typename policy_type::verification_key_type verification_key_type;
-                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;;
                     typedef typename policy_type::proof_type proof_type;
 
                     static inline proof_type process(const proving_key_type &proving_key,
@@ -91,12 +83,12 @@ namespace nil {
                         assert(proving_key.H_g1_query.size() == ssp_wit.degree + 1);
                         assert(proving_key.V_g2_query.size() == ssp_wit.num_variables + 2);
 
-                        typename CurveType::g1_type::value_type V_g1 =
+                        typename g1_type::value_type V_g1 =
                             ssp_wit.d * proving_key.V_g1_query[proving_key.V_g1_query.size() - 1];
-                        typename CurveType::g1_type::value_type alpha_V_g1 =
+                        typename g1_type::value_type alpha_V_g1 =
                             ssp_wit.d * proving_key.alpha_V_g1_query[proving_key.alpha_V_g1_query.size() - 1];
-                        typename CurveType::g1_type::value_type H_g1 = CurveType::g1_type::value_type::zero();
-                        typename CurveType::g2_type::value_type V_g2 =
+                        typename g1_type::value_type H_g1 = g1_type::value_type::zero();
+                        typename g2_type::value_type V_g2 =
                             proving_key.V_g2_query[0] +
                             ssp_wit.d * proving_key.V_g2_query[proving_key.V_g2_query.size() - 1];
 

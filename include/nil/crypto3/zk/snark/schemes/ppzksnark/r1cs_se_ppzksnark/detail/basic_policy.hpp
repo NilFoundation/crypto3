@@ -64,16 +64,13 @@
 #ifndef CRYPTO3_R1CS_SE_PPZKSNARK_TYPES_POLICY_HPP
 #define CRYPTO3_R1CS_SE_PPZKSNARK_TYPES_POLICY_HPP
 
-#include <memory>
+#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
+#include <nil/crypto3/zk/snark/reductions/r1cs_to_sap.hpp>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/proving_key.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/verification_key.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/proof.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/keypair.hpp>
-
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
-
-#include <nil/crypto3/zk/snark/reductions/r1cs_to_sap.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -50,24 +50,20 @@
 #ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_VERIFIER_HPP
 #define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_VERIFIER_HPP
 
-#include <memory>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
-
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
-
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
-
-#include <nil/crypto3/algebra/algorithms/pair.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                using namespace algebra::pairing;
+                using namespace algebra;
 
                 /**
                  * Convert a (non-processed) verification key into a processed verification key.
@@ -124,8 +120,8 @@ namespace nil {
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::g1_type<> g1_type;
                     typedef typename CurveType::gt_type gt_type;
-                    typedef typename pairing_policy<CurveType>::g1_precomputed_type g1_precomputed_type;
-                    typedef typename pairing_policy<CurveType>::g2_precomputed_type g2_precomputed_type;
+                    typedef typename pairing::pairing_policy<CurveType>::g1_precomputed_type g1_precomputed_type;
+                    typedef typename pairing::pairing_policy<CurveType>::g2_precomputed_type g2_precomputed_type;
 
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;
@@ -259,8 +255,8 @@ namespace nil {
                 //     typedef typename CurveType::scalar_field_type scalar_field_type;
                 //     typedef typename CurveType::g1_type<> g1_type;
                 //     typedef typename CurveType::gt_type gt_type;
-                //     typedef typename pairing_policy<CurveType>::affine_ate_g1_precomp affine_ate_g1_precomp;
-                //     typedef typename pairing_policy<CurveType>::affine_ate_g2_precomp affine_ate_g2_precomp;
+                //     typedef typename pairing::pairing_policy<CurveType>::affine_ate_g1_precomp affine_ate_g1_precomp;
+                //     typedef typename pairing::pairing_policy<CurveType>::affine_ate_g2_precomp affine_ate_g2_precomp;
 
                 // public:
                 //     typedef typename policy_type::constraint_system_type constraint_system_type;

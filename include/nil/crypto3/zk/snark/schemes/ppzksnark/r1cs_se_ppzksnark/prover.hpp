@@ -26,20 +26,16 @@
 #ifndef CRYPTO3_ZK_R1CS_SE_PPZKSNARK_BASIC_PROVER_HPP
 #define CRYPTO3_ZK_R1CS_SE_PPZKSNARK_BASIC_PROVER_HPP
 
-#include <memory>
-
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
-
-#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
-#include <nil/crypto3/algebra/multiexp/policies.hpp>
-
-#include <nil/crypto3/algebra/random_element.hpp>
-
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
+
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_sap.hpp>
+#include <nil/crypto3/zk/snark/relations/arithmetic_programs/sap.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
@@ -99,7 +95,7 @@ namespace nil {
                          *             * (G^{gamma * Z(t)})^r
                          *           = \prod_{i=0}^m A_query[i]^{input_i} * G_gamma_Z^r
                          */
-                        typename CurveType::g1_type::value_type A =
+                        typename CurveType::g1_type<>::value_type A =
                             r * proving_key.G_gamma_Z +
                             proving_key.A_query[0] +                // i = 0 is a special case because input_i = 1
                             sap_wit.d1 * proving_key.G_gamma_Z +    // ZK-patch
@@ -113,7 +109,7 @@ namespace nil {
                         /**
                          * compute B exactly as A, except with H as the base
                          */
-                        typename CurveType::g2_type::value_type B =
+                        typename CurveType::g2_type<>::value_type B =
                             r * proving_key.H_gamma_Z +
                             proving_key.B_query[0] +                // i = 0 is a special case because input_i = 1
                             sap_wit.d1 * proving_key.H_gamma_Z +    // ZK-patch
@@ -133,7 +129,7 @@ namespace nil {
                          * and G^{2 * r * gamma^2 * Z(t) * \sum_{i=0}^m input_i A_i(t)} =
                          *              = \prod_{i=0}^m C_query_2 * input_i
                          */
-                        typename CurveType::g1_type::value_type C =
+                        typename CurveType::g1_type<>::value_type C =
                             algebra::multiexp<algebra::policies::multiexp_method_BDLO12>(
                                 proving_key.C_query_1.begin(),
                                 proving_key.C_query_1.end(),

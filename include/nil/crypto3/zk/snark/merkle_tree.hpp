@@ -28,7 +28,6 @@
 
 #include <map>
 #include <vector>
-
 #include <cmath>
 
 namespace nil {

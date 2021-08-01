@@ -26,7 +26,6 @@
 #ifndef CRYPTO3_R1CS_SE_PPZKSNARK_PROVING_KEY_HPP
 #define CRYPTO3_R1CS_SE_PPZKSNARK_PROVING_KEY_HPP
 
-#include <memory>
 #include <vector>
 
 namespace nil {
@@ -37,37 +36,40 @@ namespace nil {
                  * A proving key for the R1CS ppzkSNARK.
                  */
                 template<typename CurveType, typename ConstraintSystem>
-                struct r1cs_se_ppzksnark_proving_key {
-                    typedef CurveType curve_type;
+                class r1cs_se_ppzksnark_proving_key {
+                    using g1_type = typename CurveType::g1_type<>;
+                    using g2_type = typename CurveType::g2_type<>;
+                public:
+
                     typedef ConstraintSystem constraint_system_type;
 
                     // G^{gamma * A_i(t)} for 0 <= i <= sap.num_variables()
-                    std::vector<typename CurveType::g1_type::value_type> A_query;
+                    std::vector<typename g1_type::value_type> A_query;
 
                     // H^{gamma * A_i(t)} for 0 <= i <= sap.num_variables()
-                    std::vector<typename CurveType::g2_type::value_type> B_query;
+                    std::vector<typename g2_type::value_type> B_query;
 
                     // G^{gamma^2 * C_i(t) + (alpha + beta) * gamma * A_i(t)}
                     // for sap.num_inputs() + 1 < i <= sap.num_variables()
-                    std::vector<typename CurveType::g1_type::value_type> C_query_1;
+                    std::vector<typename g1_type::value_type> C_query_1;
 
                     // G^{2 * gamma^2 * Z(t) * A_i(t)} for 0 <= i <= sap.num_variables()
-                    std::vector<typename CurveType::g1_type::value_type> C_query_2;
+                    std::vector<typename g1_type::value_type> C_query_2;
 
                     // G^{gamma * Z(t)}
-                    typename CurveType::g1_type::value_type G_gamma_Z;
+                    typename g1_type::value_type G_gamma_Z;
 
                     // H^{gamma * Z(t)}
-                    typename CurveType::g2_type::value_type H_gamma_Z;
+                    typename g2_type::value_type H_gamma_Z;
 
                     // G^{(alpha + beta) * gamma * Z(t)}
-                    typename CurveType::g1_type::value_type G_ab_gamma_Z;
+                    typename g1_type::value_type G_ab_gamma_Z;
 
                     // G^{gamma^2 * Z(t)^2}
-                    typename CurveType::g1_type::value_type G_gamma2_Z2;
+                    typename g1_type::value_type G_gamma2_Z2;
 
                     // G^{gamma^2 * Z(t) * t^i} for 0 <= i < sap.degree
-                    std::vector<typename CurveType::g1_type::value_type> G_gamma2_Z_t;
+                    std::vector<typename g1_type::value_type> G_gamma2_Z_t;
 
                     constraint_system_type constraint_system;
 
@@ -75,15 +77,15 @@ namespace nil {
                     r1cs_se_ppzksnark_proving_key &operator=(const r1cs_se_ppzksnark_proving_key &other) = default;
                     r1cs_se_ppzksnark_proving_key(const r1cs_se_ppzksnark_proving_key &other) = default;
                     r1cs_se_ppzksnark_proving_key(r1cs_se_ppzksnark_proving_key &&other) = default;
-                    r1cs_se_ppzksnark_proving_key(std::vector<typename CurveType::g1_type::value_type> &&A_query,
-                                                  std::vector<typename CurveType::g2_type::value_type> &&B_query,
-                                                  std::vector<typename CurveType::g1_type::value_type> &&C_query_1,
-                                                  std::vector<typename CurveType::g1_type::value_type> &&C_query_2,
-                                                  typename CurveType::g1_type::value_type &G_gamma_Z,
-                                                  typename CurveType::g2_type::value_type &H_gamma_Z,
-                                                  typename CurveType::g1_type::value_type &G_ab_gamma_Z,
-                                                  typename CurveType::g1_type::value_type &G_gamma2_Z2,
-                                                  std::vector<typename CurveType::g1_type::value_type> &&G_gamma2_Z_t,
+                    r1cs_se_ppzksnark_proving_key(std::vector<typename g1_type::value_type> &&A_query,
+                                                  std::vector<typename g2_type::value_type> &&B_query,
+                                                  std::vector<typename g1_type::value_type> &&C_query_1,
+                                                  std::vector<typename g1_type::value_type> &&C_query_2,
+                                                  typename g1_type::value_type &G_gamma_Z,
+                                                  typename g2_type::value_type &H_gamma_Z,
+                                                  typename g1_type::value_type &G_ab_gamma_Z,
+                                                  typename g1_type::value_type &G_gamma2_Z2,
+                                                  std::vector<typename g1_type::value_type> &&G_gamma2_Z_t,
                                                   constraint_system_type &&constraint_system) :
                         A_query(std::move(A_query)),
                         B_query(std::move(B_query)), C_query_1(std::move(C_query_1)), C_query_2(std::move(C_query_2)),
@@ -99,7 +101,7 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * CurveType::g1_type::value_bits + G2_size() * CurveType::g2_type::value_bits;
+                        return G1_size() * g1_type::value_bits + G2_size() * g2_type::value_bits;
                     }
 
                     bool operator==(const r1cs_se_ppzksnark_proving_key &other) const {

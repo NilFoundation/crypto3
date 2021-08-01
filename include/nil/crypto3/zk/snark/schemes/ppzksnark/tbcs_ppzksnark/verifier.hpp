@@ -27,11 +27,9 @@
 #define CRYPTO3_ZK_TBCS_PPZKSNARK_BASIC_VERIFIER_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/reductions/tbcs_to_uscs.hpp>
-
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/tbcs_ppzksnark/detail/basic_policy.hpp>
-
 #include <nil/crypto3/zk/snark/algorithms/verify.hpp>
 
 namespace nil {

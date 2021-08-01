@@ -35,9 +35,6 @@
 #define CRYPTO3_ZK_R1CS_HPP
 
 #include <cstdlib>
-#include <iostream>
-#include <map>
-#include <string>
 #include <vector>
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
@@ -178,10 +175,6 @@ namespace nil {
                                 constraints[c].c.evaluate(full_variable_assignment);
 
                             if (!(ares * bres == cres)) {
-                                std::cout << "c: " << c << std::endl;
-                                std::cout << "ares: " << ares.data << std::endl;
-                                std::cout << "bres: " << bres.data << std::endl;
-                                std::cout << "cres: " << cres.data << std::endl;
                                 return false;
                             }
                         }

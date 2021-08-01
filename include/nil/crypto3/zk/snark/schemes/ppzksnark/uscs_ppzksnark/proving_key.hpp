@@ -26,7 +26,6 @@
 #ifndef CRYPTO3_USCS_PPZKSNARK_PROVING_KEY_HPP
 #define CRYPTO3_USCS_PPZKSNARK_PROVING_KEY_HPP
 
-#include <memory>
 #include <vector>
 
 namespace nil {
@@ -37,14 +36,17 @@ namespace nil {
                  * A proving key for the USCS ppzkSNARK.
                  */
                 template<typename CurveType, typename ConstraintSystem>
-                struct uscs_ppzksnark_proving_key {
-                    typedef CurveType curve_type;
+                class uscs_ppzksnark_proving_key {
+                    using g1_type = typename CurveType::g1_type<>;
+                    using g2_type = typename CurveType::g2_type<>;
+                public:
+
                     typedef ConstraintSystem constraint_system_type;
 
-                    std::vector<typename CurveType::g1_type::value_type> V_g1_query;
-                    std::vector<typename CurveType::g1_type::value_type> alpha_V_g1_query;
-                    std::vector<typename CurveType::g1_type::value_type> H_g1_query;
-                    std::vector<typename CurveType::g2_type::value_type> V_g2_query;
+                    std::vector<typename g1_type::value_type> V_g1_query;
+                    std::vector<typename g1_type::value_type> alpha_V_g1_query;
+                    std::vector<typename g1_type::value_type> H_g1_query;
+                    std::vector<typename g2_type::value_type> V_g2_query;
 
                     constraint_system_type constraint_system;
 
@@ -52,10 +54,10 @@ namespace nil {
                     uscs_ppzksnark_proving_key &operator=(const uscs_ppzksnark_proving_key &other) = default;
                     uscs_ppzksnark_proving_key(const uscs_ppzksnark_proving_key &other) = default;
                     uscs_ppzksnark_proving_key(uscs_ppzksnark_proving_key &&other) = default;
-                    uscs_ppzksnark_proving_key(std::vector<typename CurveType::g1_type::value_type> &&V_g1_query,
-                                               std::vector<typename CurveType::g1_type::value_type> &&alpha_V_g1_query,
-                                               std::vector<typename CurveType::g1_type::value_type> &&H_g1_query,
-                                               std::vector<typename CurveType::g2_type::value_type> &&V_g2_query,
+                    uscs_ppzksnark_proving_key(std::vector<typename g1_type::value_type> &&V_g1_query,
+                                               std::vector<typename g1_type::value_type> &&alpha_V_g1_query,
+                                               std::vector<typename g1_type::value_type> &&H_g1_query,
+                                               std::vector<typename g2_type::value_type> &&V_g2_query,
                                                constraint_system_type &&constraint_system) :
                         V_g1_query(std::move(V_g1_query)),
                         alpha_V_g1_query(std::move(alpha_V_g1_query)), H_g1_query(std::move(H_g1_query)),
@@ -78,7 +80,7 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return CurveType::g1_type::value_bits * G1_size() + CurveType::g2_type::value_bits * G2_size();
+                        return g1_type::value_bits * G1_size() + g2_type::value_bits * G2_size();
                     }
 
                     bool operator==(const uscs_ppzksnark_proving_key &other) const {

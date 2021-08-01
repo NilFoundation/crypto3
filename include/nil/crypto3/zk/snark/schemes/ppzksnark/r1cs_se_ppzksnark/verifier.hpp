@@ -26,18 +26,14 @@
 #ifndef CRYPTO3_ZK_R1CS_SE_PPZKSNARK_BASIC_VERIFIER_HPP
 #define CRYPTO3_ZK_R1CS_SE_PPZKSNARK_BASIC_VERIFIER_HPP
 
-#include <memory>
-
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
-
-#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
-#include <nil/crypto3/algebra/multiexp/policies.hpp>
-
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/zk/snark/reductions/r1cs_to_sap.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
+
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
@@ -66,21 +62,23 @@ namespace nil {
 
                     static inline processed_verification_key_type
                         process(const verification_key_type &verification_key) {
-                        typedef typename pairing_policy<CurveType> pairing_policy;
 
-                        typename pairing_policy::g1_precomputed_type G_alpha_pc =
-                            precompute_g1<CurveType>(verification_key.G_alpha);
-                        typename pairing_policy::g2_precomputed_type H_beta_pc =
-                            precompute_g2<CurveType>(verification_key.H_beta);
+                        typename pairing::pairing_policy<CurveType>::g1_precomputed_type 
+                            G_alpha_pc = precompute_g1<CurveType>(verification_key.G_alpha);
+                        typename pairing::pairing_policy<CurveType>::g2_precomputed_type 
+                            H_beta_pc = precompute_g2<CurveType>(verification_key.H_beta);
 
                         processed_verification_key_type processed_verification_key;
                         processed_verification_key.G_alpha = verification_key.G_alpha;
                         processed_verification_key.H_beta = verification_key.H_beta;
                         processed_verification_key.G_alpha_H_beta_ml =
                             miller_loop<CurveType>(G_alpha_pc, H_beta_pc);
-                        processed_verification_key.G_gamma_pc = precompute_g1<CurveType>(verification_key.G_gamma);
-                        processed_verification_key.H_gamma_pc = precompute_g2<CurveType>(verification_key.H_gamma);
-                        processed_verification_key.H_pc = precompute_g2<CurveType>(verification_key.H);
+                        processed_verification_key.G_gamma_pc = 
+                            precompute_g1<CurveType>(verification_key.G_gamma);
+                        processed_verification_key.H_gamma_pc = 
+                            precompute_g2<CurveType>(verification_key.H_gamma);
+                        processed_verification_key.H_pc = 
+                            precompute_g2<CurveType>(verification_key.H);
 
                         processed_verification_key.query = verification_key.query;
 
@@ -159,13 +157,13 @@ namespace nil {
                          *                              * e(C, H)
                          * where psi = \sum_{i=0}^l input_i processed_verification_key.query[i]
                          */
-                        typename CurveType::g1_type::value_type G_psi =
+                        typename CurveType::g1_type<>::value_type G_psi =
                             processed_verification_key.query[0] +
                             algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
                                 processed_verification_key.query.begin() + 1, processed_verification_key.query.end(),
                                 primary_input.begin(), primary_input.end(), chunks);
 
-                        typename gt_typ::value_type
+                        typename CurveType::gt_type::value_type
                             test1_l = miller_loop<CurveType>(
                                 precompute_g1<CurveType>(proof.A + processed_verification_key.G_alpha),
                                 precompute_g2<CurveType>(proof.B + processed_verification_key.H_beta)),
@@ -184,7 +182,7 @@ namespace nil {
                         /**
                          * e(A, H^{gamma}) = e(G^{gamma}, B)
                          */
-                        typename gt_type::value_type test2_l = miller_loop<CurveType>(
+                        typename CurveType::gt_type::value_type test2_l = miller_loop<CurveType>(
                                                               precompute_g1<CurveType>(proof.A),
                                                               processed_verification_key.H_gamma_pc),
                                                           test2_r = miller_loop<CurveType>(

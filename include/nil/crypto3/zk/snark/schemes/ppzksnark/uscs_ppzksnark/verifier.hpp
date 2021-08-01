@@ -26,23 +26,22 @@
 #ifndef CRYPTO3_ZK_USCS_PPZKSNARK_BASIC_VERIFIER_HPP
 #define CRYPTO3_ZK_USCS_PPZKSNARK_BASIC_VERIFIER_HPP
 
-#include <memory>
-
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
-
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/zk/snark/reductions/uscs_to_ssp.hpp>
+#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp.hpp>
+#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
+#include <nil/crypto3/zk/snark/reductions/uscs_to_ssp.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+
+                using namespace algebra;
 
                 /*
                  Below are four variants of verifier algorithm for the USCS ppzkSNARK.
@@ -64,19 +63,14 @@ namespace nil {
                 template<typename CurveType>
                 class uscs_ppzksnark_process_verification_key {
                     typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
-
-                    typedef typename CurveType::pairing pairing_policy;
-
+                    using g1_type = typename CurveType::g1_type<>;
+                    using g2_type = typename CurveType::g2_type<>;
                 public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                    typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
                     static inline processed_verification_key_type process(const verification_key_type &vk) {
@@ -84,9 +78,9 @@ namespace nil {
                         processed_verification_key_type pvk;
 
                         pvk.pp_G1_one_precomp =
-                            precompute_g1<CurveType>(CurveType::g1_type::value_type::one());
+                            precompute_g1<CurveType>(g1_type::value_type::one());
                         pvk.pp_G2_one_precomp =
-                            precompute_g2<CurveType>(CurveType::g2_type::value_type::one());
+                            precompute_g2<CurveType>(g2_type::value_type::one());
 
                         pvk.vk_tilde_g2_precomp = precompute_g2<CurveType>(vk.tilde_g2);
                         pvk.vk_alpha_tilde_g2_precomp = precompute_g2<CurveType>(vk.alpha_tilde_g2);
@@ -104,16 +98,14 @@ namespace nil {
                 class uscs_ppzksnark_verifier_weak_input_consistency {
                     typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
 
-                public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
-                    typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
+                    using pairing_policy = pairing::pairing_policy<CurveType>;
 
-                    typedef typename policy_type::proving_key_type proving_key_type;
+                public:
+                    typedef typename policy_type::primary_input_type primary_input_type;
+
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
                     /**
@@ -138,15 +130,14 @@ namespace nil {
                     static inline bool process(const processed_verification_key_type &pvk,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        typedef typename pairing_policy<CurveType> pairing_policy;
 
                         assert(pvk.encoded_IC_query.domain_size() >= primary_input.size());
 
-                        const accumulation_vector<typename CurveType::g1_type> accumulated_IC =
+                        const accumulation_vector<typename CurveType::g1_type<>> accumulated_IC =
                             pvk.encoded_IC_query.accumulate_chunk(
                                 primary_input.begin(), primary_input.end(), 0);
                         assert(accumulated_IC.is_fully_accumulated());
-                        const typename CurveType::g1_type::value_type &acc = accumulated_IC.first;
+                        const typename CurveType::g1_type<>::value_type &acc = accumulated_IC.first;
 
                         bool result = true;
 
@@ -206,15 +197,11 @@ namespace nil {
                     typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
 
                 public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                    typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
                     /**

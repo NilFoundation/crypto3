@@ -26,8 +26,6 @@
 #ifndef CRYPTO3_USCS_PPZKSNARK_PROOF_HPP
 #define CRYPTO3_USCS_PPZKSNARK_PROOF_HPP
 
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -40,23 +38,26 @@ namespace nil {
                  * about the structure for statistics purposes.
                  */
                 template<typename CurveType>
-                struct uscs_ppzksnark_proof {
-                    typedef CurveType curve_type;
+                class uscs_ppzksnark_proof {
+                    using g1_type = typename CurveType::g1_type<>;
+                    using g2_type = typename CurveType::g2_type<>;
 
-                    typename CurveType::g1_type::value_type V_g1;
-                    typename CurveType::g1_type::value_type alpha_V_g1;
-                    typename CurveType::g1_type::value_type H_g1;
-                    typename CurveType::g2_type::value_type V_g2;
+                public:
+
+                    typename g1_type::value_type V_g1;
+                    typename g1_type::value_type alpha_V_g1;
+                    typename g1_type::value_type H_g1;
+                    typename g2_type::value_type V_g2;
 
                     uscs_ppzksnark_proof() :
-                        V_g1(CurveType::g1_type::value_type::one()), alpha_V_g1(CurveType::g1_type::value_type::one()),
-                        H_g1(CurveType::g1_type::value_type::one()), V_g2(CurveType::g2_type::value_type::one()) {
+                        V_g1(g1_type::value_type::one()), alpha_V_g1(g1_type::value_type::one()),
+                        H_g1(g1_type::value_type::one()), V_g2(g2_type::value_type::one()) {
                         // invalid proof with valid curve points
                     }
-                    uscs_ppzksnark_proof(typename CurveType::g1_type::value_type &&V_g1,
-                                         typename CurveType::g1_type::value_type &&alpha_V_g1,
-                                         typename CurveType::g1_type::value_type &&H_g1,
-                                         typename CurveType::g2_type::value_type &&V_g2) :
+                    uscs_ppzksnark_proof(typename g1_type::value_type &&V_g1,
+                                         typename g1_type::value_type &&alpha_V_g1,
+                                         typename g1_type::value_type &&H_g1,
+                                         typename g2_type::value_type &&V_g2) :
                         V_g1(std::move(V_g1)),
                         alpha_V_g1(std::move(alpha_V_g1)), H_g1(std::move(H_g1)), V_g2(std::move(V_g2)) {};
 
@@ -69,7 +70,7 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * CurveType::g1_type::value_bits + G2_size() * CurveType::g2_type::value_bits;
+                        return G1_size() * g1_type::value_bits + G2_size() * g2_type::value_bits;
                     }
 
                     bool is_well_formed() const {

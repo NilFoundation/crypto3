@@ -27,24 +27,18 @@
 #ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_GENERATOR_HPP
 #define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_GENERATOR_HPP
 
-#include <memory>
-#include <random>
-
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
-
-#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
-
-#include <nil/crypto3/algebra/random_element.hpp>
-
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
+#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
+#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
+#include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
