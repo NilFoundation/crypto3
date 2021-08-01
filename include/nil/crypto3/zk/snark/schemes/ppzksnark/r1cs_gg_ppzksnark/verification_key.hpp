@@ -44,17 +44,17 @@ namespace nil {
                     typedef CurveType curve_type;
 
                     typename CurveType::gt_type::value_type alpha_g1_beta_g2;
-                    typename CurveType::g2_type::value_type gamma_g2;
-                    typename CurveType::g2_type::value_type delta_g2;
+                    typename CurveType::g2_type<>::value_type gamma_g2;
+                    typename CurveType::g2_type<>::value_type delta_g2;
 
-                    accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1;
+                    accumulation_vector<typename CurveType::g1_type<>> gamma_ABC_g1;
 
                     r1cs_gg_ppzksnark_verification_key() = default;
                     r1cs_gg_ppzksnark_verification_key(
                         const typename CurveType::gt_type::value_type &alpha_g1_beta_g2,
-                        const typename CurveType::g2_type::value_type &gamma_g2,
-                        const typename CurveType::g2_type::value_type &delta_g2,
-                        const accumulation_vector<typename CurveType::g1_type> &gamma_ABC_g1) :
+                        const typename CurveType::g2_type<>::value_type &gamma_g2,
+                        const typename CurveType::g2_type<>::value_type &delta_g2,
+                        const accumulation_vector<typename CurveType::g1_type<>> &gamma_ABC_g1) :
                         alpha_g1_beta_g2(alpha_g1_beta_g2),
                         gamma_g2(gamma_g2), delta_g2(delta_g2), gamma_ABC_g1(gamma_ABC_g1) {
                     }
@@ -72,8 +72,10 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
+                        using g2_type = typename CurveType::g2_type<>;
+
                         // TODO: include GT size
-                        return (gamma_ABC_g1.size_in_bits() + 2 * CurveType::g2_type::value_bits);
+                        return (gamma_ABC_g1.size_in_bits() + 2 * g2_type::value_bits);
                     }
 
                     bool operator==(const r1cs_gg_ppzksnark_verification_key &other) const {
@@ -91,7 +93,7 @@ namespace nil {
                     typename pairing_policy::g2_precomputed_type vk_gamma_g2_precomp;
                     typename pairing_policy::g2_precomputed_type vk_delta_g2_precomp;
 
-                    accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1;
+                    accumulation_vector<typename CurveType::g1_type<>> gamma_ABC_g1;
 
                     bool operator==(const r1cs_gg_ppzksnark_processed_verification_key &other) const {
                         return (this->vk_alpha_g1_beta_g2 == other.vk_alpha_g1_beta_g2 &&

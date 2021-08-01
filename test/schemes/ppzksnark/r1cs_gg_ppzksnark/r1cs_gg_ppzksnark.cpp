@@ -33,8 +33,11 @@
 #include <cassert>
 #include <cstdio>
 
-#include "../r1cs_examples.hpp"
-#include "run_r1cs_gg_ppzksnark.hpp"
+#include <nil/crypto3/algebra/pairing/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/mnt4.hpp>
+#include <nil/crypto3/algebra/pairing/mnt6.hpp>
+
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
@@ -42,6 +45,9 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
+
+#include "../r1cs_examples.hpp"
+#include "run_r1cs_gg_ppzksnark.hpp"
 
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
