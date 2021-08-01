@@ -41,21 +41,21 @@ namespace nil {
                 /************************* BN128-254 ***********************************/
 
                 template<>
-                struct wnaf_params<typename bn128<254>::g1_type> {
+                struct wnaf_params<typename bn128<254>::g1_type<>> {
 
                     constexpr static const std::array<std::size_t, 4> wnaf_window_table = {10, 24, 40, 132};
                 };
 
                 template<>
-                struct wnaf_params<typename bn128<254>::g2_type> {
+                struct wnaf_params<typename bn128<254>::g2_type<>> {
 
                     constexpr static const std::array<std::size_t, 4> wnaf_window_table = {7, 18, 35, 116};
                 };
 
                 /************************* BN128-254 definitions ***********************************/
 
-                constexpr std::array<std::size_t, 4> const wnaf_params<typename bn128<254>::g1_type>::wnaf_window_table;
-                constexpr std::array<std::size_t, 4> const wnaf_params<typename bn128<254>::g2_type>::wnaf_window_table;
+                constexpr std::array<std::size_t, 4> const wnaf_params<typename bn128<254>::g1_type<>>::wnaf_window_table;
+                constexpr std::array<std::size_t, 4> const wnaf_params<typename bn128<254>::g2_type<>>::wnaf_window_table;
 
             }    // namespace curves
         }        // namespace algebra

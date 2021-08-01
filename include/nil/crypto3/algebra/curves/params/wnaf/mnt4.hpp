@@ -41,21 +41,21 @@ namespace nil {
                 /************************* MNT4-298 ***********************************/
 
                 template<>
-                struct wnaf_params<typename mnt4<298>::g1_type> {
+                struct wnaf_params<typename mnt4<298>::g1_type<>> {
 
                     constexpr static const std::array<std::size_t, 4> wnaf_window_table = {11, 24, 60, 127};
                 };
 
                 template<>
-                struct wnaf_params<typename mnt4<298>::g2_type> {
+                struct wnaf_params<typename mnt4<298>::g2_type<>> {
 
                     constexpr static const std::array<std::size_t, 4> wnaf_window_table = {5, 15, 39, 109};
                 };
 
                 /************************* MNT4-298 definitions ***********************************/
 
-                constexpr std::array<std::size_t, 4> const wnaf_params<typename mnt4<298>::g1_type>::wnaf_window_table;
-                constexpr std::array<std::size_t, 4> const wnaf_params<typename mnt4<298>::g2_type>::wnaf_window_table;
+                constexpr std::array<std::size_t, 4> const wnaf_params<typename mnt4<298>::g1_type<>>::wnaf_window_table;
+                constexpr std::array<std::size_t, 4> const wnaf_params<typename mnt4<298>::g2_type<>>::wnaf_window_table;
 
             }    // namespace curves
         }        // namespace algebra

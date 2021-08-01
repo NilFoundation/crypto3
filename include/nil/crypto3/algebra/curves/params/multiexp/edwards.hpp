@@ -41,7 +41,7 @@ namespace nil {
                 /************************* EDWARDS-183 ***********************************/
 
                 template<>
-                struct multiexp_params<typename edwards<183>::g1_type> {
+                struct multiexp_params<typename edwards<183>::g1_type<>> {
 
                     constexpr static const std::array<std::size_t, 22> fixed_base_exp_window_table = {
                         // window 1 is unbeaten in [-inf, 4.10]
@@ -91,7 +91,7 @@ namespace nil {
                 };
 
                 template<>
-                struct multiexp_params<typename edwards<183>::g2_type> {
+                struct multiexp_params<typename edwards<183>::g2_type<>> {
 
                     constexpr static const std::array<std::size_t, 22> fixed_base_exp_window_table = {
                         // window 1 is unbeaten in [-inf, 4.74]
@@ -143,9 +143,9 @@ namespace nil {
                 /************************* EDWARDS-183 definitions ***********************************/
 
                 constexpr std::array<std::size_t, 22> const
-                    multiexp_params<typename edwards<183>::g1_type>::fixed_base_exp_window_table;
+                    multiexp_params<typename edwards<183>::g1_type<>>::fixed_base_exp_window_table;
                 constexpr std::array<std::size_t, 22> const
-                    multiexp_params<typename edwards<183>::g2_type>::fixed_base_exp_window_table;
+                    multiexp_params<typename edwards<183>::g2_type<>>::fixed_base_exp_window_table;
 
             }    // namespace curves
         }        // namespace algebra
