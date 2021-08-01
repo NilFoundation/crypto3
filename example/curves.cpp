@@ -156,48 +156,48 @@ void fp3_curve_group_basic_math_examples() {
 
 int main() {
     std::cout << "ALT_BN128-254 curve g1 group basic math:" << std::endl;
-    fp_curve_group_basic_math_examples<curves::alt_bn128<254>::g1_type>();
+    fp_curve_group_basic_math_examples<curves::alt_bn128<254>::g1_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "ALT_BN128-254 curve g2 group basic math:" << std::endl;
-    fp2_curve_group_basic_math_examples<curves::alt_bn128<254>::g2_type>();
+    fp2_curve_group_basic_math_examples<curves::alt_bn128<254>::g2_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "BLS12-381 curve g1 group basic math:" << std::endl;
-    fp_curve_group_basic_math_examples<curves::bls12<381>::g1_type>();
+    fp_curve_group_basic_math_examples<curves::bls12<381>::g1_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "BLS12-381 curve g2 group basic math:" << std::endl;
-    fp2_curve_group_basic_math_examples<curves::bls12<381>::g2_type>();
+    fp2_curve_group_basic_math_examples<curves::bls12<381>::g2_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "BLS12-377 curve g1 group basic math:" << std::endl;
-    fp_curve_group_basic_math_examples<curves::bls12<377>::g1_type>();
+    fp_curve_group_basic_math_examples<curves::bls12<377>::g1_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "BLS12-377 curve g2 group basic math:" << std::endl;
-    fp2_curve_group_basic_math_examples<curves::bls12<377>::g2_type>();
+    fp2_curve_group_basic_math_examples<curves::bls12<377>::g2_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "Edwards curve g1 group basic math:" << std::endl;
-    fp_curve_group_basic_math_examples<curves::edwards<183>::g1_type>();
+    fp_curve_group_basic_math_examples<curves::edwards<183>::g1_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "Edwards curve g2 group basic math:" << std::endl;
-    fp3_curve_group_basic_math_examples<curves::edwards<183>::g2_type>();
+    fp3_curve_group_basic_math_examples<curves::edwards<183>::g2_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "BabyJubJub curve g1 group basic math:" << std::endl;
 
-    using babyjubjub_g1_type = typename curves::babyjubjub::g1_type;
+    using babyjubjub_g1_type = typename curves::babyjubjub::g1_type<>;
     using bjj_g1_f_v = typename babyjubjub_g1_type::field_type::value_type;
 
     typename babyjubjub_g1_type::value_type 
@@ -215,22 +215,22 @@ int main() {
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "Mnt4 curve g1 group basic math:" << std::endl;
-    fp_curve_group_basic_math_examples<curves::mnt4<298>::g1_type>();
+    fp_curve_group_basic_math_examples<curves::mnt4<298>::g1_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "Mnt4 curve g2 group basic math:" << std::endl;
-    fp2_curve_group_basic_math_examples<curves::mnt4<298>::g2_type>();
+    fp2_curve_group_basic_math_examples<curves::mnt4<298>::g2_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "Mnt6 curve g1 group basic math:" << std::endl;
-    fp_curve_group_basic_math_examples<curves::mnt6<298>::g1_type>();
+    fp_curve_group_basic_math_examples<curves::mnt6<298>::g1_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "Mnt6 curve g2 group basic math:" << std::endl;
-    fp3_curve_group_basic_math_examples<curves::mnt6<298>::g2_type>();
+    fp3_curve_group_basic_math_examples<curves::mnt6<298>::g2_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
