@@ -41,7 +41,7 @@ namespace nil {
                         using extended_number_type = typename curve_type::base_field_type::extended_modulus_type;
 
                         using g1_field_value_type = typename curve_type::base_field_type::value_type;
-                        using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
+                        using g2_field_value_type = typename curve_type::template g2_type<>::field_type::value_type;
 
                         struct affine_ate_g1_precomputation {
                             g1_field_value_type PX;

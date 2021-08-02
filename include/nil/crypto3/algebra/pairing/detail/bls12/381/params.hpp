@@ -56,12 +56,12 @@ namespace nil {
                         constexpr static const integral_type final_exponent_z = 0xD201000000010000_cppui64;
                         constexpr static const bool final_exponent_is_z_neg = true;
 
-                        using g2_field_type_value = typename curve_type::g2_type<>::field_type::value_type;
+                        using g2_field_type_value = typename curve_type::template g2_type<>::field_type::value_type;
 
-                        constexpr static const g2_field_type_value twist = curve_type::g2_type<>::params_type::twist;
+                        constexpr static const g2_field_type_value twist = curve_type::template g2_type<>::params_type::twist;
 
                         constexpr static const g2_field_type_value twist_coeff_b =
-                            curve_type::g2_type<>::params_type::b;
+                            curve_type::template g2_type<>::params_type::b;
                     };
 
                     constexpr typename pairing_params<curves::bls12<381>>::integral_type const

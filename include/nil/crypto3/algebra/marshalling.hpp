@@ -136,8 +136,8 @@ namespace nil {
             typedef ::nil::crypto3::algebra::curves::bls12<381> curve_type;
             typedef typename curve_type::base_field_type fp_type;
             typedef typename curve_type::scalar_field_type fr_type;
-            typedef typename curve_type::g1_type<> g1_type;
-            typedef typename curve_type::g2_type<> g2_type;
+            typedef typename curve_type::template g1_type<> g1_type;
+            typedef typename curve_type::template g2_type<> g2_type;
             typedef typename curve_type::gt_type gt_type;
 
             typedef std::uint8_t chunk_type;

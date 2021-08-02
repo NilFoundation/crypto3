@@ -37,8 +37,8 @@ namespace nil {
                 class short_weierstrass_jacobian_with_a4_0_ate_precompute_g1 {
                     using curve_type = CurveType;
                     using types_policy = detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type>;
-                    using g1_type = typename curve_type::g1_type<>;
-                    using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
+                    using g1_type = typename curve_type::template g1_type<>;
+                    using g1_affine_type = typename curve_type::template g1_type<curves::coordinates::affine>;
 
                 public:
                     using g1_precomputed_type = typename types_policy::ate_g1_precomputed_type;

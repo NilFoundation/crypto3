@@ -63,7 +63,7 @@ namespace nil {
                         using form = forms::twisted_edwards;
                         using coordinates = coordinates::affine;
 
-                        using group_type = typename params_type::group_type<coordinates>;
+                        using group_type = typename params_type::template group_type<coordinates>;
 
                         field_value_type X;
                         field_value_type Y;

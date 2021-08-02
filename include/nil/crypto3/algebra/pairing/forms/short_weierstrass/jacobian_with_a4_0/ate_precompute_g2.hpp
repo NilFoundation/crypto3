@@ -44,8 +44,8 @@ namespace nil {
                     using types_policy = detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;
-                    using g2_type = typename curve_type::g2_type<>;
-                    using g2_affine_type = typename curve_type::g2_type<curves::coordinates::affine>;
+                    using g2_type = typename curve_type::template g2_type<>;
+                    using g2_affine_type = typename curve_type::template g2_type<curves::coordinates::affine>;
 
                     using g2_field_type_value = typename g2_type::field_type::value_type;
 

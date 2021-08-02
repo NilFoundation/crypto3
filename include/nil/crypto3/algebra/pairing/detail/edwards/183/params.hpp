@@ -60,9 +60,9 @@ namespace nil {
                         constexpr static const extended_integral_type final_exponent = extended_integral_type(
                             0x11128FF78CE1BA3ED7BDC08DC0E8027077FC9348F971A3EF1053C9D33B1AA7CEBA86030D02292F9F5E784FDE9EE9D0176DBE7DA7ECBBCB64CDC0ACD4E64D7156C2F84EE1AAFA1098707148DB1E4797E330E5D507E78D8246A4843B4A174E7CD7CA937BDC5D67A6176F9A48984764500000000_cppui913);
 
-                        using g2_field_type_value = typename curve_type::g2_type<>::field_type::value_type;
+                        using g2_field_type_value = typename curve_type::template g2_type<>::field_type::value_type;
 
-                        constexpr static const g2_field_type_value twist = curve_type::g2_type<>::value_type::twist;
+                        constexpr static const g2_field_type_value twist = curve_type::template g2_type<>::value_type::twist;
                     };
 
                     constexpr typename pairing_params<curves::edwards<183>>::integral_type const

@@ -50,8 +50,8 @@ namespace nil {
                     using gt_type = typename curve_type::gt_type;
 
                     using base_field_type = typename curve_type::base_field_type;
-                    using g1_type = typename curve_type::g1_type<>;
-                    using g2_type = typename curve_type::g2_type<>;
+                    using g1_type = typename curve_type::template g1_type<>;
+                    using g2_type = typename curve_type::template g2_type<>;
 
                     using g1_field_type_value = typename g1_type::field_type::value_type;
                     using g2_field_type_value = typename g2_type::field_type::value_type;

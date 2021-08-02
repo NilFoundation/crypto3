@@ -39,8 +39,8 @@ namespace nil {
 
                     using params_type = detail::pairing_params<curve_type>;
                     using types_policy = detail::short_weierstrass_projective_<curve_type>;
-                    using g1_type = typename curve_type::g1_type<>;
-                    using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
+                    using g1_type = typename curve_type::template g1_type<>;
+                    using g1_affine_type = typename curve_type::template g1_type<curves::coordinates::affine>;
 
                 public:
                     using g1_precomputed_type = typename types_policy::affine_ate_g1_precomputation;

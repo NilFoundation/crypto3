@@ -59,7 +59,7 @@ namespace nil {
                         constexpr static const bool final_exponent_last_chunk_is_w0_neg = true;
                         constexpr static const integral_type final_exponent_last_chunk_w1 = integral_type(0x1);
 
-                        using g2_field_type_value = typename curve_type::g2_type<>::field_type::value_type;
+                        using g2_field_type_value = typename curve_type::template g2_type<>::field_type::value_type;
 
                         constexpr static const g2_field_type_value twist =
                             g2_field_type_value(g2_field_type_value::underlying_type::zero(),
@@ -67,9 +67,9 @@ namespace nil {
                                                 g2_field_type_value::underlying_type::zero());
 
                         constexpr static const g2_field_type_value twist_coeff_a =
-                            curve_type::g2_type<>::params_type::a;
+                            curve_type::template g2_type<>::params_type::a;
                         constexpr static const g2_field_type_value twist_coeff_b =
-                            curve_type::g2_type<>::params_type::b;
+                            curve_type::template g2_type<>::params_type::b;
                     };
 
                     constexpr typename pairing_params<curves::mnt6<298>>::integral_type const
