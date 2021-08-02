@@ -138,6 +138,7 @@ namespace nil {
                 class r1cs_gg_ppzksnark<
                     CurveType, Generator, Prover, Verifier, ProvingMode::Aggregate,
                     typename std::enable_if<is_aggregate_mode<CurveType, Generator, Prover, Verifier>::value>::type> {
+                        
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
 
                 public:

@@ -27,12 +27,12 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_VERIFY_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_VERIFY_HPP
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verification_key.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prover.hpp>
-
-#include <nil/crypto3/algebra/random_element.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -100,8 +100,8 @@ namespace nil {
                     typedef typename curve_type::gt_type gt_type;
                     typedef typename curve_type::scalar_field_type scalar_field_type;
 
-                    typedef typename g1_type<>::value_type g1_value_type;
-                    typedef typename g2_type<>::value_type g2_value_type;
+                    typedef typename g1_type::value_type g1_value_type;
+                    typedef typename g2_type::value_type g2_value_type;
                     typedef typename gt_type::value_type gt_value_type;
                     typedef typename scalar_field_type::value_type scalar_field_value_type;
 
@@ -665,31 +665,11 @@ namespace nil {
                 class r1cs_gg_ppzksnark_aggregate_verifier {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
 
-                    typedef typename CurveType::pairing pairing_policy;
-                    typedef typename CurveType::scalar_field_type scalar_field_type;
-                    typedef typename CurveType::g1_type<> g1_type;
-                    typedef typename CurveType::gt_type gt_type;
-                    typedef typename pairing_policy::g1_precomputed_type g1_precomputed_type;
-                    typedef typename pairing_policy::g2_precomputed_type g2_precomputed_type;
-                    typedef typename pairing_policy::fqk_type fqk_type;
-
                 public:
                     typedef BasicVerifier basic_verifier;
-
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
-
-                    typedef typename policy_type::srs_type srs_type;
-                    typedef typename policy_type::proving_srs_type proving_srs_type;
                     typedef typename policy_type::verification_srs_type verification_srs_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::srs_pair_type srs_pair_type;
-
                     typedef typename policy_type::proof_type proof_type;
                     typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
 

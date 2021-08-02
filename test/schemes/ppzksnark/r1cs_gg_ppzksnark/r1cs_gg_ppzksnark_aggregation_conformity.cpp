@@ -36,20 +36,21 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include <boost/assert.hpp>
-
 #include <boost/iterator/zip_iterator.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/mnt4.hpp>
+#include <nil/crypto3/algebra/pairing/mnt6.hpp>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prover.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verifier.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/transcript.hpp>
-
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark.hpp>
-
 #include <nil/crypto3/zk/snark/algorithms/prove.hpp>
 #include <nil/crypto3/zk/snark/algorithms/verify.hpp>
 
@@ -102,15 +103,15 @@ namespace boost {
     namespace test_tools {
         namespace tt_detail {
             template<>
-            struct print_log_value<typename curves::bls12<381>::g1_type::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<381>::g1_type::value_type const &e) {
+            struct print_log_value<typename curves::bls12<381>::g1_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::bls12<381>::g1_type<>::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::bls12<381>::g2_type::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<381>::g2_type::value_type const &e) {
+            struct print_log_value<typename curves::bls12<381>::g2_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::bls12<381>::g2_type<>::value_type const &e) {
                     print_fp2_curve_group_element(os, e);
                 }
             };
@@ -163,8 +164,8 @@ using scheme_type = r1cs_gg_ppzksnark<
                                          r1cs_gg_ppzksnark_verifier_strong_input_consistency<curve_type>>,
     ProvingMode::Aggregate>;
 
-using g1_type = typename curve_type::g1_type;
-using g2_type = typename curve_type::g2_type;
+using g1_type = typename curve_type::g1_type<>;
+using g2_type = typename curve_type::g2_type<>;
 using gt_type = typename curve_type::gt_type;
 using G1_value_type = typename g1_type::value_type;
 using G2_value_type = typename g2_type::value_type;
@@ -175,7 +176,7 @@ using scalar_field_value_type = typename scalar_field_type::value_type;
 using fq_type = typename curve_type::base_field_type;
 using fq_value_type = typename fq_type::value_type;
 
-using fq2_type = typename G2_value_type::underlying_field_type;
+using fq2_type = typename G2_value_type::field_type;
 using fq2_value_type = typename fq2_type::value_type;
 
 using fq12_type = typename curve_type::gt_type;
