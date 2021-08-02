@@ -63,8 +63,8 @@ namespace nil {
                 template<typename CurveType>
                 class uscs_ppzksnark_process_verification_key {
                     typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
-                    using g1_type = typename CurveType::g1_type<>;
-                    using g2_type = typename CurveType::g2_type<>;
+                    using g1_type = typename CurveType::template g1_type<>;
+                    using g2_type = typename CurveType::template g2_type<>;
                 public:
                     typedef typename policy_type::primary_input_type primary_input_type;
 
@@ -133,11 +133,11 @@ namespace nil {
 
                         assert(pvk.encoded_IC_query.domain_size() >= primary_input.size());
 
-                        const accumulation_vector<typename CurveType::g1_type<>> accumulated_IC =
+                        const accumulation_vector<typename CurveType::template g1_type<>> accumulated_IC =
                             pvk.encoded_IC_query.accumulate_chunk(
                                 primary_input.begin(), primary_input.end(), 0);
                         assert(accumulated_IC.is_fully_accumulated());
-                        const typename CurveType::g1_type<>::value_type &acc = accumulated_IC.first;
+                        const typename CurveType::template g1_type<>::value_type &acc = accumulated_IC.first;
 
                         bool result = true;
 

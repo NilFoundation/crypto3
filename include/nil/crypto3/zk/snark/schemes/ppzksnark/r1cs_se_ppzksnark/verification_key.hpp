@@ -103,14 +103,14 @@ namespace nil {
                 template<typename CurveType>
                 struct r1cs_se_ppzksnark_processed_verification_key {
 
-                    typename CurveType::g1_type<>::value_type G_alpha;
-                    typename CurveType::g2_type<>::value_type H_beta;
+                    typename CurveType::template g1_type<>::value_type G_alpha;
+                    typename CurveType::template g2_type<>::value_type H_beta;
                     typename CurveType::gt_type::value_type G_alpha_H_beta_ml;
                     typename pairing::pairing_policy<CurveType>::g1_precomputed_type G_gamma_pc;
                     typename pairing::pairing_policy<CurveType>::g2_precomputed_type H_gamma_pc;
                     typename pairing::pairing_policy<CurveType>::g2_precomputed_type H_pc;
 
-                    std::vector<typename CurveType::g1_type<>::value_type> query;
+                    std::vector<typename CurveType::template g1_type<>::value_type> query;
 
                     bool operator==(const r1cs_se_ppzksnark_processed_verification_key &other) const {
                         return (this->G_alpha == other.G_alpha && this->H_beta == other.H_beta &&

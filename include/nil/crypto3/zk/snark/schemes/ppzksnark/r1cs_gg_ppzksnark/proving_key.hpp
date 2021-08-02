@@ -39,17 +39,19 @@ namespace nil {
                     typedef CurveType curve_type;
                     typedef ConstraintSystem constraint_system_type;
 
-                    typename CurveType::g1_type<>::value_type alpha_g1;
-                    typename CurveType::g1_type<>::value_type beta_g1;
-                    typename CurveType::g2_type<>::value_type beta_g2;
-                    typename CurveType::g1_type<>::value_type delta_g1;
-                    typename CurveType::g2_type<>::value_type delta_g2;
+                    typename CurveType::template g1_type<>::value_type alpha_g1;
+                    typename CurveType::template g1_type<>::value_type beta_g1;
+                    typename CurveType::template g2_type<>::value_type beta_g2;
+                    typename CurveType::template g1_type<>::value_type delta_g1;
+                    typename CurveType::template g2_type<>::value_type delta_g2;
 
-                    std::vector<typename CurveType::g1_type<>::value_type>
+                    std::vector<typename CurveType::template g1_type<>::value_type>
                         A_query;    // this could be a sparse vector if we had multiexp for those
-                    knowledge_commitment_vector<typename CurveType::g2_type<>, typename CurveType::g1_type<>> B_query;
-                    std::vector<typename CurveType::g1_type<>::value_type> H_query;
-                    std::vector<typename CurveType::g1_type<>::value_type> L_query;
+                    knowledge_commitment_vector<typename CurveType::template g2_type<>,
+                                                typename CurveType::template g1_type<>>
+                        B_query;
+                    std::vector<typename CurveType::template g1_type<>::value_type> H_query;
+                    std::vector<typename CurveType::template g1_type<>::value_type> L_query;
 
                     constraint_system_type constraint_system;
 
@@ -59,20 +61,22 @@ namespace nil {
                     r1cs_gg_ppzksnark_proving_key(r1cs_gg_ppzksnark_proving_key &&other) = default;
 
                     r1cs_gg_ppzksnark_proving_key(
-                        typename CurveType::g1_type<>::value_type &&alpha_g1,
-                        typename CurveType::g1_type<>::value_type &&beta_g1,
-                        typename CurveType::g2_type<>::value_type &&beta_g2,
-                        typename CurveType::g1_type<>::value_type &&delta_g1,
-                        typename CurveType::g2_type<>::value_type &&delta_g2,
-                        std::vector<typename CurveType::g1_type<>::value_type> &&A_query,
-                        knowledge_commitment_vector<typename CurveType::g2_type<>, typename CurveType::g1_type<>> &&B_query,
-                        std::vector<typename CurveType::g1_type<>::value_type> &&H_query,
-                        std::vector<typename CurveType::g1_type<>::value_type> &&L_query,
+                        typename CurveType::template g1_type<>::value_type &&alpha_g1,
+                        typename CurveType::template g1_type<>::value_type &&beta_g1,
+                        typename CurveType::template g2_type<>::value_type &&beta_g2,
+                        typename CurveType::template g1_type<>::value_type &&delta_g1,
+                        typename CurveType::template g2_type<>::value_type &&delta_g2,
+                        std::vector<typename CurveType::template g1_type<>::value_type> &&A_query,
+                        knowledge_commitment_vector<typename CurveType::template g2_type<>,
+                                                    typename CurveType::template g1_type<>> &&B_query,
+                        std::vector<typename CurveType::template g1_type<>::value_type> &&H_query,
+                        std::vector<typename CurveType::template g1_type<>::value_type> &&L_query,
                         constraint_system_type &&constraint_system) :
                         alpha_g1(std::move(alpha_g1)),
                         beta_g1(std::move(beta_g1)), beta_g2(std::move(beta_g2)), delta_g1(std::move(delta_g1)),
                         delta_g2(std::move(delta_g2)), A_query(std::move(A_query)), B_query(std::move(B_query)),
-                        H_query(std::move(H_query)), L_query(std::move(L_query)), constraint_system(std::move(constraint_system)) {};
+                        H_query(std::move(H_query)), L_query(std::move(L_query)),
+                        constraint_system(std::move(constraint_system)) {};
 
                     std::size_t G1_size() const {
                         return 1 + A_query.size() + B_query.domain_size() + H_query.size() + L_query.size();
@@ -91,13 +95,12 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        using g1_type = typename CurveType::g1_type<>;
-                        using g2_type = typename CurveType::g2_type<>;
+                        using g1_type = typename CurveType::template g1_type<>;
+                        using g2_type = typename CurveType::template g2_type<>;
 
                         return A_query.size() * g1_type::value_bits + B_query.size_in_bits() +
-                               H_query.size() * g1_type::value_bits +
-                               L_query.size() * g1_type::value_bits + 1 * g1_type::value_bits +
-                               1 * g2_type::value_bits;
+                               H_query.size() * g1_type::value_bits + L_query.size() * g1_type::value_bits +
+                               1 * g1_type::value_bits + 1 * g2_type::value_bits;
                     }
 
                     bool operator==(const r1cs_gg_ppzksnark_proving_key &other) const {

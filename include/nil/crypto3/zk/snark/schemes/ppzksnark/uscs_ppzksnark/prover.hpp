@@ -56,8 +56,8 @@ namespace nil {
                 class uscs_ppzksnark_prover {
                     typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
 
-                    using g1_type = typename CurveType::g1_type<>;
-                    using g2_type = typename CurveType::g2_type<>;
+                    using g1_type = typename CurveType::template g1_type<>;
+                    using g2_type = typename CurveType::template g2_type<>;
                 public:
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::auxiliary_input_type auxiliary_input_type;

@@ -61,8 +61,8 @@ namespace nil {
                     static inline keypair_type process(const constraint_system_type &constraint_system) {
 
                         typedef typename CurveType::scalar_field_type scalar_field_type;
-                        typedef typename CurveType::g1_type<> g1_type;
-                        typedef typename CurveType::g2_type<> g2_type;
+                        typedef typename CurveType::template g1_type<> g1_type;
+                        typedef typename CurveType::template g2_type<> g2_type;
 
                         /* make the B_query "lighter" if possible */
                         constraint_system_type cs_copy(constraint_system);

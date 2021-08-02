@@ -157,7 +157,7 @@ namespace nil {
                          *                              * e(C, H)
                          * where psi = \sum_{i=0}^l input_i processed_verification_key.query[i]
                          */
-                        typename CurveType::g1_type<>::value_type G_psi =
+                        typename CurveType::template g1_type<>::value_type G_psi =
                             processed_verification_key.query[0] +
                             algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
                                 processed_verification_key.query.begin() + 1, processed_verification_key.query.end(),

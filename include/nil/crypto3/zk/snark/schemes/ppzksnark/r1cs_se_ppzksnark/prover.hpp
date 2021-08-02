@@ -95,7 +95,7 @@ namespace nil {
                          *             * (G^{gamma * Z(t)})^r
                          *           = \prod_{i=0}^m A_query[i]^{input_i} * G_gamma_Z^r
                          */
-                        typename CurveType::g1_type<>::value_type A =
+                        typename CurveType::template g1_type<>::value_type A =
                             r * proving_key.G_gamma_Z +
                             proving_key.A_query[0] +                // i = 0 is a special case because input_i = 1
                             sap_wit.d1 * proving_key.G_gamma_Z +    // ZK-patch
@@ -109,7 +109,7 @@ namespace nil {
                         /**
                          * compute B exactly as A, except with H as the base
                          */
-                        typename CurveType::g2_type<>::value_type B =
+                        typename CurveType::template g2_type<>::value_type B =
                             r * proving_key.H_gamma_Z +
                             proving_key.B_query[0] +                // i = 0 is a special case because input_i = 1
                             sap_wit.d1 * proving_key.H_gamma_Z +    // ZK-patch
@@ -129,7 +129,7 @@ namespace nil {
                          * and G^{2 * r * gamma^2 * Z(t) * \sum_{i=0}^m input_i A_i(t)} =
                          *              = \prod_{i=0}^m C_query_2 * input_i
                          */
-                        typename CurveType::g1_type<>::value_type C =
+                        typename CurveType::template g1_type<>::value_type C =
                             algebra::multiexp<algebra::policies::multiexp_method_BDLO12>(
                                 proving_key.C_query_1.begin(),
                                 proving_key.C_query_1.end(),

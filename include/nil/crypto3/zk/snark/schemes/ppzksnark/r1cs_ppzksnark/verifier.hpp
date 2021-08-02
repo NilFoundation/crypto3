@@ -44,7 +44,7 @@ namespace nil {
                 class r1cs_ppzksnark_process_verification_key {
                     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
-                    using g2_type = typename CurveType::g2_type<>;
+                    using g2_type = typename CurveType::template g2_type<>;
                 public:
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
@@ -81,8 +81,8 @@ namespace nil {
                     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
                     using pairing_policy = pairing::pairing_policy<CurveType>;
-                    using g1_type = typename CurveType::g1_type<>;
-                    using g2_type = typename CurveType::g2_type<>;
+                    using g1_type = typename CurveType::template g1_type<>;
+                    using g2_type = typename CurveType::template g2_type<>;
                     using gt_type = typename CurveType::gt_type;
                     using g1_value_type = typename g1_type::value_type;
                     using g2_value_type = typename g2_type::value_type;
@@ -250,8 +250,8 @@ namespace nil {
                 //     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
                 //     using pairing_policy = typename CurveType::pairing;
-                //     using g1_type = typename CurveType::g1_type<>;
-                //     using g2_type = typename CurveType::g2_type<>;
+                //     using g1_type = typename CurveType::template g1_type<>;
+                //     using g2_type = typename CurveType::template g2_type<>;
                 //     using gt_type = typename CurveType::gt_type;
                 //     using g1_value_type = typename g1_type::value_type;
                 //     using g2_value_type = typename g2_type::value_type;

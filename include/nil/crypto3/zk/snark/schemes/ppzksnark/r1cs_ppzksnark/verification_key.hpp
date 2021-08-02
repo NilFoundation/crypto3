@@ -41,8 +41,8 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_ppzksnark_verification_key {
 
-                    using g1_type = typename CurveType::g1_type<>;
-                    using g2_type = typename CurveType::g2_type<>;
+                    using g1_type = typename CurveType::template g1_type<>;
+                    using g2_type = typename CurveType::template g2_type<>;
 
                 public:
 
@@ -114,7 +114,7 @@ namespace nil {
                     typename pairing_policy::g1_precomputed_type vk_gamma_beta_g1_precomp;
                     typename pairing_policy::g2_precomputed_type vk_gamma_beta_g2_precomp;
 
-                    accumulation_vector<typename CurveType::g1_type<>> encoded_IC_query;
+                    accumulation_vector<typename CurveType::template g1_type<>> encoded_IC_query;
 
                     bool operator==(const r1cs_ppzksnark_processed_verification_key &other) const {
                         return (this->pp_G2_one_precomp == other.pp_G2_one_precomp &&

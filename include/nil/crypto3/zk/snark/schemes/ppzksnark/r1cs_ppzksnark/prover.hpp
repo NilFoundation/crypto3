@@ -56,8 +56,8 @@ namespace nil {
                 class r1cs_ppzksnark_prover {
                     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
-                    using g1_type = typename CurveType::g1_type<>;
-                    using g2_type = typename CurveType::g2_type<>;
+                    using g1_type = typename CurveType::template g1_type<>;
+                    using g2_type = typename CurveType::template g2_type<>;
                     using g1_value_type = typename g1_type::value_type;
                     using g2_value_type = typename g2_type::value_type;
                     using scalar_field_type = typename CurveType::scalar_field_type;

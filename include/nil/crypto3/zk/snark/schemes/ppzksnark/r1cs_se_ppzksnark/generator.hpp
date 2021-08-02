@@ -50,8 +50,8 @@ namespace nil {
                 class r1cs_se_ppzksnark_generator {
                     typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
 
-                    using g1_type = typename CurveType::g1_type<>;
-                    using g2_type = typename CurveType::g2_type<>;
+                    using g1_type = typename CurveType::template g1_type<>;
+                    using g2_type = typename CurveType::template g2_type<>;
 
                 public:
                     typedef CurveType curve_type;

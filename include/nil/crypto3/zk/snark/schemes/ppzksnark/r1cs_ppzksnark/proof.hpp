@@ -42,8 +42,8 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_ppzksnark_proof {
                     typedef CurveType curve_type;
-                    using g1_type = typename CurveType::g1_type<>;
-                    using g2_type = typename CurveType::g2_type<>;
+                    using g1_type = typename CurveType::template g1_type<>;
+                    using g2_type = typename CurveType::template g2_type<>;
                     using g1_value_type = typename g1_type::value_type;
                     using g2_value_type = typename g2_type::value_type;
 

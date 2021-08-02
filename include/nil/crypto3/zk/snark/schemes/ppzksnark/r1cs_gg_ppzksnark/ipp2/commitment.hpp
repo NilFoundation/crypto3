@@ -186,13 +186,15 @@ namespace nil {
                 /// well as in the "pair" commitment.
                 /// It contains $\{h^a^i\}_{i=1}^n$ and $\{h^b^i\}_{i=1}^n$
                 template<typename CurveType>
-                using r1cs_gg_ppzksnark_ipp2_vkey = r1cs_gg_ppzksnark_ipp2_commitment_key<typename CurveType::g2_type>;
+                using r1cs_gg_ppzksnark_ipp2_vkey =
+                    r1cs_gg_ppzksnark_ipp2_commitment_key<typename CurveType::template g2_type<>>;
 
                 /// Commitment key used by the "pair" commitment. Note the sequence of
                 /// powers starts at $n$ already.
                 /// It contains $\{g^{a^{n+i}}\}_{i=1}^n$ and $\{g^{b^{n+i}}\}_{i=1}^n$
                 template<typename CurveType>
-                using r1cs_gg_ppzksnark_ipp2_wkey = r1cs_gg_ppzksnark_ipp2_commitment_key<typename CurveType::g1_type>;
+                using r1cs_gg_ppzksnark_ipp2_wkey =
+                    r1cs_gg_ppzksnark_ipp2_commitment_key<typename CurveType::template g1_type<>>;
 
                 template<typename CurveType>
                 struct r1cs_gg_ppzksnark_ipp2_commitment {

@@ -39,8 +39,8 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class uscs_ppzksnark_proof {
-                    using g1_type = typename CurveType::g1_type<>;
-                    using g2_type = typename CurveType::g2_type<>;
+                    using g1_type = typename CurveType::template g1_type<>;
+                    using g2_type = typename CurveType::template g2_type<>;
 
                 public:
 

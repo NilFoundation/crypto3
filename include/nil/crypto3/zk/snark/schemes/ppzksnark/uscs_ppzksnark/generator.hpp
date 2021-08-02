@@ -49,8 +49,8 @@ namespace nil {
                 class uscs_ppzksnark_generator {
                     typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
 
-                    using g1_type = typename CurveType::g1_type<>;
-                    using g2_type = typename CurveType::g2_type<>;
+                    using g1_type = typename CurveType::template g1_type<>;
+                    using g2_type = typename CurveType::template g2_type<>;
                     using scalar_field_type = typename CurveType::scalar_field_type;
 
                 public:

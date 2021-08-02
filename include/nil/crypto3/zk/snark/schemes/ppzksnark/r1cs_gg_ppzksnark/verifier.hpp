@@ -118,7 +118,7 @@ namespace nil {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
-                    typedef typename CurveType::g1_type<> g1_type;
+                    typedef typename CurveType::template g1_type<> g1_type;
                     typedef typename CurveType::gt_type gt_type;
                     typedef typename pairing::pairing_policy<CurveType>::g1_precomputed_type g1_precomputed_type;
                     typedef typename pairing::pairing_policy<CurveType>::g2_precomputed_type g2_precomputed_type;
@@ -253,7 +253,7 @@ namespace nil {
                 //     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                 //     typedef typename CurveType::scalar_field_type scalar_field_type;
-                //     typedef typename CurveType::g1_type<> g1_type;
+                //     typedef typename CurveType::template g1_type<> g1_type;
                 //     typedef typename CurveType::gt_type gt_type;
                 //     typedef typename pairing::pairing_policy<CurveType>::affine_ate_g1_precomp affine_ate_g1_precomp;
                 //     typedef typename pairing::pairing_policy<CurveType>::affine_ate_g2_precomp affine_ate_g2_precomp;

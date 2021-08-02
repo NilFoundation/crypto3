@@ -40,8 +40,8 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class uscs_ppzksnark_verification_key {
-                    using g1_type = typename CurveType::g1_type<>;
-                    using g2_type = typename CurveType::g2_type<>;
+                    using g1_type = typename CurveType::template g1_type<>;
+                    using g2_type = typename CurveType::template g2_type<>;
                 public:
 
                     typename g2_type::value_type tilde_g2;
@@ -97,7 +97,7 @@ namespace nil {
                     typename pairing_policy::g2_precomputed_type vk_Z_g2_precomp;
                     typename CurveType::gt_type::value_type pairing_of_g1_and_g2;
 
-                    accumulation_vector<typename CurveType::g1_type<>> encoded_IC_query;
+                    accumulation_vector<typename CurveType::template g1_type<>> encoded_IC_query;
 
                     bool operator==(const uscs_ppzksnark_processed_verification_key &other) const {
                         return (this->pp_G1_one_precomp == other.pp_G1_one_precomp &&

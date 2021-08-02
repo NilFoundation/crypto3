@@ -38,22 +38,22 @@ namespace nil {
                 struct r1cs_gg_ppzksnark_proof {
                     typedef CurveType curve_type;
 
-                    typename CurveType::g1_type<>::value_type g_A;
-                    typename CurveType::g2_type<>::value_type g_B;
-                    typename CurveType::g1_type<>::value_type g_C;
+                    typename CurveType::template g1_type<>::value_type g_A;
+                    typename CurveType::template g2_type<>::value_type g_B;
+                    typename CurveType::template g1_type<>::value_type g_C;
 
                     r1cs_gg_ppzksnark_proof() {
-                        using g1_type = typename CurveType::g1_type<>;
-                        using g2_type = typename CurveType::g2_type<>;
+                        using g1_type = typename CurveType::template g1_type<>;
+                        using g2_type = typename CurveType::template g2_type<>;
 
                         // invalid proof with valid curve points
                         this->g_A = g1_type::value_type::one();
                         this->g_B = g2_type::value_type::one();
                         this->g_C = g1_type::value_type::one();
                     }
-                    r1cs_gg_ppzksnark_proof(typename CurveType::g1_type<>::value_type &&g_A,
-                                            typename CurveType::g2_type<>::value_type &&g_B,
-                                            typename CurveType::g1_type<>::value_type &&g_C) :
+                    r1cs_gg_ppzksnark_proof(typename CurveType::template g1_type<>::value_type &&g_A,
+                                            typename CurveType::template g2_type<>::value_type &&g_B,
+                                            typename CurveType::template g1_type<>::value_type &&g_C) :
                         g_A(std::move(g_A)),
                         g_B(std::move(g_B)), g_C(std::move(g_C)) {};
 
@@ -66,8 +66,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        using g1_type = typename CurveType::g1_type<>;
-                        using g2_type = typename CurveType::g2_type<>;
+                        using g1_type = typename CurveType::template g1_type<>;
+                        using g2_type = typename CurveType::template g2_type<>;
 
                         return G1_size() * g1_type::value_bits + G2_size() * g2_type::value_bits;
                     }
