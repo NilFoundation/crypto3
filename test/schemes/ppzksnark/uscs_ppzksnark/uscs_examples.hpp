@@ -32,6 +32,8 @@
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark.hpp>
 
+#include <nil/crypto3/algebra/random_element.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -80,7 +82,7 @@ namespace nil {
 
                     uscs_variable_assignment<FieldType> full_variable_assignment;
                     for (std::size_t i = 0; i < num_constraints; ++i) {
-                        full_variable_assignment.emplace_back(FieldType::value_type(std::rand()));
+                        full_variable_assignment.emplace_back(typename FieldType::value_type(std::rand() % 2));
                     }
 
                     for (std::size_t i = 0; i < num_constraints; ++i) {
@@ -92,10 +94,10 @@ namespace nil {
                             z = std::rand() % num_constraints;
                         } while (x == z || y == z);
 
-                        const typename FieldType::value_type x_coeff = FieldType::value_type(std::rand());
-                        const typename FieldType::value_type y_coeff = FieldType::value_type(std::rand());
+                        const typename FieldType::value_type x_coeff = algebra::random_element<FieldType>();
+                        const typename FieldType::value_type y_coeff = algebra::random_element<FieldType>();
                         const typename FieldType::value_type val =
-                            (std::rand() % 2 == 0 ? FieldType::value_type::zero() : -FieldType::value_type::zero());
+                            (std::rand() % 2 == 0 ? FieldType::value_type::one() : -FieldType::value_type::one());
                         const typename FieldType::value_type z_coeff =
                             (val - x_coeff * full_variable_assignment[x] - y_coeff * full_variable_assignment[y]) *
                             full_variable_assignment[z].inversed();
@@ -142,7 +144,7 @@ namespace nil {
 
                     uscs_variable_assignment<FieldType> full_variable_assignment;
                     for (std::size_t i = 0; i < num_inputs; ++i) {
-                        full_variable_assignment.push_back(FieldType(std::rand() % 2));
+                        full_variable_assignment.push_back(typename FieldType::value_type(std::rand() % 2));
                     }
 
                     std::size_t lastvar = num_inputs - 1;
@@ -157,7 +159,7 @@ namespace nil {
                         constr.add_term(u + 1, 1);
                         constr.add_term(v + 1, 1);
                         constr.add_term(lastvar + 1, 1);
-                        constr.add_term(0, -FieldType::value_type::zero());    // shift constant term (which is 0) by 1
+                        constr.add_term(0, -FieldType::value_type::one());    // shift constant term (which is 0) by 1
 
                         cs.add_constraint(constr);
                         full_variable_assignment.push_back(full_variable_assignment[u] + full_variable_assignment[v] -

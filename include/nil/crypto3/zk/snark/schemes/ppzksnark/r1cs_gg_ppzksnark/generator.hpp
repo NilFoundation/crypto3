@@ -27,24 +27,18 @@
 #ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_GENERATOR_HPP
 #define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_GENERATOR_HPP
 
-#include <memory>
-#include <random>
-
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
-
-#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
-
-#include <nil/crypto3/algebra/random_element.hpp>
-
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
+#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
+#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
+#include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
@@ -62,10 +56,9 @@ namespace nil {
                 class r1cs_gg_ppzksnark_generator {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
-                    typedef typename CurveType::pairing pairing_policy;
                     typedef typename CurveType::scalar_field_type scalar_field_type;
-                    typedef typename CurveType::g1_type g1_type;
-                    typedef typename CurveType::g2_type g2_type;
+                    typedef typename CurveType::g1_type<> g1_type;
+                    typedef typename CurveType::g2_type<> g2_type;
                     typedef typename CurveType::gt_type gt_type;
 
                 public:
@@ -214,7 +207,7 @@ namespace nil {
                         algebra::batch_to_special<g1_type>(L_query);
 #endif
 
-                        typename gt_type::value_type alpha_g1_beta_g2 = pairing_policy::pair_reduced(alpha_g1, beta_g2);
+                        typename gt_type::value_type alpha_g1_beta_g2 = pair_reduced<CurveType>(alpha_g1, beta_g2);
                         typename g2_type::value_type gamma_g2 = gamma * G2_gen;
 
                         typename g1_type::value_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;

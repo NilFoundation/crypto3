@@ -49,28 +49,19 @@ namespace nil {
                  * R1CS example (specified by a constraint system, input, and witness).
                  */
 
-                template<typename CurveType>
-                typename std::enable_if<CurveType::has_affine_pairing, void>::type
-                    test_affine_verifier(const typename r1cs_gg_ppzksnark<CurveType>::verification_key_type &vk,
-                                         const typename r1cs_gg_ppzksnark<CurveType>::primary_input_type &primary_input,
-                                         const typename r1cs_gg_ppzksnark<CurveType>::proof_type &proof,
-                                         const bool expected_answer) {
-                    const bool answer = verify<r1cs_gg_ppzksnark<
-                        CurveType,
-                        r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>>>(vk,
-                                                                                              primary_input,
-                                                                                              proof);
-                    BOOST_CHECK(answer == expected_answer);
-                }
-
-                template<typename CurveType>
-                typename std::enable_if<!CurveType::has_affine_pairing, void>::type
-                    test_affine_verifier(const typename r1cs_gg_ppzksnark<CurveType>::verification_key_type &vk,
-                                         const typename r1cs_gg_ppzksnark<CurveType>::primary_input_type &primary_input,
-                                         const typename r1cs_gg_ppzksnark<CurveType>::proof_type &proof,
-                                         const bool expected_answer) {
-                    // BOOST_ATTRIBUTE_UNUSED(vk, primary_input, proof, expected_answer);
-                }
+                // template<typename CurveType>
+                // typename std::enable_if<CurveType::has_affine_pairing, void>::type
+                //     test_affine_verifier(const typename r1cs_gg_ppzksnark<CurveType>::verification_key_type &vk,
+                //                          const typename r1cs_gg_ppzksnark<CurveType>::primary_input_type &primary_input,
+                //                          const typename r1cs_gg_ppzksnark<CurveType>::proof_type &proof,
+                //                          const bool expected_answer) {
+                //     const bool answer = verify<r1cs_gg_ppzksnark<
+                //         CurveType,
+                //         r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>>>(vk,
+                //                                                                               primary_input,
+                //                                                                               proof);
+                //     BOOST_CHECK(answer == expected_answer);
+                // }
 
                 /**
                  * The code below provides an example of all stages of running a R1CS GG-ppzkSNARK.

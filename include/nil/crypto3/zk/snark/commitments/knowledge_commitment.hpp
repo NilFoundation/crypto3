@@ -27,7 +27,6 @@
 #define CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP
 
 #include <nil/crypto3/zk/snark/commitments/detail/element_knowledge_commitment.hpp>
-
 #include <nil/crypto3/zk/snark/sparse_vector.hpp>
 
 namespace nil {

@@ -39,7 +39,6 @@
 #define CRYPTO3_ZK_QAP_HPP
 
 #include <map>
-#include <memory>
 #include <vector>
 
 #include <nil/crypto3/algebra/random_element.hpp>

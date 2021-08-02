@@ -50,14 +50,12 @@
 #ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_VERIFIER_HPP
 #define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_VERIFIER_HPP
 
-#include <memory>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
-
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
-
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
@@ -65,14 +63,14 @@ namespace nil {
         namespace zk {
             namespace snark {
 
+                using namespace algebra;
+
                 /**
                  * Convert a (non-processed) verification key into a processed verification key.
                  */
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_process_verification_key {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
-
-                    typedef typename CurveType::pairing pairing_policy;
 
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;
@@ -92,9 +90,9 @@ namespace nil {
                         processed_verification_key_type processed_verification_key;
                         processed_verification_key.vk_alpha_g1_beta_g2 = verification_key.alpha_g1_beta_g2;
                         processed_verification_key.vk_gamma_g2_precomp =
-                            pairing_policy::precompute_g2(verification_key.gamma_g2);
+                            precompute_g2<CurveType>(verification_key.gamma_g2);
                         processed_verification_key.vk_delta_g2_precomp =
-                            pairing_policy::precompute_g2(verification_key.delta_g2);
+                            precompute_g2<CurveType>(verification_key.delta_g2);
                         processed_verification_key.gamma_ABC_g1 = verification_key.gamma_ABC_g1;
 
                         return processed_verification_key;
@@ -119,13 +117,11 @@ namespace nil {
                 class r1cs_gg_ppzksnark_verifier_weak_input_consistency {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
-                    typedef typename CurveType::pairing pairing_policy;
                     typedef typename CurveType::scalar_field_type scalar_field_type;
-                    typedef typename CurveType::g1_type g1_type;
+                    typedef typename CurveType::g1_type<> g1_type;
                     typedef typename CurveType::gt_type gt_type;
-                    typedef typename pairing_policy::g1_precomp g1_precomp;
-                    typedef typename pairing_policy::g2_precomp g2_precomp;
-                    typedef typename pairing_policy::fqk_type fqk_type;
+                    typedef typename pairing::pairing_policy<CurveType>::g1_precomputed_type g1_precomputed_type;
+                    typedef typename pairing::pairing_policy<CurveType>::g2_precomputed_type g2_precomputed_type;
 
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;
@@ -174,18 +170,18 @@ namespace nil {
                             result = false;
                         }
 
-                        const g1_precomp proof_g_A_precomp = pairing_policy::precompute_g1(proof.g_A);
-                        const g2_precomp proof_g_B_precomp = pairing_policy::precompute_g2(proof.g_B);
-                        const g1_precomp proof_g_C_precomp = pairing_policy::precompute_g1(proof.g_C);
-                        const g1_precomp acc_precomp = pairing_policy::precompute_g1(acc);
+                        const g1_precomputed_type proof_g_A_precomp = precompute_g1<CurveType>(proof.g_A);
+                        const g2_precomputed_type proof_g_B_precomp = precompute_g2<CurveType>(proof.g_B);
+                        const g1_precomputed_type proof_g_C_precomp = precompute_g1<CurveType>(proof.g_C);
+                        const g1_precomputed_type acc_precomp = precompute_g1<CurveType>(acc);
 
-                        const typename fqk_type::value_type QAP1 =
-                            pairing_policy::miller_loop(proof_g_A_precomp, proof_g_B_precomp);
-                        const typename fqk_type::value_type QAP2 = pairing_policy::double_miller_loop(
+                        const typename gt_type::value_type QAP1 =
+                            miller_loop<CurveType>(proof_g_A_precomp, proof_g_B_precomp);
+                        const typename gt_type::value_type QAP2 = double_miller_loop<CurveType>(
                             acc_precomp, processed_verification_key.vk_gamma_g2_precomp, proof_g_C_precomp,
                             processed_verification_key.vk_delta_g2_precomp);
                         const typename gt_type::value_type QAP =
-                            pairing_policy::final_exponentiation(QAP1 * QAP2.unitary_inversed());
+                            final_exponentiation<CurveType>(QAP1 * QAP2.unitary_inversed());
 
                         if (QAP != processed_verification_key.vk_alpha_g1_beta_g2) {
                             result = false;
@@ -245,81 +241,78 @@ namespace nil {
                     }
                 };
 
-                /**
-                 * For debugging purposes (of verifier_component):
-                 *
-                 * A verifier algorithm for the R1CS GG-ppzkSNARK that:
-                 * (1) accepts a non-processed verification key,
-                 * (2) has weak input consistency, and
-                 * (3) uses affine coordinates for elliptic-curve computations.
-                 */
-                template<typename CurveType>
-                class r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
+                // /**
+                //  *
+                //  * A verifier algorithm for the R1CS GG-ppzkSNARK that:
+                //  * (1) accepts a non-processed verification key,
+                //  * (2) has weak input consistency, and
+                //  * (3) uses affine coordinates for elliptic-curve computations.
+                //  */
+                // template<typename CurveType>
+                // class r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency {
+                //     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
-                    typedef typename CurveType::pairing pairing_policy;
-                    typedef typename CurveType::scalar_field_type scalar_field_type;
-                    typedef typename CurveType::g1_type g1_type;
-                    typedef typename CurveType::gt_type gt_type;
-                    typedef typename pairing_policy::affine_ate_g1_precomp affine_ate_g1_precomp;
-                    typedef typename pairing_policy::affine_ate_g2_precomp affine_ate_g2_precomp;
-                    typedef typename pairing_policy::fqk_type fqk_type;
+                //     typedef typename CurveType::scalar_field_type scalar_field_type;
+                //     typedef typename CurveType::g1_type<> g1_type;
+                //     typedef typename CurveType::gt_type gt_type;
+                //     typedef typename pairing::pairing_policy<CurveType>::affine_ate_g1_precomp affine_ate_g1_precomp;
+                //     typedef typename pairing::pairing_policy<CurveType>::affine_ate_g2_precomp affine_ate_g2_precomp;
 
-                public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
-                    typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
+                // public:
+                //     typedef typename policy_type::constraint_system_type constraint_system_type;
+                //     typedef typename policy_type::primary_input_type primary_input_type;
+                //     typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                    typedef typename policy_type::proving_key_type proving_key_type;
-                    typedef typename policy_type::verification_key_type verification_key_type;
-                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
+                //     typedef typename policy_type::proving_key_type proving_key_type;
+                //     typedef typename policy_type::verification_key_type verification_key_type;
+                //     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                    typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::proof_type proof_type;
+                //     typedef typename policy_type::keypair_type keypair_type;
+                //     typedef typename policy_type::proof_type proof_type;
 
-                    static inline bool process(const verification_key_type &verification_key,
-                                               const primary_input_type &primary_input,
-                                               const proof_type &proof) {
+                //     static inline bool process(const verification_key_type &verification_key,
+                //                                const primary_input_type &primary_input,
+                //                                const proof_type &proof) {
 
-                        BOOST_ASSERT(verification_key.gamma_ABC_g1.domain_size() >= primary_input.size());
+                //         BOOST_ASSERT(verification_key.gamma_ABC_g1.domain_size() >= primary_input.size());
 
-                        affine_ate_g2_precomp pvk_vk_gamma_g2_precomp =
-                            pairing_policy::affine_ate_precompute_g2(verification_key.gamma_g2);
-                        affine_ate_g2_precomp pvk_vk_delta_g2_precomp =
-                            pairing_policy::affine_ate_precompute_g2(verification_key.delta_g2);
+                //         affine_ate_g2_precomp pvk_vk_gamma_g2_precomp =
+                //             affine_ate_precompute_g2<CurveType>(verification_key.gamma_g2);
+                //         affine_ate_g2_precomp pvk_vk_delta_g2_precomp =
+                //             affine_ate_precompute_g2<CurveType>(verification_key.delta_g2);
 
-                        const accumulation_vector<g1_type> accumulated_IC =
-                            verification_key.gamma_ABC_g1.accumulate_chunk(primary_input.begin(), primary_input.end(),
-                                                                           0);
-                        const typename g1_type::value_type &acc = accumulated_IC.first;
+                //         const accumulation_vector<g1_type> accumulated_IC =
+                //             verification_key.gamma_ABC_g1.accumulate_chunk(primary_input.begin(), primary_input.end(),
+                //                                                            0);
+                //         const typename g1_type::value_type &acc = accumulated_IC.first;
 
-                        bool result = true;
+                //         bool result = true;
 
-                        if (!proof.is_well_formed()) {
-                            result = false;
-                        }
+                //         if (!proof.is_well_formed()) {
+                //             result = false;
+                //         }
 
-                        const affine_ate_g1_precomp proof_g_A_precomp =
-                            pairing_policy::affine_ate_precompute_g1(proof.g_A);
-                        const affine_ate_g2_precomp proof_g_B_precomp =
-                            pairing_policy::affine_ate_precompute_g2(proof.g_B);
-                        const affine_ate_g1_precomp proof_g_C_precomp =
-                            pairing_policy::affine_ate_precompute_g1(proof.g_C);
-                        const affine_ate_g1_precomp acc_precomp = pairing_policy::affine_ate_precompute_g1(acc);
+                //         const affine_ate_g1_precomp proof_g_A_precomp =
+                //             affine_ate_precompute_g1<CurveType>(proof.g_A);
+                //         const affine_ate_g2_precomp proof_g_B_precomp =
+                //             affine_ate_precompute_g2<CurveType>(proof.g_B);
+                //         const affine_ate_g1_precomp proof_g_C_precomp =
+                //             affine_ate_precompute_g1<CurveType>(proof.g_C);
+                //         const affine_ate_g1_precomp acc_precomp = affine_ate_precompute_g1<CurveType>(acc);
 
-                        const typename fqk_type::value_type QAP_miller =
-                            CurveType::affine_ate_e_times_e_over_e_miller_loop(
-                                acc_precomp, pvk_vk_gamma_g2_precomp, proof_g_C_precomp, pvk_vk_delta_g2_precomp,
-                                proof_g_A_precomp, proof_g_B_precomp);
-                        const typename gt_type::value_type QAP =
-                            pairing_policy::final_exponentiation(QAP_miller.unitary_inversed());
+                //         const typename fqk_type::value_type QAP_miller =
+                //             affine_ate_e_times_e_over_e_miller_loop<CurveType>(
+                //                 acc_precomp, pvk_vk_gamma_g2_precomp, proof_g_C_precomp, pvk_vk_delta_g2_precomp,
+                //                 proof_g_A_precomp, proof_g_B_precomp);
+                //         const typename gt_type::value_type QAP =
+                //             final_exponentiation<CurveType>(QAP_miller.unitary_inversed());
 
-                        if (QAP != verification_key.alpha_g1_beta_g2) {
-                            result = false;
-                        }
-                        return result;
-                    }
-                };
+                //         if (QAP != verification_key.alpha_g1_beta_g2) {
+                //             result = false;
+                //         }
+                //         return result;
+                //     }
+                // };
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

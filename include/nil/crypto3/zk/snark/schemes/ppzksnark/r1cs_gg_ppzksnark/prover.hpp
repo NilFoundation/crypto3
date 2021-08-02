@@ -26,23 +26,17 @@
 #ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_PROVER_HPP
 #define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_PROVER_HPP
 
-#include <memory>
-
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
-
-#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
-#include <nil/crypto3/algebra/multiexp/policies.hpp>
-
-#include <nil/crypto3/algebra/random_element.hpp>
-
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
+
+#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
-
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
@@ -63,20 +57,14 @@ namespace nil {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
-                    typedef typename CurveType::g1_type g1_type;
-                    typedef typename CurveType::g2_type g2_type;
+                    typedef typename CurveType::g1_type<> g1_type;
+                    typedef typename CurveType::g2_type<> g2_type;
                     typedef typename CurveType::gt_type gt_type;
 
                 public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
                     typedef typename policy_type::proving_key_type proving_key_type;
-                    typedef typename policy_type::verification_key_type verification_key_type;
-                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
                     static inline proof_type process(const proving_key_type &proving_key,

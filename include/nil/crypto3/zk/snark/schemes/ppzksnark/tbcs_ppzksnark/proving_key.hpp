@@ -26,9 +26,6 @@
 #ifndef CRYPTO3_TBCS_PPZKSNARK_PROVING_KEY_HPP
 #define CRYPTO3_TBCS_PPZKSNARK_PROVING_KEY_HPP
 
-#include <memory>
-#include <vector>
-
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark.hpp>
 
 namespace nil {

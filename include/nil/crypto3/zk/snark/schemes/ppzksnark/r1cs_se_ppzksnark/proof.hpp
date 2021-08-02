@@ -26,8 +26,6 @@
 #ifndef CRYPTO3_R1CS_SE_PPZKSNARK_PROOF_HPP
 #define CRYPTO3_R1CS_SE_PPZKSNARK_PROOF_HPP
 
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -40,18 +38,24 @@ namespace nil {
                  * about the structure for statistics purposes.
                  */
                 template<typename CurveType>
-                struct r1cs_se_ppzksnark_proof {
+                class r1cs_se_ppzksnark_proof {
+
                     typedef CurveType curve_type;
 
-                    typename CurveType::g1_type::value_type A;
-                    typename CurveType::g2_type::value_type B;
-                    typename CurveType::g1_type::value_type C;
+                    using g1_type = typename CurveType::g1_type<>;
+                    using g2_type = typename CurveType::g2_type<>;
+
+                public:
+
+                    typename g1_type::value_type A;
+                    typename g2_type::value_type B;
+                    typename g1_type::value_type C;
 
                     r1cs_se_ppzksnark_proof() {
                     }
-                    r1cs_se_ppzksnark_proof(typename CurveType::g1_type::value_type &&A,
-                                            typename CurveType::g2_type::value_type &&B,
-                                            typename CurveType::g1_type::value_type &&C) :
+                    r1cs_se_ppzksnark_proof(typename g1_type::value_type &&A,
+                                            typename g2_type::value_type &&B,
+                                            typename g1_type::value_type &&C) :
                         A(std::move(A)),
                         B(std::move(B)), C(std::move(C)) {};
 
@@ -64,7 +68,7 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * CurveType::g1_type::value_bits + G2_size() * CurveType::g2_type::value_bits;
+                        return G1_size() * g1_type::value_bits + G2_size() * g2_type::value_bits;
                     }
 
                     bool is_well_formed() const {

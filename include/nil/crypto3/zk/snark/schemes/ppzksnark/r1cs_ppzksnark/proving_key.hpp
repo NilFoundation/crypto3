@@ -26,22 +26,15 @@
 #ifndef CRYPTO3_R1CS_PPZKSNARK_PROVING_KEY_HPP
 #define CRYPTO3_R1CS_PPZKSNARK_PROVING_KEY_HPP
 
-#include <memory>
-
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
-
-#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
-#include <nil/crypto3/algebra/multiexp/policies.hpp>
-
-#include <nil/crypto3/algebra/random_element.hpp>
-
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
-#include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
+
+#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -52,8 +45,8 @@ namespace nil {
                  */
                 template<typename CurveType, typename ConstraintSystemType>
                 class r1cs_ppzksnark_proving_key {
-                    using g1_type = typename CurveType::g1_type;
-                    using g2_type = typename CurveType::g2_type;
+                    using g1_type = typename CurveType::g1_type<>;
+                    using g2_type = typename CurveType::g2_type<>;
                     using g1_value_type = typename g1_type::value_type;
                     using g2_value_type = typename g2_type::value_type;
 

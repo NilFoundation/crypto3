@@ -26,33 +26,35 @@
 #ifndef CRYPTO3_USCS_PPZKSNARK_VERIFICATION_KEY_HPP
 #define CRYPTO3_USCS_PPZKSNARK_VERIFICATION_KEY_HPP
 
-#include <memory>
-#include <vector>
-
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+
+                using namespace algebra;
+
                 /**
                  * A verification key for the USCS ppzkSNARK.
                  */
                 template<typename CurveType>
-                struct uscs_ppzksnark_verification_key {
-                    typedef CurveType curve_type;
+                class uscs_ppzksnark_verification_key {
+                    using g1_type = typename CurveType::g1_type<>;
+                    using g2_type = typename CurveType::g2_type<>;
+                public:
 
-                    typename CurveType::g2_type::value_type tilde_g2;
-                    typename CurveType::g2_type::value_type alpha_tilde_g2;
-                    typename CurveType::g2_type::value_type Z_g2;
+                    typename g2_type::value_type tilde_g2;
+                    typename g2_type::value_type alpha_tilde_g2;
+                    typename g2_type::value_type Z_g2;
 
-                    accumulation_vector<typename CurveType::g1_type> encoded_IC_query;
+                    accumulation_vector<g1_type> encoded_IC_query;
 
                     uscs_ppzksnark_verification_key() = default;
-                    uscs_ppzksnark_verification_key(const typename CurveType::g2_type::value_type &tilde_g2,
-                                                    const typename CurveType::g2_type::value_type &alpha_tilde_g2,
-                                                    const typename CurveType::g2_type::value_type &Z_g2,
-                                                    const accumulation_vector<typename CurveType::g1_type> &eIC) :
+                    uscs_ppzksnark_verification_key(const typename g2_type::value_type &tilde_g2,
+                                                    const typename g2_type::value_type &alpha_tilde_g2,
+                                                    const typename g2_type::value_type &Z_g2,
+                                                    const accumulation_vector<g1_type> &eIC) :
                         tilde_g2(tilde_g2),
                         alpha_tilde_g2(alpha_tilde_g2), Z_g2(Z_g2), encoded_IC_query(eIC) {};
 
@@ -65,7 +67,7 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return encoded_IC_query.size_in_bits() + 3 * CurveType::g2_type::value_bits;
+                        return encoded_IC_query.size_in_bits() + 3 * g2_type::value_bits;
                     }
 
                     bool operator==(const uscs_ppzksnark_verification_key &other) const {
@@ -83,19 +85,19 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class uscs_ppzksnark_processed_verification_key {
-                    typedef typename CurveType::pairing pairing_policy;
+                    using pairing_policy = pairing::pairing_policy<CurveType>;
 
                 public:
                     typedef CurveType curve_type;
 
-                    typename pairing_policy::g1_precomp pp_G1_one_precomp;
-                    typename pairing_policy::g2_precomp pp_G2_one_precomp;
-                    typename pairing_policy::g2_precomp vk_tilde_g2_precomp;
-                    typename pairing_policy::g2_precomp vk_alpha_tilde_g2_precomp;
-                    typename pairing_policy::g2_precomp vk_Z_g2_precomp;
+                    typename pairing_policy::g1_precomputed_type pp_G1_one_precomp;
+                    typename pairing_policy::g2_precomputed_type pp_G2_one_precomp;
+                    typename pairing_policy::g2_precomputed_type vk_tilde_g2_precomp;
+                    typename pairing_policy::g2_precomputed_type vk_alpha_tilde_g2_precomp;
+                    typename pairing_policy::g2_precomputed_type vk_Z_g2_precomp;
                     typename CurveType::gt_type::value_type pairing_of_g1_and_g2;
 
-                    accumulation_vector<typename CurveType::g1_type> encoded_IC_query;
+                    accumulation_vector<typename CurveType::g1_type<>> encoded_IC_query;
 
                     bool operator==(const uscs_ppzksnark_processed_verification_key &other) const {
                         return (this->pp_G1_one_precomp == other.pp_G1_one_precomp &&

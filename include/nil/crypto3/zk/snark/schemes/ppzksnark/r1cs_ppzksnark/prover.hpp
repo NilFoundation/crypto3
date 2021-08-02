@@ -26,23 +26,17 @@
 #ifndef CRYPTO3_R1CS_PPZKSNARK_BASIC_PROVER_HPP
 #define CRYPTO3_R1CS_PPZKSNARK_BASIC_PROVER_HPP
 
-#include <memory>
-
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
-
-#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
-#include <nil/crypto3/algebra/multiexp/policies.hpp>
-
-#include <nil/crypto3/algebra/random_element.hpp>
-
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
+
+#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
-
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
@@ -62,22 +56,18 @@ namespace nil {
                 class r1cs_ppzksnark_prover {
                     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
-                    using g1_type = typename CurveType::g1_type;
-                    using g2_type = typename CurveType::g2_type;
+                    using g1_type = typename CurveType::g1_type<>;
+                    using g2_type = typename CurveType::g2_type<>;
                     using g1_value_type = typename g1_type::value_type;
                     using g2_value_type = typename g2_type::value_type;
                     using scalar_field_type = typename CurveType::scalar_field_type;
 
                 public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
                     typedef typename policy_type::proving_key_type proving_key_type;
-                    typedef typename policy_type::verification_key_type verification_key_type;
-                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
                     static inline proof_type process(const proving_key_type &proving_key,
@@ -111,17 +101,17 @@ namespace nil {
                         const std::size_t chunks = 1;
 #endif
 
-                        g_A = g_A + kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_bos_coster>(
+                        g_A = g_A + kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
                                         proving_key.A_query, 1, 1 + qap_wit.num_variables,
                                         qap_wit.coefficients_for_ABCs.begin(),
                                         qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables + 1, chunks);
 
-                        g_B = g_B + kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_bos_coster>(
+                        g_B = g_B + kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
                                         proving_key.B_query, 1, 1 + qap_wit.num_variables,
                                         qap_wit.coefficients_for_ABCs.begin(),
                                         qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables + 1, chunks);
 
-                        g_C = g_C + kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_bos_coster>(
+                        g_C = g_C + kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
                                         proving_key.C_query, 1, 1 + qap_wit.num_variables,
                                         qap_wit.coefficients_for_ABCs.begin(),
                                         qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables + 1, chunks);
@@ -132,7 +122,7 @@ namespace nil {
                                         qap_wit.coefficients_for_H.begin() + qap_wit.degree + 1, chunks);
 
                         g_K =
-                            g_K + algebra::multiexp_with_mixed_addition<algebra::policies::multiexp_method_bos_coster>(
+                            g_K + algebra::multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
                                       proving_key.K_query.begin() + 1,
                                       proving_key.K_query.begin() + 1 + qap_wit.num_variables,
                                       qap_wit.coefficients_for_ABCs.begin(),

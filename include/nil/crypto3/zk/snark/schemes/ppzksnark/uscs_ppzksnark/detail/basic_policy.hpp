@@ -62,14 +62,8 @@
 #ifndef CRYPTO3_USCS_PPZKSNARK_TYPES_POLICY_HPP
 #define CRYPTO3_USCS_PPZKSNARK_TYPES_POLICY_HPP
 
-#include <memory>
-
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
-
-#include <nil/crypto3/zk/snark/reductions/uscs_to_ssp.hpp>
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp.hpp>
-
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark/proving_key.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark/verification_key.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark/keypair.hpp>

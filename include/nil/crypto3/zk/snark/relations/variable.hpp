@@ -32,8 +32,6 @@
 #define CRYPTO3_ZK_VARIABLE_HPP
 
 #include <cstddef>
-#include <map>
-#include <string>
 #include <vector>
 
 namespace nil {

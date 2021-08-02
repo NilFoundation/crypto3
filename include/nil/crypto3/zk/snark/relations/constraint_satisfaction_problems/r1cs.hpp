@@ -35,9 +35,6 @@
 #define CRYPTO3_ZK_R1CS_HPP
 
 #include <cstdlib>
-#include <iostream>
-#include <map>
-#include <string>
 #include <vector>
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>

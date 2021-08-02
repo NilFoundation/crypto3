@@ -40,14 +40,12 @@
 #define CRYPTO3_ZK_SAP_HPP
 
 #include <map>
-#include <memory>
 #include <vector>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/multiexp/inner_product.hpp>
 
-#include <nil/crypto3/math/domains/evaluation_domain.hpp>
-#include <nil/crypto3/math/make_evaluation_domain.hpp>
+#include <nil/crypto3/math/evaluation_domain.hpp>
 
 namespace nil {
     namespace crypto3 {

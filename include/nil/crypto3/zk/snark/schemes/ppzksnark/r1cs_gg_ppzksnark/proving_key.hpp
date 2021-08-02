@@ -26,11 +26,7 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_PROVING_KEY_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_PROVING_KEY_HPP
 
-#include <memory>
-
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
-
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 namespace nil {
@@ -43,17 +39,17 @@ namespace nil {
                     typedef CurveType curve_type;
                     typedef ConstraintSystem constraint_system_type;
 
-                    typename CurveType::g1_type::value_type alpha_g1;
-                    typename CurveType::g1_type::value_type beta_g1;
-                    typename CurveType::g2_type::value_type beta_g2;
-                    typename CurveType::g1_type::value_type delta_g1;
-                    typename CurveType::g2_type::value_type delta_g2;
+                    typename CurveType::g1_type<>::value_type alpha_g1;
+                    typename CurveType::g1_type<>::value_type beta_g1;
+                    typename CurveType::g2_type<>::value_type beta_g2;
+                    typename CurveType::g1_type<>::value_type delta_g1;
+                    typename CurveType::g2_type<>::value_type delta_g2;
 
-                    std::vector<typename CurveType::g1_type::value_type>
+                    std::vector<typename CurveType::g1_type<>::value_type>
                         A_query;    // this could be a sparse vector if we had multiexp for those
-                    knowledge_commitment_vector<typename CurveType::g2_type, typename CurveType::g1_type> B_query;
-                    std::vector<typename CurveType::g1_type::value_type> H_query;
-                    std::vector<typename CurveType::g1_type::value_type> L_query;
+                    knowledge_commitment_vector<typename CurveType::g2_type<>, typename CurveType::g1_type<>> B_query;
+                    std::vector<typename CurveType::g1_type<>::value_type> H_query;
+                    std::vector<typename CurveType::g1_type<>::value_type> L_query;
 
                     constraint_system_type constraint_system;
 
@@ -63,15 +59,15 @@ namespace nil {
                     r1cs_gg_ppzksnark_proving_key(r1cs_gg_ppzksnark_proving_key &&other) = default;
 
                     r1cs_gg_ppzksnark_proving_key(
-                        typename CurveType::g1_type::value_type &&alpha_g1,
-                        typename CurveType::g1_type::value_type &&beta_g1,
-                        typename CurveType::g2_type::value_type &&beta_g2,
-                        typename CurveType::g1_type::value_type &&delta_g1,
-                        typename CurveType::g2_type::value_type &&delta_g2,
-                        std::vector<typename CurveType::g1_type::value_type> &&A_query,
-                        knowledge_commitment_vector<typename CurveType::g2_type, typename CurveType::g1_type> &&B_query,
-                        std::vector<typename CurveType::g1_type::value_type> &&H_query,
-                        std::vector<typename CurveType::g1_type::value_type> &&L_query,
+                        typename CurveType::g1_type<>::value_type &&alpha_g1,
+                        typename CurveType::g1_type<>::value_type &&beta_g1,
+                        typename CurveType::g2_type<>::value_type &&beta_g2,
+                        typename CurveType::g1_type<>::value_type &&delta_g1,
+                        typename CurveType::g2_type<>::value_type &&delta_g2,
+                        std::vector<typename CurveType::g1_type<>::value_type> &&A_query,
+                        knowledge_commitment_vector<typename CurveType::g2_type<>, typename CurveType::g1_type<>> &&B_query,
+                        std::vector<typename CurveType::g1_type<>::value_type> &&H_query,
+                        std::vector<typename CurveType::g1_type<>::value_type> &&L_query,
                         constraint_system_type &&constraint_system) :
                         alpha_g1(std::move(alpha_g1)),
                         beta_g1(std::move(beta_g1)), beta_g2(std::move(beta_g2)), delta_g1(std::move(delta_g1)),
@@ -95,10 +91,13 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return A_query.size() * CurveType::g1_type::value_bits + B_query.size_in_bits() +
-                               H_query.size() * CurveType::g1_type::value_bits +
-                               L_query.size() * CurveType::g1_type::value_bits + 1 * CurveType::g1_type::value_bits +
-                               1 * CurveType::g2_type::value_bits;
+                        using g1_type = typename CurveType::g1_type<>;
+                        using g2_type = typename CurveType::g2_type<>;
+
+                        return A_query.size() * g1_type::value_bits + B_query.size_in_bits() +
+                               H_query.size() * g1_type::value_bits +
+                               L_query.size() * g1_type::value_bits + 1 * g1_type::value_bits +
+                               1 * g2_type::value_bits;
                     }
 
                     bool operator==(const r1cs_gg_ppzksnark_proving_key &other) const {

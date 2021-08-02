@@ -50,9 +50,10 @@ namespace nil {
                         std::is_same<r1cs_gg_ppzksnark_prover<CurveType>, Prover>::value &&
                         (std::is_same<r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType>, Verifier>::value ||
                          std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>,
-                                      Verifier>::value ||
-                         std::is_same<r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>,
-                                      Verifier>::value)>;
+                                      Verifier>::value 
+                        // || std::is_same<r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>,
+                        //               Verifier>::value
+                                      )>;
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
                 using is_aggregate_mode = typename std::integral_constant<

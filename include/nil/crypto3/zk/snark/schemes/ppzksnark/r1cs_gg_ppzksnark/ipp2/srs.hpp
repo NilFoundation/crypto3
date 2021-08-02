@@ -27,7 +27,6 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_AGGREGATE_IPP2_SRS_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_AGGREGATE_IPP2_SRS_HPP
 
-#include <memory>
 #include <vector>
 #include <tuple>
 
