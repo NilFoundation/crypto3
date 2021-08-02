@@ -40,8 +40,8 @@ namespace nil {
                 class r1cs_se_ppzksnark_verification_key {
                     typedef CurveType curve_type;
 
-                    using g1_type = typename curve_type::g1_type<>;
-                    using g2_type = typename curve_type::g2_type<>;
+                    using g1_type = typename curve_type::template g1_type<>;
+                    using g2_type = typename curve_type::template g2_type<>;
                 public:
                     // H
                     typename g2_type::value_type H;

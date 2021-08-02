@@ -37,29 +37,18 @@ namespace nil {
                 class r1cs_gg_ppzksnark_aggregate_generator {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
 
-                    typedef typename CurveType::pairing pairing_policy;
                     typedef typename CurveType::scalar_field_type scalar_field_type;
-                    typedef typename CurveType::g1_type g1_type;
-                    typedef typename CurveType::g2_type g2_type;
-                    typedef typename CurveType::gt_type gt_type;
+                    typedef typename CurveType::template g1_type<> g1_type;
+                    typedef typename CurveType::template g2_type<> g2_type;
 
                 public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
-                    typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
+                    typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
-
                     typedef typename policy_type::srs_type srs_type;
-                    typedef typename policy_type::proving_srs_type proving_srs_type;
-                    typedef typename policy_type::verification_srs_type verification_srs_type;
-
                     typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::srs_pair_type srs_pair_type;
-
-                    typedef typename policy_type::proof_type proof_type;
-                    typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
 
                     template<typename DistributionType =
                                  boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>,

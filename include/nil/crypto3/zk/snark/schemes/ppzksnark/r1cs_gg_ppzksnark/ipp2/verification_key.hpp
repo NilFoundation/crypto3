@@ -38,20 +38,20 @@ namespace nil {
                 struct r1cs_gg_ppzksnark_aggregate_verification_key {
                     typedef CurveType curve_type;
 
-                    typename curve_type::g1_type::value_type alpha_g1;
-                    typename curve_type::g2_type::value_type beta_g2;
-                    typename curve_type::g2_type::value_type gamma_g2;
-                    typename curve_type::g2_type::value_type delta_g2;
+                    typename curve_type::template g1_type<>::value_type alpha_g1;
+                    typename curve_type::template g2_type<>::value_type beta_g2;
+                    typename curve_type::template g2_type<>::value_type gamma_g2;
+                    typename curve_type::template g2_type<>::value_type delta_g2;
 
-                    accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1;
+                    accumulation_vector<typename CurveType::template g1_type<>> gamma_ABC_g1;
 
                     r1cs_gg_ppzksnark_aggregate_verification_key() = default;
                     r1cs_gg_ppzksnark_aggregate_verification_key(
-                        const typename curve_type::g1_type::value_type &alpha_g1,
-                        const typename curve_type::g2_type::value_type &beta_g2,
-                        const typename curve_type::g2_type::value_type &gamma_g2,
-                        const typename curve_type::g2_type::value_type &delta_g2,
-                        const accumulation_vector<typename curve_type::g1_type> &gamma_ABC_g1) :
+                        const typename curve_type::template g1_type<>::value_type &alpha_g1,
+                        const typename curve_type::template g2_type<>::value_type &beta_g2,
+                        const typename curve_type::template g2_type<>::value_type &gamma_g2,
+                        const typename curve_type::template g2_type<>::value_type &delta_g2,
+                        const accumulation_vector<typename curve_type::template g1_type<>> &gamma_ABC_g1) :
                         alpha_g1(alpha_g1),
                         beta_g2(beta_g2), gamma_g2(gamma_g2), delta_g2(delta_g2), gamma_ABC_g1(gamma_ABC_g1) {
                     }

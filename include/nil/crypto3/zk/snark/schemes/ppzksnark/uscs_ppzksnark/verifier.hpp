@@ -66,12 +66,8 @@ namespace nil {
                     using g1_type = typename CurveType::template g1_type<>;
                     using g2_type = typename CurveType::template g2_type<>;
                 public:
-                    typedef typename policy_type::primary_input_type primary_input_type;
-
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::proof_type proof_type;
 
                     static inline processed_verification_key_type process(const verification_key_type &vk) {
 
@@ -102,10 +98,8 @@ namespace nil {
 
                 public:
                     typedef typename policy_type::primary_input_type primary_input_type;
-
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
                     typedef typename policy_type::proof_type proof_type;
 
                     /**
@@ -198,10 +192,8 @@ namespace nil {
 
                 public:
                     typedef typename policy_type::primary_input_type primary_input_type;
-
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
                     typedef typename policy_type::proof_type proof_type;
 
                     /**

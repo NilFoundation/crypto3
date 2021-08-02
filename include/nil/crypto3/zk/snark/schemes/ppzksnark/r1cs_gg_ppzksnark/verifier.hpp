@@ -73,16 +73,8 @@ namespace nil {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                 public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
-                    typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::proof_type proof_type;
 
                     static inline processed_verification_key_type
                         process(const verification_key_type &verification_key) {
@@ -124,15 +116,9 @@ namespace nil {
                     typedef typename pairing::pairing_policy<CurveType>::g2_precomputed_type g2_precomputed_type;
 
                 public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
                     /**
@@ -196,15 +182,9 @@ namespace nil {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                 public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
                     /**
@@ -259,15 +239,11 @@ namespace nil {
                 //     typedef typename pairing::pairing_policy<CurveType>::affine_ate_g2_precomp affine_ate_g2_precomp;
 
                 // public:
-                //     typedef typename policy_type::constraint_system_type constraint_system_type;
                 //     typedef typename policy_type::primary_input_type primary_input_type;
-                //     typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                //     typedef typename policy_type::proving_key_type proving_key_type;
                 //     typedef typename policy_type::verification_key_type verification_key_type;
                 //     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                //     typedef typename policy_type::keypair_type keypair_type;
                 //     typedef typename policy_type::proof_type proof_type;
 
                 //     static inline bool process(const verification_key_type &verification_key,

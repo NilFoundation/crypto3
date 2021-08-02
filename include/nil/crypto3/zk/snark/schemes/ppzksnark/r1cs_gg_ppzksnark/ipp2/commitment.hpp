@@ -199,16 +199,16 @@ namespace nil {
                 template<typename CurveType>
                 struct r1cs_gg_ppzksnark_ipp2_commitment {
                     typedef CurveType curve_type;
-                    typedef pairing::pairing_policy<curve_type> pairing;
+                    typedef algebra::pairing::pairing_policy<curve_type> pairing;
 
-                    typedef r1cs_gg_ppzksnark_ipp2_wkey<CurveType> wkey_type;
-                    typedef r1cs_gg_ppzksnark_ipp2_vkey<CurveType> vkey_type;
+                    typedef r1cs_gg_ppzksnark_ipp2_wkey<curve_type> wkey_type;
+                    typedef r1cs_gg_ppzksnark_ipp2_vkey<curve_type> vkey_type;
 
                     typedef typename wkey_type::group_value_type g1_value_type;
                     typedef typename vkey_type::group_value_type g2_value_type;
                     typedef typename curve_type::gt_type::value_type gt_value_type;
 
-                    typedef r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType> output_type;
+                    typedef r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type> output_type;
 
                     /// Commits to a tuple of G1 vector and G2 vector in the following way:
                     /// $T = \prod_{i=0}^n e(A_i, v_{1,i})e(B_i,w_{1,i})$

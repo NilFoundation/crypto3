@@ -75,8 +75,8 @@ namespace nil {
                 template<typename CurveType, typename InputRange,
                          typename ValueType = typename std::iterator_traits<typename InputRange::iterator>::value_type>
                 typename std::enable_if<
-                    std::is_same<typename CurveType::g1_type::value_type, ValueType>::value ||
-                    std::is_same<typename CurveType::g2_type::value_type, ValueType>::value ||
+                    std::is_same<typename CurveType::template g1_type<>::value_type, ValueType>::value ||
+                    std::is_same<typename CurveType::template g2_type<>::value_type, ValueType>::value ||
                     std::is_same<typename CurveType::scalar_field_type::value_type, ValueType>::value>::type
                     compress(InputRange &vec, std::size_t split,
                              const typename CurveType::scalar_field_type::value_type &scalar) {
@@ -214,11 +214,11 @@ namespace nil {
 
                 template<typename CurveType, typename InputG2Iterator, typename InputScalarIterator>
                 typename std::enable_if<
-                    std::is_same<typename CurveType::g2_type::value_type,
+                    std::is_same<typename CurveType::template g2_type<>::value_type,
                                  typename std::iterator_traits<InputG2Iterator>::value_type>::value &&
                         std::is_same<typename CurveType::scalar_field_type::value_type,
                                      typename std::iterator_traits<InputScalarIterator>::value_type>::value,
-                    kzg_opening<typename CurveType::g2_type>>::type
+                    kzg_opening<typename CurveType::template g2_type<>>>::type
                     prove_commitment_v(InputG2Iterator srs_powers_alpha_first, InputG2Iterator srs_powers_alpha_last,
                                        InputG2Iterator srs_powers_beta_first, InputG2Iterator srs_powers_beta_last,
                                        InputScalarIterator transcript_first, InputScalarIterator transcript_last,
@@ -234,18 +234,18 @@ namespace nil {
                             transcript_first, transcript_last, kzg_challenge,
                             CurveType::scalar_field_type::value_type::one());
 
-                    return prove_commitment_key_kzg_opening<typename CurveType::g2_type>(
+                    return prove_commitment_key_kzg_opening<typename CurveType::template g2_type<>>(
                         srs_powers_alpha_first, srs_powers_alpha_last, srs_powers_beta_first, srs_powers_beta_last,
                         vkey_poly, vkey_poly_z, kzg_challenge);
                 }
 
                 template<typename CurveType, typename InputG1Iterator, typename InputScalarIterator>
                 typename std::enable_if<
-                    std::is_same<typename CurveType::g1_type::value_type,
+                    std::is_same<typename CurveType::template g1_type<>::value_type,
                                  typename std::iterator_traits<InputG1Iterator>::value_type>::value &&
                         std::is_same<typename CurveType::scalar_field_type::value_type,
                                      typename std::iterator_traits<InputScalarIterator>::value_type>::value,
-                    kzg_opening<typename CurveType::g1_type>>::type
+                    kzg_opening<typename CurveType::template g1_type<>>>::type
                     prove_commitment_w(InputG1Iterator srs_powers_alpha_first, InputG1Iterator srs_powers_alpha_last,
                                        InputG1Iterator srs_powers_beta_first, InputG1Iterator srs_powers_beta_last,
                                        InputScalarIterator transcript_first, InputScalarIterator transcript_last,
@@ -270,7 +270,7 @@ namespace nil {
                     // this computes f_w(z) by multiplying by zn
                     typename CurveType::scalar_field_type::value_type fwz = fz * zn;
 
-                    return prove_commitment_key_kzg_opening<typename CurveType::g1_type>(
+                    return prove_commitment_key_kzg_opening<typename CurveType::template g1_type<>>(
                         srs_powers_alpha_first, srs_powers_alpha_last, srs_powers_beta_first, srs_powers_beta_last,
                         fcoeffs, fwz, kzg_challenge);
                 }
@@ -282,13 +282,13 @@ namespace nil {
                 template<typename CurveType, typename Hash = hashes::sha2<256>, typename InputG1Iterator1,
                          typename InputG2Iterator, typename InputG1Iterator2, typename InputScalarIterator>
                 typename std::enable_if<
-                    std::is_same<typename CurveType::g1_type::value_type,
+                    std::is_same<typename CurveType::template g1_type<>::value_type,
                                  typename std::iterator_traits<InputG1Iterator1>::value_type>::value &&
-                        std::is_same<typename CurveType::g2_type::value_type,
+                        std::is_same<typename CurveType::template g2_type<>::value_type,
                                      typename std::iterator_traits<InputG2Iterator>::value_type>::value &&
                         std::is_same<typename CurveType::scalar_field_type::value_type,
                                      typename std::iterator_traits<InputScalarIterator>::value_type>::value &&
-                        std::is_same<typename CurveType::g1_type::value_type,
+                        std::is_same<typename CurveType::template g1_type<>::value_type,
                                      typename std::iterator_traits<InputG1Iterator2>::value_type>::value,
                     std::tuple<gipa_proof<CurveType>, std::vector<typename CurveType::scalar_field_type::value_type>,
                                std::vector<typename CurveType::scalar_field_type::value_type>>>::type
@@ -306,8 +306,8 @@ namespace nil {
 
                     // the values of vectors A and B rescaled at each step of the loop
                     // the values of vectors C and r rescaled at each step of the loop
-                    std::vector<typename CurveType::g1_type::value_type> m_a {a_first, a_last}, m_c {c_first, c_last};
-                    std::vector<typename CurveType::g2_type::value_type> m_b {b_first, b_last};
+                    std::vector<typename CurveType::template g1_type<>::value_type> m_a {a_first, a_last}, m_c {c_first, c_last};
+                    std::vector<typename CurveType::template g2_type<>::value_type> m_b {b_first, b_last};
                     std::vector<typename CurveType::scalar_field_type::value_type> m_r {r_first, r_last};
 
                     // the values of the commitment keys rescaled at each step of the loop
@@ -325,7 +325,7 @@ namespace nil {
                         std::pair<typename CurveType::gt_type::value_type, typename CurveType::gt_type::value_type>>
                         z_ab;
                     std::vector<
-                        std::pair<typename CurveType::g1_type::value_type, typename CurveType::g1_type::value_type>>
+                        std::pair<typename CurveType::template g1_type<>::value_type, typename CurveType::template g1_type<>::value_type>>
                         z_c;
                     std::vector<typename CurveType::scalar_field_type::value_type> challenges, challenges_inv;
 
@@ -355,8 +355,8 @@ namespace nil {
                         typename CurveType::gt_type::value_type zab_l = CurveType::gt_type::value_type::one();
                         std::for_each(boost::make_zip_iterator(boost::make_tuple(m_a.begin() + split, m_b.begin())),
                                       boost::make_zip_iterator(boost::make_tuple(m_a.end(), m_b.begin() + split)),
-                                      [&](const boost::tuple<const typename CurveType::g1_type::value_type &,
-                                                             const typename CurveType::g2_type::value_type &> &t) {
+                                      [&](const boost::tuple<const typename CurveType::template g1_type<>::value_type &,
+                                                             const typename CurveType::template g2_type<>::value_type &> &t) {
                                           zab_l = zab_l *
                                                   algebra::pair<CurveType>(t.template get<0>(), t.template get<1>());
                                       });
@@ -364,8 +364,8 @@ namespace nil {
                         typename CurveType::gt_type::value_type zab_r = CurveType::gt_type::value_type::one();
                         std::for_each(boost::make_zip_iterator(boost::make_tuple(m_a.begin(), m_b.begin() + split)),
                                       boost::make_zip_iterator(boost::make_tuple(m_a.begin() + split, m_b.end())),
-                                      [&](const boost::tuple<const typename CurveType::g1_type::value_type &,
-                                                             const typename CurveType::g2_type::value_type &> &t) {
+                                      [&](const boost::tuple<const typename CurveType::template g1_type<>::value_type &,
+                                                             const typename CurveType::template g2_type<>::value_type &> &t) {
                                           zab_r = zab_r *
                                                   algebra::pair<CurveType>(t.template get<0>(), t.template get<1>());
                                       });
@@ -373,11 +373,11 @@ namespace nil {
 
                         // MIPP part
                         // z_l = c[n':] ^ r[:n']
-                        typename CurveType::g1_type::value_type zc_l =
+                        typename CurveType::template g1_type<>::value_type zc_l =
                             algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
                                 m_c.begin() + split, m_c.end(), m_r.begin(), m_r.begin() + split, 1);
                         // Z_r = c[:n'] ^ r[n':]
-                        typename CurveType::g1_type::value_type zc_r =
+                        typename CurveType::template g1_type<>::value_type zc_r =
                             algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
                                 m_c.begin(), m_c.begin() + split, m_r.begin() + split, m_r.end(), 1);
                         // u_l = c[n':] * v[:n']
@@ -393,8 +393,8 @@ namespace nil {
                         // combine both TIPP and MIPP transcript
                         tr.template write<typename CurveType::gt_type>(zab_l);
                         tr.template write<typename CurveType::gt_type>(zab_r);
-                        tr.template write<typename CurveType::g1_type>(zc_l);
-                        tr.template write<typename CurveType::g1_type>(zc_r);
+                        tr.template write<typename CurveType::template g1_type<>>(zc_l);
+                        tr.template write<typename CurveType::template g1_type<>>(zc_r);
                         tr.template write<typename CurveType::gt_type>(tab_l.first);
                         tr.template write<typename CurveType::gt_type>(tab_l.second);
                         tr.template write<typename CurveType::gt_type>(tab_r.first);
@@ -452,11 +452,11 @@ namespace nil {
                 template<typename CurveType, typename Hash = hashes::sha2<256>, typename InputG1Iterator1,
                          typename InputG2Iterator, typename InputG1Iterator2, typename InputScalarIterator>
                 typename std::enable_if<
-                    std::is_same<typename CurveType::g1_type::value_type,
+                    std::is_same<typename CurveType::template g1_type<>::value_type,
                                  typename std::iterator_traits<InputG1Iterator1>::value_type>::value &&
-                        std::is_same<typename CurveType::g2_type::value_type,
+                        std::is_same<typename CurveType::template g2_type<>::value_type,
                                      typename std::iterator_traits<InputG2Iterator>::value_type>::value &&
-                        std::is_same<typename CurveType::g1_type::value_type,
+                        std::is_same<typename CurveType::template g1_type<>::value_type,
                                      typename std::iterator_traits<InputG1Iterator2>::value_type>::value &&
                         std::is_same<typename CurveType::scalar_field_type::value_type,
                                      typename std::iterator_traits<InputScalarIterator>::value_type>::value,
@@ -483,10 +483,10 @@ namespace nil {
                     constexpr std::array<std::uint8_t, 8> domain_separator {'r', 'a', 'n', 'd', 'o', 'm', '-', 'z'};
                     tr.write_domain_separator(domain_separator.begin(), domain_separator.end());
                     tr.template write<typename CurveType::scalar_field_type>(challenges[0]);
-                    tr.template write<typename CurveType::g2_type>(proof.final_vkey.first);
-                    tr.template write<typename CurveType::g2_type>(proof.final_vkey.second);
-                    tr.template write<typename CurveType::g1_type>(proof.final_wkey.first);
-                    tr.template write<typename CurveType::g1_type>(proof.final_wkey.second);
+                    tr.template write<typename CurveType::template g2_type<>>(proof.final_vkey.first);
+                    tr.template write<typename CurveType::template g2_type<>>(proof.final_vkey.second);
+                    tr.template write<typename CurveType::template g1_type<>>(proof.final_wkey.first);
+                    tr.template write<typename CurveType::template g1_type<>>(proof.final_wkey.second);
                     typename CurveType::scalar_field_type::value_type z = tr.read_challenge();
 
                     // Complete KZG proofs
@@ -521,8 +521,8 @@ namespace nil {
                     // TODO: parallel
                     // We first commit to A B and C - these commitments are what the verifier
                     // will use later to verify the TIPP and MIPP proofs
-                    std::vector<typename CurveType::g1_type::value_type> a, c;
-                    std::vector<typename CurveType::g2_type::value_type> b;
+                    std::vector<typename CurveType::template g1_type<>::value_type> a, c;
+                    std::vector<typename CurveType::template g2_type<>::value_type> b;
                     auto proofs_it = proofs_first;
                     while (proofs_it != proofs_last) {
                         a.emplace_back(proofs_it->g_A);
@@ -563,11 +563,11 @@ namespace nil {
                                    [](const auto &r_i) { return r_i.inversed(); });
 
                     // B^{r}
-                    std::vector<typename CurveType::g2_type::value_type> b_r;
+                    std::vector<typename CurveType::template g2_type<>::value_type> b_r;
                     std::for_each(
                         boost::make_zip_iterator(boost::make_tuple(b.begin(), r_vec.begin())),
                         boost::make_zip_iterator(boost::make_tuple(b.end(), r_vec.end())),
-                        [&](const boost::tuple<const typename CurveType::g2_type::value_type &,
+                        [&](const boost::tuple<const typename CurveType::template g2_type<>::value_type &,
                                                const typename CurveType::scalar_field_type::value_type &> &t) {
                             b_r.emplace_back((t.template get<0>() * t.template get<1>()));
                         });
@@ -577,21 +577,21 @@ namespace nil {
                     typename CurveType::gt_type::value_type ip_ab = CurveType::gt_type::value_type::one();
                     std::for_each(boost::make_zip_iterator(boost::make_tuple(a.begin(), b_r.begin())),
                                   boost::make_zip_iterator(boost::make_tuple(a.end(), b_r.end())),
-                                  [&](const boost::tuple<const typename CurveType::g1_type::value_type &,
-                                                         const typename CurveType::g2_type::value_type &> &t) {
+                                  [&](const boost::tuple<const typename CurveType::template g1_type<>::value_type &,
+                                                         const typename CurveType::template g2_type<>::value_type &> &t) {
                                       ip_ab =
                                           ip_ab * algebra::pair<CurveType>(t.template get<0>(), t.template get<1>());
                                   });
                     ip_ab = algebra::final_exponentiation<CurveType>(ip_ab);
                     // compute C^r for the verifier
-                    typename CurveType::g1_type::value_type agg_c =
+                    typename CurveType::template g1_type<>::value_type agg_c =
                         algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(c.begin(), c.end(),
                                                                                          r_vec.begin(), r_vec.end(), 1);
                     tr.template write<typename CurveType::gt_type>(ip_ab);
-                    tr.template write<typename CurveType::g1_type>(agg_c);
+                    tr.template write<typename CurveType::template g1_type<>>(agg_c);
 
                     // w^{r^{-1}}
-                    r1cs_gg_ppzksnark_ipp2_commitment_key<typename CurveType::g1_type> wkey_r_inv =
+                    r1cs_gg_ppzksnark_ipp2_commitment_key<typename CurveType::template g1_type<>> wkey_r_inv =
                         srs.wkey.scale(r_inv.begin(), r_inv.end());
 
                     // we prove tipp and mipp using the same recursive loop
@@ -610,28 +610,14 @@ namespace nil {
                 class r1cs_gg_ppzksnark_aggregate_prover {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
 
-                    typedef typename CurveType::scalar_field_type scalar_field_type;
-                    typedef typename CurveType::g1_type g1_type;
-                    typedef typename CurveType::g2_type g2_type;
-                    typedef typename CurveType::gt_type gt_type;
-
                 public:
+
                     typedef BasicProver basic_prover;
 
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
                     typedef typename policy_type::proving_key_type proving_key_type;
-                    typedef typename policy_type::verification_key_type verification_key_type;
-
-                    typedef typename policy_type::srs_type srs_type;
                     typedef typename policy_type::proving_srs_type proving_srs_type;
-                    typedef typename policy_type::verification_srs_type verification_srs_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::srs_pair_type srs_pair_type;
-
                     typedef typename policy_type::proof_type proof_type;
                     typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
 
