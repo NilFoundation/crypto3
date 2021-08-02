@@ -41,9 +41,9 @@ namespace nil {
                  */
                 template<std::size_t WordBits = limb_bits>
                 struct p384 : public curve_nist<384, WordBits> {
-                    typedef typename curve_nist<384>::number_type number_type;
+                    typedef typename curve_nist<384>::integral_type integral_type;
 
-                    constexpr static const number_type p =
+                    constexpr static const integral_type p =
                         0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF_cppui384;
                 };
             }    // namespace curves

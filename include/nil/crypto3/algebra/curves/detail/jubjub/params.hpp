@@ -52,24 +52,11 @@ namespace nil {
                         using scalar_field_type = typename jubjub_basic_params::scalar_field_type;
 
                         // Edwards representation constants a and d
-                        constexpr static const typename base_field_type::modulus_type
-                            a =    ///< twisted Edwards elliptic curve
-                            0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000000_cppui255;    ///< described
-                                                                                                            ///< by
-                                                                                                            ///< equation
-                                                                                                            ///< ax^2 +
-                                                                                                            ///< y^2 = 1
-                                                                                                            ///< +
-                                                                                                            ///< dx^2y^2
-                        constexpr static const typename base_field_type::modulus_type
-                            d =    ///< twisted Edwards elliptic curve
-                            0x2A9318E74BFA2B48F5FD9207E6BD7FD4292D7F6D37579D2601065FD6D6343EB1_cppui254;    ///< described
-                                                                                                            ///< by
-                                                                                                            ///< equation
-                                                                                                            ///< ax^2 +
-                                                                                                            ///< y^2 = 1
-                                                                                                            ///< +
-                                                                                                            ///< dx^2y^2
+                        constexpr static const typename base_field_type::integral_type a =                                              ///< twisted Edwards elliptic curve 
+                            0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000000_cppui255;    ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
+                        constexpr static const typename base_field_type::integral_type d =                                              ///< twisted Edwards elliptic curve 
+                            0x2A9318E74BFA2B48F5FD9207E6BD7FD4292D7F6D37579D2601065FD6D6343EB1_cppui254;    ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
+
                     };
 
                     template<>
@@ -79,8 +66,11 @@ namespace nil {
                         using scalar_field_type = typename jubjub_basic_params::scalar_field_type;
 
                         // Montgomery representation constants A and scale
-                        constexpr static const typename base_field_type::modulus_type A = 0xA002_cppui16;
-                        constexpr static const typename base_field_type::modulus_type scale = 0x01;
+                        constexpr static const typename base_field_type::integral_type A = 
+                            0xA002_cppui16;
+                        constexpr static const typename base_field_type::integral_type scale = 
+                            0x01;
+
                     };
 
                     template<>
@@ -102,15 +92,11 @@ namespace nil {
                                 0x1d523cf1ddab1a1793132e78c866c0c33e26ba5cc220fed7cc3f870e59d292aa_cppui253)};
                     };
 
-                    constexpr typename jubjub_params<forms::twisted_edwards>::base_field_type::modulus_type const
-                        jubjub_params<forms::twisted_edwards>::a;
-                    constexpr typename jubjub_params<forms::twisted_edwards>::base_field_type::modulus_type const
-                        jubjub_params<forms::twisted_edwards>::d;
+                    constexpr typename jubjub_params<forms::twisted_edwards>::base_field_type::integral_type const jubjub_params<forms::twisted_edwards>::a;
+                    constexpr typename jubjub_params<forms::twisted_edwards>::base_field_type::integral_type const jubjub_params<forms::twisted_edwards>::d;
 
-                    constexpr typename jubjub_params<forms::montgomery>::base_field_type::modulus_type const
-                        jubjub_params<forms::montgomery>::A;
-                    constexpr typename jubjub_params<forms::montgomery>::base_field_type::modulus_type const
-                        jubjub_params<forms::montgomery>::scale;
+                    constexpr typename jubjub_params<forms::montgomery>::base_field_type::integral_type const jubjub_params<forms::montgomery>::A;
+                    constexpr typename jubjub_params<forms::montgomery>::base_field_type::integral_type const jubjub_params<forms::montgomery>::scale;
 
                     constexpr std::array<typename jubjub_g1_params<forms::twisted_edwards>::base_field_type::value_type,
                                          2> const jubjub_g1_params<forms::twisted_edwards>::zero_fill;

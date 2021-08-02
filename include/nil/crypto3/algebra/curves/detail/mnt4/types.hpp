@@ -66,7 +66,7 @@ namespace nil {
                         using g2_field_type = typename fields::fp2<base_field_type>;
                         using gt_field_type = typename fields::fp4<base_field_type>;
 
-                        using integral_type = typename base_field_type::modulus_type;
+                        using integral_type = typename base_field_type::integral_type;
 
                         template<typename Form, typename Coordinates>
                         using g1_type = mnt4_g1<Version, Form, Coordinates>;

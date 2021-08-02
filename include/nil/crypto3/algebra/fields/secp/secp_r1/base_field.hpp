@@ -50,14 +50,14 @@ namespace nil {
                     typedef field<256> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modular_type modular_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff_cppui256;
 
                     typedef typename detail::element_fp<params<secp_r1_base_field<256>>> value_type;
@@ -74,7 +74,7 @@ namespace nil {
                 constexpr typename std::size_t const secp_r1_fq<256>::modulus_bits;
                 constexpr typename std::size_t const secp_r1_fq<256>::number_bits;
                 constexpr typename std::size_t const secp_r1_fq<256>::value_bits;
-                constexpr typename secp_r1_fq<256>::modulus_type const secp_r1_fq<256>::modulus;
+                constexpr typename secp_r1_fq<256>::integral_type const secp_r1_fq<256>::modulus;
 
             }    // namespace fields
         }        // namespace algebra

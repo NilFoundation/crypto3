@@ -53,7 +53,7 @@ namespace nil {
                         using g2_type = curves::detail::alt_bn128_g2<254>;
                         using gt_type = typename policy_type::gt_type;
 
-                        constexpr static const typename policy_type::number_type ate_loop_count =
+                        constexpr static const typename policy_type::integral_type ate_loop_count =
                             policy_type::ate_loop_count;
 
                         constexpr static const typename g2_type::underlying_field_type::value_type twist =
@@ -293,7 +293,7 @@ namespace nil {
                             R.Y = Qcopy.Y;
                             R.Z = Fq2::one();
 
-                            const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
+                            const typename policy_type::integral_type &loop_count = policy_type::ate_loop_count;
 
                             bool found_one = false;
                             ate_ell_coeffs c;
@@ -342,7 +342,7 @@ namespace nil {
                             bool found_one = false;
                             std::size_t idx = 0;
 
-                            const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
+                            const typename policy_type::integral_type &loop_count = policy_type::ate_loop_count;
 
                             ate_ell_coeffs c;
 
@@ -391,7 +391,7 @@ namespace nil {
                             bool found_one = false;
                             std::size_t idx = 0;
 
-                            const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
+                            const typename policy_type::integral_type &loop_count = policy_type::ate_loop_count;
 
                             for (long i = loop_count.max_bits(); i >= 0; --i) {
                                 const bool bit = loop_count.test_bit(i);

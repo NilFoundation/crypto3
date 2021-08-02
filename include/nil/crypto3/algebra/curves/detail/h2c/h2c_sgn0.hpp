@@ -38,9 +38,9 @@ namespace nil {
 
                     template<typename FieldParams>
                     inline bool sgn0(const element_fp<FieldParams> &e) {
-                        using number_type = typename element_fp<FieldParams>::number_type;
+                        using modular_type = typename FieldParams::modular_type;
 
-                        static const number_type two = number_type(2, element_fp<FieldParams>::modulus);
+                        static const modular_type two = modular_type(2, element_fp<FieldParams>::modulus);
 
                         return static_cast<bool>(e.data % two);
                     }
@@ -48,13 +48,13 @@ namespace nil {
                     template<typename FieldParams>
                     inline bool sgn0(const element_fp2<FieldParams> &e) {
                         using underlying_type = typename element_fp2<FieldParams>::underlying_type;
-                        typedef typename underlying_type::number_type number_type;
+                        using modular_type = typename FieldParams::modular_type;
 
-                        static const number_type two = number_type(2, underlying_type::modulus);
+                        static const modular_type two = modular_type(2, underlying_type::modulus);
 
-                        number_type sign_0 = e.data[0].data % two;
+                        modular_type sign_0 = e.data[0].data % two;
                         bool zero_0 = e.data[0].data.is_zero();
-                        number_type sign_1 = e.data[1].data % two;
+                        modular_type sign_1 = e.data[1].data % two;
                         return static_cast<bool>(sign_0) || (zero_0 && static_cast<bool>(sign_1));
                     }
                 }    // namespace detail

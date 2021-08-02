@@ -79,10 +79,8 @@ namespace nil {
                             edwards_g2_params<183, forms::edwards>::one_fill;
                     };
 
-                    constexpr typename edwards_params<183, forms::twisted_edwards>::base_field_type::modulus_type const
-                        edwards_params<183, forms::twisted_edwards>::a;
-                    constexpr typename edwards_params<183, forms::twisted_edwards>::base_field_type::modulus_type const
-                        edwards_params<183, forms::twisted_edwards>::d;
+                    constexpr typename edwards_params<183, forms::twisted_edwards>::base_field_type::integral_type const edwards_params<183, forms::twisted_edwards>::a;
+                    constexpr typename edwards_params<183, forms::twisted_edwards>::base_field_type::integral_type const edwards_params<183, forms::twisted_edwards>::d;
 
                     constexpr std::array<
                         typename edwards_g1_params<183, forms::twisted_edwards>::field_type::value_type, 2> const

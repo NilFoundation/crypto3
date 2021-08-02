@@ -51,10 +51,9 @@ namespace nil {
                         typedef params<base_field_type> policy_type;
 
                     public:
-                        typedef typename policy_type::number_type number_type;
-                        typedef typename policy_type::modulus_type modulus_type;
+                        typedef typename policy_type::integral_type integral_type;
 
-                        constexpr static const modulus_type modulus = policy_type::modulus;
+                        constexpr static const integral_type modulus = policy_type::modulus;
 
                         typedef base_field_type non_residue_field_type;
                         typedef typename non_residue_field_type::value_type non_residue_type;
@@ -68,7 +67,7 @@ namespace nil {
                             non_residue_type(0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298),
                             non_residue_type(0x3AD84453493094F44C0E4B334F83D9B7D7845383998B4CFE8788F285043342F78DC81FC7F3D_cppui298)};*/
 
-                        constexpr static const std::array<modulus_type, 4> Frobenius_coeffs_c1 = {
+                        constexpr static const std::array<integral_type, 4> Frobenius_coeffs_c1 = {
                             0x01, 0xF73779FE09916DFDCC2FD1F968D534BEB17DAF7518CD9FAE5C1F7BDCF94DD5D7DEF6980C4_cppui292,
                             0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298,
                             0x3AD84453493094F44C0E4B334F83D9B7D7845383998B4CFE8788F285043342F78DC81FC7F3D_cppui298};
@@ -81,11 +80,12 @@ namespace nil {
                         fp4_extension_params<mnt4_base_field<Version>>::non_residue;
 
                     template<std::size_t Version>
-                    constexpr typename fp4_extension_params<mnt4_base_field<Version>>::modulus_type const
+                    constexpr typename fp4_extension_params<mnt4_base_field<Version>>::integral_type const
                         fp4_extension_params<mnt4_base_field<Version>>::modulus;
 
                     template<std::size_t Version>
-                    constexpr std::array<typename fp4_extension_params<mnt4_base_field<Version>>::modulus_type, 4> const
+                    constexpr std::array<typename fp4_extension_params<mnt4_base_field<Version>>::integral_type,
+                                         4> const
                         fp4_extension_params<mnt4_base_field<Version>>::Frobenius_coeffs_c1;
 
                 }    // namespace detail

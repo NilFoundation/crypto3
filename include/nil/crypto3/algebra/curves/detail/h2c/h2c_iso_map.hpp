@@ -49,10 +49,10 @@ namespace nil {
 
                         typedef typename suite_type::group_value_type group_value_type;
                         typedef typename suite_type::field_value_type field_value_type;
-                        typedef typename suite_type::number_type number_type;
+                        typedef typename suite_type::integral_type integral_type;
 
-                        // TODO: change number_type on field_value_type when constexpr will be finished
-                        constexpr static std::array<number_type, 12> k_x_num = {
+                        // TODO: change integral_type on field_value_type when constexpr will be finished
+                        constexpr static std::array<integral_type, 12> k_x_num = {
                             0x11a05f2b1e833340b809101dd99815856b303e88a2d7005ff2627b56cdb4e2c85610c2d5f2e62d6eaeac1662734649b7_cppui381,
                             0x17294ed3e943ab2f0588bab22147a81c7c17e75b2f6a8417f565e33c70d1e86b4838f2a6f318c356e834eef1b3cb83bb_cppui381,
                             0xd54005db97678ec1d1048c5d10a9a1bce032473295983e56878e501ec68e25c958c3e3d2a09729fe0179f9dac9edcb0_cppui381,
@@ -66,7 +66,7 @@ namespace nil {
                             0x10321da079ce07e272d8ec09d2565b0dfa7dccdde6787f96d50af36003b14866f69b771f8c285decca67df3f1605fb7b_cppui381,
                             0x6e08c248e260e70bd1e962381edee3d31d79d7e22c837bc23c0bf1bc24c6b68c24b1b80b64d391fa9c8ba2e8ba2d229_cppui381};
 
-                        constexpr static std::array<number_type, 10> k_x_den = {
+                        constexpr static std::array<integral_type, 10> k_x_den = {
                             0x8ca8d548cff19ae18b2e62f4bd3fa6f01d5ef4ba35b48ba9c9588617fc8ac62b558d681be343df8993cf9fa40d21b1c_cppui381,
                             0x12561a5deb559c4348b4711298e536367041e8ca0cf0800c0126c2588c48bf5713daa8846cb026e9e5c8276ec82b3bff_cppui381,
                             0xb2962fe57a3225e8137e629bff2991f6f89416f5a718cd1fca64e00b11aceacd6a3d0967c94fedcfcc239ba5cb83e19_cppui381,
@@ -78,7 +78,7 @@ namespace nil {
                             0xa10ecf6ada54f825e920b3dafc7a3cce07f8d1d7161366b74100da67f39883503826692abba43704776ec3a79a1d641_cppui381,
                             0x95fc13ab9e92ad4476d6e3eb3a56680f682b4ee96f7d03776df533978f31c1593174e4b4b7865002d6384d168ecdd0a_cppui381};
 
-                        constexpr static std::array<number_type, 16> k_y_num = {
+                        constexpr static std::array<integral_type, 16> k_y_num = {
                             0x90d97c81ba24ee0259d1f094980dcfa11ad138e48a869522b52af6c956543d3cd0c7aee9b3ba3c2be9845719707bb33_cppui381,
                             0x134996a104ee5811d51036d776fb46831223e96c254f383d0f906343eb67ad34d6c56711962fa8bfe097e75a2e41c696_cppui381,
                             0xcc786baa966e66f4a384c86a3b49942552e2d658a31ce2c344be4b91400da7d26d521628b00523b8dfe240c72de1f6_cppui381,
@@ -96,7 +96,7 @@ namespace nil {
                             0x5c129645e44cf1102a159f748c4a3fc5e673d81d7e86568d9ab0f5d396a7ce46ba1049b6579afb7866b1e715475224b_cppui381,
                             0x15e6be4e990f03ce4ea50b3b42df2eb5cb181d8f84965a3957add4fa95af01b2b665027efec01c7704b456be69c8b604_cppui381};
 
-                        constexpr static std::array<number_type, 15> k_y_den = {
+                        constexpr static std::array<integral_type, 15> k_y_den = {
                             0x16112c4c3a9c98b252181140fad0eae9601a6de578980be6eec3232b5be72e7a07f3688ef60c206d01479253b03663c1_cppui381,
                             0x1962d75c2381201e1a0cbd6c43c348b885c84ff731c4d59ca4a10356f453e01f78a4260763529e3532f6102c2e49a03d_cppui381,
                             0x58df3306640da276faaae7d6e8eb15778c4855551ae7f310c35a5dd279cd2eca6757cd636f96f891e2538b53dbf67f2_cppui381,
@@ -163,10 +163,10 @@ namespace nil {
 
                         typedef typename suite_type::group_value_type group_value_type;
                         typedef typename suite_type::field_value_type field_value_type;
-                        typedef typename suite_type::number_type number_type;
+                        typedef typename suite_type::integral_type integral_type;
 
-                        // TODO: change number_type on field_value_type when constexpr will be finished
-                        constexpr static std::array<std::array<number_type, 2>, 4> k_x_num = {
+                        // TODO: change integral_type on field_value_type when constexpr will be finished
+                        constexpr static std::array<std::array<integral_type, 2>, 4> k_x_num = {
                             {{{0x5c759507e8e333ebb5b7a9a47d7ed8532c52d39fd3a042a88b58423c50ae15d5c2638e343d9c71c6238aaaaaaaa97d6_cppui381,
                                0x5c759507e8e333ebb5b7a9a47d7ed8532c52d39fd3a042a88b58423c50ae15d5c2638e343d9c71c6238aaaaaaaa97d6_cppui381}},
                              {{0,
@@ -176,13 +176,13 @@ namespace nil {
                              {{0x171d6541fa38ccfaed6dea691f5fb614cb14b4e7f4e810aa22d6108f142b85757098e38d0f671c7188e2aaaaaaaa5ed1_cppui381,
                                0}}}};
 
-                        constexpr static std::array<std::array<number_type, 2>, 2> k_x_den = {
+                        constexpr static std::array<std::array<integral_type, 2>, 2> k_x_den = {
                             {{{0,
                                0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaa63_cppui381}},
                              {{0xc,
                                0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaa9f_cppui381}}}};
 
-                        constexpr static std::array<std::array<number_type, 2>, 4> k_y_num = {
+                        constexpr static std::array<std::array<integral_type, 2>, 4> k_y_num = {
                             {{{0x1530477c7ab4113b59a4c18b076d11930f7da5d4a07f649bf54439d87d27e500fc8c25ebf8c92f6812cfc71c71c6d706_cppui381,
                                0x1530477c7ab4113b59a4c18b076d11930f7da5d4a07f649bf54439d87d27e500fc8c25ebf8c92f6812cfc71c71c6d706_cppui381}},
                              {{0,
@@ -192,7 +192,7 @@ namespace nil {
                              {{0x124c9ad43b6cf79bfbf7043de3811ad0761b0f37a1e26286b0e977c69aa274524e79097a56dc4bd9e1b371c71c718b10_cppui381,
                                0}}}};
 
-                        constexpr static std::array<std::array<number_type, 2>, 3> k_y_den = {
+                        constexpr static std::array<std::array<integral_type, 2>, 3> k_y_den = {
                             {{{0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffa8fb_cppui381,
                                0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffa8fb_cppui381}},
                              {{0,

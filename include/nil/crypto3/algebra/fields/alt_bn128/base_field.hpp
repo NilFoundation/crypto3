@@ -50,17 +50,17 @@ namespace nil {
                     typedef field<254> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modular_type modular_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD47_cppui254;
 
-                    constexpr static const modulus_type mul_generator = 0x03;
+                    constexpr static const integral_type mul_generator = 0x03;
 
                     typedef typename detail::element_fp<params<alt_bn128_base_field<254>>> value_type;
 
@@ -74,10 +74,10 @@ namespace nil {
 
                 constexpr typename std::size_t const alt_bn128_base_field<254>::value_bits;
 
-                constexpr typename alt_bn128_base_field<254>::modulus_type const alt_bn128_base_field<254>::modulus;
+                constexpr typename alt_bn128_base_field<254>::integral_type const alt_bn128_base_field<254>::modulus;
 
                 constexpr
-                    typename alt_bn128_base_field<254>::modulus_type const alt_bn128_base_field<254>::mul_generator;
+                    typename alt_bn128_base_field<254>::integral_type const alt_bn128_base_field<254>::mul_generator;
 
                 template<std::size_t Version = 254>
                 using alt_bn128_fq = alt_bn128_base_field<Version>;

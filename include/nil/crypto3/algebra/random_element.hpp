@@ -52,7 +52,7 @@ namespace nil {
 
             template<
                 typename FieldType,
-                typename DistributionType = boost::random::uniform_int_distribution<typename FieldType::modulus_type>,
+                typename DistributionType = boost::random::uniform_int_distribution<typename FieldType::integral_type>,
                 typename GeneratorType = boost::random::mt19937>
             typename std::enable_if<is_field<FieldType>::value && !(is_extended_field<FieldType>::value),
                                     typename FieldType::value_type>::type
@@ -74,7 +74,7 @@ namespace nil {
 
             template<
                 typename FieldType,
-                typename DistributionType = boost::random::uniform_int_distribution<typename FieldType::modulus_type>,
+                typename DistributionType = boost::random::uniform_int_distribution<typename FieldType::integral_type>,
                 typename GeneratorType = boost::random::mt19937>
             typename std::enable_if<is_field<FieldType>::value && is_extended_field<FieldType>::value,
                                     typename FieldType::value_type>::type
@@ -96,15 +96,15 @@ namespace nil {
             }
 
             template<typename CurveGroupType,
-                     typename DistributionType =
-                         boost::random::uniform_int_distribution<typename CurveGroupType::field_type::modulus_type>,
+                     typename DistributionType = boost::random::uniform_int_distribution<
+                         typename CurveGroupType::field_type::integral_type>,
                      typename GeneratorType = boost::random::mt19937>
             typename std::enable_if<is_curve_group<CurveGroupType>::value, typename CurveGroupType::value_type>::type
                 random_element() {
 
                 using curve_type = typename CurveGroupType::curve_type;
                 using field_type = typename curve_type::scalar_field_type;
-                using distribution_type = boost::random::uniform_int_distribution<typename field_type::modulus_type>;
+                using distribution_type = boost::random::uniform_int_distribution<typename field_type::integral_type>;
                 using generator_type = GeneratorType;
 
                 return random_element<typename curve_type::scalar_field_type, distribution_type, generator_type>() *

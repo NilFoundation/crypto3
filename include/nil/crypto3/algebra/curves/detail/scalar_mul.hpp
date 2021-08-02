@@ -88,7 +88,7 @@ namespace nil {
                     GroupValueType::group_type>::value &&
                                                 !is_field<typename
                     GroupValueType::group_type>::value>::type> GroupValueType operator*( const GroupValueType &left,
-                        const typename GroupValueType::underlying_field_type::modulus_type &right) {
+                        const typename GroupValueType::underlying_field_type::integral_type &right) {
 
                         return scalar_mul(left, right);
                     }
@@ -98,7 +98,7 @@ namespace nil {
                     GroupValueType::group_type>::value &&
                                                 !is_field<typename
                     GroupValueType::group_type>::value>::type> GroupValueType operator*( const typename
-                    GroupValueType::underlying_field_type::modulus_type &left, const GroupValueType &right) {
+                    GroupValueType::underlying_field_type::integral_type &left, const GroupValueType &right) {
 
                         return right * left;
                     }*/

@@ -55,8 +55,8 @@ namespace nil {
                         using scalar_field_type = fields::secp_r1_scalar_field<Version>;
 
                         using g1_field_type = base_field_type;
-
-                        using integral_type = typename base_field_type::modulus_type;
+                        
+                        using integral_type = typename base_field_type::integral_type;
 
                         template<typename Form, typename Coordinates>
                         using g1_type = secp_r1_g1<Version, Form, Coordinates>;

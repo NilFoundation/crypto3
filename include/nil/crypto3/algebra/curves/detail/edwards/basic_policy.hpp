@@ -59,26 +59,26 @@ namespace nil {
                         typedef typename fields::fp3<base_field_type> g2_field_type;
                         typedef typename fields::fp6_2over3<base_field_type> gt_field_type;
 
-                        typedef typename base_field_type::modulus_type number_type;
-                        typedef typename base_field_type::extended_modulus_type extended_number_type;
+                        typedef typename base_field_type::integral_type integral_type;
+                        typedef typename base_field_type::extended_integral_type extended_integral_type;
 
-                        constexpr static const number_type base_field_modulus =
+                        constexpr static const integral_type base_field_modulus =
                             base_field_type::modulus;    ///< characteristic of the base field
 
                         typedef fields::edwards_fr<version> scalar_field_type;
-                        constexpr static const number_type scalar_field_modulus =
+                        constexpr static const integral_type scalar_field_modulus =
                             scalar_field_type::modulus;    ///< characteristic of the scalar field (order of the group
                                                            ///< of points)
 
-                        constexpr static const number_type p =
+                        constexpr static const integral_type p =
                             base_field_modulus;    ///< characteristic of the base field
-                        constexpr static const number_type q =
+                        constexpr static const integral_type q =
                             scalar_field_modulus;    ///< characteristic of the scalar field (order of the group of
                                                      ///< points)
 
-                        constexpr static const number_type a =
+                        constexpr static const integral_type a =
                             0x01;    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
-                        constexpr static const number_type d =
+                        constexpr static const integral_type d =
                             0x64536D55979879327CF1306BB5A6277D254EF9776CE70_cppui179;    ///< coefficient of short
                                                                                          ///< Weierstrass curve
                                                                                          ///< $y^2=x^3+a*x+b$
@@ -113,16 +113,16 @@ namespace nil {
                                 0x3c3baf061e62a04a4e9d1db335b8779c70384ae2933a73_cppui182)};
                     };
 
-                    constexpr typename edwards_basic_policy<183>::number_type const
+                    constexpr typename edwards_basic_policy<183>::integral_type const
                         edwards_basic_policy<183>::base_field_modulus;
-                    constexpr typename edwards_basic_policy<183>::number_type const
+                    constexpr typename edwards_basic_policy<183>::integral_type const
                         edwards_basic_policy<183>::scalar_field_modulus;
 
-                    constexpr typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::a;
-                    constexpr typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::d;
+                    constexpr typename edwards_basic_policy<183>::integral_type const edwards_basic_policy<183>::a;
+                    constexpr typename edwards_basic_policy<183>::integral_type const edwards_basic_policy<183>::d;
 
-                    constexpr typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::p;
-                    constexpr typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::q;
+                    constexpr typename edwards_basic_policy<183>::integral_type const edwards_basic_policy<183>::p;
+                    constexpr typename edwards_basic_policy<183>::integral_type const edwards_basic_policy<183>::q;
 
                     constexpr std::array<typename edwards_basic_policy<183>::g1_field_type::value_type, 3> const
                         edwards_basic_policy<183>::g1_zero_fill;

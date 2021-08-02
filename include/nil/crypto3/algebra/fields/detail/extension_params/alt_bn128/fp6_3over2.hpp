@@ -51,10 +51,9 @@ namespace nil {
                         typedef params<base_field_type> policy_type;
 
                     public:
-                        typedef typename policy_type::number_type number_type;
-                        typedef typename policy_type::modulus_type modulus_type;
+                        typedef typename policy_type::integral_type integral_type;
 
-                        constexpr static const modulus_type modulus = policy_type::modulus;
+                        constexpr static const integral_type modulus = policy_type::modulus;
 
                         typedef fields::fp2<base_field_type> non_residue_field_type;
                         typedef typename non_residue_field_type::value_type non_residue_type;
@@ -85,7 +84,7 @@ namespace nil {
                             non_residue_type(0x1EE972AE6A826A7D1D9DA40771B6F589DE1AFB54342C724FA97BDA050992657F_cppui253,
                         0x10DE546FF8D4AB51D2B513CDBB25772454326430418536D15721E37E70C255C9_cppui253)};*/
 
-                        constexpr static const std::array<modulus_type, 6 * 2> Frobenius_coeffs_c1 = {
+                        constexpr static const std::array<integral_type, 6 * 2> Frobenius_coeffs_c1 = {
                             0x01,
                             0x00,
                             0x2FB347984F7911F74C0BEC3CF559B143B78CC310C2C3330C99E39557176F553D_cppui254,
@@ -99,7 +98,7 @@ namespace nil {
                             0x28BE74D4BB943F51699582B87809D9CAF71614D4B0B71F3A62E913EE1DADA9E4_cppui254,
                             0x14A88AE0CB747B99C2B86ABCBE01477A54F40EB4C3F6068DEDAE0BCEC9C7AAC7_cppui253};
 
-                        constexpr static const std::array<modulus_type, 6 * 2> Frobenius_coeffs_c2 = {
+                        constexpr static const std::array<integral_type, 6 * 2> Frobenius_coeffs_c2 = {
                             0x01,
                             0x00,
                             0x5B54F5E64EEA80180F3C0B75A181E84D33365F7BE94EC72848A1F55921EA762_cppui251,
@@ -123,11 +122,14 @@ namespace nil {
 
                     template<std::size_t Version>
                     constexpr std::array<
-                        typename fp6_3over2_extension_params<alt_bn128_base_field<Version>>::modulus_type, 6 * 2> const
+                        typename fp6_3over2_extension_params<alt_bn128_base_field<Version>>::integral_type,
+                        6 * 2> const
                         fp6_3over2_extension_params<alt_bn128_base_field<Version>>::Frobenius_coeffs_c1;
                     template<std::size_t Version>
                     constexpr std::array<
-                        typename fp6_3over2_extension_params<alt_bn128_base_field<Version>>::modulus_type, 6 * 2> const
+                        typename fp6_3over2_extension_params<alt_bn128_base_field<Version>>::integral_type,
+                        6 * 2> const
+
                         fp6_3over2_extension_params<alt_bn128_base_field<Version>>::Frobenius_coeffs_c2;
                 }    // namespace detail
             }        // namespace fields

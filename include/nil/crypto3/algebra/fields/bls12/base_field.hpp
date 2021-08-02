@@ -50,14 +50,14 @@ namespace nil {
                     typedef field<381> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modular_type modular_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0x1A0111EA397FE69A4B1BA7B6434BACD764774B84F38512BF6730D2A0F6B0F6241EABFFFEB153FFFFB9FEFFFFFFFFAAAB_cppui381;
 
                     typedef typename detail::element_fp<params<bls12_base_field<381>>> value_type;
@@ -71,14 +71,14 @@ namespace nil {
                     typedef field<377> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modular_type modular_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508C00000000001_cppui377;
 
                     typedef typename detail::element_fp<params<bls12_base_field<377>>> value_type;
@@ -96,8 +96,8 @@ namespace nil {
                 constexpr typename std::size_t const bls12_base_field<381>::value_bits;
                 constexpr typename std::size_t const bls12_base_field<377>::value_bits;
 
-                constexpr typename bls12_base_field<381>::modulus_type const bls12_base_field<381>::modulus;
-                constexpr typename bls12_base_field<377>::modulus_type const bls12_base_field<377>::modulus;
+                constexpr typename bls12_base_field<381>::integral_type const bls12_base_field<381>::modulus;
+                constexpr typename bls12_base_field<377>::integral_type const bls12_base_field<377>::modulus;
 
                 template<std::size_t Version = 381>
                 using bls12_fq = bls12_base_field<Version>;

@@ -407,7 +407,7 @@ void check_curve_operations(const std::vector<typename CurveGroup::value_type> &
 template<typename CurveGroup>
 void check_curve_operations_twisted_edwards(
     const std::vector<typename CurveGroup::value_type> &points,
-    const std::vector<typename CurveGroup::field_type::modulus_type> &constants) {
+    const std::vector<typename CurveGroup::field_type::integral_type> &constants) {
     using nil::crypto3::multiprecision::cpp_int;
 
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
@@ -437,7 +437,7 @@ void fp_curve_test_init(std::vector<typename FpCurveGroup::value_type> &points,
     for (auto &point : test_set.second.get_child("point_coordinates")) {
         auto i = 0;
         for (auto &coordinate : point.second) {
-            coordinates[i++] = field_value_type(typename field_value_type::modulus_type(coordinate.second.data()));
+            coordinates[i++] = field_value_type(typename field_value_type::integral_type(coordinate.second.data()));
         }
         points.emplace_back(typename FpCurveGroup::value_type(coordinates[0], coordinates[1], coordinates[2]));
     }
@@ -449,7 +449,7 @@ void fp_curve_test_init(std::vector<typename FpCurveGroup::value_type> &points,
 
 template<typename FpCurveGroup, typename TestSet>
 void fp_curve_twisted_edwards_test_init(std::vector<typename FpCurveGroup::value_type> &points,
-                                        std::vector<typename FpCurveGroup::field_type::modulus_type> &constants,
+                                        std::vector<typename FpCurveGroup::field_type::integral_type> &constants,
                                         const TestSet &test_set) {
     typedef typename FpCurveGroup::field_type::value_type field_value_type;
     std::array<field_value_type, 3> coordinates;
@@ -457,13 +457,13 @@ void fp_curve_twisted_edwards_test_init(std::vector<typename FpCurveGroup::value
     for (auto &point : test_set.second.get_child("point_coordinates")) {
         auto i = 0;
         for (auto &coordinate : point.second) {
-            coordinates[i++] = field_value_type(typename field_value_type::modulus_type(coordinate.second.data()));
+            coordinates[i++] = field_value_type(typename field_value_type::integral_type(coordinate.second.data()));
         }
         points.emplace_back(typename FpCurveGroup::value_type(coordinates[0], coordinates[1]));
     }
 
     for (auto &constant : test_set.second.get_child("constants")) {
-        constants.emplace_back(typename FpCurveGroup::field_type::modulus_type(constant.second.data()));
+        constants.emplace_back(typename FpCurveGroup::field_type::integral_type(constant.second.data()));
     }
 }
 
@@ -472,14 +472,14 @@ void fp2_curve_test_init(std::vector<typename Fp2CurveGroup::value_type> &points
                          std::vector<std::size_t> &constants,
                          const TestSet &test_set) {
     using fp2_value_type = typename Fp2CurveGroup::field_type::value_type;
-    using modulus_type = typename fp2_value_type::underlying_type::modulus_type;
-    std::array<modulus_type, 6> coordinates;
+    using integral_type = typename fp2_value_type::underlying_type::integral_type;
+    std::array<integral_type, 6> coordinates;
 
     for (auto &point : test_set.second.get_child("point_coordinates")) {
         auto i = 0;
         for (auto &coordinate_pairs : point.second) {
             for (auto &coordinate : coordinate_pairs.second) {
-                coordinates[i++] = modulus_type(coordinate.second.data());
+                coordinates[i++] = integral_type(coordinate.second.data());
             }
         }
         points.emplace_back(typename Fp2CurveGroup::value_type(fp2_value_type(coordinates[0], coordinates[1]),
@@ -497,15 +497,15 @@ void fp3_curve_test_init(std::vector<typename Fp3CurveGroup::value_type> &points
                          std::vector<std::size_t> &constants,
                          const TestSet &test_set) {
     using fp3_value_type = typename Fp3CurveGroup::field_type::value_type;
-    using modulus_type = typename fp3_value_type::underlying_type::modulus_type;
+    using integral_type = typename fp3_value_type::underlying_type::integral_type;
 
-    std::array<modulus_type, 9> coordinates;
+    std::array<integral_type, 9> coordinates;
 
     for (auto &point : test_set.second.get_child("point_coordinates")) {
         auto i = 0;
         for (auto &coordinate_pairs : point.second) {
             for (auto &coordinate : coordinate_pairs.second) {
-                coordinates[i++] = modulus_type(coordinate.second.data());
+                coordinates[i++] = integral_type(coordinate.second.data());
             }
         }
         points.emplace_back(
@@ -536,11 +536,11 @@ void curve_operation_test(const TestSet &test_set,
 template<typename CurveGroup, typename TestSet>
 void curve_operation_test_twisted_edwards(const TestSet &test_set,
                                           void (&test_init)(std::vector<typename CurveGroup::value_type> &,
-                                                            std::vector<typename CurveGroup::field_type::modulus_type> &,
+                                                            std::vector<typename CurveGroup::field_type::integral_type> &,
                                                             const TestSet &)) {
 
     std::vector<typename CurveGroup::value_type> points;
-    std::vector<typename CurveGroup::field_type::modulus_type> constants;
+    std::vector<typename CurveGroup::field_type::integral_type> constants;
 
     test_init(points, constants, test_set);
 

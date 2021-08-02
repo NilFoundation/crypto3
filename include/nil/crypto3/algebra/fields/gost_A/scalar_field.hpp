@@ -50,14 +50,14 @@ namespace nil {
                     typedef field<256> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modular_type modular_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6C611070995AD10045841B09B761B893_cppui256;
 
                     typedef typename detail::element_fp<params<gost_A_scalar_field<256>>> value_type;
@@ -66,7 +66,7 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename gost_A_scalar_field<256>::modulus_type const gost_A_scalar_field<256>::modulus;
+                constexpr typename gost_A_scalar_field<256>::integral_type const gost_A_scalar_field<256>::modulus;
 
                 template<std::size_t Version = 256>
                 using gost_A_fr = gost_A_scalar_field<Version>;

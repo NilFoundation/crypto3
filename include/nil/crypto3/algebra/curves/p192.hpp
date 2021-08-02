@@ -42,9 +42,9 @@ namespace nil {
                  */
                 template<std::size_t WordBits = limb_bits>
                 struct p192 : public curve_nist<192, WordBits> {
-                    typedef typename curve_nist<192>::number_type number_type;
+                    typedef typename curve_nist<192>::integral_type integral_type;
 
-                    constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF_cppui192;
+                    constexpr static const integral_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF_cppui192;
                 };
             }    // namespace curves
         }        // namespace algebra

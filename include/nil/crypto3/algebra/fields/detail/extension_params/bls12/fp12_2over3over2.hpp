@@ -51,10 +51,9 @@ namespace nil {
                         typedef params<base_field_type> policy_type;
 
                     public:
-                        typedef typename policy_type::number_type number_type;
-                        typedef typename policy_type::modulus_type modulus_type;
+                        typedef typename policy_type::integral_type integral_type;
 
-                        constexpr static const modulus_type modulus = policy_type::modulus;
+                        constexpr static const integral_type modulus = policy_type::modulus;
 
                         typedef fields::fp2<base_field_type> non_residue_field_type;
                         typedef typename non_residue_field_type::value_type non_residue_type;
@@ -88,7 +87,7 @@ namespace nil {
                             non_residue_type(0x5B2CFD9013A5FD8DF47FA6B48B1E045F39816240C0B8FEE8BEADF4D8E9C0566C63A3E6E257F87329B18FAE980078116_cppui379,
                            0x144E4211384586C16BD3AD4AFA99CC9170DF3560E77982D0DB45F3536814F0BD5871C1908BD478CD1EE605167FF82995_cppui381)};*/
 
-                        constexpr static const std::array<modulus_type, 12 * 2> Frobenius_coeffs_c1 = {
+                        constexpr static const std::array<integral_type, 12 * 2> Frobenius_coeffs_c1 = {
                             0x01,
                             0x00,
                             0x1904D3BF02BB0667C231BEB4202C0D1F0FD603FD3CBD5F4F7B2443D784BAB9C4F67EA53D63E7813D8D0775ED92235FB8_cppui381,
@@ -127,10 +126,9 @@ namespace nil {
                         typedef params<base_field_type> policy_type;
 
                     public:
-                        typedef typename policy_type::number_type number_type;
-                        typedef typename policy_type::modulus_type modulus_type;
+                        typedef typename policy_type::integral_type integral_type;
 
-                        constexpr static const modulus_type modulus = policy_type::modulus;
+                        constexpr static const integral_type modulus = policy_type::modulus;
 
                         typedef fields::fp2<base_field_type> non_residue_field_type;
                         typedef typename non_residue_field_type::value_type non_residue_type;
@@ -163,7 +161,7 @@ namespace nil {
                             non_residue_type(0xE0C97AD7FBDAB63937B3EBD47E0A1B36A986DEEF71F15C288ED7951A488E3B332941CFC8F883FAFFCA93E41F1603CF_cppui376,
                            0x00)};*/
 
-                        constexpr static const std::array<modulus_type, 12 * 2> Frobenius_coeffs_c1 = {
+                        constexpr static const std::array<integral_type, 12 * 2> Frobenius_coeffs_c1 = {
                             0x01,
                             0x00,
                             0x9A9975399C019633C1E30682567F915C8A45E0F94EBC8EC681BF34A3AA559DB57668E558EB0188E938A9D1104F2031_cppui376,
@@ -199,10 +197,10 @@ namespace nil {
                         fp12_2over3over2_extension_params<bls12_base_field<377>>::non_residue;
 
                     constexpr std::array<
-                        typename fp12_2over3over2_extension_params<bls12_base_field<381>>::modulus_type, 12 * 2> const
+                        typename fp12_2over3over2_extension_params<bls12_base_field<381>>::integral_type, 12 * 2> const
                         fp12_2over3over2_extension_params<bls12_base_field<381>>::Frobenius_coeffs_c1;
                     constexpr std::array<
-                        typename fp12_2over3over2_extension_params<bls12_base_field<377>>::modulus_type, 12 * 2> const
+                        typename fp12_2over3over2_extension_params<bls12_base_field<377>>::integral_type, 12 * 2> const
                         fp12_2over3over2_extension_params<bls12_base_field<377>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields

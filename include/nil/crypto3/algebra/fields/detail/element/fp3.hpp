@@ -38,10 +38,9 @@ namespace nil {
                     class element_fp3 {
                         typedef FieldParams policy_type;
 
-                        typedef typename policy_type::number_type number_type;
-                        typedef typename policy_type::modulus_type modulus_type;
+                        typedef typename policy_type::integral_type integral_type;
 
-                        constexpr static const modulus_type modulus = policy_type::modulus;
+                        constexpr static const integral_type modulus = policy_type::modulus;
 
                     public:
                         typedef typename policy_type::field_type field_type;
@@ -72,7 +71,7 @@ namespace nil {
                                 {underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)});
                         }
 
-                        constexpr element_fp3(modulus_type in_data0, modulus_type in_data1, modulus_type in_data2) {
+                        constexpr element_fp3(integral_type in_data0, integral_type in_data1, integral_type in_data2) {
                             data = data_type(
                                 {underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)});
                         }
