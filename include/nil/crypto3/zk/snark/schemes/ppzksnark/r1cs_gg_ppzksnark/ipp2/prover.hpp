@@ -183,11 +183,11 @@ namespace nil {
 
                     // f_v(X) - f_v(z) / (X - z)
                     std::vector<typename GroupType::curve_type::scalar_field_type::value_type> f_vX_sub_f_vZ;
-                    math::_polynomial_subtraction<typename GroupType::curve_type::scalar_field_type>(f_vX_sub_f_vZ,
-                                                                                                     poly,
-                                                                                                     {{
-                                                                                                         eval_poly,
-                                                                                                     }});
+                    math::_polynomial_subtraction(f_vX_sub_f_vZ,
+                                                  poly,
+                                                  {{
+                                                      eval_poly,
+                                                  }});
                     std::vector<typename GroupType::curve_type::scalar_field_type::value_type> quotient_polynomial,
                         remainder_polynomial;
                     math::_polynomial_division<typename GroupType::curve_type::scalar_field_type>(
