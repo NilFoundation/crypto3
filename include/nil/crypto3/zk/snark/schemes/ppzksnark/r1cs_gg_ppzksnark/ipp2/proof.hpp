@@ -60,17 +60,17 @@ namespace nil {
                         std::pair<typename curve_type::gt_type::value_type, typename curve_type::gt_type::value_type>>
                         z_ab;
                     std::vector<
-                        std::pair<typename curve_type::g1_type::value_type, typename curve_type::g1_type::value_type>>
+                        std::pair<typename curve_type::g1_type<>::value_type, typename curve_type::g1_type<>::value_type>>
                         z_c;
-                    typename curve_type::g1_type::value_type final_a;
-                    typename curve_type::g2_type::value_type final_b;
-                    typename curve_type::g1_type::value_type final_c;
+                    typename curve_type::g1_type<>::value_type final_a;
+                    typename curve_type::g2_type<>::value_type final_b;
+                    typename curve_type::g1_type<>::value_type final_c;
 
                     /// final commitment keys $v$ and $w$ - there is only one element at the
                     /// end for v1 and v2 hence it's a tuple.
-                    std::pair<typename curve_type::g2_type::value_type, typename curve_type::g2_type::value_type>
+                    std::pair<typename curve_type::g2_type<>::value_type, typename curve_type::g2_type<>::value_type>
                         final_vkey;
-                    std::pair<typename curve_type::g1_type::value_type, typename curve_type::g1_type::value_type>
+                    std::pair<typename curve_type::g1_type<>::value_type, typename curve_type::g1_type<>::value_type>
                         final_wkey;
 
                     static std::size_t log_proofs(std::size_t nproofs) {
@@ -83,8 +83,8 @@ namespace nil {
                     typedef CurveType curve_type;
 
                     gipa_proof<curve_type> gipa;
-                    kzg_opening<typename curve_type::g2_type> vkey_opening;
-                    kzg_opening<typename curve_type::g1_type> wkey_opening;
+                    kzg_opening<typename curve_type::g2_type<>> vkey_opening;
+                    kzg_opening<typename curve_type::g1_type<>> wkey_opening;
                 };
                 /// AggregateProof contains all elements to verify n aggregated Groth16 proofs
                 /// using inner pairing product arguments. This proof can be created by any
@@ -100,7 +100,7 @@ namespace nil {
                     /// $A^r * B = Z$ is the left value on the aggregated Groth16 equation
                     typename curve_type::gt_type::value_type ip_ab;
                     /// $C^r$ is used on the right side of the aggregated Groth16 equation
-                    typename curve_type::g1_type::value_type agg_c;
+                    typename curve_type::g1_type<>::value_type agg_c;
                     tipp_mipp_proof<curve_type> tmipp;
 
                     /// Performs some high level checks on the length of vectors and others to

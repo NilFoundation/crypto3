@@ -60,8 +60,8 @@ namespace nil {
                 struct r1cs_gg_ppzksnark_aggregate_proving_srs {
                     typedef CurveType curve_type;
 
-                    typedef typename curve_type::g1_type g1_type;
-                    typedef typename curve_type::g2_type g2_type;
+                    typedef typename curve_type::g1_type<> g1_type;
+                    typedef typename curve_type::g2_type<> g2_type;
                     typedef typename g1_type::value_type g1_value_type;
                     typedef typename g2_type::value_type g2_value_type;
 
@@ -101,12 +101,12 @@ namespace nil {
                     typedef CurveType curve_type;
 
                     std::size_t n;
-                    typename CurveType::g1_type::value_type g;
-                    typename CurveType::g2_type::value_type h;
-                    typename CurveType::g1_type::value_type g_alpha;
-                    typename CurveType::g1_type::value_type g_beta;
-                    typename CurveType::g2_type::value_type h_alpha;
-                    typename CurveType::g2_type::value_type h_beta;
+                    typename CurveType::g1_type<>::value_type g;
+                    typename CurveType::g2_type<>::value_type h;
+                    typename CurveType::g1_type<>::value_type g_alpha;
+                    typename CurveType::g1_type<>::value_type g_beta;
+                    typename CurveType::g2_type<>::value_type h_alpha;
+                    typename CurveType::g2_type<>::value_type h_beta;
                 };
 
                 /// It contains the maximum number of raw elements of the SRS needed to aggregate and verify
@@ -120,8 +120,8 @@ namespace nil {
                 struct r1cs_gg_pp_zksnark_aggregate_srs {
                     typedef CurveType curve_type;
                     typedef typename curve_type::scalar_field_type scalar_field_type;
-                    typedef typename curve_type::g1_type g1_type;
-                    typedef typename curve_type::g2_type g2_type;
+                    typedef typename curve_type::g1_type<> g1_type;
+                    typedef typename curve_type::g2_type<> g2_type;
                     typedef typename g1_type::value_type g1_value_type;
                     typedef typename g2_type::value_type g2_value_type;
                     typedef typename scalar_field_type::value_type scalar_field_value_type;
@@ -168,17 +168,17 @@ namespace nil {
                         std::size_t g_up = tn;
                         std::size_t h_low = 0;
                         std::size_t h_up = h_low + n;
-                        std::vector<typename CurveType::g2_type::value_type> v1 = {h_alpha_powers.begin() + h_low,
+                        std::vector<typename CurveType::g2_type<>::value_type> v1 = {h_alpha_powers.begin() + h_low,
                                                                                    h_alpha_powers.begin() + h_up};
-                        std::vector<typename CurveType::g2_type::value_type> v2 = {h_beta_powers.begin() + h_low,
+                        std::vector<typename CurveType::g2_type<>::value_type> v2 = {h_beta_powers.begin() + h_low,
                                                                                    h_beta_powers.begin() + h_up};
                         typename proving_srs_type::vkey_type vkey = {v1, v2};
                         BOOST_ASSERT(vkey.has_correct_len(n));
                         // however, here we only need the "right" shifted bases for the
                         // commitment scheme.
-                        std::vector<typename CurveType::g1_type::value_type> w1 = {g_alpha_powers.begin() + n,
+                        std::vector<typename CurveType::g1_type<>::value_type> w1 = {g_alpha_powers.begin() + n,
                                                                                    g_alpha_powers.begin() + g_up};
-                        std::vector<typename CurveType::g1_type::value_type> w2 = {g_beta_powers.begin() + n,
+                        std::vector<typename CurveType::g1_type<>::value_type> w2 = {g_beta_powers.begin() + n,
                                                                                    g_beta_powers.begin() + g_up};
                         typename proving_srs_type::wkey_type wkey = {w1, w2};
                         BOOST_ASSERT(wkey.has_correct_len(n));

@@ -59,16 +59,8 @@ namespace nil {
                     typedef detail::tbcs_ppzksnark_policy<CurveType> policy_type;
 
                 public:
-                    typedef typename policy_type::circuit_type circuit_type;
-                    typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::proof_type proof_type;
 
                     static inline processed_verification_key_type process(const verification_key_type &vk) {
                         return uscs_ppzksnark_process_verification_key<CurveType>::process(vk);
@@ -85,17 +77,9 @@ namespace nil {
                                           uscs_ppzksnark_verifier_weak_input_consistency<CurveType>>;
 
                 public:
-                    typedef CurveType curve_type;
-
-                    typedef typename policy_type::circuit_type circuit_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
                     /**
@@ -136,15 +120,9 @@ namespace nil {
 
                     using uscs_ppzksnark_proof_system = uscs_ppzksnark<CurveType>;
                 public:
-                    typedef typename policy_type::circuit_type circuit_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
                     /**
