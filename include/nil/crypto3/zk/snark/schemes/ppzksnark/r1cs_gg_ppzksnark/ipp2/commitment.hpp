@@ -199,7 +199,7 @@ namespace nil {
                 template<typename CurveType>
                 struct r1cs_gg_ppzksnark_ipp2_commitment {
                     typedef CurveType curve_type;
-                    typedef typename curve_type::pairing pairing;
+                    typedef pairing::pairing_policy<curve_type> pairing;
 
                     typedef r1cs_gg_ppzksnark_ipp2_wkey<CurveType> wkey_type;
                     typedef r1cs_gg_ppzksnark_ipp2_vkey<CurveType> vkey_type;

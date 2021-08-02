@@ -120,8 +120,8 @@ namespace nil {
                 struct r1cs_gg_pp_zksnark_aggregate_srs {
                     typedef CurveType curve_type;
                     typedef typename curve_type::scalar_field_type scalar_field_type;
-                    typedef typename curve_type::g1_type g1_type;
-                    typedef typename curve_type::g2_type g2_type;
+                    typedef typename curve_type::template g1_type<> g1_type;
+                    typedef typename curve_type::template g2_type<> g2_type;
                     typedef typename g1_type::value_type g1_value_type;
                     typedef typename g2_type::value_type g2_value_type;
                     typedef typename scalar_field_type::value_type scalar_field_value_type;
