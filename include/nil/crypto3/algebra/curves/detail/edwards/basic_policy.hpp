@@ -87,24 +87,30 @@ namespace nil {
                             g1_field_type::value_type::zero()};
 
                         constexpr static const std::array<typename g1_field_type::value_type, 3> g1_one_fill = {
-                            typename g1_field_type::value_type(0x32d83d8aaa0c500f57b15fda90b1ad111067f812c7dd27_cppui182),
-                            typename g1_field_type::value_type(0x26c5df4587aa6a5d345efc9f2d47f8b1656517ef618f7a_cppui182),
-                            typename g1_field_type::value_type(0x3c6395f7eeafc1d930f0234a46e4a4806b953f0c3374ac_cppui182)};
+                            typename g1_field_type::value_type(
+                                0x32d83d8aaa0c500f57b15fda90b1ad111067f812c7dd27_cppui182),
+                            typename g1_field_type::value_type(
+                                0x26c5df4587aa6a5d345efc9f2d47f8b1656517ef618f7a_cppui182),
+                            typename g1_field_type::value_type(
+                                0x3c6395f7eeafc1d930f0234a46e4a4806b953f0c3374ac_cppui182)};
 
                         constexpr static const std::array<typename g2_field_type::value_type, 3> g2_zero_fill = {
                             g2_field_type::value_type::one(), g2_field_type::value_type::zero(),
                             g2_field_type::value_type::zero()};
 
                         constexpr static const std::array<typename g2_field_type::value_type, 3> g2_one_fill = {
-                            typename g2_field_type::value_type(0x3CE954C85AD30F53B1BB4C4F87029780F4141927FEB19_cppui178,
-                                                               0x2214EB976DE3A4D9DF9C8D5F7AEDFEC337E03A20B32FFF_cppui182,
-                                                               0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182),
-                            typename g2_field_type::value_type(0x2F501F9482C0D0D6E80AC55A79FD4D4594CAF187952660_cppui182,
-                                                        0x37BF8F1B1CDA11A81E8BB8F41B5FF462C9A13DC7DE1578_cppui182,
-                                                        0x2962F0DA0C7928B2CFBBACE3D0354652B6922A764C12D8_cppui182),
-                            typename g2_field_type::value_type(0x3b6ad5c355d8b231b16e97b5c6f635357993efdc248101_cppui182,
-                                                               0x2e8b3daf5fa18f9d9c6fa2ca0603fd0c9b09eeece8fd0d_cppui182,
-                                                               0x3c3baf061e62a04a4e9d1db335b8779c70384ae2933a73_cppui182)};
+                            typename g2_field_type::value_type(
+                                0x3CE954C85AD30F53B1BB4C4F87029780F4141927FEB19_cppui178,
+                                0x2214EB976DE3A4D9DF9C8D5F7AEDFEC337E03A20B32FFF_cppui182,
+                                0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182),
+                            typename g2_field_type::value_type(
+                                0x2F501F9482C0D0D6E80AC55A79FD4D4594CAF187952660_cppui182,
+                                0x37BF8F1B1CDA11A81E8BB8F41B5FF462C9A13DC7DE1578_cppui182,
+                                0x2962F0DA0C7928B2CFBBACE3D0354652B6922A764C12D8_cppui182),
+                            typename g2_field_type::value_type(
+                                0x3b6ad5c355d8b231b16e97b5c6f635357993efdc248101_cppui182,
+                                0x2e8b3daf5fa18f9d9c6fa2ca0603fd0c9b09eeece8fd0d_cppui182,
+                                0x3c3baf061e62a04a4e9d1db335b8779c70384ae2933a73_cppui182)};
                     };
 
                     constexpr typename edwards_basic_policy<183>::integral_type const

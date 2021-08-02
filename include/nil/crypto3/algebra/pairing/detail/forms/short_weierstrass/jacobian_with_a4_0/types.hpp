@@ -42,7 +42,7 @@ namespace nil {
                         using extended_integral_type = typename curve_type::base_field_type::extended_integral_type;
 
                         using g1_field_value_type = typename curve_type::base_field_type::value_type;
-                        using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
+                        using g2_field_value_type = typename curve_type::template g2_type<>::field_type::value_type;
 
                         struct ate_g1_precomputed_type {
 

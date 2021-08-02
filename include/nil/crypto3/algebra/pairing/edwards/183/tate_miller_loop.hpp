@@ -48,11 +48,10 @@ namespace nil {
                     using params_type = detail::pairing_params<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
                     using gt_type = typename curve_type::gt_type;
-                public:
 
-                    static typename gt_type::value_type process(
-                        const types_policy::tate_g1_precomp &prec_P, 
-                        const types_policy::tate_g2_precomp &prec_Q) {
+                public:
+                    static typename gt_type::value_type process(const types_policy::tate_g1_precomp &prec_P,
+                                                                const types_policy::tate_g2_precomp &prec_Q) {
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 
@@ -71,14 +70,14 @@ namespace nil {
                                policy_type::scalar_field_modulus (skipping leading zeros) in MSB to LSB
                                order */
                             typename types_policy::Fq_conic_coefficients cc = prec_P[idx++];
-                            typename gt_type::value_type g_RR_at_Q =
-                                typename gt_type::value_type(Fq3(cc.c_XZ, Fq(0l), Fq(0l)) + cc.c_XY * prec_Q.y0, cc.c_ZZ * prec_Q.eta);
+                            typename gt_type::value_type g_RR_at_Q = typename gt_type::value_type(
+                                Fq3(cc.c_XZ, Fq(0l), Fq(0l)) + cc.c_XY * prec_Q.y0, cc.c_ZZ * prec_Q.eta);
                             f = f.squared() * g_RR_at_Q;
                             if (bit) {
                                 cc = prec_P[idx++];
 
-                                typename gt_type::value_type g_RP_at_Q =
-                                    typename gt_type::value_type(Fq3(cc.c_XZ, Fq(0l), Fq(0l)) + cc.c_XY * prec_Q.y0, cc.c_ZZ * prec_Q.eta);
+                                typename gt_type::value_type g_RP_at_Q = typename gt_type::value_type(
+                                    Fq3(cc.c_XZ, Fq(0l), Fq(0l)) + cc.c_XY * prec_Q.y0, cc.c_ZZ * prec_Q.eta);
                                 f = f * g_RP_at_Q;
                             }
                         }
@@ -86,8 +85,8 @@ namespace nil {
                         return f;
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_TATE_MILLER_LOOP_HPP

@@ -54,8 +54,10 @@ namespace nil {
 
                 /************************* MNT6-298 definitions ***********************************/
 
-                constexpr std::array<std::size_t, 4> const wnaf_params<typename mnt6<298>::g1_type<>>::wnaf_window_table;
-                constexpr std::array<std::size_t, 4> const wnaf_params<typename mnt6<298>::g2_type<>>::wnaf_window_table;
+                constexpr std::array<std::size_t, 4> const
+                    wnaf_params<typename mnt6<298>::g1_type<>>::wnaf_window_table;
+                constexpr std::array<std::size_t, 4> const
+                    wnaf_params<typename mnt6<298>::g2_type<>>::wnaf_window_table;
 
             }    // namespace curves
         }        // namespace algebra

@@ -32,18 +32,17 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    /** @brief A struct representing element addition from the group G1 of short Weierstrass curve 
+                    /** @brief A struct representing element addition from the group G1 of short Weierstrass curve
                      *  for projective coordinates representation.
-                     *  NOTE: does not handle O and pts of order 2,4 
+                     *  NOTE: does not handle O and pts of order 2,4
                      *  http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
                      */
-                    
+
                     struct short_weierstrass_element_g1_projective_add_1998_cmo_2 {
 
-                        template <typename ElementType>
-                        constexpr static inline ElementType process(
-                            const ElementType &first, 
-                            const ElementType &second) {
+                        template<typename ElementType>
+                        constexpr static inline ElementType process(const ElementType &first,
+                                                                    const ElementType &second) {
 
                             using field_value_type = typename ElementType::field_type::value_type;
 
@@ -51,17 +50,15 @@ namespace nil {
                             const field_value_type X1Z2 = (first.X) * (second.Z);        // X1Z2 = X1*Z2
                             const field_value_type Z1Z2 = (first.Z) * (second.Z);        // Z1Z2 = Z1*Z2
                             const field_value_type u = (second.Y) * (first.Z) - Y1Z2;    // u    = Y2*Z1-Y1Z2
-                            const field_value_type uu = u.squared();            // uu   = u^2
+                            const field_value_type uu = u.squared();                     // uu   = u^2
                             const field_value_type v = (second.X) * (first.Z) - X1Z2;    // v    = X2*Z1-X1Z2
-                            const field_value_type vv = v.squared();            // vv   = v^2
-                            const field_value_type vvv = v * vv;                // vvv  = v*vv
-                            const field_value_type R = vv * X1Z2;               // R    = vv*X1Z2
-                            const field_value_type A =
-                                uu * Z1Z2 - (vvv + R + R);                      // A    = uu*Z1Z2 - vvv - 2*R
-                            const field_value_type X3 = v * A;                  // X3   = v*A
-                            const field_value_type Y3 =
-                                u * (R - A) - vvv * Y1Z2;                       // Y3   = u*(R-A) - vvv*Y1Z2
-                            const field_value_type Z3 = vvv * Z1Z2;             // Z3   = vvv*Z1Z2
+                            const field_value_type vv = v.squared();                     // vv   = v^2
+                            const field_value_type vvv = v * vv;                         // vvv  = v*vv
+                            const field_value_type R = vv * X1Z2;                        // R    = vv*X1Z2
+                            const field_value_type A = uu * Z1Z2 - (vvv + R + R);        // A    = uu*Z1Z2 - vvv - 2*R
+                            const field_value_type X3 = v * A;                           // X3   = v*A
+                            const field_value_type Y3 = u * (R - A) - vvv * Y1Z2;        // Y3   = u*(R-A) - vvv*Y1Z2
+                            const field_value_type Z3 = vvv * Z1Z2;                      // Z3   = vvv*Z1Z2
 
                             return ElementType(X3, Y3, Z3);
                         }

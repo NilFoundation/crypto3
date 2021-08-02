@@ -37,36 +37,33 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    /** @brief A struct representing a group G1 of elliptic curve. 
-                     *    @tparam CurveParams Parameters of the group 
-                     *    @tparam Form Form of the curve 
-                     *    @tparam Coordinates Representation coordinates of the group element 
+                    /** @brief A struct representing a group G1 of elliptic curve.
+                     *    @tparam CurveParams Parameters of the group
+                     *    @tparam Form Form of the curve
+                     *    @tparam Coordinates Representation coordinates of the group element
                      */
-                    template<typename CurveParams, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<typename CurveParams, typename Form, typename Coordinates>
                     struct curve_element;
 
-                    /** @brief A struct representing an element from the group G1 of short Weierstrass curve of 
+                    /** @brief A struct representing an element from the group G1 of short Weierstrass curve of
                      *  affine coordinates representation.
                      *  Description: https://hyperelliptic.org/EFD/g1p/auto-shortw.html
                      *
                      */
                     template<typename CurveParams>
-                    struct curve_element<CurveParams, 
-                                   forms::short_weierstrass, 
-                                   coordinates::affine> {
+                    struct curve_element<CurveParams, forms::short_weierstrass, coordinates::affine> {
 
                         using field_type = typename CurveParams::field_type;
+
                     private:
                         using params_type = CurveParams;
                         using field_value_type = typename field_type::value_type;
-                    public:
 
+                    public:
                         using form = forms::short_weierstrass;
                         using coordinates = coordinates::affine;
 
-                        using group_type = typename params_type::group_type<coordinates>;
+                        using group_type = typename params_type::template group_type<coordinates>;
 
                         field_value_type X;
                         field_value_type Y;
@@ -77,8 +74,8 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr curve_element() : curve_element(params_type::zero_fill[0], 
-                            params_type::zero_fill[1]) {};
+                        constexpr curve_element() :
+                            curve_element(params_type::zero_fill[0], params_type::zero_fill[1]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y)$ in the affine coordinates
@@ -120,7 +117,7 @@ namespace nil {
                                 return false;
                             }
 
-                            if (this->Y  != other.Y) {
+                            if (this->Y != other.Y) {
                                 return false;
                             }
 
@@ -143,18 +140,17 @@ namespace nil {
 
                         /** @brief
                          *
-                         * @return return the corresponding element from affine coordinates to 
+                         * @return return the corresponding element from affine coordinates to
                          * projective coordinates
                          */
-                        constexpr curve_element<
-                            params_type, 
-                            form, 
-                            typename curves::coordinates::projective> to_projective () const {
+                        constexpr curve_element<params_type, form, typename curves::coordinates::projective>
+                            to_projective() const {
 
-                            using result_type = curve_element<params_type, 
-                                form, typename curves::coordinates::projective>;
+                            using result_type =
+                                curve_element<params_type, form, typename curves::coordinates::projective>;
 
-                            return result_type(X, Y, result_type::field_type::value_type::one()); // X = x, Y = y, Z = 1
+                            return result_type(
+                                X, Y, result_type::field_type::value_type::one());    // X = x, Y = y, Z = 1
                         }
 
                         /*************************  Arithmetic operations  ***********************************/
@@ -207,18 +203,16 @@ namespace nil {
                                 field_value_type Xsquared3pa = Xsquared.doubled() + Xsquared + params_type::a;
                                 field_value_type Xsquared3pasquared = Xsquared3pa.squared();
                                 field_value_type Y2squared = Y.doubled().squared();
-                                
-                                field_value_type X3 = Xsquared3pasquared * 
-                                    Y2squared.inversed() - X - X;
-                                field_value_type Y3 = (X.doubled() + X) * Xsquared3pa * 
-                                    Y.doubled().inversed() - Xsquared3pasquared*Xsquared3pa * 
-                                    Y2squared*(Y.doubled()) - Y;
+
+                                field_value_type X3 = Xsquared3pasquared * Y2squared.inversed() - X - X;
+                                field_value_type Y3 = (X.doubled() + X) * Xsquared3pa * Y.doubled().inversed() -
+                                                      Xsquared3pasquared * Xsquared3pa * Y2squared * (Y.doubled()) - Y;
                             }
                         }
 
                     private:
                         /** @brief
-                         * Affine addition formulas: (x1,y1)+(x2,y2)=(x3,y3) where 
+                         * Affine addition formulas: (x1,y1)+(x2,y2)=(x3,y3) where
                          * x3 = (y2-y1)2/(x2-x1)2-x1-x2
                          * y3 = (2*x1+x2)*(y2-y1)/(x2-x1)-(y2-y1)3/(x2-x1)3-y1
                          */
@@ -228,11 +222,9 @@ namespace nil {
                             field_value_type X2mX1 = other.X - this->X;
                             field_value_type X2mX1squared = X2mX1.squared();
 
-                            field_value_type X3 = Y2mY1squared * X2mX1squared.inversed() - 
-                                this->X - other.X;
-                            field_value_type Y3 = ((this-X).doubled() + other.X) * Y2mY1 * 
-                                X2mX1.inversed() - Y2mY1*Y2mY1squared * (X2mX1*X2mX1squared).inversed() - 
-                                this->Y;
+                            field_value_type X3 = Y2mY1squared * X2mX1squared.inversed() - this->X - other.X;
+                            field_value_type Y3 = ((this - X).doubled() + other.X) * Y2mY1 * X2mX1.inversed() -
+                                                  Y2mY1 * Y2mY1squared * (X2mX1 * X2mX1squared).inversed() - this->Y;
 
                             return curve_element(X3, Y3);
                         }

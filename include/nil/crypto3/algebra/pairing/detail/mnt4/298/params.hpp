@@ -46,7 +46,7 @@ namespace nil {
                         using integral_type = typename curve_type::base_field_type::integral_type;
                         using extended_integral_type = typename curve_type::base_field_type::extended_integral_type;
 
-                        constexpr static const std::size_t integral_type_max_bits = 
+                        constexpr static const std::size_t integral_type_max_bits =
                             curve_type::base_field_type::modulus_bits;
 
                         constexpr static const integral_type ate_loop_count =
@@ -60,19 +60,20 @@ namespace nil {
                         constexpr static const bool final_exponent_last_chunk_is_w0_neg = false;
                         constexpr static const integral_type final_exponent_last_chunk_w1 = integral_type(0x1);
 
-                        using g2_field_type_value = typename curve_type::g2_type<>::field_type::value_type;
+                        using g2_field_type_value = typename curve_type::template g2_type<>::field_type::value_type;
 
-                        constexpr static const g2_field_type_value twist = 
+                        constexpr static const g2_field_type_value twist =
                             g2_field_type_value(g2_field_type_value::underlying_type::zero(),
                                                 g2_field_type_value::underlying_type::one());
 
-                        constexpr static const g2_field_type_value twist_coeff_a = 
-                            curve_type::g2_type<>::params_type::a;
-                        constexpr static const g2_field_type_value twist_coeff_b = 
-                            curve_type::g2_type<>::params_type::b;
+                        constexpr static const g2_field_type_value twist_coeff_a =
+                            curve_type::template g2_type<>::params_type::a;
+                        constexpr static const g2_field_type_value twist_coeff_b =
+                            curve_type::template g2_type<>::params_type::b;
                     };
 
-                    constexpr typename pairing_params<curves::mnt4<298>>::integral_type const pairing_params<curves::mnt4<298>>::ate_loop_count;
+                    constexpr typename pairing_params<curves::mnt4<298>>::integral_type const
+                        pairing_params<curves::mnt4<298>>::ate_loop_count;
                     constexpr typename pairing_params<curves::mnt4<298>>::integral_type const
                         pairing_params<curves::mnt4<298>>::final_exponent_last_chunk_abs_of_w0;
                     constexpr typename pairing_params<curves::mnt4<298>>::integral_type const
@@ -80,11 +81,11 @@ namespace nil {
                     constexpr typename pairing_params<curves::mnt4<298>>::extended_integral_type const
                         pairing_params<curves::mnt4<298>>::final_exponent;
 
-                    constexpr typename pairing_params<curves::mnt4<298>>::g2_field_type_value const 
+                    constexpr typename pairing_params<curves::mnt4<298>>::g2_field_type_value const
                         pairing_params<curves::mnt4<298>>::twist;
-                    constexpr typename pairing_params<curves::mnt4<298>>::g2_field_type_value const 
+                    constexpr typename pairing_params<curves::mnt4<298>>::g2_field_type_value const
                         pairing_params<curves::mnt4<298>>::twist_coeff_a;
-                    constexpr typename pairing_params<curves::mnt4<298>>::g2_field_type_value const 
+                    constexpr typename pairing_params<curves::mnt4<298>>::g2_field_type_value const
                         pairing_params<curves::mnt4<298>>::twist_coeff_b;
 
                     constexpr bool const pairing_params<curves::mnt4<298>>::ate_is_loop_count_neg;

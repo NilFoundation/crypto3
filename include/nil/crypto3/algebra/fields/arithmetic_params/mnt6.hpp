@@ -105,6 +105,7 @@ namespace nil {
                 constexpr typename arithmetic_params<fp3<mnt6_base_field<298>>>::extended_integral_type const
                     arithmetic_params<fp3<mnt6_base_field<298>>>::t;
 
+
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::integral_type const
                     arithmetic_params<mnt6_base_field<298>>::t_minus_1_over_2;
                 constexpr typename arithmetic_params<fp3<mnt6_base_field<298>>>::extended_integral_type const

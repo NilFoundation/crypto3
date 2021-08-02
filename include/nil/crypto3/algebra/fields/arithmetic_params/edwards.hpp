@@ -40,8 +40,7 @@ namespace nil {
             namespace fields {
 
                 template<std::size_t Version>
-                struct arithmetic_params<edwards_base_field<Version>>
-                    : public params<edwards_base_field<Version>> {
+                struct arithmetic_params<edwards_base_field<Version>> : public params<edwards_base_field<Version>> {
                 private:
                     typedef params<edwards_base_field<Version>> policy_type;
 
@@ -97,8 +96,7 @@ namespace nil {
                 };
 
                 template<std::size_t Version>
-                struct arithmetic_params<edwards_scalar_field<Version>>
-                    : public params<edwards_scalar_field<Version>> {
+                struct arithmetic_params<edwards_scalar_field<Version>> : public params<edwards_scalar_field<Version>> {
                 private:
                     typedef params<edwards_scalar_field<Version>> policy_type;
 

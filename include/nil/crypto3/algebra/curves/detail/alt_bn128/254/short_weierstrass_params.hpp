@@ -26,7 +26,6 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_ALT_BN128_254_SHORT_WEIERSTRASS_PARAMS_HPP
 #define CRYPTO3_ALGEBRA_CURVES_ALT_BN128_254_SHORT_WEIERSTRASS_PARAMS_HPP
 
-
 #include <nil/crypto3/algebra/curves/forms.hpp>
 #include <nil/crypto3/algebra/curves/detail/alt_bn128/types.hpp>
 
@@ -45,18 +44,19 @@ namespace nil {
                         using scalar_field_type = typename alt_bn128_types<254>::scalar_field_type;
 
                         constexpr static const typename alt_bn128_types<254>::integral_type a =
-                            typename alt_bn128_types<254>::integral_type(0x00);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
-                        constexpr static const typename alt_bn128_types<254>::integral_type b = 
-                            typename alt_bn128_types<254>::integral_type(0x03);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                            typename alt_bn128_types<254>::integral_type(
+                                0x00);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                        constexpr static const typename alt_bn128_types<254>::integral_type b =
+                            typename alt_bn128_types<254>::integral_type(
+                                0x03);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
                     };
 
                     template<>
-                    struct alt_bn128_g1_params<254, 
-                        forms::short_weierstrass> : 
-                            public alt_bn128_params<254, forms::short_weierstrass> {
+                    struct alt_bn128_g1_params<254, forms::short_weierstrass>
+                        : public alt_bn128_params<254, forms::short_weierstrass> {
 
                         using field_type = typename alt_bn128_types<254>::g1_field_type;
-                        
+
                         template<typename Coordinates>
                         using group_type = alt_bn128_types<254>::g1_type<forms::short_weierstrass, Coordinates>;
 
@@ -64,24 +64,21 @@ namespace nil {
                             field_type::value_type::zero(), field_type::value_type::one()};
 
                         constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
-                            field_type::value_type::one(),
-                            typename field_type::value_type(
-                                0x02)};
+                            field_type::value_type::one(), typename field_type::value_type(0x02)};
                     };
 
                     template<>
-                    struct alt_bn128_g2_params<254, 
-                        forms::short_weierstrass> : 
-                            public alt_bn128_params<254, forms::short_weierstrass> {
+                    struct alt_bn128_g2_params<254, forms::short_weierstrass>
+                        : public alt_bn128_params<254, forms::short_weierstrass> {
 
                         using field_type = typename alt_bn128_types<254>::g2_field_type;
-                        
+
                         template<typename Coordinates>
                         using group_type = alt_bn128_types<254>::g2_type<forms::short_weierstrass, Coordinates>;
 
                         constexpr static const typename field_type::value_type twist =
                             typename field_type::value_type(0x09, 0x01);
-                        constexpr static const typename field_type::value_type::underlying_type g1_b = 
+                        constexpr static const typename field_type::value_type::underlying_type g1_b =
                             typename field_type::value_type::underlying_type(b);
                         constexpr static const typename field_type::value_type b = g1_b * twist.inversed();
 
@@ -97,17 +94,23 @@ namespace nil {
                                 0x90689D0585FF075EC9E99AD690C3395BC4B313370B38EF355ACDADCD122975B_cppui254)};
                     };
 
-                    constexpr typename alt_bn128_types<254>::integral_type const alt_bn128_params<254, forms::short_weierstrass>::a;
-                    constexpr typename alt_bn128_types<254>::integral_type const alt_bn128_params<254, forms::short_weierstrass>::b;
+                    constexpr typename alt_bn128_types<254>::integral_type const
+                        alt_bn128_params<254, forms::short_weierstrass>::a;
+                    constexpr typename alt_bn128_types<254>::integral_type const
+                        alt_bn128_params<254, forms::short_weierstrass>::b;
 
-                    constexpr std::array<typename alt_bn128_g1_params<254, forms::short_weierstrass>::field_type::value_type, 2> const
-                        alt_bn128_g1_params<254, forms::short_weierstrass>::zero_fill;
-                    constexpr std::array<typename alt_bn128_g1_params<254, forms::short_weierstrass>::field_type::value_type, 2> const
-                        alt_bn128_g1_params<254, forms::short_weierstrass>::one_fill;
-                    constexpr std::array<typename alt_bn128_g2_params<254, forms::short_weierstrass>::field_type::value_type, 2> const
-                        alt_bn128_g2_params<254, forms::short_weierstrass>::zero_fill;
-                    constexpr std::array<typename alt_bn128_g2_params<254, forms::short_weierstrass>::field_type::value_type, 2> const
-                        alt_bn128_g2_params<254, forms::short_weierstrass>::one_fill;
+                    constexpr std::array<
+                        typename alt_bn128_g1_params<254, forms::short_weierstrass>::field_type::value_type,
+                        2> const alt_bn128_g1_params<254, forms::short_weierstrass>::zero_fill;
+                    constexpr std::array<
+                        typename alt_bn128_g1_params<254, forms::short_weierstrass>::field_type::value_type,
+                        2> const alt_bn128_g1_params<254, forms::short_weierstrass>::one_fill;
+                    constexpr std::array<
+                        typename alt_bn128_g2_params<254, forms::short_weierstrass>::field_type::value_type,
+                        2> const alt_bn128_g2_params<254, forms::short_weierstrass>::zero_fill;
+                    constexpr std::array<
+                        typename alt_bn128_g2_params<254, forms::short_weierstrass>::field_type::value_type,
+                        2> const alt_bn128_g2_params<254, forms::short_weierstrass>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves

@@ -43,53 +43,57 @@ namespace nil {
 
                         constexpr static const typename edwards_types<183>::integral_type a =
                             typename edwards_types<183>::integral_type(0x01);
-                        constexpr static const typename edwards_types<183>::integral_type d = 
+                        constexpr static const typename edwards_types<183>::integral_type d =
                             edwards_params<183, forms::edwards>::d;
                     };
 
                     template<>
-                    struct edwards_g1_params<183, forms::twisted_edwards> : 
-                        public edwards_params<183, forms::twisted_edwards> {
+                    struct edwards_g1_params<183, forms::twisted_edwards>
+                        : public edwards_params<183, forms::twisted_edwards> {
 
                         using field_type = typename edwards_types<183>::g1_field_type;
-                        
+
                         template<typename Coordinates>
                         using group_type = edwards_types<183>::g1_type<forms::twisted_edwards, Coordinates>;
 
-                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = 
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill =
                             edwards_g1_params<183, forms::edwards>::zero_fill;
 
-                        constexpr static const std::array<typename field_type::value_type, 2> one_fill = 
+                        constexpr static const std::array<typename field_type::value_type, 2> one_fill =
                             edwards_g1_params<183, forms::edwards>::one_fill;
                     };
 
                     template<>
-                    struct edwards_g2_params<183, forms::twisted_edwards> : 
-                        public edwards_params<183, forms::twisted_edwards> {
+                    struct edwards_g2_params<183, forms::twisted_edwards>
+                        : public edwards_params<183, forms::twisted_edwards> {
 
                         using field_type = typename edwards_types<183>::g2_field_type;
-                        
+
                         template<typename Coordinates>
                         using group_type = edwards_types<183>::g2_type<forms::twisted_edwards, Coordinates>;
 
-                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = 
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill =
                             edwards_g2_params<183, forms::edwards>::zero_fill;
 
-                        constexpr static const std::array<typename field_type::value_type, 2> one_fill = 
+                        constexpr static const std::array<typename field_type::value_type, 2> one_fill =
                             edwards_g2_params<183, forms::edwards>::one_fill;
                     };
 
                     constexpr typename edwards_params<183, forms::twisted_edwards>::base_field_type::integral_type const edwards_params<183, forms::twisted_edwards>::a;
                     constexpr typename edwards_params<183, forms::twisted_edwards>::base_field_type::integral_type const edwards_params<183, forms::twisted_edwards>::d;
 
-                    constexpr std::array<typename edwards_g1_params<183, forms::twisted_edwards>::field_type::value_type, 2> const
+                    constexpr std::array<
+                        typename edwards_g1_params<183, forms::twisted_edwards>::field_type::value_type, 2> const
                         edwards_g1_params<183, forms::twisted_edwards>::zero_fill;
-                    constexpr std::array<typename edwards_g1_params<183, forms::twisted_edwards>::field_type::value_type, 2> const
+                    constexpr std::array<
+                        typename edwards_g1_params<183, forms::twisted_edwards>::field_type::value_type, 2> const
                         edwards_g1_params<183, forms::twisted_edwards>::one_fill;
 
-                    constexpr std::array<typename edwards_g2_params<183, forms::twisted_edwards>::field_type::value_type, 2> const
+                    constexpr std::array<
+                        typename edwards_g2_params<183, forms::twisted_edwards>::field_type::value_type, 2> const
                         edwards_g2_params<183, forms::twisted_edwards>::zero_fill;
-                    constexpr std::array<typename edwards_g2_params<183, forms::twisted_edwards>::field_type::value_type, 2> const
+                    constexpr std::array<
+                        typename edwards_g2_params<183, forms::twisted_edwards>::field_type::value_type, 2> const
                         edwards_g2_params<183, forms::twisted_edwards>::one_fill;
 
                 }    // namespace detail

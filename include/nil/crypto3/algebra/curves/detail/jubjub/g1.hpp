@@ -42,8 +42,7 @@ namespace nil {
                 namespace detail {
                     /** @brief A struct representing a group G1 of JubJub curve.
                      */
-                    template<typename Form, 
-                             typename Coordinates>
+                    template<typename Form, typename Coordinates>
                     struct jubjub_g1 {
                         using params_type = jubjub_g1_params<Form>;
 

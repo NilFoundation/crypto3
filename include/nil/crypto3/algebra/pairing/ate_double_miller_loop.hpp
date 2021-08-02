@@ -34,8 +34,8 @@ namespace nil {
                 template<typename CurveType>
                 class ate_double_miller_loop;
 
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_ATE_DOUBLE_MILLER_LOOP_HPP

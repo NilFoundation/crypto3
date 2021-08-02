@@ -44,11 +44,11 @@ namespace nil {
                     using types_policy = detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type>;
 
                     using gt_type = typename curve_type::gt_type;
-                public:
 
-                    static typename gt_type::value_type process(
-                        const typename types_policy::ate_g1_precomputed_type &prec_P, 
-                        const typename types_policy::ate_g2_precomputed_type &prec_Q) {
+                public:
+                    static typename gt_type::value_type
+                        process(const typename types_policy::ate_g1_precomputed_type &prec_P,
+                                const typename types_policy::ate_g2_precomputed_type &prec_Q) {
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 
@@ -88,8 +88,8 @@ namespace nil {
                         return f;
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_MILLER_LOOP_HPP

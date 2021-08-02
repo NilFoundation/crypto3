@@ -44,8 +44,7 @@ namespace nil {
                     /************************* BN128 ***********************************/
 
                     template<std::size_t Version>
-                    class fp6_3over2_extension_params<fields::bn128<Version>>
-                        : public params<fields::bn128<Version>> {
+                    class fp6_3over2_extension_params<fields::bn128<Version>> : public params<fields::bn128<Version>> {
 
                         typedef fields::bn128<Version> base_field_type;
                         typedef params<base_field_type> policy_type;

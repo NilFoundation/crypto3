@@ -44,15 +44,16 @@ namespace nil {
                         using scalar_field_type = typename mnt4_types<298>::scalar_field_type;
 
                         constexpr static const typename mnt4_types<298>::integral_type a =
-                            typename mnt4_types<298>::integral_type(0x02);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
-                        constexpr static const typename mnt4_types<298>::integral_type b = 
                             typename mnt4_types<298>::integral_type(
-                            0x3545A27639415585EA4D523234FC3EDD2A2070A085C7B980F4E9CD21A515D4B0EF528EC0FD5_cppui298);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                                0x02);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                        constexpr static const typename mnt4_types<298>::integral_type b =
+                            typename mnt4_types<298>::integral_type(
+                                0x3545A27639415585EA4D523234FC3EDD2A2070A085C7B980F4E9CD21A515D4B0EF528EC0FD5_cppui298);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
                     };
 
                     template<>
-                    struct mnt4_g1_params<298, forms::short_weierstrass> : 
-                            public mnt4_params<298, forms::short_weierstrass> {
+                    struct mnt4_g1_params<298, forms::short_weierstrass>
+                        : public mnt4_params<298, forms::short_weierstrass> {
 
                         using field_type = typename mnt4_types<298>::g1_field_type;
 
@@ -70,8 +71,8 @@ namespace nil {
                     };
 
                     template<>
-                    struct mnt4_g2_params<298, forms::short_weierstrass> : 
-                            public mnt4_params<298, forms::short_weierstrass> {
+                    struct mnt4_g2_params<298, forms::short_weierstrass>
+                        : public mnt4_params<298, forms::short_weierstrass> {
 
                         using field_type = typename mnt4_types<298>::g2_field_type;
                         // using group_type = mnt4_g2<298, forms::short_weierstrass>;
@@ -81,15 +82,15 @@ namespace nil {
 
                         constexpr static const typename g1_field_type::value_type g1_a = g1_field_type::value_type(a);
                         constexpr static const typename g1_field_type::value_type g1_b = g1_field_type::value_type(b);
-                    public:
 
+                    public:
                         constexpr static const typename field_type::value_type a =
                             typename field_type::value_type(g1_a * field_type::value_type::non_residue,
                                                             g1_field_type::value_type::zero());
 
                         constexpr static const typename field_type::value_type b =
                             typename field_type::value_type(g1_field_type::value_type::zero(),
-                                                        g1_b * field_type::value_type::non_residue);
+                                                            g1_b *field_type::value_type::non_residue);
 
                         template<typename Coordinates>
                         using group_type = mnt4_types<298>::g2_type<forms::short_weierstrass, Coordinates>;
@@ -103,26 +104,28 @@ namespace nil {
                                 0x4BA59A3F72DA165DEF838081AF697C851F002F576303302BB6C02C712C968BE32C0AE0A989_cppui295),
                             typename field_type::value_type(
                                 0x4B471F33FFAAD868A1C47D6605D31E5C4B3B2E0B60EC98F0F610A5AAFD0D9522BCA4E79F22_cppui295,
-                                0x355D05A1C69A5031F3F81A5C100CB7D982F78EC9CFC3B5168ED8D75C7C484FB61A3CBF0E0F1_cppui298)};  
+                                0x355D05A1C69A5031F3F81A5C100CB7D982F78EC9CFC3B5168ED8D75C7C484FB61A3CBF0E0F1_cppui298)};
                     };
 
-                    constexpr typename mnt4_types<298>::integral_type const mnt4_params<298, forms::short_weierstrass>::a;
-                    constexpr typename mnt4_types<298>::integral_type const mnt4_params<298, forms::short_weierstrass>::b;
+                    constexpr
+                        typename mnt4_types<298>::integral_type const mnt4_params<298, forms::short_weierstrass>::a;
+                    constexpr
+                        typename mnt4_types<298>::integral_type const mnt4_params<298, forms::short_weierstrass>::b;
 
-                    constexpr typename mnt4_g2_params<298, forms::short_weierstrass>::field_type::value_type const 
+                    constexpr typename mnt4_g2_params<298, forms::short_weierstrass>::field_type::value_type const
                         mnt4_g2_params<298, forms::short_weierstrass>::a;
-                    constexpr typename mnt4_g2_params<298, forms::short_weierstrass>::field_type::value_type const 
+                    constexpr typename mnt4_g2_params<298, forms::short_weierstrass>::field_type::value_type const
                         mnt4_g2_params<298, forms::short_weierstrass>::b;
 
-                    constexpr std::array<typename mnt4_g1_params<298, forms::short_weierstrass>::field_type::value_type, 2> const
-                        mnt4_g1_params<298, forms::short_weierstrass>::zero_fill;
-                    constexpr std::array<typename mnt4_g1_params<298, forms::short_weierstrass>::field_type::value_type, 2> const
-                        mnt4_g1_params<298, forms::short_weierstrass>::one_fill;
+                    constexpr std::array<typename mnt4_g1_params<298, forms::short_weierstrass>::field_type::value_type,
+                                         2> const mnt4_g1_params<298, forms::short_weierstrass>::zero_fill;
+                    constexpr std::array<typename mnt4_g1_params<298, forms::short_weierstrass>::field_type::value_type,
+                                         2> const mnt4_g1_params<298, forms::short_weierstrass>::one_fill;
 
-                    constexpr std::array<typename mnt4_g2_params<298, forms::short_weierstrass>::field_type::value_type, 2> const
-                        mnt4_g2_params<298, forms::short_weierstrass>::zero_fill;
-                    constexpr std::array<typename mnt4_g2_params<298, forms::short_weierstrass>::field_type::value_type, 2> const
-                        mnt4_g2_params<298, forms::short_weierstrass>::one_fill;
+                    constexpr std::array<typename mnt4_g2_params<298, forms::short_weierstrass>::field_type::value_type,
+                                         2> const mnt4_g2_params<298, forms::short_weierstrass>::zero_fill;
+                    constexpr std::array<typename mnt4_g2_params<298, forms::short_weierstrass>::field_type::value_type,
+                                         2> const mnt4_g2_params<298, forms::short_weierstrass>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves

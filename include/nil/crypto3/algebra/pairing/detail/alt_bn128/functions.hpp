@@ -334,7 +334,8 @@ namespace nil {
                             return result;
                         }
 
-                        static gt ate_miller_loop(const ate_g1_precomputed_type &prec_P, const ate_g2_precomputed_type &prec_Q) {
+                        static gt ate_miller_loop(const ate_g1_precomputed_type &prec_P,
+                                                  const ate_g2_precomputed_type &prec_Q) {
 
                             gt f = gt::one();
 
@@ -380,8 +381,10 @@ namespace nil {
                             return f;
                         }
 
-                        static gt ate_double_miller_loop(const ate_g1_precomputed_type &prec_P1, const ate_g2_precomputed_type &prec_Q1,
-                                                         const ate_g1_precomputed_type &prec_P2, const ate_g2_precomputed_type &prec_Q2) {
+                        static gt ate_double_miller_loop(const ate_g1_precomputed_type &prec_P1,
+                                                         const ate_g2_precomputed_type &prec_Q1,
+                                                         const ate_g1_precomputed_type &prec_P2,
+                                                         const ate_g2_precomputed_type &prec_Q2) {
 
                             gt f = gt::one();
 
@@ -468,8 +471,10 @@ namespace nil {
                             return ate_miller_loop(prec_P, prec_Q);
                         }
 
-                        static gt double_miller_loop(const g1_precomputed_type &prec_P1, const g2_precomputed_type &prec_Q1,
-                                                     const g1_precomputed_type &prec_P2, const g2_precomputed_type &prec_Q2) {
+                        static gt double_miller_loop(const g1_precomputed_type &prec_P1,
+                                                     const g2_precomputed_type &prec_Q1,
+                                                     const g1_precomputed_type &prec_P2,
+                                                     const g2_precomputed_type &prec_Q2) {
                             return ate_double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
                         }
 

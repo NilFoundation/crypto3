@@ -146,7 +146,7 @@ namespace nil {
                     arithmetic_params<mnt4_base_field<298>>::group_order;
                 constexpr typename arithmetic_params<fp2<mnt4_base_field<298>>>::extended_integral_type const
                     arithmetic_params<fp2<mnt4_base_field<298>>>::group_order;
-                    
+
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3

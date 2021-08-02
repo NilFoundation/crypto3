@@ -44,17 +44,19 @@ namespace nil {
                         using scalar_field_type = typename bls12_types<377>::scalar_field_type;
 
                         constexpr static const typename bls12_types<377>::integral_type a =
-                            typename bls12_types<377>::integral_type(0x00);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
-                        constexpr static const typename bls12_types<377>::integral_type b = 
-                            typename bls12_types<377>::integral_type(0x01);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                            typename bls12_types<377>::integral_type(
+                                0x00);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                        constexpr static const typename bls12_types<377>::integral_type b =
+                            typename bls12_types<377>::integral_type(
+                                0x01);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
                     };
 
                     template<>
-                    struct bls12_g1_params<377, forms::short_weierstrass> : 
-                            public bls12_params<377, forms::short_weierstrass> {
+                    struct bls12_g1_params<377, forms::short_weierstrass>
+                        : public bls12_params<377, forms::short_weierstrass> {
 
                         using field_type = typename bls12_types<377>::g1_field_type;
-                        
+
                         template<typename Coordinates>
                         using group_type = bls12_types<377>::g1_type<forms::short_weierstrass, Coordinates>;
 
@@ -69,18 +71,18 @@ namespace nil {
                     };
 
                     template<>
-                    struct bls12_g2_params<377, forms::short_weierstrass> : 
-                            public bls12_params<377, forms::short_weierstrass> {
+                    struct bls12_g2_params<377, forms::short_weierstrass>
+                        : public bls12_params<377, forms::short_weierstrass> {
 
                         using field_type = typename bls12_types<377>::g2_field_type;
-                        
+
                         template<typename Coordinates>
                         using group_type = bls12_types<377>::g2_type<forms::short_weierstrass, Coordinates>;
 
                         constexpr static const typename field_type::value_type twist =
                             typename field_type::value_type(field_type::value_type::underlying_type::zero(),
-                                                field_type::value_type::underlying_type::one());
-                        constexpr static const typename field_type::value_type::underlying_type g1_b = 
+                                                            field_type::value_type::underlying_type::one());
+                        constexpr static const typename field_type::value_type::underlying_type g1_b =
                             typename field_type::value_type::underlying_type(b);
                         constexpr static const typename field_type::value_type b = g1_b * twist.inversed();
 
@@ -96,18 +98,24 @@ namespace nil {
                                 0x185067C6CA76D992F064A432BD9F9BE832B0CAC2D824D0518F77D39E76C3E146AFB825F2092218D038867D7F337A010_cppui377)};
                     };
 
-                    constexpr typename bls12_types<377>::integral_type const bls12_params<377, forms::short_weierstrass>::a;
-                    constexpr typename bls12_types<377>::integral_type const bls12_params<377, forms::short_weierstrass>::b;
+                    constexpr
+                        typename bls12_types<377>::integral_type const bls12_params<377, forms::short_weierstrass>::a;
+                    constexpr
+                        typename bls12_types<377>::integral_type const bls12_params<377, forms::short_weierstrass>::b;
 
-                    constexpr std::array<typename bls12_g1_params<377, forms::short_weierstrass>::field_type::value_type, 2> const
-                        bls12_g1_params<377, forms::short_weierstrass>::zero_fill;
-                    constexpr std::array<typename bls12_g1_params<377, forms::short_weierstrass>::field_type::value_type, 2> const
-                        bls12_g1_params<377, forms::short_weierstrass>::one_fill;
+                    constexpr std::array<
+                        typename bls12_g1_params<377, forms::short_weierstrass>::field_type::value_type,
+                        2> const bls12_g1_params<377, forms::short_weierstrass>::zero_fill;
+                    constexpr std::array<
+                        typename bls12_g1_params<377, forms::short_weierstrass>::field_type::value_type,
+                        2> const bls12_g1_params<377, forms::short_weierstrass>::one_fill;
 
-                    constexpr std::array<typename bls12_g2_params<377, forms::short_weierstrass>::field_type::value_type, 2> const
-                        bls12_g2_params<377, forms::short_weierstrass>::zero_fill;
-                    constexpr std::array<typename bls12_g2_params<377, forms::short_weierstrass>::field_type::value_type, 2> const
-                        bls12_g2_params<377, forms::short_weierstrass>::one_fill;
+                    constexpr std::array<
+                        typename bls12_g2_params<377, forms::short_weierstrass>::field_type::value_type,
+                        2> const bls12_g2_params<377, forms::short_weierstrass>::zero_fill;
+                    constexpr std::array<
+                        typename bls12_g2_params<377, forms::short_weierstrass>::field_type::value_type,
+                        2> const bls12_g2_params<377, forms::short_weierstrass>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves

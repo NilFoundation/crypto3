@@ -44,16 +44,11 @@ namespace nil {
                 struct pairing_policy<curves::edwards<183>> {
                     using curve_type = curves::edwards<183>;
 
-                    using precompute_g1 = 
-                        pairing::edwards_ate_precompute_g1<183>;
-                    using precompute_g2 = 
-                        pairing::edwards_ate_precompute_g2<183>;
-                    using miller_loop = 
-                        pairing::edwards_ate_miller_loop<183>;
-                    using double_miller_loop = 
-                        pairing::edwards_ate_double_miller_loop<183>;
-                    using final_exponentiation = 
-                        pairing::edwards_final_exponentiation<183>;
+                    using precompute_g1 = pairing::edwards_ate_precompute_g1<183>;
+                    using precompute_g2 = pairing::edwards_ate_precompute_g2<183>;
+                    using miller_loop = pairing::edwards_ate_miller_loop<183>;
+                    using double_miller_loop = pairing::edwards_ate_double_miller_loop<183>;
+                    using final_exponentiation = pairing::edwards_final_exponentiation<183>;
 
                     using g1_precomputed_type = typename precompute_g1::g1_precomputed_type;
                     using g2_precomputed_type = typename precompute_g2::g2_precomputed_type;

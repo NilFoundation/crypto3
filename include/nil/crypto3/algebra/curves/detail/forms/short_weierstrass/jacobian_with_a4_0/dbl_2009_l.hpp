@@ -32,16 +32,15 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    /** @brief A struct representing element doubling from the group G1 of short Weierstrass curve 
+                    /** @brief A struct representing element doubling from the group G1 of short Weierstrass curve
                      *  for jacobian_with_a4_0 coordinates representation.
                      *  NOTE: does not handle O and pts of order 2,4
                      *  http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#doubling-dbl-2009-l
                      */
                     struct short_weierstrass_element_g1_jacobian_with_a4_0_dbl_2009_l {
 
-                        template <typename ElementType>
-                        constexpr static inline ElementType process(
-                            const ElementType &first) {
+                        template<typename ElementType>
+                        constexpr static inline ElementType process(const ElementType &first) {
 
                             using field_value_type = typename ElementType::field_type::value_type;
 
@@ -54,7 +53,7 @@ namespace nil {
                             field_value_type B = (first.Y).squared();    // B = Y1^2
                             field_value_type C = B.squared();            // C = B^2
                             field_value_type D = (first.X + B).squared() - A - C;
-                            D = D + D;                                       // D = 2 * ((X1 + B)^2 - A - C)
+                            D = D + D;                            // D = 2 * ((X1 + B)^2 - A - C)
                             field_value_type E = A + A + A;       // E = 3 * A
                             field_value_type F = E.squared();     // F = E^2
                             field_value_type X3 = F - (D + D);    // X3 = F - 2 D

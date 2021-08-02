@@ -32,22 +32,22 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                namespace coordinates{
+                namespace coordinates {
 
                     /** @brief Twisted Edwards curve group element coordinates representation.
                      * Description: https://hyperelliptic.org/EFD/g1p/auto-twisted.html
                      */
-                
-                    struct affine; 
-                    struct extended; 
-                    struct extended_with_a_minus_1; 
-                    struct inverted; 
+
+                    struct affine;
+                    struct extended;
+                    struct extended_with_a_minus_1;
+                    struct inverted;
                     struct projective;
-                
-                }        // namespace coordinates
+
+                }    // namespace coordinates
             }        // namespace curves
-        }        // namespace algebra
-    }            // namespace crypto3
+        }            // namespace algebra
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_ALGEBRA_CURVES_TWISTED_EDWARDS_COORDINATES_REPRESENTATIONS_HPP

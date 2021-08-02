@@ -193,12 +193,12 @@ template<typename CurveType>
 void pairing_example() {
     using curve_type = CurveType;
 
-    using g1_type = typename curve_type::g1_type<>;
-    using g2_type = typename curve_type::g2_type<>;
+    using g1_type = typename curve_type::template g1_type<>;
+    using g2_type = typename curve_type::template g2_type<>;
     using g1_field_value_type = typename g1_type::field_type::value_type;
     using g2_field_value_type = typename g2_type::field_type::value_type;
 
-    typename curve_type::g1_type<>::value_type g1_el1 = random_element<typename curve_type::g1_type<>>();
+    typename curve_type::template g1_type<>::value_type g1_el1 = random_element<typename curve_type::template g1_type<>>();
     std::cout << "g1_el1: ";
     print_curve_group_element(g1_el1);
 
@@ -207,7 +207,7 @@ void pairing_example() {
     std::cout << "g1_precomp_el1: ";
     // print_ate_g1_precomp_element(g1_precomp_el1);
 
-    typename curve_type::g1_type<>::value_type g1_el2 = g1_type::value_type::one();
+    typename curve_type::template g1_type<>::value_type g1_el2 = g1_type::value_type::one();
     std::cout << "g1_el2: ";
     print_curve_group_element(g1_el2);
     typename pairing::pairing_policy<curve_type>::g1_precomputed_type 
@@ -215,14 +215,14 @@ void pairing_example() {
     std::cout << "g1_precomp_el2: ";
     // print_ate_g1_precomp_element(g1_precomp_el2);
 
-    typename curve_type::g2_type<>::value_type g2_el1 = random_element<typename curve_type::g2_type<>>();
+    typename curve_type::template g2_type<>::value_type g2_el1 = random_element<typename curve_type::template g2_type<>>();
     std::cout << "g2_el1: ";
     print_curve_group_element(g2_el1);
     typename pairing::pairing_policy<curve_type>::g2_precomputed_type 
         g2_precomp_el1 = precompute_g2<curve_type>(g2_el1);
     std::cout << "g2_precomp_el1: ";
     // print_ate_g2_precomp_element(g2_precomp_el1);
-    typename curve_type::g2_type<>::value_type g2_el2 = g2_type::value_type::one();
+    typename curve_type::template g2_type<>::value_type g2_el2 = g2_type::value_type::one();
     std::cout << "g2_el2: ";
     print_curve_group_element(g2_el2);
     typename pairing::pairing_policy<curve_type>::g2_precomputed_type 

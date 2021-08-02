@@ -44,43 +44,41 @@ namespace nil {
                     using types_policy = detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;
-                    using g2_type = typename curve_type::g2_type<>;
-                    using g2_affine_type = typename curve_type::g2_type<curves::coordinates::affine>;
+                    using g2_type = typename curve_type::template g2_type<>;
+                    using g2_affine_type = typename curve_type::template g2_type<curves::coordinates::affine>;
 
                     using g2_field_type_value = typename g2_type::field_type::value_type;
 
-                    static void doubling_step_for_miller_loop(
-                        const typename base_field_type::value_type &two_inv, 
-                        typename g2_type::value_type &current, 
-                        typename types_policy::ate_ell_coeffs &c) {
+                    static void doubling_step_for_miller_loop(const typename base_field_type::value_type &two_inv,
+                                                              typename g2_type::value_type &current,
+                                                              typename types_policy::ate_ell_coeffs &c) {
 
                         const g2_field_type_value X = current.X, Y = current.Y, Z = current.Z;
 
-                        const g2_field_type_value A = two_inv * (X * Y);            // A = X1 * Y1 / 2
-                        const g2_field_type_value B = Y.squared();                  // B = Y1^2
-                        const g2_field_type_value C = Z.squared();                  // C = Z1^2
-                        const g2_field_type_value D = 0x03 * C;                    // D = 3 * C
+                        const g2_field_type_value A = two_inv * (X * Y);                 // A = X1 * Y1 / 2
+                        const g2_field_type_value B = Y.squared();                       // B = Y1^2
+                        const g2_field_type_value C = Z.squared();                       // C = Z1^2
+                        const g2_field_type_value D = 0x03 * C;                          // D = 3 * C
                         const g2_field_type_value E = params_type::twist_coeff_b * D;    // E = twist_b * D
 
-                        const g2_field_type_value F = 0x03 * E;                      // F = 3 * E
+                        const g2_field_type_value F = 0x03 * E;                       // F = 3 * E
                         const g2_field_type_value G = two_inv * (B + F);              // G = (B+F)/2
                         const g2_field_type_value H = (Y + Z).squared() - (B + C);    // H = (Y1+Z1)^2-(B+C)
                         const g2_field_type_value I = E - B;                          // I = E-B
                         const g2_field_type_value J = X.squared();                    // J = X1^2
                         const g2_field_type_value E_squared = E.squared();            // E_squared = E^2
 
-                        current.X = A * (B - F);                                          // X3 = A * (B-F)
+                        current.X = A * (B - F);                         // X3 = A * (B-F)
                         current.Y = G.squared() - (0x03 * E_squared);    // Y3 = G^2 - 3*E^2
-                        current.Z = B * H;                                                // Z3 = B * H
-                        c.ell_0 = I;                                                      // ell_0 = xi * I
-                        c.ell_VW = -params_type::twist * H;    // ell_VW = - H (later: * yP)
-                        c.ell_VV = 0x03 * J;         // ell_VV = 3*J (later: * xP)
+                        current.Z = B * H;                               // Z3 = B * H
+                        c.ell_0 = I;                                     // ell_0 = xi * I
+                        c.ell_VW = -params_type::twist * H;              // ell_VW = - H (later: * yP)
+                        c.ell_VV = 0x03 * J;                             // ell_VV = 3*J (later: * xP)
                     }
 
-                    static void mixed_addition_step_for_miller_loop(
-                        const typename g2_affine_type::value_type base, 
-                        typename g2_type::value_type &current, 
-                        typename types_policy::ate_ell_coeffs &c) {
+                    static void mixed_addition_step_for_miller_loop(const typename g2_affine_type::value_type base,
+                                                                    typename g2_type::value_type &current,
+                                                                    typename types_policy::ate_ell_coeffs &c) {
 
                         const g2_field_type_value X1 = current.X, Y1 = current.Y, Z1 = current.Z;
                         const g2_field_type_value &x2 = base.X, &y2 = base.Y;
@@ -98,18 +96,17 @@ namespace nil {
                         current.Z = Z1 * H;                    // Z3 = Z1*H
                         c.ell_0 = E * x2 - D * y2;             // ell_0 = xi * (E * X2 - D * Y2)
                         c.ell_VV = -E;                         // ell_VV = - E (later: * xP)
-                        c.ell_VW = params_type::twist * D;              // ell_VW = D (later: * yP    )
+                        c.ell_VW = params_type::twist * D;     // ell_VW = D (later: * yP    )
                     }
 
                 public:
-
                     using g2_precomputed_type = typename types_policy::ate_g2_precomputed_type;
 
                     static g2_precomputed_type process(const typename g2_type::value_type &Q) {
 
                         typename g2_affine_type::value_type Qcopy = Q.to_affine();
 
-                        typename base_field_type::value_type two_inv = 
+                        typename base_field_type::value_type two_inv =
                             (typename base_field_type::value_type(0x02).inversed());
 
                         g2_precomputed_type result;
@@ -146,8 +143,8 @@ namespace nil {
                         return result;
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_PRECOMPUTE_G2_HPP

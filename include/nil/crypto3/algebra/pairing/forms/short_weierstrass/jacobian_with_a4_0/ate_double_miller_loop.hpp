@@ -44,21 +44,20 @@ namespace nil {
                     using types_policy = detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type>;
 
                     using gt_type = typename curve_type::gt_type;
-                public:
 
-                    static typename gt_type::value_type process(
-                        const typename types_policy::ate_g1_precomputed_type &prec_P1, 
-                        const typename types_policy::ate_g2_precomputed_type &prec_Q1,
-                        const typename types_policy::ate_g1_precomputed_type &prec_P2, 
-                        const typename types_policy::ate_g2_precomputed_type &prec_Q2) {
+                public:
+                    static typename gt_type::value_type
+                        process(const typename types_policy::ate_g1_precomputed_type &prec_P1,
+                                const typename types_policy::ate_g2_precomputed_type &prec_Q1,
+                                const typename types_policy::ate_g1_precomputed_type &prec_P2,
+                                const typename types_policy::ate_g2_precomputed_type &prec_Q2) {
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 
                         bool found_one = false;
                         std::size_t idx = 0;
 
-                        const typename types_policy::integral_type &loop_count = 
-                            params_type::ate_loop_count;
+                        const typename types_policy::integral_type &loop_count = params_type::ate_loop_count;
 
                         for (long i = params_type::integral_type_max_bits; i >= 0; --i) {
                             const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
@@ -98,8 +97,8 @@ namespace nil {
                         return f;
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_DOUBLE_MILLER_LOOP_HPP

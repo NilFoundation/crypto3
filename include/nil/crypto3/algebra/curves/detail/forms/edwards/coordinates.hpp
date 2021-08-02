@@ -32,7 +32,7 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                namespace coordinates{
+                namespace coordinates {
 
                     /** @brief Edwards curve group element coordinates representation.
                      * Description: https://hyperelliptic.org/EFD/g1p/auto-edwards.html
@@ -42,11 +42,11 @@ namespace nil {
                     struct projective;
                     struct squared_yz_squared_d;
                     struct yz_squared_d;
-                        
-                }        // namespace coordinates
+
+                }    // namespace coordinates
             }        // namespace curves
-        }        // namespace algebra
-    }            // namespace crypto3
+        }            // namespace algebra
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_ALGEBRA_CURVES_EDWARDS_COORDINATES_REPRESENTATIONS_HPP

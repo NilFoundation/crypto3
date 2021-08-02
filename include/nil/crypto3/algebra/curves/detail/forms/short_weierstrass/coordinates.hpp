@@ -32,28 +32,28 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                namespace coordinates{
+                namespace coordinates {
 
                     /** @brief Short Weierstrass curve group element coordinates representation.
                      * Description: https://hyperelliptic.org/EFD/g1p/auto-shortw.html
                      */
-                    struct affine; 
-                    struct jacobian; 
-                    struct jacobian_with_a4_0; 
-                    struct jacobian_with_a4_minus_3; 
-                    struct modified_jacobian; 
-                    struct projective; 
-                    struct projective_with_a4_minus_1; 
-                    struct projective_with_a4_minus_3; 
-                    struct w12_with_a6_0; 
-                    struct xyzz; 
-                    struct xyzz_with_a4_minus_3; 
+                    struct affine;
+                    struct jacobian;
+                    struct jacobian_with_a4_0;
+                    struct jacobian_with_a4_minus_3;
+                    struct modified_jacobian;
+                    struct projective;
+                    struct projective_with_a4_minus_1;
+                    struct projective_with_a4_minus_3;
+                    struct w12_with_a6_0;
+                    struct xyzz;
+                    struct xyzz_with_a4_minus_3;
                     struct xz;
 
-                }        // namespace coordinates
+                }    // namespace coordinates
             }        // namespace curves
-        }        // namespace algebra
-    }            // namespace crypto3
+        }            // namespace algebra
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_ALGEBRA_CURVES_SHORT_WEIERSTRASS_COORDINATES_REPRESENTATIONS_HPP

@@ -32,37 +32,36 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    /** @brief A struct representing element addition from the group G1 of short Weierstrass curve 
+                    /** @brief A struct representing element addition from the group G1 of short Weierstrass curve
                      *  for jacobian_with_a4_0 coordinates representation.
-                     *  NOTE: does not handle O and pts of order 2,4 
+                     *  NOTE: does not handle O and pts of order 2,4
                      *  http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#addition-madd-2007-bl
                      */
-                    
+
                     struct short_weierstrass_element_g1_jacobian_with_a4_0_madd_2007_bl {
 
-                        template <typename ElementType>
-                        constexpr static inline ElementType process(
-                            const ElementType &first, 
-                            const ElementType &second) {
+                        template<typename ElementType>
+                        constexpr static inline ElementType process(const ElementType &first,
+                                                                    const ElementType &second) {
 
                             using field_value_type = typename ElementType::field_type::value_type;
 
                             // Because for some reasons it's not so
                             // assert(second.Z == field_value_type::one());
 
-                            const field_value_type Z1Z1 = (first.Z).squared();   // Z1Z1 = Z1^2
-                            const field_value_type U2 = second.X * Z1Z1;          // X2*Z1Z1
-                            const field_value_type S2 = second.Y * first.Z * Z1Z1;    // S2 = Y2 * Z1 * Z1Z1
-                            const field_value_type H = U2 - (first.X);    // H = U2-X1
-                            const field_value_type HH = H.squared();      // HH = H^2
-                            const field_value_type I = HH.doubled().doubled();           // I = 4*HH
-                            const field_value_type J = H * I;             // J = H*I
-                            const field_value_type r = (S2 - (first.Y)).doubled();    // r = 2*(S2-Y1)
-                            const field_value_type V = first.X * I;               // V = X1*I
+                            const field_value_type Z1Z1 = (first.Z).squared();            // Z1Z1 = Z1^2
+                            const field_value_type U2 = second.X * Z1Z1;                  // X2*Z1Z1
+                            const field_value_type S2 = second.Y * first.Z * Z1Z1;        // S2 = Y2 * Z1 * Z1Z1
+                            const field_value_type H = U2 - (first.X);                    // H = U2-X1
+                            const field_value_type HH = H.squared();                      // HH = H^2
+                            const field_value_type I = HH.doubled().doubled();            // I = 4*HH
+                            const field_value_type J = H * I;                             // J = H*I
+                            const field_value_type r = (S2 - (first.Y)).doubled();        // r = 2*(S2-Y1)
+                            const field_value_type V = first.X * I;                       // V = X1*I
                             const field_value_type X3 = r.squared() - J - V.doubled();    // X3 = r^2-J-2*V
-                            const field_value_type Y3 = r * (V - X3) - (first.Y*J).doubled();  // Y3 = r*(V-X3)-2*Y1*J
-                            const field_value_type Z3 =
-                                (first.Z + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
+                            const field_value_type Y3 =
+                                r * (V - X3) - (first.Y * J).doubled();                         // Y3 = r*(V-X3)-2*Y1*J
+                            const field_value_type Z3 = (first.Z + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
 
                             return ElementType(X3, Y3, Z3);
                         }

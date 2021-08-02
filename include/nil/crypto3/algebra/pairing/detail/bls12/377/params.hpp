@@ -62,8 +62,7 @@ namespace nil {
 
                         using g2_field_type_value = typename curve_type::g2_type::field_type::value_type;
 
-                        constexpr static const g2_field_type_value twist = 
-                            g2_type::params_type::twist;
+                        constexpr static const g2_field_type_value twist = g2_type::params_type::twist;
                     };
 
                     constexpr

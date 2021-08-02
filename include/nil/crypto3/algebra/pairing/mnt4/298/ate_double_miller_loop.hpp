@@ -50,23 +50,23 @@ namespace nil {
 
                     using gt_type = typename curve_type::gt_type;
                     using base_field_type = typename curve_type::base_field_type;
-                    using g1_type = typename curve_type::g1_type<>;
-                    using g2_type = typename curve_type::g2_type<>;
+                    using g1_type = typename curve_type::template g1_type<>;
+                    using g2_type = typename curve_type::template g2_type<>;
 
                     using g1_field_type_value = typename g1_type::field_type::value_type;
                     using g2_field_type_value = typename g2_type::field_type::value_type;
+
                 public:
+                    static typename gt_type::value_type
+                        process(const typename types_policy::ate_g1_precomputed_type &prec_P1,
+                                const typename types_policy::ate_g2_precomputed_type &prec_Q1,
+                                const typename types_policy::ate_g1_precomputed_type &prec_P2,
+                                const typename types_policy::ate_g2_precomputed_type &prec_Q2) {
 
-                    static typename gt_type::value_type process(
-                        const typename types_policy::ate_g1_precomputed_type &prec_P1, 
-                        const typename types_policy::ate_g2_precomputed_type &prec_Q1,
-                        const typename types_policy::ate_g1_precomputed_type &prec_P2, 
-                        const typename types_policy::ate_g2_precomputed_type &prec_Q2) {
-
-                        g2_field_type_value L1_coeff1 = g2_field_type_value(
-                            prec_P1.PX, g1_field_type_value::zero()) - prec_Q1.QX_over_twist;
-                        g2_field_type_value L1_coeff2 = g2_field_type_value(
-                            prec_P2.PX, g1_field_type_value::zero()) - prec_Q2.QX_over_twist;
+                        g2_field_type_value L1_coeff1 =
+                            g2_field_type_value(prec_P1.PX, g1_field_type_value::zero()) - prec_Q1.QX_over_twist;
+                        g2_field_type_value L1_coeff2 =
+                            g2_field_type_value(prec_P2.PX, g1_field_type_value::zero()) - prec_Q2.QX_over_twist;
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 
@@ -90,11 +90,11 @@ namespace nil {
                             typename types_policy::ate_dbl_coeffs dc2 = prec_Q2.dbl_coeffs[dbl_idx];
                             ++dbl_idx;
 
-                            typename gt_type::value_type g_RR_at_P1 =
-                                typename gt_type::value_type(-dc1.c_4C - dc1.c_J * prec_P1.PX_twist + dc1.c_L, dc1.c_H * prec_P1.PY_twist);
+                            typename gt_type::value_type g_RR_at_P1 = typename gt_type::value_type(
+                                -dc1.c_4C - dc1.c_J * prec_P1.PX_twist + dc1.c_L, dc1.c_H * prec_P1.PY_twist);
 
-                            typename gt_type::value_type g_RR_at_P2 =
-                                typename gt_type::value_type(-dc2.c_4C - dc2.c_J * prec_P2.PX_twist + dc2.c_L, dc2.c_H * prec_P2.PY_twist);
+                            typename gt_type::value_type g_RR_at_P2 = typename gt_type::value_type(
+                                -dc2.c_4C - dc2.c_J * prec_P2.PX_twist + dc2.c_L, dc2.c_H * prec_P2.PY_twist);
 
                             f = f.squared() * g_RR_at_P1 * g_RR_at_P2;
 
@@ -103,10 +103,12 @@ namespace nil {
                                 typename types_policy::ate_add_coeffs ac2 = prec_Q2.add_coeffs[add_idx];
                                 ++add_idx;
 
-                                typename gt_type::value_type g_RQ_at_P1 = typename gt_type::value_type(ac1.c_RZ * prec_P1.PY_twist,
-                                                   -(prec_Q1.QY_over_twist * ac1.c_RZ + L1_coeff1 * ac1.c_L1));
-                                typename gt_type::value_type g_RQ_at_P2 = typename gt_type::value_type(ac2.c_RZ * prec_P2.PY_twist,
-                                                   -(prec_Q2.QY_over_twist * ac2.c_RZ + L1_coeff2 * ac2.c_L1));
+                                typename gt_type::value_type g_RQ_at_P1 = typename gt_type::value_type(
+                                    ac1.c_RZ * prec_P1.PY_twist,
+                                    -(prec_Q1.QY_over_twist * ac1.c_RZ + L1_coeff1 * ac1.c_L1));
+                                typename gt_type::value_type g_RQ_at_P2 = typename gt_type::value_type(
+                                    ac2.c_RZ * prec_P2.PY_twist,
+                                    -(prec_Q2.QY_over_twist * ac2.c_RZ + L1_coeff2 * ac2.c_L1));
 
                                 f = f * g_RQ_at_P1 * g_RQ_at_P2;
                             }
@@ -129,8 +131,8 @@ namespace nil {
                         return f;
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_MNT4_298_ATE_DOUBLE_MILLER_LOOP_HPP

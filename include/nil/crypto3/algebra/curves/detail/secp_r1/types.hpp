@@ -35,17 +35,13 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<std::size_t Version, typename Form, typename Coordinates>
                     struct secp_r1_g1;
 
-                    template<std::size_t Version, 
-                             typename Form>
+                    template<std::size_t Version, typename Form>
                     struct secp_r1_params;
 
-                    template<std::size_t Version, 
-                             typename Form>
+                    template<std::size_t Version, typename Form>
                     struct secp_r1_g1_params;
 
                     using namespace algebra;
@@ -62,8 +58,7 @@ namespace nil {
                         
                         using integral_type = typename base_field_type::integral_type;
 
-                        template<typename Form, 
-                             typename Coordinates>
+                        template<typename Form, typename Coordinates>
                         using g1_type = secp_r1_g1<Version, Form, Coordinates>;
                     };
 

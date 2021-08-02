@@ -39,8 +39,7 @@ namespace nil {
             namespace fields {
 
                 template<std::size_t Version>
-                struct arithmetic_params<dsa_jce_base_field<Version>>
-                    : public params<dsa_jce_base_field<Version>> {
+                struct arithmetic_params<dsa_jce_base_field<Version>> : public params<dsa_jce_base_field<Version>> {
                 private:
                     typedef params<dsa_jce_base_field<Version>> policy_type;
 

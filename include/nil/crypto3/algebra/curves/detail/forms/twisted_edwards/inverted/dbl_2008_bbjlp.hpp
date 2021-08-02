@@ -32,17 +32,16 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    /** @brief A struct representing element doubling from the group G1 of twisted Edwards curve 
+                    /** @brief A struct representing element doubling from the group G1 of twisted Edwards curve
                      *  for inversed coordinates representation.
-                     *  NOTE: does not handle O and pts of order 2,4 
+                     *  NOTE: does not handle O and pts of order 2,4
                      *  http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#doubling-dbl-2008-bbjlp
                      */
-                    
+
                     struct twisted_edwards_element_g1_inverted_dbl_2008_bbjlp {
 
-                        template <typename ElementType>
-                        constexpr static inline ElementType process(
-                            const ElementType &first) {
+                        template<typename ElementType>
+                        constexpr static inline ElementType process(const ElementType &first) {
 
                             using field_value_type = typename ElementType::field_type::value_type;
 
@@ -50,16 +49,17 @@ namespace nil {
                                 return (first);
                             } else {
 
-                                field_value_type A = (first.X).squared();                  // A = X1^2
-                                field_value_type B = (first.Y).squared();                  // B = Y1^2
-                                field_value_type U = ElementType::params_type::a * B;       // U = a*B
-                                field_value_type C = A + U;                                // C = A+U
-                                field_value_type D = A - U;                                // D = A-U
+                                field_value_type A = (first.X).squared();                      // A = X1^2
+                                field_value_type B = (first.Y).squared();                      // B = Y1^2
+                                field_value_type U = ElementType::params_type::a * B;          // U = a*B
+                                field_value_type C = A + U;                                    // C = A+U
+                                field_value_type D = A - U;                                    // D = A-U
                                 field_value_type E = (first.X + first.Y).squared() - A - B;    // E = (X1+Y1)^2-A-B
-                                field_value_type X3 = C * D;                               // X3 = C*D
-                                field_value_type d2 = ElementType::params_type::d + ElementType::params_type::d;    // d2=2*d
-                                field_value_type Y3 = E * (C - d2 * first.Z.squared());    // Y3 = E*(C-d2*Z1^2)
-                                field_value_type Z3 = D * E;                  // Z3 = D*E
+                                field_value_type X3 = C * D;                                   // X3 = C*D
+                                field_value_type d2 =
+                                    ElementType::params_type::d + ElementType::params_type::d;    // d2=2*d
+                                field_value_type Y3 = E * (C - d2 * first.Z.squared());           // Y3 = E*(C-d2*Z1^2)
+                                field_value_type Z3 = D * E;                                      // Z3 = D*E
 
                                 return ElementType(X3, Y3, Z3);
                             }

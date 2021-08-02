@@ -653,9 +653,9 @@ void pairing_test_Fr_init(std::vector<typename fields::detail::element_fp<FieldP
 }
 
 template<typename CurveType, typename TestSet>
-void pairing_test_G1_init(std::vector<typename CurveType::g1_type<>::value_type> &elements, const TestSet &test_set) {
+void pairing_test_G1_init(std::vector<typename CurveType::template g1_type<>::value_type> &elements, const TestSet &test_set) {
     
-    using value_type = typename CurveType::g1_type<>::value_type;
+    using value_type = typename CurveType::template g1_type<>::value_type;
 
     for (auto &elem_coords : test_set.second.get_child("G1")) {
         elements.emplace_back(curve_point_init<value_type>(elem_coords));
@@ -663,9 +663,9 @@ void pairing_test_G1_init(std::vector<typename CurveType::g1_type<>::value_type>
 }
 
 template<typename CurveType, typename TestSet>
-void pairing_test_G2_init(std::vector<typename CurveType::g2_type<>::value_type> &elements, const TestSet &test_set) {
+void pairing_test_G2_init(std::vector<typename CurveType::template g2_type<>::value_type> &elements, const TestSet &test_set) {
     
-    using value_type = typename CurveType::g2_type<>::value_type;
+    using value_type = typename CurveType::template g2_type<>::value_type;
 
     for (auto &elem_coords : test_set.second.get_child("G2")) {
         elements.emplace_back(curve_point_init<value_type>(elem_coords));
@@ -690,7 +690,7 @@ void pairing_test_g1_precomp_init(std::vector<typename pairing::pairing_policy<c
     using value_type = typename pairing_policy::g1_precomputed_type;
     
     using g1_field_value_type = typename curve_type::base_field_type::value_type;
-    using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
+    using g2_field_value_type = typename curve_type::template g2_type<>::field_type::value_type;
 
     for (auto &elem : test_set.second.get_child("g1_precomputed_type")) {
         elements.emplace_back(
@@ -707,7 +707,7 @@ void pairing_test_g1_precomp_init(std::vector<typename pairing::pairing_policy<c
     using value_type = typename pairing_policy::g1_precomputed_type;
 
     using g1_field_value_type = typename curve_type::base_field_type::value_type;
-    using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
+    using g2_field_value_type = typename curve_type::template g2_type<>::field_type::value_type;
 
     for (auto &elem : test_set.second.get_child("g1_precomputed_type")) {
         elements.emplace_back(
@@ -726,7 +726,7 @@ void pairing_test_g1_precomp_init(std::vector<typename pairing::pairing_policy<c
     using value_type = typename pairing_policy::g1_precomputed_type;
 
     using g1_field_value_type = typename curve_type::base_field_type::value_type;
-    using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
+    using g2_field_value_type = typename curve_type::template g2_type<>::field_type::value_type;
 
     for (auto &elem : test_set.second.get_child("g1_precomputed_type")) {
         elements.emplace_back(
@@ -745,7 +745,7 @@ void pairing_test_g2_precomp_init(std::vector<typename pairing::pairing_policy<c
     using value_type = typename pairing_policy::g2_precomputed_type;
     
     using g1_field_value_type = typename curve_type::base_field_type::value_type;
-    using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
+    using g2_field_value_type = typename curve_type::template g2_type<>::field_type::value_type;
 
     using coeffs_type = value_type::coeffs_type;
     using coeffs_value_type = g2_field_value_type;
@@ -777,7 +777,7 @@ void pairing_test_g2_precomp_init(std::vector<typename pairing::pairing_policy<c
     using value_type = typename pairing_policy::g2_precomputed_type;
 
     using g1_field_value_type = typename curve_type::base_field_type::value_type;
-    using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
+    using g2_field_value_type = typename curve_type::template g2_type<>::field_type::value_type;
 
     using dbl_coeffs_type = typename value_type::dbl_coeffs_type;
     using add_coeffs_type = typename value_type::add_coeffs_type;
@@ -827,7 +827,7 @@ void pairing_test_g2_precomp_init(std::vector<typename pairing::pairing_policy<c
     using value_type = typename pairing_policy::g2_precomputed_type;
     
     using g1_field_value_type = typename curve_type::base_field_type::value_type;
-    using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
+    using g2_field_value_type = typename curve_type::template g2_type<>::field_type::value_type;
 
     using dbl_coeffs_type = typename value_type::dbl_coeffs_type;
     using add_coeffs_type = typename value_type::add_coeffs_type;
@@ -889,8 +889,8 @@ void pairing_test_init(std::vector<Fr_value_type> &Fr_elements,
 template<typename CurveType, typename TestSet>
 void pairing_operation_test(const TestSet &test_set) {
     std::vector<typename CurveType::scalar_field_type::value_type> Fr_elements;
-    std::vector<typename CurveType::g1_type<>::value_type> G1_elements;
-    std::vector<typename CurveType::g2_type<>::value_type> G2_elements;
+    std::vector<typename CurveType::template g1_type<>::value_type> G1_elements;
+    std::vector<typename CurveType::template g2_type<>::value_type> G2_elements;
     std::vector<typename CurveType::gt_type::value_type> GT_elements;
     std::vector<typename pairing::pairing_policy<CurveType>::g1_precomputed_type> G1_prec_elements;
     std::vector<typename pairing::pairing_policy<CurveType>::g2_precomputed_type> G2_prec_elements;

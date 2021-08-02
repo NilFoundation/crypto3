@@ -49,8 +49,8 @@ namespace nil {
                     using types_policy = detail::types_policy<curve_type>;
 
                     using base_field_type = typename curve_type::base_field_type;
-                    using g1_type = typename curve_type::g1_type<>;
-                    using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
+                    using g1_type = typename curve_type::template g1_type<>;
+                    using g1_affine_type = typename curve_type::template g1_type<curves::coordinates::affine>;
 
                     using g1_field_type_value = typename g1_type::field_type::value_type;
 
@@ -61,9 +61,8 @@ namespace nil {
                         g1_field_type_value T;
                     };
 
-                    static void doubling_step_for_miller_loop(
-                        extended_g1_projective &current,
-                        typename types_policy::Fq_conic_coefficients &cc) {
+                    static void doubling_step_for_miller_loop(extended_g1_projective &current,
+                                                              typename types_policy::Fq_conic_coefficients &cc) {
 
                         const g1_field_type_value &X = current.X, &Y = current.Y, &Z = current.Z, &T = current.T;
                         const g1_field_type_value A = X.squared();          // A    = X1^2
@@ -91,15 +90,12 @@ namespace nil {
                         current.T = F * (B - H);    // T3 = F*(B-H)
                     }
 
-                    static void full_addition_step_for_miller_loop(
-                        const extended_g1_projective &base,
-                        extended_g1_projective &current,
-                        typename types_policy::Fq_conic_coefficients &cc) {
+                    static void full_addition_step_for_miller_loop(const extended_g1_projective &base,
+                                                                   extended_g1_projective &current,
+                                                                   typename types_policy::Fq_conic_coefficients &cc) {
 
-                        const g1_field_type_value &X1 = current.X, &Y1 = current.Y, 
-                            &Z1 = current.Z, &T1 = current.T;
-                        const g1_field_type_value &X2 = base.X, &Y2 = base.Y, 
-                            &Z2 = base.Z, &T2 = base.T;
+                        const g1_field_type_value &X1 = current.X, &Y1 = current.Y, &Z1 = current.Z, &T1 = current.T;
+                        const g1_field_type_value &X2 = base.X, &Y2 = base.Y, &Z2 = base.Z, &T2 = base.T;
 
                         const g1_field_type_value A = X1 * X2;                          // A    = X1*X2
                         const g1_field_type_value B = Y1 * Y2;                          // B    = Y1*Y2
@@ -120,10 +116,9 @@ namespace nil {
                         current.T = E * H;                              // T3   = E*H
                     }
 
-                    static void mixed_addition_step_for_miller_loop(
-                        const extended_g1_projective &base,
-                        extended_g1_projective &current,
-                        typename types_policy::Fq_conic_coefficients &cc) {
+                    static void mixed_addition_step_for_miller_loop(const extended_g1_projective &base,
+                                                                    extended_g1_projective &current,
+                                                                    typename types_policy::Fq_conic_coefficients &cc) {
 
                         const g1_field_type_value &X1 = current.X, &Y1 = current.Y, &Z1 = current.Z, &T1 = current.T;
                         const g1_field_type_value &X2 = base.X, &Y2 = base.Y, &T2 = base.T;
@@ -148,11 +143,9 @@ namespace nil {
                     }
 
                 public:
-
                     using g1_precomputed_type = typename types_policy::tate_g1_precomp;
 
-                    static typename types_policy::tate_g1_precomp  process(
-                        const typename g1_type::value_type &P) {
+                    static typename types_policy::tate_g1_precomp process(const typename g1_type::value_type &P) {
 
                         typename types_policy::tate_g1_precomp result;
 
@@ -193,8 +186,8 @@ namespace nil {
                         return result;
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_TATE_PRECOMPUTE_G1_HPP

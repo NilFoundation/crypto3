@@ -35,8 +35,7 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    template<typename Form, 
-                             typename Coordinates>
+                    template<typename Form, typename Coordinates>
                     struct babyjubjub_g1;
 
                     template<typename Form>
@@ -47,7 +46,8 @@ namespace nil {
 
                     /** @brief A struct representing details about base and scalar fields of the size 183 bits and 181
                      * bits respectively. Corresponds to [BabyJubJub](https://eips.ethereum.org/EIPS/eip-2494)
-                     * twisted Edwards elliptic curve defined over alt_bn128 scalar field and described by equation ax^2 + y^2 = 1 + dx^2y^2
+                     * twisted Edwards elliptic curve defined over alt_bn128 scalar field and described by equation ax^2
+                     * + y^2 = 1 + dx^2y^2
                      *
                      */
                     struct babyjubjub_types {
@@ -58,8 +58,7 @@ namespace nil {
 
                         using integral_type = typename base_field_type::integral_type;
 
-                        template<typename Form, 
-                             typename Coordinates>
+                        template<typename Form, typename Coordinates>
                         using g1_type = babyjubjub_g1<Form, Coordinates>;
                     };
 
