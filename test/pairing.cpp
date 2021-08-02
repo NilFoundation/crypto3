@@ -43,6 +43,12 @@
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
+#include <nil/crypto3/algebra/pairing/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/mnt4.hpp>
+#include <nil/crypto3/algebra/pairing/mnt6.hpp>
+
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
+
 #include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
 #include <nil/crypto3/algebra/fields/detail/element/fp4.hpp>
 #include <nil/crypto3/algebra/fields/detail/element/fp6_2over3.hpp>
@@ -116,7 +122,7 @@ void print_curve_group_element(std::ostream &os, const CurveGroupValue &e) {
     os << ")" << std::endl;
 }
 
-void print_g1_precomp_element(std::ostream &os, const typename curves::bls12<381>::pairing::g1_precomp &e) {
+void print_g1_precomp_element(std::ostream &os, const typename pairing::pairing_policy<curves::bls12<381>>::g1_precomputed_type &e) {
     os << "{\"PX\": ";
     print_field_element(os, e.PX);
     os << ", \"PY\": ";
@@ -124,19 +130,7 @@ void print_g1_precomp_element(std::ostream &os, const typename curves::bls12<381
     os << "}" << std::endl;
 }
 
-void print_g1_precomp_element(std::ostream &os, const typename curves::mnt4<298>::pairing::g1_precomp &e) {
-    os << "{\"PX\": ";
-    print_field_element(os, e.PX);
-    os << ", \"PY\": ";
-    print_field_element(os, e.PY);
-    os << ", \"PX_twist\": ";
-    print_field_element(os, e.PX_twist);
-    os << ", \"PY_twist\": ";
-    print_field_element(os, e.PY_twist);
-    os << "}" << std::endl;
-}
-
-void print_g1_precomp_element(std::ostream &os, const typename curves::mnt6<298>::pairing::g1_precomp &e) {
+void print_g1_precomp_element(std::ostream &os, const typename pairing::pairing_policy<curves::mnt4<298>>::g1_precomputed_type &e) {
     os << "{\"PX\": ";
     print_field_element(os, e.PX);
     os << ", \"PY\": ";
@@ -148,7 +142,19 @@ void print_g1_precomp_element(std::ostream &os, const typename curves::mnt6<298>
     os << "}" << std::endl;
 }
 
-void print_g2_precomp_element(std::ostream &os, const typename curves::bls12<381>::pairing::g2_precomp &e) {
+void print_g1_precomp_element(std::ostream &os, const typename pairing::pairing_policy<curves::mnt6<298>>::g1_precomputed_type &e) {
+    os << "{\"PX\": ";
+    print_field_element(os, e.PX);
+    os << ", \"PY\": ";
+    print_field_element(os, e.PY);
+    os << ", \"PX_twist\": ";
+    print_field_element(os, e.PX_twist);
+    os << ", \"PY_twist\": ";
+    print_field_element(os, e.PY_twist);
+    os << "}" << std::endl;
+}
+
+void print_g2_precomp_element(std::ostream &os, const typename pairing::pairing_policy<curves::bls12<381>>::g2_precomputed_type &e) {
     os << "\"coordinates\": [[" << e.QX.data[0].data << " , " << e.QX.data[1].data << "] , [" << e.QY.data[0].data
        << " , " << e.QY.data[1].data << "]]" << std::endl;
     auto print_coeff = [&os](const auto &c) {
@@ -165,7 +171,7 @@ void print_g2_precomp_element(std::ostream &os, const typename curves::bls12<381
     os << "]" << std::endl;
 }
 
-void print_g2_precomp_element(std::ostream &os, const typename curves::mnt4<298>::pairing::g2_precomp &e) {
+void print_g2_precomp_element(std::ostream &os, const typename pairing::pairing_policy<curves::mnt4<298>>::g2_precomputed_type &e) {
     os << "\"coordinates\": {\"QX\": ";
     print_field_element(os, e.QX);
     os << ", \"QY\": ";
@@ -210,7 +216,7 @@ void print_g2_precomp_element(std::ostream &os, const typename curves::mnt4<298>
     std::cout << std::endl;
 }
 
-void print_g2_precomp_element(std::ostream &os, const typename curves::mnt6<298>::pairing::g2_precomp &e) {
+void print_g2_precomp_element(std::ostream &os, const typename pairing::pairing_policy<curves::mnt6<298>>::g2_precomputed_type &e) {
     os << "\"coordinates\": {\"QX\": ";
     print_field_element(os, e.QX);
     os << ", \"QY\": ";
@@ -275,117 +281,117 @@ namespace boost {
             };
 
             template<>
-            struct print_log_value<curves::bls12<381>::pairing::g1_type::value_type> {
+            struct print_log_value<curves::bls12<381>::g1_type<>::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::bls12<381>::pairing::g1_type::value_type &e) {
+                                const typename curves::bls12<381>::g1_type<>::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::bls12<381>::pairing::g2_type::value_type> {
+            struct print_log_value<curves::bls12<381>::g2_type<>::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::bls12<381>::pairing::g2_type::value_type &e) {
+                                const typename curves::bls12<381>::g2_type<>::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::bls12<381>::pairing::g1_precomp> {
-                void operator()(std::ostream &os, const typename curves::bls12<381>::pairing::g1_precomp &e) {
+            struct print_log_value<pairing::pairing_policy<curves::bls12<381>>::g1_precomputed_type> {
+                void operator()(std::ostream &os, const typename pairing::pairing_policy<curves::bls12<381>>::g1_precomputed_type &e) {
                     print_g1_precomp_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::bls12<381>::pairing::g2_precomp> {
-                void operator()(std::ostream &os, const typename curves::bls12<381>::pairing::g2_precomp &e) {
+            struct print_log_value<pairing::pairing_policy<curves::bls12<381>>::g2_precomputed_type> {
+                void operator()(std::ostream &os, const typename pairing::pairing_policy<curves::bls12<381>>::g2_precomputed_type &e) {
                     print_g2_precomp_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::bls12<381>::pairing::gt_type::value_type> {
+            struct print_log_value<curves::bls12<381>::gt_type::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::bls12<381>::pairing::gt_type::value_type &e) {
+                                const typename curves::bls12<381>::gt_type::value_type &e) {
                     print_field_element(os, e);
                     std::cout << std::endl;
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing::g1_type::value_type> {
+            struct print_log_value<curves::mnt4<298>::g1_type<>::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt4<298>::pairing::g1_type::value_type &e) {
+                                const typename curves::mnt4<298>::g1_type<>::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing::g2_type::value_type> {
+            struct print_log_value<curves::mnt4<298>::g2_type<>::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt4<298>::pairing::g2_type::value_type &e) {
+                                const typename curves::mnt4<298>::g2_type<>::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing::g1_precomp> {
-                void operator()(std::ostream &os, const typename curves::mnt4<298>::pairing::g1_precomp &e) {
+            struct print_log_value<pairing::pairing_policy<curves::mnt4<298>>::g1_precomputed_type> {
+                void operator()(std::ostream &os, const typename pairing::pairing_policy<curves::mnt4<298>>::g1_precomputed_type &e) {
                     print_g1_precomp_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing::g2_precomp> {
-                void operator()(std::ostream &os, const typename curves::mnt4<298>::pairing::g2_precomp &e) {
+            struct print_log_value<pairing::pairing_policy<curves::mnt4<298>>::g2_precomputed_type> {
+                void operator()(std::ostream &os, const typename pairing::pairing_policy<curves::mnt4<298>>::g2_precomputed_type &e) {
                     print_g2_precomp_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing::gt_type::value_type> {
+            struct print_log_value<curves::mnt4<298>::gt_type::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt4<298>::pairing::gt_type::value_type &e) {
+                                const typename curves::mnt4<298>::gt_type::value_type &e) {
                     print_field_element(os, e);
                     std::cout << std::endl;
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt6<298>::pairing::g1_type::value_type> {
+            struct print_log_value<curves::mnt6<298>::g1_type<>::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt6<298>::pairing::g1_type::value_type &e) {
+                                const typename curves::mnt6<298>::g1_type<>::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt6<298>::pairing::g2_type::value_type> {
+            struct print_log_value<curves::mnt6<298>::g2_type<>::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt6<298>::pairing::g2_type::value_type &e) {
+                                const typename curves::mnt6<298>::g2_type<>::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt6<298>::pairing::g1_precomp> {
-                void operator()(std::ostream &os, const typename curves::mnt6<298>::pairing::g1_precomp &e) {
+            struct print_log_value<pairing::pairing_policy<curves::mnt6<298>>::g1_precomputed_type> {
+                void operator()(std::ostream &os, const typename pairing::pairing_policy<curves::mnt6<298>>::g1_precomputed_type &e) {
                     print_g1_precomp_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt6<298>::pairing::g2_precomp> {
-                void operator()(std::ostream &os, const typename curves::mnt6<298>::pairing::g2_precomp &e) {
+            struct print_log_value<pairing::pairing_policy<curves::mnt6<298>>::g2_precomputed_type> {
+                void operator()(std::ostream &os, const typename pairing::pairing_policy<curves::mnt6<298>>::g2_precomputed_type &e) {
                     print_g2_precomp_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt6<298>::pairing::gt_type::value_type> {
+            struct print_log_value<curves::mnt6<298>::gt_type::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt6<298>::pairing::gt_type::value_type &e) {
+                                const typename curves::mnt6<298>::gt_type::value_type &e) {
                     print_field_element(os, e);
                     std::cout << std::endl;
                 }
@@ -427,7 +433,7 @@ enum g1_precomp_enum : std::size_t { prec_A1, prec_A2 };
 enum g2_precomp_enum : std::size_t { prec_B1, prec_B2 };
 
 // TODO: add affine_pair_reduceding test
-template<typename PairingT, typename Fr_value_type, typename G1_value_type, typename G2_value_type,
+template<typename CurveType, typename Fr_value_type, typename G1_value_type, typename G2_value_type,
          typename GT_value_type, typename g1_precomp_value_type, typename g2_precomp_value_type>
 void check_pairing_operations(std::vector<Fr_value_type> &Fr_elements,
                               std::vector<G1_value_type> &G1_elements,
@@ -454,60 +460,60 @@ void check_pairing_operations(std::vector<Fr_value_type> &Fr_elements,
     std::cout << " * Basic fields and groups tests finished." << std::endl << std::endl;
 
     std::cout << " * Precomputing and pairing tests started..." << std::endl;
-    BOOST_CHECK_EQUAL(PairingT::precompute_g1(G1_elements[A1]), G1_prec_elements[prec_A1]);
-    BOOST_CHECK_EQUAL(PairingT::precompute_g1(G1_elements[A2]), G1_prec_elements[prec_A2]);
-    BOOST_CHECK_EQUAL(PairingT::precompute_g2(G2_elements[B1]), G2_prec_elements[prec_B1]);
-    BOOST_CHECK_EQUAL(PairingT::precompute_g2(G2_elements[B2]), G2_prec_elements[prec_B2]);
-    BOOST_CHECK_EQUAL(PairingT::pair(G1_elements[A1], G2_elements[B1]), GT_elements[pairing_A1_B1]);
-    BOOST_CHECK_EQUAL(PairingT::pair(G1_elements[A2], G2_elements[B2]), GT_elements[pairing_A2_B2]);
+    BOOST_CHECK_EQUAL(precompute_g1<CurveType>(G1_elements[A1]), G1_prec_elements[prec_A1]);
+    BOOST_CHECK_EQUAL(precompute_g1<CurveType>(G1_elements[A2]), G1_prec_elements[prec_A2]);
+    BOOST_CHECK_EQUAL(precompute_g2<CurveType>(G2_elements[B1]), G2_prec_elements[prec_B1]);
+    BOOST_CHECK_EQUAL(precompute_g2<CurveType>(G2_elements[B2]), G2_prec_elements[prec_B2]);
+    BOOST_CHECK_EQUAL(pair<CurveType>(G1_elements[A1], G2_elements[B1]), GT_elements[pairing_A1_B1]);
+    BOOST_CHECK_EQUAL(pair<CurveType>(G1_elements[A2], G2_elements[B2]), GT_elements[pairing_A2_B2]);
     std::cout << " * Precomputing and pairing tests finished." << std::endl << std::endl;
 
     // TODO: activate after pair_reduceding->cyclotomic_exp fixed. Bugs in final_exponentiation_last_chunk
     std::cout << " * Reduced pairing tests started..." << std::endl;
-    BOOST_CHECK_EQUAL(PairingT::pair_reduced(G1_elements[A1], G2_elements[B1]), GT_elements[pair_reduceding_A1_B1]);
-    BOOST_CHECK_EQUAL(PairingT::pair_reduced(G1_elements[A1], G2_elements[B1]),
-                      PairingT::pair_reduced(G1_elements[VKx], G2_elements[VKy]) *
-                          PairingT::pair_reduced(G1_elements[C1], G2_elements[VKz]));
-    BOOST_CHECK_EQUAL(PairingT::pair_reduced(G1_elements[A2], G2_elements[B2]), GT_elements[pair_reduceding_A2_B2]);
-    BOOST_CHECK_EQUAL(PairingT::pair_reduced(G1_elements[A2], G2_elements[B2]),
-                      PairingT::pair_reduced(G1_elements[VKx], G2_elements[VKy]) *
-                          PairingT::pair_reduced(G1_elements[C2], G2_elements[VKz]));
-    BOOST_CHECK_EQUAL(PairingT::pair_reduced(G1_elements[A1], G2_elements[B1]) *
-                          PairingT::pair_reduced(G1_elements[A2], G2_elements[B2]),
+    BOOST_CHECK_EQUAL(pair_reduced<CurveType>(G1_elements[A1], G2_elements[B1]), GT_elements[pair_reduceding_A1_B1]);
+    BOOST_CHECK_EQUAL(pair_reduced<CurveType>(G1_elements[A1], G2_elements[B1]),
+                      pair_reduced<CurveType>(G1_elements[VKx], G2_elements[VKy]) *
+                          pair_reduced<CurveType>(G1_elements[C1], G2_elements[VKz]));
+    BOOST_CHECK_EQUAL(pair_reduced<CurveType>(G1_elements[A2], G2_elements[B2]), GT_elements[pair_reduceding_A2_B2]);
+    BOOST_CHECK_EQUAL(pair_reduced<CurveType>(G1_elements[A2], G2_elements[B2]),
+                      pair_reduced<CurveType>(G1_elements[VKx], G2_elements[VKy]) *
+                          pair_reduced<CurveType>(G1_elements[C2], G2_elements[VKz]));
+    BOOST_CHECK_EQUAL(pair_reduced<CurveType>(G1_elements[A1], G2_elements[B1]) *
+                          pair_reduced<CurveType>(G1_elements[A2], G2_elements[B2]),
                       GT_elements[pair_reduceding_A1_B1_mul_pair_reduceding_A2_B2]);
     std::cout << " * Reduced pairing tests finished." << std::endl << std::endl;
 
     // TODO: activate when scalar multiplication done
     std::cout << " * Reduced pairing tests with scalar multiplication started..." << std::endl;
-    BOOST_CHECK_EQUAL(PairingT::pair_reduced(G1_elements[A1], G2_elements[B1]) *
-                          PairingT::pair_reduced(G1_elements[A2], G2_elements[B2]),
-                      PairingT::pair_reduced(Fr_value_type(2) * G1_elements[VKx], G2_elements[VKy]) *
-                          PairingT::pair_reduced(G1_elements[C1] + G1_elements[C2], G2_elements[VKz]));
-    BOOST_CHECK_EQUAL(PairingT::pair_reduced(Fr_elements[VKx_poly] * G1_elements[A1], G2_elements[B1]),
+    BOOST_CHECK_EQUAL(pair_reduced<CurveType>(G1_elements[A1], G2_elements[B1]) *
+                          pair_reduced<CurveType>(G1_elements[A2], G2_elements[B2]),
+                      pair_reduced<CurveType>(Fr_value_type(2) * G1_elements[VKx], G2_elements[VKy]) *
+                          pair_reduced<CurveType>(G1_elements[C1] + G1_elements[C2], G2_elements[VKz]));
+    BOOST_CHECK_EQUAL(pair_reduced<CurveType>(Fr_elements[VKx_poly] * G1_elements[A1], G2_elements[B1]),
                       GT_elements[pair_reduceding_VKx_poly_A1_B1]);
-    BOOST_CHECK_EQUAL(PairingT::pair_reduced(Fr_elements[VKx_poly] * G1_elements[A1], G2_elements[B1]),
-                      PairingT::pair_reduced(G1_elements[A1], Fr_elements[VKx_poly] * G2_elements[B1]));
+    BOOST_CHECK_EQUAL(pair_reduced<CurveType>(Fr_elements[VKx_poly] * G1_elements[A1], G2_elements[B1]),
+                      pair_reduced<CurveType>(G1_elements[A1], Fr_elements[VKx_poly] * G2_elements[B1]));
     std::cout << " * Reduced pairing tests with scalar multiplication finished." << std::endl << std::endl;
 
     // TODO: activate when pow will be override with field element
     std::cout << " * Reduced pairing tests with pow started..." << std::endl;
     BOOST_CHECK_EQUAL(
-        PairingT::pair_reduced(Fr_elements[VKx_poly] * G1_elements[A1], G2_elements[B1]),
+        pair_reduced<CurveType>(Fr_elements[VKx_poly] * G1_elements[A1], G2_elements[B1]),
         // TODO: fix pow to accept field element as exponent
-        PairingT::pair_reduced(G1_elements[A1], G2_elements[B1]).pow(cpp_int(Fr_elements[VKx_poly].data)));
+        pair_reduced<CurveType>(G1_elements[A1], G2_elements[B1]).pow(cpp_int(Fr_elements[VKx_poly].data)));
     std::cout << " * Reduced pairing tests with pow finished." << std::endl << std::endl;
 
     std::cout << " * Miller loop tests started..." << std::endl;
-    BOOST_CHECK_EQUAL(PairingT::miller_loop(G1_prec_elements[prec_A1], G2_prec_elements[prec_B1]),
+    BOOST_CHECK_EQUAL(miller_loop<CurveType>(G1_prec_elements[prec_A1], G2_prec_elements[prec_B1]),
                       GT_elements[miller_loop_prec_A1_prec_B1]);
-    BOOST_CHECK_EQUAL(PairingT::miller_loop(G1_prec_elements[prec_A2], G2_prec_elements[prec_B2]),
+    BOOST_CHECK_EQUAL(miller_loop<CurveType>(G1_prec_elements[prec_A2], G2_prec_elements[prec_B2]),
                       GT_elements[miller_loop_prec_A2_prec_B2]);
-    BOOST_CHECK_EQUAL(PairingT::double_miller_loop(G1_prec_elements[prec_A1], G2_prec_elements[prec_B1],
+    BOOST_CHECK_EQUAL(double_miller_loop<CurveType>(G1_prec_elements[prec_A1], G2_prec_elements[prec_B1],
                                                    G1_prec_elements[prec_A2], G2_prec_elements[prec_B2]),
                       GT_elements[double_miller_loop_prec_A1_prec_B1_prec_A2_prec_B2]);
-    BOOST_CHECK_EQUAL(PairingT::miller_loop(G1_prec_elements[prec_A1], G2_prec_elements[prec_B1]) *
-                          PairingT::miller_loop(G1_prec_elements[prec_A2], G2_prec_elements[prec_B2]),
-                      PairingT::double_miller_loop(G1_prec_elements[prec_A1], G2_prec_elements[prec_B1],
+    BOOST_CHECK_EQUAL(miller_loop<CurveType>(G1_prec_elements[prec_A1], G2_prec_elements[prec_B1]) *
+                          miller_loop<CurveType>(G1_prec_elements[prec_A2], G2_prec_elements[prec_B2]),
+                      double_miller_loop<CurveType>(G1_prec_elements[prec_A1], G2_prec_elements[prec_B1],
                                                    G1_prec_elements[prec_A2], G2_prec_elements[prec_B2]));
     std::cout << " * Miller loop tests finished." << std::endl << std::endl;
 }
@@ -626,7 +632,7 @@ struct field_element_init<fields::detail::element_fp12_2over3over2<FieldParams>>
 template<typename CurveGroupValue, typename PointData>
 CurveGroupValue curve_point_init(const PointData &point_data) {
     using group_value_type = CurveGroupValue;
-    using field_value_type = typename group_value_type::underlying_field_value_type;
+    using field_value_type = typename group_value_type::field_type::value_type;
 
     std::array<field_value_type, 3> coordinates;
     auto i = 0;
@@ -646,30 +652,30 @@ void pairing_test_Fr_init(std::vector<typename fields::detail::element_fp<FieldP
     }
 }
 
-template<typename PairingT, typename TestSet>
-void pairing_test_G1_init(std::vector<typename PairingT::g1_type::value_type> &elements, const TestSet &test_set) {
-    using pairing_policy = PairingT;
-    using value_type = typename pairing_policy::g1_type::value_type;
+template<typename CurveType, typename TestSet>
+void pairing_test_G1_init(std::vector<typename CurveType::g1_type<>::value_type> &elements, const TestSet &test_set) {
+    
+    using value_type = typename CurveType::g1_type<>::value_type;
 
     for (auto &elem_coords : test_set.second.get_child("G1")) {
         elements.emplace_back(curve_point_init<value_type>(elem_coords));
     }
 }
 
-template<typename PairingT, typename TestSet>
-void pairing_test_G2_init(std::vector<typename PairingT::g2_type::value_type> &elements, const TestSet &test_set) {
-    using pairing_policy = PairingT;
-    using value_type = typename pairing_policy::g2_type::value_type;
+template<typename CurveType, typename TestSet>
+void pairing_test_G2_init(std::vector<typename CurveType::g2_type<>::value_type> &elements, const TestSet &test_set) {
+    
+    using value_type = typename CurveType::g2_type<>::value_type;
 
     for (auto &elem_coords : test_set.second.get_child("G2")) {
         elements.emplace_back(curve_point_init<value_type>(elem_coords));
     }
 }
 
-template<typename PairingT, typename TestSet>
-void pairing_test_GT_init(std::vector<typename PairingT::gt_type::value_type> &elements, const TestSet &test_set) {
-    using pairing_policy = PairingT;
-    using value_type = typename pairing_policy::gt_type::value_type;
+template<typename CurveType, typename TestSet>
+void pairing_test_GT_init(std::vector<typename CurveType::gt_type::value_type> &elements, const TestSet &test_set) {
+    
+    using value_type = typename CurveType::gt_type::value_type;
 
     for (auto &elem_GT : test_set.second.get_child("GT")) {
         elements.emplace_back(field_element_init<value_type>::process(elem_GT));
@@ -677,67 +683,78 @@ void pairing_test_GT_init(std::vector<typename PairingT::gt_type::value_type> &e
 }
 
 template<typename TestSet>
-void pairing_test_g1_precomp_init(std::vector<typename curves::bls12<381>::pairing::g1_precomp> &elements,
+void pairing_test_g1_precomp_init(std::vector<typename pairing::pairing_policy<curves::bls12<381>>::g1_precomputed_type> &elements,
                                   const TestSet &test_set) {
-    using pairing_policy = typename curves::bls12<381>::pairing;
-    using value_type = typename pairing_policy::g1_precomp;
-    using element_type = value_type::value_type;
+    using curve_type = curves::bls12<381>;
+    using pairing_policy = typename pairing::pairing_policy<curve_type>;
+    using value_type = typename pairing_policy::g1_precomputed_type;
+    
+    using g1_field_value_type = typename curve_type::base_field_type::value_type;
+    using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
 
-    for (auto &elem : test_set.second.get_child("g1_precomp")) {
+    for (auto &elem : test_set.second.get_child("g1_precomputed_type")) {
         elements.emplace_back(
-            value_type {field_element_init<element_type>::process(elem.second.get_child("PX").front()),
-                        field_element_init<element_type>::process(elem.second.get_child("PY").front())});
+            value_type {field_element_init<g1_field_value_type>::process(elem.second.get_child("PX").front()),
+                        field_element_init<g1_field_value_type>::process(elem.second.get_child("PY").front())});
     }
 }
 
 template<typename TestSet>
-void pairing_test_g1_precomp_init(std::vector<typename curves::mnt4<298>::pairing::g1_precomp> &elements,
+void pairing_test_g1_precomp_init(std::vector<typename pairing::pairing_policy<curves::mnt4<298>>::g1_precomputed_type> &elements,
                                   const TestSet &test_set) {
-    using pairing_policy = typename curves::mnt4<298>::pairing;
-    using value_type = typename pairing_policy::g1_precomp;
-    using element_type = value_type::value_type;
-    using twist_element_type = value_type::twist_value_type;
+    using curve_type = curves::mnt4<298>;
+    using pairing_policy = typename pairing::pairing_policy<curve_type>;
+    using value_type = typename pairing_policy::g1_precomputed_type;
 
-    for (auto &elem : test_set.second.get_child("g1_precomp")) {
+    using g1_field_value_type = typename curve_type::base_field_type::value_type;
+    using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
+
+    for (auto &elem : test_set.second.get_child("g1_precomputed_type")) {
         elements.emplace_back(
-            value_type {field_element_init<element_type>::process(elem.second.get_child("PX").front()),
-                        field_element_init<element_type>::process(elem.second.get_child("PY").front()),
-                        field_element_init<twist_element_type>::process(elem.second.get_child("PX_twist").front()),
-                        field_element_init<twist_element_type>::process(elem.second.get_child("PY_twist").front())});
+            value_type {field_element_init<g1_field_value_type>::process(elem.second.get_child("PX").front()),
+                        field_element_init<g1_field_value_type>::process(elem.second.get_child("PY").front()),
+                        field_element_init<g2_field_value_type>::process(elem.second.get_child("PX_twist").front()),
+                        field_element_init<g2_field_value_type>::process(elem.second.get_child("PY_twist").front())});
     }
 }
 
 template<typename TestSet>
-void pairing_test_g1_precomp_init(std::vector<typename curves::mnt6<298>::pairing::g1_precomp> &elements,
+void pairing_test_g1_precomp_init(std::vector<typename pairing::pairing_policy<curves::mnt6<298>>::g1_precomputed_type> &elements,
                                   const TestSet &test_set) {
-    using pairing_policy = typename curves::mnt6<298>::pairing;
-    using value_type = typename pairing_policy::g1_precomp;
-    using element_type = value_type::value_type;
-    using twist_element_type = value_type::twist_value_type;
+    using curve_type = curves::mnt6<298>;
+    using pairing_policy = typename pairing::pairing_policy<curve_type>;
+    using value_type = typename pairing_policy::g1_precomputed_type;
 
-    for (auto &elem : test_set.second.get_child("g1_precomp")) {
+    using g1_field_value_type = typename curve_type::base_field_type::value_type;
+    using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
+
+    for (auto &elem : test_set.second.get_child("g1_precomputed_type")) {
         elements.emplace_back(
-            value_type {field_element_init<element_type>::process(elem.second.get_child("PX").front()),
-                        field_element_init<element_type>::process(elem.second.get_child("PY").front()),
-                        field_element_init<twist_element_type>::process(elem.second.get_child("PX_twist").front()),
-                        field_element_init<twist_element_type>::process(elem.second.get_child("PY_twist").front())});
+            value_type {field_element_init<g1_field_value_type>::process(elem.second.get_child("PX").front()),
+                        field_element_init<g1_field_value_type>::process(elem.second.get_child("PY").front()),
+                        field_element_init<g2_field_value_type>::process(elem.second.get_child("PX_twist").front()),
+                        field_element_init<g2_field_value_type>::process(elem.second.get_child("PY_twist").front())});
     }
 }
 
 template<typename TestSet>
-void pairing_test_g2_precomp_init(std::vector<typename curves::bls12<381>::pairing::g2_precomp> &elements,
+void pairing_test_g2_precomp_init(std::vector<typename pairing::pairing_policy<curves::bls12<381>>::g2_precomputed_type> &elements,
                                   const TestSet &test_set) {
-    using pairing_policy = typename curves::bls12<381>::pairing;
-    using value_type = typename pairing_policy::g2_precomp;
-    using element_type = value_type::value_type;
+    using curve_type = curves::bls12<381>;
+    using pairing_policy = typename pairing::pairing_policy<curve_type>;
+    using value_type = typename pairing_policy::g2_precomputed_type;
+    
+    using g1_field_value_type = typename curve_type::base_field_type::value_type;
+    using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
+
     using coeffs_type = value_type::coeffs_type;
-    using coeffs_value_type = coeffs_type::value_type;
+    using coeffs_value_type = g2_field_value_type;
 
-    for (auto &elem : test_set.second.get_child("g2_precomp")) {
+    for (auto &elem : test_set.second.get_child("g2_precomputed_type")) {
         elements.emplace_back(value_type());
 
-        elements.back().QX = field_element_init<element_type>::process(elem.second.get_child("QX").front());
-        elements.back().QY = field_element_init<element_type>::process(elem.second.get_child("QY").front());
+        elements.back().QX = field_element_init<g2_field_value_type>::process(elem.second.get_child("QX").front());
+        elements.back().QY = field_element_init<g2_field_value_type>::process(elem.second.get_child("QY").front());
 
         for (auto &elem_coeffs : elem.second.get_child("coeffs")) {
             elements.back().coeffs.emplace_back(coeffs_type());
@@ -753,26 +770,30 @@ void pairing_test_g2_precomp_init(std::vector<typename curves::bls12<381>::pairi
 }
 
 template<typename TestSet>
-void pairing_test_g2_precomp_init(std::vector<typename curves::mnt4<298>::pairing::g2_precomp> &elements,
+void pairing_test_g2_precomp_init(std::vector<typename pairing::pairing_policy<curves::mnt4<298>>::g2_precomputed_type> &elements,
                                   const TestSet &test_set) {
-    using pairing_policy = typename curves::mnt4<298>::pairing;
-    using value_type = typename pairing_policy::g2_precomp;
-    using element_type = typename value_type::value_type;
+    using curve_type = curves::mnt4<298>;
+    using pairing_policy = typename pairing::pairing_policy<curve_type>;
+    using value_type = typename pairing_policy::g2_precomputed_type;
+
+    using g1_field_value_type = typename curve_type::base_field_type::value_type;
+    using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
+
     using dbl_coeffs_type = typename value_type::dbl_coeffs_type;
     using add_coeffs_type = typename value_type::add_coeffs_type;
-    using dbl_coeffs_value_type = typename dbl_coeffs_type::value_type;
-    using add_coeffs_value_type = typename add_coeffs_type::value_type;
+    using dbl_coeffs_value_type = g2_field_value_type;
+    using add_coeffs_value_type = g2_field_value_type;
 
-    for (auto &elem : test_set.second.get_child("g2_precomp")) {
+    for (auto &elem : test_set.second.get_child("g2_precomputed_type")) {
         elements.emplace_back(value_type());
 
-        elements.back().QX = field_element_init<element_type>::process(elem.second.get_child("QX").front());
-        elements.back().QY = field_element_init<element_type>::process(elem.second.get_child("QY").front());
-        elements.back().QY2 = field_element_init<element_type>::process(elem.second.get_child("QY2").front());
+        elements.back().QX = field_element_init<g2_field_value_type>::process(elem.second.get_child("QX").front());
+        elements.back().QY = field_element_init<g2_field_value_type>::process(elem.second.get_child("QY").front());
+        elements.back().QY2 = field_element_init<g2_field_value_type>::process(elem.second.get_child("QY2").front());
         elements.back().QX_over_twist =
-            field_element_init<element_type>::process(elem.second.get_child("QX_over_twist").front());
+            field_element_init<g2_field_value_type>::process(elem.second.get_child("QX_over_twist").front());
         elements.back().QY_over_twist =
-            field_element_init<element_type>::process(elem.second.get_child("QY_over_twist").front());
+            field_element_init<g2_field_value_type>::process(elem.second.get_child("QY_over_twist").front());
 
         for (auto &elem_coeffs : elem.second.get_child("dbl_coeffs")) {
             elements.back().dbl_coeffs.emplace_back(dbl_coeffs_type());
@@ -799,26 +820,30 @@ void pairing_test_g2_precomp_init(std::vector<typename curves::mnt4<298>::pairin
 }
 
 template<typename TestSet>
-void pairing_test_g2_precomp_init(std::vector<typename curves::mnt6<298>::pairing::g2_precomp> &elements,
+void pairing_test_g2_precomp_init(std::vector<typename pairing::pairing_policy<curves::mnt6<298>>::g2_precomputed_type> &elements,
                                   const TestSet &test_set) {
-    using pairing_policy = typename curves::mnt6<298>::pairing;
-    using value_type = typename pairing_policy::g2_precomp;
-    using element_type = typename value_type::value_type;
+    using curve_type = curves::mnt6<298>;
+    using pairing_policy = typename pairing::pairing_policy<curve_type>;
+    using value_type = typename pairing_policy::g2_precomputed_type;
+    
+    using g1_field_value_type = typename curve_type::base_field_type::value_type;
+    using g2_field_value_type = typename curve_type::g2_type<>::field_type::value_type;
+
     using dbl_coeffs_type = typename value_type::dbl_coeffs_type;
     using add_coeffs_type = typename value_type::add_coeffs_type;
-    using dbl_coeffs_value_type = typename dbl_coeffs_type::value_type;
-    using add_coeffs_value_type = typename add_coeffs_type::value_type;
+    using dbl_coeffs_value_type = g2_field_value_type;
+    using add_coeffs_value_type = g2_field_value_type;
 
-    for (auto &elem : test_set.second.get_child("g2_precomp")) {
+    for (auto &elem : test_set.second.get_child("g2_precomputed_type")) {
         elements.emplace_back(value_type());
 
-        elements.back().QX = field_element_init<element_type>::process(elem.second.get_child("QX").front());
-        elements.back().QY = field_element_init<element_type>::process(elem.second.get_child("QY").front());
-        elements.back().QY2 = field_element_init<element_type>::process(elem.second.get_child("QY2").front());
+        elements.back().QX = field_element_init<g2_field_value_type>::process(elem.second.get_child("QX").front());
+        elements.back().QY = field_element_init<g2_field_value_type>::process(elem.second.get_child("QY").front());
+        elements.back().QY2 = field_element_init<g2_field_value_type>::process(elem.second.get_child("QY2").front());
         elements.back().QX_over_twist =
-            field_element_init<element_type>::process(elem.second.get_child("QX_over_twist").front());
+            field_element_init<g2_field_value_type>::process(elem.second.get_child("QX_over_twist").front());
         elements.back().QY_over_twist =
-            field_element_init<element_type>::process(elem.second.get_child("QY_over_twist").front());
+            field_element_init<g2_field_value_type>::process(elem.second.get_child("QY_over_twist").front());
 
         for (auto &elem_coeffs : elem.second.get_child("dbl_coeffs")) {
             elements.back().dbl_coeffs.emplace_back(dbl_coeffs_type());
@@ -861,18 +886,18 @@ void pairing_test_init(std::vector<Fr_value_type> &Fr_elements,
     pairing_test_g2_precomp_init(G2_prec_elements, test_set);
 }
 
-template<typename PairingT, typename TestSet>
+template<typename CurveType, typename TestSet>
 void pairing_operation_test(const TestSet &test_set) {
-    std::vector<typename PairingT::fp_type::value_type> Fr_elements;
-    std::vector<typename PairingT::g1_type::value_type> G1_elements;
-    std::vector<typename PairingT::g2_type::value_type> G2_elements;
-    std::vector<typename PairingT::gt_type::value_type> GT_elements;
-    std::vector<typename PairingT::g1_precomp> G1_prec_elements;
-    std::vector<typename PairingT::g2_precomp> G2_prec_elements;
+    std::vector<typename CurveType::scalar_field_type::value_type> Fr_elements;
+    std::vector<typename CurveType::g1_type<>::value_type> G1_elements;
+    std::vector<typename CurveType::g2_type<>::value_type> G2_elements;
+    std::vector<typename CurveType::gt_type::value_type> GT_elements;
+    std::vector<typename pairing::pairing_policy<CurveType>::g1_precomputed_type> G1_prec_elements;
+    std::vector<typename pairing::pairing_policy<CurveType>::g2_precomputed_type> G2_prec_elements;
 
-    pairing_test_init<PairingT>(Fr_elements, G1_elements, G2_elements, GT_elements, G1_prec_elements, G2_prec_elements,
+    pairing_test_init<CurveType>(Fr_elements, G1_elements, G2_elements, GT_elements, G1_prec_elements, G2_prec_elements,
                                 test_set);
-    check_pairing_operations<PairingT>(Fr_elements, G1_elements, G2_elements, GT_elements, G1_prec_elements,
+    check_pairing_operations<CurveType>(Fr_elements, G1_elements, G2_elements, GT_elements, G1_prec_elements,
                                        G2_prec_elements);
 }
 
@@ -880,21 +905,21 @@ BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 
 // TODO: fix pair_reduceding
 BOOST_DATA_TEST_CASE(pairing_operation_test_bls12_381, string_data("pairing_operation_test_bls12_381"), data_set) {
-    using pairing_policy = typename curves::bls12<381>::pairing;
+    using curve_type = typename curves::bls12<381>;
 
-    pairing_operation_test<pairing_policy>(data_set);
+    pairing_operation_test<curve_type>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(pairing_operation_test_mnt4_298, string_data("pairing_operation_test_mnt4_298"), data_set) {
-    using pairing_policy = typename curves::mnt4<298>::pairing;
+    using curve_type = typename curves::mnt4<298>;
 
-    pairing_operation_test<pairing_policy>(data_set);
+    pairing_operation_test<curve_type>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(pairing_operation_test_mnt6_298, string_data("pairing_operation_test_mnt6_298"), data_set) {
-    using pairing_policy = typename curves::mnt6<298>::pairing;
+    using curve_type = typename curves::mnt6<298>;
 
-    pairing_operation_test<pairing_policy>(data_set);
+    pairing_operation_test<curve_type>(data_set);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

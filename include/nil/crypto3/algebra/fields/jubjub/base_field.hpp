@@ -44,14 +44,11 @@ namespace nil {
                  * @brief IETF IPsec groups
                  * @tparam Version
                  */
-                template<std::size_t Version = 255>
                 using jubjub_base_field = bls12_scalar_field<381>;
 
-                template<std::size_t Version = 255>
-                using jubjub_fq = jubjub_base_field<Version>;
+                using jubjub_fq = jubjub_base_field;
 
-                template<std::size_t Version = 255>
-                using jubjub = jubjub_base_field<Version>;
+                using jubjub = jubjub_base_field;
 
             }    // namespace fields
         }        // namespace algebra

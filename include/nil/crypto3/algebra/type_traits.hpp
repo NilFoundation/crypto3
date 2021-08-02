@@ -44,7 +44,7 @@ namespace nil {
 
             BOOST_TTI_HAS_TYPE(extension_policy)
             BOOST_TTI_HAS_TYPE(curve_type)
-            BOOST_TTI_HAS_TYPE(underlying_field_type)
+            BOOST_TTI_HAS_TYPE(field_type)
             BOOST_TTI_HAS_TYPE(value_type)
             BOOST_TTI_HAS_TYPE(modulus_type)
             BOOST_TTI_HAS_TYPE(base_field_type)
@@ -70,19 +70,16 @@ namespace nil {
 
             template<typename T>
             struct is_curve {
-                static const bool value = has_type_base_field_type<T>::value && has_type_number_type<T>::value &&
-                                          has_type_scalar_field_type<T>::value && has_type_g1_type<T>::value &&
-                                          has_type_g2_type<T>::value && has_type_gt_type<T>::value &&
-                                          has_type_number_type<T>::value &&
-                                          has_static_member_data_p<T, const typename T::number_type>::value &&
-                                          has_static_member_data_q<T, const typename T::number_type>::value;
+                static const bool value = has_type_base_field_type<T>::value && has_type_scalar_field_type<T>::value && 
+                                          has_type_g1_type<T>::value && has_type_g2_type<T>::value && 
+                                          has_type_gt_type<T>::value;
                 typedef T type;
             };
 
             // TODO: we should add some other params to curve group policy to identify it more clearly
             template<typename T>
             struct is_curve_group {
-                static const bool value = has_type_value_type<T>::value && has_type_underlying_field_type<T>::value &&
+                static const bool value = has_type_value_type<T>::value && has_type_field_type<T>::value &&
                                           has_static_member_data_value_bits<T, const std::size_t>::value &&
                                           has_type_curve_type<T>::value;
                 typedef T type;

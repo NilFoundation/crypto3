@@ -27,12 +27,12 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_MNT4_HPP
 #define CRYPTO3_ALGEBRA_CURVES_MNT4_HPP
 
-#include <nil/crypto3/algebra/curves/detail/mnt4/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/mnt4/types.hpp>
 #include <nil/crypto3/algebra/curves/detail/mnt4/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/mnt4/g2.hpp>
 
-#include <nil/crypto3/algebra/pairing/mnt4.hpp>
-#include <nil/crypto3/algebra/pairing/detail/mnt4/functions.hpp>
+// #include <nil/crypto3/algebra/pairing/mnt4.hpp>
+// #include <nil/crypto3/algebra/pairing/detail/mnt4/functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -45,43 +45,34 @@ namespace nil {
                 template<std::size_t Version>
                 class mnt4 {
 
-                    using policy_type = detail::mnt4_basic_policy<Version>;
+                    using types_policy = detail::mnt4_types<Version>;
 
                 public:
-                    typedef typename policy_type::base_field_type base_field_type;
-                    typedef typename policy_type::scalar_field_type scalar_field_type;
-                    typedef typename policy_type::number_type number_type;
-                    typedef typename policy_type::extended_number_type extended_number_type;
+                    typedef typename types_policy::base_field_type base_field_type;
+                    typedef typename types_policy::scalar_field_type scalar_field_type;
 
-                    constexpr static const number_type p = policy_type::p;    ///< base field characteristic
+                    template <typename Coordinates = coordinates::projective, 
+                              typename Form = forms::short_weierstrass>
+                    using g1_type = typename detail::mnt4_g1<Version, 
+                        Form, Coordinates>;
 
-                    constexpr static const number_type q =
-                        policy_type::q;    ///< scalar field characteristic (order of the group of points)
+                    template <typename Coordinates = coordinates::projective, 
+                              typename Form = forms::short_weierstrass>
+                    using g2_type = typename detail::mnt4_g2<Version, 
+                        Form, Coordinates>;
 
-                    typedef typename detail::mnt4_g1<Version> g1_type;
-                    typedef typename detail::mnt4_g2<Version> g2_type;
+                    // typedef typename pairing::pairing_policy<mnt4<Version>,
+                    //                                          pairing::detail::mnt4_pairing_functions<Version>>
+                    //     pairing;
 
-                    typedef typename pairing::pairing_policy<mnt4<Version>,
-                                                             pairing::detail::mnt4_pairing_functions<Version>>
-                        pairing;
+                    // typedef typename pairing::pair_curve_type chained_on_curve_type;
 
-                    typedef typename pairing::pair_curve_type chained_on_curve_type;
-
-                    typedef typename policy_type::gt_field_type gt_type;
+                    typedef typename types_policy::gt_field_type gt_type;
 
                     constexpr static const bool has_affine_pairing = true;
-
-                    constexpr static const number_type a = policy_type::a;
-                    constexpr static const number_type b = policy_type::b;
                 };
 
                 typedef mnt4<298> mnt4_298;
-
-                template<std::size_t Version>
-                constexpr typename mnt4<Version>::number_type const mnt4<Version>::a;
-                template<std::size_t Version>
-                constexpr typename mnt4<Version>::number_type const mnt4<Version>::b;
-
             }    // namespace curves
         }        // namespace algebra
     }            // namespace crypto3

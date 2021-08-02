@@ -24,14 +24,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_HPP
-#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP
+#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards/edwards183/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/edwards183/element_g1.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/jubjub/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/babyjubjub/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/babyjubjub/element_g1.hpp>
+// #include <nil/crypto3/algebra/curves/detail/edwards/183/edwards_params.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/183/twisted_edwards_params.hpp>
+// #include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/element_g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/inverted/element_g1.hpp>
+
+#include <nil/crypto3/algebra/curves/forms.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -41,70 +42,30 @@ namespace nil {
                 template<std::size_t Version>
                 struct edwards;
 
-                struct jubjub;
-
-                struct babyjubjub;
-
                 namespace detail {
                     /** @brief A struct representing a group G1 of Edwards curve.
                      *    @tparam Version version of the curve
                      *
                      */
-                    template<std::size_t Version>
-                    struct edwards_g1;
+                    template<std::size_t Version, 
+                             typename Form, 
+                             typename Coordinates>
+                    struct edwards_g1 {
 
-                    template<>
-                    struct edwards_g1<183> {
-                        constexpr static const std::size_t version = 183;
+                        using params_type = edwards_g1_params<Version, Form>;
 
-                        using policy_type = edwards_basic_policy<version>;
+                        using curve_type = edwards<Version>;
 
-                        using curve_type = edwards<version>;
-
-                        using underlying_field_type = typename policy_type::g1_field_type;
+                        using field_type = typename params_type::field_type;
 
                         constexpr static const std::size_t value_bits =
-                            underlying_field_type::value_bits + 1;    ///< size of the base field in bits
+                            field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = element_edwards_g1<version>;
-                    };
-
-                    // JubJub
-                    template<>
-                    struct edwards_g1<255> {
-                        constexpr static const std::size_t version = 255;
-
-                        using policy_type = edwards_basic_policy<version>;
-
-                        using curve_type = jubjub;
-
-                        using underlying_field_type = typename policy_type::g1_field_type;
-
-                        constexpr static const std::size_t value_bits =
-                            underlying_field_type::value_bits + 1;    ///< size of the base field in bits
-
-                        using value_type = element_twisted_edwards_g1<version>;
-                    };
-
-                    // BabyJubJub
-                    template<>
-                    struct edwards_g1<254> {
-                        constexpr static const std::size_t version = 254;
-
-                        using policy_type = edwards_basic_policy<version>;
-
-                        using curve_type = babyjubjub;
-
-                        using underlying_field_type = typename policy_type::g1_field_type;
-
-                        constexpr static const std::size_t value_bits =
-                            underlying_field_type::value_bits + 1;    ///< size of the base field in bits
-
-                        using value_type = element_twisted_edwards_g1<version>;
+                        using value_type = curve_element<params_type, Form, Coordinates>;
                     };
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_183_G1_HPP

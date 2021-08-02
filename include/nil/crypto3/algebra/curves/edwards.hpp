@@ -27,14 +27,16 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_HPP
 #define CRYPTO3_ALGEBRA_CURVES_EDWARDS_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards/edwards183/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/jubjub/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/babyjubjub/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/types.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/g2.hpp>
 
-#include <nil/crypto3/algebra/pairing/edwards.hpp>
-#include <nil/crypto3/algebra/pairing/detail/edwards/functions.hpp>
+// #include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
+
+// #include <nil/crypto3/algebra/pairing/edwards.hpp>
+// #include <nil/crypto3/algebra/pairing/detail/edwards/functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -46,28 +48,29 @@ namespace nil {
                  *
                  */
                 template<std::size_t Version>
-                struct edwards {
+                class edwards {
 
-                    using policy_type = detail::edwards_basic_policy<Version>;
+                    using types_policy = detail::edwards_types<Version>;
+                public:
+                    
+                    typedef typename types_policy::base_field_type base_field_type;
+                    typedef typename types_policy::scalar_field_type scalar_field_type;
 
-                    typedef typename policy_type::base_field_type base_field_type;
-                    typedef typename policy_type::scalar_field_type scalar_field_type;
-                    typedef typename policy_type::number_type number_type;
-                    typedef typename policy_type::extended_number_type extended_number_type;
+                    template <typename Coordinates = coordinates::inverted, 
+                              typename Form = forms::twisted_edwards>
+                    using g1_type = typename detail::edwards_g1<Version, 
+                        Form, Coordinates>;
 
-                    constexpr static const number_type p = policy_type::p;    ///< base field characteristic
+                    template <typename Coordinates = coordinates::inverted, 
+                              typename Form = forms::twisted_edwards>
+                    using g2_type = typename detail::edwards_g2<Version, 
+                        Form, Coordinates>;
 
-                    constexpr static const number_type q =
-                        policy_type::q;    ///< scalar field characteristic (order of the group of points)
+                    // typedef typename pairing::pairing_policy<edwards<Version>,
+                    //                                          pairing::detail::edwards_pairing_functions<Version>>
+                    //     pairing;
 
-                    typedef typename detail::edwards_g1<Version> g1_type;
-                    typedef typename detail::edwards_g2<Version> g2_type;
-
-                    typedef typename pairing::pairing_policy<edwards<Version>,
-                                                             pairing::detail::edwards_pairing_functions<Version>>
-                        pairing;
-
-                    typedef typename policy_type::gt_field_type gt_type;
+                    typedef typename types_policy::gt_field_type gt_type;
 
                     constexpr static const bool has_affine_pairing = false;
                 };

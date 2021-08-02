@@ -39,14 +39,9 @@ namespace nil {
             namespace fields {
 
                 /*!
-                 * @brief IETF IPsec groups
-                 * @tparam Version
+                 * @brief BabyJubJub curve scalar field
                  */
-                template<std::size_t Version>
-                struct babyjubjub_scalar_field;
-
-                template<>
-                struct babyjubjub_scalar_field<254> : public field<251> {
+                struct babyjubjub_scalar_field : public field<251> {
                     typedef field<251> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -60,22 +55,21 @@ namespace nil {
                     constexpr static const modulus_type modulus =
                         0x60c89ce5c263405370a08b6d0302b0bab3eedb83920ee0a677297dc392126f1_cppui251;
 
-                    typedef typename detail::element_fp<params<babyjubjub_scalar_field<254>>> value_type;
+                    typedef typename detail::element_fp<params<babyjubjub_scalar_field>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename std::size_t const babyjubjub_scalar_field<254>::modulus_bits;
+                constexpr typename std::size_t const babyjubjub_scalar_field::modulus_bits;
 
-                constexpr typename std::size_t const babyjubjub_scalar_field<254>::number_bits;
+                constexpr typename std::size_t const babyjubjub_scalar_field::number_bits;
 
-                constexpr typename std::size_t const babyjubjub_scalar_field<254>::value_bits;
+                constexpr typename std::size_t const babyjubjub_scalar_field::value_bits;
 
-                constexpr typename babyjubjub_scalar_field<254>::modulus_type const babyjubjub_scalar_field<254>::modulus;
+                constexpr typename babyjubjub_scalar_field::modulus_type const babyjubjub_scalar_field::modulus;
 
-                template<std::size_t Version = 254>
-                using babyjubjub_fr = babyjubjub_scalar_field<Version>;
+                using babyjubjub_fr = babyjubjub_scalar_field;
 
             }    // namespace fields
         }        // namespace algebra

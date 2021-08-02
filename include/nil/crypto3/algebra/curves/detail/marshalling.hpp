@@ -47,11 +47,14 @@ namespace nil {
         struct curve_element_serializer<algebra::curves::bls12_381> {
             typedef algebra::curves::bls12_381 curve_type;
 
-            typedef typename curve_type::g1_type::value_type g1_value_type;
-            typedef typename curve_type::g2_type::value_type g2_value_type;
+            typedef typename curve_type::g1_type<>::value_type g1_value_type;
+            typedef typename curve_type::g2_type<>::value_type g2_value_type;
 
-            typedef typename g1_value_type::underlying_field_value_type g1_field_value_type;
-            typedef typename g2_value_type::underlying_field_value_type g2_field_value_type;
+            typedef typename curve_type::g1_type<algebra::curves::coordinates::affine>::value_type g1_affine_value_type;
+            typedef typename curve_type::g2_type<algebra::curves::coordinates::affine>::value_type g2_affine_value_type;
+
+            typedef typename g1_value_type::field_type::value_type g1_field_value_type;
+            typedef typename g2_value_type::field_type::value_type g2_field_value_type;
 
             typedef typename g1_field_value_type::modulus_type modulus_type;
 
@@ -65,7 +68,7 @@ namespace nil {
             // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-09#appendix-C.1
             static inline compressed_g1_octets point_to_octets_compress(const g1_value_type &point) {
                 compressed_g1_octets result = {0};
-                g1_value_type point_affine = point.to_affine();
+                g1_affine_value_type point_affine = point.to_affine();
                 auto m_byte = evaluate_m_byte(point_affine, true);
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
@@ -78,7 +81,7 @@ namespace nil {
 
             static inline uncompressed_g1_octets point_to_octets(const g1_value_type &point) {
                 uncompressed_g1_octets result = {0};
-                g1_value_type point_affine = point.to_affine();
+                g1_affine_value_type point_affine = point.to_affine();
                 auto m_byte = evaluate_m_byte(point_affine, false);
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
@@ -95,7 +98,7 @@ namespace nil {
 
             static inline compressed_g2_octets point_to_octets_compress(const g2_value_type &point) {
                 compressed_g2_octets result = {0};
-                g2_value_type point_affine = point.to_affine();
+                g2_affine_value_type point_affine = point.to_affine();
                 auto m_byte = evaluate_m_byte(point_affine, true);
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
@@ -112,7 +115,7 @@ namespace nil {
 
             static inline uncompressed_g2_octets point_to_octets(const g2_value_type &point) {
                 uncompressed_g2_octets result = {0};
-                g2_value_type point_affine = point.to_affine();
+                g2_affine_value_type point_affine = point.to_affine();
                 auto m_byte = evaluate_m_byte(point_affine, false);
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
@@ -321,7 +324,7 @@ namespace nil {
                     result |= C_bit;
                 }
                 // TODO: check condition of infinite point
-                if (point.Z.is_zero()) {
+                if (point.is_zero()) {
                     result |= I_bit;
                 } else if (compression && sign_gf_p(point.Y)) {
                     result |= S_bit;

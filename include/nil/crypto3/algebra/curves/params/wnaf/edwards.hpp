@@ -41,13 +41,13 @@ namespace nil {
                 /************************* EDWARDS-183 ***********************************/
 
                 template<>
-                struct wnaf_params<typename edwards<183>::g1_type> {
+                struct wnaf_params<typename edwards<183>::g1_type<>> {
 
                     constexpr static const std::array<std::size_t, 4> wnaf_window_table = {9, 14, 24, 117};
                 };
 
                 template<>
-                struct wnaf_params<typename edwards<183>::g2_type> {
+                struct wnaf_params<typename edwards<183>::g2_type<>> {
 
                     constexpr static const std::array<std::size_t, 4> wnaf_window_table = {6, 12, 42, 97};
                 };
@@ -55,9 +55,9 @@ namespace nil {
                 /************************* EDWARDS-183 definitions ***********************************/
 
                 constexpr std::array<std::size_t, 4> const
-                    wnaf_params<typename edwards<183>::g1_type>::wnaf_window_table;
+                    wnaf_params<typename edwards<183>::g1_type<>>::wnaf_window_table;
                 constexpr std::array<std::size_t, 4> const
-                    wnaf_params<typename edwards<183>::g2_type>::wnaf_window_table;
+                    wnaf_params<typename edwards<183>::g2_type<>>::wnaf_window_table;
 
             }    // namespace curves
         }        // namespace algebra

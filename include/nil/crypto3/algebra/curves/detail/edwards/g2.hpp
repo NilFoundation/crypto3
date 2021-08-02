@@ -27,9 +27,8 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_G2_HPP
 #define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G2_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards/edwards183/basic_policy.hpp>
-
-#include <nil/crypto3/algebra/curves/detail/edwards/edwards183/element_g2.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/element_g2.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -44,17 +43,19 @@ namespace nil {
                      *    @tparam Version version of the curve
                      *
                      */
-                    template<std::size_t Version>
+                    template<std::size_t Version, 
+                             typename Form, 
+                             typename Coordinates>
                     struct edwards_g2 {
 
-                        using policy_type = edwards_basic_policy<Version>;
+                        using params_type = edwards_basic_policy<Version>;
 
                         using curve_type = edwards<Version>;
 
-                        using underlying_field_type = typename policy_type::g2_field_type;
+                        using field_type = typename params_type::g2_field_type;
 
                         constexpr static const std::size_t value_bits =
-                            underlying_field_type::value_bits + 1;    ///< size of the base field in bits
+                            field_type::value_bits + 1;    ///< size of the base field in bits
 
                         using value_type = element_edwards_g2<Version>;
                     };

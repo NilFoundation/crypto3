@@ -135,6 +135,10 @@ namespace nil {
                     constexpr std::array<typename fp3_extension_params<edwards_base_field<Version>>::modulus_type,
                                          3> const
                         fp3_extension_params<edwards_base_field<Version>>::Frobenius_coeffs_c1;
+                    template<std::size_t Version>
+                    constexpr std::array<typename fp3_extension_params<edwards_base_field<Version>>::modulus_type,
+                                         3> const
+                        fp3_extension_params<edwards_base_field<Version>>::Frobenius_coeffs_c2;
 
                 }    // namespace detail
             }        // namespace fields

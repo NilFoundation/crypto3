@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_bls12_381_g1) {
     static_assert(p1.doubled() == p_dbl, "double error");
     static_assert(p1.mixed_add(p2) == p_mixed_add, "mixed add error");
     static_assert(p1.to_affine() == p_to_affine, "to affine error");
-    static_assert(p2.to_projective() == p_to_projective, "to special error");
+    static_assert(p2.to_projective() == p_to_projective, "to projective error");
 }
 
 BOOST_AUTO_TEST_CASE(curve_operation_test_bls12_381_g2) {
@@ -398,7 +398,7 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_bls12_381_g2) {
     static_assert(p1.doubled() == p_dbl, "double error");
     static_assert(p1.mixed_add(p2) == p_mixed_add, "mixed add error");
     static_assert(p1.to_affine() == p_to_affine, "to affine error");
-    static_assert(p2.to_projective() == p_to_projective, "to special error");
+    static_assert(p2.to_projective() == p_to_projective, "to projective error");
 }
 
 BOOST_AUTO_TEST_CASE(curve_operation_test_mnt4_g1) {
@@ -466,7 +466,7 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt4_g1) {
     static_assert(p1.doubled() == p_dbl, "double error");
     static_assert(p1.mixed_add(p2) == p_mixed_add, "mixed add error");
     static_assert(p1.to_affine() == p_to_affine, "to affine error");
-    static_assert(p2.to_projective() == p_to_projective, "to special error");
+    static_assert(p2.to_projective() == p_to_projective, "to projective error");
 }
 
 BOOST_AUTO_TEST_CASE(curve_operation_test_mnt4_g2) {
@@ -624,7 +624,7 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt4_g2) {
     static_assert(p1.doubled() == p_dbl, "double error");
     static_assert(p1.mixed_add(p2) == p_mixed_add, "mixed add error");
     static_assert(p1.to_affine() == p_to_affine, "to affine error");
-    static_assert(p2.to_projective() == p_to_projective, "to special error");
+    static_assert(p2.to_projective() == p_to_projective, "to projective error");
 }
 
 BOOST_AUTO_TEST_CASE(curve_operation_test_mnt6_g1) {
@@ -692,7 +692,7 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt6_g1) {
     static_assert(p1.doubled() == p_dbl, "double error");
     static_assert(p1.mixed_add(p2) == p_mixed_add, "mixed add error");
     static_assert(p1.to_affine() == p_to_affine, "to affine error");
-    static_assert(p2.to_projective() == p_to_projective, "to special error");
+    static_assert(p2.to_projective() == p_to_projective, "to projective error");
 }
 
 BOOST_AUTO_TEST_CASE(curve_operation_test_mnt6_g2) {
@@ -880,7 +880,7 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt6_g2) {
     static_assert(p1.doubled() == p_dbl, "double error");
     static_assert(p1.mixed_add(p2) == p_mixed_add, "mixed add error");
     static_assert(p1.to_affine() == p_to_affine, "to affine error");
-    static_assert(p2.to_projective() == p_to_projective, "to special error");
+    static_assert(p2.to_projective() == p_to_projective, "to projective error");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

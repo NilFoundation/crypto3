@@ -68,11 +68,11 @@ namespace nil {
                         using gt = typename fqk_type::value_type;
 
                     public:
-                        struct ate_g1_precomp {
+                        struct ate_g1_precomputed_type {
                             Fq PX;
                             Fq PY;
 
-                            bool operator==(const ate_g1_precomp &other) const {
+                            bool operator==(const ate_g1_precomputed_type &other) const {
                                 return (this->PX == other.PX && this->PY == other.PY);
                             }
                         };
@@ -88,12 +88,12 @@ namespace nil {
                             }
                         };
 
-                        struct ate_g2_precomp {
+                        struct ate_g2_precomputed_type {
                             Fq2 QX;
                             Fq2 QY;
                             std::vector<ate_ell_coeffs> coeffs;
 
-                            bool operator==(const ate_g2_precomp &other) const {
+                            bool operator==(const ate_g2_precomputed_type &other) const {
                                 return (this->QX == other.QX && this->QY == other.QY && this->coeffs == other.coeffs);
                             }
                         };
@@ -267,24 +267,24 @@ namespace nil {
                             c.ell_VW = D;                           // ell_VW = D (later: * yP    )
                         }
 
-                        static ate_g1_precomp ate_precompute_g1(const g1 &P) {
+                        static ate_g1_precomputed_type ate_precompute_g1(const g1 &P) {
 
                             g1 Pcopy = P.to_affine();
 
-                            ate_g1_precomp result;
+                            ate_g1_precomputed_type result;
                             result.PX = Pcopy.X;
                             result.PY = Pcopy.Y;
 
                             return result;
                         }
 
-                        static ate_g2_precomp ate_precompute_g2(const g2 &Q) {
+                        static ate_g2_precomputed_type ate_precompute_g2(const g2 &Q) {
 
                             g2 Qcopy(Q).to_affine();
 
                             Fq two_inv = Fq(0x02).inversed();    // could add to global params if needed
 
-                            ate_g2_precomp result;
+                            ate_g2_precomputed_type result;
                             result.QX = Qcopy.X;
                             result.QY = Qcopy.Y;
 
@@ -334,7 +334,7 @@ namespace nil {
                             return result;
                         }
 
-                        static gt ate_miller_loop(const ate_g1_precomp &prec_P, const ate_g2_precomp &prec_Q) {
+                        static gt ate_miller_loop(const ate_g1_precomputed_type &prec_P, const ate_g2_precomputed_type &prec_Q) {
 
                             gt f = gt::one();
 
@@ -380,8 +380,8 @@ namespace nil {
                             return f;
                         }
 
-                        static gt ate_double_miller_loop(const ate_g1_precomp &prec_P1, const ate_g2_precomp &prec_Q1,
-                                                         const ate_g1_precomp &prec_P2, const ate_g2_precomp &prec_Q2) {
+                        static gt ate_double_miller_loop(const ate_g1_precomputed_type &prec_P1, const ate_g2_precomputed_type &prec_Q1,
+                                                         const ate_g1_precomputed_type &prec_P2, const ate_g2_precomputed_type &prec_Q2) {
 
                             gt f = gt::one();
 
@@ -441,8 +441,8 @@ namespace nil {
                         }
 
                         static gt ate_pair(const g1 &P, const g2 &Q) {
-                            ate_g1_precomp prec_P = ate_precompute_g1(P);
-                            ate_g2_precomp prec_Q = ate_precompute_g2(Q);
+                            ate_g1_precomputed_type prec_P = ate_precompute_g1(P);
+                            ate_g2_precomputed_type prec_Q = ate_precompute_g2(Q);
                             gt result = ate_miller_loop(prec_P, prec_Q);
                             return result;
                         }
@@ -456,20 +456,20 @@ namespace nil {
                         /*************************  CHOICE OF PAIRING ***********************************/
 
                     public:
-                        static g1_precomp precompute_g1(const g1 &P) {
+                        static g1_precomputed_type precompute_g1(const g1 &P) {
                             return ate_precompute_g1(P);
                         }
 
-                        static g2_precomp precompute_g2(const g2 &Q) {
+                        static g2_precomputed_type precompute_g2(const g2 &Q) {
                             return ate_precompute_g2(Q);
                         }
 
-                        static gt miller_loop(const g1_precomp &prec_P, const g2_precomp &prec_Q) {
+                        static gt miller_loop(const g1_precomputed_type &prec_P, const g2_precomputed_type &prec_Q) {
                             return ate_miller_loop(prec_P, prec_Q);
                         }
 
-                        static gt double_miller_loop(const g1_precomp &prec_P1, const g2_precomp &prec_Q1,
-                                                     const g1_precomp &prec_P2, const g2_precomp &prec_Q2) {
+                        static gt double_miller_loop(const g1_precomputed_type &prec_P1, const g2_precomputed_type &prec_Q1,
+                                                     const g1_precomputed_type &prec_P2, const g2_precomputed_type &prec_Q2) {
                             return ate_double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
                         }
 

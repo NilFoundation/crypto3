@@ -1,0 +1,256 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
+//
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//---------------------------------------------------------------------------//
+
+#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_INVERTED_HPP
+#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_INVERTED_HPP
+
+#include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
+#include <nil/crypto3/algebra/curves/forms.hpp>
+
+#include <nil/crypto3/algebra/curves/detail/forms/edwards/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/add_2007_bl.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/dbl_2007_bl.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/edwards/inverted/madd_2007_bl.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/edwards/element_g1_affine.hpp>
+
+namespace nil {
+    namespace crypto3 {
+        namespace algebra {
+            namespace curves {
+                namespace detail {
+                    /** @brief A struct representing a group G1 of elliptic curve. 
+                     *    @tparam CurveParams Parameters of the group 
+                     *    @tparam Form Form of the curve 
+                     *    @tparam Coordinates Representation coordinates of the group element 
+                     */
+                    template<typename CurveParams, 
+                             typename Form, 
+                             typename Coordinates>
+                    struct curve_element;
+
+                    /** @brief A struct representing an element from the group G1 of Edwards curve of 
+                     *  inverted coordinates representation.
+                     *  Description: http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html
+                     *
+                     */
+                    template<typename CurveParams>
+                    struct curve_element<CurveParams, 
+                                   forms::edwards, 
+                                   coordinates::inverted> {
+
+                        using params_type = CurveParams;
+                        using field_type = typename params_type::field_type;
+                    private:
+                        using field_value_type = typename field_type::value_type;
+
+                        using common_addition_processor = edwards_element_g1_inverted_add_2007_bl; 
+                        using common_doubling_processor = edwards_element_g1_inverted_dbl_2007_bl;
+                        using mixed_addition_processor = edwards_element_g1_inverted_madd_2007_bl;
+                    public:
+                        using group_type = typename params_type::group_type;
+
+                        using form = forms::edwards;
+                        using coordinates = coordinates::inverted;
+
+                        field_value_type X;
+                        field_value_type Y;
+                        field_value_type Z;
+
+                        /*************************  Constructors and zero/one  ***********************************/
+
+                        /** @brief
+                         *    @return the point at infinity by default
+                         *
+                         */
+                        constexpr curve_element() : curve_element(
+                            params_type::zero_fill[0], 
+                            params_type::zero_fill[1], 
+                            params_type::zero_fill[2]) {};
+
+                        /** @brief
+                         *    @return the selected point (X:Y:Z)
+                         *
+                         */
+                        constexpr curve_element(field_value_type X,
+                                                  field_value_type Y,
+                                                  field_value_type Z) {
+                            this->X = X;
+                            this->Y = Y;
+                            this->Z = Z;
+                        };
+
+                        /** @brief Get the point at infinity
+                         *
+                         */
+                        constexpr static curve_element zero() {
+                            return curve_element();
+                        }
+
+                        /** @brief Get the generator of group G1
+                         *
+                         */
+                        constexpr static curve_element one() {
+                            return curve_element(params_type::one_fill[0], params_type::one_fill[1], 
+                                params_type::one_fill[2]);
+                        }
+
+                        /*************************  Comparison operations  ***********************************/
+
+                        constexpr bool operator==(const curve_element &other) const {
+                            if (this->is_zero()) {
+                                return other.is_zero();
+                            }
+
+                            if (other.is_zero()) {
+                                return false;
+                            }
+
+                            /* now neither is O */
+
+                            // X1/Z1 = X2/Z2 <=> X1*Z2 = X2*Z1
+                            if ((this->X * other.Z) != (other.X * this->Z)) {
+                                return false;
+                            }
+
+                            // Y1/Z1 = Y2/Z2 <=> Y1*Z2 = Y2*Z1
+                            if ((this->Y * other.Z) != (other.Y * this->Z)) {
+                                return false;
+                            }
+
+                            return true;
+                        }
+
+                        constexpr bool operator!=(const curve_element &other) const {
+                            return !(operator==(other));
+                        }
+                        /** @brief
+                         *
+                         * @return true if element from group G1 is the point at infinity
+                         */
+                        constexpr bool is_zero() const {
+                            return (this->Y.is_zero() && this->Z.is_zero());
+                        }
+                        
+                        /** @brief
+                         *
+                         * @return true if element from group G1 lies on the elliptic curve
+                         */
+                        constexpr bool is_well_formed() const {
+                            assert(false && "Not implemented yet.");
+                        }
+
+                        /*************************  Reducing operations  ***********************************/
+                        
+                        /** @brief
+                         *
+                         * @return return the corresponding element from inverted coordinates to 
+                         * affine coordinates
+                         */
+                        constexpr curve_element<
+                            typename params_type::affine_params, 
+                            form, 
+                            typename curves::coordinates::affine> to_affine () const {
+
+                            using result_type = curve_element<typename params_type::affine_params, 
+                                form, typename curves::coordinates::affine>;
+                            
+                            if (is_zero()){
+                                return result_type::zero();
+                            }
+
+                            return result_type(Z/X, Z/Y); //  x=Z/X, y=Z/Y
+                        }
+
+                        /*************************  Arithmetic operations  ***********************************/
+
+                        constexpr curve_element operator=(const curve_element &other) {
+                            // handle special cases having to do with O
+                            this->X = other.X;
+                            this->Y = other.Y;
+                            this->Z = other.Z;
+
+                            return *this;
+                        }
+
+                        constexpr curve_element operator+(const curve_element &other) const {
+                            // handle special cases having to do with O
+                            if (this->is_zero()) {
+                                return other;
+                            }
+
+                            if (other.is_zero()) {
+                                return (*this);
+                            }
+
+                            if (*this == other) {
+                                return this->doubled();
+                            }
+
+                            return common_addition_processor::process(*this, other);
+                        }
+
+                        constexpr curve_element operator-() const {
+                            return curve_element(-(this->X), this->Y, this->Z);
+                        }
+
+                        constexpr curve_element operator-(const curve_element &other) const {
+                            return (*this) + (-other);
+                        }
+                        
+                        /** @brief
+                         *
+                         * @return doubled element from group G1
+                         */
+                        constexpr curve_element doubled() const {
+                            return common_doubling_processor::process(*this);
+                        }
+
+                        /** @brief
+                         *
+                         * “Mixed addition” refers to the case Z2 known to be 1.
+                         * @return addition of two elements from group G1
+                         */
+                        curve_element mixed_add(const curve_element &other) const {
+
+                            // handle special cases having to do with O
+                            if (this->is_zero()) {
+                                return other;
+                            }
+
+                            if (other.is_zero()) {
+                                return *this;
+                            }
+
+                            return mixed_addition_processor::process(*this, other);
+                        }
+                    };
+
+                }    // namespace detail
+            }        // namespace curves
+        }            // namespace algebra
+    }                // namespace crypto3
+}    // namespace nil
+#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_INVERTED_HPP

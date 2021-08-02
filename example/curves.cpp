@@ -63,7 +63,7 @@ void print_fp3_curve_group_element(Fp3CurveGroupElement e) {
 template<typename FpCurveGroup>
 void fp_curve_group_basic_math_examples() {
     typedef typename FpCurveGroup::value_type group_value_type;
-    typedef typename FpCurveGroup::underlying_field_type::value_type field_value_type;
+    typedef typename FpCurveGroup::field_type::value_type field_value_type;
 
     field_value_type e1 = field_value_type(2), e2(3), e3(5), e4(3), e5(5), e6(7);
     group_value_type c1(e1, e2, e3), c2(e4, e5, e6);
@@ -95,7 +95,7 @@ void fp_curve_group_basic_math_examples() {
 template<typename Fp2CurveGroup>
 void fp2_curve_group_basic_math_examples() {
     using group_value_type = typename Fp2CurveGroup::value_type;
-    using field_value_type = typename Fp2CurveGroup::underlying_field_type::value_type;
+    using field_value_type = typename Fp2CurveGroup::field_type::value_type;
 
     group_value_type c1 = group_value_type::one(), c2 = group_value_type::one().doubled();
 
@@ -126,7 +126,7 @@ void fp2_curve_group_basic_math_examples() {
 template<typename Fp3CurveGroup>
 void fp3_curve_group_basic_math_examples() {
     using group_value_type = typename Fp3CurveGroup::value_type;
-    using field_value_type = typename Fp3CurveGroup::underlying_field_type::value_type;
+    using field_value_type = typename Fp3CurveGroup::field_type::value_type;
 
     group_value_type c1 = group_value_type::one(), c2 = group_value_type::one().doubled();
 
@@ -156,50 +156,49 @@ void fp3_curve_group_basic_math_examples() {
 
 int main() {
     std::cout << "ALT_BN128-254 curve g1 group basic math:" << std::endl;
-    fp_curve_group_basic_math_examples<curves::alt_bn128<254>::g1_type>();
+    fp_curve_group_basic_math_examples<curves::alt_bn128<254>::g1_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "ALT_BN128-254 curve g2 group basic math:" << std::endl;
-    fp2_curve_group_basic_math_examples<curves::alt_bn128<254>::g2_type>();
+    fp2_curve_group_basic_math_examples<curves::alt_bn128<254>::g2_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "BLS12-381 curve g1 group basic math:" << std::endl;
-    fp_curve_group_basic_math_examples<curves::bls12<381>::g1_type>();
+    fp_curve_group_basic_math_examples<curves::bls12<381>::g1_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "BLS12-381 curve g2 group basic math:" << std::endl;
-    fp2_curve_group_basic_math_examples<curves::bls12<381>::g2_type>();
+    fp2_curve_group_basic_math_examples<curves::bls12<381>::g2_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "BLS12-377 curve g1 group basic math:" << std::endl;
-    fp_curve_group_basic_math_examples<curves::bls12<377>::g1_type>();
+    fp_curve_group_basic_math_examples<curves::bls12<377>::g1_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "BLS12-377 curve g2 group basic math:" << std::endl;
-    fp2_curve_group_basic_math_examples<curves::bls12<377>::g2_type>();
+    fp2_curve_group_basic_math_examples<curves::bls12<377>::g2_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "Edwards curve g1 group basic math:" << std::endl;
-    fp_curve_group_basic_math_examples<curves::edwards<183>::g1_type>();
+    fp_curve_group_basic_math_examples<curves::edwards<183>::g1_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "Edwards curve g2 group basic math:" << std::endl;
-    fp3_curve_group_basic_math_examples<curves::edwards<183>::g2_type>();
+    fp3_curve_group_basic_math_examples<curves::edwards<183>::g2_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "BabyJubJub curve g1 group basic math:" << std::endl;
-    fp_curve_group_basic_math_examples<curves::babyjubjub::g1_type>();
 
-    using babyjubjub_g1_type = typename curves::babyjubjub::g1_type;
-    using bjj_g1_f_v = typename babyjubjub_g1_type::underlying_field_type::value_type;
+    using babyjubjub_g1_type = typename curves::babyjubjub::g1_type<>;
+    using bjj_g1_f_v = typename babyjubjub_g1_type::field_type::value_type;
 
     typename babyjubjub_g1_type::value_type 
                         P1(bjj_g1_f_v(0x274DBCE8D15179969BC0D49FA725BDDF9DE555E0BA6A693C6ADB52FC9EE7A82C_cppui254),
@@ -209,31 +208,29 @@ int main() {
                         P3(bjj_g1_f_v(0x11805510440A3488B3B811EAACD0EC7C72DDED51978190E19067A2AFAEBAF361_cppui253),
                            bjj_g1_f_v(0x1F07AA1B3C598E2FF9FF77744A39298A0A89A9027777AF9FA100DD448E072C13_cppui253));
 
-    typename babyjubjub_g1_type::value_type P1pP2 = P1 + P2;
     std::cout << "BabyJubJub addition test: " << std::endl;
-    print_fp_curve_group_element(P1pP2);
-    print_fp_curve_group_element(P3);
+    typename babyjubjub_g1_type::value_type P1pP2 = P1 + P2;
     assert(P1pP2 == P3);
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "Mnt4 curve g1 group basic math:" << std::endl;
-    fp_curve_group_basic_math_examples<curves::mnt4<298>::g1_type>();
+    fp_curve_group_basic_math_examples<curves::mnt4<298>::g1_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "Mnt4 curve g2 group basic math:" << std::endl;
-    fp2_curve_group_basic_math_examples<curves::mnt4<298>::g2_type>();
+    fp2_curve_group_basic_math_examples<curves::mnt4<298>::g2_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "Mnt6 curve g1 group basic math:" << std::endl;
-    fp_curve_group_basic_math_examples<curves::mnt6<298>::g1_type>();
+    fp_curve_group_basic_math_examples<curves::mnt6<298>::g1_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "Mnt6 curve g2 group basic math:" << std::endl;
-    fp3_curve_group_basic_math_examples<curves::mnt6<298>::g2_type>();
+    fp3_curve_group_basic_math_examples<curves::mnt6<298>::g2_type<>>();
 
     std::cout << "----------------------------" << std::endl;
 
