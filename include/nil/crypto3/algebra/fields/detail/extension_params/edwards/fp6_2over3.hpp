@@ -51,10 +51,9 @@ namespace nil {
                         typedef params<base_field_type> policy_type;
 
                     public:
-                        typedef typename policy_type::number_type number_type;
-                        typedef typename policy_type::modulus_type modulus_type;
+                        typedef typename policy_type::integral_type integral_type;
 
-                        constexpr static const modulus_type modulus = policy_type::modulus;
+                        constexpr static const integral_type modulus = policy_type::modulus;
 
                         typedef base_field_type non_residue_field_type;
                         typedef typename non_residue_field_type::value_type non_residue_type;
@@ -70,7 +69,7 @@ namespace nil {
                             non_residue_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui182),
                             non_residue_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C4_cppui182)};*/
 
-                        constexpr static const std::array<modulus_type, 6> Frobenius_coeffs_c1 = {
+                        constexpr static const std::array<integral_type, 6> Frobenius_coeffs_c1 = {
                             0x01,
                             0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180,
                             0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui180,
@@ -86,12 +85,12 @@ namespace nil {
                         fp6_2over3_extension_params<edwards_base_field<Version>>::non_residue;
 
                     template<std::size_t Version>
-                    constexpr typename fp6_2over3_extension_params<edwards_base_field<Version>>::modulus_type const
+                    constexpr typename fp6_2over3_extension_params<edwards_base_field<Version>>::integral_type const
                         fp6_2over3_extension_params<edwards_base_field<Version>>::modulus;
 
                     template<std::size_t Version>
                     constexpr std::array<
-                        typename fp6_2over3_extension_params<edwards_base_field<Version>>::modulus_type, 6> const
+                        typename fp6_2over3_extension_params<edwards_base_field<Version>>::integral_type, 6> const
                         fp6_2over3_extension_params<edwards_base_field<Version>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields

@@ -50,14 +50,14 @@ namespace nil {
                     typedef field<298> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modular_type modular_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000001_cppui298;
 
                     typedef typename detail::element_fp<params<mnt6_base_field<298>>> value_type;
@@ -72,7 +72,7 @@ namespace nil {
 
                 constexpr typename std::size_t const mnt6_base_field<298>::value_bits;
 
-                constexpr typename mnt6_base_field<298>::modulus_type const mnt6_base_field<298>::modulus;
+                constexpr typename mnt6_base_field<298>::integral_type const mnt6_base_field<298>::modulus;
 
                 template<std::size_t Version = 298>
                 using mnt6_fq = mnt6_base_field<Version>;

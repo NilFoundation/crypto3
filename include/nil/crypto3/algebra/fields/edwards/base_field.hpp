@@ -50,14 +50,14 @@ namespace nil {
                     typedef field<183> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modular_type modular_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0x40D5FC9D2A395B138B924ED6342D41B6EB690B80000001_cppui183;
 
                     typedef typename detail::element_fp<params<edwards_base_field<183>>> value_type;
@@ -72,7 +72,7 @@ namespace nil {
 
                 constexpr typename std::size_t const edwards_base_field<183>::value_bits;
 
-                constexpr typename edwards_base_field<183>::modulus_type const edwards_base_field<183>::modulus;
+                constexpr typename edwards_base_field<183>::integral_type const edwards_base_field<183>::modulus;
 
                 template<std::size_t Version = 183>
                 using edwards_fq = edwards_base_field<Version>;

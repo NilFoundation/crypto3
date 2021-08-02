@@ -50,14 +50,14 @@ namespace nil {
                     typedef field<160> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modular_type modular_type;
 
-                    constexpr static const modulus_type modulus = 0xE95E4A5F737059DC60DFC7AD95B3D8139515620F_cppui160;
+                    constexpr static const integral_type modulus = 0xE95E4A5F737059DC60DFC7AD95B3D8139515620F_cppui160;
 
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<160>>> value_type;
 
@@ -70,11 +70,11 @@ namespace nil {
                     typedef field<192> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0xC302F41D932A36CDA7A3463093D18DB78FCE476DE1A86297_cppui192;
 
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<192>>> value_type;
@@ -88,11 +88,11 @@ namespace nil {
                     typedef field<224> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0xD7C134AA264366862A18302575D1D787B09F075797DA89F57EC8C0FF_cppui224;
 
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<224>>> value_type;
@@ -106,11 +106,11 @@ namespace nil {
                     typedef field<256> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0xA9FB57DBA1EEA9BC3E660A909D838D726E3BF623D52620282013481D1F6E5377_cppui256;
 
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<256>>> value_type;
@@ -124,11 +124,11 @@ namespace nil {
                     typedef field<320> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0xD35E472036BC4FB7E13C785ED201E065F98FCFA6F6F40DEF4F92B9EC7893EC28FCD412B1F1B32E27_cppui320;
 
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<320>>> value_type;
@@ -142,11 +142,11 @@ namespace nil {
                     typedef field<384> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0x8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B412B1DA197FB71123ACD3A729901D1A71874700133107EC53_cppui384;
 
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<384>>> value_type;
@@ -160,11 +160,11 @@ namespace nil {
                     typedef field<512> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0xAADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA703308717D4D9B009BC66842AECDA12AE6A380E62881FF2F2D82C68528AA6056583A48F3_cppui512;
 
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<512>>> value_type;
@@ -174,19 +174,19 @@ namespace nil {
                 };
 
                 constexpr
-                    typename brainpool_r1_base_field<160>::modulus_type const brainpool_r1_base_field<160>::modulus;
+                    typename brainpool_r1_base_field<160>::integral_type const brainpool_r1_base_field<160>::modulus;
                 constexpr
-                    typename brainpool_r1_base_field<192>::modulus_type const brainpool_r1_base_field<192>::modulus;
+                    typename brainpool_r1_base_field<192>::integral_type const brainpool_r1_base_field<192>::modulus;
                 constexpr
-                    typename brainpool_r1_base_field<224>::modulus_type const brainpool_r1_base_field<224>::modulus;
+                    typename brainpool_r1_base_field<224>::integral_type const brainpool_r1_base_field<224>::modulus;
                 constexpr
-                    typename brainpool_r1_base_field<256>::modulus_type const brainpool_r1_base_field<256>::modulus;
+                    typename brainpool_r1_base_field<256>::integral_type const brainpool_r1_base_field<256>::modulus;
                 constexpr
-                    typename brainpool_r1_base_field<320>::modulus_type const brainpool_r1_base_field<320>::modulus;
+                    typename brainpool_r1_base_field<320>::integral_type const brainpool_r1_base_field<320>::modulus;
                 constexpr
-                    typename brainpool_r1_base_field<384>::modulus_type const brainpool_r1_base_field<384>::modulus;
+                    typename brainpool_r1_base_field<384>::integral_type const brainpool_r1_base_field<384>::modulus;
                 constexpr
-                    typename brainpool_r1_base_field<512>::modulus_type const brainpool_r1_base_field<512>::modulus;
+                    typename brainpool_r1_base_field<512>::integral_type const brainpool_r1_base_field<512>::modulus;
 
                 template<std::size_t Version = 160>
                 using brainpool_r1_fq = brainpool_r1_base_field<Version>;

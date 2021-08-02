@@ -62,9 +62,6 @@ namespace nil {
                     using g2_precomputed_type = typename precompute_g2::g2_precomputed_type;
                 };
 
-                // template<std::size_t Version, typename PairingFunctions>
-                // constexpr typename pairing_policy<curves::bls12<Version>, PairingFunctions>::number_type const
-                //     pairing_policy<curves::bls12<Version>, PairingFunctions>::pairing_loop_count;
             }    // namespace pairing
         }        // namespace algebra
     }            // namespace crypto3

@@ -230,7 +230,7 @@ struct field_element_init<fields::detail::element_fp<FieldParams>> {
 
     template<typename ElementData>
     static inline element_type process(const ElementData &element_data) {
-        return element_type(typename element_type::modulus_type(element_data.second.data()));
+        return element_type(typename element_type::integral_type(element_data.second.data()));
     }
 };
 
@@ -427,22 +427,22 @@ void field_operation_test(const TestSet &test_set) {
 template<typename FieldType>
 void field_not_square_test(const std::vector<const char *> &test_set) {
     typedef typename FieldType::value_type value_type;
-    typedef typename value_type::modulus_type modulus_type;
+    typedef typename value_type::integral_type integral_type;
 
     for (auto &not_square : test_set) {
-        BOOST_CHECK_EQUAL(value_type(modulus_type(not_square)).is_square(), false);
-        BOOST_CHECK_EQUAL(value_type(modulus_type(not_square)).pow(2).is_square(), true);
+        BOOST_CHECK_EQUAL(value_type(integral_type(not_square)).is_square(), false);
+        BOOST_CHECK_EQUAL(value_type(integral_type(not_square)).pow(2).is_square(), true);
     }
 }
 
 template<typename FieldType>
 void field_not_square_test(const std::vector<std::array<const char *, 2>> &test_set) {
     typedef typename FieldType::value_type value_type;
-    typedef typename value_type::underlying_type::modulus_type modulus_type;
+    typedef typename value_type::underlying_type::integral_type integral_type;
 
     for (auto &not_square : test_set) {
-        BOOST_CHECK_EQUAL(value_type(modulus_type(not_square[0]), modulus_type(not_square[1])).is_square(), false);
-        BOOST_CHECK_EQUAL(value_type(modulus_type(not_square[0]), modulus_type(not_square[1])).pow(2).is_square(),
+        BOOST_CHECK_EQUAL(value_type(integral_type(not_square[0]), integral_type(not_square[1])).is_square(), false);
+        BOOST_CHECK_EQUAL(value_type(integral_type(not_square[0]), integral_type(not_square[1])).pow(2).is_square(),
                           true);
     }
 }
@@ -752,7 +752,7 @@ BOOST_AUTO_TEST_CASE(field_not_square_manual_test_bls12_381_fq) {
 BOOST_AUTO_TEST_CASE(field_not_square_manual_test_bls12_381_fq2) {
     using policy_type = fields::fp2<fields::bls12_fq<381>>;
     typedef typename policy_type::value_type value_type;
-    typedef typename value_type::underlying_type::modulus_type modulus_type;
+    typedef typename value_type::underlying_type::integral_type integral_type;
 
     std::vector<std::array<const char *, 2>> not_squares = {
         {"3524621578887081555995618340212814089553799753665493370168024281656572217651956527488772586862482092190213449"

@@ -56,14 +56,14 @@ namespace nil {
                     typedef typename extension_policy::underlying_field_type underlying_field_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modular_type modular_type;
 
-                    constexpr static const modulus_type modulus = policy_type::modulus;
+                    constexpr static const integral_type modulus = policy_type::modulus;
 
                     typedef typename detail::element_fp2<extension_policy> value_type;
 
@@ -72,7 +72,7 @@ namespace nil {
                 };
 
                 template<typename BaseField>
-                constexpr typename fp2<BaseField>::modulus_type const fp2<BaseField>::modulus;
+                constexpr typename fp2<BaseField>::integral_type const fp2<BaseField>::modulus;
 
                 template<typename BaseField>
                 constexpr typename std::size_t const fp2<BaseField>::arity;

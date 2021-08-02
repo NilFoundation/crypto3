@@ -60,7 +60,7 @@ namespace nil {
 
                         using g1_field_type = base_field_type;
                         
-                        using integral_type = typename base_field_type::modulus_type;
+                        using integral_type = typename base_field_type::integral_type;
 
                         template<typename Form, 
                              typename Coordinates>

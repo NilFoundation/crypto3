@@ -45,14 +45,14 @@ namespace nil {
                     typedef field<252> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modular_type modular_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0xE7DB4EA6533AFA906673B0101343B00A6682093CCC81082D0970E5ED6F72CB7_cppui252;
 
                     typedef typename detail::element_fp<params<jubjub_scalar_field>> value_type;
@@ -67,7 +67,7 @@ namespace nil {
 
                 constexpr typename std::size_t const jubjub_scalar_field::value_bits;
 
-                constexpr typename jubjub_scalar_field::modulus_type const jubjub_scalar_field::modulus;
+                constexpr typename jubjub_scalar_field::integral_type const jubjub_scalar_field::modulus;
 
                 using jubjub_fr = jubjub_scalar_field;
 

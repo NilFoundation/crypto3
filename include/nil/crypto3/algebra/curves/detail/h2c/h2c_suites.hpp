@@ -54,15 +54,15 @@ namespace nil {
                         typedef hashes::sha2<256> hash_type;
 
                         typedef typename group_type::value_type group_value_type;
-                        typedef typename curve_type::number_type number_type;
-                        typedef typename group_type::underlying_field_type::number_type modular_type;
+                        typedef typename curve_type::integral_type integral_type;
+                        typedef typename group_type::underlying_field_type::integral_type integral_type;
                         typedef typename group_type::underlying_field_type::value_type field_value_type;
 
                         // BLS12381G1_XMD:SHA-256_SSWU_RO_
                         constexpr static std::array<std::uint8_t, 31> suite_id = {
                             66, 76, 83, 49, 50, 51, 56, 49, 71, 49, 95, 88, 77, 68, 58, 83,
                             72, 65, 45, 50, 53, 54, 95, 83, 83, 87, 85, 95, 82, 79, 95};
-                        constexpr static number_type p = curve_type::p;
+                        constexpr static integral_type p = curve_type::p;
                         constexpr static std::size_t m = 1;
                         constexpr static std::size_t k = 128;
                         constexpr static std::size_t L = 64;
@@ -72,7 +72,7 @@ namespace nil {
                         constexpr static inline const field_value_type Bi = field_value_type(
                             0x12e2908d11688030018b12e8753eee3b2016c1f0f24f4070a0b9c14fcef35ef55a23215a316ceaa5d1cc48e98e172be0_cppui381);
                         constexpr static inline const field_value_type Z = field_value_type(11);
-                        constexpr static number_type h_eff = 0xd201000000010001_cppui381;
+                        constexpr static integral_type h_eff = 0xd201000000010001_cppui381;
                     };
 
                     template<>
@@ -82,8 +82,8 @@ namespace nil {
                         typedef hashes::sha2<256> hash_type;
 
                         typedef typename group_type::value_type group_value_type;
-                        typedef typename curve_type::number_type number_type;
-                        typedef typename group_type::underlying_field_type::number_type modular_type;
+                        typedef typename curve_type::integral_type integral_type;
+                        typedef typename group_type::underlying_field_type::integral_type integral_type;
                         typedef typename group_type::underlying_field_type::value_type field_value_type;
 
                         // BLS12381G2_XMD:SHA-256_SSWU_RO_
@@ -91,7 +91,7 @@ namespace nil {
                             0x42, 0x4c, 0x53, 0x31, 0x32, 0x33, 0x38, 0x31, 0x47, 0x32, 0x5f,
                             0x58, 0x4d, 0x44, 0x3a, 0x53, 0x48, 0x41, 0x2d, 0x32, 0x35, 0x36,
                             0x5f, 0x53, 0x53, 0x57, 0x55, 0x5f, 0x52, 0x4f, 0x5f};
-                        constexpr static number_type p = curve_type::p;
+                        constexpr static integral_type p = curve_type::p;
                         constexpr static std::size_t m = 2;
                         constexpr static std::size_t k = 128;
                         constexpr static std::size_t L = 64;

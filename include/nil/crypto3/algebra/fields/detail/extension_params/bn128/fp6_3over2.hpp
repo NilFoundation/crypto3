@@ -51,10 +51,9 @@ namespace nil {
                         typedef params<base_field_type> policy_type;
 
                     public:
-                        typedef typename policy_type::number_type number_type;
-                        typedef typename policy_type::modulus_type modulus_type;
+                        typedef typename policy_type::integral_type integral_type;
 
-                        constexpr static const modulus_type modulus = policy_type::modulus;
+                        constexpr static const integral_type modulus = policy_type::modulus;
 
                         typedef fields::fp2<base_field_type> non_residue_field_type;
                         typedef typename non_residue_field_type::value_type non_residue_type;
@@ -73,10 +72,10 @@ namespace nil {
                             non_residue_type(0x00, 0x00),
                             non_residue_type(0x00, 0x00)};*/
 
-                        constexpr static const std::array<modulus_type, 6 * 2> Frobenius_coeffs_c1 = {
+                        constexpr static const std::array<integral_type, 6 * 2> Frobenius_coeffs_c1 = {
                             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-                        constexpr static const std::array<modulus_type, 6 * 2> Frobenius_coeffs_c2 = {
+                        constexpr static const std::array<integral_type, 6 * 2> Frobenius_coeffs_c2 = {
                             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
                         constexpr static const non_residue_type non_residue = non_residue_type(0x09, 0x01);
@@ -88,11 +87,11 @@ namespace nil {
 
                     template<std::size_t Version>
                     constexpr std::array<
-                        typename fp6_3over2_extension_params<bn128_base_field<Version>>::modulus_type, 6 * 2> const
+                        typename fp6_3over2_extension_params<bn128_base_field<Version>>::integral_type, 6 * 2> const
                         fp6_3over2_extension_params<bn128_base_field<Version>>::Frobenius_coeffs_c1;
                     template<std::size_t Version>
                     constexpr std::array<
-                        typename fp6_3over2_extension_params<bn128_base_field<Version>>::modulus_type, 6 * 2> const
+                        typename fp6_3over2_extension_params<bn128_base_field<Version>>::integral_type, 6 * 2> const
                         fp6_3over2_extension_params<bn128_base_field<Version>>::Frobenius_coeffs_c2;
 
                 }    // namespace detail

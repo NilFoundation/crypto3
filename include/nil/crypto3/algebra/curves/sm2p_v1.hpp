@@ -43,23 +43,23 @@ namespace nil {
                 struct sm2p_v1<256> {
                     constexpr static const std::size_t base_field_bits = 256;
                     typedef fields::sm2p_v1_fq<base_field_bits> base_field_type;
-                    typedef typename base_field_type::modulus_type number_type;
-                    constexpr static const number_type base_field_modulus = base_field_type::modulus;
+                    typedef typename base_field_type::integral_type integral_type;
+                    constexpr static const integral_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 256;
                     typedef fields::sm2p_v1_fr<scalar_field_bits> scalar_field_type;
-                    constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
+                    constexpr static const integral_type scalar_field_modulus = scalar_field_type::modulus;
 
-                    constexpr static const number_type p = base_field_modulus;
-                    constexpr static const number_type q = scalar_field_modulus;
+                    constexpr static const integral_type p = base_field_modulus;
+                    constexpr static const integral_type q = scalar_field_modulus;
 
-                    constexpr static const number_type a =
+                    constexpr static const integral_type a =
                         0xFFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000FFFFFFFFFFFFFFFC_cppui256;
-                    constexpr static const number_type b =
+                    constexpr static const integral_type b =
                         0x28E9FA9E9D9F5E344D5A9E4BCF6509A7F39789F515AB8F92DDBCBD414D940E93_cppui256;
-                    constexpr static const number_type x =
+                    constexpr static const integral_type x =
                         0x32C4AE2C1F1981195F9904466A39C9948FE30BBFF2660BE1715A4589334C74C7_cppui256;
-                    constexpr static const number_type y =
+                    constexpr static const integral_type y =
                         0xBC3736A2F4F6779C59BDCEE36B692153D0A9877CC62A474002DF32E52139F0A0_cppui256;
                 };
 

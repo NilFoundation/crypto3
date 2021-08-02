@@ -43,8 +43,8 @@ namespace nil {
 
                     public:
 
-                        using integral_type = typename curve_type::base_field_type::modulus_type;
-                        using extended_integral_type = typename curve_type::base_field_type::extended_modulus_type;
+                        using integral_type = typename curve_type::base_field_type::integral_type;
+                        using extended_integral_type = typename curve_type::base_field_type::extended_integral_type;
 
                         constexpr static const std::size_t integral_type_max_bits = 
                             curve_type::base_field_type::modulus_bits;

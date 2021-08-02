@@ -50,12 +50,12 @@ namespace nil {
                     public:
                         typedef typename policy_type::field_type field_type;
 
-                        typedef typename policy_type::number_type number_type;
-                        typedef typename policy_type::modulus_type modulus_type;
+                        typedef typename policy_type::modular_type modular_type;
+                        typedef typename policy_type::integral_type integral_type;
 
-                        constexpr static const modulus_type modulus = policy_type::modulus;
+                        constexpr static const integral_type modulus = policy_type::modulus;
 
-                        using data_type = number_type;
+                        using data_type = modular_type;
 
                         data_type data;
 
@@ -63,7 +63,7 @@ namespace nil {
 
                         constexpr element_fp(data_type data) : data(data) {};
 
-                        constexpr element_fp(modulus_type data) : data(data, modulus) {};
+                        constexpr element_fp(integral_type data) : data(data, modulus) {};
 
                         template<typename Number,
                                  typename std::enable_if<boost::is_integral<Number>::value, bool>::type = true>
@@ -226,7 +226,7 @@ namespace nil {
                     };
 
                     template<typename FieldParams>
-                    constexpr typename element_fp<FieldParams>::modulus_type const element_fp<FieldParams>::modulus;
+                    constexpr typename element_fp<FieldParams>::integral_type const element_fp<FieldParams>::modulus;
 
                 }    // namespace detail
             }        // namespace fields

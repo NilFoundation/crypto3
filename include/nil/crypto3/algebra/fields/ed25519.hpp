@@ -50,17 +50,17 @@ namespace nil {
                     typedef field<255> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::integral_type integral_type;
 
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modular_type modular_type;
 
-                    constexpr static const modulus_type modulus =
+                    constexpr static const integral_type modulus =
                         0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFED_cppui255;    // 2^255 - 19
 
-                    constexpr static const modulus_type mul_generator = 0x02;    // ?
+                    constexpr static const integral_type mul_generator = 0x02;    // ?
 
                     typedef typename detail::element_fp<params<ed25519<modulus_bits>>> value_type;
 
@@ -68,8 +68,8 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename ed25519<255>::modulus_type const ed25519<255>::modulus;
-                constexpr typename ed25519<255>::modulus_type const ed25519<255>::mul_generator;
+                constexpr typename ed25519<255>::integral_type const ed25519<255>::modulus;
+                constexpr typename ed25519<255>::integral_type const ed25519<255>::mul_generator;
 
             }    // namespace fields
         }        // namespace algebra

@@ -64,7 +64,7 @@ namespace nil {
                 field_element_from_bytes(InputFieldValueIterator first, InputFieldValueIterator last) {
                 BOOST_ASSERT(field_octets_num == std::distance(first, last));
 
-                typename FieldType::modulus_type result;
+                typename FieldType::integral_type result;
                 ::nil::crypto3::multiprecision::import_bits(result, first, last, chunk_size, false);
 
                 return std::make_pair(result < FieldType::modulus, field_value_type(result));
@@ -103,7 +103,7 @@ namespace nil {
                 BOOST_ASSERT(field_octets_num == std::distance(out_first, out_last));
 
                 ::nil::crypto3::multiprecision::export_bits(
-                    element.data.template convert_to<typename FieldType::modulus_type>(), out_first, chunk_size, false);
+                    element.data.template convert_to<typename FieldType::integral_type>(), out_first, chunk_size, false);
 
                 return field_octets_num;
             }

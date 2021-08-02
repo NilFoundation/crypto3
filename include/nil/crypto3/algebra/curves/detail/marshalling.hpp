@@ -56,7 +56,7 @@ namespace nil {
             typedef typename g1_value_type::field_type::value_type g1_field_value_type;
             typedef typename g2_value_type::field_type::value_type g2_field_value_type;
 
-            typedef typename g1_field_value_type::modulus_type modulus_type;
+            typedef typename g1_field_value_type::integral_type integral_type;
 
             constexpr static const unsigned sizeof_field_element = 48;
             typedef std::array<std::uint8_t, sizeof_field_element> compressed_g1_octets;
@@ -73,7 +73,7 @@ namespace nil {
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
                     multiprecision::export_bits(
-                        point_affine.X.data.template convert_to<modulus_type>(), result.rbegin(), 8, false);
+                        point_affine.X.data.template convert_to<integral_type>(), result.rbegin(), 8, false);
                 }
                 result[0] |= m_byte;
                 return result;
@@ -86,8 +86,8 @@ namespace nil {
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
                     multiprecision::export_bits(
-                        point_affine.Y.data.template convert_to<modulus_type>(), result.rbegin(), 8, false);
-                    multiprecision::export_bits(point_affine.X.data.template convert_to<modulus_type>(),
+                        point_affine.Y.data.template convert_to<integral_type>(), result.rbegin(), 8, false);
+                    multiprecision::export_bits(point_affine.X.data.template convert_to<integral_type>(),
                                                 result.rbegin() + sizeof_field_element,
                                                 8,
                                                 false);
@@ -103,8 +103,8 @@ namespace nil {
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
                     multiprecision::export_bits(
-                        point_affine.X.data[0].data.template convert_to<modulus_type>(), result.rbegin(), 8, false);
-                    multiprecision::export_bits(point_affine.X.data[1].data.template convert_to<modulus_type>(),
+                        point_affine.X.data[0].data.template convert_to<integral_type>(), result.rbegin(), 8, false);
+                    multiprecision::export_bits(point_affine.X.data[1].data.template convert_to<integral_type>(),
                                                 result.rbegin() + sizeof_field_element,
                                                 8,
                                                 false);
@@ -120,16 +120,16 @@ namespace nil {
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
                     multiprecision::export_bits(
-                        point_affine.Y.data[0].data.template convert_to<modulus_type>(), result.rbegin(), 8, false);
-                    multiprecision::export_bits(point_affine.Y.data[1].data.template convert_to<modulus_type>(),
+                        point_affine.Y.data[0].data.template convert_to<integral_type>(), result.rbegin(), 8, false);
+                    multiprecision::export_bits(point_affine.Y.data[1].data.template convert_to<integral_type>(),
                                                 result.rbegin() + sizeof_field_element,
                                                 8,
                                                 false);
-                    multiprecision::export_bits(point_affine.X.data[0].data.template convert_to<modulus_type>(),
+                    multiprecision::export_bits(point_affine.X.data[0].data.template convert_to<integral_type>(),
                                                 result.rbegin() + 2 * sizeof_field_element,
                                                 8,
                                                 false);
-                    multiprecision::export_bits(point_affine.X.data[1].data.template convert_to<modulus_type>(),
+                    multiprecision::export_bits(point_affine.X.data[1].data.template convert_to<integral_type>(),
                                                 result.rbegin() + 3 * sizeof_field_element,
                                                 8,
                                                 false);
@@ -184,8 +184,8 @@ namespace nil {
             constexpr static const std::uint8_t C_bit = 0x80;
             constexpr static const std::uint8_t I_bit = 0x40;
             constexpr static const std::uint8_t S_bit = 0x20;
-            // constexpr static const typename g1_field_value_type::modulus_type half_p =
-            //     (g1_field_value_type::modulus - modulus_type(1)) / modulus_type(2);
+            // constexpr static const typename g1_field_value_type::integral_type half_p =
+            //     (g1_field_value_type::modulus - integral_type(1)) / integral_type(2);
 
             template<typename PointOctetsRange,
                      typename = typename std::enable_if<
@@ -198,7 +198,7 @@ namespace nil {
                     return g1_value_type();    // point at infinity
                 }
 
-                modulus_type x;
+                integral_type x;
                 multiprecision::import_bits(x, point_octets.rbegin(), point_octets.rend(), 8, false);
                 g1_field_value_type x_mod(x);
                 g1_field_value_type y2_mod = x_mod.pow(3) + g1_field_value_type(4);
@@ -226,7 +226,7 @@ namespace nil {
                     return g1_value_type();    // point at infinity
                 }
 
-                modulus_type x, y;
+                integral_type x, y;
                 multiprecision::import_bits(
                     y, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
                 multiprecision::import_bits(
@@ -247,7 +247,7 @@ namespace nil {
                     return g2_value_type();    // point at infinity
                 }
 
-                modulus_type x_0, x_1;
+                integral_type x_0, x_1;
                 multiprecision::import_bits(
                     x_0, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
                 multiprecision::import_bits(
@@ -278,7 +278,7 @@ namespace nil {
                     return g2_value_type();    // point at infinity
                 }
 
-                modulus_type x_0, x_1, y_0, y_1;
+                integral_type x_0, x_1, y_0, y_1;
                 multiprecision::import_bits(
                     y_0, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
                 multiprecision::import_bits(y_1,
@@ -301,8 +301,8 @@ namespace nil {
             }
 
             static inline bool sign_gf_p(const g1_field_value_type &v) {
-                static const typename g1_field_value_type::modulus_type half_p =
-                    (g1_field_value_type::modulus - modulus_type(1)) / modulus_type(2);
+                static const typename g1_field_value_type::integral_type half_p =
+                    (g1_field_value_type::modulus - integral_type(1)) / integral_type(2);
 
                 if (v > half_p) {
                     return true;

@@ -51,10 +51,9 @@ namespace nil {
                         typedef params<base_field_type> policy_type;
 
                     public:
-                        typedef typename policy_type::number_type number_type;
-                        typedef typename policy_type::modulus_type modulus_type;
+                        typedef typename policy_type::integral_type integral_type;
 
-                        constexpr static const modulus_type modulus = policy_type::modulus;
+                        constexpr static const integral_type modulus = policy_type::modulus;
 
                         typedef base_field_type non_residue_field_type;
                         typedef typename non_residue_field_type::value_type non_residue_type;
@@ -69,7 +68,7 @@ namespace nil {
                             non_residue_type(0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui292),
                             non_residue_type(0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui293)};*/
 
-                        constexpr static const std::array<modulus_type, 6> Frobenius_coeffs_c1 = {
+                        constexpr static const std::array<integral_type, 6> Frobenius_coeffs_c1 = {
                             0x01,
                             0x3B48E50A1662E26F0E834E15FAF68204A9845655F46B277A6D05B75068AD3F6801655344BED_cppui298,
                             0x3B48E50A1662E26F0E834E15FAF68204A9845655F46B277A6D05B75068AD3F6801655344BEC_cppui298,
@@ -85,12 +84,12 @@ namespace nil {
                         fp6_2over3_extension_params<mnt6_base_field<Version>>::non_residue;
 
                     template<std::size_t Version>
-                    constexpr typename fp6_2over3_extension_params<mnt6_base_field<Version>>::modulus_type const
+                    constexpr typename fp6_2over3_extension_params<mnt6_base_field<Version>>::integral_type const
                         fp6_2over3_extension_params<mnt6_base_field<Version>>::modulus;
 
                     template<std::size_t Version>
                     constexpr std::array<
-                        typename fp6_2over3_extension_params<mnt6_base_field<Version>>::modulus_type, 6> const
+                        typename fp6_2over3_extension_params<mnt6_base_field<Version>>::integral_type, 6> const
                         fp6_2over3_extension_params<mnt6_base_field<Version>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields

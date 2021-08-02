@@ -46,9 +46,9 @@ namespace nil {
             BOOST_TTI_HAS_TYPE(curve_type)
             BOOST_TTI_HAS_TYPE(field_type)
             BOOST_TTI_HAS_TYPE(value_type)
-            BOOST_TTI_HAS_TYPE(modulus_type)
+            BOOST_TTI_HAS_TYPE(integral_type)
             BOOST_TTI_HAS_TYPE(base_field_type)
-            BOOST_TTI_HAS_TYPE(number_type)
+            BOOST_TTI_HAS_TYPE(modular_type)
             BOOST_TTI_HAS_TYPE(scalar_field_type)
             BOOST_TTI_HAS_TYPE(g1_type)
             BOOST_TTI_HAS_TYPE(g2_type)
@@ -89,9 +89,9 @@ namespace nil {
             struct is_field {
                 static const bool value =
                     has_type_value_type<T>::value && has_static_member_data_value_bits<T, const std::size_t>::value &&
-                    has_type_modulus_type<T>::value &&
+                    has_type_integral_type<T>::value &&
                     has_static_member_data_modulus_bits<T, const std::size_t>::value &&
-                    has_type_number_type<T>::value && has_static_member_data_arity<T, const std::size_t>::value;
+                    has_type_modular_type<T>::value && has_static_member_data_arity<T, const std::size_t>::value;
                 typedef T type;
             };
 
@@ -99,9 +99,9 @@ namespace nil {
             struct is_extended_field {
                 static const bool value = has_type_value_type<T>::value &&
                                           has_static_member_data_value_bits<T, const std::size_t>::value &&
-                                          has_type_modulus_type<T>::value &&
+                                          has_type_integral_type<T>::value &&
                                           has_static_member_data_modulus_bits<T, const std::size_t>::value &&
-                                          has_type_number_type<T>::value &&
+                                          has_type_modular_type<T>::value &&
                                           has_static_member_data_modulus_bits<T, const std::size_t>::value &&
                                           has_type_extension_policy<T>::value;
                 typedef T type;
