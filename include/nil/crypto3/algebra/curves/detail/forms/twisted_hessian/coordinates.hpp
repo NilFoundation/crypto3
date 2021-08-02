@@ -32,18 +32,18 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                namespace coordinates{
+                namespace coordinates {
 
                     /** @brief Twisted Hessian curve group element coordinates representation.
                      * Description: https://hyperelliptic.org/EFD/g1p/auto-twistedhessian.html
                      */
-                    struct affine; 
-                    struct projective; 
-                
-                }        // namespace coordinates
+                    struct affine;
+                    struct projective;
+
+                }    // namespace coordinates
             }        // namespace curves
-        }        // namespace algebra
-    }            // namespace crypto3
+        }            // namespace algebra
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_ALGEBRA_CURVES_TWISTED_HESSIAN_COORDINATES_REPRESENTATIONS_HPP

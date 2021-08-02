@@ -40,9 +40,7 @@ namespace nil {
                      *    @tparam Version version of the curve
                      *
                      */
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<std::size_t Version, typename Form, typename Coordinates>
                     struct edwards_g2;
                     /** @brief A struct representing an element from the group G2 of Edwards curve.
                      *    @tparam Version version of the curve
@@ -56,8 +54,7 @@ namespace nil {
                     template<>
                     struct element_edwards_g2<183> {
 
-                        using group_type = edwards_g2<183, forms::twisted_edwards,  
-                            coordinates::inverted>;
+                        using group_type = edwards_g2<183, forms::twisted_edwards, coordinates::inverted>;
 
                         using policy_type = edwards_basic_policy<183>;
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
@@ -74,14 +71,16 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr element_edwards_g2() : element_edwards_g2(policy_type::g2_zero_fill[0], policy_type::g2_zero_fill[1], policy_type::g2_zero_fill[2]) {};
+                        constexpr element_edwards_g2() :
+                            element_edwards_g2(policy_type::g2_zero_fill[0], policy_type::g2_zero_fill[1],
+                                               policy_type::g2_zero_fill[2]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
                          *
                          */
                         constexpr element_edwards_g2(underlying_field_value_type in_X, underlying_field_value_type in_Y,
-                                           underlying_field_value_type in_Z) {
+                                                     underlying_field_value_type in_Z) {
                             this->X = in_X;
                             this->Y = in_Y;
                             this->Z = in_Z;
@@ -96,14 +95,16 @@ namespace nil {
                          *
                          */
                         constexpr static element_edwards_g2 zero() {
-                            return element_edwards_g2(policy_type::g2_zero_fill[0], policy_type::g2_zero_fill[1], policy_type::g2_zero_fill[2]);
+                            return element_edwards_g2(policy_type::g2_zero_fill[0], policy_type::g2_zero_fill[1],
+                                                      policy_type::g2_zero_fill[2]);
                         }
                         /** @brief Get the generator of group G2
                          *
                          */
                         constexpr static element_edwards_g2 one() {
-                            return element_edwards_g2(policy_type::g2_one_fill[0], policy_type::g2_one_fill[1]);    // it's better to precompute also
-                            // policy_type::g2_one_fill[2] 
+                            return element_edwards_g2(policy_type::g2_one_fill[0],
+                                                      policy_type::g2_one_fill[1]);    // it's better to precompute also
+                            // policy_type::g2_one_fill[2]
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -308,7 +309,7 @@ namespace nil {
 
                             return element_edwards_g2(p_out[0], p_out[1], p_out[2]);
                         }
-                        
+
                         /** @brief
                          *
                          * @return return the corresponding element from projective coordinates to affine coordinates
@@ -349,7 +350,6 @@ namespace nil {
                             g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
                         constexpr static const g1_field_type_value twist_mul_by_q_Z =
                             g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
-
                     };
 
                     constexpr typename element_edwards_g2<183>::g1_field_type_value const element_edwards_g2<183>::a;
@@ -375,8 +375,10 @@ namespace nil {
                     constexpr typename element_edwards_g2<183>::g1_field_type_value const
                         element_edwards_g2<183>::twist_mul_by_q_Z;
 
-                    constexpr typename element_edwards_g2<183>::g1_field_type_value element_edwards_g2<183>::twist_mul_by_a_c0;
-                    constexpr typename element_edwards_g2<183>::g1_field_type_value element_edwards_g2<183>::twist_mul_by_d_c0;
+                    constexpr typename element_edwards_g2<183>::g1_field_type_value
+                        element_edwards_g2<183>::twist_mul_by_a_c0;
+                    constexpr typename element_edwards_g2<183>::g1_field_type_value
+                        element_edwards_g2<183>::twist_mul_by_d_c0;
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

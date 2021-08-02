@@ -189,10 +189,10 @@ namespace nil {
                         constexpr static const non_residue_type non_residue = non_residue_type(0x00, 0x01);
                     };
 
-                    constexpr typename fp6_3over2_extension_params<bls12_base_field<381>>::non_residue_type
-                                         const fp6_3over2_extension_params<bls12_base_field<381>>::non_residue;
-                    constexpr typename fp6_3over2_extension_params<bls12_base_field<377>>::non_residue_type
-                                         const fp6_3over2_extension_params<bls12_base_field<377>>::non_residue;
+                    constexpr typename fp6_3over2_extension_params<bls12_base_field<381>>::non_residue_type const
+                        fp6_3over2_extension_params<bls12_base_field<381>>::non_residue;
+                    constexpr typename fp6_3over2_extension_params<bls12_base_field<377>>::non_residue_type const
+                        fp6_3over2_extension_params<bls12_base_field<377>>::non_residue;
 
                     constexpr std::array<typename fp6_3over2_extension_params<bls12_base_field<381>>::modulus_type,
                                          6 * 2> const

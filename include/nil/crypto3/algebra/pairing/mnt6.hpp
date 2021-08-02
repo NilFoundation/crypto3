@@ -47,23 +47,19 @@ namespace nil {
 
                     using chained_curve_type = curves::mnt4<298>;
 
-                    using precompute_g1 = 
-                        pairing::short_weierstrass_projective_ate_precompute_g1<curve_type>;
-                    using precompute_g2 = 
-                        pairing::short_weierstrass_projective_ate_precompute_g2<curve_type>;
-                    using miller_loop = 
-                        pairing::mnt6_ate_miller_loop<298>;
-                    using double_miller_loop = 
-                        pairing::mnt6_ate_double_miller_loop<298>;
-                    using final_exponentiation = 
-                        pairing::mnt6_final_exponentiation<298>;
+                    using precompute_g1 = pairing::short_weierstrass_projective_ate_precompute_g1<curve_type>;
+                    using precompute_g2 = pairing::short_weierstrass_projective_ate_precompute_g2<curve_type>;
+                    using miller_loop = pairing::mnt6_ate_miller_loop<298>;
+                    using double_miller_loop = pairing::mnt6_ate_double_miller_loop<298>;
+                    using final_exponentiation = pairing::mnt6_final_exponentiation<298>;
 
                     using g1_precomputed_type = typename precompute_g1::g1_precomputed_type;
                     using g2_precomputed_type = typename precompute_g2::g2_precomputed_type;
                 };
 
                 // template<std::size_t Version, typename PairingFunctions>
-                // constexpr  typename pairing_policy<curves::mnt6<Version>, PairingFunctions>::g2_type::underlying_field_type::value_type 
+                // constexpr  typename pairing_policy<curves::mnt6<Version>,
+                // PairingFunctions>::g2_type::underlying_field_type::value_type
                 //     pairing_policy<curves::mnt6<Version>, PairingFunctions>::twist;
 
                 // template<std::size_t Version, typename PairingFunctions>

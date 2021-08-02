@@ -85,8 +85,7 @@ namespace nil {
                         fp4_extension_params<mnt4_base_field<Version>>::modulus;
 
                     template<std::size_t Version>
-                    constexpr std::array<typename fp4_extension_params<mnt4_base_field<Version>>::modulus_type,
-                                         4> const
+                    constexpr std::array<typename fp4_extension_params<mnt4_base_field<Version>>::modulus_type, 4> const
                         fp4_extension_params<mnt4_base_field<Version>>::Frobenius_coeffs_c1;
 
                 }    // namespace detail

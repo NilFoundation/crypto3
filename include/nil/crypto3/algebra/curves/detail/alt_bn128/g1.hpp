@@ -47,9 +47,7 @@ namespace nil {
                      *
                      */
 
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<std::size_t Version, typename Form, typename Coordinates>
                     struct alt_bn128_g1 {
 
                         using params_type = alt_bn128_g1_params<Version, Form>;

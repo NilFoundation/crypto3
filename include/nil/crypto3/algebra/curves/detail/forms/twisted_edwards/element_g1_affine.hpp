@@ -36,33 +36,30 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    /** @brief A struct representing a group G1 of elliptic curve. 
-                     *    @tparam CurveParams Parameters of the group 
-                     *    @tparam Form Form of the curve 
-                     *    @tparam Coordinates Representation coordinates of the group element 
+                    /** @brief A struct representing a group G1 of elliptic curve.
+                     *    @tparam CurveParams Parameters of the group
+                     *    @tparam Form Form of the curve
+                     *    @tparam Coordinates Representation coordinates of the group element
                      */
-                    template<typename CurveParams, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<typename CurveParams, typename Form, typename Coordinates>
                     struct curve_element;
-                    
-                    /** @brief A struct representing an element from the group G1 of twisted Edwards curve of 
-                     *  affine coordinates representation. 
+
+                    /** @brief A struct representing an element from the group G1 of twisted Edwards curve of
+                     *  affine coordinates representation.
                      *  Twisted Edwards curves introduced on https://eprint.iacr.org/2008/013.pdf
                      *  Description: https://hyperelliptic.org/EFD/g1p/auto-twisted.html
                      *
                      */
                     template<typename CurveParams>
-                    struct curve_element<CurveParams, 
-                                   forms::twisted_edwards, 
-                                   coordinates::affine> {
+                    struct curve_element<CurveParams, forms::twisted_edwards, coordinates::affine> {
 
                         using field_type = typename CurveParams::field_type;
+
                     private:
                         using params_type = CurveParams;
                         using field_value_type = typename field_type::value_type;
-                    public:
 
+                    public:
                         using form = forms::twisted_edwards;
                         using coordinates = coordinates::affine;
 
@@ -76,8 +73,8 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr curve_element() : curve_element(params_type::zero_fill[0], 
-                            params_type::zero_fill[1]) {};
+                        constexpr curve_element() :
+                            curve_element(params_type::zero_fill[0], params_type::zero_fill[1]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
@@ -139,20 +136,19 @@ namespace nil {
                         /** @brief
                          *
                          * @return true if element from group G1 lies on the elliptic curve
-                         * 
+                         *
                          * A check, that a*X*X + Y*Y = 1 + d*X*X*Y*Y
                          */
                         constexpr bool is_well_formed() const {
                             if (this->is_zero()) {
                                 return true;
                             } else {
-                                
+
                                 field_value_type XX = this->X.squared();
                                 field_value_type YY = this->Y.squared();
 
-                                return (field_value_type(params_type::a)*XX + YY == 
-                                    field_value_type::one() + 
-                                    field_value_type(params_type::d)*XX*YY);
+                                return (field_value_type(params_type::a) * XX + YY ==
+                                        field_value_type::one() + field_value_type(params_type::d) * XX * YY);
                             }
                         }
 
@@ -160,43 +156,43 @@ namespace nil {
 
                         // /** @brief
                         //  *
-                        //  * @return return the corresponding element from affine coordinates to 
+                        //  * @return return the corresponding element from affine coordinates to
                         //  * projective coordinates
                         //  */
                         // constexpr curve_element<
-                        //     params_type, 
-                        //     form, 
+                        //     params_type,
+                        //     form,
                         //     typename curves::coordinates::projective> to_projective () const {
 
-                        //     using result_type = curve_element<params_type, 
+                        //     using result_type = curve_element<params_type,
                         //         form, typename curves::coordinates::projective>;
 
-                        //     return result_type(X, Y, result_type::field_type::value_type::one()); // X = x, Y = y, Z = 1
+                        //     return result_type(X, Y, result_type::field_type::value_type::one()); // X = x, Y = y, Z
+                        //     = 1
                         // }
 
                         /** @brief
                          *
-                         * @return return the corresponding element from affine coordinates to 
+                         * @return return the corresponding element from affine coordinates to
                          * inverted coordinates
                          */
-                        constexpr curve_element<
-                            params_type, 
-                            form, 
-                            typename curves::coordinates::inverted> to_inverted () const {
+                        constexpr curve_element<params_type, form, typename curves::coordinates::inverted>
+                            to_inverted() const {
 
-                            using result_type = curve_element<params_type, 
-                                form, typename curves::coordinates::inverted>;
+                            using result_type =
+                                curve_element<params_type, form, typename curves::coordinates::inverted>;
 
-                            return result_type(X.inversed(), Y.inversed(), 
-                                result_type::field_type::value_type::one()); // X = x^(-1), Y = y^(-1), Z = 1
+                            return result_type(
+                                X.inversed(), Y.inversed(),
+                                result_type::field_type::value_type::one());    // X = x^(-1), Y = y^(-1), Z = 1
                         }
 
                         /** @brief
                          *
-                         * @return return the corresponding element from affine coordinates to 
+                         * @return return the corresponding element from affine coordinates to
                          * affine coordinates. Just for compatibility.
                          */
-                        constexpr curve_element to_affine () const {
+                        constexpr curve_element to_affine() const {
                             return *this;
                         }
 
@@ -243,28 +239,27 @@ namespace nil {
                             if (this->is_zero()) {
                                 return (*this);
                             } else {
-                                
-                                return this->add(*this); // Temporary intil we find something more efficient
+
+                                return this->add(*this);    // Temporary intil we find something more efficient
                             }
                         }
 
                     private:
                         /** @brief
-                         * Affine addition formulas: (x1,y1)+(x2,y2)=(x3,y3) where 
+                         * Affine addition formulas: (x1,y1)+(x2,y2)=(x3,y3) where
                          *   x3 = (x1*y2+y1*x2)/(1+d*x1*x2*y1*y2)
                          *   y3 = (y1*y2-a*x1*x2)/(1-d*x1*x2*y1*y2)
                          */
                         curve_element add(const curve_element &other) const {
-                            field_value_type XX = (this->X)*(other.X);
-                            field_value_type YY = (this->Y)*(other.Y);
-                            field_value_type XY = (this->X)*(other.Y);
-                            field_value_type YX = (this->Y)*(other.X);
+                            field_value_type XX = (this->X) * (other.X);
+                            field_value_type YY = (this->Y) * (other.Y);
+                            field_value_type XY = (this->X) * (other.Y);
+                            field_value_type YX = (this->Y) * (other.X);
 
                             field_value_type lambda = params_type::d * XX * YY;
-                            field_value_type X3 = (XY + YX) * 
-                                (field_value_type::one() + lambda).inversed();
-                            field_value_type Y3 = (YY - params_type::a * XX) * 
-                                (field_value_type::one() - lambda).inversed();
+                            field_value_type X3 = (XY + YX) * (field_value_type::one() + lambda).inversed();
+                            field_value_type Y3 =
+                                (YY - params_type::a * XX) * (field_value_type::one() - lambda).inversed();
 
                             return curve_element(X3, Y3);
                         }
@@ -274,26 +269,27 @@ namespace nil {
 
                         // /** @brief
                         //  *
-                        //  * @return return the corresponding element from twisted edwards form and 
+                        //  * @return return the corresponding element from twisted edwards form and
                         //  * affine coordinates to montgomery form and affine coordinates
                         //  */
                         // // This should be moved to montgomery form element constructor
-                        // curve_element<params_type, 
+                        // curve_element<params_type,
                         //     forms::montgomery, coordinates> to_montgomery() const {
                         //     field_value_type p_out[3];
 
-                        //     // The only points on the curve with x=0 or y=1 (for which birational equivalence is not valid), 
+                        //     // The only points on the curve with x=0 or y=1 (for which birational equivalence is not
+                        //     valid),
                         //     // are (0,1) and (0,-1), both of which are of low order, and should therefore not occur.
                         //     assert(!(this->X.is_zero()) && this->Y != field_value_type::one());
-                            
+
                         //     // (x, y) -> (u, v) where
                         //     //      u = (1 + y) / (1 - y)
                         //     //      v = u / x
-                        //     field_value_type u = 
-                        //         (field_value_type::one() + this->Y) * 
+                        //     field_value_type u =
+                        //         (field_value_type::one() + this->Y) *
                         //         (field_value_type::one() - this->Y).inversed();
-                        //     return curve_element<params_type, 
-                        //         forms::montgomery, coordinates>{u, 
+                        //     return curve_element<params_type,
+                        //         forms::montgomery, coordinates>{u,
                         //             params_type::scale * u * this->X.inversed()};
                         // }
                     };

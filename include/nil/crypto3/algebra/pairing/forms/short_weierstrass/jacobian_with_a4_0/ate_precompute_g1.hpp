@@ -39,12 +39,11 @@ namespace nil {
                     using types_policy = detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type>;
                     using g1_type = typename curve_type::g1_type<>;
                     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
-                public:
 
+                public:
                     using g1_precomputed_type = typename types_policy::ate_g1_precomputed_type;
 
-                    static g1_precomputed_type process(
-                        const typename g1_type::value_type &P) {
+                    static g1_precomputed_type process(const typename g1_type::value_type &P) {
 
                         typename g1_affine_type::value_type Pcopy = P.to_affine();
 
@@ -55,8 +54,8 @@ namespace nil {
                         return result;
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_PRECOMPUTE_G1_HPP

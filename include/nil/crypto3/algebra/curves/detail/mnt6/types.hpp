@@ -38,26 +38,19 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<std::size_t Version, typename Form, typename Coordinates>
                     struct mnt6_g1;
 
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<std::size_t Version, typename Form, typename Coordinates>
                     struct mnt6_g2;
 
-                    template<std::size_t Version, 
-                             typename Form>
+                    template<std::size_t Version, typename Form>
                     struct mnt6_params;
 
-                    template<std::size_t Version, 
-                             typename Form>
+                    template<std::size_t Version, typename Form>
                     struct mnt6_g1_params;
 
-                    template<std::size_t Version, 
-                             typename Form>
+                    template<std::size_t Version, typename Form>
                     struct mnt6_g2_params;
 
                     /** @brief A struct representing details about base and scalar fields.
@@ -75,12 +68,10 @@ namespace nil {
 
                         using integral_type = typename base_field_type::modulus_type;
 
-                        template<typename Form, 
-                             typename Coordinates>
+                        template<typename Form, typename Coordinates>
                         using g1_type = mnt6_g1<Version, Form, Coordinates>;
 
-                        template<typename Form, 
-                             typename Coordinates>
+                        template<typename Form, typename Coordinates>
                         using g2_type = mnt6_g2<Version, Form, Coordinates>;
                     };
 

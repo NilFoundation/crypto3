@@ -105,14 +105,12 @@ namespace nil {
                     constexpr typename std::size_t const fp3_extension_params<edwards_base_field<Version>>::s;
 
                     template<std::size_t Version>
-                    constexpr
-                        typename fp3_extension_params<edwards_base_field<Version>>::extended_modulus_type const
-                            fp3_extension_params<edwards_base_field<Version>>::t;
+                    constexpr typename fp3_extension_params<edwards_base_field<Version>>::extended_modulus_type const
+                        fp3_extension_params<edwards_base_field<Version>>::t;
 
                     template<std::size_t Version>
-                    constexpr
-                        typename fp3_extension_params<edwards_base_field<Version>>::extended_modulus_type const
-                            fp3_extension_params<edwards_base_field<Version>>::t_minus_1_over_2;
+                    constexpr typename fp3_extension_params<edwards_base_field<Version>>::extended_modulus_type const
+                        fp3_extension_params<edwards_base_field<Version>>::t_minus_1_over_2;
 
                     template<std::size_t Version>
                     constexpr std::array<typename fp3_extension_params<edwards_base_field<Version>>::modulus_type,
@@ -123,9 +121,8 @@ namespace nil {
                                          3> const fp3_extension_params<edwards_base_field<Version>>::nqr_to_t;
 
                     template<std::size_t Version>
-                    constexpr
-                        typename fp3_extension_params<edwards_base_field<Version>>::extended_modulus_type const
-                            fp3_extension_params<edwards_base_field<Version>>::group_order;
+                    constexpr typename fp3_extension_params<edwards_base_field<Version>>::extended_modulus_type const
+                        fp3_extension_params<edwards_base_field<Version>>::group_order;
 
                     template<std::size_t Version>
                     constexpr typename fp3_extension_params<edwards_base_field<Version>>::modulus_type const

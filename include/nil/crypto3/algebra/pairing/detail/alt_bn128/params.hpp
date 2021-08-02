@@ -42,11 +42,10 @@ namespace nil {
                         using curve_type = curves::alt_bn128<254>;
 
                     public:
-
                         using number_type = typename curve_type::base_field_type::modulus_type;
                         using extended_number_type = typename curve_type::base_field_type::extended_modulus_type;
 
-                        constexpr static const std::size_t number_type_max_bits = 
+                        constexpr static const std::size_t number_type_max_bits =
                             curve_type::base_field_type::modulus_bits;
 
                         constexpr static const number_type ate_loop_count = 0x19D797039BE763BA8_cppui254;
@@ -59,15 +58,14 @@ namespace nil {
 
                         using g2_field_type_value = typename curve_type::g2_type::field_type::value_type;
 
-                        constexpr static const g2_field_type_value twist = 
-                            g2_type::params_type::twist;
+                        constexpr static const g2_field_type_value twist = g2_type::params_type::twist;
                     };
 
-                    constexpr
-                        typename pairing_params<curves::alt_bn128<254>>::number_type const pairing_params<curves::alt_bn128<254>>::ate_loop_count;
+                    constexpr typename pairing_params<curves::alt_bn128<254>>::number_type const
+                        pairing_params<curves::alt_bn128<254>>::ate_loop_count;
 
-                    constexpr
-                        typename pairing_params<curves::alt_bn128<254>>::number_type const pairing_params<curves::alt_bn128<254>>::final_exponent_z;
+                    constexpr typename pairing_params<curves::alt_bn128<254>>::number_type const
+                        pairing_params<curves::alt_bn128<254>>::final_exponent_z;
 
                     constexpr typename pairing_params<curves::alt_bn128<254>>::extended_number_type const
                         pairing_params<curves::alt_bn128<254>>::final_exponent;

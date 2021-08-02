@@ -132,79 +132,79 @@ namespace nil {
 
                 constexpr std::size_t const arithmetic_params<mnt6_base_field<298>>::s;
                 constexpr std::size_t const arithmetic_params<fp3<mnt6_base_field<298>>>::s;
-                //constexpr std::size_t const arithmetic_params<mnt6_scalar_field<298>>::s;
+                // constexpr std::size_t const arithmetic_params<mnt6_scalar_field<298>>::s;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::t;
                 constexpr typename arithmetic_params<fp3<mnt6_base_field<298>>>::extended_modulus_type const
                     arithmetic_params<fp3<mnt6_base_field<298>>>::t;
-                //constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
-                //    arithmetic_params<mnt6_scalar_field<298>>::t;
+                // constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                //     arithmetic_params<mnt6_scalar_field<298>>::t;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::t_minus_1_over_2;
                 constexpr typename arithmetic_params<fp3<mnt6_base_field<298>>>::extended_modulus_type const
                     arithmetic_params<fp3<mnt6_base_field<298>>>::t_minus_1_over_2;
-                //constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
-                //    arithmetic_params<mnt6_scalar_field<298>>::t_minus_1_over_2;
+                // constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                //     arithmetic_params<mnt6_scalar_field<298>>::t_minus_1_over_2;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::arithmetic_generator;
-                //constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
-                //    arithmetic_params<mnt6_scalar_field<298>>::arithmetic_generator;
+                // constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                //     arithmetic_params<mnt6_scalar_field<298>>::arithmetic_generator;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::geometric_generator;
-                //constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
-                //    arithmetic_params<mnt6_scalar_field<298>>::geometric_generator;
+                // constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                //     arithmetic_params<mnt6_scalar_field<298>>::geometric_generator;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::multiplicative_generator;
-                //constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
-                //    arithmetic_params<mnt6_scalar_field<298>>::multiplicative_generator;
+                // constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                //     arithmetic_params<mnt6_scalar_field<298>>::multiplicative_generator;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::root_of_unity;
-                //constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
-                //    arithmetic_params<mnt6_scalar_field<298>>::root_of_unity;
+                // constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                //     arithmetic_params<mnt6_scalar_field<298>>::root_of_unity;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::nqr;
                 constexpr std::array<typename arithmetic_params<fp3<mnt6_base_field<298>>>::modulus_type, 3> const
                     arithmetic_params<fp3<mnt6_base_field<298>>>::nqr;
-                //constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
-                //    arithmetic_params<mnt6_scalar_field<298>>::nqr;
+                // constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                //     arithmetic_params<mnt6_scalar_field<298>>::nqr;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::nqr_to_t;
                 constexpr std::array<typename arithmetic_params<fp3<mnt6_base_field<298>>>::modulus_type, 3> const
                     arithmetic_params<fp3<mnt6_base_field<298>>>::nqr_to_t;
-                //constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
-                //    arithmetic_params<mnt6_scalar_field<298>>::nqr_to_t;
+                // constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                //     arithmetic_params<mnt6_scalar_field<298>>::nqr_to_t;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::Rsquared;
-                //constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
-                //    arithmetic_params<mnt6_scalar_field<298>>::Rsquared;
+                // constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                //     arithmetic_params<mnt6_scalar_field<298>>::Rsquared;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::Rcubed;
-                //constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
-                //    arithmetic_params<mnt6_scalar_field<298>>::Rcubed;
+                // constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                //     arithmetic_params<mnt6_scalar_field<298>>::Rcubed;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::modulus;
                 constexpr typename arithmetic_params<fp3<mnt6_base_field<298>>>::modulus_type const
                     arithmetic_params<fp3<mnt6_base_field<298>>>::modulus;
-                //constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
-                //    arithmetic_params<mnt6_scalar_field<298>>::modulus;
+                // constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                //     arithmetic_params<mnt6_scalar_field<298>>::modulus;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::group_order;
                 constexpr typename arithmetic_params<fp3<mnt6_base_field<298>>>::extended_modulus_type const
                     arithmetic_params<fp3<mnt6_base_field<298>>>::group_order;
-                //constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
-                //    arithmetic_params<mnt6_scalar_field<298>>::group_order;
+                // constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                //     arithmetic_params<mnt6_scalar_field<298>>::group_order;
 
             }    // namespace fields
         }        // namespace algebra

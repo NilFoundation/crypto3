@@ -42,11 +42,10 @@ namespace nil {
                         using curve_type = curves::edwards<183>;
 
                     public:
-
                         using integral_type = typename curve_type::base_field_type::modulus_type;
                         using extended_integral_type = typename curve_type::base_field_type::extended_modulus_type;
 
-                        constexpr static const std::size_t integral_type_max_bits = 
+                        constexpr static const std::size_t integral_type_max_bits =
                             curve_type::base_field_type::modulus_bits;
 
                         constexpr static const integral_type ate_loop_count =
@@ -63,17 +62,16 @@ namespace nil {
 
                         using g2_field_type_value = typename curve_type::g2_type<>::field_type::value_type;
 
-                        constexpr static const g2_field_type_value twist = 
-                            curve_type::g2_type<>::value_type::twist;
+                        constexpr static const g2_field_type_value twist = curve_type::g2_type<>::value_type::twist;
                     };
 
-                    constexpr
-                        typename pairing_params<curves::edwards<183>>::integral_type const pairing_params<curves::edwards<183>>::ate_loop_count;
-                    constexpr
-                        typename pairing_params<curves::edwards<183>>::integral_type const pairing_params<curves::edwards<183>>::final_exponent_last_chunk_abs_of_w0;
+                    constexpr typename pairing_params<curves::edwards<183>>::integral_type const
+                        pairing_params<curves::edwards<183>>::ate_loop_count;
+                    constexpr typename pairing_params<curves::edwards<183>>::integral_type const
+                        pairing_params<curves::edwards<183>>::final_exponent_last_chunk_abs_of_w0;
 
-                    constexpr
-                        typename pairing_params<curves::edwards<183>>::integral_type const pairing_params<curves::edwards<183>>::final_exponent_last_chunk_w1;
+                    constexpr typename pairing_params<curves::edwards<183>>::integral_type const
+                        pairing_params<curves::edwards<183>>::final_exponent_last_chunk_w1;
 
                     constexpr typename pairing_params<curves::edwards<183>>::extended_integral_type const
                         pairing_params<curves::edwards<183>>::final_exponent;

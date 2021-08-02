@@ -46,13 +46,14 @@ namespace nil {
                     using types_policy = detail::short_weierstrass_projective_types_policy<curve_type>;
 
                     using gt_type = typename curve_type::gt_type;
-                
-                    static typename gt_type::value_type final_exponentiation_last_chunk(
-                        const typename gt_type::value_type &elt, 
-                        const typename gt_type::value_type &elt_inv) {
+
+                    static typename gt_type::value_type
+                        final_exponentiation_last_chunk(const typename gt_type::value_type &elt,
+                                                        const typename gt_type::value_type &elt_inv) {
 
                         const typename gt_type::value_type elt_q = elt.Frobenius_map(1);
-                        typename gt_type::value_type w1_part = elt_q.cyclotomic_exp(params_type::final_exponent_last_chunk_w1);
+                        typename gt_type::value_type w1_part =
+                            elt_q.cyclotomic_exp(params_type::final_exponent_last_chunk_w1);
                         typename gt_type::value_type w0_part;
                         if (params_type::final_exponent_last_chunk_is_w0_neg) {
                             w0_part = elt_inv.cyclotomic_exp(params_type::final_exponent_last_chunk_abs_of_w0);
@@ -64,9 +65,9 @@ namespace nil {
                         return result;
                     }
 
-                    static typename gt_type::value_type final_exponentiation_first_chunk(
-                        const typename gt_type::value_type &elt, 
-                        const typename gt_type::value_type &elt_inv) {
+                    static typename gt_type::value_type
+                        final_exponentiation_first_chunk(const typename gt_type::value_type &elt,
+                                                         const typename gt_type::value_type &elt_inv) {
 
                         /* (q^2-1) */
 
@@ -79,18 +80,18 @@ namespace nil {
                     }
 
                 public:
-
                     static typename gt_type::value_type process(const typename gt_type::value_type &elt) {
 
                         const typename gt_type::value_type elt_inv = elt.inversed();
-                        const typename gt_type::value_type elt_to_first_chunk = final_exponentiation_first_chunk(elt, elt_inv);
-                        const typename gt_type::value_type elt_inv_to_first_chunk = final_exponentiation_first_chunk(elt_inv, elt);
+                        const typename gt_type::value_type elt_to_first_chunk =
+                            final_exponentiation_first_chunk(elt, elt_inv);
+                        const typename gt_type::value_type elt_inv_to_first_chunk =
+                            final_exponentiation_first_chunk(elt_inv, elt);
                         return final_exponentiation_last_chunk(elt_to_first_chunk, elt_inv_to_first_chunk);
-
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_MNT4_298_FINAL_EXPONENTIATION_HPP

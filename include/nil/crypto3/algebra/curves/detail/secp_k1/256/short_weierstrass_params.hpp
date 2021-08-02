@@ -44,14 +44,16 @@ namespace nil {
                         using scalar_field_type = typename secp_k1_types<256>::scalar_field_type;
 
                         constexpr static const typename secp_k1_types<256>::integral_type a =
-                            typename secp_k1_types<256>::integral_type(0x00);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
-                        constexpr static const typename secp_k1_types<256>::integral_type b = 
-                            typename secp_k1_types<256>::integral_type(0x07);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                            typename secp_k1_types<256>::integral_type(
+                                0x00);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                        constexpr static const typename secp_k1_types<256>::integral_type b =
+                            typename secp_k1_types<256>::integral_type(
+                                0x07);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
                     };
 
                     template<>
-                    struct secp_k1_g1_params<256, forms::short_weierstrass> : 
-                            public secp_k1_params<256, forms::short_weierstrass> {
+                    struct secp_k1_g1_params<256, forms::short_weierstrass>
+                        : public secp_k1_params<256, forms::short_weierstrass> {
 
                         using field_type = typename secp_k1_types<256>::g1_field_type;
 
@@ -68,12 +70,16 @@ namespace nil {
                                 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8_cppui256)};
                     };
 
-                    constexpr typename secp_k1_types<256>::integral_type const secp_k1_params<256, forms::short_weierstrass>::a;
-                    constexpr typename secp_k1_types<256>::integral_type const secp_k1_params<256, forms::short_weierstrass>::b;
+                    constexpr typename secp_k1_types<256>::integral_type const
+                        secp_k1_params<256, forms::short_weierstrass>::a;
+                    constexpr typename secp_k1_types<256>::integral_type const
+                        secp_k1_params<256, forms::short_weierstrass>::b;
 
-                    constexpr std::array<typename secp_k1_g1_params<256, forms::short_weierstrass>::field_type::value_type, 2> const
+                    constexpr std::array<
+                        typename secp_k1_g1_params<256, forms::short_weierstrass>::field_type::value_type, 2> const
                         secp_k1_g1_params<256, forms::short_weierstrass>::zero_fill;
-                    constexpr std::array<typename secp_k1_g1_params<256, forms::short_weierstrass>::field_type::value_type, 2> const
+                    constexpr std::array<
+                        typename secp_k1_g1_params<256, forms::short_weierstrass>::field_type::value_type, 2> const
                         secp_k1_g1_params<256, forms::short_weierstrass>::one_fill;
 
                 }    // namespace detail

@@ -32,28 +32,27 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    /** @brief A struct representing element addition from the group G1 of short Weierstrass curve 
+                    /** @brief A struct representing element addition from the group G1 of short Weierstrass curve
                      *  for jacobian_with_a4_0 coordinates representation.
-                     *  NOTE: does not handle O and pts of order 2,4 
+                     *  NOTE: does not handle O and pts of order 2,4
                      *  http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#addition-add-2007-bl
                      */
-                    
+
                     struct short_weierstrass_element_g1_jacobian_with_a4_0_add_2007_bl {
 
-                        template <typename ElementType>
-                        constexpr static inline ElementType process(
-                            const ElementType &first, 
-                            const ElementType &second) {
+                        template<typename ElementType>
+                        constexpr static inline ElementType process(const ElementType &first,
+                                                                    const ElementType &second) {
 
                             using field_value_type = typename ElementType::field_type::value_type;
 
-                            field_value_type Z1Z1 = (first.Z).squared();           // Z1Z1 = Z1^2
+                            field_value_type Z1Z1 = (first.Z).squared();            // Z1Z1 = Z1^2
                             field_value_type Z2Z2 = (second.Z).squared();           // Z2Z2 = Z2^2
-                            field_value_type U1 = (first.X) * Z2Z2;                // U1 = X1 * Z2Z2
+                            field_value_type U1 = (first.X) * Z2Z2;                 // U1 = X1 * Z2Z2
                             field_value_type U2 = (second.X) * Z1Z1;                // U2 = X2 * Z1Z1
                             field_value_type S1 = (first.Y) * (second.Z) * Z2Z2;    // S1 = Y1 * Z2 * Z2Z2
                             field_value_type S2 = (second.Y) * (first.Z) * Z1Z1;    // S2 = Y2 * Z1 * Z1Z1
-                            field_value_type H = U2 - U1;                          // H = U2-U1
+                            field_value_type H = U2 - U1;                           // H = U2-U1
                             field_value_type S2_minus_S1 = S2 - S1;
                             field_value_type I = (H + H).squared();             // I = (2 * H)^2
                             field_value_type J = H * I;                         // J = H * I

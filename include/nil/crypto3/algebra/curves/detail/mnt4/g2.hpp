@@ -43,9 +43,7 @@ namespace nil {
                      *    @tparam Version version of the curve
                      *
                      */
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<std::size_t Version, typename Form, typename Coordinates>
                     struct mnt4_g2 {
                         using params_type = mnt4_g2_params<Version, Form>;
 

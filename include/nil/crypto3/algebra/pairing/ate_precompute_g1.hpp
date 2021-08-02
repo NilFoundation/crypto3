@@ -34,8 +34,8 @@ namespace nil {
                 template<typename CurveType>
                 class ate_precompute_g1;
 
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_ATE_PRECOMPUTE_G1_HPP

@@ -42,17 +42,16 @@ namespace nil {
                     typedef typename types_policy::base_field_type base_field_type;
                     typedef typename types_policy::scalar_field_type scalar_field_type;
 
-                    template <typename Coordinates = coordinates::jacobian_with_a4_0, 
-                              typename Form = forms::short_weierstrass>
-                    using g1_type = typename detail::secp_k1_g1<Version, 
-                        Form, Coordinates>;
+                    template<typename Coordinates = coordinates::jacobian_with_a4_0,
+                             typename Form = forms::short_weierstrass>
+                    using g1_type = typename detail::secp_k1_g1<Version, Form, Coordinates>;
                 };
 
                 typedef secp_k1<160> secp160k1;
                 typedef secp_k1<192> secp192k1;
                 typedef secp_k1<224> secp224k1;
                 typedef secp_k1<256> secp256k1;
-                
+
             }    // namespace curves
         }        // namespace algebra
     }            // namespace crypto3

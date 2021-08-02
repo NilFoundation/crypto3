@@ -40,36 +40,33 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    /** @brief A struct representing a group G1 of elliptic curve. 
-                     *    @tparam CurveParams Parameters of the group 
-                     *    @tparam Form Form of the curve 
-                     *    @tparam Coordinates Representation coordinates of the group element 
+                    /** @brief A struct representing a group G1 of elliptic curve.
+                     *    @tparam CurveParams Parameters of the group
+                     *    @tparam Form Form of the curve
+                     *    @tparam Coordinates Representation coordinates of the group element
                      */
-                    template<typename CurveParams, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<typename CurveParams, typename Form, typename Coordinates>
                     struct curve_element;
 
-                    /** @brief A struct representing an element from the group G1 of twisted Edwards curve of 
+                    /** @brief A struct representing an element from the group G1 of twisted Edwards curve of
                      *  inverted coordinates representation.
                      *  Description: http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html
                      *
                      */
                     template<typename CurveParams>
-                    struct curve_element<CurveParams, 
-                                   forms::twisted_edwards, 
-                                   coordinates::inverted> {
+                    struct curve_element<CurveParams, forms::twisted_edwards, coordinates::inverted> {
 
                         using params_type = CurveParams;
                         using field_type = typename params_type::field_type;
+
                     private:
                         using field_value_type = typename field_type::value_type;
 
-                        using common_addition_processor = twisted_edwards_element_g1_inverted_add_2008_bbjlp; 
+                        using common_addition_processor = twisted_edwards_element_g1_inverted_add_2008_bbjlp;
                         using common_doubling_processor = twisted_edwards_element_g1_inverted_dbl_2008_bbjlp;
                         using mixed_addition_processor = twisted_edwards_element_g1_inverted_madd_2008_bbjlp;
-                    public:
 
+                    public:
                         using form = forms::twisted_edwards;
                         using coordinates = coordinates::inverted;
 
@@ -85,18 +82,16 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr curve_element() : curve_element(
-                            params_type::zero_fill[1], 
-                            params_type::zero_fill[0], 
-                            field_value_type::zero()) {};
+                        constexpr curve_element() :
+                            curve_element(params_type::zero_fill[1],
+                                          params_type::zero_fill[0],
+                                          field_value_type::zero()) {};
 
                         /** @brief
                          *    @return the selected point (X:Y:Z)
                          *
                          */
-                        constexpr curve_element(field_value_type X,
-                                                  field_value_type Y,
-                                                  field_value_type Z) {
+                        constexpr curve_element(field_value_type X, field_value_type Y, field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -113,10 +108,9 @@ namespace nil {
                          *
                          */
                         constexpr static curve_element one() {
-                            return curve_element(
-                                params_type::one_fill[0].inversed(), 
-                                params_type::one_fill[1].inversed(), 
-                                field_value_type::one());
+                            return curve_element(params_type::one_fill[0].inversed(),
+                                                 params_type::one_fill[1].inversed(),
+                                                 field_value_type::one());
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -155,7 +149,7 @@ namespace nil {
                         constexpr bool is_zero() const {
                             return (this->Y.is_zero() && this->Z.is_zero());
                         }
-                        
+
                         /** @brief
                          *
                          * @return true if element from group G1 lies on the elliptic curve
@@ -165,25 +159,22 @@ namespace nil {
                         }
 
                         /*************************  Reducing operations  ***********************************/
-                        
+
                         /** @brief
                          *
-                         * @return return the corresponding element from inverted coordinates to 
+                         * @return return the corresponding element from inverted coordinates to
                          * affine coordinates
                          */
-                        constexpr curve_element<
-                            params_type, 
-                            form, 
-                            typename curves::coordinates::affine> to_affine () const {
+                        constexpr curve_element<params_type, form, typename curves::coordinates::affine>
+                            to_affine() const {
 
-                            using result_type = curve_element<params_type, 
-                                form, typename curves::coordinates::affine>;
-                            
-                            if (is_zero()){
+                            using result_type = curve_element<params_type, form, typename curves::coordinates::affine>;
+
+                            if (is_zero()) {
                                 return result_type::zero();
                             }
 
-                            return result_type(Z/X, Z/Y); //  x=Z/X, y=Z/Y
+                            return result_type(Z / X, Z / Y);    //  x=Z/X, y=Z/Y
                         }
 
                         /*************************  Arithmetic operations  ***********************************/
@@ -221,7 +212,7 @@ namespace nil {
                         constexpr curve_element operator-(const curve_element &other) const {
                             return (*this) + (-other);
                         }
-                        
+
                         /** @brief
                          *
                          * @return doubled element from group G1

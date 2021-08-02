@@ -106,12 +106,12 @@ namespace nil {
                         fp2_extension_params<mnt4_base_field<Version>>::t_minus_1_over_2;
 
                     template<std::size_t Version>
-                    constexpr std::array<typename fp2_extension_params<mnt4_base_field<Version>>::modulus_type,
-                                         2> const fp2_extension_params<mnt4_base_field<Version>>::nqr;
+                    constexpr std::array<typename fp2_extension_params<mnt4_base_field<Version>>::modulus_type, 2> const
+                        fp2_extension_params<mnt4_base_field<Version>>::nqr;
 
                     template<std::size_t Version>
-                    constexpr std::array<typename fp2_extension_params<mnt4_base_field<Version>>::modulus_type,
-                                         2> const fp2_extension_params<mnt4_base_field<Version>>::nqr_to_t;
+                    constexpr std::array<typename fp2_extension_params<mnt4_base_field<Version>>::modulus_type, 2> const
+                        fp2_extension_params<mnt4_base_field<Version>>::nqr_to_t;
 
                     template<std::size_t Version>
                     constexpr typename fp2_extension_params<mnt4_base_field<Version>>::extended_modulus_type const
@@ -122,8 +122,7 @@ namespace nil {
                         fp2_extension_params<mnt4_base_field<Version>>::modulus;
 
                     template<std::size_t Version>
-                    constexpr std::array<typename fp2_extension_params<mnt4_base_field<Version>>::modulus_type,
-                                         2> const
+                    constexpr std::array<typename fp2_extension_params<mnt4_base_field<Version>>::modulus_type, 2> const
                         fp2_extension_params<mnt4_base_field<Version>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields

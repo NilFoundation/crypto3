@@ -43,9 +43,7 @@ namespace nil {
                      *    @tparam Version version of the curve
                      *
                      */
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<std::size_t Version, typename Form, typename Coordinates>
                     struct secp_k1_g1 {
 
                         using params_type = secp_k1_g1_params<Version, Form>;

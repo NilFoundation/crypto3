@@ -104,24 +104,22 @@ namespace nil {
                     }*/
 
                     template<typename GroupValueType, typename FieldValueType>
-                    typename std::enable_if<
-                        is_curve_group<typename GroupValueType::group_type>::value &&
-                            !is_field<typename GroupValueType::group_type>::value &&
-                            is_field<typename FieldValueType::field_type>::value &&
-                            !is_extended_field<typename FieldValueType::field_type>::value,
-                        GroupValueType>::type
+                    typename std::enable_if<is_curve_group<typename GroupValueType::group_type>::value &&
+                                                !is_field<typename GroupValueType::group_type>::value &&
+                                                is_field<typename FieldValueType::field_type>::value &&
+                                                !is_extended_field<typename FieldValueType::field_type>::value,
+                                            GroupValueType>::type
                         operator*(const GroupValueType &left, const FieldValueType &right) {
 
                         return left * right.data;
                     }
 
                     template<typename GroupValueType, typename FieldValueType>
-                    typename std::enable_if<
-                        is_curve_group<typename GroupValueType::group_type>::value &&
-                            !is_field<typename GroupValueType::group_type>::value &&
-                            is_field<typename FieldValueType::field_type>::value &&
-                            !is_extended_field<typename FieldValueType::field_type>::value,
-                        GroupValueType>::type
+                    typename std::enable_if<is_curve_group<typename GroupValueType::group_type>::value &&
+                                                !is_field<typename GroupValueType::group_type>::value &&
+                                                is_field<typename FieldValueType::field_type>::value &&
+                                                !is_extended_field<typename FieldValueType::field_type>::value,
+                                            GroupValueType>::type
                         operator*(const FieldValueType &left, const GroupValueType &right) {
 
                         return right * left;

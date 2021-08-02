@@ -82,14 +82,14 @@ namespace nil {
                     };
 
                     template<std::size_t Version>
-                    constexpr typename fp12_2over3over2_extension_params<bn128_base_field<Version>>::non_residue_type
-                        const fp12_2over3over2_extension_params<bn128_base_field<Version>>::non_residue;
+                    constexpr
+                        typename fp12_2over3over2_extension_params<bn128_base_field<Version>>::non_residue_type const
+                            fp12_2over3over2_extension_params<bn128_base_field<Version>>::non_residue;
 
                     template<std::size_t Version>
                     constexpr std::array<
                         typename fp12_2over3over2_extension_params<bn128_base_field<Version>>::modulus_type,
-                        12 * 2> const
-                        fp12_2over3over2_extension_params<bn128_base_field<Version>>::Frobenius_coeffs_c1;
+                        12 * 2> const fp12_2over3over2_extension_params<bn128_base_field<Version>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

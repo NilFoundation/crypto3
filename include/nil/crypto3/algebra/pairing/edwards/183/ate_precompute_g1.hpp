@@ -45,24 +45,25 @@ namespace nil {
 
                     using g1_type = typename curve_type::g1_type<>;
                     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
-                public:
 
+                public:
                     using g1_precomputed_type = typename types_policy::ate_g1_precomputed_type;
 
-                    static typename types_policy::ate_g1_precomputed_type  process(
-                        const typename g1_type::value_type &P) {
+                    static typename types_policy::ate_g1_precomputed_type
+                        process(const typename g1_type::value_type &P) {
 
                         typename g1_affine_type::value_type Pcopy = P.to_affine();
                         typename types_policy::ate_g1_precomputed_type result;
                         result.P_XY = Pcopy.X * Pcopy.Y;
-                        result.P_XZ = Pcopy.X;                        // P.X * P.Z but P.Z = 1
-                        result.P_ZZplusYZ = (g1_type::field_type::value_type::one() + Pcopy.Y);    // (P.Z + P.Y) * P.Z but P.Z =
+                        result.P_XZ = Pcopy.X;    // P.X * P.Z but P.Z = 1
+                        result.P_ZZplusYZ =
+                            (g1_type::field_type::value_type::one() + Pcopy.Y);    // (P.Z + P.Y) * P.Z but P.Z =
 
                         return result;
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_ATE_PRECOMPUTE_G1_HPP

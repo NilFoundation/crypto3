@@ -32,17 +32,16 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    /** @brief A struct representing element doubling from the group G1 of Edwards curve 
+                    /** @brief A struct representing element doubling from the group G1 of Edwards curve
                      *  for inversed coordinates representation.
-                     *  NOTE: does not handle O and pts of order 2,4 
+                     *  NOTE: does not handle O and pts of order 2,4
                      *  http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#doubling-dbl-2007-bl
                      */
-                    
+
                     struct edwards_element_g1_inverted_dbl_2007_bl {
 
-                        template <typename ElementType>
-                        constexpr static inline ElementType process(
-                            const ElementType &first) {
+                        template<typename ElementType>
+                        constexpr static inline ElementType process(const ElementType &first) {
 
                             using field_value_type = typename ElementType::field_type::value_type;
 
@@ -56,10 +55,10 @@ namespace nil {
                                 field_value_type D = A - B;                                // D = A-B
                                 field_value_type E = (first.X + first.Y).squared() - C;    // E = (X1+Y1)^2-C
                                 field_value_type X3 = C * D;                               // X3 = C*D
-                                field_value_type dZZ = ElementType::params_type::c * 
-                                    ElementType::params_type::c * ElementType::params_type::d * first.Z.squared();
-                                field_value_type Y3 = E * (C - dZZ - dZZ);    // Y3 = E*(C-c*c*2*d*Z1^2)
-                                field_value_type Z3 = ElementType::params_type::c * D * E;                  // Z3 = c*D*E
+                                field_value_type dZZ = ElementType::params_type::c * ElementType::params_type::c *
+                                                       ElementType::params_type::d * first.Z.squared();
+                                field_value_type Y3 = E * (C - dZZ - dZZ);                    // Y3 = E*(C-c*c*2*d*Z1^2)
+                                field_value_type Z3 = ElementType::params_type::c * D * E;    // Z3 = c*D*E
 
                                 return ElementType(X3, Y3, Z3);
                             }

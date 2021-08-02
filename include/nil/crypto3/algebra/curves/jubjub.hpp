@@ -38,25 +38,26 @@ namespace nil {
         namespace algebra {
             namespace curves {
 
-                /** @brief A struct representing a [JubJub](https://raw.githubusercontent.com/zcash/zips/master/protocol/protocol.pdf#jubjub) 
-                 * twisted Edwards elliptic curve defined over Bls12-381 scalar field and described by equation ax^2 + y^2 = 1 + dx^2y^2.
+                /** @brief A struct representing a
+                 * [JubJub](https://raw.githubusercontent.com/zcash/zips/master/protocol/protocol.pdf#jubjub) twisted
+                 * Edwards elliptic curve defined over Bls12-381 scalar field and described by equation ax^2 + y^2 = 1 +
+                 * dx^2y^2.
                  *    @tparam Version version of the curve
                  *
                  */
                 class jubjub {
 
                     using types_policy = detail::jubjub_types;
-                public:
 
+                public:
                     typedef typename types_policy::base_field_type base_field_type;
                     typedef typename types_policy::scalar_field_type scalar_field_type;
 
-                    template <typename Coordinates = coordinates::affine, 
-                              typename Form = forms::twisted_edwards>
+                    template<typename Coordinates = coordinates::affine, typename Form = forms::twisted_edwards>
                     using g1_type = typename detail::jubjub_g1<Form, Coordinates>;
 
                     // typedef typename curves::bls12<381> chained_on_curve_type;
-                    
+
                     // typedef typename pairing::pairing_policy<edwards<version>,
                     //                                          pairing::detail::edwards_pairing_functions<Version>>
                     //     pairing;

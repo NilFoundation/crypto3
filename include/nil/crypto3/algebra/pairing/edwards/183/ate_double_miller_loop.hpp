@@ -48,21 +48,20 @@ namespace nil {
                     using params_type = detail::pairing_params<curve_type>;
                     using types_policy = detail::types_policy<curve_type>;
                     using gt_type = typename curve_type::gt_type;
-                public:
 
-                    static typename gt_type::value_type process(
-                        const typename types_policy::ate_g1_precomputed_type &prec_P1, 
-                        const typename types_policy::ate_g2_precomputed_type &prec_Q1,
-                        const typename types_policy::ate_g1_precomputed_type &prec_P2, 
-                        const typename types_policy::ate_g2_precomputed_type &prec_Q2) {
+                public:
+                    static typename gt_type::value_type
+                        process(const typename types_policy::ate_g1_precomputed_type &prec_P1,
+                                const typename types_policy::ate_g2_precomputed_type &prec_Q1,
+                                const typename types_policy::ate_g1_precomputed_type &prec_P2,
+                                const typename types_policy::ate_g2_precomputed_type &prec_Q2) {
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 
                         bool found_one = false;
                         std::size_t idx = 0;
 
-                        const typename types_policy::integral_type &loop_count = 
-                            params_type::ate_loop_count;
+                        const typename types_policy::integral_type &loop_count = params_type::ate_loop_count;
 
                         for (long i = params_type::integral_type_max_bits - 1; i >= 0; --i) {
                             const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
@@ -79,23 +78,21 @@ namespace nil {
                             typename types_policy::Fq3_conic_coefficients cc2 = prec_Q2[idx];
                             ++idx;
 
-                            typename gt_type::value_type g_RR_at_P1 = typename gt_type::value_type(prec_P1.P_XY * cc1.c_XY + prec_P1.P_XZ * cc1.c_XZ,
-                                               prec_P1.P_ZZplusYZ * cc1.c_ZZ);
+                            typename gt_type::value_type g_RR_at_P1 = typename gt_type::value_type(
+                                prec_P1.P_XY * cc1.c_XY + prec_P1.P_XZ * cc1.c_XZ, prec_P1.P_ZZplusYZ * cc1.c_ZZ);
 
-                            typename gt_type::value_type g_RR_at_P2 = typename gt_type::value_type(prec_P2.P_XY * cc2.c_XY + prec_P2.P_XZ * cc2.c_XZ,
-                                               prec_P2.P_ZZplusYZ * cc2.c_ZZ);
+                            typename gt_type::value_type g_RR_at_P2 = typename gt_type::value_type(
+                                prec_P2.P_XY * cc2.c_XY + prec_P2.P_XZ * cc2.c_XZ, prec_P2.P_ZZplusYZ * cc2.c_ZZ);
                             f = f.squared() * g_RR_at_P1 * g_RR_at_P2;
 
                             if (bit) {
                                 cc1 = prec_Q1[idx];
                                 cc2 = prec_Q2[idx];
                                 ++idx;
-                                typename gt_type::value_type g_RQ_at_P1 = 
-                                    typename gt_type::value_type(prec_P1.P_ZZplusYZ * cc1.c_ZZ,
-                                                   prec_P1.P_XY * cc1.c_XY + prec_P1.P_XZ * cc1.c_XZ);
-                                typename gt_type::value_type g_RQ_at_P2 = 
-                                    typename gt_type::value_type(prec_P2.P_ZZplusYZ * cc2.c_ZZ,
-                                                   prec_P2.P_XY * cc2.c_XY + prec_P2.P_XZ * cc2.c_XZ);
+                                typename gt_type::value_type g_RQ_at_P1 = typename gt_type::value_type(
+                                    prec_P1.P_ZZplusYZ * cc1.c_ZZ, prec_P1.P_XY * cc1.c_XY + prec_P1.P_XZ * cc1.c_XZ);
+                                typename gt_type::value_type g_RQ_at_P2 = typename gt_type::value_type(
+                                    prec_P2.P_ZZplusYZ * cc2.c_ZZ, prec_P2.P_XY * cc2.c_XY + prec_P2.P_XZ * cc2.c_XZ);
                                 f = f * g_RQ_at_P1 * g_RQ_at_P2;
                             }
                         }
@@ -103,8 +100,8 @@ namespace nil {
                         return f;
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_ATE_DOUBLE_MILLER_LOOP_HPP

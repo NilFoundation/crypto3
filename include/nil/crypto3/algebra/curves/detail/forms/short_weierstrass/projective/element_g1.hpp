@@ -40,39 +40,36 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    /** @brief A struct representing a group G1 of elliptic curve. 
-                     *    @tparam CurveParams Parameters of the group 
-                     *    @tparam Form Form of the curve 
-                     *    @tparam Coordinates Representation coordinates of the group element 
+                    /** @brief A struct representing a group G1 of elliptic curve.
+                     *    @tparam CurveParams Parameters of the group
+                     *    @tparam Form Form of the curve
+                     *    @tparam Coordinates Representation coordinates of the group element
                      */
-                    template<typename CurveParams, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<typename CurveParams, typename Form, typename Coordinates>
                     struct curve_element;
 
-                    /** @brief A struct representing an element from the group G1 of short Weierstrass curve of 
+                    /** @brief A struct representing an element from the group G1 of short Weierstrass curve of
                      *  projective coordinates representation.
                      *  Description: https://hyperelliptic.org/EFD/g1p/auto-shortw-projective.html
                      *
                      */
                     template<typename CurveParams>
-                    struct curve_element<CurveParams, 
-                                   forms::short_weierstrass, 
-                                   coordinates::projective> {
+                    struct curve_element<CurveParams, forms::short_weierstrass, coordinates::projective> {
 
                         using params_type = CurveParams;
                         using field_type = typename params_type::field_type;
+
                     private:
                         using field_value_type = typename field_type::value_type;
 
-                        using common_addition_processor = short_weierstrass_element_g1_projective_add_1998_cmo_2; 
+                        using common_addition_processor = short_weierstrass_element_g1_projective_add_1998_cmo_2;
                         using common_doubling_processor = short_weierstrass_element_g1_projective_dbl_2007_bl;
-                    public:
 
+                    public:
                         using form = forms::short_weierstrass;
                         using coordinates = coordinates::projective;
 
-                        using group_type = typename params_type::group_type<coordinates>;
+                        using group_type = typename params_type::template group_type<coordinates>;
 
                         field_value_type X;
                         field_value_type Y;
@@ -84,18 +81,16 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr curve_element() : curve_element(
-                            params_type::zero_fill[0], 
-                            params_type::zero_fill[1], 
-                            field_value_type::zero()) {};
+                        constexpr curve_element() :
+                            curve_element(params_type::zero_fill[0],
+                                          params_type::zero_fill[1],
+                                          field_value_type::zero()) {};
 
                         /** @brief
                          *    @return the selected point (X:Y:Z)
                          *
                          */
-                        constexpr curve_element(field_value_type X,
-                                                  field_value_type Y,
-                                                  field_value_type Z) {
+                        constexpr curve_element(field_value_type X, field_value_type Y, field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -112,8 +107,8 @@ namespace nil {
                          *
                          */
                         constexpr static curve_element one() {
-                            return curve_element(params_type::one_fill[0], params_type::one_fill[1], 
-                                field_value_type::one());
+                            return curve_element(params_type::one_fill[0], params_type::one_fill[1],
+                                                 field_value_type::one());
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -152,7 +147,7 @@ namespace nil {
                         constexpr bool is_zero() const {
                             return (this->X.is_zero() && this->Z.is_zero());
                         }
-                        
+
                         /** @brief
                          *
                          * @return true if element from group G1 lies on the elliptic curve
@@ -180,25 +175,22 @@ namespace nil {
                         }
 
                         /*************************  Reducing operations  ***********************************/
-                        
+
                         /** @brief
                          *
-                         * @return return the corresponding element from projective coordinates to 
+                         * @return return the corresponding element from projective coordinates to
                          * affine coordinates
                          */
-                        constexpr curve_element<
-                            params_type, 
-                            form, 
-                            typename curves::coordinates::affine> to_affine () const {
+                        constexpr curve_element<params_type, form, typename curves::coordinates::affine>
+                            to_affine() const {
 
-                            using result_type = curve_element<params_type, 
-                                form, typename curves::coordinates::affine>;
-                            
-                            if (is_zero()){
+                            using result_type = curve_element<params_type, form, typename curves::coordinates::affine>;
+
+                            if (is_zero()) {
                                 return result_type::zero();
                             }
 
-                            return result_type(X*Z.inversed(), Y*Z.inversed()); //  x=X/Z, y=Y/Z
+                            return result_type(X * Z.inversed(), Y * Z.inversed());    //  x=X/Z, y=Y/Z
                         }
 
                         /*************************  Arithmetic operations  ***********************************/
@@ -236,7 +228,7 @@ namespace nil {
                         constexpr curve_element operator-(const curve_element &other) const {
                             return (*this) + (-other);
                         }
-                        
+
                         /** @brief
                          *
                          * @return doubled element from group G1
@@ -280,17 +272,16 @@ namespace nil {
                                 return this->doubled();
                             }
 
-                            const field_value_type u = Y2Z1 - this->Y;                // u = Y2*Z1-Y1
-                            const field_value_type uu = u.squared();                  // uu = u2
-                            const field_value_type v = X2Z1 - this->X;                // v = X2*Z1-X1
-                            const field_value_type vv = v.squared();                  // vv = v2
-                            const field_value_type vvv = v * vv;                      // vvv = v*vv
-                            const field_value_type R = vv * this->X;                  // R = vv*X1
-                            const field_value_type A = uu * this->Z - vvv - R - R;    // A = uu*Z1-vvv-2*R
-                            const field_value_type X3 = v * A;                        // X3 = v*A
-                            const field_value_type Y3 =
-                                u * (R - A) - vvv * this->Y;                         // Y3 = u*(R-A)-vvv*Y1
-                            const field_value_type Z3 = vvv * this->Z;    // Z3 = vvv*Z1
+                            const field_value_type u = Y2Z1 - this->Y;                  // u = Y2*Z1-Y1
+                            const field_value_type uu = u.squared();                    // uu = u2
+                            const field_value_type v = X2Z1 - this->X;                  // v = X2*Z1-X1
+                            const field_value_type vv = v.squared();                    // vv = v2
+                            const field_value_type vvv = v * vv;                        // vvv = v*vv
+                            const field_value_type R = vv * this->X;                    // R = vv*X1
+                            const field_value_type A = uu * this->Z - vvv - R - R;      // A = uu*Z1-vvv-2*R
+                            const field_value_type X3 = v * A;                          // X3 = v*A
+                            const field_value_type Y3 = u * (R - A) - vvv * this->Y;    // Y3 = u*(R-A)-vvv*Y1
+                            const field_value_type Z3 = vvv * this->Z;                  // Z3 = vvv*Z1
 
                             return curve_element(X3, Y3, Z3);
                         }

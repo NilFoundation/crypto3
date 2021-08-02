@@ -72,8 +72,7 @@ namespace nil {
                 };
 
                 template<std::size_t Version>
-                struct arithmetic_params<fp2<bn128_base_field<Version>>>
-                    : public params<bn128_base_field<Version>> {
+                struct arithmetic_params<fp2<bn128_base_field<Version>>> : public params<bn128_base_field<Version>> {
                 private:
                     typedef params<bn128_base_field<Version>> policy_type;
 
@@ -98,8 +97,7 @@ namespace nil {
                 };
 
                 template<std::size_t Version>
-                struct arithmetic_params<bn128_scalar_field<Version>>
-                    : public params<bn128_scalar_field<Version>> {
+                struct arithmetic_params<bn128_scalar_field<Version>> : public params<bn128_scalar_field<Version>> {
                 private:
                     typedef params<bn128_scalar_field<Version>> policy_type;
 

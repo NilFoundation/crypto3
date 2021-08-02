@@ -61,20 +61,20 @@ namespace nil {
                         g2_field_type_value T;
                     };
 
-                    static void doubling_step_for_flipped_miller_loop(
-                        extended_g2_projective &current,
-                        typename types_policy::Fq3_conic_coefficients &cc) {
+                    static void
+                        doubling_step_for_flipped_miller_loop(extended_g2_projective &current,
+                                                              typename types_policy::Fq3_conic_coefficients &cc) {
 
-                        const g2_field_type_value &X = current.X, 
-                            &Y = current.Y, &Z = current.Z, &T = current.T;
-                        const g2_field_type_value A = X.squared();              // A    = X1^2
-                        const g2_field_type_value B = Y.squared();              // B    = Y1^2
-                        const g2_field_type_value C = Z.squared();              // C    = Z1^2
-                        const g2_field_type_value D = (X + Y).squared();        // D    = (X1+Y1)^2
-                        const g2_field_type_value E = (Y + Z).squared();        // E    = (Y1+Z1)^2
-                        const g2_field_type_value F = D - (A + B);              // F    = D-(A+B)
-                        const g2_field_type_value G = E - (B + C);              // G    = E-(B+C)
-                        const g2_field_type_value H = g2_type::value_type::mul_by_a(A);    // param_twist_coeff_a is 1 * X for us
+                        const g2_field_type_value &X = current.X, &Y = current.Y, &Z = current.Z, &T = current.T;
+                        const g2_field_type_value A = X.squared();          // A    = X1^2
+                        const g2_field_type_value B = Y.squared();          // B    = Y1^2
+                        const g2_field_type_value C = Z.squared();          // C    = Z1^2
+                        const g2_field_type_value D = (X + Y).squared();    // D    = (X1+Y1)^2
+                        const g2_field_type_value E = (Y + Z).squared();    // E    = (Y1+Z1)^2
+                        const g2_field_type_value F = D - (A + B);          // F    = D-(A+B)
+                        const g2_field_type_value G = E - (B + C);          // G    = E-(B+C)
+                        const g2_field_type_value H =
+                            g2_type::value_type::mul_by_a(A);    // param_twist_coeff_a is 1 * X for us
                         // H    = twisted_a * A
                         const g2_field_type_value I = H + B;    // I    = H+B
                         const g2_field_type_value J = C - I;    // J    = C-I
@@ -95,10 +95,10 @@ namespace nil {
                         current.T = F * (B - H);    // T3 = F*(B-H)
                     }
 
-                    static void full_addition_step_for_flipped_miller_loop(
-                        const extended_g2_projective &base,
-                        extended_g2_projective &current,
-                        typename types_policy::Fq3_conic_coefficients &cc) {
+                    static void
+                        full_addition_step_for_flipped_miller_loop(const extended_g2_projective &base,
+                                                                   extended_g2_projective &current,
+                                                                   typename types_policy::Fq3_conic_coefficients &cc) {
 
                         const g2_field_type_value &X1 = current.X, &Y1 = current.Y, &Z1 = current.Z, &T1 = current.T;
                         const g2_field_type_value &X2 = base.X, &Y2 = base.Y, &Z2 = base.Z, &T2 = base.T;
@@ -110,14 +110,15 @@ namespace nil {
                         const g2_field_type_value E = D + C;                            // E    = D+C
                         const g2_field_type_value F = (X1 - Y1) * (X2 + Y2) + B - A;    // F    = (X1-Y1)*(X2+Y2)+B-A
                         // G = B + twisted_a * A
-                        const g2_field_type_value G = B + g2_type::value_type::mul_by_a(A);    // param_twist_coeff_a is 1*X for us
-                        
+                        const g2_field_type_value G =
+                            B + g2_type::value_type::mul_by_a(A);    // param_twist_coeff_a is 1*X for us
+
                         const g2_field_type_value H = D - C;      // H    = D-C
                         const g2_field_type_value I = T1 * T2;    // I    = T1*T2
 
                         // c_ZZ = delta_3* ((T1-X1)*(T2+X2)-I+A)
                         cc.c_ZZ = g2_type::value_type::mul_by_a((T1 - X1) * (T2 + X2) - I +
-                                                     A);    // param_twist_coeff_a is 1*X for us
+                                                                A);    // param_twist_coeff_a is 1*X for us
 
                         cc.c_XY = X1 * Z2 - X2 * Z1 + F;                // c_XY = X1*Z2-X2*Z1+F
                         cc.c_XZ = (Y1 - T1) * (Y2 + T2) - B + I - H;    // c_XZ = (Y1-T1)*(Y2+T2)-B+I-H
@@ -127,13 +128,12 @@ namespace nil {
                         current.T = E * H;                              // T3   = E*H
                     }
 
-                    static void mixed_addition_step_for_flipped_miller_loop(
-                        const extended_g2_projective &base,
-                        extended_g2_projective &current,
-                        typename types_policy::Fq3_conic_coefficients &cc) {
+                    static void
+                        mixed_addition_step_for_flipped_miller_loop(const extended_g2_projective &base,
+                                                                    extended_g2_projective &current,
+                                                                    typename types_policy::Fq3_conic_coefficients &cc) {
 
-                        const g2_field_type_value &X1 = current.X, 
-                            &Y1 = current.Y, &Z1 = current.Z, &T1 = current.T;
+                        const g2_field_type_value &X1 = current.X, &Y1 = current.Y, &Z1 = current.Z, &T1 = current.T;
                         const g2_field_type_value &X2 = base.X, &Y2 = base.Y, &T2 = base.T;
 
                         const g2_field_type_value A = X1 * X2;                          // A    = X1*X2
@@ -142,13 +142,14 @@ namespace nil {
                         const g2_field_type_value E = T1 + C;                           // E    = T1+C
                         const g2_field_type_value F = (X1 - Y1) * (X2 + Y2) + B - A;    // F    = (X1-Y1)*(X2+Y2)+B-A
                         // G = B + twisted_a * A
-                        const g2_field_type_value G = B + g2_type::value_type::mul_by_a(A);    // param_twist_coeff_a is 1*X for us
-                        const g2_field_type_value H = T1 - C;     // H    = T1-C
-                        const g2_field_type_value I = T1 * T2;    // I    = T1*T2
+                        const g2_field_type_value G =
+                            B + g2_type::value_type::mul_by_a(A);    // param_twist_coeff_a is 1*X for us
+                        const g2_field_type_value H = T1 - C;        // H    = T1-C
+                        const g2_field_type_value I = T1 * T2;       // I    = T1*T2
 
                         // c_ZZ = delta_3* ((T1-X1)*(T2+X2)-I+A)
                         cc.c_ZZ = g2_type::value_type::mul_by_a((T1 - X1) * (T2 + X2) - I +
-                                                     A);    // param_twist_coeff_a is 1*X for us
+                                                                A);    // param_twist_coeff_a is 1*X for us
 
                         cc.c_XY = X1 - X2 * Z1 + F;                     // c_XY = X1*Z2-X2*Z1+F
                         cc.c_XZ = (Y1 - T1) * (Y2 + T2) - B + I - H;    // c_XZ = (Y1-T1)*(Y2+T2)-B+I-H
@@ -159,11 +160,9 @@ namespace nil {
                     }
 
                 public:
-
                     using g2_precomputed_type = typename types_policy::ate_g2_precomputed_type;
 
-                    static g2_precomputed_type process(
-                        const typename g2_type::value_type &Q) {
+                    static g2_precomputed_type process(const typename g2_type::value_type &Q) {
 
                         g2_precomputed_type result;
                         typename g2_affine_type::value_type Qcopy = Q.to_affine();
@@ -175,8 +174,7 @@ namespace nil {
 
                         extended_g2_projective R = Q_ext;
 
-                        const typename types_policy::integral_type &loop_count = 
-                            params_type::ate_loop_count;
+                        const typename types_policy::integral_type &loop_count = params_type::ate_loop_count;
 
                         bool found_one = false;
                         for (long i = params_type::integral_type_max_bits - 1; i >= 0; --i) {
@@ -199,8 +197,8 @@ namespace nil {
                         return result;
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G2_HPP

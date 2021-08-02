@@ -41,40 +41,37 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    /** @brief A struct representing a group G1 of elliptic curve. 
-                     *    @tparam CurveParams Parameters of the group 
-                     *    @tparam Form Form of the curve 
-                     *    @tparam Coordinates Representation coordinates of the group element 
+                    /** @brief A struct representing a group G1 of elliptic curve.
+                     *    @tparam CurveParams Parameters of the group
+                     *    @tparam Form Form of the curve
+                     *    @tparam Coordinates Representation coordinates of the group element
                      */
-                    template<typename CurveParams, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<typename CurveParams, typename Form, typename Coordinates>
                     struct curve_element;
 
-                    /** @brief A struct representing an element from the group G1 of short Weierstrass curve of 
+                    /** @brief A struct representing an element from the group G1 of short Weierstrass curve of
                      *  jacobian_with_a4_0 coordinates representation.
                      *  Description: http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html
                      *
                      */
                     template<typename CurveParams>
-                    struct curve_element<CurveParams, 
-                                   forms::short_weierstrass, 
-                                   coordinates::jacobian_with_a4_0> {
+                    struct curve_element<CurveParams, forms::short_weierstrass, coordinates::jacobian_with_a4_0> {
 
                         using params_type = CurveParams;
                         using field_type = typename params_type::field_type;
+
                     private:
                         using field_value_type = typename field_type::value_type;
 
-                        using common_addition_processor = short_weierstrass_element_g1_jacobian_with_a4_0_add_2007_bl; 
+                        using common_addition_processor = short_weierstrass_element_g1_jacobian_with_a4_0_add_2007_bl;
                         using common_doubling_processor = short_weierstrass_element_g1_jacobian_with_a4_0_dbl_2009_l;
                         using mixed_addition_processor = short_weierstrass_element_g1_jacobian_with_a4_0_madd_2007_bl;
-                    public:
 
+                    public:
                         using form = forms::short_weierstrass;
                         using coordinates = coordinates::jacobian_with_a4_0;
 
-                        using group_type = typename params_type::group_type<coordinates>;
+                        using group_type = typename params_type::template group_type<coordinates>;
 
                         field_value_type X;
                         field_value_type Y;
@@ -86,18 +83,16 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr curve_element() : curve_element(
-                            params_type::zero_fill[0], 
-                            params_type::zero_fill[1], 
-                            field_value_type::zero()) {};
+                        constexpr curve_element() :
+                            curve_element(params_type::zero_fill[0],
+                                          params_type::zero_fill[1],
+                                          field_value_type::zero()) {};
 
                         /** @brief
                          *    @return the selected point (X:Y:Z)
                          *
                          */
-                        constexpr curve_element(field_value_type X,
-                                                  field_value_type Y,
-                                                  field_value_type Z) {
+                        constexpr curve_element(field_value_type X, field_value_type Y, field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -114,8 +109,8 @@ namespace nil {
                          *
                          */
                         constexpr static curve_element one() {
-                            return curve_element(params_type::one_fill[0], params_type::one_fill[1], 
-                                field_value_type::one());
+                            return curve_element(params_type::one_fill[0], params_type::one_fill[1],
+                                                 field_value_type::one());
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -165,7 +160,7 @@ namespace nil {
                         constexpr bool is_zero() const {
                             return (this->Z.is_zero());
                         }
-                        
+
                         /** @brief
                          *
                          * @return true if element from group G1 lies on the elliptic curve
@@ -196,46 +191,41 @@ namespace nil {
                         }
 
                         /*************************  Reducing operations  ***********************************/
-                        
+
                         /** @brief
                          *
-                         * @return return the corresponding element from jacobian_with_a4_0 coordinates to 
+                         * @return return the corresponding element from jacobian_with_a4_0 coordinates to
                          * affine coordinates
                          */
-                        constexpr curve_element<
-                            params_type, 
-                            form, 
-                            typename curves::coordinates::affine> to_affine () const {
+                        constexpr curve_element<params_type, form, typename curves::coordinates::affine>
+                            to_affine() const {
 
-                            using result_type = curve_element<params_type, 
-                                form, typename curves::coordinates::affine>;
-                            
-                            if (is_zero()){
+                            using result_type = curve_element<params_type, form, typename curves::coordinates::affine>;
+
+                            if (is_zero()) {
                                 return result_type::zero();
                             }
 
-                            return result_type(X/Z.squared(), Y/(Z*Z.squared())); //  x=X/Z^2, y=Y/Z^3
+                            return result_type(X / Z.squared(), Y / (Z * Z.squared()));    //  x=X/Z^2, y=Y/Z^3
                         }
 
                         /** @brief
                          *
-                         * @return return the corresponding element from jacobian_with_a4_0 coordinates to 
+                         * @return return the corresponding element from jacobian_with_a4_0 coordinates to
                          * projective coordinates
                          */
-                        constexpr curve_element<
-                            params_type, 
-                            form, 
-                            typename curves::coordinates::projective> to_projective () const {
+                        constexpr curve_element<params_type, form, typename curves::coordinates::projective>
+                            to_projective() const {
 
-                            using result_type = curve_element<params_type, 
-                                form, typename curves::coordinates::projective>;
-                            
-                            if (is_zero()){
+                            using result_type =
+                                curve_element<params_type, form, typename curves::coordinates::projective>;
+
+                            if (is_zero()) {
                                 return result_type::zero();
                             }
 
-                            return result_type(X/Z, Y/Z.squared(), 
-                                Z); // X = X/Z, Y = Y/Z^2, Z = Z
+                            return result_type(X / Z, Y / Z.squared(),
+                                               Z);    // X = X/Z, Y = Y/Z^2, Z = Z
                         }
 
                         /*************************  Arithmetic operations  ***********************************/
@@ -273,7 +263,7 @@ namespace nil {
                         constexpr curve_element operator-(const curve_element &other) const {
                             return (*this) + (-other);
                         }
-                        
+
                         /** @brief
                          *
                          * @return doubled element from group G1

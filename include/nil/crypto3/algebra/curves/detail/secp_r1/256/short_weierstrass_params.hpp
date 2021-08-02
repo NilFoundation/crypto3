@@ -45,18 +45,28 @@ namespace nil {
 
                         constexpr static const typename secp_r1_types<256>::integral_type a =
                             typename secp_r1_types<256>::integral_type(
-                            0xffffffff00000001000000000000000000000000fffffffffffffffffffffffc_cppui256);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
-                        constexpr static const typename secp_r1_types<256>::integral_type b = 
+                                0xffffffff00000001000000000000000000000000fffffffffffffffffffffffc_cppui256);    ///< coefficient
+                                                                                                                 ///< of
+                                                                                                                 ///< short
+                                                                                                                 ///< Weierstrass
+                                                                                                                 ///< curve
+                                                                                                                 ///< $y^2=x^3+a*x+b$
+                        constexpr static const typename secp_r1_types<256>::integral_type b =
                             typename secp_r1_types<256>::integral_type(
-                            0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b_cppui256);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                                0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b_cppui256);    ///< coefficient
+                                                                                                                 ///< of
+                                                                                                                 ///< short
+                                                                                                                 ///< Weierstrass
+                                                                                                                 ///< curve
+                                                                                                                 ///< $y^2=x^3+a*x+b$
                     };
 
                     template<>
-                    struct secp_r1_g1_params<256, forms::short_weierstrass> : 
-                            public secp_r1_params<256, forms::short_weierstrass> {
+                    struct secp_r1_g1_params<256, forms::short_weierstrass>
+                        : public secp_r1_params<256, forms::short_weierstrass> {
 
                         using field_type = typename secp_r1_types<256>::g1_field_type;
-                        
+
                         template<typename Coordinates>
                         using group_type = secp_r1_types<256>::g1_type<forms::short_weierstrass, Coordinates>;
 
@@ -70,12 +80,16 @@ namespace nil {
                                 0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5_cppui256)};
                     };
 
-                    constexpr typename secp_r1_types<256>::integral_type const secp_r1_params<256, forms::short_weierstrass>::a;
-                    constexpr typename secp_r1_types<256>::integral_type const secp_r1_params<256, forms::short_weierstrass>::b;
+                    constexpr typename secp_r1_types<256>::integral_type const
+                        secp_r1_params<256, forms::short_weierstrass>::a;
+                    constexpr typename secp_r1_types<256>::integral_type const
+                        secp_r1_params<256, forms::short_weierstrass>::b;
 
-                    constexpr std::array<typename secp_r1_g1_params<256, forms::short_weierstrass>::field_type::value_type, 2> const
+                    constexpr std::array<
+                        typename secp_r1_g1_params<256, forms::short_weierstrass>::field_type::value_type, 2> const
                         secp_r1_g1_params<256, forms::short_weierstrass>::zero_fill;
-                    constexpr std::array<typename secp_r1_g1_params<256, forms::short_weierstrass>::field_type::value_type, 2> const
+                    constexpr std::array<
+                        typename secp_r1_g1_params<256, forms::short_weierstrass>::field_type::value_type, 2> const
                         secp_r1_g1_params<256, forms::short_weierstrass>::one_fill;
 
                 }    // namespace detail

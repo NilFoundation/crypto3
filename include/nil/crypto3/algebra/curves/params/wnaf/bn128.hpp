@@ -54,8 +54,10 @@ namespace nil {
 
                 /************************* BN128-254 definitions ***********************************/
 
-                constexpr std::array<std::size_t, 4> const wnaf_params<typename bn128<254>::g1_type<>>::wnaf_window_table;
-                constexpr std::array<std::size_t, 4> const wnaf_params<typename bn128<254>::g2_type<>>::wnaf_window_table;
+                constexpr std::array<std::size_t, 4> const
+                    wnaf_params<typename bn128<254>::g1_type<>>::wnaf_window_table;
+                constexpr std::array<std::size_t, 4> const
+                    wnaf_params<typename bn128<254>::g2_type<>>::wnaf_window_table;
 
             }    // namespace curves
         }        // namespace algebra

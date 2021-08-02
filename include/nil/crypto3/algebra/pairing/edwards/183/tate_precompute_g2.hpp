@@ -45,12 +45,11 @@ namespace nil {
 
                     using g2_type = typename curve_type::g2_type<>;
                     using g2_affine_type = typename curve_type::g2_type<curves::coordinates::affine>;
-                public:
 
+                public:
                     using g2_precomputed_type = typename types_policy::tate_g2_precomp;
 
-                    static typename types_policy::tate_g2_precomp  process(
-                        const typename g2_type::value_type &P) {
+                    static typename types_policy::tate_g2_precomp process(const typename g2_type::value_type &P) {
 
                         typename g2_affine_type::value_type Qcopy = Q.to_affine();
                         typename types_policy::tate_g2_precomp result;
@@ -60,8 +59,8 @@ namespace nil {
                         return result;
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_TATE_PRECOMPUTE_G2_HPP

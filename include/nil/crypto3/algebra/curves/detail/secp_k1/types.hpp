@@ -35,17 +35,13 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<std::size_t Version, typename Form, typename Coordinates>
                     struct secp_k1_g1;
 
-                    template<std::size_t Version, 
-                             typename Form>
+                    template<std::size_t Version, typename Form>
                     struct secp_k1_params;
 
-                    template<std::size_t Version, 
-                             typename Form>
+                    template<std::size_t Version, typename Form>
                     struct secp_k1_g1_params;
 
                     /** @brief A struct representing details about base and scalar fields.
@@ -58,11 +54,10 @@ namespace nil {
                         using scalar_field_type = fields::secp_k1_scalar_field<Version>;
 
                         using g1_field_type = base_field_type;
-                        
+
                         using integral_type = typename base_field_type::modulus_type;
 
-                        template<typename Form, 
-                             typename Coordinates>
+                        template<typename Form, typename Coordinates>
                         using g1_type = secp_k1_g1<Version, Form, Coordinates>;
                     };
 

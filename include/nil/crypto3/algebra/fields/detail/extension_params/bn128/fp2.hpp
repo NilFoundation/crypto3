@@ -83,8 +83,8 @@ namespace nil {
 
                         constexpr static const std::array<modulus_type, 2> Frobenius_coeffs_c1 = {0x00, 0x00};
 
-                        constexpr static const non_residue_type non_residue =
-                            non_residue_type(0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD46_cppui254);
+                        constexpr static const non_residue_type non_residue = non_residue_type(
+                            0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD46_cppui254);
                     };
 
                     template<std::size_t Version>
@@ -116,8 +116,7 @@ namespace nil {
 
                     template<std::size_t Version>
                     constexpr std::array<typename fp2_extension_params<bn128_base_field<Version>>::modulus_type,
-                                         2> const
-                        fp2_extension_params<bn128_base_field<Version>>::Frobenius_coeffs_c1;
+                                         2> const fp2_extension_params<bn128_base_field<Version>>::Frobenius_coeffs_c1;
 
                 }    // namespace detail
             }        // namespace fields

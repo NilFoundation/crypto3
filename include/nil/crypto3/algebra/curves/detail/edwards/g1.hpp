@@ -47,9 +47,7 @@ namespace nil {
                      *    @tparam Version version of the curve
                      *
                      */
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<std::size_t Version, typename Form, typename Coordinates>
                     struct edwards_g1 {
 
                         using params_type = edwards_g1_params<Version, Form>;

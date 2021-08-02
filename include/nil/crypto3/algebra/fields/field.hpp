@@ -46,22 +46,24 @@ namespace nil {
                 struct field {
 
                     constexpr static const std::size_t modulus_bits = ModulusBits;
-                    typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<
-                        modulus_bits, modulus_bits, nil::crypto3::multiprecision::unsigned_magnitude,
-                        nil::crypto3::multiprecision::unchecked, void>>
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::cpp_int_backend<
+                            modulus_bits, modulus_bits, nil::crypto3::multiprecision::unsigned_magnitude,
+                            nil::crypto3::multiprecision::unchecked, void>>
                         modulus_type;
 
-                    typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<
-                        16 * modulus_bits, 16 * modulus_bits, nil::crypto3::multiprecision::unsigned_magnitude,
-                        nil::crypto3::multiprecision::unchecked, void>>
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::cpp_int_backend<
+                            16 * modulus_bits, 16 * modulus_bits, nil::crypto3::multiprecision::unsigned_magnitude,
+                            nil::crypto3::multiprecision::unchecked, void>>
                         extended_modulus_type;
 
                     constexpr static const std::size_t number_bits = ModulusBits;
-                    typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::modular_adaptor<
-                        nil::crypto3::multiprecision::backends::cpp_int_backend<
-                            modulus_bits, modulus_bits, nil::crypto3::multiprecision::signed_magnitude,
-                            nil::crypto3::multiprecision::unchecked, void
-                            >>>
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            nil::crypto3::multiprecision::backends::cpp_int_backend<
+                                modulus_bits, modulus_bits, nil::crypto3::multiprecision::signed_magnitude,
+                                nil::crypto3::multiprecision::unchecked, void>>>
                         number_type;
                 };
 

@@ -55,15 +55,14 @@ namespace nil {
 
                     using g1_field_type_value = typename g1_type::field_type::value_type;
                     using g2_field_type_value = typename g2_type::field_type::value_type;
+
                 public:
+                    static typename gt_type::value_type process(const types_policy::ate_g1_precomputed_type &prec_P,
+                                                                const types_policy::ate_g2_precomputed_type &prec_Q) {
 
-                    static typename gt_type::value_type process(
-                        const types_policy::ate_g1_precomputed_type &prec_P, 
-                        const types_policy::ate_g2_precomputed_type &prec_Q) {
-
-                        g2_field_type_value L1_coeff = g2_field_type_value(prec_P.PX, 
-                            g1_field_type_value::zero(), 
-                            g1_field_type_value::zero()) - prec_Q.QX_over_twist;
+                        g2_field_type_value L1_coeff =
+                            g2_field_type_value(prec_P.PX, g1_field_type_value::zero(), g1_field_type_value::zero()) -
+                            prec_Q.QX_over_twist;
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 
@@ -85,15 +84,14 @@ namespace nil {
                                order */
                             typename types_policy::ate_dbl_coeffs dc = prec_Q.dbl_coeffs[dbl_idx++];
 
-                            typename gt_type::value_type g_RR_at_P =
-                                typename gt_type::value_type(-dc.c_4C - dc.c_J * prec_P.PX_twist + dc.c_L, dc.c_H * prec_P.PY_twist);
+                            typename gt_type::value_type g_RR_at_P = typename gt_type::value_type(
+                                -dc.c_4C - dc.c_J * prec_P.PX_twist + dc.c_L, dc.c_H * prec_P.PY_twist);
                             f = f.squared() * g_RR_at_P;
 
                             if (bit) {
                                 typename types_policy::ate_add_coeffs ac = prec_Q.add_coeffs[add_idx++];
-                                typename gt_type::value_type g_RQ_at_P = 
-                                    typename gt_type::value_type(ac.c_RZ * prec_P.PY_twist,
-                                                  -(prec_Q.QY_over_twist * ac.c_RZ + L1_coeff * ac.c_L1));
+                                typename gt_type::value_type g_RQ_at_P = typename gt_type::value_type(
+                                    ac.c_RZ * prec_P.PY_twist, -(prec_Q.QY_over_twist * ac.c_RZ + L1_coeff * ac.c_L1));
                                 f = f * g_RQ_at_P;
                             }
                         }
@@ -101,16 +99,15 @@ namespace nil {
                         if (params_type::ate_is_loop_count_neg) {
                             typename types_policy::ate_add_coeffs ac = prec_Q.add_coeffs[add_idx++];
                             typename gt_type::value_type g_RnegR_at_P = typename gt_type::value_type(
-                                ac.c_RZ * prec_P.PY_twist,
-                                -(prec_Q.QY_over_twist * ac.c_RZ + L1_coeff * ac.c_L1));
+                                ac.c_RZ * prec_P.PY_twist, -(prec_Q.QY_over_twist * ac.c_RZ + L1_coeff * ac.c_L1));
                             f = (f * g_RnegR_at_P).inversed();
                         }
 
                         return f;
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_MNT6_298_ATE_MILLER_LOOP_HPP

@@ -32,23 +32,23 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                namespace coordinates{
+                namespace coordinates {
 
                     /** @brief Jacobi quatrics curve group element coordinates representation.
                      * Description: https://hyperelliptic.org/EFD/g1p/auto-jquartic.html
                      */
-                    struct affine{}; 
-                    struct double_oriented_xxyzz{}; 
-                    struct doubling_oriented_xxyzzr{}; 
-                    struct double_oriented_xyz{}; 
-                    struct xxyzz{}; 
-                    struct xxyzzr{}; 
-                    struct xyz{}; 
-                
-                }        // namespace coordinates
+                    struct affine { };
+                    struct double_oriented_xxyzz { };
+                    struct doubling_oriented_xxyzzr { };
+                    struct double_oriented_xyz { };
+                    struct xxyzz { };
+                    struct xxyzzr { };
+                    struct xyz { };
+
+                }    // namespace coordinates
             }        // namespace curves
-        }        // namespace algebra
-    }            // namespace crypto3
+        }            // namespace algebra
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_ALGEBRA_CURVES_JACOBI_QUATRICS_COORDINATES_REPRESENTATIONS_HPP

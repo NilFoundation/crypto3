@@ -37,7 +37,6 @@ namespace nil {
                         using curve_type = CurveType;
 
                     public:
-
                         using number_type = typename curve_type::base_field_type::modulus_type;
                         using extended_number_type = typename curve_type::base_field_type::extended_modulus_type;
 

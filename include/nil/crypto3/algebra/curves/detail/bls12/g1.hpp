@@ -47,9 +47,7 @@ namespace nil {
                      *    @tparam Version version of the curve
                      *
                      */
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<std::size_t Version, typename Form, typename Coordinates>
                     struct bls12_g1 {
 
                         using params_type = bls12_g1_params<Version, Form>;

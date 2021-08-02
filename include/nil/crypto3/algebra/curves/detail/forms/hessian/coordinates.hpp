@@ -32,7 +32,7 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                namespace coordinates{
+                namespace coordinates {
 
                     /** @brief Hessian curve group element coordinates representation.
                      * Description: https://hyperelliptic.org/EFD/g1p/auto-hessian.html
@@ -40,11 +40,11 @@ namespace nil {
                     struct affine;
                     struct extended;
                     struct projective;
-                    
-                }        // namespace coordinates
+
+                }    // namespace coordinates
             }        // namespace curves
-        }        // namespace algebra
-    }            // namespace crypto3
+        }            // namespace algebra
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_ALGEBRA_CURVES_HESSIAN_COORDINATES_REPRESENTATIONS_HPP

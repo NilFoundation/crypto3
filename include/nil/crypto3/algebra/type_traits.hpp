@@ -70,8 +70,8 @@ namespace nil {
 
             template<typename T>
             struct is_curve {
-                static const bool value = has_type_base_field_type<T>::value && has_type_scalar_field_type<T>::value && 
-                                          has_type_g1_type<T>::value && has_type_g2_type<T>::value && 
+                static const bool value = has_type_base_field_type<T>::value && has_type_scalar_field_type<T>::value &&
+                                          has_type_g1_type<T>::value && has_type_g2_type<T>::value &&
                                           has_type_gt_type<T>::value;
                 typedef T type;
             };
@@ -109,16 +109,14 @@ namespace nil {
 
             template<typename T>
             struct is_g1_group_element {
-                static const bool value = boost::is_same<
-                    typename T::group_type::curve_type::g1_type,
-                    typename T::group_type>::value;
+                static const bool value =
+                    boost::is_same<typename T::group_type::curve_type::g1_type, typename T::group_type>::value;
             };
 
             template<typename T>
             struct is_g2_group_element {
-                static const bool value = boost::is_same<
-                    typename T::group_type::curve_type::g2_type,
-                    typename T::group_type>::value;
+                static const bool value =
+                    boost::is_same<typename T::group_type::curve_type::g2_type, typename T::group_type>::value;
             };
 
             template<typename T>

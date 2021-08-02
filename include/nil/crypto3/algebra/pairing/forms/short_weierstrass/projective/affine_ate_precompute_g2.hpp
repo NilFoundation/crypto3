@@ -50,7 +50,6 @@ namespace nil {
                     using g2_field_type_value = typename g2_type::field_type::value_type;
 
                 public:
-
                     using g2_precomputed_type = typename types_policy::affine_ate_g2_precomputation;
 
                     static g2_precomputed_type process(const typename g2_type::value_type &Q) {
@@ -78,8 +77,7 @@ namespace nil {
                             c.old_RX = RX;
                             c.old_RY = RY;
                             g2_field_type_value old_RX_2 = c.old_RX.squared();
-                            c.gamma = (old_RX_2 + old_RX_2 + old_RX_2 + 
-                                       params_type::twist_coeff_a) *
+                            c.gamma = (old_RX_2 + old_RX_2 + old_RX_2 + params_type::twist_coeff_a) *
                                       (c.old_RY + c.old_RY).inversed();
                             c.gamma_twist = c.gamma * params_type::twist;
 
@@ -111,8 +109,8 @@ namespace nil {
                         return result;
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_AFFINE_ATE_PRECOMPUTE_G2_HPP

@@ -38,26 +38,19 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<std::size_t Version, typename Form, typename Coordinates>
                     struct edwards_g1;
 
-                    template<std::size_t Version, 
-                             typename Form, 
-                             typename Coordinates>
+                    template<std::size_t Version, typename Form, typename Coordinates>
                     struct edwards_g2;
 
-                    template<std::size_t Version, 
-                             typename Form>
+                    template<std::size_t Version, typename Form>
                     struct edwards_params;
 
-                    template<std::size_t Version, 
-                             typename Form>
+                    template<std::size_t Version, typename Form>
                     struct edwards_g1_params;
 
-                    template<std::size_t Version, 
-                             typename Form>
+                    template<std::size_t Version, typename Form>
                     struct edwards_g2_params;
 
                     /** @brief A struct representing details about base and scalar fields.
@@ -75,12 +68,10 @@ namespace nil {
 
                         using integral_type = typename base_field_type::modulus_type;
 
-                        template<typename Form, 
-                             typename Coordinates>
+                        template<typename Form, typename Coordinates>
                         using g1_type = edwards_g1<Version, Form, Coordinates>;
 
-                        template<typename Form, 
-                             typename Coordinates>
+                        template<typename Form, typename Coordinates>
                         using g2_type = edwards_g2<Version, Form, Coordinates>;
                     };
 

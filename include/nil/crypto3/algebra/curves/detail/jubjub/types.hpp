@@ -35,8 +35,7 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    template<typename Form, 
-                             typename Coordinates>
+                    template<typename Form, typename Coordinates>
                     struct jubjub_g1;
 
                     template<typename Form>
@@ -45,9 +44,11 @@ namespace nil {
                     template<typename Form>
                     struct jubjub_g1_params;
 
-                    /** @brief A struct representing details about base and scalar fields of the corresponding size 183 bits and 181
-                     * bits respectively. Corresponds to [JubJub](https://raw.githubusercontent.com/zcash/zips/master/protocol/protocol.pdf#jubjub)
-                     * twisted Edwards elliptic curve defined over Bls12-381 scalar field and described by equation ax^2 + y^2 = 1 + dx^2y^2
+                    /** @brief A struct representing details about base and scalar fields of the corresponding size 183
+                     * bits and 181 bits respectively. Corresponds to
+                     * [JubJub](https://raw.githubusercontent.com/zcash/zips/master/protocol/protocol.pdf#jubjub)
+                     * twisted Edwards elliptic curve defined over Bls12-381 scalar field and described by equation ax^2
+                     * + y^2 = 1 + dx^2y^2
                      *
                      */
                     struct jubjub_types {
@@ -58,8 +59,7 @@ namespace nil {
 
                         using integral_type = typename base_field_type::modulus_type;
 
-                        template<typename Form, 
-                             typename Coordinates>
+                        template<typename Form, typename Coordinates>
                         using g1_type = jubjub_g1<Form, Coordinates>;
                     };
 

@@ -56,24 +56,25 @@ namespace nil {
                         g2_field_type_value T;
                     };
 
-                    static void doubling_step_for_flipped_miller_loop(
-                        extended_g2_projective &current,
-                        typename types_policy::ate_dbl_coeffs &dc) {
+                    static void doubling_step_for_flipped_miller_loop(extended_g2_projective &current,
+                                                                      typename types_policy::ate_dbl_coeffs &dc) {
 
                         const g2_field_type_value X = current.X, Y = current.Y, Z = current.Z, T = current.T;
 
-                        const g2_field_type_value A = T.squared();                            // A = T1^2
-                        const g2_field_type_value B = X.squared();                            // B = X1^2
-                        const g2_field_type_value C = Y.squared();                            // C = Y1^2
-                        const g2_field_type_value D = C.squared();                            // D = C^2
-                        const g2_field_type_value E = (X + C).squared() - B - D;              // E = (X1+C)^2-B-D
-                        const g2_field_type_value F = (B + B + B) + params_type::twist_coeff_a * A;    // F = 3*B +  a  *A
-                        const g2_field_type_value G = F.squared();                            // G = F^2
+                        const g2_field_type_value A = T.squared();                  // A = T1^2
+                        const g2_field_type_value B = X.squared();                  // B = X1^2
+                        const g2_field_type_value C = Y.squared();                  // C = Y1^2
+                        const g2_field_type_value D = C.squared();                  // D = C^2
+                        const g2_field_type_value E = (X + C).squared() - B - D;    // E = (X1+C)^2-B-D
+                        const g2_field_type_value F =
+                            (B + B + B) + params_type::twist_coeff_a * A;    // F = 3*B +  a  *A
+                        const g2_field_type_value G = F.squared();           // G = F^2
 
-                        current.X = -E.doubled().doubled() + G;                // X3 = -4*E+G
-                        current.Y = -typename base_field_type::value_type(0x08) * D + F * (E + E - current.X);    // Y3 = -8*D+F*(2*E-X3)
-                        current.Z = (Y + Z).squared() - C - Z.squared();       // Z3 = (Y1+Z1)^2-C-Z1^2
-                        current.T = current.Z.squared();                       // T3 = Z3^2
+                        current.X = -E.doubled().doubled() + G;    // X3 = -4*E+G
+                        current.Y = -typename base_field_type::value_type(0x08) * D +
+                                    F * (E + E - current.X);                // Y3 = -8*D+F*(2*E-X3)
+                        current.Z = (Y + Z).squared() - C - Z.squared();    // Z3 = (Y1+Z1)^2-C-Z1^2
+                        current.T = current.Z.squared();                    // T3 = Z3^2
 
                         dc.c_H = (current.Z + T).squared() - current.T - A;    // H = (Z3+T1)^2-T3-A
                         dc.c_4C = C + C + C + C;                               // fourC = 4*C
@@ -81,24 +82,24 @@ namespace nil {
                         dc.c_L = (F + X).squared() - G - B;                    // L = (F+X1)^2-G-B
                     }
 
-                    static void mixed_addition_step_for_flipped_miller_loop(
-                        const g2_field_type_value base_X, const g2_field_type_value base_Y,
-                        const g2_field_type_value base_Y_squared,
-                        extended_g2_projective &current,
-                        typename types_policy::ate_add_coeffs &ac) {
-                        
+                    static void mixed_addition_step_for_flipped_miller_loop(const g2_field_type_value base_X,
+                                                                            const g2_field_type_value base_Y,
+                                                                            const g2_field_type_value base_Y_squared,
+                                                                            extended_g2_projective &current,
+                                                                            typename types_policy::ate_add_coeffs &ac) {
+
                         const g2_field_type_value X1 = current.X, Y1 = current.Y, Z1 = current.Z, T1 = current.T;
                         const g2_field_type_value &x2 = base_X, &y2 = base_Y, &y2_squared = base_Y_squared;
 
                         const g2_field_type_value B = x2 * T1;    // B = x2 * T1
-                        const g2_field_type_value D = ((y2 + Z1).squared() - y2_squared - T1) *
-                                      T1;                // D = ((y2 + Z1)^2 - y2squared - T1) * T1
-                        const g2_field_type_value H = B - X1;            // H = B - X1
-                        const g2_field_type_value I = H.squared();       // I = H^2
-                        const g2_field_type_value E = I + I + I + I;     // E = 4*I
-                        const g2_field_type_value J = H * E;             // J = H * E
-                        const g2_field_type_value V = X1 * E;            // V = X1 * E
-                        const g2_field_type_value L1 = D - (Y1 + Y1);    // L1 = D - 2 * Y1
+                        const g2_field_type_value D =
+                            ((y2 + Z1).squared() - y2_squared - T1) * T1;    // D = ((y2 + Z1)^2 - y2squared - T1) * T1
+                        const g2_field_type_value H = B - X1;                // H = B - X1
+                        const g2_field_type_value I = H.squared();           // I = H^2
+                        const g2_field_type_value E = I + I + I + I;         // E = 4*I
+                        const g2_field_type_value J = H * E;                 // J = H * E
+                        const g2_field_type_value V = X1 * E;                // V = X1 * E
+                        const g2_field_type_value L1 = D - (Y1 + Y1);        // L1 = D - 2 * Y1
 
                         current.X = L1.squared() - J - (V + V);              // X3 = L1^2 - J - 2*V
                         current.Y = L1 * (V - current.X) - (Y1 + Y1) * J;    // Y3 = L1 * (V-X3) - 2*Y1 * J
@@ -110,14 +111,14 @@ namespace nil {
                     }
 
                 public:
-
                     using g2_precomputed_type = typename types_policy::ate_g2_precomputed_type;
 
                     static g2_precomputed_type process(const typename g2_type::value_type &Q) {
 
                         typename g2_affine_type::value_type Qcopy = Q.to_affine();
 
-                        g2_field_type_value twist_inv = params_type::twist.inversed();    // could add to global params if needed
+                        g2_field_type_value twist_inv =
+                            params_type::twist.inversed();    // could add to global params if needed
 
                         g2_precomputed_type result;
                         result.QX = Qcopy.X;
@@ -146,8 +147,7 @@ namespace nil {
                             result.dbl_coeffs.push_back(dc);
                             if (bit) {
                                 typename types_policy::ate_add_coeffs ac;
-                                mixed_addition_step_for_flipped_miller_loop(result.QX, result.QY, result.QY2, R,
-                                                                            ac);
+                                mixed_addition_step_for_flipped_miller_loop(result.QX, result.QY, result.QY2, R, ac);
                                 result.add_coeffs.push_back(ac);
                             }
                         }
@@ -165,11 +165,11 @@ namespace nil {
                             result.add_coeffs.push_back(ac);
                         }
 
-                        return result;    
+                        return result;
                     }
                 };
-            }        // namespace pairing
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_ATE_PRECOMPUTE_G2_HPP
