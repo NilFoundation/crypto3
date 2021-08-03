@@ -16,7 +16,7 @@ endif()
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${Boost_LIBRARIES}
 
-                       ${CURRENT_PROJECT_NAME}::multiprecision
+                       crypto3::multiprecision
                        ${CMAKE_WORKSPACE_NAME}::core)
 
 macro(define_marshalling_test test)
