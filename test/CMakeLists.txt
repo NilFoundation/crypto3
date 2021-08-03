@@ -16,12 +16,12 @@ endif()
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${Boost_LIBRARIES}
 
-                       ${CURRENT_PROJECT_NAME}::multiprecision
-                       ${CURRENT_PROJECT_NAME}::algebra
-                       ${CURRENT_PROJECT_NAME}::zk
-                       ${CURRENT_PROJECT_NAME}::blueprint
-                       ${CMAKE_WORKSPACE_NAME}::crypto3-multiprecision
-                       ${CMAKE_WORKSPACE_NAME}::crypto3-algebra
+                       crypto3::multiprecision
+                       crypto3::algebra
+                       crypto3::zk
+                       crypto3::blueprint
+                       ${CMAKE_WORKSPACE_NAME}::crypto3_multiprecision
+                       ${CMAKE_WORKSPACE_NAME}::crypto3_algebra
                        ${CMAKE_WORKSPACE_NAME}::core)
 
 macro(define_marshalling_test test)
