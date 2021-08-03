@@ -23,7 +23,7 @@ macro(cm_find_package NAME)
     endif()
 endmacro()
 
-cm_project(crypto3-algebra WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
+cm_project(crypto3_algebra WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
 cm_find_package(CM)
 include(CMDeploy)
@@ -65,9 +65,9 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${Boost_LIBRARIES}
 
-                      ${CURRENT_PROJECT_NAME}::multiprecision
-                      ${CURRENT_PROJECT_NAME}::algebra
-                      ${CMAKE_WORKSPACE_NAME}::crypto3-multiprecision
+                      crypto3::multiprecision
+                      crypto3::algebra
+                      ${CMAKE_WORKSPACE_NAME}::crypto3_multiprecision
                       ${CMAKE_WORKSPACE_NAME}::core)
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
