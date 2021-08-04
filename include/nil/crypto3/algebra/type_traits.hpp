@@ -68,6 +68,12 @@ namespace nil {
             BOOST_TTI_HAS_FUNCTION(to_special)
             BOOST_TTI_HAS_FUNCTION(is_special)
 
+            BOOST_TTI_HAS_STATIC_MEMBER_FUNCTION(zero)
+            BOOST_TTI_HAS_STATIC_MEMBER_FUNCTION(one)
+            BOOST_TTI_HAS_FUNCTION(is_zero)
+            BOOST_TTI_HAS_FUNCTION(is_well_formed)
+            BOOST_TTI_HAS_FUNCTION(doubled)
+
             template<typename T>
             struct is_curve {
                 static const bool value = has_type_base_field_type<T>::value && has_type_scalar_field_type<T>::value &&
@@ -108,15 +114,28 @@ namespace nil {
             };
 
             template<typename T>
+            struct is_group_element{
+                static const bool value = has_type_field_type<T>::value && 
+                                          has_type_group_type<T>::value &&
+                                          has_static_member_function_zero<T, T>::value && 
+                                          has_static_member_function_one<T, T>::value && 
+                                          has_function_is_zero<T, bool>::value && 
+                                          has_function_is_well_formed<T, bool>::value && 
+                                          has_function_doubled<T, T>::value;
+            };
+
+            template<typename T>
             struct is_g1_group_element {
                 static const bool value =
-                    boost::is_same<typename T::group_type::curve_type::g1_type, typename T::group_type>::value;
+                    boost::is_same<typename T::group_type::curve_type::g1_type<typename T::coordinates, 
+                        typename T::form>, typename T::group_type>::value;
             };
 
             template<typename T>
             struct is_g2_group_element {
                 static const bool value =
-                    boost::is_same<typename T::group_type::curve_type::g2_type, typename T::group_type>::value;
+                    boost::is_same<typename T::group_type::curve_type::g2_type<typename T::coordinates, 
+                        typename T::form>, typename T::group_type>::value;
             };
 
             template<typename T>
