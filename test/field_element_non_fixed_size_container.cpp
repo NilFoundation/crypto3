@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_SUITE(field_element_non_fixed_size_container_test_suite)
 
 BOOST_AUTO_TEST_CASE(field_element_non_fixed_size_container_bls12_381_g1_field_be) {
     std::cout << "BLS12-381 g1 group field non fixed size container big-endian test started" << std::endl;
-    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g1_type::underlying_field_type, 
+    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g1_type<>::field_type, 
         nil::marshalling::option::big_endian, 
         5>();
     std::cout << "BLS12-381 g1 group field non fixed size container big-endian test finished" << std::endl;
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(field_element_non_fixed_size_container_bls12_381_g1_field_b
 
 BOOST_AUTO_TEST_CASE(field_element_non_fixed_size_container_bls12_381_g1_field_le) {
     std::cout << "BLS12-381 g1 group field non fixed size container little-endian test started" << std::endl;
-    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g1_type::underlying_field_type, 
+    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g1_type<>::field_type, 
         nil::marshalling::option::little_endian, 
         5>();
     std::cout << "BLS12-381 g1 group field non fixed size container little-endian test finished" << std::endl;
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(field_element_non_fixed_size_container_bls12_381_g1_field_l
 
 BOOST_AUTO_TEST_CASE(field_element_non_fixed_size_container_bls12_381_g2_field_be) {
     std::cout << "BLS12-381 g2 group field non fixed size container big-endian test started" << std::endl;
-    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g2_type::underlying_field_type, 
+    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g2_type<>::field_type, 
         nil::marshalling::option::big_endian, 
         7>();
     std::cout << "BLS12-381 g2 group field non fixed size container big-endian test finished" << std::endl;
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(field_element_non_fixed_size_container_bls12_381_g2_field_b
 
 BOOST_AUTO_TEST_CASE(field_element_non_fixed_size_container_bls12_381_g2_field_le) {
     std::cout << "BLS12-381 g2 group field non fixed size container little-endian test started" << std::endl;
-    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g2_type::underlying_field_type, 
+    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g2_type<>::field_type, 
         nil::marshalling::option::little_endian, 
         7>();
     std::cout << "BLS12-381 g2 group field non fixed size container little-endian test finished" << std::endl;

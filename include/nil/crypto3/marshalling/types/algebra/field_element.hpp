@@ -60,44 +60,44 @@ namespace nil {
                             nil::marshalling::option::little_endian>,
                             integral<
                                 TTypeBase, 
-                                typename FieldType::modulus_type>,
+                                typename FieldType::integral_type>,
                             nil::marshalling::option::fixed_size_storage<
                                 FieldType::arity>
                         >,
                         integral<
                             TTypeBase, 
-                            typename FieldType::modulus_type
+                            typename FieldType::integral_type
                         >
                     >::type;
                 namespace detail {
                     template<typename FieldType>
                     typename std::enable_if<
                                 !(algebra::is_extended_field<FieldType>::value), 
-                                std::array<typename FieldType::modulus_type, 
+                                std::array<typename FieldType::integral_type, 
                                     FieldType::arity>>::type
                         obtain_field_data(typename FieldType::value_type field_elem){
 
-                        std::array<typename FieldType::modulus_type, 
+                        std::array<typename FieldType::integral_type, 
                                     FieldType::arity> result;
-                        result[0] = typename FieldType::modulus_type(field_elem.data);
+                        result[0] = typename FieldType::integral_type(field_elem.data);
                         return result;
                     }
 
                     template<typename FieldType>
                     typename std::enable_if<
                                 algebra::is_extended_field<FieldType>::value, 
-                                std::array<typename FieldType::modulus_type, 
+                                std::array<typename FieldType::integral_type, 
                                     FieldType::arity>>::type
                         obtain_field_data(typename FieldType::value_type field_elem){
                         
-                        std::array<typename FieldType::modulus_type, 
+                        std::array<typename FieldType::integral_type, 
                                     FieldType::arity> result;
 
                         for (std::size_t i = 0; 
                              i < FieldType::arity/
                                 FieldType::underlying_field_type::arity;
                              i++){
-                            std::array<typename FieldType::modulus_type, 
+                            std::array<typename FieldType::integral_type, 
                                 FieldType::underlying_field_type::arity> 
                                 intermediate_res = 
                                 obtain_field_data<
@@ -130,11 +130,11 @@ namespace nil {
                     using integral_type = integral<
                         nil::marshalling::field_type<
                         Endianness>,
-                        typename FieldType::modulus_type>;
+                        typename FieldType::integral_type>;
 
                     nil::marshalling::container::static_vector<
                         integral_type, FieldType::arity> container_data;
-                    std::array<typename FieldType::modulus_type, 
+                    std::array<typename FieldType::integral_type, 
                         FieldType::arity> val_container = 
                         detail::obtain_field_data<FieldType>(field_elem);
                     for (std::size_t i=0;
@@ -163,10 +163,10 @@ namespace nil {
                     using integral_type = integral<
                         nil::marshalling::field_type<
                         Endianness>,
-                        typename FieldType::modulus_type>;
+                        typename FieldType::integral_type>;
 
                     return field_element_type(integral_type(
-                        typename FieldType::modulus_type(field_elem.data)));
+                        typename FieldType::integral_type(field_elem.data)));
                 }
 
                 template<typename FieldType, 
@@ -230,7 +230,7 @@ namespace nil {
                                 typename FieldType::value_type
                              >::type
                         construct_field_element(typename std::array<
-                            typename FieldType::modulus_type, 
+                            typename FieldType::integral_type, 
                             FieldType::arity>::iterator 
                             field_elem_data_iter){
                         
@@ -243,7 +243,7 @@ namespace nil {
                                 typename FieldType::value_type
                              >::type
                         construct_field_element(typename std::array<
-                            typename FieldType::modulus_type, 
+                            typename FieldType::integral_type, 
                             FieldType::arity>::iterator 
                             field_elem_data_iter){
                         
@@ -281,7 +281,7 @@ namespace nil {
                             FieldType> field_elem){
 
                         std::array<
-                                typename FieldType::modulus_type, 
+                                typename FieldType::integral_type, 
                                 FieldType::arity>
                                 field_elem_data;
 

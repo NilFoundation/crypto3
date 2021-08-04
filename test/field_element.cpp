@@ -119,28 +119,28 @@ BOOST_AUTO_TEST_SUITE(field_element_test_suite)
 
 BOOST_AUTO_TEST_CASE(field_element_bls12_381_g1_field_be) {
     std::cout << "BLS12-381 g1 group field big-endian test started" << std::endl;
-    test_field_element<nil::crypto3::algebra::curves::bls12<381>::g1_type::underlying_field_type, 
+    test_field_element<nil::crypto3::algebra::curves::bls12<381>::g1_type<>::field_type, 
         nil::marshalling::option::big_endian>();
     std::cout << "BLS12-381 g1 group field big-endian test finished" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(field_element_bls12_381_g1_field_le) {
     std::cout << "BLS12-381 g1 group field little-endian test started" << std::endl;
-    test_field_element<nil::crypto3::algebra::curves::bls12<381>::g1_type::underlying_field_type, 
+    test_field_element<nil::crypto3::algebra::curves::bls12<381>::g1_type<>::field_type, 
         nil::marshalling::option::little_endian>();
     std::cout << "BLS12-381 g1 group field little-endian test finished" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(field_element_bls12_381_g2_field_be) {
     std::cout << "BLS12-381 g2 group field big-endian test started" << std::endl;
-    test_field_element<nil::crypto3::algebra::curves::bls12<381>::g2_type::underlying_field_type, 
+    test_field_element<nil::crypto3::algebra::curves::bls12<381>::g2_type<>::field_type, 
         nil::marshalling::option::big_endian>();
     std::cout << "BLS12-381 g2 group field big-endian test finished" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(field_element_bls12_381_g2_field_le) {
     std::cout << "BLS12-381 g2 group field little-endian test started" << std::endl;
-    test_field_element<nil::crypto3::algebra::curves::bls12<381>::g2_type::underlying_field_type, 
+    test_field_element<nil::crypto3::algebra::curves::bls12<381>::g2_type<>::field_type, 
         nil::marshalling::option::little_endian>();
     std::cout << "BLS12-381 g2 group field little-endian test finished" << std::endl;
 }
