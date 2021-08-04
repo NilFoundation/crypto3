@@ -35,13 +35,14 @@
 #include <nil/crypto3/multiprecision/number.hpp>
 
 #include <nil/marshalling/types/integral.hpp>
+#include <nil/marshalling/types/array_list.hpp>
 #include <nil/marshalling/types/tag.hpp>
 #include <nil/marshalling/types/detail/adapt_basic_field.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 
-#include <nil/crypto3/marshalling/types/integral/detail/basic_fixed_precision_type.hpp>
-#include <nil/crypto3/marshalling/types/integral/detail/basic_non_fixed_precision_type.hpp>
+#include <nil/crypto3/marshalling/types/detail/integral/basic_fixed_precision_type.hpp>
+#include <nil/crypto3/marshalling/types/detail/integral/basic_non_fixed_precision_type.hpp>
 
 namespace nil {
     namespace crypto3 {
