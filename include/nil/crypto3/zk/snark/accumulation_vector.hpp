@@ -46,6 +46,8 @@ namespace nil {
                     using underlying_value_type = typename Type::value_type;
 
                 public:
+                    using group_type = Type;
+                    
                     underlying_value_type first;
                     sparse_vector<Type> rest;
 
