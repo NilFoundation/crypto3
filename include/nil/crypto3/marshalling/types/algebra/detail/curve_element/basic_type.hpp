@@ -91,7 +91,7 @@ namespace nil {
                         }
 
                         static constexpr std::size_t max_bit_length() {
-                            return CurveGroupType::underlying_field_type::value_bits;
+                            return CurveGroupType::field_type::value_bits;
                         }
 
                         static constexpr serialized_type to_serialized(value_type val) {

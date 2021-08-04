@@ -345,13 +345,13 @@ namespace nil {
                                                TOptions...> &field2) {
 
                     int compared_X = compare_field_data<
-                                typename CurveGroupType::underlying_field_type>(
+                                typename CurveGroupType::field_type>(
                                     field1.value().X, field2.value().X);
                     int compared_Y = compare_field_data<
-                                typename CurveGroupType::underlying_field_type>(
+                                typename CurveGroupType::field_type>(
                                     field1.value().Y, field2.value().Y);
                     int compared_Z = compare_field_data<
-                                typename CurveGroupType::underlying_field_type>(
+                                typename CurveGroupType::field_type>(
                                     field1.value().Z, field2.value().Z);
 
                     if (compared_X == -1) return true;

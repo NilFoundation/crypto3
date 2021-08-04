@@ -50,9 +50,9 @@ namespace nil {
                             !(algebra::is_extended_field<G1FieldType>::value), bool>::type
                         sign_gf_p(const typename G1FieldType::value_type &v) {
 
-                        constexpr static const typename G1FieldType::modulus_type half_p =
-                            (G1FieldType::modulus - typename G1FieldType::modulus_type(1)) / 
-                                typename G1FieldType::modulus_type(2);
+                        constexpr static const typename G1FieldType::integral_type half_p =
+                            (G1FieldType::modulus - typename G1FieldType::integral_type(1)) / 
+                                typename G1FieldType::integral_type(2);
 
                         if (v > half_p) {
                             return true;
@@ -84,9 +84,9 @@ namespace nil {
                             result |= C_bit;
                         }
                         // TODO: check condition of infinite point
-                        if (point.Z.is_zero()) {
+                        if (point.is_zero()) {
                             result |= I_bit;
-                        } else if (compression && sign_gf_p<typename GroupValueType::underlying_field_type>(point.Y)) {
+                        } else if (compression && sign_gf_p<typename GroupValueType::field_type>(point.Y)) {
                             result |= S_bit;
                         }
                         return result;

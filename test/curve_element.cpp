@@ -119,13 +119,13 @@ BOOST_AUTO_TEST_SUITE(curve_element_test_suite)
 
 BOOST_AUTO_TEST_CASE(curve_element_bls12_381_g1) {
     std::cout << "BLS12-381 g1 group test started" << std::endl;
-    test_curve_element<nil::crypto3::algebra::curves::bls12<381>::g1_type>();
+    test_curve_element<nil::crypto3::algebra::curves::bls12<381>::g1_type<>>();
     std::cout << "BLS12-381 g1 group test finished" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(curve_element_bls12_381_g2) {
     std::cout << "BLS12-381 g2 group test started" << std::endl;
-    test_curve_element<nil::crypto3::algebra::curves::bls12<381>::g2_type>();
+    test_curve_element<nil::crypto3::algebra::curves::bls12<381>::g2_type<>>();
     std::cout << "BLS12-381 g2 group test finished" << std::endl;
 }
 

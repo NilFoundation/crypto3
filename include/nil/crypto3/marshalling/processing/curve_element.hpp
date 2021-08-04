@@ -58,7 +58,9 @@ namespace nil {
 
                     constexpr static const chunk_type I_bit = 0x40;
 
-                    G1GroupElement point_affine = point.to_affine();
+                    typename G1GroupElement::group_type::curve_type::g1_type<
+                        typename algebra::curves::coordinates::affine, 
+                        typename G1GroupElement::form>::value_type point_affine = point.to_affine();
                     chunk_type m_unit = 
                         detail::evaluate_m_unit<chunk_type>(point_affine, true);
                     // TODO: check possibilities for TA
@@ -67,7 +69,7 @@ namespace nil {
 
                         // We assume here, that write_data doesn't change the iter
                         write_data<TSize, Endianness>(
-                            point_affine.X.data.template convert_to<typename G1GroupElement::underlying_field_type::modulus_type>(), 
+                            point_affine.X.data.template convert_to<typename G1GroupElement::field_type::integral_type>(), 
                             iter);
                     }
                     (*iter) |= m_unit;
@@ -86,7 +88,7 @@ namespace nil {
                             typename TIter::value_type;
 
                     constexpr static const std::size_t sizeof_field_element = 
-                        TSize/(G2GroupElement::underlying_field_type::arity);
+                        TSize/(G2GroupElement::field_type::arity);
                     constexpr static const std::size_t units_bits = 8;
                     constexpr static const std::size_t chunk_bits = sizeof(typename TIter::value_type) * units_bits;
                     constexpr static const std::size_t sizeof_field_element_chunks_count = 
@@ -95,7 +97,9 @@ namespace nil {
 
                     constexpr static const chunk_type I_bit = 0x40;
 
-                    G2GroupElement point_affine = point.to_affine();
+                    typename G2GroupElement::group_type::curve_type::g2_type<
+                        typename algebra::curves::coordinates::affine, 
+                        typename G2GroupElement::form>::value_type point_affine = point.to_affine();
                     chunk_type m_unit = 
                         detail::evaluate_m_unit<chunk_type>(point_affine, true);
                     // TODO: check possibilities for TA
@@ -105,13 +109,13 @@ namespace nil {
                         TIter write_iter = iter;
                         // We assume here, that write_data doesn't change the iter
                         write_data<sizeof_field_element, Endianness>(
-                            point_affine.X.data[1].data.template convert_to<typename G2GroupElement::underlying_field_type::modulus_type>(), 
+                            point_affine.X.data[1].data.template convert_to<typename G2GroupElement::field_type::integral_type>(), 
                             write_iter);
 
                         write_iter += sizeof_field_element_chunks_count;
                         // We assume here, that write_data doesn't change the iter
                         write_data<sizeof_field_element, Endianness>(
-                            point_affine.X.data[0].data.template convert_to<typename G2GroupElement::underlying_field_type::modulus_type>(), 
+                            point_affine.X.data[0].data.template convert_to<typename G2GroupElement::field_type::integral_type>(), 
                             write_iter);
 
                     }
@@ -133,7 +137,7 @@ namespace nil {
                         BOOST_ASSERT(m_unit != 0x20 && m_unit != 0x60 && m_unit != 0xE0);
 
                         constexpr static const std::size_t sizeof_field_element = 
-                            TSize/(G1GroupElement::underlying_field_type::arity);
+                            TSize/(G1GroupElement::field_type::arity);
                         constexpr static const std::size_t units_bits = 8;
                         constexpr static const std::size_t chunk_bits = sizeof(chunk_type) * units_bits;
                         constexpr static const std::size_t sizeof_field_element_chunks_count = 
@@ -141,7 +145,7 @@ namespace nil {
                             ((sizeof_field_element % chunk_bits)?1:0);
                         using g1_value_type = G1GroupElement;
                         using g1_field_type = 
-                            typename g1_value_type::underlying_field_type;
+                            typename g1_value_type::field_type;
                         using g1_field_value_type = 
                             typename g1_field_type::value_type;
 
@@ -156,8 +160,8 @@ namespace nil {
                             return g1_value_type();    // point at infinity
                         }
 
-                        typename G1GroupElement::underlying_field_type::modulus_type x = read_data<sizeof_field_element,
-                                                 typename G1GroupElement::underlying_field_type::modulus_type,
+                        typename G1GroupElement::field_type::integral_type x = read_data<sizeof_field_element,
+                                                 typename G1GroupElement::field_type::integral_type,
                                                  Endianness>(iter);
 
                         g1_field_value_type x_mod(x);
@@ -190,7 +194,7 @@ namespace nil {
                             BOOST_ASSERT(m_unit != 0x20 && m_unit != 0x60 && m_unit != 0xE0);
 
                             constexpr static const std::size_t sizeof_field_element = 
-                                TSize/(G2GroupElement::underlying_field_type::arity);
+                                TSize/(G2GroupElement::field_type::arity);
                             constexpr static const std::size_t units_bits = 8;
                             constexpr static const std::size_t chunk_bits = sizeof(chunk_type) * units_bits;
                             constexpr static const std::size_t sizeof_field_element_chunks_count = 
@@ -198,7 +202,7 @@ namespace nil {
                                 ((sizeof_field_element % chunk_bits)?1:0);
                             using g2_value_type = G2GroupElement;
                             using g2_field_type = 
-                                typename g2_value_type::underlying_field_type;
+                                typename g2_value_type::field_type;
                             using g2_field_value_type = 
                                 typename g2_field_type::value_type;
 
@@ -215,13 +219,13 @@ namespace nil {
 
                             TIter read_iter = iter;
 
-                            typename G2GroupElement::underlying_field_type::modulus_type x_1 = read_data<sizeof_field_element,
-                                                 typename G2GroupElement::underlying_field_type::modulus_type,
+                            typename G2GroupElement::field_type::integral_type x_1 = read_data<sizeof_field_element,
+                                                 typename G2GroupElement::field_type::integral_type,
                                                  Endianness>(read_iter);
                             read_iter += sizeof_field_element_chunks_count;
 
-                            typename G2GroupElement::underlying_field_type::modulus_type x_0 = read_data<sizeof_field_element,
-                                                 typename G2GroupElement::underlying_field_type::modulus_type,
+                            typename G2GroupElement::field_type::integral_type x_0 = read_data<sizeof_field_element,
+                                                 typename G2GroupElement::field_type::integral_type,
                                                  Endianness>(read_iter);
 
                             g2_field_value_type x_mod(x_0, x_1);
