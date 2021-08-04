@@ -42,6 +42,9 @@
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
+#include <nil/crypto3/algebra/pairing/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/mnt4.hpp>
+#include <nil/crypto3/algebra/pairing/mnt6.hpp>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark.hpp>
 
@@ -135,11 +138,11 @@ void test_proof() {
         test_proof<SchemeType, Endianness>(
             typename SchemeType::proof_type(
                 std::move(nil::crypto3::algebra::random_element<
-                    typename SchemeType::proof_type::curve_type::g1_type>()), 
+                    typename SchemeType::proof_type::curve_type::g1_type<>>()), 
                 std::move(nil::crypto3::algebra::random_element<
-                    typename SchemeType::proof_type::curve_type::g2_type>()), 
+                    typename SchemeType::proof_type::curve_type::g2_type<>>()), 
                 std::move(nil::crypto3::algebra::random_element<
-                    typename SchemeType::proof_type::curve_type::g1_type>())
+                    typename SchemeType::proof_type::curve_type::g1_type<>>())
                 ));
     }
 }

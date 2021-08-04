@@ -136,7 +136,7 @@ void test_sparse_vector() {
         }
         for (std::size_t i=0; i<TSize; i++){
             val_container.push_back( 
-                nil::crypto3::algebra::random_element<GroupType>().to_affine());
+                nil::crypto3::algebra::random_element<GroupType>());
         }
         test_sparse_vector<Endianness>(
             zk::snark::sparse_vector<GroupType>(std::move(val_container)));
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_SUITE(sparse_vector_test_suite)
 
 BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_g1_be) {
     std::cout << "BLS12-381 g1 group field sparse vector big-endian test started" << std::endl;
-    test_sparse_vector<nil::crypto3::algebra::curves::bls12<381>::g1_type, 
+    test_sparse_vector<nil::crypto3::algebra::curves::bls12<381>::g1_type<>, 
         nil::marshalling::option::big_endian, 
         5>();
     std::cout << "BLS12-381 g1 group field sparse vector big-endian test finished" << std::endl;
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_g1_be) {
 
 // BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_g1_le) {
 //     std::cout << "BLS12-381 g1 group field sparse vector little-endian test started" << std::endl;
-//     test_sparse_vector<nil::crypto3::algebra::curves::bls12<381>::g1_type, 
+//     test_sparse_vector<nil::crypto3::algebra::curves::bls12<381>::g1_type<>, 
 //         nil::marshalling::option::little_endian, 
 //         5>();
 //     std::cout << "BLS12-381 g1 group field sparse vector little-endian test finished" << std::endl;
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_g1_be) {
 
 BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_g2_be) {
     std::cout << "BLS12-381 g2 group field sparse vector big-endian test started" << std::endl;
-    test_sparse_vector<nil::crypto3::algebra::curves::bls12<381>::g2_type, 
+    test_sparse_vector<nil::crypto3::algebra::curves::bls12<381>::g2_type<>, 
         nil::marshalling::option::big_endian, 
         5>();
     std::cout << "BLS12-381 g2 group field sparse vector big-endian test finished" << std::endl;
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_g2_be) {
 
 // BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_g2_le) {
 //     std::cout << "BLS12-381 g2 group field little-endian test started" << std::endl;
-//     test_sparse_vector<nil::crypto3::algebra::curves::bls12<381>::g2_type, 
+//     test_sparse_vector<nil::crypto3::algebra::curves::bls12<381>::g2_type<>, 
 //         nil::marshalling::option::little_endian, 
 //         5>();
 //     std::cout << "BLS12-381 g2 group field little-endian test finished" << std::endl;

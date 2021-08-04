@@ -69,17 +69,17 @@ namespace nil {
                             // g_A
                             curve_element<
                                 TTypeBase, 
-                                typename ProofType::curve_type::g1_type
+                                typename ProofType::curve_type::g1_type<>
                             >,
                             // g_B
                             curve_element<
                                 TTypeBase, 
-                                typename ProofType::curve_type::g2_type
+                                typename ProofType::curve_type::g2_type<>
                             >,
                             // g_C
                             curve_element<
                                 TTypeBase, 
-                                typename ProofType::curve_type::g1_type
+                                typename ProofType::curve_type::g1_type<>
                             >
                         >
                     >;
@@ -97,13 +97,13 @@ namespace nil {
                     using curve_g1_element_type = 
                         curve_element<
                             TTypeBase,
-                            typename ProofType::curve_type::g1_type
+                            typename ProofType::curve_type::g1_type<>
                         >;
 
                     using curve_g2_element_type = 
                         curve_element<
                             TTypeBase,
-                            typename ProofType::curve_type::g2_type
+                            typename ProofType::curve_type::g2_type<>
                         >;
 
                     return r1cs_gg_ppzksnark_proof<nil::marshalling::field_type<

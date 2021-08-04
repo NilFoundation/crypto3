@@ -74,18 +74,18 @@ namespace nil {
                             // gamma_g2
                             curve_element<
                                 TTypeBase, 
-                                typename VerificationKey::curve_type::g2_type
+                                typename VerificationKey::curve_type::g2_type<>
                             >,
                             // delta_g2
                             curve_element<
                                 TTypeBase, 
-                                typename VerificationKey::curve_type::g2_type
+                                typename VerificationKey::curve_type::g2_type<>
                             >,
                             // gamma_ABC_g1
                             accumulation_vector<
                                 TTypeBase, 
                                 zk::snark::accumulation_vector< 
-                                    typename VerificationKey::curve_type::g1_type
+                                    typename VerificationKey::curve_type::g1_type<>
                                 >
                             >
                         >
@@ -110,14 +110,14 @@ namespace nil {
                     using curve_g2_element_type = 
                         curve_element<
                             TTypeBase,
-                            typename VerificationKey::curve_type::g2_type
+                            typename VerificationKey::curve_type::g2_type<>
                         >;
 
                     using accumulation_vector_type = 
                         accumulation_vector<
                             TTypeBase, 
                             zk::snark::accumulation_vector< 
-                                typename VerificationKey::curve_type::g1_type
+                                typename VerificationKey::curve_type::g1_type<>
                             >
                         >;
 
@@ -134,7 +134,7 @@ namespace nil {
                     accumulation_vector_type filled_gamma_ABC_g1 = 
                         fill_accumulation_vector<
                             zk::snark::accumulation_vector< 
-                                typename VerificationKey::curve_type::g1_type
+                                typename VerificationKey::curve_type::g1_type<>
                             >,
                             Endianness> (r1cs_gg_ppzksnark_verification_key_inp.gamma_ABC_g1);
 
@@ -167,7 +167,7 @@ namespace nil {
                         std::move(std::get<2>(filled_r1cs_gg_ppzksnark_verification_key.value()).value()),
                         std::move(construct_accumulation_vector<
                             zk::snark::accumulation_vector<
-                                typename VerificationKey::curve_type::g1_type>, 
+                                typename VerificationKey::curve_type::g1_type<>>, 
                             Endianness>(
                                 std::get<3>(filled_r1cs_gg_ppzksnark_verification_key.value())))
                             );

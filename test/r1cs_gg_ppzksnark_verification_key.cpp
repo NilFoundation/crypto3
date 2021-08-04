@@ -42,6 +42,9 @@
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
+#include <nil/crypto3/algebra/pairing/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/mnt4.hpp>
+#include <nil/crypto3/algebra/pairing/mnt6.hpp>
 
 #include <nil/crypto3/zk/snark/sparse_vector.hpp>
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
@@ -127,8 +130,8 @@ template<typename CurveType,
          typename Endianness, 
          std::size_t TSize>
 void test_verification_key() {
-    using g1_type = typename CurveType::g1_type;
-    using g2_type = typename CurveType::g2_type;
+    using g1_type = typename CurveType::g1_type<>;
+    using g2_type = typename CurveType::g2_type<>;
     using gt_type = typename CurveType::gt_type;
 
     std::cout << std::hex;
