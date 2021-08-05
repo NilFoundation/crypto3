@@ -96,8 +96,8 @@ namespace nil {
             }
 
             template<typename CurveGroupType,
-                     typename DistributionType = boost::random::uniform_int_distribution<
-                         typename CurveGroupType::field_type::integral_type>,
+                     typename DistributionType =
+                         boost::random::uniform_int_distribution<typename CurveGroupType::field_type::integral_type>,
                      typename GeneratorType = boost::random::mt19937>
             typename std::enable_if<is_curve_group<CurveGroupType>::value, typename CurveGroupType::value_type>::type
                 random_element() {

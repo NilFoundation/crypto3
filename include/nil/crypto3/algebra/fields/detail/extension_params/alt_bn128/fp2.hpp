@@ -96,15 +96,12 @@ namespace nil {
                     constexpr typename std::size_t const fp2_extension_params<alt_bn128_base_field<Version>>::s;
 
                     template<std::size_t Version>
-                    constexpr
-                        typename fp2_extension_params<alt_bn128_base_field<Version>>::extended_integral_type const
-                            fp2_extension_params<alt_bn128_base_field<Version>>::t;
+                    constexpr typename fp2_extension_params<alt_bn128_base_field<Version>>::extended_integral_type const
+                        fp2_extension_params<alt_bn128_base_field<Version>>::t;
 
                     template<std::size_t Version>
-                    constexpr
-                        typename fp2_extension_params<alt_bn128_base_field<Version>>::extended_integral_type const
-                            fp2_extension_params<alt_bn128_base_field<Version>>::t_minus_1_over_2;
-
+                    constexpr typename fp2_extension_params<alt_bn128_base_field<Version>>::extended_integral_type const
+                        fp2_extension_params<alt_bn128_base_field<Version>>::t_minus_1_over_2;
 
                     template<std::size_t Version>
                     constexpr std::array<typename fp2_extension_params<alt_bn128_base_field<Version>>::integral_type,
@@ -116,9 +113,8 @@ namespace nil {
 
                     template<std::size_t Version>
 
-                    constexpr
-                        typename fp2_extension_params<alt_bn128_base_field<Version>>::extended_integral_type const
-                            fp2_extension_params<alt_bn128_base_field<Version>>::group_order;
+                    constexpr typename fp2_extension_params<alt_bn128_base_field<Version>>::extended_integral_type const
+                        fp2_extension_params<alt_bn128_base_field<Version>>::group_order;
 
                     template<std::size_t Version>
                     constexpr std::array<typename fp2_extension_params<alt_bn128_base_field<Version>>::integral_type,

@@ -173,20 +173,20 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr
-                    typename brainpool_r1_scalar_field<160>::integral_type const brainpool_r1_scalar_field<160>::modulus;
-                constexpr
-                    typename brainpool_r1_scalar_field<192>::integral_type const brainpool_r1_scalar_field<192>::modulus;
-                constexpr
-                    typename brainpool_r1_scalar_field<224>::integral_type const brainpool_r1_scalar_field<224>::modulus;
-                constexpr
-                    typename brainpool_r1_scalar_field<256>::integral_type const brainpool_r1_scalar_field<256>::modulus;
-                constexpr
-                    typename brainpool_r1_scalar_field<320>::integral_type const brainpool_r1_scalar_field<320>::modulus;
-                constexpr
-                    typename brainpool_r1_scalar_field<384>::integral_type const brainpool_r1_scalar_field<384>::modulus;
-                constexpr
-                    typename brainpool_r1_scalar_field<512>::integral_type const brainpool_r1_scalar_field<512>::modulus;
+                constexpr typename brainpool_r1_scalar_field<160>::integral_type const
+                    brainpool_r1_scalar_field<160>::modulus;
+                constexpr typename brainpool_r1_scalar_field<192>::integral_type const
+                    brainpool_r1_scalar_field<192>::modulus;
+                constexpr typename brainpool_r1_scalar_field<224>::integral_type const
+                    brainpool_r1_scalar_field<224>::modulus;
+                constexpr typename brainpool_r1_scalar_field<256>::integral_type const
+                    brainpool_r1_scalar_field<256>::modulus;
+                constexpr typename brainpool_r1_scalar_field<320>::integral_type const
+                    brainpool_r1_scalar_field<320>::modulus;
+                constexpr typename brainpool_r1_scalar_field<384>::integral_type const
+                    brainpool_r1_scalar_field<384>::modulus;
+                constexpr typename brainpool_r1_scalar_field<512>::integral_type const
+                    brainpool_r1_scalar_field<512>::modulus;
 
                 template<std::size_t Version = 160>
                 using brainpool_r1_fr = brainpool_r1_scalar_field<Version>;

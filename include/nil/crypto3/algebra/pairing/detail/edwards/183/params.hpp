@@ -42,7 +42,6 @@ namespace nil {
                         using curve_type = curves::edwards<183>;
 
                     public:
-
                         using integral_type = typename curve_type::base_field_type::integral_type;
                         using extended_integral_type = typename curve_type::base_field_type::extended_integral_type;
 
@@ -63,7 +62,8 @@ namespace nil {
 
                         using g2_field_type_value = typename curve_type::template g2_type<>::field_type::value_type;
 
-                        constexpr static const g2_field_type_value twist = curve_type::template g2_type<>::value_type::twist;
+                        constexpr static const g2_field_type_value twist =
+                            curve_type::template g2_type<>::value_type::twist;
                     };
 
                     constexpr typename pairing_params<curves::edwards<183>>::integral_type const

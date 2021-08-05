@@ -62,10 +62,14 @@ namespace nil {
                     constexpr static const integral_type p = base_field_modulus;
                     constexpr static const integral_type q = scalar_field_modulus;
 
-                    constexpr static const integral_type a = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC_cppui192;
-                    constexpr static const integral_type b = 0xCC22D6DFB95C6B25E49C0D6364A4E5980C393AA21668D953_cppui192;
-                    constexpr static const integral_type x = 0xEEA2BAE7E1497842F2DE7769CFE9C989C072AD696F48034A_cppui192;
-                    constexpr static const integral_type y = 0x6574D11D69B6EC7A672BB82A083DF2F2B0847DE970B2DE15_cppui192;
+                    constexpr static const integral_type a =
+                        0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC_cppui192;
+                    constexpr static const integral_type b =
+                        0xCC22D6DFB95C6B25E49C0D6364A4E5980C393AA21668D953_cppui192;
+                    constexpr static const integral_type x =
+                        0xEEA2BAE7E1497842F2DE7769CFE9C989C072AD696F48034A_cppui192;
+                    constexpr static const integral_type y =
+                        0x6574D11D69B6EC7A672BB82A083DF2F2B0847DE970B2DE15_cppui192;
                 };
 
                 template<>
@@ -82,10 +86,14 @@ namespace nil {
                     constexpr static const integral_type p = base_field_modulus;
                     constexpr static const integral_type q = scalar_field_modulus;
 
-                    constexpr static const integral_type a = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC_cppui192;
-                    constexpr static const integral_type b = 0x22123DC2395A05CAA7423DAECCC94760A7D462256BD56916_cppui192;
-                    constexpr static const integral_type x = 0x7D29778100C65A1DA1783716588DCE2B8B4AEE8E228F1896_cppui192;
-                    constexpr static const integral_type y = 0x38A90F22637337334B49DCB66A6DC8F9978ACA7648A943B0_cppui192;
+                    constexpr static const integral_type a =
+                        0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC_cppui192;
+                    constexpr static const integral_type b =
+                        0x22123DC2395A05CAA7423DAECCC94760A7D462256BD56916_cppui192;
+                    constexpr static const integral_type x =
+                        0x7D29778100C65A1DA1783716588DCE2B8B4AEE8E228F1896_cppui192;
+                    constexpr static const integral_type y =
+                        0x38A90F22637337334B49DCB66A6DC8F9978ACA7648A943B0_cppui192;
                 };
 
                 template<>

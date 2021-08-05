@@ -56,8 +56,10 @@ namespace nil {
 
                         constexpr static const std::size_t base_field_bits = policy_type::base_field_type::modulus_bits;
                         constexpr static const integral_type base_field_modulus = policy_type::base_field_type::modulus;
-                        constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_type::modulus_bits;
-                        constexpr static const integral_type scalar_field_modulus = policy_type::scalar_field_type::modulus;
+                        constexpr static const std::size_t scalar_field_bits =
+                            policy_type::scalar_field_type::modulus_bits;
+                        constexpr static const integral_type scalar_field_modulus =
+                            policy_type::scalar_field_type::modulus;
 
                         constexpr static const std::size_t integral_type_max_bits = base_field_bits;
 

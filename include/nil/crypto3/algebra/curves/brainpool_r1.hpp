@@ -88,10 +88,14 @@ namespace nil {
                     constexpr static const integral_type p = base_field_modulus;
                     constexpr static const integral_type q = scalar_field_modulus;
 
-                    constexpr static const integral_type a = 0x6A91174076B1E0E19C39C031FE8685C1CAE040E5C69A28EF_cppui192;
-                    constexpr static const integral_type b = 0x469A28EF7C28CCA3DC721D044F4496BCCA7EF4146FBF25C9_cppui192;
-                    constexpr static const integral_type x = 0xC0A0647EAAB6A48753B033C56CB0F0900A2F5C4853375FD6_cppui192;
-                    constexpr static const integral_type y = 0x14B690866ABD5BB88B5F4828C1490002E6773FA2FA299B8F_cppui192;
+                    constexpr static const integral_type a =
+                        0x6A91174076B1E0E19C39C031FE8685C1CAE040E5C69A28EF_cppui192;
+                    constexpr static const integral_type b =
+                        0x469A28EF7C28CCA3DC721D044F4496BCCA7EF4146FBF25C9_cppui192;
+                    constexpr static const integral_type x =
+                        0xC0A0647EAAB6A48753B033C56CB0F0900A2F5C4853375FD6_cppui192;
+                    constexpr static const integral_type y =
+                        0x14B690866ABD5BB88B5F4828C1490002E6773FA2FA299B8F_cppui192;
                 };
 
                 template<>

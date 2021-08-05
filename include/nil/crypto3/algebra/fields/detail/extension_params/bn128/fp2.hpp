@@ -115,8 +115,7 @@ namespace nil {
 
                     template<std::size_t Version>
                     constexpr std::array<typename fp2_extension_params<bn128_base_field<Version>>::integral_type,
-                                         2> const
-                        fp2_extension_params<bn128_base_field<Version>>::Frobenius_coeffs_c1;
+                                         2> const fp2_extension_params<bn128_base_field<Version>>::Frobenius_coeffs_c1;
 
                 }    // namespace detail
             }        // namespace fields

@@ -88,8 +88,8 @@ namespace nil {
                         fp6_2over3_extension_params<mnt6_base_field<Version>>::modulus;
 
                     template<std::size_t Version>
-                    constexpr std::array<
-                        typename fp6_2over3_extension_params<mnt6_base_field<Version>>::integral_type, 6> const
+                    constexpr std::array<typename fp6_2over3_extension_params<mnt6_base_field<Version>>::integral_type,
+                                         6> const
                         fp6_2over3_extension_params<mnt6_base_field<Version>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields

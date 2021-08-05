@@ -42,11 +42,10 @@ namespace nil {
                         using curve_type = curves::alt_bn128<254>;
 
                     public:
-
                         using integral_type = typename curve_type::base_field_type::integral_type;
                         using extended_integral_type = typename curve_type::base_field_type::extended_integral_type;
 
-                        constexpr static const std::size_t integral_type_max_bits = 
+                        constexpr static const std::size_t integral_type_max_bits =
                             curve_type::base_field_type::modulus_bits;
 
                         constexpr static const integral_type ate_loop_count = 0x19D797039BE763BA8_cppui254;
@@ -62,11 +61,11 @@ namespace nil {
                         constexpr static const g2_field_type_value twist = g2_type::params_type::twist;
                     };
 
-                    constexpr
-                        typename pairing_params<curves::alt_bn128<254>>::integral_type const pairing_params<curves::alt_bn128<254>>::ate_loop_count;
+                    constexpr typename pairing_params<curves::alt_bn128<254>>::integral_type const
+                        pairing_params<curves::alt_bn128<254>>::ate_loop_count;
 
-                    constexpr
-                        typename pairing_params<curves::alt_bn128<254>>::integral_type const pairing_params<curves::alt_bn128<254>>::final_exponent_z;
+                    constexpr typename pairing_params<curves::alt_bn128<254>>::integral_type const
+                        pairing_params<curves::alt_bn128<254>>::final_exponent_z;
 
                     constexpr typename pairing_params<curves::alt_bn128<254>>::extended_integral_type const
                         pairing_params<curves::alt_bn128<254>>::final_exponent;

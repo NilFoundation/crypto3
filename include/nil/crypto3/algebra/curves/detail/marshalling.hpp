@@ -50,8 +50,10 @@ namespace nil {
             typedef typename curve_type::template g1_type<>::value_type g1_value_type;
             typedef typename curve_type::template g2_type<>::value_type g2_value_type;
 
-            typedef typename curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type g1_affine_value_type;
-            typedef typename curve_type::template g2_type<algebra::curves::coordinates::affine>::value_type g2_affine_value_type;
+            typedef typename curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type
+                g1_affine_value_type;
+            typedef typename curve_type::template g2_type<algebra::curves::coordinates::affine>::value_type
+                g2_affine_value_type;
 
             typedef typename g1_value_type::field_type::value_type g1_field_value_type;
             typedef typename g2_value_type::field_type::value_type g2_field_value_type;

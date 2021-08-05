@@ -85,12 +85,12 @@ namespace nil {
                         fp6_3over2_extension_params<bn128_base_field<Version>>::non_residue;
 
                     template<std::size_t Version>
-                    constexpr std::array<
-                        typename fp6_3over2_extension_params<bn128_base_field<Version>>::integral_type, 6 * 2> const
+                    constexpr std::array<typename fp6_3over2_extension_params<bn128_base_field<Version>>::integral_type,
+                                         6 * 2> const
                         fp6_3over2_extension_params<bn128_base_field<Version>>::Frobenius_coeffs_c1;
                     template<std::size_t Version>
-                    constexpr std::array<
-                        typename fp6_3over2_extension_params<bn128_base_field<Version>>::integral_type, 6 * 2> const
+                    constexpr std::array<typename fp6_3over2_extension_params<bn128_base_field<Version>>::integral_type,
+                                         6 * 2> const
                         fp6_3over2_extension_params<bn128_base_field<Version>>::Frobenius_coeffs_c2;
 
                 }    // namespace detail

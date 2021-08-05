@@ -37,7 +37,6 @@ namespace nil {
                         using curve_type = CurveType;
 
                     public:
-
                         using integral_type = typename curve_type::base_field_type::integral_type;
                         using extended_integral_type = typename curve_type::base_field_type::extended_integral_type;
 

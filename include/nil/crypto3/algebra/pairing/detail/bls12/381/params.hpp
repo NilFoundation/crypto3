@@ -42,7 +42,6 @@ namespace nil {
                         using curve_type = curves::bls12<381>;
 
                     public:
-
                         using integral_type = typename curve_type::base_field_type::integral_type;
                         using extended_integral_type = typename curve_type::base_field_type::extended_integral_type;
 
@@ -59,7 +58,8 @@ namespace nil {
 
                         using g2_field_type_value = typename curve_type::template g2_type<>::field_type::value_type;
 
-                        constexpr static const g2_field_type_value twist = curve_type::template g2_type<>::params_type::twist;
+                        constexpr static const g2_field_type_value twist =
+                            curve_type::template g2_type<>::params_type::twist;
 
                         constexpr static const g2_field_type_value twist_coeff_b =
                             curve_type::template g2_type<>::params_type::b;

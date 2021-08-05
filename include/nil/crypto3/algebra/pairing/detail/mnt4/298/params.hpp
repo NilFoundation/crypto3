@@ -42,7 +42,6 @@ namespace nil {
                         using curve_type = curves::mnt4<298>;
 
                     public:
-
                         using integral_type = typename curve_type::base_field_type::integral_type;
                         using extended_integral_type = typename curve_type::base_field_type::extended_integral_type;
 

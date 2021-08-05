@@ -103,7 +103,8 @@ namespace nil {
                 BOOST_ASSERT(field_octets_num == std::distance(out_first, out_last));
 
                 ::nil::crypto3::multiprecision::export_bits(
-                    element.data.template convert_to<typename FieldType::integral_type>(), out_first, chunk_size, false);
+                    element.data.template convert_to<typename FieldType::integral_type>(), out_first, chunk_size,
+                    false);
 
                 return field_octets_num;
             }

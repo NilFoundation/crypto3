@@ -44,7 +44,8 @@ namespace nil {
                 struct p192 : public curve_nist<192, WordBits> {
                     typedef typename curve_nist<192>::integral_type integral_type;
 
-                    constexpr static const integral_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF_cppui192;
+                    constexpr static const integral_type p =
+                        0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF_cppui192;
                 };
             }    // namespace curves
         }        // namespace algebra
