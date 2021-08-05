@@ -128,7 +128,7 @@ namespace nil {
 
                 processingStatus = status_type::success;
 
-                using modulus_type = typename FieldType::modulus_type;
+                using integral_type = typename FieldType::integral_type;
                 using field_type = FieldType;
 
                 std::pair<bool, typename field_type::value_type> processed =
@@ -152,7 +152,7 @@ namespace nil {
 
                 processingStatus = status_type::success;
                 
-                using modulus_type = typename FieldType::modulus_type;
+                using integral_type = typename FieldType::integral_type;
                 using field_type = FieldType;
 
                 std::pair<bool, typename field_type::value_type> processed =
@@ -896,14 +896,14 @@ namespace nil {
                                    typename std::vector<chunk_type>::iterator &write_iter) {
 
                 typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
-                    modulus_type;
+                    integral_type;
 
                 constexpr const std::size_t modulus_bits = FieldType::modulus_bits;
 
                 constexpr const std::size_t modulus_chunks =
                     modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
 
-                nil::crypto3::multiprecision::export_bits(modulus_type(input_fp.data), write_iter, chunk_size, false);
+                nil::crypto3::multiprecision::export_bits(integral_type(input_fp.data), write_iter, chunk_size, false);
                 write_iter += modulus_chunks;
             }
 

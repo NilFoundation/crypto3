@@ -554,7 +554,7 @@ namespace nil {
                 /// seed comes from a random beeacon, we are hashing this as a safety precaution.
                 template<typename CurveType,
                          typename DistributionType = boost::random::uniform_int_distribution<
-                             typename CurveType::scalar_field_type::modulus_type>,
+                             typename CurveType::scalar_field_type::integral_type>,
                          typename GeneratorType = boost::random::mt19937, typename Hash = hashes::sha2<256>,
                          typename InputRangesRange, typename InputIterator>
                 inline typename std::enable_if<

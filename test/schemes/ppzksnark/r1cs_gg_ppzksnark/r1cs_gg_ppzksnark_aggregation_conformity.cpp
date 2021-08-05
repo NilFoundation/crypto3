@@ -188,7 +188,7 @@ using base_modular_type = typename curve_type::base_field_type::number_type;
 
 using hash_type = hashes::sha2<256>;
 
-using DistributionType = boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>;
+using DistributionType = boost::random::uniform_int_distribution<typename scalar_field_type::integral_type>;
 using GeneratorType = boost::random::mt19937;
 
 BOOST_AUTO_TEST_SUITE(aggregation_functions_conformity_test)

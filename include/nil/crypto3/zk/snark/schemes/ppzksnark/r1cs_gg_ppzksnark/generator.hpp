@@ -74,7 +74,7 @@ namespace nil {
                     typedef typename policy_type::proof_type proof_type;
 
                     template<typename DistributionType =
-                                 boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>,
+                                 boost::random::uniform_int_distribution<typename scalar_field_type::integral_type>,
                              typename GeneratorType = boost::random::mt19937>
                     static inline auto basic_process(const constraint_system_type &constraint_system) {
 
@@ -227,7 +227,7 @@ namespace nil {
                     }
 
                     template<typename DistributionType =
-                                 boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>,
+                                 boost::random::uniform_int_distribution<typename scalar_field_type::integral_type>,
                              typename GeneratorType = boost::random::mt19937>
                     static inline keypair_type process(const constraint_system_type &constraint_system) {
 

@@ -51,7 +51,7 @@ namespace nil {
                     typedef typename policy_type::srs_pair_type srs_pair_type;
 
                     template<typename DistributionType =
-                                 boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>,
+                                 boost::random::uniform_int_distribution<typename scalar_field_type::integral_type>,
                              typename GeneratorType = boost::random::mt19937>
                     static inline keypair_type process(const constraint_system_type &constraint_system) {
 
@@ -86,7 +86,7 @@ namespace nil {
                     }
 
                     template<typename DistributionType =
-                                 boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>,
+                                 boost::random::uniform_int_distribution<typename scalar_field_type::integral_type>,
                              typename GeneratorType = boost::random::mt19937>
                     static inline srs_pair_type process(std::size_t num_proofs) {
 

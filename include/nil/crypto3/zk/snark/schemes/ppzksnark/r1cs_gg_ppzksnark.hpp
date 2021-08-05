@@ -161,7 +161,7 @@ namespace nil {
 
                     // Generate key pair
                     template<typename DistributionType = boost::random::uniform_int_distribution<
-                                 typename CurveType::scalar_field_type::modulus_type>,
+                                 typename CurveType::scalar_field_type::integral_type>,
                              typename GeneratorType = boost::random::mt19937>
                     static inline keypair_type generate(const constraint_system_type &constraint_system) {
                         return Generator::template process<DistributionType, GeneratorType>(constraint_system);
@@ -169,7 +169,7 @@ namespace nil {
 
                     // Generate SRS pair
                     template<typename DistributionType = boost::random::uniform_int_distribution<
-                                 typename CurveType::scalar_field_type::modulus_type>,
+                                 typename CurveType::scalar_field_type::integral_type>,
                              typename GeneratorType = boost::random::mt19937>
                     static inline srs_pair_type generate(std::size_t num_proofs) {
                         return Generator::template process<DistributionType, GeneratorType>(num_proofs);
@@ -205,7 +205,7 @@ namespace nil {
 
                     // Aggregate verify
                     template<typename DistributionType = boost::random::uniform_int_distribution<
-                                 typename CurveType::scalar_field_type::modulus_type>,
+                                 typename CurveType::scalar_field_type::integral_type>,
                              typename GeneratorType = boost::random::mt19937, typename Hash = hashes::sha2<256>,
                              typename InputPrimaryInputRange, typename InputIterator>
                     static inline bool verify(const verification_srs_type &ip_verifier_srs,
