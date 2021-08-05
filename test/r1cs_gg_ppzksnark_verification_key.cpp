@@ -112,8 +112,7 @@ void test_verification_key(
     verification_key_type test_val_read;
 
     auto read_iter = cv.begin();
-    status = 
-        test_val_read.read(read_iter, 
+    status = test_val_read.read(read_iter, 
                 cv.size());
 
     zk::snark::r1cs_gg_ppzksnark_verification_key<CurveType> 

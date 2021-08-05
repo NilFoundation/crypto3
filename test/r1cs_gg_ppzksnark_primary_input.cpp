@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_primary_input_bls12_381_be) {
     std::cout << "BLS12-381 r1cs_gg_ppzksnark primary input big-endian test started" << std::endl;
     test_primary_input<nil::crypto3::zk::snark::r1cs_gg_ppzksnark<nil::crypto3::algebra::curves::bls12<381>>, 
         nil::marshalling::option::big_endian, 
-        5>();
+        100>();
     std::cout << "BLS12-381 r1cs_gg_ppzksnark primary input big-endian test finished" << std::endl;
 }
 
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_primary_input_bls12_381_le) {
     std::cout << "BLS12-381 r1cs_gg_ppzksnark primary input little-endian test started" << std::endl;
     test_primary_input<nil::crypto3::zk::snark::r1cs_gg_ppzksnark<nil::crypto3::algebra::curves::bls12<381>>, 
         nil::marshalling::option::little_endian, 
-        5>();
+        100>();
     std::cout << "BLS12-381 r1cs_gg_ppzksnark primary input little-endian test finished" << std::endl;
 }
 
