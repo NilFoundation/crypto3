@@ -323,14 +323,14 @@ namespace nil {
                         // temporary added until fixed-precision modular adaptor is ready:
                         typedef nil::crypto3::multiprecision::number<
                             nil::crypto3::multiprecision::backends::cpp_int_backend<>>
-                            non_fixed_precision_modulus_type;
+                            non_fixed_precision_integral_type;
 
-                        using modulus_type = typename FieldType::modulus_type;
+                        using integral_type = typename FieldType::integral_type;
 
                         for (std::size_t i = 0; i < 32; ++i) {
-                            const non_fixed_precision_modulus_type v = non_fixed_precision_modulus_type(
+                            const non_fixed_precision_integral_type v = non_fixed_precision_integral_type(
                                 (this->bp.lc_val(X[i]) + this->bp.lc_val(Y[i]) + this->bp.lc_val(Z[i])).data);
-                            this->bp.val(result_bits[i]) = typename FieldType::value_type(modulus_type(v / 2));
+                            this->bp.val(result_bits[i]) = typename FieldType::value_type(integral_type(v / 2));
                         }
 
                         pack_result->generate_r1cs_witness_from_bits();

@@ -266,7 +266,7 @@ namespace nil {
 
                         typedef nil::crypto3::multiprecision::number<
                             nil::crypto3::multiprecision::backends::cpp_int_backend<>>
-                            modulus_type;
+                            integral_type;
 
                         for (const typename FieldType::value_type &elt : hash_elems) {
                             // std::vector<std::uint8_t> elt_bytes;
@@ -275,7 +275,7 @@ namespace nil {
                             std::vector<bool>::iterator write_iter = elt_bits.begin();
                             // little-endian, to preserve compatibility with blueprint_packing_sum.
                             auto end = ::nil::crypto3::multiprecision::export_bits(
-                                modulus_type(elt.data), write_iter, 1, false);
+                                integral_type(elt.data), write_iter, 1, false);
 
                             result.insert(result.end(), elt_bits.begin(), elt_bits.end());
                         }

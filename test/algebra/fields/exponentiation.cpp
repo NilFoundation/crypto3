@@ -51,14 +51,14 @@ using namespace nil::crypto3::algebra;
 
 template<typename FpkT, template<class> class Fpk_variableT, template<class> class Fpk_mul_componentT,
          template<class> class Fpk_sqr_componentT>
-void test_exponentiation_component(const typename FpkT::modulus_type &power) {
+void test_exponentiation_component(const typename FpkT::integral_type &power) {
     typedef typename FpkT::base_field_type FieldType;
 
     components::blueprint<FieldType> bp;
     Fpk_variableT<FpkT> x(bp);
     Fpk_variableT<FpkT> x_to_power(bp);
     components::exponentiation_component<FpkT, Fpk_variableT, Fpk_mul_componentT, Fpk_sqr_componentT,
-                             typename FpkT::modulus_type>
+                             typename FpkT::integral_type>
         exp_component(bp, x, power, x_to_power);
     exp_component.generate_r1cs_constraints();
 
