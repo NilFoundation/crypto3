@@ -41,9 +41,6 @@ namespace nil {
 
         BOOST_TTI_HAS_TYPE(tag)
 
-        BOOST_TTI_HAS_TYPE(interface_options_type)
-        BOOST_TTI_HAS_TYPE(impl_options_type)
-
         /// @brief Compile time check function of whether a provided type is any
         ///     variant of nil::marshalling::types::array_list.
         /// @tparam T Any type.

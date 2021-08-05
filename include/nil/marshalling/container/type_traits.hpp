@@ -25,25 +25,12 @@
 #ifndef MARSHALLING_CONTAINER_TYPE_TRAITS_HPP
 #define MARSHALLING_CONTAINER_TYPE_TRAITS_HPP
 
-#include <boost/tti/tti.hpp>
-#include <boost/mpl/placeholders.hpp>
-#include <boost/type_traits/is_same.hpp>
-
 #include <nil/marshalling/container/static_vector.hpp>
 #include <nil/marshalling/container/static_string.hpp>
 
 namespace nil {
     namespace marshalling {
         namespace container {
-
-            using namespace boost::mpl::placeholders;
-
-            BOOST_TTI_HAS_TYPE(tag)
-
-            BOOST_TTI_HAS_TYPE(interface_options_type)
-            BOOST_TTI_HAS_TYPE(impl_options_type)
-
-
             namespace detail {
 
                 template<typename T>
