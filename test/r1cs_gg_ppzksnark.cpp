@@ -29,8 +29,6 @@
 
 #include <iostream>
 
-#include "detail/r1cs_examples.hpp"
-
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
 #include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
@@ -52,6 +50,8 @@
 #include <nil/crypto3/marshalling/types/zk/r1cs_gg_ppzksnark/primary_input.hpp>
 #include <nil/crypto3/marshalling/types/zk/r1cs_gg_ppzksnark/proof.hpp>
 #include <nil/crypto3/marshalling/types/zk/r1cs_gg_ppzksnark/verification_key.hpp>
+
+#include "detail/r1cs_examples.hpp"
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::marshalling;
@@ -138,11 +138,6 @@ bool test_r1cs_gg_ppzksnark() {
 
     status = filled_primary_input_val.write(primary_input_write_iter, 
             primary_input_byteblob.size());
-
-
-
-
-
 
     std::cout << "Byteblobs filled." << std::endl;
 
