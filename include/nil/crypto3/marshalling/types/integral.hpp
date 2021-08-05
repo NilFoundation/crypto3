@@ -34,6 +34,7 @@
 
 #include <nil/crypto3/multiprecision/number.hpp>
 
+#include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/types/integral.hpp>
 #include <nil/marshalling/types/array_list.hpp>
 #include <nil/marshalling/types/tag.hpp>

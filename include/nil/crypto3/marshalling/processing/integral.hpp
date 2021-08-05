@@ -74,13 +74,18 @@ namespace nil {
                         (TSize / chunk_bits) + 
                         ((TSize % chunk_bits)?1:0);
 
-                    std::size_t begin_index = chunks_count - 
-                        ((nil::crypto3::multiprecision::msb(value) + 1)/chunk_bits + 
-                            (((nil::crypto3::multiprecision::msb(value) + 1) % chunk_bits)?1:0));
+                    if (value > 0) {
+                        std::size_t begin_index = chunks_count - 
+                            ((nil::crypto3::multiprecision::msb(value) + 1)/chunk_bits + 
+                                (((nil::crypto3::multiprecision::msb(value) + 1) % chunk_bits)?1:0));
 
-                    std::fill(iter, iter + begin_index, 0);
+                        std::fill(iter, iter + begin_index, 0);
 
-                    export_bits(value, iter + begin_index, chunk_bits, true);
+                        export_bits(value, iter + begin_index, chunk_bits, true);
+                    } else {
+                        std::fill(iter, iter + chunks_count, 0);
+                    }
+
                 }
 
                 /// @brief Read part of integral value from the input area using big
@@ -161,15 +166,19 @@ namespace nil {
                         (TSize / chunk_bits) + 
                         ((TSize % chunk_bits)?1:0);
 
-                    std::size_t end_index = chunks_count - 
-                        ((nil::crypto3::multiprecision::msb(value) + 1)/chunk_bits + 
-                            (((nil::crypto3::multiprecision::msb(value) + 1) % chunk_bits)?1:0));
+                    if (value > 0){
+                        std::size_t end_index = chunks_count - 
+                            ((nil::crypto3::multiprecision::msb(value) + 1)/chunk_bits + 
+                                (((nil::crypto3::multiprecision::msb(value) + 1) % chunk_bits)?1:0));
 
-                    if (end_index < chunks_count){
-                        std::fill(iter + end_index, iter + chunks_count, 0x00);
+                        if (end_index < chunks_count){
+                            std::fill(iter + end_index, iter + chunks_count, 0x00);
+                        }
+                        
+                        export_bits(value, iter, chunk_bits, false);
+                    } else {
+                        std::fill(iter, iter + chunks_count, 0);
                     }
-                    
-                    export_bits(value, iter, chunk_bits, false);
                 }
 
                 /// @brief Read integral value from the input area using little
