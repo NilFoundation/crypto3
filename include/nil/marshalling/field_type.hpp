@@ -42,7 +42,7 @@ namespace nil {
         /// @brief Base class to all the field classes.
         /// @details Every custom "field" class should inherit from this one.
         /// @tparam TOptions Zero or more options. The supported options are:
-        ///     @li nil::marshalling::option::BigEndian or nil::marshalling::option::LittleEndian - Option to
+        ///     @li nil::marshalling::option::big_endian or nil::marshalling::option::little_endian - Option to
         ///         specify serialization endian. If none is provided big endian is
         ///         assumed.
         /// @headerfile nil/marshalling/field_type.hpp

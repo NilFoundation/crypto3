@@ -33,31 +33,31 @@ namespace nil {
         namespace types {
             namespace adapter {
 
-                template<typename TInitialiser, typename TBase>
-                class default_value_initialiser : public TBase {
+                template<typename TInitializer, typename TBase>
+                class default_value_initializer : public TBase {
                     using base_impl_type = TBase;
-                    using initialiser_type = TInitialiser;
+                    using initializer_type = TInitializer;
 
                 public:
                     using value_type = typename base_impl_type::value_type;
 
-                    default_value_initialiser() {
-                        initialiser_type()(*this);
+                    default_value_initializer() {
+                        initializer_type()(*this);
                     }
 
-                    explicit default_value_initialiser(const value_type &val) : base_impl_type(val) {
+                    explicit default_value_initializer(const value_type &val) : base_impl_type(val) {
                     }
 
-                    explicit default_value_initialiser(value_type &&val) : base_impl_type(std::move(val)) {
+                    explicit default_value_initializer(value_type &&val) : base_impl_type(std::move(val)) {
                     }
 
-                    default_value_initialiser(const default_value_initialiser &) = default;
+                    default_value_initializer(const default_value_initializer &) = default;
 
-                    default_value_initialiser(default_value_initialiser &&) = default;
+                    default_value_initializer(default_value_initializer &&) = default;
 
-                    default_value_initialiser &operator=(const default_value_initialiser &) = default;
+                    default_value_initializer &operator=(const default_value_initializer &) = default;
 
-                    default_value_initialiser &operator=(default_value_initialiser &&) = default;
+                    default_value_initializer &operator=(default_value_initializer &&) = default;
                 };
 
             }    // namespace adapter

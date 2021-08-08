@@ -168,7 +168,7 @@ namespace nil {
                     : public options_parser<TOptions...> {
                 public:
                     static const bool has_sequence_size_field_prefix = true;
-                    using sequence_size_field_prefix_type = TSizeField;
+                    using sequence_size_field_prefix = TSizeField;
                 };
 
                 template<typename TField, status_type TReadErrorStatus, typename... TOptions>
@@ -177,7 +177,7 @@ namespace nil {
                     TOptions...> : public options_parser<TOptions...> {
                 public:
                     static const bool has_sequence_ser_length_field_prefix = true;
-                    using sequence_ser_length_field_prefix_type = TField;
+                    using sequence_ser_length_field_prefix = TField;
                     static const status_type sequence_ser_length_field_read_error_status
                         = TReadErrorStatus;
                 };
@@ -188,7 +188,7 @@ namespace nil {
                     TOptions...> : public options_parser<TOptions...> {
                 public:
                     static const bool has_sequence_elem_ser_length_field_prefix = true;
-                    using sequence_elem_ser_length_field_prefix_type = TField;
+                    using sequence_elem_ser_length_field_prefix = TField;
                     static const status_type sequence_elem_ser_length_field_read_error_status
                         = TReadErrorStatus;
                 };
@@ -199,7 +199,7 @@ namespace nil {
                     TOptions...> : public options_parser<TOptions...> {
                 public:
                     static const bool has_sequence_elem_fixed_ser_length_field_prefix = true;
-                    using sequence_elem_fixed_ser_length_field_prefix_type = TField;
+                    using sequence_elem_fixed_ser_length_field_prefix = TField;
                     static const status_type sequence_elem_fixed_ser_length_field_read_error_status
                         = TReadErrorStatus;
                 };
@@ -221,7 +221,7 @@ namespace nil {
                 };
 
                 template<typename TInitialiser, typename... TOptions>
-                class options_parser<nil::marshalling::option::default_value_initialiser<TInitialiser>, TOptions...>
+                class options_parser<nil::marshalling::option::default_value_initializer<TInitialiser>, TOptions...>
                     : public options_parser<TOptions...> {
                 public:
                     static const bool has_default_value_initializer = true;

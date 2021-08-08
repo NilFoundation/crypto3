@@ -54,8 +54,8 @@ namespace nil {
             ///     of the field.@n
             ///     Supported options are:
             ///     @li @ref nil::marshalling::option::default_value_initializer - All wrapped fields may
-            ///         specify their independent default value initialisers. It is
-            ///         also possible to provide initialiser for the bundle field which
+            ///         specify their independent default value initializers. It is
+            ///         also possible to provide initializer for the bundle field which
             ///         will set appropriate values to the fields based on some
             ///         internal logic.
             ///     @li @ref nil::marshalling::option::contents_validator - All wrapped fields may specify
@@ -519,10 +519,10 @@ namespace nil {
                               "bundle field");
                 static_assert(
                     !parsed_options_type::has_sequence_size_forcing,
-                    "nil::marshalling::option::SequenceSizeForcingEnabled option is not applicable to bundle field");
+                    "nil::marshalling::option::sequence_size_forcing_enabled option is not applicable to bundle field");
                 static_assert(
                     !parsed_options_type::has_sequence_length_forcing,
-                    "nil::marshalling::option::SequenceLengthForcingEnabled option is not applicable to bundle field");
+                    "nil::marshalling::option::sequence_length_forcing_enabled option is not applicable to bundle field");
                 static_assert(!parsed_options_type::has_sequence_fixed_size,
                               "nil::marshalling::option::sequence_fixed_size option is not applicable to bundle field");
                 static_assert(!parsed_options_type::has_sequence_fixed_size_use_fixed_size_storage,

@@ -627,13 +627,13 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test18) {
     static_assert(!SizeField::is_version_dependent(), "Invalid version dependency assumption");
 
     typedef types::string<field_type<option::big_endian>, option::sequence_size_field_prefix<SizeField>,
-                          option::default_value_initialiser<HelloInitialiser>>
+                          option::default_value_initializer<HelloInitialiser>>
         testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
     typedef types::string<field_type<option::big_endian>, option::sequence_size_field_prefix<SizeField>,
-                          option::default_value_initialiser<HelloInitialiser>, option::fixed_size_storage<64>>
+                          option::default_value_initializer<HelloInitialiser>, option::fixed_size_storage<64>>
         StaticStorageField;
 
     static_assert(!StaticStorageField::is_version_dependent(), "Invalid version dependency assumption");
@@ -1484,7 +1484,7 @@ BOOST_AUTO_TEST_CASE(test47) {
     typedef types::bundle<field_type<option::big_endian>,
                           std::tuple<types::integral<field_type<option::big_endian>, std::uint16_t>,
                                      types::integral<field_type<option::big_endian>, std::uint8_t>>,
-                          option::default_value_initialiser<BundleInitialiserTest47>>
+                          option::default_value_initializer<BundleInitialiserTest47>>
         testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");

@@ -41,7 +41,7 @@
 #include <nil/marshalling/types/adapter/sequence_elem_fixed_ser_length_field_prefix.hpp>
 #include <nil/marshalling/types/adapter/sequence_trailing_field_suffix.hpp>
 #include <nil/marshalling/types/adapter/sequence_termination_field_suffix.hpp>
-#include <nil/marshalling/types/adapter/default_value_initialiser.hpp>
+#include <nil/marshalling/types/adapter/default_value_initializer.hpp>
 #include <nil/marshalling/types/adapter/num_value_multi_range_validator.hpp>
 #include <nil/marshalling/types/adapter/custom_validator.hpp>
 #include <nil/marshalling/types/adapter/custom_refresher.hpp>
@@ -315,7 +315,7 @@ namespace nil {
                 struct adapt_field_sequence_size_field_prefix<true> {
                     template<typename TField, typename TOpts>
                     using type = types::adapter::
-                        sequence_size_field_prefix<typename TOpts::sequence_size_field_prefix_type, TField>;
+                        sequence_size_field_prefix<typename TOpts::sequence_size_field_prefix, TField>;
                 };
 
                 template<>
@@ -336,7 +336,7 @@ namespace nil {
                 struct adapt_field_sequence_ser_length_field_prefix<true> {
                     template<typename TField, typename TOpts>
                     using type = types::adapter::sequence_ser_length_field_prefix<
-                        typename TOpts::sequence_ser_length_field_prefix_type,
+                        typename TOpts::sequence_ser_length_field_prefix,
                         TOpts::sequence_ser_length_field_read_error_status,
                         TField>;
                 };
@@ -361,7 +361,7 @@ namespace nil {
                 struct adapt_field_sequence_elem_ser_length_field_prefix<true> {
                     template<typename TField, typename TOpts>
                     using type = types::adapter::sequence_elem_ser_length_field_prefix<
-                        typename TOpts::sequence_elem_ser_length_field_prefix_type,
+                        typename TOpts::sequence_elem_ser_length_field_prefix,
                         TOpts::sequence_elem_ser_length_field_read_error_status,
                         TField>;
                 };
@@ -386,7 +386,7 @@ namespace nil {
                 struct adapt_field_sequence_elem_fixed_ser_length_field_prefix<true> {
                     template<typename TField, typename TOpts>
                     using type = types::adapter::sequence_elem_fixed_ser_length_field_prefix<
-                        typename TOpts::sequence_elem_fixed_ser_length_field_prefix_type,
+                        typename TOpts::sequence_elem_fixed_ser_length_field_prefix,
                         TOpts::sequence_elem_fixed_ser_length_field_read_error_status,
                         TField>;
                 };
@@ -447,23 +447,23 @@ namespace nil {
                         TOpts::has_sequence_termination_field_suffix>::template type<TField, TOpts>;
 
                 template<bool THasDefaultValueInitialiser>
-                struct adapt_field_default_value_initialiser;
+                struct adapt_field_default_value_initializer;
 
                 template<>
-                struct adapt_field_default_value_initialiser<true> {
+                struct adapt_field_default_value_initializer<true> {
                     template<typename TField, typename TOpts>
                     using type = types::adapter::
-                        default_value_initialiser<typename TOpts::default_value_initializer, TField>;
+                        default_value_initializer<typename TOpts::default_value_initializer, TField>;
                 };
 
                 template<>
-                struct adapt_field_default_value_initialiser<false> {
+                struct adapt_field_default_value_initializer<false> {
                     template<typename TField, typename TOpts>
                     using type = TField;
                 };
 
                 template<typename TField, typename TOpts>
-                using adapt_field_default_value_initialiser_type = typename adapt_field_default_value_initialiser<
+                using adapt_field_default_value_initializer_type = typename adapt_field_default_value_initializer<
                     TOpts::has_default_value_initializer>::template type<TField, TOpts>;
 
                 template<bool THasMultiRangeValidation>
@@ -609,7 +609,7 @@ namespace nil {
                                   "custom_value_reader option is incompatible with following options: "
                                   "num_value_ser_offset, fixed_length, fixed_bit_length, var_length, "
                                   "has_sequence_elem_length_forcing, "
-                                  "SequenceSizeForcingEnabled, SequenceLengthForcingEnabled, sequence_fixed_size, "
+                                  "sequence_size_forcing_enabled, sequence_length_forcing_enabled, sequence_fixed_size, "
                                   "sequence_size_field_prefix, "
                                   "sequence_ser_length_field_prefix, sequence_elem_ser_length_field_prefix, "
                                   "sequence_elem_fixed_ser_length_field_prefix, sequence_trailing_field_suffix, "
@@ -630,7 +630,7 @@ namespace nil {
                                       parsed_options_type::has_sequence_termination_field_suffix>::value,
                                   "The following options are incompatible, cannot be used together: "
                                   "sequence_size_field_prefix, sequence_ser_length_field_prefix, "
-                                  "sequence_fixed_size, SequenceSizeForcingEnabled, SequenceLengthForcingEnabled, "
+                                  "sequence_fixed_size, sequence_size_forcing_enabled, sequence_length_forcing_enabled, "
                                   "sequence_termination_field_suffix");
 
                     static_assert(1U >= fields_options_compatibility_calc<
@@ -709,11 +709,11 @@ namespace nil {
                     using sequence_termination_field_suffix_adapted
                         = adapt_field_sequence_termination_field_suffix_type<sequence_trailing_field_suffix_adapted,
                                                                              parsed_options_type>;
-                    using default_value_initialiser_adapted
-                        = adapt_field_default_value_initialiser_type<sequence_termination_field_suffix_adapted,
+                    using default_value_initializer_adapted
+                        = adapt_field_default_value_initializer_type<sequence_termination_field_suffix_adapted,
                                                                      parsed_options_type>;
                     using num_value_multi_range_validator_adapted
-                        = adapt_field_num_value_multi_range_validator_type<default_value_initialiser_adapted,
+                        = adapt_field_num_value_multi_range_validator_type<default_value_initializer_adapted,
                                                                            parsed_options_type>;
                     using custom_validator_adapted
                         = adapt_field_custom_validator_type<num_value_multi_range_validator_adapted,

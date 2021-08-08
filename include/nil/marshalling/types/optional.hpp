@@ -46,9 +46,9 @@ namespace nil {
             ///     of the field.@n
             ///     Supported options are:
             ///     @li @ref nil::marshalling::option::default_value_initializer, @ref
-            ///     nil::marshalling::option::DefaultOptionalMode,
-            ///         @ref nil::marshalling::option::OptionalMissingByDefault, or @ref
-            ///         nil::marshalling::option::OptionalExistsByDefault.
+            ///     nil::marshalling::option::default_optional_mode,
+            ///         @ref nil::marshalling::option::optional_missing_by_default, or @ref
+            ///         nil::marshalling::option::optional_exists_by_default.
             ///     @li @ref nil::marshalling::option::contents_validator.
             ///     @li @ref nil::marshalling::option::contents_refresher
             ///     @li @ref nil::marshalling::option::has_custom_read

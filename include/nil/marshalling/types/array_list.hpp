@@ -72,12 +72,12 @@ namespace nil {
             ///     Supported options are:
             ///     @li @ref nil::marshalling::option::fixed_size_storage
             ///     @li @ref nil::marshalling::option::custom_storage_type
-            ///     @li @ref nil::marshalling::option::sequence_size_field_prefix_type
-            ///     @li @ref nil::marshalling::option::sequence_ser_length_field_prefix_type
-            ///     @li @ref nil::marshalling::option::sequence_elem_ser_length_field_prefix_type
-            ///     @li @ref nil::marshalling::option::sequence_elem_fixed_ser_length_field_prefix_type
-            ///     @li @ref nil::marshalling::option::SequenceSizeForcingEnabled
-            ///     @li @ref nil::marshalling::option::SequenceLengthForcingEnabled
+            ///     @li @ref nil::marshalling::option::sequence_size_field_prefix
+            ///     @li @ref nil::marshalling::option::sequence_ser_length_field_prefix
+            ///     @li @ref nil::marshalling::option::sequence_elem_ser_length_field_prefix
+            ///     @li @ref nil::marshalling::option::sequence_elem_fixed_ser_length_field_prefix
+            ///     @li @ref nil::marshalling::option::sequence_size_forcing_enabled
+            ///     @li @ref nil::marshalling::option::sequence_length_forcing_enabled
             ///     @li @ref nil::marshalling::option::sequence_fixed_size
             ///     @li @ref nil::marshalling::option::sequence_termination_field_suffix
             ///     @li @ref nil::marshalling::option::sequence_trailing_field_suffix
@@ -88,7 +88,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::has_custom_refresh
             ///     @li @ref nil::marshalling::option::fail_on_invalid
             ///     @li @ref nil::marshalling::option::ignore_invalid
-            ///     @li @ref nil::marshalling::option::OrigDataView (valid only if TElement is integral type
+            ///     @li @ref nil::marshalling::option::orig_data_view (valid only if TElement is integral type
             ///         of 1 byte size.
             ///     @li @ref nil::marshalling::option::empty_serialization
             ///     @li @ref nil::marshalling::option::version_storage
@@ -166,10 +166,10 @@ namespace nil {
                 /// @brief Read field value from input data sequence
                 /// @details By default, the read operation will try to consume all the
                 ///     data available, unless size limiting option (such as
-                ///     nil::marshalling::option::sequence_size_field_prefix_type,
+                ///     nil::marshalling::option::sequence_size_field_prefix,
                 ///     nil::marshalling::option::sequence_fixed_size,
-                ///     nil::marshalling::option::SequenceSizeForcingEnabled,
-                ///     nil::marshalling::option::SequenceLengthForcingEnabled) is used.
+                ///     nil::marshalling::option::sequence_size_forcing_enabled,
+                ///     nil::marshalling::option::sequence_length_forcing_enabled) is used.
                 /// @param[in, out] iter Iterator to read the data.
                 /// @param[in] len Number of bytes available for reading.
                 /// @return Status of read operation.
@@ -244,7 +244,7 @@ namespace nil {
 
                 /// @brief Force number of elements that must be read in the next read()
                 ///     invocation.
-                /// @details Exists only if nil::marshalling::option::SequenceSizeForcingEnabled option has been
+                /// @details Exists only if nil::marshalling::option::sequence_size_forcing_enabled option has been
                 ///     used.
                 /// @param[in] count Number of elements to read during following read operation.
                 void force_read_elem_count(std::size_t count) {
@@ -253,14 +253,14 @@ namespace nil {
 
                 /// @brief Clear forcing of the number of elements that must be read in the next read()
                 ///     invocation.
-                /// @details Exists only if nil::marshalling::option::SequenceSizeForcingEnabled option has been
+                /// @details Exists only if nil::marshalling::option::sequence_size_forcing_enabled option has been
                 ///     used.
                 void clear_read_elem_count() {
                     return base_impl_type::clear_read_elem_count();
                 }
 
                 /// @brief Force available length for the next read() invocation.
-                /// @details Exists only if @ref nil::marshalling::option::SequenceLengthForcingEnabled option has been
+                /// @details Exists only if @ref nil::marshalling::option::sequence_length_forcing_enabled option has been
                 ///     used.
                 /// @param[in] count Number of elements to read during following read operation.
                 void force_read_length(std::size_t count) {
@@ -269,7 +269,7 @@ namespace nil {
 
                 /// @brief Clear forcing of the available length in the next read()
                 ///     invocation.
-                /// @details Exists only if @ref nil::marshalling::option::SequenceLengthForcingEnabled option has been
+                /// @details Exists only if @ref nil::marshalling::option::sequence_length_forcing_enabled option has been
                 ///     used.
                 void clear_read_length_forcing() {
                     return base_impl_type::clear_read_length_forcing();

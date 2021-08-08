@@ -74,10 +74,10 @@ namespace nil {
             ///     @li @ref nil::marshalling::num_value_ser_offset
             ///     @li @ref nil::marshalling::option::default_value_initializer or
             ///     nil::marshalling::option::default_num_value.
-            ///     @li @ref nil::marshalling::option::ContentsValidator
-            ///     @li @ref nil::marshalling::option::valid_num_value_range, @ref nil::marshalling::option::ValidNumValue,
-            ///         @ref nil::marshalling::option::ValidBigUnsignedNumValueRange, @ref
-            ///         nil::marshalling::option::ValidBigUnsignedNumValue
+            ///     @li @ref nil::marshalling::option::contents_validator
+            ///     @li @ref nil::marshalling::option::valid_num_value_range, @ref nil::marshalling::option::valid_num_value,
+            ///         @ref nil::marshalling::option::valid_big_unsigned_num_value_range, @ref
+            ///         nil::marshalling::option::valid_big_unsigned_num_value_range
             ///     @li @ref nil::marshalling::option::valid_ranges_clear
             ///     @li @ref nil::marshalling::option::contents_refresher
             ///     @li @ref nil::marshalling::option::has_custom_read
@@ -234,10 +234,10 @@ namespace nil {
                               "nil::marshalling::option::SequenceElemLengthForcingEnabled option is not applicable to "
                               "enumeration field");
                 static_assert(!parsed_options_type::has_sequence_size_forcing,
-                              "nil::marshalling::option::SequenceSizeForcingEnabled option is not applicable to "
+                              "nil::marshalling::option::sequence_size_forcing_enabled option is not applicable to "
                               "enumeration field");
                 static_assert(!parsed_options_type::has_sequence_length_forcing,
-                              "nil::marshalling::option::SequenceLengthForcingEnabled option is not applicable to "
+                              "nil::marshalling::option::sequence_length_forcing_enabled option is not applicable to "
                               "enumeration field");
                 static_assert(
                     !parsed_options_type::has_sequence_fixed_size,

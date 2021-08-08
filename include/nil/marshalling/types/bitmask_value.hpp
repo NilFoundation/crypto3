@@ -70,7 +70,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::default_value_initializer or
             ///     nil::marshalling::option::default_num_value.
             ///     @li @ref nil::marshalling::option::contents_validator or
-            ///     nil::marshalling::option::BitmaskReservedBits.
+            ///     nil::marshalling::option::bitmask_reserved_bits.
             ///     @li @ref nil::marshalling::option::contents_refresher
             ///     @li @ref nil::marshalling::option::has_custom_read
             ///     @li @ref nil::marshalling::option::has_custom_refresh
@@ -289,10 +289,10 @@ namespace nil {
                               "nil::marshalling::option::SequenceElemLengthForcingEnabled option is not applicable to "
                               "bitmask_value field");
                 static_assert(!parsed_options_type::has_sequence_size_forcing,
-                              "nil::marshalling::option::SequenceSizeForcingEnabled option is not applicable to "
+                              "nil::marshalling::option::sequence_size_forcing_enabled option is not applicable to "
                               "bitmask_value field");
                 static_assert(!parsed_options_type::has_sequence_length_forcing,
-                              "nil::marshalling::option::SequenceLengthForcingEnabled option is not applicable to "
+                              "nil::marshalling::option::sequence_length_forcing_enabled option is not applicable to "
                               "bitmask_value field");
                 static_assert(
                     !parsed_options_type::has_sequence_fixed_size,
@@ -526,7 +526,7 @@ namespace nil {
 ///         nil::marshalling::types::bitmask_value<
 ///             MyFieldBase,
 ///             nil::marshalling::types::fixed_length<1>,
-///             nil::marshalling::types::BitmaskReservedBits<0xf2, 0>,
+///             nil::marshalling::types::bitmask_reserved_bits<0xf2, 0>,
 ///             TExtraOptions...
 ///         >
 ///     {
@@ -535,7 +535,7 @@ namespace nil {
 ///             nil::marshalling::types::bitmask_value<
 ///                 MyFieldBase,
 ///                 nil::marshalling::types::fixed_length<1>,
-///                 smarshalling::types::BitmaskReservedBits<0xf2, 0>,
+///                 smarshalling::types::bitmask_reserved_bits<0xf2, 0>,
 ///                 TExtraOptions...
 ///             >;
 ///     public:
@@ -616,7 +616,7 @@ namespace nil {
 ///         nil::marshalling::types::bitmask_value<
 ///             MyFieldBase,
 ///             nil::marshalling::types::fixed_length<1>,
-///             nil::marshalling::types::BitmaskReservedBits<0xf0, 0>,
+///             nil::marshalling::types::bitmask_reserved_bits<0xf0, 0>,
 ///             TExtraOptions...
 ///         >
 ///     {
@@ -625,7 +625,7 @@ namespace nil {
 ///             nil::marshalling::types::bitmask_value<
 ///                 MyFieldBase,
 ///                 nil::marshalling::types::fixed_length<1>,
-///                 scomms::types::BitmaskReservedBits<0xf0, 0>,
+///                 scomms::types::bitmask_reserved_bits<0xf0, 0>,
 ///                 TExtraOptions...
 ///             >;
 ///     public:

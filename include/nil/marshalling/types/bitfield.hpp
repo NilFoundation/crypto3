@@ -273,7 +273,7 @@ namespace nil {
                               "bitfield field");
                 static_assert(
                     !parsed_options_type::has_sequence_size_forcing,
-                    "nil::marshalling::option::SequenceSizeForcingEnabled option is not applicable to bitfield field");
+                    "nil::marshalling::option::sequence_size_forcing_enabled option is not applicable to bitfield field");
                 static_assert(
                     !parsed_options_type::has_sequence_length_forcing,
                     "nil::marshalling::option::SequenceLengthorcingEnabled option is not applicable to bitfield field");
