@@ -29,8 +29,6 @@
 #include <iterator>
 #include <type_traits>
 
-#include <nil/crypto3/pkpad/emsa.hpp>
-
 #include <nil/crypto3/algebra/type_traits.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
@@ -87,6 +85,14 @@ namespace nil {
                         }
                     };
 
+                    template<typename MsgReprType, typename Hash>
+                    struct emsa1_encoding_policy<
+                        MsgReprType, Hash,
+                        typename std::enable_if<
+                            algebra::is_field<MsgReprType>::value &&
+                            !algebra::is_extended_field<typename MsgReprType::field_type>::value>::type>
+                        : public emsa1_encoding_policy<typename MsgReprType::value_type, Hash> { };
+
                     template<typename MsgReprType, typename Hash, typename = void>
                     struct emsa1_verification_policy;
 
@@ -125,6 +131,14 @@ namespace nil {
                             return encoding_policy::process(acc) == msg_repr;
                         }
                     };
+
+                    template<typename MsgReprType, typename Hash>
+                    struct emsa1_verification_policy<
+                        MsgReprType, Hash,
+                        typename std::enable_if<
+                            algebra::is_field<MsgReprType>::value &&
+                            !algebra::is_extended_field<typename MsgReprType::field_type>::value>::type>
+                        : public emsa1_verification_policy<typename MsgReprType::value_type, Hash> { };
                 }    // namespace detail
 
                 /*!
@@ -135,7 +149,7 @@ namespace nil {
                  * @tparam Hash
                  * @tparam l
                  */
-                template<typename MsgReprType, typename Hash>
+                template<typename MsgReprType, typename Hash, typename Params = void>
                 struct emsa1 {
                     typedef MsgReprType msg_repr_type;
                     typedef Hash hash_type;
