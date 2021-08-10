@@ -70,7 +70,7 @@ namespace nil {
                         using form = forms::twisted_edwards;
                         using coordinates = coordinates::inverted;
 
-                        using group_type = typename params_type::group_type<coordinates>;
+                        using group_type = typename params_type::template group_type<coordinates>;
 
                         field_value_type X;
                         field_value_type Y;
@@ -156,6 +156,7 @@ namespace nil {
                          */
                         constexpr bool is_well_formed() const {
                             assert(false && "Not implemented yet.");
+                            return true;
                         }
 
                         /*************************  Reducing operations  ***********************************/

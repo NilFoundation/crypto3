@@ -127,14 +127,14 @@ namespace nil {
             template<typename T>
             struct is_g1_group_element {
                 static const bool value =
-                    boost::is_same<typename T::group_type::curve_type::g1_type<typename T::coordinates, 
+                    boost::is_same<typename T::group_type::curve_type::template g1_type<typename T::coordinates,
                         typename T::form>, typename T::group_type>::value;
             };
 
             template<typename T>
             struct is_g2_group_element {
                 static const bool value =
-                    boost::is_same<typename T::group_type::curve_type::g2_type<typename T::coordinates, 
+                    boost::is_same<typename T::group_type::curve_type::template g2_type<typename T::coordinates,
                         typename T::form>, typename T::group_type>::value;
             };
 
