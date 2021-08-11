@@ -63,10 +63,10 @@ namespace nil {
 
                 typedef typename curve_type::scalar_field_type scalar_field_type;
                 typedef typename scalar_field_type::value_type scalar_field_value_type;
-                typedef typename curve_type::g1_type g1_type;
+                typedef typename curve_type::template g1_type<> g1_type;
                 typedef typename g1_type::value_type g1_value_type;
-                typedef typename curve_type::base_field_type::modulus_type base_modulus_type;
-                typedef typename scalar_field_type::number_type scalar_number_type;
+                typedef typename curve_type::base_field_type::integral_type base_integral_type;
+                typedef typename scalar_field_type::modular_type scalar_modular_type;
 
                 typedef g1_value_type public_key_type;
                 typedef std::pair<scalar_field_value_type, scalar_field_value_type> signature_type;
@@ -94,8 +94,8 @@ namespace nil {
                         return false;
                     }
                     return signature.first ==
-                           scalar_field_value_type(scalar_number_type(
-                               static_cast<base_modulus_type>(X.to_affine().X.data), scalar_field_value_type::modulus));
+                           scalar_field_value_type(scalar_modular_type(
+                               static_cast<base_integral_type>(X.to_affine().X.data), scalar_field_value_type::modulus));
                 }
 
             protected:
@@ -117,8 +117,8 @@ namespace nil {
 
                 typedef typename base_type::scalar_field_value_type scalar_field_value_type;
                 typedef typename base_type::g1_value_type g1_value_type;
-                typedef typename base_type::base_modulus_type base_modulus_type;
-                typedef typename base_type::scalar_number_type scalar_number_type;
+                typedef typename base_type::base_integral_type base_integral_type;
+                typedef typename base_type::scalar_modular_type scalar_modular_type;
 
                 typedef scalar_field_value_type private_key_type;
                 typedef typename base_type::public_key_type public_key_type;
@@ -159,8 +159,8 @@ namespace nil {
                         }
                         // TODO: review converting of kG x-coordinate to r - in case of 2^m order field procedure seems
                         //  not to be trivial
-                        r = scalar_field_value_type(scalar_number_type(
-                            static_cast<base_modulus_type>((k * g1_value_type::one()).to_affine().X.data),
+                        r = scalar_field_value_type(scalar_modular_type(
+                            static_cast<base_integral_type>((k * g1_value_type::one()).to_affine().X.data),
                             scalar_field_value_type::modulus));
                         s = k.inversed() * (privkey * r + m);
                     } while (r.is_zero() || s.is_zero());

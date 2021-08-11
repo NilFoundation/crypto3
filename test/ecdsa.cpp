@@ -36,7 +36,8 @@
 
 #include <nil/crypto3/pubkey/ecdsa.hpp>
 
-#include <nil/crypto3/algebra/curves/secp.hpp>
+#include <nil/crypto3/algebra/curves/secp_r1.hpp>
+#include <nil/crypto3/algebra/curves/secp_k1.hpp>
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
 #include <nil/crypto3/random/algebraic_engine.hpp>
@@ -46,6 +47,7 @@
 #include <nil/crypto3/hash/sha2.hpp>
 
 using namespace nil::crypto3;
+using namespace nil::crypto3::algebra;
 
 template<typename FieldParams>
 void print_field_element(std::ostream &os, const typename algebra::fields::detail::element_fp<FieldParams> &e) {
@@ -67,15 +69,15 @@ namespace boost {
     namespace test_tools {
         namespace tt_detail {
             template<>
-            struct print_log_value<typename algebra::curves::secp256r1::g1_type::value_type> {
-                void operator()(std::ostream &os, typename algebra::curves::secp256r1::g1_type::value_type const &e) {
+            struct print_log_value<typename curves::secp_r1<256>::g1_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::secp_r1<256>::g1_type<>::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename algebra::curves::secp256k1::g1_type::value_type> {
-                void operator()(std::ostream &os, typename algebra::curves::secp256k1::g1_type::value_type const &e) {
+            struct print_log_value<typename curves::secp_k1<256>::g1_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::secp_k1<256>::g1_type<>::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
