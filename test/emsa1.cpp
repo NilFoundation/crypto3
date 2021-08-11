@@ -41,7 +41,7 @@
 #include <nil/crypto3/pkpad/algorithms/verify.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/curves/secp.hpp>
+#include <nil/crypto3/algebra/curves/secp_r1.hpp>
 
 #include <nil/crypto3/hash/sha1.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
@@ -89,7 +89,7 @@ struct field_element_init<algebra::fields::detail::element_fp<FieldParams>> {
 
     template<typename ElementData>
     static inline element_type process(const ElementData &element_data) {
-        return element_type(typename element_type::modulus_type(element_data.second.data()));
+        return element_type(typename element_type::integral_type(element_data.second.data()));
     }
 };
 
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(emsa1_secp256r1_fr_manual_conformity_test) {
     using curve_type = algebra::curves::secp256r1;
     using field_type = typename curve_type::scalar_field_type;
     using field_value_type = typename field_type::value_type;
-    using modulus_type = typename field_type::modulus_type;
+    using integral_type = typename field_type::integral_type;
     using hash_type = hashes::sha2<256>;
     using padding_type = pubkey::padding::emsa1<field_value_type, hash_type>;
 
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(emsa1_secp256r1_fr_manual_conformity_test) {
     std::vector<uint8_t> data(text.data(), text.data() + text.length());
     field_value_type out = pubkey::encode<padding_type>(data);
     field_value_type etalon_out =
-        modulus_type("111474717792720247796999809655932432881783035037226574051829933946736885398526");
+        integral_type("111474717792720247796999809655932432881783035037226574051829933946736885398526");
     BOOST_CHECK_EQUAL(out, etalon_out);
 }
 
@@ -137,7 +137,6 @@ BOOST_DATA_TEST_CASE(emsa1_sha256_secp256r1_fr_conformity_test, string_data("ems
     using curve_type = algebra::curves::secp256r1;
     using field_type = typename curve_type::scalar_field_type;
     using field_value_type = typename field_type::value_type;
-    using modulus_type = typename field_type::modulus_type;
     using hash_type = hashes::sha2<256>;
     using padding_type = pubkey::padding::emsa1<field_value_type, hash_type>;
 
@@ -148,7 +147,6 @@ BOOST_DATA_TEST_CASE(emsa1_sha512_secp256r1_fr_conformity_test, string_data("ems
     using curve_type = algebra::curves::secp256r1;
     using field_type = typename curve_type::scalar_field_type;
     using field_value_type = typename field_type::value_type;
-    using modulus_type = typename field_type::modulus_type;
     using hash_type = hashes::sha2<512>;
     using padding_type = pubkey::padding::emsa1<field_value_type, hash_type>;
 
