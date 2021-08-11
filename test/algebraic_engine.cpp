@@ -52,11 +52,6 @@ void print_field_element(std::ostream &os, const typename algebra::fields::detai
     os << "[" << e.data[0].data << ", " << e.data[1].data << "]";
 }
 
-template<typename FieldParams>
-void print_field_element(std::ostream &os, const typename algebra::fields::detail::element_fp3<FieldParams> &e) {
-    os << "[" << e.data[0].data << ", " << e.data[1].data << ", " << e.data[2].data << "]";
-}
-
 template<typename FpCurveGroupElement>
 void print_fp_curve_group_element(std::ostream &os, const FpCurveGroupElement &e) {
     os << "( " << e.X.data << " : " << e.Y.data << " : " << e.Z.data << " )";
@@ -108,29 +103,29 @@ namespace boost {
             };
 
             template<>
-            struct print_log_value<typename algebra::curves::mnt4<298>::g1_type::value_type> {
-                void operator()(std::ostream &os, typename algebra::curves::mnt4<298>::g1_type::value_type const &e) {
+            struct print_log_value<typename algebra::curves::mnt4<298>::g1_type<>::value_type> {
+                void operator()(std::ostream &os, typename algebra::curves::mnt4<298>::g1_type<>::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename algebra::curves::mnt4<298>::g2_type::value_type> {
-                void operator()(std::ostream &os, typename algebra::curves::mnt4<298>::g2_type::value_type const &e) {
+            struct print_log_value<typename algebra::curves::mnt4<298>::g2_type<>::value_type> {
+                void operator()(std::ostream &os, typename algebra::curves::mnt4<298>::g2_type<>::value_type const &e) {
                     print_fp2_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename algebra::curves::bls12<381>::g1_type::value_type> {
-                void operator()(std::ostream &os, typename algebra::curves::bls12<381>::g1_type::value_type const &e) {
+            struct print_log_value<typename algebra::curves::bls12<381>::g1_type<>::value_type> {
+                void operator()(std::ostream &os, typename algebra::curves::bls12<381>::g1_type<>::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename algebra::curves::bls12<381>::g2_type::value_type> {
-                void operator()(std::ostream &os, typename algebra::curves::bls12<381>::g2_type::value_type const &e) {
+            struct print_log_value<typename algebra::curves::bls12<381>::g2_type<>::value_type> {
+                void operator()(std::ostream &os, typename algebra::curves::bls12<381>::g2_type<>::value_type const &e) {
                     print_fp2_curve_group_element(os, e);
                 }
             };
@@ -243,10 +238,10 @@ BOOST_AUTO_TEST_CASE(mnt4_test) {
     using scalar_field_type = typename curve_type::scalar_field_type;
 
     test_UniformRandomBitGenerator<scalar_field_type>();
-    test_UniformRandomBitGenerator<typename curve_type::g1_type::underlying_field_type>();
-    test_UniformRandomBitGenerator<typename curve_type::g2_type::underlying_field_type>();
-    test_UniformRandomBitGenerator<typename curve_type::g1_type>();
-    test_UniformRandomBitGenerator<typename curve_type::g2_type>();
+    test_UniformRandomBitGenerator<typename curve_type::g1_type<>::field_type>();
+    test_UniformRandomBitGenerator<typename curve_type::g2_type<>::field_type>();
+    test_UniformRandomBitGenerator<typename curve_type::g1_type<>>();
+    test_UniformRandomBitGenerator<typename curve_type::g2_type<>>();
 }
 
 BOOST_AUTO_TEST_CASE(bls12_381_test) {
@@ -254,10 +249,10 @@ BOOST_AUTO_TEST_CASE(bls12_381_test) {
     using scalar_field_type = typename curve_type::scalar_field_type;
 
     test_UniformRandomBitGenerator<scalar_field_type>();
-    test_UniformRandomBitGenerator<typename curve_type::g1_type::underlying_field_type>();
-    test_UniformRandomBitGenerator<typename curve_type::g2_type::underlying_field_type>();
-    test_UniformRandomBitGenerator<typename curve_type::g1_type>();
-    test_UniformRandomBitGenerator<typename curve_type::g2_type>();
+    test_UniformRandomBitGenerator<typename curve_type::g1_type<>::field_type>();
+    test_UniformRandomBitGenerator<typename curve_type::g2_type<>::field_type>();
+    test_UniformRandomBitGenerator<typename curve_type::g1_type<>>();
+    test_UniformRandomBitGenerator<typename curve_type::g2_type<>>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -269,10 +264,10 @@ BOOST_AUTO_TEST_CASE(mnt4_test) {
     using scalar_field_type = typename curve_type::scalar_field_type;
 
     test_RandomNumberEngine<scalar_field_type>();
-    test_RandomNumberEngine<typename curve_type::g1_type::underlying_field_type>();
-    test_RandomNumberEngine<typename curve_type::g2_type::underlying_field_type>();
-    test_RandomNumberEngine<typename curve_type::g1_type>();
-    test_RandomNumberEngine<typename curve_type::g2_type>();
+    test_RandomNumberEngine<typename curve_type::g1_type<>::field_type>();
+    test_RandomNumberEngine<typename curve_type::g2_type<>::field_type>();
+    test_RandomNumberEngine<typename curve_type::g1_type<>>();
+    test_RandomNumberEngine<typename curve_type::g2_type<>>();
 }
 
 BOOST_AUTO_TEST_CASE(bls12_381_test) {
@@ -280,10 +275,10 @@ BOOST_AUTO_TEST_CASE(bls12_381_test) {
     using scalar_field_type = typename curve_type::scalar_field_type;
 
     test_RandomNumberEngine<scalar_field_type>();
-    test_RandomNumberEngine<typename curve_type::g1_type::underlying_field_type>();
-    test_RandomNumberEngine<typename curve_type::g2_type::underlying_field_type>();
-    test_RandomNumberEngine<typename curve_type::g1_type>();
-    test_RandomNumberEngine<typename curve_type::g2_type>();
+    test_RandomNumberEngine<typename curve_type::g1_type<>::field_type>();
+    test_RandomNumberEngine<typename curve_type::g2_type<>::field_type>();
+    test_RandomNumberEngine<typename curve_type::g1_type<>>();
+    test_RandomNumberEngine<typename curve_type::g2_type<>>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
