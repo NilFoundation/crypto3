@@ -180,8 +180,11 @@ BOOST_AUTO_TEST_CASE(hmac_sha3_6byte_key_accumulator_input) {
     std::string text_str = "Sample #1";
     std::vector<std::uint8_t> text(text_str.begin(), text_str.end());
 
+    compute<mac_policy>(text.begin(), text.end() - 2, acc);
+    compute<mac_policy>(text.end() - 2, text.end(), acc);
+
     BOOST_CHECK_EQUAL(
-        std::to_string(accumulators::extract::mac<mode_type>(compute<mac_policy>(text.begin(), text.end(), acc))),
+        std::to_string(accumulators::extract::mac<mode_type>(acc)),
         "583b7a1fd5d3cb91f33ea5dfb5b30a0a0da99d6ca9823ae626298a054327563e4fef41976248c99e7b980a3a8b393eab35b5c5c381dfc3"
         "b750eccfe5a68698e9");
 }
@@ -205,8 +208,11 @@ BOOST_AUTO_TEST_CASE(hmac_sha3_100byte_key_accumulator_input) {
     std::string text_str = "Sample #1";
     std::vector<std::uint8_t> text(text_str.begin(), text_str.end());
 
+    compute<mac_policy>(text.begin(), text.end() - 2, acc);
+    compute<mac_policy>(text.end() - 2, text.end(), acc);
+
     BOOST_CHECK_EQUAL(
-        std::to_string(accumulators::extract::mac<mode_type>(compute<mac_policy>(text.begin(), text.end(), acc))),
+        std::to_string(accumulators::extract::mac<mode_type>(acc)),
         "6cf864145a3adfaa3dbd0538ce2021b142c2ea474858b25f1f5ad3e3ba484675db8a6047c1d64281384eccffdf8e8193a444b5c64881ef"
         "9c7a6a3b4330fd346c");
 }
