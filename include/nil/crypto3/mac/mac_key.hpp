@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -22,19 +23,24 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLOCK_ACCUMULATORS_PARAMETERS_CIPHER_HPP
-#define CRYPTO3_BLOCK_ACCUMULATORS_PARAMETERS_CIPHER_HPP
-
-#include <boost/parameter/keyword.hpp>
-#include <boost/accumulators/accumulators_fwd.hpp>
+#ifndef CRYPTO3_MAC_KEY_HPP
+#define CRYPTO3_MAC_KEY_HPP
 
 namespace nil {
     namespace crypto3 {
-        namespace accumulators {
-            BOOST_PARAMETER_KEYWORD(tag, cipher)
-            BOOST_ACCUMULATORS_IGNORE_GLOBAL(cipher)
-        }    // namespace accumulators
+        namespace mac {
+            /*!
+             * @brief
+             *
+             * @ingroup mac_algorithms
+             *
+             * Mac key - a key that can be used to create and verify MAC
+             *
+             */
+            template<typename Mac, typename = void>
+            struct mac_key;
+        }    // namespace mac
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BITS_HPP
+#endif    // CRYPTO3_MAC_KEY_HPP
