@@ -29,8 +29,6 @@
 
 #include <array>
 
-#include <boost/iterator/zip_iterator.hpp>
-
 #include <nil/crypto3/detail/strxor.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>

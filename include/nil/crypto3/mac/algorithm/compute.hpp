@@ -26,20 +26,19 @@
 #ifndef CRYPTO3_MAC_COMPUTE_HPP
 #define CRYPTO3_MAC_COMPUTE_HPP
 
-#include <nil/crypto3/mac/algorithm/mac.hpp>
-
 #include <nil/crypto3/mac/mac_value.hpp>
 #include <nil/crypto3/mac/mac_state.hpp>
 #include <nil/crypto3/mac/mac_key.hpp>
+#include <nil/crypto3/mac/mac_processing_policies.hpp>
 
-#include <nil/crypto3/mac/modes/isomorphic.hpp>
+#include <nil/crypto3/mac/algorithm/mac.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace mac {
-            template<typename Mac>
-            using computation_policy = typename modes::isomorphic<Mac, nop_padding>::computation_policy;
-        }    // namespace mac
+            template<typename Mac, template<typename> class Padding = nop_padding>
+            using computation_policy = typename processing_policies<Mac, Padding>::computation_policy;
+        }
 
         /*!
          * @brief
@@ -56,9 +55,7 @@ namespace nil {
         template<typename Mac, typename InputIterator, typename OutputIterator>
         OutputIterator compute(InputIterator first, InputIterator last, const mac::mac_key<Mac> &key,
                                OutputIterator out) {
-            typedef typename mac::modes::isomorphic<Mac, mac::nop_padding>::template bind<
-                mac::computation_policy<Mac>>::type Mode;
-            typedef mac::mac_accumulator_set<Mode> MacAccumulator;
+            typedef mac::computation_accumulator_set<mac::computation_policy<Mac>> MacAccumulator;
 
             typedef mac::detail::value_mac_impl<MacAccumulator> StreamSchemeImpl;
             typedef mac::detail::itr_mac_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
@@ -79,9 +76,7 @@ namespace nil {
          */
         template<typename Mac, typename SinglePassRange, typename OutputIterator>
         OutputIterator compute(const SinglePassRange &rng, const mac::mac_key<Mac> &key, OutputIterator out) {
-            typedef typename mac::modes::isomorphic<Mac, mac::nop_padding>::template bind<
-                mac::computation_policy<Mac>>::type Mode;
-            typedef mac::mac_accumulator_set<Mode> MacAccumulator;
+            typedef mac::computation_accumulator_set<mac::computation_policy<Mac>> MacAccumulator;
 
             typedef mac::detail::value_mac_impl<MacAccumulator> StreamSchemeImpl;
             typedef mac::detail::itr_mac_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
@@ -101,9 +96,7 @@ namespace nil {
          * @return
          */
         template<typename Mac, typename InputIterator,
-                 typename Mode = typename mac::modes::isomorphic<Mac, mac::nop_padding>::template bind<
-                     mac::computation_policy<Mac>>::type,
-                 typename MacAccumulator = mac::mac_accumulator_set<Mode>,
+                 typename MacAccumulator = mac::computation_accumulator_set<mac::computation_policy<Mac>>,
                  typename StreamMacImpl = mac::detail::value_mac_impl<MacAccumulator>,
                  typename MacImpl = mac::detail::range_mac_impl<StreamMacImpl>>
         MacImpl compute(InputIterator first, InputIterator last, const mac::mac_key<Mac> &key) {
@@ -119,9 +112,7 @@ namespace nil {
          * @return
          */
         template<typename Mac, typename SinglePassRange,
-                 typename Mode = typename mac::modes::isomorphic<Mac, mac::nop_padding>::template bind<
-                     mac::computation_policy<Mac>>::type,
-                 typename MacAccumulator = mac::mac_accumulator_set<Mode>,
+                 typename MacAccumulator = mac::computation_accumulator_set<mac::computation_policy<Mac>>,
                  typename StreamMacImpl = mac::detail::value_mac_impl<MacAccumulator>,
                  typename MacImpl = mac::detail::range_mac_impl<StreamMacImpl>>
         MacImpl compute(const SinglePassRange &rng, const mac::mac_key<Mac> &key) {
@@ -145,9 +136,7 @@ namespace nil {
          * @return
          */
         template<typename Mac, typename InputIterator,
-                 typename Mode = typename mac::modes::isomorphic<Mac, mac::nop_padding>::template bind<
-                     mac::computation_policy<Mac>>::type,
-                 typename OutputAccumulator = mac::mac_accumulator_set<Mode>>
+                 typename OutputAccumulator = mac::computation_accumulator_set<mac::computation_policy<Mac>>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
             compute(InputIterator first, InputIterator last, OutputAccumulator &acc) {
@@ -173,9 +162,7 @@ namespace nil {
          * @return
          */
         template<typename Mac, typename SinglePassRange,
-                 typename Mode = typename mac::modes::isomorphic<Mac, mac::nop_padding>::template bind<
-                     mac::computation_policy<Mac>>::type,
-                 typename OutputAccumulator = mac::mac_accumulator_set<Mode>>
+                 typename OutputAccumulator = mac::computation_accumulator_set<mac::computation_policy<Mac>>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
             compute(const SinglePassRange &r, OutputAccumulator &acc) {

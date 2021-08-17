@@ -31,15 +31,13 @@
 
 #include <nil/crypto3/mac/accumulators/mac.hpp>
 
-#include <nil/crypto3/detail/static_digest.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace mac {
-            template<typename Mode>
-            using mac_accumulator_set =
-                boost::accumulators::accumulator_set<typename Mode::result_type,
-                                                     boost::accumulators::features<accumulators::tag::mac<Mode>>>;
+            template<typename ProcessingPolicy>
+            using computation_accumulator_set = boost::accumulators::accumulator_set<
+                typename ProcessingPolicy::result_type,
+                boost::accumulators::features<accumulators::tag::mac<ProcessingPolicy>>>;
         }    // namespace mac
     }        // namespace crypto3
 }    // namespace nil

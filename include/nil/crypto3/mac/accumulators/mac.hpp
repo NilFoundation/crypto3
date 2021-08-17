@@ -39,20 +39,20 @@ namespace nil {
     namespace crypto3 {
         namespace accumulators {
             namespace impl {
-                template<typename Mode>
+                template<typename ProcessingPolicy>
                 struct mac_impl : boost::accumulators::accumulator_base {
                 protected:
-                    typedef Mode mode_type;
-                    typedef typename mode_type::mac_type mac_type;
-                    typedef typename mode_type::key_type key_type;
-                    typedef typename mode_type::internal_accumulator_type internal_accumulator_type;
+                    typedef ProcessingPolicy processing_policy;
+                    typedef typename processing_policy::mac_type mac_type;
+                    typedef typename processing_policy::key_type key_type;
+                    typedef typename processing_policy::internal_accumulator_type internal_accumulator_type;
 
                 public:
-                    typedef typename mode_type::result_type result_type;
+                    typedef typename processing_policy::result_type result_type;
 
                     template<typename Args>
                     mac_impl(const Args &args) : key(args[boost::accumulators::sample]) {
-                        mode_type::init_accumulator(key, acc);
+                        processing_policy::init_accumulator(key, acc);
                     }
 
                     template<typename ArgumentPack>
@@ -62,18 +62,18 @@ namespace nil {
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
-                        return mode_type::process(key, acc);
+                        return processing_policy::process(key, acc);
                     }
 
                 protected:
                     template<typename InputRange, typename InputIterator>
                     inline void resolve_type(const InputRange &range, InputIterator) {
-                        mode_type::update(key, acc, range);
+                        processing_policy::update(key, acc, range);
                     }
 
                     template<typename InputIterator>
                     inline void resolve_type(InputIterator first, InputIterator second) {
-                        mode_type::update(key, acc, first, second);
+                        processing_policy::update(key, acc, first, second);
                     }
 
                     key_type key;
@@ -82,22 +82,22 @@ namespace nil {
             }    // namespace impl
 
             namespace tag {
-                template<typename Mode>
+                template<typename ProcessingPolicy>
                 struct mac : boost::accumulators::depends_on<> {
-                    typedef Mode mode_type;
+                    typedef ProcessingPolicy processing_policy;
 
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::mac_impl<mode_type>> impl;
+                    typedef boost::mpl::always<accumulators::impl::mac_impl<processing_policy>> impl;
                 };
             }    // namespace tag
 
             namespace extract {
-                template<typename Mode, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::mac<Mode>>::type::result_type
+                template<typename ProcessingPolicy, typename AccumulatorSet>
+                typename boost::mpl::apply<AccumulatorSet, tag::mac<ProcessingPolicy>>::type::result_type
                     mac(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::mac<Mode>>(acc);
+                    return boost::accumulators::extract_result<tag::mac<ProcessingPolicy>>(acc);
                 }
             }    // namespace extract
         }        // namespace accumulators

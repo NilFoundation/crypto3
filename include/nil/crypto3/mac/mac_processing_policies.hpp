@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MAC_SCHEME_MODES_HPP
-#define CRYPTO3_MAC_SCHEME_MODES_HPP
+#ifndef CRYPTO3_MAC_PROCESSING_POLICIES_HPP
+#define CRYPTO3_MAC_PROCESSING_POLICIES_HPP
 
 #include <type_traits>
 
@@ -35,15 +35,15 @@ namespace nil {
         namespace mac {
             namespace detail {
                 template<typename Mac>
-                struct isomorphic_policy {
+                struct basic_policy {
                     typedef std::size_t size_type;
 
                     typedef Mac mac_type;
                 };
 
                 template<typename Mac>
-                struct isomorphic_computation_policy : public isomorphic_policy<Mac> {
-                    typedef typename isomorphic_policy<Mac>::mac_type mac_type;
+                struct computation_policy : public basic_policy<Mac> {
+                    typedef typename basic_policy<Mac>::mac_type mac_type;
 
                     typedef mac_key<mac_type> key_type;
                     typedef typename key_type::internal_accumulator_type internal_accumulator_type;
@@ -66,8 +66,8 @@ namespace nil {
                 };
 
                 template<typename Mac>
-                struct isomorphic_verification_policy : public isomorphic_policy<Mac> {
-                    typedef typename isomorphic_policy<Mac>::mac_type mac_type;
+                struct verification_policy : public basic_policy<Mac> {
+                    typedef typename basic_policy<Mac>::mac_type mac_type;
 
                     typedef mac_key<mac_type> key_type;
                     typedef typename key_type::internal_accumulator_type internal_accumulator_type;
@@ -88,65 +88,28 @@ namespace nil {
                         key.init_accumulator(args...);
                     }
                 };
-
-                template<typename Policy>
-                class isomorphic {
-                    typedef Policy policy_type;
-
-                public:
-                    typedef typename policy_type::mac_type mac_type;
-                    typedef typename policy_type::key_type key_type;
-                    typedef typename policy_type::internal_accumulator_type internal_accumulator_type;
-                    typedef typename policy_type::result_type result_type;
-
-                    template<typename... Args>
-                    inline static result_type process(Args &...args) {
-                        return policy_type::process(args...);
-                    }
-
-                    template<typename... Args>
-                    inline static void update(Args &...args) {
-                        policy_type::update(args...);
-                    }
-
-                    template<typename... Args>
-                    inline static void init_accumulator(Args &...args) {
-                        policy_type::init_accumulator(args...);
-                    }
-                };
             }    // namespace detail
 
-            namespace modes {
-                /*!
-                 * @defgroup mac_modes Mac Modes
-                 * @brief
-                 *
-                 * @defgroup mac_modes
-                 * @ingroup mac_modes
-                 * @brief
-                 */
+            /*!
+             * @defgroup mac_processing_policies Mac Modes
+             * @brief
+             *
+             * @defgroup mac_processing_policies
+             * @ingroup mac_processing_policies
+             *
+             * @tparam Mac
+             */
+            template<typename Mac, template<typename> class Padding>
+            struct processing_policies {
+                typedef Mac mac_type;
+                // TODO: refactor padding concept
+                typedef Padding<Mac> padding_type;
 
-                /*!
-                 * @brief
-                 * @tparam Mac
-                 */
-                template<typename Mac, template<typename> class Padding>
-                struct isomorphic {
-                    typedef Mac mac_type;
-                    // TODO: refactor padding concept
-                    typedef Padding<Mac> padding_type;
-
-                    typedef detail::isomorphic_computation_policy<mac_type> computation_policy;
-                    typedef detail::isomorphic_verification_policy<mac_type> verification_policy;
-
-                    template<typename Policy>
-                    struct bind {
-                        typedef detail::isomorphic<Policy> type;
-                    };
-                };
-            }    // namespace modes
-        }        // namespace mac
-    }            // namespace crypto3
+                typedef detail::computation_policy<mac_type> computation_policy;
+                typedef detail::verification_policy<mac_type> verification_policy;
+            };
+        }    // namespace mac
+    }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_MAC_SCHEME_MODES_HPP
+#endif    // CRYPTO3_MAC_PROCESSING_POLICIES_HPP

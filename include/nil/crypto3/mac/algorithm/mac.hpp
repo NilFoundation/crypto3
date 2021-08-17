@@ -33,13 +33,13 @@ namespace nil {
         namespace mac {
             /*!
              * @brief
-             * @tparam MessageAuthenticationCode
+             * @tparam Mac
              */
-            template<typename MessageAuthenticationCode>
+            template<typename Mac>
             struct nop_padding {
                 typedef std::size_t size_type;
 
-                typedef MessageAuthenticationCode mac_type;
+                typedef Mac mac_type;
 
                 typedef typename mac_type::block_type block_type;
             };

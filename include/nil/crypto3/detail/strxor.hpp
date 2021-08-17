@@ -26,43 +26,45 @@
 #ifndef CRYPTO3_DETAIL_STRXOR_HPP
 #define CRYPTO3_DETAIL_STRXOR_HPP
 
+#include <iterator>
+
 #include <boost/concept/assert.hpp>
 #include <boost/assert.hpp>
-
-#include <iterator>
+#include <boost/range/concepts.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace detail {
             template<typename InputIterator1, typename InputIterator2, typename OutputIterator>
-            constexpr inline
-                typename std::enable_if<std::is_same<typename std::iterator_traits<InputIterator1>::value_type,
-                                                     typename std::iterator_traits<InputIterator2>::value_type>::value,
-                                        OutputIterator>::type
+            constexpr inline typename std::enable_if<
+                std::is_same<typename std::iterator_traits<InputIterator1>::value_type,
+                             typename std::iterator_traits<InputIterator2>::value_type>::value &&
+                    std::is_same<typename std::iterator_traits<InputIterator1>::value_type,
+                                 typename std::iterator_traits<OutputIterator>::value_type>::value,
+                OutputIterator>::type
                 strxor(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2,
                        OutputIterator out) {
-                BOOST_ASSERT(std::distance(first1, last1) == std::distance(first2, last2));
+                BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator1>));
+                BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator2>));
+                BOOST_CONCEPT_ASSERT(
+                    (boost::OutputIteratorConcept<OutputIterator,
+                                                  typename std::iterator_traits<OutputIterator>::value_type>));
+
+                assert(std::distance(first1, last1) == std::distance(first2, last2));
 
                 for (; first1 != last1 && first2 != last2; first1++, first2++, out++) {
                     *out = *first1 ^ *first2;
                 }
+
+                return out;
             }
 
-            template<typename InputType, typename OutputType>
-            constexpr inline void strxor(const InputType &in1, const InputType &in2, OutputType &out) {
-                BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<InputType>));
-                BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<OutputType>));
-                BOOST_CONCEPT_ASSERT((boost::WriteableRangeConcept<OutputType>));
+            template<typename InputRange1, typename InputRange2, typename OutputIterator>
+            constexpr inline OutputIterator strxor(const InputRange1 &in1, const InputRange2 &in2, OutputIterator out) {
+                BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<InputRange1>));
+                BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<InputRange2>));
 
-                BOOST_ASSERT(std::distance(in1.begin(), in1.end()) == std::distance(in2.begin(), in2.end()) &&
-                             std::distance(in1.begin(), in1.end()) == std::distance(out.begin(), out.end()));
-
-                auto in1_i = in1.cbegin();
-                auto in2_i = in2.cbegin();
-                auto out_i = out.begin();
-                while (in1_i != in1.end() && in2_i != in2.end()) {
-                    *out_i++ = *in1_i++ ^ *in2_i++;
-                }
+                return strxor(in1.cbegin(), in1.cend(), in2.cbegin(), in2.cend(), out);
             }
         }    // namespace detail
     }        // namespace crypto3
