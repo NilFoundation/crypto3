@@ -93,7 +93,7 @@ namespace nil {
                             PaddingStateImpl(std::forward<accumulator_set_type>(ise)) {
                             BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
-                            this->accumulator_set(first, accumulators::iterator_last = last);
+                            this->accumulator_set(first, ::nil::crypto3::accumulators::iterator_last = last);
                         }
 
                         template<typename OutputRange>
@@ -151,7 +151,7 @@ namespace nil {
                             BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
                             BOOST_CONCEPT_ASSERT((boost::OutputIteratorConcept<OutputIterator, result_type>));
 
-                            this->accumulator_set(first, accumulators::iterator_last = last);
+                            this->accumulator_set(first, ::nil::crypto3::accumulators::iterator_last = last);
                         }
 
                         operator OutputIterator() const {

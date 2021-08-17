@@ -64,7 +64,7 @@ namespace nil {
                             template<typename Args>
                             inline void operator()(const Args &args) {
                                 resolve_type(args[boost::accumulators::sample],
-                                             args[padding::accumulators::iterator_last | nullptr]);
+                                             args[::nil::crypto3::accumulators::iterator_last | nullptr]);
                             }
 
                             inline result_type result(boost::accumulators::dont_care) const {
