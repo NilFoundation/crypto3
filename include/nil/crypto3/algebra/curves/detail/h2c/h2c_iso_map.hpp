@@ -43,8 +43,8 @@ namespace nil {
                     // 11-isogeny map for BLS12-381 G1
                     // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-E.2
                     template<>
-                    class iso_map<typename bls12_381::g1_type> {
-                        typedef typename bls12_381::g1_type group_type;
+                    class iso_map<typename bls12_381::g1_type<>> {
+                        typedef typename bls12_381::g1_type<> group_type;
                         typedef h2c_suite<group_type> suite_type;
 
                         typedef typename suite_type::group_value_type group_value_type;
@@ -157,8 +157,8 @@ namespace nil {
                     // 3-isogeny map for BLS12-381 G2
                     // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-E.3
                     template<>
-                    class iso_map<typename bls12_381::g2_type> {
-                        typedef typename bls12_381::g2_type group_type;
+                    class iso_map<typename bls12_381::g2_type<>> {
+                        typedef typename bls12_381::g2_type<> group_type;
                         typedef h2c_suite<group_type> suite_type;
 
                         typedef typename suite_type::group_value_type group_value_type;

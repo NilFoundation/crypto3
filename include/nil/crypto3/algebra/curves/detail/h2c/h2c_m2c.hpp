@@ -96,12 +96,12 @@ namespace nil {
                     struct map_to_curve;
 
                     template<>
-                    struct map_to_curve<typename bls12_381::g1_type>
-                        : m2c_simple_swu_zeroAB<typename bls12_381::g1_type> { };
+                    struct map_to_curve<typename bls12_381::g1_type<>>
+                        : m2c_simple_swu_zeroAB<typename bls12_381::g1_type<>> { };
 
                     template<>
-                    struct map_to_curve<typename bls12_381::g2_type>
-                        : m2c_simple_swu_zeroAB<typename bls12_381::g2_type> { };
+                    struct map_to_curve<typename bls12_381::g2_type<>>
+                        : m2c_simple_swu_zeroAB<typename bls12_381::g2_type<>> { };
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

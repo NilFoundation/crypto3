@@ -52,6 +52,7 @@
 
 using namespace nil::crypto3::multiprecision;
 using namespace nil::crypto3;
+using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::algebra::curves::detail;
 using namespace nil::crypto3::algebra::curves;
 
@@ -94,15 +95,15 @@ namespace boost {
             };
 
             template<>
-            struct print_log_value<typename curves::bls12<381>::g1_type::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<381>::g1_type::value_type const &e) {
+            struct print_log_value<typename curves::bls12<381>::g1_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::bls12<381>::g1_type<>::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::bls12<381>::g2_type::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<381>::g2_type::value_type const &e) {
+            struct print_log_value<typename curves::bls12<381>::g2_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::bls12<381>::g2_type<>::value_type const &e) {
                     print_fp2_curve_group_element(os, e);
                 }
             };
@@ -162,7 +163,7 @@ template<typename H2CType,
 void check_hash_to_curve(const std::string &msg_str, const GroupValueType &expected, const DstType &dst) {
     std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
     GroupValueType result = H2CType::hash_to_curve(msg, dst);
-    BOOST_CHECK_EQUAL(result.to_affine(), expected);
+    BOOST_CHECK_EQUAL(result, expected);
 }
 
 BOOST_AUTO_TEST_SUITE(h2c_manual_tests)
@@ -325,7 +326,7 @@ BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g1_h2c_sha256_test) {
     using group_type = typename curve_type::g1_type<>;
     using h2c_type = ep_map<group_type>;
     typedef typename group_type::field_type::value_type field_value_type;
-    typedef typename curve_type::integral_type integral_type;
+    typedef typename group_type::field_type::integral_type integral_type;
 
     std::string default_tag_str = "QUUX-V01-CS02-with-";
     std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());
@@ -378,8 +379,8 @@ BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g2_h2c_sha256_test) {
     using curve_type = bls12_381;
     using group_type = typename curve_type::g2_type<>;
     using h2c_type = ep2_map<group_type>;
-    typedef typename group_type::underlying_field_type::value_type field_value_type;
-    typedef typename curve_type::integral_type integral_type;
+    typedef typename group_type::field_type::value_type field_value_type;
+    typedef typename group_type::field_type::integral_type integral_type;
 
     std::string default_tag_str = "QUUX-V01-CS02-with-";
     std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());
@@ -457,8 +458,8 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g1_h2c_sha256_test) {
     using group_type = typename curve_type::g1_type<>;
     using h2c_type = ep_map<group_type>;
     typedef typename group_type::value_type group_value_type;
-    typedef typename group_type::underlying_field_type::value_type field_value_type;
-    typedef typename curve_type::integral_type integral_type;
+    typedef typename group_type::field_type::value_type field_value_type;
+    typedef typename group_type::field_type::integral_type integral_type;
 
     std::string default_tag_str = "QUUX-V01-CS02-with-";
     std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());
@@ -518,8 +519,8 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g2_h2c_sha256_test) {
     using group_type = typename curve_type::g2_type<>;
     using h2c_type = ep2_map<group_type>;
     typedef typename group_type::value_type group_value_type;
-    typedef typename group_type::underlying_field_type::value_type field_value_type;
-    typedef typename curve_type::integral_type integral_type;
+    typedef typename group_type::field_type::value_type field_value_type;
+    typedef typename group_type::field_type::integral_type integral_type;
 
     std::string default_tag_str = "QUUX-V01-CS02-with-";
     std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());
