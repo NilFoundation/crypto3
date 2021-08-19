@@ -52,7 +52,7 @@ namespace nil {
 
                     constexpr static const chunk_type I_bit = 0x40;
 
-                    typename G1GroupElement::group_type::curve_type::g1_type<
+                    typename G1GroupElement::group_type::curve_type::template g1_type<
                         typename algebra::curves::coordinates::affine,
                         typename G1GroupElement::form>::value_type point_affine = point.to_affine();
                     chunk_type m_unit = detail::evaluate_m_unit<chunk_type>(point_affine, true);
@@ -84,7 +84,7 @@ namespace nil {
 
                     constexpr static const chunk_type I_bit = 0x40;
 
-                    typename G2GroupElement::group_type::curve_type::g2_type<
+                    typename G2GroupElement::group_type::curve_type::template g2_type<
                         typename algebra::curves::coordinates::affine,
                         typename G2GroupElement::form>::value_type point_affine = point.to_affine();
                     chunk_type m_unit = detail::evaluate_m_unit<chunk_type>(point_affine, true);
