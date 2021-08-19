@@ -43,7 +43,6 @@
 
 #include <nil/crypto3/marshalling/types/integral.hpp>
 
-
 template<class T>
 struct unchecked_type {
     typedef T type;
@@ -81,11 +80,9 @@ T generate_random() {
     return val;
 }
 
-template <typename TIter>
-void print_byteblob(TIter iter_begin, TIter iter_end){
-    for (TIter it = iter_begin; 
-         it != iter_end;
-         it++){
+template<typename TIter>
+void print_byteblob(TIter iter_begin, TIter iter_end) {
+    for (TIter it = iter_begin; it != iter_end; it++) {
         std::cout << std::hex << int(*it) << std::endl;
     }
 }
@@ -96,61 +93,45 @@ void test_round_trip_fixed_size_container_fixed_precision_big_endian(
     using namespace nil::crypto3::marshalling;
     std::size_t units_bits = 8;
     using unit_type = unsigned char;
-    using integral_type = types::integral<
-        nil::marshalling::field_type<
-        nil::marshalling::option::big_endian>,
-        T>;
+    using integral_type = types::integral<nil::marshalling::field_type<nil::marshalling::option::big_endian>, T>;
 
-    using container_type = 
-    nil::marshalling::types::array_list<
-        nil::marshalling::field_type<
-        nil::marshalling::option::little_endian>,
-        integral_type,
-        nil::marshalling::option::fixed_size_storage<TSize>
-    >;
+    using container_type =
+        nil::marshalling::types::array_list<nil::marshalling::field_type<nil::marshalling::option::little_endian>,
+                                            integral_type, nil::marshalling::option::fixed_size_storage<TSize>>;
 
-    std::size_t unitblob_size = 
-        integral_type::bit_length()/units_bits + 
-        ((integral_type::bit_length()%units_bits)?1:0);
-    
+    std::size_t unitblob_size =
+        integral_type::bit_length() / units_bits + ((integral_type::bit_length() % units_bits) ? 1 : 0);
+
     container_type test_val_container;
 
     std::vector<unit_type> cv;
-    cv.resize(unitblob_size*TSize, 0x00);
+    cv.resize(unitblob_size * TSize, 0x00);
 
-    for (std::size_t i=0; i<TSize; i++){
-        std::size_t begin_index = unitblob_size - 
-        ((nil::crypto3::multiprecision::msb(val_container[i]) + 1)/units_bits + 
-            (((nil::crypto3::multiprecision::msb(val_container[i]) + 1) % units_bits)?1:0));
+    for (std::size_t i = 0; i < TSize; i++) {
+        std::size_t begin_index =
+            unitblob_size - ((nil::crypto3::multiprecision::msb(val_container[i]) + 1) / units_bits +
+                             (((nil::crypto3::multiprecision::msb(val_container[i]) + 1) % units_bits) ? 1 : 0));
 
-        export_bits(val_container[i], 
-            cv.begin() + unitblob_size*i + begin_index,
-            units_bits, true);
+        export_bits(val_container[i], cv.begin() + unitblob_size * i + begin_index, units_bits, true);
     }
 
     auto read_iter = cv.begin();
-    nil::marshalling::status_type status = 
-        test_val_container.read(read_iter, cv.size());
-    BOOST_CHECK(status == 
-        nil::marshalling::status_type::success);
+    nil::marshalling::status_type status = test_val_container.read(read_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    for (std::size_t i = 0; i < val_container.size(); i++){
-        BOOST_CHECK(val_container[i] == 
-            test_val_container.value()[i].value());
+    for (std::size_t i = 0; i < val_container.size(); i++) {
+        BOOST_CHECK(val_container[i] == test_val_container.value()[i].value());
     }
 
     std::vector<unit_type> test_val_byteblob;
     test_val_byteblob.resize(cv.size());
     auto write_iter = test_val_byteblob.begin();
 
-    status = test_val_container.write(write_iter, 
-        test_val_byteblob.size() * units_bits);
-	BOOST_CHECK(status == 
-        nil::marshalling::status_type::success);
+    status = test_val_container.write(write_iter, test_val_byteblob.size() * units_bits);
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-	BOOST_CHECK(cv == test_val_byteblob);
+    BOOST_CHECK(cv == test_val_byteblob);
 }
-
 
 template<class T, std::size_t TSize>
 void test_round_trip_fixed_size_container_fixed_precision_little_endian(
@@ -158,54 +139,39 @@ void test_round_trip_fixed_size_container_fixed_precision_little_endian(
     using namespace nil::crypto3::marshalling;
     std::size_t units_bits = 8;
     using unit_type = unsigned char;
-    using integral_type = types::integral<
-        nil::marshalling::field_type<
-        nil::marshalling::option::little_endian>,
-        T>;
+    using integral_type = types::integral<nil::marshalling::field_type<nil::marshalling::option::little_endian>, T>;
 
-    using container_type = 
-    nil::marshalling::types::array_list<
-        nil::marshalling::field_type<
-        nil::marshalling::option::little_endian>,
-        integral_type,
-        nil::marshalling::option::fixed_size_storage<TSize>
-    >;
+    using container_type =
+        nil::marshalling::types::array_list<nil::marshalling::field_type<nil::marshalling::option::little_endian>,
+                                            integral_type, nil::marshalling::option::fixed_size_storage<TSize>>;
 
-    std::size_t unitblob_size = 
-        integral_type::bit_length()/units_bits + 
-        ((integral_type::bit_length()%units_bits)?1:0);
-    
+    std::size_t unitblob_size =
+        integral_type::bit_length() / units_bits + ((integral_type::bit_length() % units_bits) ? 1 : 0);
+
     container_type test_val_container;
 
     std::vector<unit_type> cv;
-    cv.resize(unitblob_size*TSize, 0x00);
+    cv.resize(unitblob_size * TSize, 0x00);
 
-    for (std::size_t i=0; i<TSize; i++){
+    for (std::size_t i = 0; i < TSize; i++) {
 
-        export_bits(val_container[i], 
-            cv.begin() + unitblob_size*i,
-            units_bits, false);
+        export_bits(val_container[i], cv.begin() + unitblob_size * i, units_bits, false);
     }
 
     auto read_iter = cv.begin();
-    nil::marshalling::status_type status = 
-        test_val_container.read(read_iter, cv.size());
-    BOOST_CHECK(status == 
-        nil::marshalling::status_type::success);
+    nil::marshalling::status_type status = test_val_container.read(read_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    for (std::size_t i = 0; i < val_container.size(); i++){
-        BOOST_CHECK(val_container[i] == 
-            test_val_container.value()[i].value());
+    for (std::size_t i = 0; i < val_container.size(); i++) {
+        BOOST_CHECK(val_container[i] == test_val_container.value()[i].value());
     }
 
     std::vector<unit_type> test_val_byteblob;
     test_val_byteblob.resize(cv.size());
     auto write_iter = test_val_byteblob.begin();
 
-    status = test_val_container.write(write_iter, 
-        test_val_byteblob.size() * units_bits);
-    BOOST_CHECK(status == 
-        nil::marshalling::status_type::success);
+    status = test_val_container.write(write_iter, test_val_byteblob.size() * units_bits);
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     BOOST_CHECK(cv == test_val_byteblob);
 }
@@ -216,7 +182,7 @@ void test_round_trip_fixed_size_container_fixed_precision() {
     std::cerr << std::hex;
     for (unsigned i = 0; i < 1000; ++i) {
         nil::marshalling::container::static_vector<T, TSize> val_container;
-        for (std::size_t i=0; i<TSize; i++){
+        for (std::size_t i = 0; i < TSize; i++) {
             val_container.push_back(generate_random<T>());
         }
         test_round_trip_fixed_size_container_fixed_precision_big_endian<T, TSize>(val_container);
@@ -235,13 +201,17 @@ BOOST_AUTO_TEST_CASE(integral_cpp_uint512) {
 }
 
 BOOST_AUTO_TEST_CASE(integral_cpp_int_backend_64) {
-    test_round_trip_fixed_size_container_fixed_precision<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
-        64, 64, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>, 128>();
+    test_round_trip_fixed_size_container_fixed_precision<
+        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
+            64, 64, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>,
+        128>();
 }
 
 BOOST_AUTO_TEST_CASE(integral_cpp_int_backend_23) {
-    test_round_trip_fixed_size_container_fixed_precision<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
-        23, 23, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>, 128>();
+    test_round_trip_fixed_size_container_fixed_precision<
+        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
+            23, 23, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>,
+        128>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -43,14 +43,10 @@ namespace nil {
         namespace marshalling {
             namespace types {
                 namespace detail {
-
-                    template<typename TTypeBase, 
+                    template<typename TTypeBase,
                              typename Backend,
                              multiprecision::expression_template_option ExpressionTemplates>
-                    class basic_integral<TTypeBase, 
-                                         Backend,
-                                         ExpressionTemplates,
-                                         false> : public TTypeBase {
+                    class basic_integral<TTypeBase, Backend, ExpressionTemplates, false> : public TTypeBase {
                         using T = multiprecision::number<Backend, ExpressionTemplates>;
 
                         using base_impl_type = TTypeBase;
@@ -116,12 +112,15 @@ namespace nil {
                         void read_no_status(TIter &iter) {
                             read_no_status(length());
                         }
+
                     private:
                         template<typename TIter>
                         void read_no_status(TIter &iter, std::size_t size) {
-                            value_ = crypto3::marshalling::
-                                processing::read_data<T, typename base_impl_type::endian_type>(iter, size);
+                            value_ =
+                                crypto3::marshalling::processing::read_data<T, typename base_impl_type::endian_type>(
+                                    iter, size);
                         }
+
                     public:
                         template<typename TIter>
                         nil::marshalling::status_type write(TIter &iter, std::size_t size) const {
@@ -135,17 +134,16 @@ namespace nil {
 
                         template<typename TIter>
                         void write_no_status(TIter &iter) const {
-                            crypto3::marshalling::processing::
-                                write_data<typename base_impl_type::endian_type>(value_, iter);
+                            crypto3::marshalling::processing::write_data<typename base_impl_type::endian_type>(value_,
+                                                                                                               iter);
                         }
 
                     private:
                         value_type value_ = static_cast<value_type>(0);
                     };
-
                 }    // namespace detail
             }        // namespace types
         }            // namespace marshalling
-    }            // namespace crypto3
+    }                // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_MARSHALLING_BASIC_INTEGRAL_NON_FIXED_PRECISION_HPP

@@ -70,14 +70,12 @@ namespace nil {
                 void write_big_endian(T value, TIter &iter) {
                     std::size_t units_bits = 8;
                     std::size_t chunk_bits = sizeof(typename std::iterator_traits<TIter>::value_type) * units_bits;
-                    std::size_t chunks_count = 
-                        (TSize / chunk_bits) + 
-                        ((TSize % chunk_bits)?1:0);
+                    std::size_t chunks_count = (TSize / chunk_bits) + ((TSize % chunk_bits) ? 1 : 0);
 
                     if (value > 0) {
-                        std::size_t begin_index = chunks_count - 
-                            ((nil::crypto3::multiprecision::msb(value) + 1)/chunk_bits + 
-                                (((nil::crypto3::multiprecision::msb(value) + 1) % chunk_bits)?1:0));
+                        std::size_t begin_index =
+                            chunks_count - ((nil::crypto3::multiprecision::msb(value) + 1) / chunk_bits +
+                                            (((nil::crypto3::multiprecision::msb(value) + 1) % chunk_bits) ? 1 : 0));
 
                         std::fill(iter, iter + begin_index, 0);
 
@@ -85,7 +83,6 @@ namespace nil {
                     } else {
                         std::fill(iter, iter + chunks_count, 0);
                     }
-
                 }
 
                 /// @brief Read part of integral value from the input area using big
@@ -103,12 +100,9 @@ namespace nil {
                     T serializedValue;
                     std::size_t units_bits = 8;
                     std::size_t chunk_bits = sizeof(typename std::iterator_traits<TIter>::value_type) * units_bits;
-                    std::size_t chunks_count = 
-                        (value_size / chunk_bits) + 
-                        ((value_size % chunk_bits)?1:0);
+                    std::size_t chunks_count = (value_size / chunk_bits) + ((value_size % chunk_bits) ? 1 : 0);
 
-                    multiprecision::import_bits(serializedValue, 
-                        iter, iter + chunks_count, chunk_bits, true);
+                    multiprecision::import_bits(serializedValue, iter, iter + chunks_count, chunk_bits, true);
                     return serializedValue;
                 }
 
@@ -127,12 +121,9 @@ namespace nil {
                     T serializedValue;
                     std::size_t units_bits = 8;
                     std::size_t chunk_bits = sizeof(typename std::iterator_traits<TIter>::value_type) * units_bits;
-                    std::size_t chunks_count = 
-                        (TSize / chunk_bits) + 
-                        ((TSize % chunk_bits)?1:0);
+                    std::size_t chunks_count = (TSize / chunk_bits) + ((TSize % chunk_bits) ? 1 : 0);
 
-                    multiprecision::import_bits(serializedValue, 
-                        iter, iter + chunks_count, chunk_bits, true);
+                    multiprecision::import_bits(serializedValue, iter, iter + chunks_count, chunk_bits, true);
                     return serializedValue;
                 }
 
@@ -162,19 +153,17 @@ namespace nil {
                 void write_little_endian(T value, TIter &iter) {
                     std::size_t units_bits = 8;
                     std::size_t chunk_bits = sizeof(typename std::iterator_traits<TIter>::value_type) * units_bits;
-                    std::size_t chunks_count = 
-                        (TSize / chunk_bits) + 
-                        ((TSize % chunk_bits)?1:0);
+                    std::size_t chunks_count = (TSize / chunk_bits) + ((TSize % chunk_bits) ? 1 : 0);
 
-                    if (value > 0){
-                        std::size_t end_index = chunks_count - 
-                            ((nil::crypto3::multiprecision::msb(value) + 1)/chunk_bits + 
-                                (((nil::crypto3::multiprecision::msb(value) + 1) % chunk_bits)?1:0));
+                    if (value > 0) {
+                        std::size_t end_index =
+                            chunks_count - ((nil::crypto3::multiprecision::msb(value) + 1) / chunk_bits +
+                                            (((nil::crypto3::multiprecision::msb(value) + 1) % chunk_bits) ? 1 : 0));
 
-                        if (end_index < chunks_count){
+                        if (end_index < chunks_count) {
                             std::fill(iter + end_index, iter + chunks_count, 0x00);
                         }
-                        
+
                         export_bits(value, iter, chunk_bits, false);
                     } else {
                         std::fill(iter, iter + chunks_count, 0);
@@ -194,12 +183,9 @@ namespace nil {
                     T serializedValue;
                     std::size_t units_bits = 8;
                     std::size_t chunk_bits = sizeof(typename std::iterator_traits<TIter>::value_type) * units_bits;
-                    std::size_t chunks_count = 
-                        (value_size / chunk_bits) + 
-                        ((value_size % chunk_bits)?1:0);
+                    std::size_t chunks_count = (value_size / chunk_bits) + ((value_size % chunk_bits) ? 1 : 0);
 
-                    multiprecision::import_bits(serializedValue, 
-                        iter, iter + chunks_count, chunk_bits, false);
+                    multiprecision::import_bits(serializedValue, iter, iter + chunks_count, chunk_bits, false);
                     return serializedValue;
                 }
 
@@ -216,125 +202,83 @@ namespace nil {
                     T serializedValue;
                     std::size_t units_bits = 8;
                     std::size_t chunk_bits = sizeof(typename std::iterator_traits<TIter>::value_type) * units_bits;
-                    std::size_t chunks_count = 
-                        (TSize / chunk_bits) + 
-                        ((TSize % chunk_bits)?1:0);
+                    std::size_t chunks_count = (TSize / chunk_bits) + ((TSize % chunk_bits) ? 1 : 0);
 
-                    multiprecision::import_bits(serializedValue, 
-                        iter, iter + chunks_count, chunk_bits, false);
+                    multiprecision::import_bits(serializedValue, iter, iter + chunks_count, chunk_bits, false);
                     return serializedValue;
                 }
 
                 /// @brief Same as write_big_endian<T, TIter>()
-                template<typename Endianness,
-                         typename T, 
-                         typename TIter>
-                typename std::enable_if<
-                    std::is_same<Endianness, 
-                                 nil::marshalling::endian::big_endian>::value, 
-                    void>::type
+                template<typename Endianness, typename T, typename TIter>
+                typename std::enable_if<std::is_same<Endianness, nil::marshalling::endian::big_endian>::value,
+                                        void>::type
                     write_data(T value, TIter &iter) {
-                    
+
                     write_big_endian(value, iter);
                 }
 
                 /// @brief Same as write_big_endian<TSize, T, TIter>()
-                template<std::size_t TSize, 
-                         typename Endianness,
-                         typename T, 
-                         typename TIter>
-                typename std::enable_if<
-                    std::is_same<Endianness, 
-                                 nil::marshalling::endian::big_endian>::value, 
-                    void>::type
+                template<std::size_t TSize, typename Endianness, typename T, typename TIter>
+                typename std::enable_if<std::is_same<Endianness, nil::marshalling::endian::big_endian>::value,
+                                        void>::type
                     write_data(T value, TIter &iter) {
-                    
+
                     write_big_endian<TSize>(value, iter);
                 }
 
                 /// @brief Same as write_little_endian<T, TIter>()
-                template<typename Endianness,
-                         typename T, 
-                         typename TIter>
-                typename std::enable_if<
-                    std::is_same<Endianness, 
-                                 nil::marshalling::endian::little_endian>::value, 
-                    void>::type
+                template<typename Endianness, typename T, typename TIter>
+                typename std::enable_if<std::is_same<Endianness, nil::marshalling::endian::little_endian>::value,
+                                        void>::type
                     write_data(T value, TIter &iter) {
-                    
+
                     write_little_endian(value, iter);
                 }
 
                 /// @brief Same as write_little_endian<TSize, T, TIter>()
-                template<std::size_t TSize, 
-                         typename Endianness,
-                         typename T, 
-                         typename TIter>
-                typename std::enable_if<
-                    std::is_same<Endianness, 
-                                 nil::marshalling::endian::little_endian>::value, 
-                    void>::type
+                template<std::size_t TSize, typename Endianness, typename T, typename TIter>
+                typename std::enable_if<std::is_same<Endianness, nil::marshalling::endian::little_endian>::value,
+                                        void>::type
                     write_data(T value, TIter &iter) {
-                    
+
                     write_little_endian<TSize>(value, iter);
                 }
 
                 /// @brief Same as read_big_endian<T, TIter>()
-                template<typename T, 
-                         typename Endianness,
-                         typename TIter>
-                typename std::enable_if<
-                    std::is_same<Endianness, 
-                                 nil::marshalling::endian::big_endian>::value, 
-                    T>::type
+                template<typename T, typename Endianness, typename TIter>
+                typename std::enable_if<std::is_same<Endianness, nil::marshalling::endian::big_endian>::value, T>::type
                     read_data(TIter &iter, std::size_t value_size) {
 
                     return read_big_endian<T>(iter, value_size);
                 }
 
                 /// @brief Same as read_little_endian<T, TIter>()
-                template<typename T, 
-                         typename Endianness,
-                         typename TIter>
-                typename std::enable_if<
-                    std::is_same<Endianness, 
-                                 nil::marshalling::endian::little_endian>::value, 
-                    T>::type
+                template<typename T, typename Endianness, typename TIter>
+                typename std::enable_if<std::is_same<Endianness, nil::marshalling::endian::little_endian>::value,
+                                        T>::type
                     read_data(TIter &iter, std::size_t value_size) {
 
                     return read_little_endian<T>(iter, value_size);
                 }
 
                 /// @brief Same as read_big_endian<TSize, T, TIter>()
-                template<std::size_t TSize, 
-                         typename T,
-                         typename Endianness, 
-                         typename TIter>
-                typename std::enable_if<
-                    std::is_same<Endianness, 
-                                 nil::marshalling::endian::big_endian>::value, 
-                    T>::type
+                template<std::size_t TSize, typename T, typename Endianness, typename TIter>
+                typename std::enable_if<std::is_same<Endianness, nil::marshalling::endian::big_endian>::value, T>::type
                     read_data(TIter &iter) {
 
                     return read_big_endian<TSize, T>(iter);
                 }
 
                 /// @brief Same as read_little_endian<TSize, T, TIter>()
-                template<std::size_t TSize, 
-                         typename T,
-                         typename Endianness, 
-                         typename TIter>
-                typename std::enable_if<
-                    std::is_same<Endianness, 
-                                 nil::marshalling::endian::little_endian>::value, 
-                    T>::type
+                template<std::size_t TSize, typename T, typename Endianness, typename TIter>
+                typename std::enable_if<std::is_same<Endianness, nil::marshalling::endian::little_endian>::value,
+                                        T>::type
                     read_data(TIter &iter) {
 
                     return read_little_endian<TSize, T>(iter);
                 }
-
             }    // namespace processing
-        }    // namespace marshalling
-    }    // namespace crypto3
+        }        // namespace marshalling
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_MARSHALLING_PROCESSING_INTERGRAL_HPP

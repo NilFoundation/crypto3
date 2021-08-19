@@ -37,17 +37,14 @@ namespace nil {
         namespace marshalling {
             namespace types {
                 namespace detail {
-
-                    template<typename TTypeBase, 
-                             typename Backend,
+                    template<typename TTypeBase, typename Backend,
                              multiprecision::expression_template_option ExpressionTemplates,
-                             bool IsFixedPrecision = 
-                                multiprecision::backends::is_fixed_precision<Backend>::value>
-                    class basic_integral{};
+                             bool IsFixedPrecision = multiprecision::backends::is_fixed_precision<Backend>::value>
+                    class basic_integral { };
 
                 }    // namespace detail
             }        // namespace types
         }            // namespace marshalling
-    }            // namespace crypto3
+    }                // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_MARSHALLING_BASIC_INTEGRAL_DEFINITION_HPP

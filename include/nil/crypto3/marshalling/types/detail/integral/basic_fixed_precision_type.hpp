@@ -44,14 +44,10 @@ namespace nil {
         namespace marshalling {
             namespace types {
                 namespace detail {
-
-                    template<typename TTypeBase, 
+                    template<typename TTypeBase,
                              typename Backend,
                              multiprecision::expression_template_option ExpressionTemplates>
-                    class basic_integral<TTypeBase, 
-                                         Backend,
-                                         ExpressionTemplates,
-                                         true> : public TTypeBase {
+                    class basic_integral<TTypeBase, Backend, ExpressionTemplates, true> : public TTypeBase {
 
                         using backend_type = Backend;
                         using T = multiprecision::number<backend_type, ExpressionTemplates>;
@@ -90,13 +86,11 @@ namespace nil {
                         }
 
                         static constexpr std::size_t min_length() {
-                            return min_bit_length()/8 + 
-                            ((min_bit_length()%8)?1:0);
+                            return min_bit_length() / 8 + ((min_bit_length() % 8) ? 1 : 0);
                         }
 
                         static constexpr std::size_t max_length() {
-                            return max_bit_length()/8 + 
-                            ((max_bit_length()%8)?1:0);
+                            return max_bit_length() / 8 + ((max_bit_length() % 8) ? 1 : 0);
                         }
 
                         static constexpr std::size_t bit_length() {
@@ -104,15 +98,17 @@ namespace nil {
                         }
 
                         static constexpr std::size_t min_bit_length() {
-                            return nil::crypto3::multiprecision::backends::min_precision<backend_type>::value == UINT_MAX ?
-                                INT_MAX :
-                                nil::crypto3::multiprecision::backends::min_precision<backend_type>::value;
+                            return nil::crypto3::multiprecision::backends::min_precision<backend_type>::value ==
+                                           UINT_MAX ?
+                                       INT_MAX :
+                                       nil::crypto3::multiprecision::backends::min_precision<backend_type>::value;
                         }
 
                         static constexpr std::size_t max_bit_length() {
-                            return nil::crypto3::multiprecision::backends::max_precision<backend_type>::value == UINT_MAX ?
-                                INT_MAX :
-                                nil::crypto3::multiprecision::backends::max_precision<backend_type>::value;
+                            return nil::crypto3::multiprecision::backends::max_precision<backend_type>::value ==
+                                           UINT_MAX ?
+                                       INT_MAX :
+                                       nil::crypto3::multiprecision::backends::max_precision<backend_type>::value;
                         }
 
                         static constexpr serialized_type to_serialized(value_type val) {
@@ -136,12 +132,10 @@ namespace nil {
 
                         template<typename TIter>
                         void read_no_status(TIter &iter) {
-                            value_ = crypto3::marshalling::
-                                processing::read_data<bit_length(), 
-                                    value_type, 
-                                    typename base_impl_type::endian_type>(iter);
+                            value_ = crypto3::marshalling::processing::
+                                read_data<bit_length(), value_type, typename base_impl_type::endian_type>(iter);
                         }
-                    
+
                         template<typename TIter>
                         nil::marshalling::status_type write(TIter &iter, std::size_t size) const {
                             // if (size < length()) {
@@ -156,18 +150,17 @@ namespace nil {
 
                         template<typename TIter>
                         void write_no_status(TIter &iter) const {
-                            crypto3::marshalling::processing::
-                                write_data<bit_length(), 
-                                           typename base_impl_type::endian_type>(value_, iter);
+                            crypto3::marshalling::processing::write_data<bit_length(),
+                                                                         typename base_impl_type::endian_type>(value_,
+                                                                                                               iter);
                         }
 
                     private:
                         value_type value_ = static_cast<value_type>(0);
                     };
-
                 }    // namespace detail
             }        // namespace types
         }            // namespace marshalling
-    }            // namespace crypto3
+    }                // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_MARSHALLING_BASIC_INTEGRAL_FIXED_PRECISION_HPP
