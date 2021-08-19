@@ -19,6 +19,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
+#include <nil/marshalling/status_type.hpp>
+
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
 #include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
@@ -40,7 +42,6 @@
 #include <nil/crypto3/zk/snark/algorithms/verify.hpp>
 #include <nil/crypto3/zk/snark/algorithms/prove.hpp>
 
-#include <nil/marshalling/status_type.hpp>
 #include <nil/crypto3/marshalling/types/zk/r1cs_gg_ppzksnark/primary_input.hpp>
 #include <nil/crypto3/marshalling/types/zk/r1cs_gg_ppzksnark/proof.hpp>
 #include <nil/crypto3/marshalling/types/zk/r1cs_gg_ppzksnark/verification_key.hpp>

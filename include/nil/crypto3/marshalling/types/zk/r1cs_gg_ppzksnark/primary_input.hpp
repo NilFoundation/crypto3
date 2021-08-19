@@ -49,54 +49,53 @@ namespace nil {
         namespace marshalling {
             namespace types {
 
-                template<typename TTypeBase, 
+                template<typename TTypeBase,
                          typename PrimaryInput,
                          typename = typename std::enable_if<
-                             std::is_same<PrimaryInput, 
+                             std::is_same<PrimaryInput,
                                 zk::snark::r1cs_primary_input<
                                     typename PrimaryInput::value_type::field_type
                                 >
                              >::value,
                              bool>::type,
                          typename... TOptions>
-                using r1cs_gg_ppzksnark_primary_input = 
+                using r1cs_gg_ppzksnark_primary_input =
                     nil::marshalling::types::array_list<
                         TTypeBase,
                         field_element<
-                            TTypeBase, 
+                            TTypeBase,
                             typename PrimaryInput::value_type::field_type
                         >,
                         nil::marshalling::option::sequence_size_field_prefix<
                             nil::marshalling::types::integral<
-                                TTypeBase, 
+                                TTypeBase,
                                 std::size_t
                             >
-                        > 
+                        >
                     >;
 
-                template <typename PrimaryInput, 
+                template <typename PrimaryInput,
                           typename Endianness>
                 r1cs_gg_ppzksnark_primary_input<nil::marshalling::field_type<
                                 Endianness>,
                                 PrimaryInput>
                     fill_r1cs_gg_ppzksnark_primary_input(PrimaryInput r1cs_gg_ppzksnark_primary_input_inp){
 
-                    return fill_field_element_vector<typename PrimaryInput::value_type::field_type, 
+                    return fill_field_element_vector<typename PrimaryInput::value_type::field_type,
                                 Endianness>(r1cs_gg_ppzksnark_primary_input_inp);
                 }
 
-                template <typename PrimaryInput, 
+                template <typename PrimaryInput,
                           typename Endianness>
                 PrimaryInput
-                    construct_r1cs_gg_ppzksnark_primary_input(
+                    make_r1cs_gg_ppzksnark_primary_input(
                         r1cs_gg_ppzksnark_primary_input<nil::marshalling::field_type<
                                 Endianness>,
                                 PrimaryInput> filled_r1cs_gg_ppzksnark_primary_input){
 
-                    return construct_field_element_vector<typename PrimaryInput::value_type::field_type, 
-                        Endianness>(filled_r1cs_gg_ppzksnark_primary_input);
+                    return make_field_element_vector<typename PrimaryInput::value_type::field_type, Endianness>(
+                        filled_r1cs_gg_ppzksnark_primary_input);
                 }
-
             }    // namespace types
         }        // namespace marshalling
     }        // namespace crypto3

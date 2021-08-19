@@ -48,8 +48,7 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-
-                template<typename TTypeBase, 
+                template<typename TTypeBase,
                          typename SparseVector,
                          typename = typename std::enable_if<
                              std::is_same<SparseVector, 
@@ -143,8 +142,7 @@ namespace nil {
 
                 template <typename SparseVector, 
                           typename Endianness>
-                SparseVector
-                    construct_sparse_vector(
+                SparseVector make_sparse_vector(
                         sparse_vector<nil::marshalling::field_type<
                                 Endianness>,
                                 SparseVector> filled_sparse_vector){
@@ -172,11 +170,8 @@ namespace nil {
 
                     SparseVector result;
                     result.indices = constructed_indices;
-                    result.values = 
-                        construct_curve_element_vector<
-                            typename SparseVector::group_type, 
-                            Endianness>(
-                                std::get<1>(filled_sparse_vector.value()));
+                    result.values = make_curve_element_vector<typename SparseVector::group_type, Endianness>(
+                        std::get<1>(filled_sparse_vector.value()));
                     result.domain_size_ = 
                         std::get<2>(filled_sparse_vector.value()).value();
 

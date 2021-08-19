@@ -52,46 +52,46 @@ namespace nil {
         namespace marshalling {
             namespace types {
 
-                template<typename TTypeBase, 
+                template<typename TTypeBase,
                          typename VerificationKey,
                          typename = typename std::enable_if<
-                             std::is_same<VerificationKey, 
+                             std::is_same<VerificationKey,
                                 zk::snark::r1cs_gg_ppzksnark_verification_key<
                                     typename VerificationKey::curve_type
                                 >
                              >::value,
                              bool>::type,
                          typename... TOptions>
-                using r1cs_gg_ppzksnark_verification_key = 
+                using r1cs_gg_ppzksnark_verification_key =
                     nil::marshalling::types::bundle<
                         TTypeBase,
                         std::tuple<
                             // alpha_g1_beta_g2
                             field_element<
-                                TTypeBase, 
+                                TTypeBase,
                                 typename VerificationKey::curve_type::gt_type
                             >,
                             // gamma_g2
                             curve_element<
-                                TTypeBase, 
-                                typename VerificationKey::curve_type::g2_type<>
+                                TTypeBase,
+                                typename VerificationKey::curve_type::template g2_type<>
                             >,
                             // delta_g2
                             curve_element<
-                                TTypeBase, 
-                                typename VerificationKey::curve_type::g2_type<>
+                                TTypeBase,
+                                typename VerificationKey::curve_type::template g2_type<>
                             >,
                             // gamma_ABC_g1
                             accumulation_vector<
-                                TTypeBase, 
-                                zk::snark::accumulation_vector< 
-                                    typename VerificationKey::curve_type::g1_type<>
+                                TTypeBase,
+                                zk::snark::accumulation_vector<
+                                    typename VerificationKey::curve_type::template g1_type<>
                                 >
                             >
                         >
                     >;
 
-                template <typename VerificationKey, 
+                template <typename VerificationKey,
                           typename Endianness>
                 r1cs_gg_ppzksnark_verification_key<nil::marshalling::field_type<
                                 Endianness>,
@@ -101,40 +101,40 @@ namespace nil {
                     using TTypeBase = nil::marshalling::field_type<
                                 Endianness>;
 
-                    using field_gt_element_type = 
+                    using field_gt_element_type =
                         field_element<
                             TTypeBase,
                             typename VerificationKey::curve_type::gt_type
                         >;
 
-                    using curve_g2_element_type = 
+                    using curve_g2_element_type =
                         curve_element<
                             TTypeBase,
-                            typename VerificationKey::curve_type::g2_type<>
+                            typename VerificationKey::curve_type::template g2_type<>
                         >;
 
-                    using accumulation_vector_type = 
+                    using accumulation_vector_type =
                         accumulation_vector<
-                            TTypeBase, 
-                            zk::snark::accumulation_vector< 
-                                typename VerificationKey::curve_type::g1_type<>
+                            TTypeBase,
+                            zk::snark::accumulation_vector<
+                                typename VerificationKey::curve_type::template g1_type<>
                             >
                         >;
 
-                    field_gt_element_type filled_alpha_g1_beta_g2 = 
-                        fill_field_element<typename VerificationKey::curve_type::gt_type, 
+                    field_gt_element_type filled_alpha_g1_beta_g2 =
+                        fill_field_element<typename VerificationKey::curve_type::gt_type,
                             Endianness> (r1cs_gg_ppzksnark_verification_key_inp.alpha_g1_beta_g2);
 
-                    curve_g2_element_type filled_gamma_g2 = 
+                    curve_g2_element_type filled_gamma_g2 =
                         curve_g2_element_type (r1cs_gg_ppzksnark_verification_key_inp.gamma_g2);
 
-                    curve_g2_element_type filled_delta_g2 = 
+                    curve_g2_element_type filled_delta_g2 =
                         curve_g2_element_type (r1cs_gg_ppzksnark_verification_key_inp.delta_g2);
 
-                    accumulation_vector_type filled_gamma_ABC_g1 = 
+                    accumulation_vector_type filled_gamma_ABC_g1 =
                         fill_accumulation_vector<
-                            zk::snark::accumulation_vector< 
-                                typename VerificationKey::curve_type::g1_type<>
+                            zk::snark::accumulation_vector<
+                                typename VerificationKey::curve_type::template g1_type<>
                             >,
                             Endianness> (r1cs_gg_ppzksnark_verification_key_inp.gamma_ABC_g1);
 
@@ -142,37 +142,35 @@ namespace nil {
                                 Endianness>,
                                 VerificationKey>(
                                     std::make_tuple(
-                                        filled_alpha_g1_beta_g2, 
-                                        filled_gamma_g2, 
-                                        filled_delta_g2, 
+                                        filled_alpha_g1_beta_g2,
+                                        filled_gamma_g2,
+                                        filled_delta_g2,
                                         filled_gamma_ABC_g1
                                         ));
                 }
 
-                template <typename VerificationKey, 
+                template <typename VerificationKey,
                           typename Endianness>
-                VerificationKey
-                    construct_r1cs_gg_ppzksnark_verification_key(
+                VerificationKey make_r1cs_gg_ppzksnark_verification_key(
                         r1cs_gg_ppzksnark_verification_key<nil::marshalling::field_type<
                                 Endianness>,
                                 VerificationKey> filled_r1cs_gg_ppzksnark_verification_key){
 
                     return VerificationKey (
-                        std::move(construct_field_element<
-                            typename VerificationKey::curve_type::gt_type, 
+                        std::move(make_field_element<
+                            typename VerificationKey::curve_type::gt_type,
                             Endianness>(
                                 std::get<0>(filled_r1cs_gg_ppzksnark_verification_key.value()))
                             ),
                         std::move(std::get<1>(filled_r1cs_gg_ppzksnark_verification_key.value()).value()),
                         std::move(std::get<2>(filled_r1cs_gg_ppzksnark_verification_key.value()).value()),
-                        std::move(construct_accumulation_vector<
-                            zk::snark::accumulation_vector<
-                                typename VerificationKey::curve_type::g1_type<>>, 
-                            Endianness>(
+                        std::move(
+                            make_accumulation_vector<zk::snark::accumulation_vector<
+                                                         typename VerificationKey::curve_type::template g1_type<>>,
+                                                     Endianness>(
                                 std::get<3>(filled_r1cs_gg_ppzksnark_verification_key.value())))
                             );
                 }
-
             }    // namespace types
         }        // namespace marshalling
     }        // namespace crypto3

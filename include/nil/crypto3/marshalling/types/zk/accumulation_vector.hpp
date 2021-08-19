@@ -49,8 +49,7 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-
-                template<typename TTypeBase, 
+                template<typename TTypeBase,
                          typename AccumulationVector,
                          typename = typename std::enable_if<
                              std::is_same<AccumulationVector, 
@@ -109,22 +108,17 @@ namespace nil {
 
                 template <typename AccumulationVector, 
                           typename Endianness>
-                AccumulationVector
-                    construct_accumulation_vector(
+                AccumulationVector make_accumulation_vector(
                         accumulation_vector<nil::marshalling::field_type<
                                 Endianness>,
                                 AccumulationVector> filled_accumulation_vector){
 
                     return AccumulationVector (
                         std::move(std::get<0>(filled_accumulation_vector.value()).value()),
-                        std::move(construct_sparse_vector<
-                            zk::snark::sparse_vector<
-                                typename AccumulationVector::group_type>, 
-                            Endianness>(
-                                std::get<1>(filled_accumulation_vector.value())))
+                        std::move(make_sparse_vector<zk::snark::sparse_vector<typename AccumulationVector::group_type>,
+                                                     Endianness>(std::get<1>(filled_accumulation_vector.value())))
                             );
                 }
-
             }    // namespace types
         }        // namespace marshalling
     }        // namespace crypto3

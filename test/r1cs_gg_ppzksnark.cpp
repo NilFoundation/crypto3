@@ -57,7 +57,7 @@ using namespace nil::crypto3;
 using namespace nil::crypto3::marshalling;
 using namespace nil::crypto3::zk;
 
-template <typename CurveType, typename Endianness>
+template<typename CurveType, typename Endianness>
 bool test_r1cs_gg_ppzksnark() {
 
     std::size_t num_constraints = 1000, input_size = 100;
@@ -82,35 +82,27 @@ bool test_r1cs_gg_ppzksnark() {
     const typename scheme_type::proof_type proof =
         zk::snark::prove<scheme_type>(keypair.first, example.primary_input, example.auxiliary_input);
 
-    using verification_key_marshalling_type = types::r1cs_gg_ppzksnark_verification_key<
-        nil::marshalling::field_type<
-            Endianness>,
-        typename scheme_type::verification_key_type>;
+    using verification_key_marshalling_type =
+        types::r1cs_gg_ppzksnark_verification_key<nil::marshalling::field_type<Endianness>,
+                                                  typename scheme_type::verification_key_type>;
 
-    verification_key_marshalling_type filled_verification_key_val = 
-        types::fill_r1cs_gg_ppzksnark_verification_key<
-            typename scheme_type::verification_key_type,
-            Endianness>(keypair.second);
+    verification_key_marshalling_type filled_verification_key_val =
+        types::fill_r1cs_gg_ppzksnark_verification_key<typename scheme_type::verification_key_type, Endianness>(
+            keypair.second);
 
-    using proof_marshalling_type = types::r1cs_gg_ppzksnark_proof<
-        nil::marshalling::field_type<
-            Endianness>,
-        typename scheme_type::proof_type>;
+    using proof_marshalling_type =
+        types::r1cs_gg_ppzksnark_proof<nil::marshalling::field_type<Endianness>, typename scheme_type::proof_type>;
 
-    proof_marshalling_type filled_proof_val = 
-        types::fill_r1cs_gg_ppzksnark_proof<
-            typename scheme_type::proof_type,
-            Endianness>(proof);
+    proof_marshalling_type filled_proof_val =
+        types::fill_r1cs_gg_ppzksnark_proof<typename scheme_type::proof_type, Endianness>(proof);
 
-    using primary_input_marshalling_type = types::r1cs_gg_ppzksnark_primary_input<
-        nil::marshalling::field_type<
-            Endianness>,
-        typename scheme_type::primary_input_type>;
+    using primary_input_marshalling_type =
+        types::r1cs_gg_ppzksnark_primary_input<nil::marshalling::field_type<Endianness>,
+                                               typename scheme_type::primary_input_type>;
 
-    primary_input_marshalling_type filled_primary_input_val = 
-        types::fill_r1cs_gg_ppzksnark_primary_input<
-            typename scheme_type::primary_input_type,
-            Endianness>(example.primary_input);
+    primary_input_marshalling_type filled_primary_input_val =
+        types::fill_r1cs_gg_ppzksnark_primary_input<typename scheme_type::primary_input_type, Endianness>(
+            example.primary_input);
 
     std::cout << "Marshalling types filled." << std::endl;
 
@@ -120,67 +112,52 @@ bool test_r1cs_gg_ppzksnark() {
     verification_key_byteblob.resize(filled_verification_key_val.length(), 0x00);
     auto write_iter = verification_key_byteblob.begin();
 
-    typename nil::marshalling::status_type status =  
-        filled_verification_key_val.write(write_iter, 
-            verification_key_byteblob.size());
+    typename nil::marshalling::status_type status =
+        filled_verification_key_val.write(write_iter, verification_key_byteblob.size());
 
     std::vector<unit_type> proof_byteblob;
     proof_byteblob.resize(filled_proof_val.length(), 0x00);
     write_iter = proof_byteblob.begin();
 
-    status = filled_proof_val.write(write_iter, 
-            proof_byteblob.size());
+    status = filled_proof_val.write(write_iter, proof_byteblob.size());
 
     std::vector<unit_type> primary_input_byteblob;
 
     primary_input_byteblob.resize(filled_primary_input_val.length(), 0x00);
     auto primary_input_write_iter = primary_input_byteblob.begin();
 
-    status = filled_primary_input_val.write(primary_input_write_iter, 
-            primary_input_byteblob.size());
+    status = filled_primary_input_val.write(primary_input_write_iter, primary_input_byteblob.size());
 
     std::cout << "Byteblobs filled." << std::endl;
 
     verification_key_marshalling_type val_verification_key_read;
 
     auto read_iter = verification_key_byteblob.begin();
-    status = val_verification_key_read.read(read_iter, 
-                verification_key_byteblob.size());
+    status = val_verification_key_read.read(read_iter, verification_key_byteblob.size());
 
-    typename scheme_type::verification_key_type
-        constructed_val_verification_key_read = 
-        types::construct_r1cs_gg_ppzksnark_verification_key<
-            typename scheme_type::verification_key_type,
-            Endianness>(val_verification_key_read);
+    typename scheme_type::verification_key_type constructed_val_verification_key_read =
+        types::make_r1cs_gg_ppzksnark_verification_key<typename scheme_type::verification_key_type, Endianness>(
+            val_verification_key_read);
 
     proof_marshalling_type val_proof_read;
 
     read_iter = proof_byteblob.begin();
-    status = val_proof_read.read(read_iter, 
-                proof_byteblob.size());
+    status = val_proof_read.read(read_iter, proof_byteblob.size());
 
-    typename scheme_type::proof_type
-        constructed_val_proof_read = 
-        types::construct_r1cs_gg_ppzksnark_proof<
-            typename scheme_type::proof_type,
-            Endianness>(val_proof_read);
+    typename scheme_type::proof_type constructed_val_proof_read =
+        types::make_r1cs_gg_ppzksnark_proof<typename scheme_type::proof_type, Endianness>(val_proof_read);
 
     primary_input_marshalling_type val_primary_input_read;
 
     read_iter = primary_input_byteblob.begin();
-    status = val_primary_input_read.read(read_iter, 
-                primary_input_byteblob.size());
+    status = val_primary_input_read.read(read_iter, primary_input_byteblob.size());
 
-    typename scheme_type::primary_input_type
-        constructed_val_primary_input_read = 
-        types::construct_r1cs_gg_ppzksnark_primary_input<
-            typename scheme_type::primary_input_type,
-            Endianness>(val_primary_input_read);
+    typename scheme_type::primary_input_type constructed_val_primary_input_read =
+        types::make_r1cs_gg_ppzksnark_primary_input<typename scheme_type::primary_input_type, Endianness>(
+            val_primary_input_read);
 
-    bool ans = zk::snark::verify<scheme_type>(
-        constructed_val_verification_key_read, 
-        constructed_val_primary_input_read, 
-        constructed_val_proof_read);
+    bool ans = zk::snark::verify<scheme_type>(constructed_val_verification_key_read, constructed_val_primary_input_read,
+                                              constructed_val_proof_read);
 
     return ans;
 }
@@ -189,15 +166,15 @@ BOOST_AUTO_TEST_SUITE(r1cs_gg_ppzksnark_test_suite)
 
 BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_bls12_381_be) {
     std::cout << "BLS12-381 r1cs_gg_ppzksnark big-endian test started" << std::endl;
-    bool res = test_r1cs_gg_ppzksnark<nil::crypto3::algebra::curves::bls12<381>, 
-                               nil::marshalling::option::big_endian>();
+    bool res =
+        test_r1cs_gg_ppzksnark<nil::crypto3::algebra::curves::bls12<381>, nil::marshalling::option::big_endian>();
     BOOST_CHECK(res);
     std::cout << "BLS12-381 r1cs_gg_ppzksnark big-endian test finished" << std::endl;
 }
 
 // BOOST_AUTO_TEST_CASE(proof_bls12_381_le) {
 //     std::cout << "BLS12-381 r1cs_gg_ppzksnark proof little-endian test started" << std::endl;
-//     test_proof<nil::crypto3::zk::snark::r1cs_gg_ppzksnark<nil::crypto3::algebra::curves::bls12<381>>, 
+//     test_proof<nil::crypto3::zk::snark::r1cs_gg_ppzksnark<nil::crypto3::algebra::curves::bls12<381>>,
 //         nil::marshalling::option::little_endian>();
 //     std::cout << "BLS12-381 r1cs_gg_ppzksnark proof little-endian test finished" << std::endl;
 // }

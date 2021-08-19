@@ -50,11 +50,9 @@
 
 #include <nil/crypto3/marshalling/types/zk/r1cs_gg_ppzksnark/proof.hpp>
 
-template <typename TIter>
-void print_byteblob(TIter iter_begin, TIter iter_end){
-    for (TIter it = iter_begin; 
-         it != iter_end;
-         it++){
+template<typename TIter>
+void print_byteblob(TIter iter_begin, TIter iter_end) {
+    for (TIter it = iter_begin; it != iter_end; it++) {
         std::cout << std::hex << int(*it) << std::endl;
     }
 }
@@ -70,80 +68,56 @@ void print_fp2_curve_group_element(Fp2CurveGroupElement e) {
               << e.Y.data[1].data << ") (" << e.Z.data[0].data << " " << e.Z.data[1].data << ")" << std::endl;
 }
 
-template<typename SchemeType, 
-         typename Endianness>
-void test_proof(
-    typename SchemeType::proof_type val) {
+template<typename SchemeType, typename Endianness>
+void test_proof(typename SchemeType::proof_type val) {
 
     using namespace nil::crypto3::marshalling;
 
     std::size_t units_bits = 8;
     using unit_type = unsigned char;
-    using proof_type = types::r1cs_gg_ppzksnark_proof<
-        nil::marshalling::field_type<
-            Endianness>,
-        typename SchemeType::proof_type>;
+    using proof_type =
+        types::r1cs_gg_ppzksnark_proof<nil::marshalling::field_type<Endianness>, typename SchemeType::proof_type>;
 
-    proof_type filled_val = 
-        types::fill_r1cs_gg_ppzksnark_proof<
-            typename SchemeType::proof_type,
-            Endianness>(val);
+    proof_type filled_val = types::fill_r1cs_gg_ppzksnark_proof<typename SchemeType::proof_type, Endianness>(val);
 
-    typename SchemeType::proof_type 
-        constructed_val = 
-        types::construct_r1cs_gg_ppzksnark_proof<
-            typename SchemeType::proof_type,
-            Endianness>(filled_val);
+    typename SchemeType::proof_type constructed_val =
+        types::make_r1cs_gg_ppzksnark_proof<typename SchemeType::proof_type, Endianness>(filled_val);
     BOOST_CHECK(val == constructed_val);
 
-    std::size_t unitblob_size = 
-        filled_val.length();
+    std::size_t unitblob_size = filled_val.length();
 
     std::vector<unit_type> cv;
     cv.resize(unitblob_size, 0x00);
 
     auto write_iter = cv.begin();
 
-    nil::marshalling::status_type status =  
-        filled_val.write(write_iter, 
-            cv.size());
+    nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
 
     proof_type test_val_read;
 
     auto read_iter = cv.begin();
-    status = 
-        test_val_read.read(read_iter, 
-                cv.size());
+    status = test_val_read.read(read_iter, cv.size());
 
-    typename SchemeType::proof_type 
-        constructed_val_read = 
-        types::construct_r1cs_gg_ppzksnark_proof<
-            typename SchemeType::proof_type,
-            Endianness>(test_val_read);
+    typename SchemeType::proof_type constructed_val_read =
+        types::make_r1cs_gg_ppzksnark_proof<typename SchemeType::proof_type, Endianness>(test_val_read);
 
-    BOOST_CHECK(val == 
-        constructed_val_read);
+    BOOST_CHECK(val == constructed_val_read);
 }
 
-template<typename SchemeType, 
-         typename Endianness>
+template<typename SchemeType, typename Endianness>
 void test_proof() {
     std::cout << std::hex;
     std::cerr << std::hex;
     for (unsigned i = 0; i < 128; ++i) {
-        if (!(i%(16)) && i){
+        if (!(i % (16)) && i) {
             std::cout << std::dec << i << " tested" << std::endl;
         }
-        
-        test_proof<SchemeType, Endianness>(
-            typename SchemeType::proof_type(
-                std::move(nil::crypto3::algebra::random_element<
-                    typename SchemeType::proof_type::curve_type::g1_type<>>()), 
-                std::move(nil::crypto3::algebra::random_element<
-                    typename SchemeType::proof_type::curve_type::g2_type<>>()), 
-                std::move(nil::crypto3::algebra::random_element<
-                    typename SchemeType::proof_type::curve_type::g1_type<>>())
-                ));
+
+        test_proof<SchemeType, Endianness>(typename SchemeType::proof_type(
+            std::move(nil::crypto3::algebra::random_element<typename SchemeType::proof_type::curve_type::g1_type<>>()),
+            std::move(nil::crypto3::algebra::random_element<typename SchemeType::proof_type::curve_type::g2_type<>>()),
+            std::move(
+                nil::crypto3::algebra::random_element<typename SchemeType::proof_type::curve_type::g1_type<>>())));
     }
 }
 
@@ -151,14 +125,14 @@ BOOST_AUTO_TEST_SUITE(proof_test_suite)
 
 BOOST_AUTO_TEST_CASE(proof_bls12_381_be) {
     std::cout << "BLS12-381 r1cs_gg_ppzksnark proof big-endian test started" << std::endl;
-    test_proof<nil::crypto3::zk::snark::r1cs_gg_ppzksnark<nil::crypto3::algebra::curves::bls12<381>>, 
-        nil::marshalling::option::big_endian>();
+    test_proof<nil::crypto3::zk::snark::r1cs_gg_ppzksnark<nil::crypto3::algebra::curves::bls12<381>>,
+               nil::marshalling::option::big_endian>();
     std::cout << "BLS12-381 r1cs_gg_ppzksnark proof big-endian test finished" << std::endl;
 }
 
 // BOOST_AUTO_TEST_CASE(proof_bls12_381_le) {
 //     std::cout << "BLS12-381 r1cs_gg_ppzksnark proof little-endian test started" << std::endl;
-//     test_proof<nil::crypto3::zk::snark::r1cs_gg_ppzksnark<nil::crypto3::algebra::curves::bls12<381>>, 
+//     test_proof<nil::crypto3::zk::snark::r1cs_gg_ppzksnark<nil::crypto3::algebra::curves::bls12<381>>,
 //         nil::marshalling::option::little_endian>();
 //     std::cout << "BLS12-381 r1cs_gg_ppzksnark proof little-endian test finished" << std::endl;
 // }
