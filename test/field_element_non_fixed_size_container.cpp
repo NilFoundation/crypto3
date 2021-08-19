@@ -46,11 +46,9 @@
 
 #include <nil/crypto3/marshalling/types/algebra/field_element.hpp>
 
-template <typename TIter>
-void print_byteblob(TIter iter_begin, TIter iter_end){
-    for (TIter it = iter_begin; 
-         it != iter_end;
-         it++){
+template<typename TIter>
+void print_byteblob(TIter iter_begin, TIter iter_end) {
+    for (TIter it = iter_begin; it != iter_end; it++) {
         std::cout << std::hex << int(*it) << std::endl;
     }
 }
@@ -65,87 +63,55 @@ void print_field_element(typename nil::crypto3::algebra::fields::detail::element
     std::cout << std::hex << e.data[0].data << " " << e.data[1].data << std::endl;
 }
 
-template<typename FieldType, 
-         typename Endianness>
-void test_field_element_non_fixed_size_container(
-    std::vector<typename FieldType::value_type> val_container) {
+template<typename FieldType, typename Endianness>
+void test_field_element_non_fixed_size_container(std::vector<typename FieldType::value_type> val_container) {
 
     using namespace nil::crypto3::marshalling;
 
     std::size_t units_bits = 8;
     using unit_type = unsigned char;
-    using field_element_vector_type = 
-        nil::marshalling::types::array_list<
-            nil::marshalling::field_type<
-                    Endianness>,
-            types::field_element<
-                nil::marshalling::field_type<
-                    Endianness>,
-                FieldType>,
-            nil::marshalling::option::sequence_size_field_prefix<
-                nil::marshalling::types::integral<
-                    nil::marshalling::field_type<
-                    Endianness>, 
-                    std::size_t
-                >
-            > 
-        >;
+    using field_element_vector_type = nil::marshalling::types::array_list<
+        nil::marshalling::field_type<Endianness>,
+        types::field_element<nil::marshalling::field_type<Endianness>, FieldType>,
+        nil::marshalling::option::sequence_size_field_prefix<
+            nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>;
 
-    field_element_vector_type test_val = 
-        types::fill_field_element_vector<FieldType,
-            Endianness>(val_container);
+    field_element_vector_type test_val = types::fill_field_element_vector<FieldType, Endianness>(val_container);
 
-    std::vector<typename FieldType::value_type> constructed_val = 
-        types::construct_field_element_vector<FieldType, 
-            Endianness>(
-                test_val);
-    BOOST_CHECK(std::equal(val_container.begin(), 
-                           val_container.end(), 
-                           constructed_val.begin()));
+    std::vector<typename FieldType::value_type> constructed_val =
+        types::make_field_element_vector<FieldType, Endianness>(test_val);
+    BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), constructed_val.begin()));
 
-    std::size_t unitblob_size = 
-        test_val.length();
+    std::size_t unitblob_size = test_val.length();
 
     std::vector<unit_type> cv;
     cv.resize(unitblob_size, 0x00);
 
     auto write_iter = cv.begin();
 
-    nil::marshalling::status_type status =  
-        test_val.write(write_iter, 
-            cv.size());
+    nil::marshalling::status_type status = test_val.write(write_iter, cv.size());
 
     field_element_vector_type test_val_read;
 
     auto read_iter = cv.begin();
-    status = 
-        test_val_read.read(read_iter, 
-                cv.size());
+    status = test_val_read.read(read_iter, cv.size());
 
-    std::vector<typename FieldType::value_type> read_val = 
-        types::construct_field_element_vector<FieldType, 
-            Endianness>(
-                test_val_read);
-    BOOST_CHECK(std::equal(val_container.begin(), 
-                           val_container.end(), 
-                           read_val.begin()));
+    std::vector<typename FieldType::value_type> read_val =
+        types::make_field_element_vector<FieldType, Endianness>(test_val_read);
+    BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), read_val.begin()));
 }
 
-template<typename FieldType, 
-         typename Endianness,
-         std::size_t TSize>
+template<typename FieldType, typename Endianness, std::size_t TSize>
 void test_field_element_non_fixed_size_container() {
     std::cout << std::hex;
     std::cerr << std::hex;
     for (unsigned i = 0; i < 128; ++i) {
-        std::vector<typename FieldType::value_type> 
-            val_container;
-        if (!(i%16) && i){
+        std::vector<typename FieldType::value_type> val_container;
+        if (!(i % 16) && i) {
             std::cout << std::dec << i << " tested" << std::endl;
         }
-        for (std::size_t i=0; i<TSize; i++){
-            val_container.push_back( 
-                nil::crypto3::algebra::random_element<FieldType>());
+        for (std::size_t i = 0; i < TSize; i++) {
+            val_container.push_back(nil::crypto3::algebra::random_element<FieldType>());
         }
         test_field_element_non_fixed_size_container<FieldType, Endianness>(val_container);
     }
@@ -155,33 +121,33 @@ BOOST_AUTO_TEST_SUITE(field_element_non_fixed_size_container_test_suite)
 
 BOOST_AUTO_TEST_CASE(field_element_non_fixed_size_container_bls12_381_g1_field_be) {
     std::cout << "BLS12-381 g1 group field non fixed size container big-endian test started" << std::endl;
-    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g1_type<>::field_type, 
-        nil::marshalling::option::big_endian, 
-        5>();
+    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g1_type<>::field_type,
+                                                nil::marshalling::option::big_endian,
+                                                5>();
     std::cout << "BLS12-381 g1 group field non fixed size container big-endian test finished" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(field_element_non_fixed_size_container_bls12_381_g1_field_le) {
     std::cout << "BLS12-381 g1 group field non fixed size container little-endian test started" << std::endl;
-    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g1_type<>::field_type, 
-        nil::marshalling::option::little_endian, 
-        5>();
+    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g1_type<>::field_type,
+                                                nil::marshalling::option::little_endian,
+                                                5>();
     std::cout << "BLS12-381 g1 group field non fixed size container little-endian test finished" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(field_element_non_fixed_size_container_bls12_381_g2_field_be) {
     std::cout << "BLS12-381 g2 group field non fixed size container big-endian test started" << std::endl;
-    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g2_type<>::field_type, 
-        nil::marshalling::option::big_endian, 
-        7>();
+    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g2_type<>::field_type,
+                                                nil::marshalling::option::big_endian,
+                                                7>();
     std::cout << "BLS12-381 g2 group field non fixed size container big-endian test finished" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(field_element_non_fixed_size_container_bls12_381_g2_field_le) {
     std::cout << "BLS12-381 g2 group field non fixed size container little-endian test started" << std::endl;
-    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g2_type<>::field_type, 
-        nil::marshalling::option::little_endian, 
-        7>();
+    test_field_element_non_fixed_size_container<nil::crypto3::algebra::curves::bls12<381>::g2_type<>::field_type,
+                                                nil::marshalling::option::little_endian,
+                                                7>();
     std::cout << "BLS12-381 g2 group field non fixed size container little-endian test finished" << std::endl;
 }
 

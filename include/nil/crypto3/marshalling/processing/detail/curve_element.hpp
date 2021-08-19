@@ -43,16 +43,15 @@ namespace nil {
         namespace marshalling {
             namespace processing {
                 namespace detail {
-
                     template<typename G1FieldType>
-                    typename std::enable_if<
-                            algebra::is_field<G1FieldType>::value &&
-                            !(algebra::is_extended_field<G1FieldType>::value), bool>::type
+                    typename std::enable_if<algebra::is_field<G1FieldType>::value &&
+                                                !(algebra::is_extended_field<G1FieldType>::value),
+                                            bool>::type
                         sign_gf_p(const typename G1FieldType::value_type &v) {
 
                         constexpr static const typename G1FieldType::integral_type half_p =
-                            (G1FieldType::modulus - typename G1FieldType::integral_type(1)) / 
-                                typename G1FieldType::integral_type(2);
+                            (G1FieldType::modulus - typename G1FieldType::integral_type(1)) /
+                            typename G1FieldType::integral_type(2);
 
                         if (v > half_p) {
                             return true;
@@ -63,17 +62,15 @@ namespace nil {
                     template<typename G2FieldType>
                     typename std::enable_if<algebra::is_extended_field<G2FieldType>::value, bool>::type
                         sign_gf_p(const typename G2FieldType::value_type &v) {
-                            
+
                         if (v.data[1] == 0) {
                             return sign_gf_p<typename G2FieldType::underlying_field_type>(v.data[0]);
                         }
                         return sign_gf_p<typename G2FieldType::underlying_field_type>(v.data[1]);
                     }
 
-                    template<typename ChunkType,
-                             typename GroupValueType>
-                    static inline ChunkType evaluate_m_unit(const GroupValueType &point, 
-                        bool compression) {
+                    template<typename ChunkType, typename GroupValueType>
+                    static inline ChunkType evaluate_m_unit(const GroupValueType &point, bool compression) {
 
                         constexpr static const ChunkType C_bit = 0x80;
                         constexpr static const ChunkType I_bit = 0x40;
@@ -91,10 +88,9 @@ namespace nil {
                         }
                         return result;
                     }
-
                 }    // namespace detail
-            }    // namespace processing
-        }    // namespace marshalling
-    }    // namespace crypto3
+            }        // namespace processing
+        }            // namespace marshalling
+    }                // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_MARSHALLING_PROCESSING_CURVE_ELEMENT_DETAIL_HPP

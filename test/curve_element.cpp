@@ -45,11 +45,9 @@
 
 #include <nil/crypto3/marshalling/types/algebra/curve_element.hpp>
 
-template <typename TIter>
-void print_byteblob(TIter iter_begin, TIter iter_end){
-    for (TIter it = iter_begin; 
-         it != iter_end;
-         it++){
+template<typename TIter>
+void print_byteblob(TIter iter_begin, TIter iter_end) {
+    for (TIter it = iter_begin; it != iter_end; it++) {
         std::cout << std::hex << int(*it) << std::endl;
     }
 }
@@ -60,21 +58,16 @@ void test_curve_element_big_endian(CurveGroupElement val) {
 
     std::size_t units_bits = 8;
     using unit_type = unsigned char;
-    
-    using curve_element_type = types::curve_element<
-        nil::marshalling::field_type<
-        nil::marshalling::option::big_endian>,
-        typename CurveGroupElement::group_type>;
+
+    using curve_element_type = types::curve_element<nil::marshalling::field_type<nil::marshalling::option::big_endian>,
+                                                    typename CurveGroupElement::group_type>;
     using curve_type = typename CurveGroupElement::group_type::curve_type;
 
     auto compressed_curve_group_element =
-        nil::marshalling::
-            curve_element_serializer<curve_type>::
-                point_to_octets_compress(val);
+        nil::marshalling::curve_element_serializer<curve_type>::point_to_octets_compress(val);
 
-    std::size_t unitblob_size = 
-        curve_element_type::bit_length()/units_bits + 
-        ((curve_element_type::bit_length()%units_bits)?1:0);
+    std::size_t unitblob_size =
+        curve_element_type::bit_length() / units_bits + ((curve_element_type::bit_length() % units_bits) ? 1 : 0);
     curve_element_type test_val = curve_element_type(val);
 
     std::vector<unit_type> cv;
@@ -82,20 +75,14 @@ void test_curve_element_big_endian(CurveGroupElement val) {
 
     auto write_iter = cv.begin();
 
-    nil::marshalling::status_type status =  
-        test_val.write(write_iter, 
-            unitblob_size * units_bits);
+    nil::marshalling::status_type status = test_val.write(write_iter, unitblob_size * units_bits);
 
-    BOOST_CHECK(std::equal(compressed_curve_group_element.begin(), 
-                           compressed_curve_group_element.end(),
-                           cv.begin()));
+    BOOST_CHECK(std::equal(compressed_curve_group_element.begin(), compressed_curve_group_element.end(), cv.begin()));
 
     curve_element_type test_val_read;
 
     auto read_iter = cv.begin();
-    status = 
-        test_val_read.read(read_iter, 
-                curve_element_type::bit_length());
+    status = test_val_read.read(read_iter, curve_element_type::bit_length());
 
     BOOST_CHECK(test_val == test_val_read);
 }
@@ -105,11 +92,10 @@ void test_curve_element() {
     std::cout << std::hex;
     std::cerr << std::hex;
     for (unsigned i = 0; i < 128; ++i) {
-        if (!(i%16) && i){
+        if (!(i % 16) && i) {
             std::cout << std::dec << i << " tested" << std::endl;
         }
-        typename CurveGroup::value_type val = 
-            nil::crypto3::algebra::random_element<CurveGroup>();
+        typename CurveGroup::value_type val = nil::crypto3::algebra::random_element<CurveGroup>();
         test_curve_element_big_endian(val);
         // test_curve_element_little_endian(val);
     }

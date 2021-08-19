@@ -37,9 +37,7 @@ namespace nil {
         namespace marshalling {
             namespace types {
                 namespace detail {
-
-                    template<typename TTypeBase, 
-                             typename CurveGroupType>
+                    template<typename TTypeBase, typename CurveGroupType>
                     class basic_curve_element : public TTypeBase {
 
                         using T = typename CurveGroupType::value_type;
@@ -82,8 +80,7 @@ namespace nil {
                         }
 
                         static constexpr std::size_t max_length() {
-                            return max_bit_length()/8 + 
-                            ((max_bit_length()%8)?1:0);
+                            return max_bit_length() / 8 + ((max_bit_length() % 8) ? 1 : 0);
                         }
 
                         static constexpr std::size_t bit_length() {
@@ -115,12 +112,10 @@ namespace nil {
 
                         template<typename TIter>
                         void read_no_status(TIter &iter) {
-                            value_ = crypto3::marshalling::
-                                processing::curve_element_read_data<bit_length(), 
-                                    typename base_impl_type::endian_type, 
-                                    value_type>(iter);
+                            value_ = crypto3::marshalling::processing::curve_element_read_data<
+                                bit_length(), typename base_impl_type::endian_type, value_type>(iter);
                         }
-                    
+
                         template<typename TIter>
                         nil::marshalling::status_type write(TIter &iter, std::size_t size) const {
                             // if (size < length()) {
@@ -134,18 +129,16 @@ namespace nil {
 
                         template<typename TIter>
                         void write_no_status(TIter &iter) const {
-                            crypto3::marshalling::processing::
-                                curve_element_write_data<bit_length(), 
-                                    typename base_impl_type::endian_type>(value_, iter);
+                            crypto3::marshalling::processing::curve_element_write_data<
+                                bit_length(), typename base_impl_type::endian_type>(value_, iter);
                         }
 
                     private:
                         value_type value_;
                     };
-
                 }    // namespace detail
             }        // namespace types
         }            // namespace marshalling
-    }            // namespace crypto3
+    }                // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_MARSHALLING_BASIC_CURVE_ELEMENT_HPP
