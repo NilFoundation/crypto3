@@ -1264,7 +1264,7 @@ namespace boost {
                 noexcept
 #endif
             {
-                return multiprecision::detail::digits10_2_2(
+                return nil::crypto3::multiprecision::detail::digits10_2_2(
                     nil::crypto3::multiprecision::mpfi_float::default_precision());
             }
             template<>
@@ -1274,7 +1274,7 @@ namespace boost {
                 noexcept
 #endif
             {
-                return multiprecision::detail::digits10_2_2(
+                return nil::crypto3::multiprecision::detail::digits10_2_2(
                     nil::crypto3::multiprecision::mpfi_float::default_precision());
             }
 
@@ -1336,7 +1336,7 @@ namespace boost {
                 noexcept
 #endif
             {
-                return multiprecision::detail::digits10_2_2(logged_type1::default_precision());
+                return nil::crypto3::multiprecision::detail::digits10_2_2(logged_type1::default_precision());
             }
             template<>
             inline int digits<logged_type2>()
@@ -1344,7 +1344,7 @@ namespace boost {
                 noexcept
 #endif
             {
-                return multiprecision::detail::digits10_2_2(logged_type1::default_precision());
+                return nil::crypto3::multiprecision::detail::digits10_2_2(logged_type1::default_precision());
             }
 
             template<>

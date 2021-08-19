@@ -19,14 +19,16 @@
 template<class T>
 struct is_boost_rational<boost::rational<T>> : public boost::mpl::true_ { };
 
-namespace boost {
-    namespace multiprecision {
+namespace nil {
+    namespace crypto3 {
+        namespace multiprecision {
 
-        template<>
-        struct number_category<rational<tom_int>> : public boost::mpl::int_<number_kind_rational> { };
+            template<>
+            struct number_category<boost::rational<tom_int>> : public boost::mpl::int_<number_kind_rational> { };
 
-    }    // namespace multiprecision
-}    // namespace boost
+        }    // namespace multiprecision
+    }        // namespace crypto3
+}    // namespace nil
 
 int main() {
     test<boost::rational<nil::crypto3::multiprecision::tom_int>>();
