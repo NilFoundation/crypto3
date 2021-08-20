@@ -172,7 +172,6 @@ namespace nil {
                         auto it = adjusted_range.cbegin();
                         marshalling_integral_value_be.template read(it, modulus_octets);
                         result = marshalling_integral_value_be.value();
-                        std::cout << result << std::endl;
                     } else {
                         // TODO: check correctness of this case
                         marshalling_integral_value_le_type marshalling_integral_value_le;
@@ -184,9 +183,8 @@ namespace nil {
                 }
 
                 template<typename InputRange>
-                static inline modulus_octets_container_type bits2octets(const InputRange &range) {
-                    field_value_type z2(bits2int(range));
-                    return int2octets(z2);
+                static inline modulus_octets_container_type bits2octets(const InputRange& range) {
+                    return int2octets(field_value_type(bits2int(range)));
                 }
 
                 inline void seed(const result_type& x, const digest_type& h1) {
@@ -194,69 +192,60 @@ namespace nil {
                     std::fill(V.begin(), V.end(), 1);
 
                     // c.
-                    digest_type K;
                     std::fill(K.begin(), K.end(), 0);
-                    Key = key_type(K);
+                    key_type Key(K);
 
                     // d.
                     internal_accumulator_type acc_d(Key);
+                    auto int2octets_x = int2octets(x);
+                    auto bits2octets_h1 = bits2octets(h1);
                     compute<hmac_policy>(V, acc_d);
                     compute<hmac_policy>(std::array<std::uint8_t, 1> {0}, acc_d);
-                    // int2octets(x)
-                    marshalling_field_element_be_type marshalling_field_element =
-                        ::nil::crypto3::marshalling::types::fill_field_element<field_type,
-                                                                               ::nil::marshalling::option::big_endian>(
-                            x);
-                    modulus_octets_container_type modulus_octet_container;
-                    marshalling_field_element.template write(modulus_octet_container.begin(), modulus_octets);
-                    compute<hmac_policy>(modulus_octet_container, acc_d);
-                    compute<hmac_policy>(h1, acc_d);
-                    Key = key_type(
-                        ::nil::crypto3::accumulators::extract::mac<mac::computation_policy<hmac_policy>>(acc_d));
+                    compute<hmac_policy>(int2octets_x, acc_d);
+                    compute<hmac_policy>(bits2octets_h1, acc_d);
+                    Key = key_type(::nil::crypto3::accumulators::extract::mac<mac::computation_policy<hmac_policy>>(acc_d));
 
                     // e.
-                    internal_accumulator_type acc_e(Key);
-                    compute<hmac_policy>(V, acc_e);
-                    V = ::nil::crypto3::accumulators::extract::mac<mac::computation_policy<hmac_policy>>(acc_e);
+                    V = compute<hmac_policy>(V, Key);
 
                     // f.
                     internal_accumulator_type acc_f(Key);
                     compute<hmac_policy>(V, acc_f);
                     compute<hmac_policy>(std::array<std::uint8_t, 1> {1}, acc_f);
-                    compute<hmac_policy>(modulus_octet_container, acc_f);
-                    compute<hmac_policy>(h1, acc_f);
-                    Key = key_type(
-                        ::nil::crypto3::accumulators::extract::mac<mac::computation_policy<hmac_policy>>(acc_f));
+                    compute<hmac_policy>(int2octets_x, acc_f);
+                    compute<hmac_policy>(bits2octets_h1, acc_f);
+                    K = ::nil::crypto3::accumulators::extract::mac<mac::computation_policy<hmac_policy>>(acc_f);
+                    Key = key_type(K);
 
                     // g.
-                    internal_accumulator_type acc_g(Key);
-                    compute<hmac_policy>(V, acc_g);
-                    V = ::nil::crypto3::accumulators::extract::mac<mac::computation_policy<hmac_policy>>(acc_g);
+                    V = compute<hmac_policy>(V, Key);
                 }
 
                 inline result_type operator()() {
                     // h.
                     do {
-                        std::vector<std::uint8_t> T;
+                        std::array<std::uint8_t, digest_chunks * digest_octets> T;
 
                         // h.2.
+                        key_type Key(K);
                         for (auto i = 0; i < digest_chunks; i++) {
-                            digest_type T_temp = compute<hmac_policy>(V, Key);
-                            std::copy(T_temp.cbegin(), T_temp.cend(), std::back_inserter(T));
+                            V = compute<hmac_policy>(V, Key);
+                            std::copy(V.cbegin(), V.cend(), T.begin() + i * digest_octets);
                         }
 
                         // h.3.
-                        // TODO: use marshalling
-                        integral_type k;
-                        ::nil::crypto3::multiprecision::import_bits(k, T.begin(), T.begin() + modulus_octets, 8, false);
-                        if (1 < k && k < field_type::modulus) {
+                        integral_type k = bits2int(T);
+                        if (0 < k && k < field_type::modulus) {
                             return k;
                         }
 
-                        // marshalling_field_element_type marshalling_field_element;
-                        // marshalling_field_element.read(T.begin(), modulus_octets);
-                        // return crypto3::marshalling::types::construct_field_element<field_type, endianness>(
-                        //     marshalling_field_element);
+                        internal_accumulator_type acc_h3(Key);
+                        compute<hmac_policy>(V, acc_h3);
+                        compute<hmac_policy>(std::array<std::uint8_t, 1> {0}, acc_h3);
+                        K = ::nil::crypto3::accumulators::extract::mac<mac::computation_policy<hmac_policy>>(acc_h3);
+
+                        Key = key_type(K);
+                        V = compute<hmac_policy>(V, Key);
                     } while (true);
                 }
 
@@ -294,7 +283,7 @@ namespace nil {
 
             protected:
                 digest_type V;
-                key_type Key;
+                digest_type K;
             };
         }    // namespace random
     }        // namespace crypto3

@@ -126,7 +126,8 @@ namespace boost {
 
 BOOST_AUTO_TEST_SUITE(rfc6979_engine_tests)
 
-BOOST_AUTO_TEST_CASE(mnt4_test) {
+// test data from https://datatracker.ietf.org/doc/html/rfc6979#appendix-A.1.2
+BOOST_AUTO_TEST_CASE(k_generation_ansix9t163k1) {
     using scalar_field_type = algebra::fields::sect_k1_scalar_field<163>;
     using scalar_field_value_type = typename scalar_field_type::value_type;
     using integral_type = typename scalar_field_type::integral_type;
@@ -166,6 +167,11 @@ BOOST_AUTO_TEST_CASE(mnt4_test) {
                            std::vector<std::uint8_t> {0x01, 0x79, 0x5E, 0xDF, 0x0D, 0x54, 0xDB, 0x76, 0x0F, 0x15,
                            0x6D, 0x0D, 0xAC, 0x04, 0xC0, 0x32, 0x2B, 0x3A, 0x20, 0x42, 0x24}
                                                       .cbegin()));
+
+    auto gen = generator_type(x, h1);
+    auto k = gen();
+    integral_type etalon_k("3259566757037731885269073930746036563011142801435");
+    BOOST_CHECK(k == etalon_k);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
