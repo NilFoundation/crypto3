@@ -52,11 +52,11 @@ namespace nil {
                          class Fpk_mul_componentT,
                          template<class>
                          class Fpk_sqr_componentT,
-                         typename NumberType = typename FpkT::number_type>
+                         typename NumberType = typename FpkT::integral_type>
                 class exponentiation_component : component<typename FpkT::base_field_type> {
                 public:
                     typedef typename FpkT::base_field_type FieldType;
-                    typedef NumberType number_type;
+                    typedef NumberType integral_type;
                     std::vector<long> NAF;
 
                     std::vector<std::shared_ptr<Fpk_variableT<FpkT>>> intermediate;
@@ -65,7 +65,7 @@ namespace nil {
                     std::vector<std::shared_ptr<Fpk_sqr_componentT<FpkT>>> doubling_steps;
 
                     Fpk_variableT<FpkT> elt;
-                    number_type power;
+                    integral_type power;
                     Fpk_variableT<FpkT> result;
 
                     std::size_t intermed_count;

@@ -72,10 +72,10 @@ namespace nil {
                     }
 
                     element_g1(blueprint<scalar_field_type> &bp,
-                               const typename CurveType::pairing::chained_curve_type::g1_type::value_type &P) :
+                               const typename CurveType::pairing::chained_curve_type::template g1_type<>::value_type &P) :
                         component<scalar_field_type>(bp) {
 
-                        // typename CurveType::pairing::chained_curve_type::g1_type::value_type Pcopy =
+                        // typename CurveType::pairing::chained_curve_type::template g1_type<>::value_type Pcopy =
                         //     P.to_affine();
 
                         X.assign(bp, P.X);
@@ -87,8 +87,8 @@ namespace nil {
                     }
 
                     void generate_r1cs_witness(
-                        const typename CurveType::pairing::chained_curve_type::g1_type::value_type &el) {
-                        typename CurveType::pairing::chained_curve_type::g1_type::value_type el_normalized =
+                        const typename CurveType::pairing::chained_curve_type::template g1_type<>::value_type &el) {
+                        typename CurveType::pairing::chained_curve_type::template g1_type<>::value_type el_normalized =
                             el.to_affine();
 
                         this->bp.lc_val(X) = el_normalized.X;

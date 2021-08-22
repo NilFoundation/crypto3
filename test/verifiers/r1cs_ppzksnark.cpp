@@ -283,12 +283,12 @@ void test_full_pair() {
     typedef typename pairing::CurveType::pairing::pair_curve_type::pairing pairing_policy;
 
     components::blueprint<FieldType> bp;
-    pairing::CurveType::pairing::pair_curve_type::g1_type::value_type P_val =
+    pairing::CurveType::pairing::pair_curve_type::template g1_type<>::value_type P_val =
         algebra::random_element<pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
-        pairing::CurveType::pairing::pair_curve_type::g1_type::value_type::one();
-    pairing::CurveType::pairing::pair_curve_type::g2_type::value_type Q_val =
+        pairing::CurveType::pairing::pair_curve_type::template g1_type<>::value_type::one();
+    pairing::CurveType::pairing::pair_curve_type::template g2_type<>::value_type Q_val =
         algebra::random_element<pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
-        pairing::CurveType::pairing::pair_curve_type::g2_type::value_type::one();
+        pairing::CurveType::pairing::pair_curve_type::template g2_type<>::value_type::one();
 
     element_g1<CurveType> P(bp);
     element_g2<CurveType> Q(bp);
@@ -338,12 +338,12 @@ void test_full_precomputed_pair() {
     typedef typename pairing::CurveType::pairing::pair_curve_type::pairing pairing_policy;
 
     components::blueprint<FieldType> bp;
-    pairing::CurveType::pairing::pair_curve_type::g1_type::value_type P_val =
+    pairing::CurveType::pairing::pair_curve_type::template g1_type<>::value_type P_val =
         algebra::random_element<pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
-        pairing::CurveType::pairing::pair_curve_type::g1_type::value_type::one();
-    pairing::CurveType::pairing::pair_curve_type::g2_type::value_type Q_val =
+        pairing::CurveType::pairing::pair_curve_type::template g1_type<>::value_type::one();
+    pairing::CurveType::pairing::pair_curve_type::template g2_type<>::value_type Q_val =
         algebra::random_element<pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
-        pairing::CurveType::pairing::pair_curve_type::g2_type::value_type::one();
+        pairing::CurveType::pairing::pair_curve_type::template g2_type<>::value_type::one();
 
     g1_precomputation<CurveType> prec_P(bp, P_val);
     g2_precomputation<CurveType> prec_Q(bp, Q_val);
@@ -382,7 +382,7 @@ BOOST_AUTO_TEST_CASE(benes_components_mnt4_test) {
 
     std::cout << "Benes components test for mnt4-298 started" << std::endl;
     using curve_type = typename algebra::curves::mnt4<298>;
-    using fq2_type = typename curve_type::g2_type::underlying_field_type;
+    using fq2_type = typename curve_type::template g2_type<>::field_type;
     using fq4_type = typename curve_type::gt_type;
 
     test_mul<fq2_type, element_fp2, element_fp2_mul>();
@@ -424,7 +424,7 @@ BOOST_AUTO_TEST_CASE(benes_components_mnt6_test) {
     std::cout << "Benes components test for mnt6-298 started" << std::endl;
 
     using curve_type = typename algebra::curves::mnt6<298>;
-    using fq3_type = typename curve_type::g2_type::underlying_field_type;
+    using fq3_type = typename curve_type::template g2_type<>::field_type;
     using fq6_2over3_type = typename curve_type::gt_type;
 
     test_mul<fq3_type, element_fp3, element_fp3_mul>();

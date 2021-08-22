@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_SUITE(field_element_arithmetic_component_test_suite)
 
 BOOST_AUTO_TEST_CASE(field_element_mul_component_test_mnt6_case) {
     using curve_type = typename curves::mnt6<298>;
-    using field_type = typename curve_type::g2_type::underlying_field_type;
+    using field_type = typename curve_type::template g2_type<>::field_type;
     using base_field_type = typename curve_type::base_field_type;
 
     std::size_t tries_quantity = 10;
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(field_element_mul_component_test_mnt6_case) {
 
 BOOST_AUTO_TEST_CASE(field_element_squared_component_test_mnt6_case) {
     using curve_type = typename curves::mnt6<298>;
-    using field_type = typename curve_type::g2_type::underlying_field_type;
+    using field_type = typename curve_type::template g2_type<>::field_type;
     using base_field_type = typename curve_type::base_field_type;
 
     std::size_t tries_quantity = 10;

@@ -340,7 +340,7 @@ namespace nil {
                             vk_gamma_beta_g1_precomp.reset(new g1_precomputation<CurveType>(bp, r1cs_vk.gamma_beta_g1));
 
                             pp_G2_one_precomp.reset(new g2_precomputation<CurveType>(
-                                bp, CurveType::pairing::pair_curve_type::g2_type::value_type::one()));
+                                bp, CurveType::pairing::pair_curve_type::template g2_type<>::value_type::one()));
                             vk_alphaA_g2_precomp.reset(new g2_precomputation<CurveType>(bp, r1cs_vk.alphaA_g2));
                             vk_alphaC_g2_precomp.reset(new g2_precomputation<CurveType>(bp, r1cs_vk.alphaC_g2));
                             vk_gamma_beta_g2_precomp.reset(new g2_precomputation<CurveType>(bp, r1cs_vk.gamma_beta_g2));
@@ -393,7 +393,7 @@ namespace nil {
                                 bp, *vk.gamma_beta_g1, *pvk.vk_gamma_beta_g1_precomp));
 
                             pvk.pp_G2_one_precomp.reset(new g2_precomputation<CurveType>(
-                                bp, CurveType::pairing::pair_curve_type::g2_type::value_type::one()));
+                                bp, CurveType::pairing::pair_curve_type::template g2_type<>::value_type::one()));
                             compute_vk_alphaA_g2_precomp.reset(
                                 new precompute_G2_component<CurveType>(bp, *vk.alphaA_g2, *pvk.vk_alphaA_g2_precomp));
                             compute_vk_alphaC_g2_precomp.reset(

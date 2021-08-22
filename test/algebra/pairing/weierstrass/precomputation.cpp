@@ -44,9 +44,9 @@ using namespace nil::crypto3::algebra;
 template<typename CurveType>
 void test_element_g1_precomp() {
     components::blueprint<typename CurveType::scalar_field_type> bp;
-    typename CurveType::pairing::pair_curve_type::g1_type::value_type g_val =
+    typename CurveType::pairing::pair_curve_type::template g1_type<>::value_type g_val =
         algebra::random_element<typename CurveType::pairing::pair_curve_type::scalar_field_type>() *
-        CurveType::pairing::pair_curve_type::g1_type::value_type::one();
+        CurveType::pairing::pair_curve_type::template g1_type<>::value_type::one();
 
     element_g1<CurveType> g(bp);
     g1_precomputation<CurveType> precomp;
@@ -68,9 +68,9 @@ void test_element_g1_precomp() {
 template<typename CurveType>
 void test_element_g2_precomp() {
     components::blueprint<typename CurveType::scalar_field_type> bp;
-    typename CurveType::pairing::pair_curve_type::g2_type::value_type g_val =
+    typename CurveType::pairing::pair_curve_type::template g2_type<>::value_type g_val =
         algebra::random_element<typename CurveType::pairing::pair_curve_type::scalar_field_type>() *
-        CurveType::pairing::pair_curve_type::g2_type::value_type::one();
+        CurveType::pairing::pair_curve_type::template g2_type<>::value_type::one();
 
     element_g2<CurveType> g(bp);
     g2_precomputation<CurveType> precomp;

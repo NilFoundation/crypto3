@@ -98,17 +98,12 @@ namespace nil {
 
                     void generate_r1cs_witness() {
 
-                        // temporary added until fixed-precision modular adaptor is ready:
-                        typedef nil::crypto3::multiprecision::number<
-                            nil::crypto3::multiprecision::backends::cpp_int_backend<>>
-                            non_fixed_precision_modulus_type;
-
                         /* assumes that idx can be fit in ulong; true for our purposes for now */
                         const typename FieldType::value_type valint = this->bp.val(index);
 
-                        unsigned long idx = static_cast<unsigned long>(non_fixed_precision_modulus_type(valint.data));
+                        unsigned long idx = static_cast<unsigned long>(typename FieldType::integral_type(valint.data));
 
-                        if (idx >= arr.size() || non_fixed_precision_modulus_type(valint.data) >= arr.size()) {
+                        if (idx >= arr.size() || typename FieldType::integral_type(valint.data) >= arr.size()) {
                             for (std::size_t i = 0; i < arr.size(); ++i) {
                                 this->bp.val(alpha[i]) = FieldType::value_type::zero();
                             }

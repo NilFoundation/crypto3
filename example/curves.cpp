@@ -63,8 +63,8 @@ void verify_component(components::blueprint<typename CurveType::scalar_field_typ
 
 template <typename CurveType>
 components::blueprint<typename CurveType::scalar_field_type> addition_example(
-    typename CurveType::pairing::chained_curve_type::g1_type::value_type p1,
-    typename CurveType::pairing::chained_curve_type::g1_type::value_type p2){
+    typename CurveType::pairing::chained_curve_type::template g1_type<>::value_type p1,
+    typename CurveType::pairing::chained_curve_type::template g1_type<>::value_type p2){
 
     using main_curve_type = CurveType;
     using chained_curve_type = typename CurveType::pairing::chained_curve_type;
@@ -128,9 +128,9 @@ int main(){
     using chained_curve_type = typename main_curve_type::pairing::chained_curve_type;
     using scalar_field_type = typename main_curve_type::scalar_field_type;
 
-    typename chained_curve_type::g1_type::value_type p1 = 
+    typename chained_curve_type::template g1_type<>::value_type p1 = 
         random_element<typename chained_curve_type::g1_type>();
-    typename chained_curve_type::g1_type::value_type p2 = 
+    typename chained_curve_type::template g1_type<>::value_type p2 = 
         random_element<typename chained_curve_type::g1_type>();
 
     components::blueprint<scalar_field_type> bp = addition_example<main_curve_type>(p1, p2);

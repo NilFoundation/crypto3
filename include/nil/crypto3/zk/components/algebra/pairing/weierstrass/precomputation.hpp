@@ -69,14 +69,14 @@ namespace nil {
                     }
 
                     g1_precomputation(blueprint<FieldType> &bp,
-                                      const typename CurveType::pairing::pair_curve_type::g1_type::value_type &P_val) {
-                        typename CurveType::pairing::pair_curve_type::g1_type::value_type P_val_copy =
+                                      const typename CurveType::pairing::pair_curve_type::template g1_type<>::value_type &P_val) {
+                        typename CurveType::pairing::pair_curve_type::template g1_type<>::value_type P_val_copy =
                             P_val.to_affine();
                         P.reset(new element_g1<CurveType>(bp, P_val_copy));
                         PY_twist_squared.reset(new typename component_policy::Fqe_variable_type(
                             bp,
                             P_val_copy.Y() *
-                                CurveType::pairing::pair_curve_type::g2_type::value_type::twist.squared()));
+                                CurveType::pairing::pair_curve_type::template g2_type<>::value_type::twist.squared()));
                     }
                 };
 
@@ -199,7 +199,7 @@ namespace nil {
                     g2_precomputation() {
                     }
                     g2_precomputation(blueprint<FieldType> &bp,
-                                      const typename CurveType::pairing::pair_curve_type::g2_type::value_type &Q_val) {
+                                      const typename CurveType::pairing::pair_curve_type::template g2_type<>::value_type &Q_val) {
                         Q.reset(new element_g2<CurveType>(bp, Q_val));
                         const typename CurveType::pairing::pair_curve_type::pairing::affine_ate_g2_precomp
                             native_precomp =
