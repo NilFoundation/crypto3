@@ -58,13 +58,12 @@ namespace nil {
                 typedef typename field_type::value_type field_value_type;
                 typedef typename field_type::integral_type integral_type;
 
-                typedef boost::random_device internal_generator_type;
-                typedef boost::random::uniform_int_distribution<integral_type> internal_distribution_type;
-
                 constexpr static integral_type _min = 0;
                 constexpr static integral_type _max = field_type::modulus - 1;
 
             public:
+                typedef boost::random_device internal_generator_type;
+                typedef boost::random::uniform_int_distribution<integral_type> internal_distribution_type;
                 typedef field_value_type result_type;
 
                 /** Returns a random value in the range [min, max]. */
@@ -98,9 +97,8 @@ namespace nil {
                 typedef typename extended_field_type::value_type extended_field_value_type;
                 typedef typename extended_field_type::underlying_field_type underlying_field_type;
 
-                typedef algebraic_random_device<underlying_field_type> internal_generator_type;
-
             public:
+                typedef algebraic_random_device<underlying_field_type> internal_generator_type;
                 typedef extended_field_value_type result_type;
 
                 /** Returns a random value in the range [min, max]. */
@@ -147,9 +145,8 @@ namespace nil {
                 typedef typename group_type::value_type group_value_type;
                 typedef typename group_type::curve_type::scalar_field_type scalar_field_type;
 
-                typedef algebraic_random_device<scalar_field_type> internal_generator_type;
-
             public:
+                typedef algebraic_random_device<scalar_field_type> internal_generator_type;
                 typedef group_value_type result_type;
 
                 /**
