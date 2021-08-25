@@ -28,9 +28,14 @@
 
 #include <utility>
 
+#include <nil/crypto3/random/rfc6979.hpp>
+#include <nil/crypto3/random/type_traits.hpp>
+
 #include <nil/crypto3/pkpad/algorithms/encode.hpp>
 
 #include <nil/crypto3/pubkey/private_key.hpp>
+
+#include <nil/crypto3/hash/algorithm/hash.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -38,7 +43,10 @@ namespace nil {
             // TODO: add distribution support
             // TODO: review ECDSA implementation and add auxiliary functional provided by the standard
             // TODO: review generator passing
-            template<typename CurveType, typename Padding, typename GeneratorType, typename DistributionType = void,
+            template<typename CurveType,
+                     typename Padding,
+                     typename GeneratorType,
+                     typename DistributionType = void,
                      typename = typename std::enable_if<std::is_same<typename CurveType::scalar_field_type::value_type,
                                                                      typename GeneratorType::result_type>::value>::type>
             struct ecdsa {
@@ -47,6 +55,30 @@ namespace nil {
                 typedef Padding padding_type;
                 typedef GeneratorType generator_type;
                 typedef DistributionType distribution_type;
+                typedef typename Padding::hash_type hash_type;
+
+                typedef public_key<self_type> public_key_type;
+                typedef private_key<self_type> private_key_type;
+            };
+
+            template<typename CurveType,
+                     typename Padding,
+                     typename GeneratorResultType,
+                     typename GeneratorHash,
+                     typename DistributionType>
+            struct ecdsa<CurveType,
+                         Padding,
+                         random::rfc6979<GeneratorResultType, GeneratorHash>,
+                         DistributionType,
+                         typename std::enable_if<std::is_same<typename Padding::hash_type, GeneratorHash>::value &&
+                                                 std::is_same<typename CurveType::scalar_field_type::value_type,
+                                                              GeneratorResultType>::value>::type> {
+                typedef random::rfc6979<GeneratorResultType, GeneratorHash> generator_type;
+                typedef ecdsa<CurveType, Padding, generator_type, DistributionType> self_type;
+                typedef CurveType curve_type;
+                typedef Padding padding_type;
+                typedef DistributionType distribution_type;
+                typedef typename Padding::hash_type hash_type;
 
                 typedef public_key<self_type> public_key_type;
                 typedef private_key<self_type> private_key_type;
@@ -85,17 +117,21 @@ namespace nil {
                 }
 
                 inline bool verify(internal_accumulator_type &acc, const signature_type &signature) const {
-                    scalar_field_value_type m =
+                    scalar_field_value_type encoded_m =
                         padding::accumulators::extract::encode<padding::encoding_policy<padding_type>>(acc);
 
                     scalar_field_value_type w = signature.second.inversed();
-                    g1_value_type X = (m * w) * g1_value_type::one() + (signature.first * w) * pubkey;
+                    g1_value_type X = (encoded_m * w) * g1_value_type::one() + (signature.first * w) * pubkey;
                     if (X.is_zero()) {
                         return false;
                     }
-                    return signature.first ==
-                           scalar_field_value_type(scalar_modular_type(
-                               static_cast<base_integral_type>(X.to_affine().X.data), scalar_field_value_type::modulus));
+                    return signature.first == scalar_field_value_type(scalar_modular_type(
+                                                  static_cast<base_integral_type>(X.to_affine().X.data),
+                                                  scalar_field_value_type::modulus));
+                }
+
+                inline public_key_type pubkey_data() const {
+                    return pubkey;
                 }
 
             protected:
@@ -103,7 +139,13 @@ namespace nil {
             };
 
             template<typename CurveType, typename Padding, typename GeneratorType, typename DistributionType>
-            struct private_key<ecdsa<CurveType, Padding, GeneratorType, DistributionType>>
+            struct private_key<
+                ecdsa<CurveType, Padding, GeneratorType, DistributionType>,
+                typename std::enable_if<!std::is_same<
+                    GeneratorType,
+                    random::rfc6979<typename CurveType::scalar_field_type::value_type,
+                                    typename ecdsa<CurveType, Padding, GeneratorType, DistributionType>::hash_type>>::
+                                            value>::type>
                 : public public_key<ecdsa<CurveType, Padding, GeneratorType, DistributionType>> {
                 typedef ecdsa<CurveType, Padding, GeneratorType, DistributionType> policy_type;
                 typedef public_key<policy_type> base_type;
@@ -112,6 +154,7 @@ namespace nil {
                 typedef typename policy_type::padding_type padding_type;
                 typedef typename policy_type::generator_type generator_type;
                 typedef typename policy_type::distribution_type distribution_type;
+                typedef typename policy_type::hash_type hash_type;
 
                 typedef padding::encoding_accumulator_set<padding_type> internal_accumulator_type;
 
@@ -146,7 +189,7 @@ namespace nil {
                 // TODO: review passing of generator seed
                 inline signature_type sign(internal_accumulator_type &acc) const {
                     generator_type gen;
-                    scalar_field_value_type m =
+                    scalar_field_value_type encoded_m =
                         padding::accumulators::extract::encode<padding::encoding_policy<padding_type>>(acc);
 
                     // TODO: review behaviour if k, r or s generation produced zero, maybe return status instead cycled
@@ -157,12 +200,98 @@ namespace nil {
                     do {
                         while ((k = gen()).is_zero()) {
                         }
-                        // TODO: review converting of kG x-coordinate to r - in case of 2^m order field procedure seems
-                        //  not to be trivial
+                        // TODO: review converting of kG x-coordinate to r - in case of 2^n order (binary) fields
+                        //  procedure seems not to be trivial
                         r = scalar_field_value_type(scalar_modular_type(
                             static_cast<base_integral_type>((k * g1_value_type::one()).to_affine().X.data),
                             scalar_field_value_type::modulus));
-                        s = k.inversed() * (privkey * r + m);
+                        s = k.inversed() * (privkey * r + encoded_m);
+                    } while (r.is_zero() || s.is_zero());
+
+                    return signature_type(r, s);
+                }
+
+            protected:
+                private_key_type privkey;
+            };
+
+            template<typename CurveType, typename Padding, typename GeneratorType, typename DistributionType>
+            struct private_key<
+                ecdsa<CurveType, Padding, GeneratorType, DistributionType>,
+                typename std::enable_if<std::is_same<
+                    GeneratorType,
+                    random::rfc6979<typename CurveType::scalar_field_type::value_type,
+                                    typename ecdsa<CurveType, Padding, GeneratorType, DistributionType>::hash_type>>::
+                                            value>::type>
+                : public public_key<ecdsa<CurveType, Padding, GeneratorType, DistributionType>> {
+                typedef ecdsa<CurveType, Padding, GeneratorType, DistributionType> policy_type;
+                typedef public_key<policy_type> base_type;
+
+                typedef typename policy_type::curve_type curve_type;
+                typedef typename policy_type::padding_type padding_type;
+                typedef typename policy_type::generator_type generator_type;
+                typedef typename policy_type::distribution_type distribution_type;
+                typedef typename policy_type::hash_type hash_type;
+
+                typedef std::pair<accumulator_set<hash_type>, padding::encoding_accumulator_set<padding_type>>
+                    internal_accumulator_type;
+
+                typedef typename base_type::scalar_field_value_type scalar_field_value_type;
+                typedef typename base_type::g1_value_type g1_value_type;
+                typedef typename base_type::base_integral_type base_integral_type;
+                typedef typename base_type::scalar_modular_type scalar_modular_type;
+
+                typedef scalar_field_value_type private_key_type;
+                typedef typename base_type::public_key_type public_key_type;
+                typedef typename base_type::signature_type signature_type;
+
+                private_key(const private_key_type &key) : privkey(key), base_type(generate_public_key(key)) {
+                }
+
+                static inline public_key_type generate_public_key(const private_key_type &key) {
+                    return key * public_key_type::one();
+                }
+
+                template<typename InputRange>
+                inline void update(internal_accumulator_type &acc, const InputRange &range) const {
+                    hash<hash_type>(range, acc.first);
+                    encode<padding_type>(range, acc.second);
+                }
+
+                template<typename InputIterator>
+                inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) const {
+                    hash<hash_type>(first, last, acc.first);
+                    encode<padding_type>(first, last, acc.second);
+                }
+
+                template<class T>
+                class TD;
+                inline signature_type sign(internal_accumulator_type &acc) const {
+                    scalar_field_value_type encoded_m =
+                        padding::accumulators::extract::encode<padding::encoding_policy<padding_type>>(acc.second);
+                    // std::cout << encoded_m.data << std::endl;
+
+                    auto h = ::nil::crypto3::accumulators::extract::hash<hash_type>(acc.first);
+                    generator_type gen(privkey, h);
+
+                    // TODO: review behaviour if k, r or s generation produced zero, maybe return status instead cycled
+                    //  generation
+                    scalar_field_value_type k;
+                    scalar_field_value_type r;
+                    scalar_field_value_type s;
+                    do {
+                        while ((k = gen()).is_zero()) {
+                        }
+                        // std::cout << k.data << std::endl;
+                        // std::cout << k.inversed().data << std::endl;
+                        // TODO: review converting of kG x-coordinate to r - in case of 2^n order (binary) fields
+                        //  procedure seems not to be trivial
+                        r = scalar_field_value_type(scalar_modular_type(
+                            static_cast<base_integral_type>((k * g1_value_type::one()).to_affine().X.data),
+                            scalar_field_value_type::modulus));
+                        // std::cout << r.data << std::endl;
+                        s = (privkey * r + encoded_m) / k;
+                        // std::cout << s.data << std::endl;
                     } while (r.is_zero() || s.is_zero());
 
                     return signature_type(r, s);
