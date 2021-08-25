@@ -124,7 +124,6 @@ namespace nil {
                     // TODO: local_char_bits is supposed to equal chunk_size from import_bits call in marshalling
                     constexpr std::size_t local_char_bits = 8;
                     constexpr std::size_t adjustment_shift = modulus_octets * local_char_bits - modulus_bits;
-                    constexpr std::size_t bits_remain = local_char_bits - adjustment_shift;
                     constexpr std::size_t chunk_size = std::numeric_limits<ValueType>::digits;
                     using bitset_repr_type = std::bitset<chunk_size>;
 
@@ -158,12 +157,9 @@ namespace nil {
                     return result;
                 }
 
-                template<
-                    typename InputRange,
-                    typename std::enable_if<
-                        std::is_same<std::uint8_t,
-                                     typename std::iterator_traits<typename InputRange::iterator>::value_type>::value,
-                        bool>::type = true>
+                template<typename InputRange,
+                         typename ValueType = typename std::iterator_traits<typename InputRange::iterator>::value_type,
+                         typename std::enable_if<std::is_same<std::uint8_t, ValueType>::value, bool>::type = true>
                 static inline integral_type bits2int(const InputRange& range) {
                     integral_type result;
                     if (modulus_bits < range.size() * 8) {
@@ -173,11 +169,17 @@ namespace nil {
                         marshalling_integral_value_be.template read(it, modulus_octets);
                         result = marshalling_integral_value_be.value();
                     } else {
-                        // TODO: check correctness of this case
-                        marshalling_integral_value_le_type marshalling_integral_value_le;
-                        auto it = range.crbegin();
-                        marshalling_integral_value_le.template read(it, range.size());
-                        result = marshalling_integral_value_le.value();
+                        // TODO: creating copy of input range of modulus_octets size is a bottleneck:
+                        //  extend marshaling interface by function supporting initialization from container which
+                        //  length is less than modulus_octets
+                        // TODO: check need for adjust_bitstring call
+                        modulus_octets_container_type range_padded;
+                        range_padded.fill(0);
+                        std::copy(std::crbegin(range), std::crend(range), std::rbegin(range_padded));
+                        marshalling_integral_value_be_type marshalling_integral_value_be;
+                        auto it = std::cbegin(range_padded);
+                        marshalling_integral_value_be.template read(it, range_padded.size());
+                        result = marshalling_integral_value_be.value();
                     }
                     return result;
                 }
@@ -203,7 +205,8 @@ namespace nil {
                     compute<hmac_policy>(std::array<std::uint8_t, 1> {0}, acc_d);
                     compute<hmac_policy>(int2octets_x, acc_d);
                     compute<hmac_policy>(bits2octets_h1, acc_d);
-                    Key = key_type(::nil::crypto3::accumulators::extract::mac<mac::computation_policy<hmac_policy>>(acc_d));
+                    Key = key_type(
+                        ::nil::crypto3::accumulators::extract::mac<mac::computation_policy<hmac_policy>>(acc_d));
 
                     // e.
                     V = compute<hmac_policy>(V, Key);
@@ -248,38 +251,6 @@ namespace nil {
                         V = compute<hmac_policy>(V, Key);
                     } while (true);
                 }
-
-                // inline void discard(std::size_t n) {
-                //     if (n > 0 && !cached) {
-                //         operator()();
-                //     }
-                // }
-                //
-                // inline bool operator==(const hash& other) const {
-                //     return state == other.state;
-                // }
-                //
-                // inline bool operator!=(const hash& other) const {
-                //     return !(*this == other);
-                // }
-                //
-                // /** Writes a rfc6979 to a @c std::ostream */
-                // template<class CharT, class Traits>
-                // friend std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os,
-                //                                                      const algebraic_engine& e) {
-                //     os << e.state;
-                //     return os;
-                // }
-                //
-                // /** Reads a rfc6979 from a @c std::istream */
-                // template<class CharT, class Traits>
-                // friend std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>& is,
-                //                                                      algebraic_engine& e) {
-                //     input_type x;
-                //     is >> x;
-                //     e.seed(x);
-                //     return is;
-                // }
 
             protected:
                 digest_type V;
