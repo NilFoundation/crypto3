@@ -50,13 +50,22 @@ namespace nil {
                         typename std::enable_if<
                             algebra::is_field<typename MsgReprType::field_type>::value &&
                             !algebra::is_extended_field<typename MsgReprType::field_type>::value>::type> {
-                    protected:
                         typedef Hash hash_type;
+
+                    protected:
                         typedef typename MsgReprType::field_type field_type;
                         typedef ::nil::marshalling::option::big_endian endianness;
                         typedef ::nil::crypto3::marshalling::types::field_element<
                             ::nil::marshalling::field_type<::nil::marshalling::option::big_endian>, field_type>
                             marshalling_field_element_type;
+
+                        constexpr static std::size_t digest_bits = hash_type::digest_bits;
+
+                        constexpr static std::size_t modulus_bits = field_type::modulus_bits;
+                        constexpr static std::size_t modulus_octets =
+                            modulus_bits / 8 + static_cast<std::size_t>(modulus_bits % 8 != 0);
+
+                        typedef std::array<std::uint8_t, modulus_octets> modulus_octets_container_type;
 
                     public:
                         typedef MsgReprType msg_repr_type;
@@ -74,12 +83,32 @@ namespace nil {
                             hash<hash_type>(first, last, acc);
                         }
 
+                        template<std::size_t DigistBits = digest_bits, std::size_t ModulusBits = modulus_bits,
+                                 typename std::enable_if<(DigistBits >= ModulusBits), bool>::type = true>
                         static inline result_type process(internal_accumulator_type &acc) {
                             typename hash_type::digest_type digest =
                                 ::nil::crypto3::accumulators::extract::hash<hash_type>(acc);
                             marshalling_field_element_type marshalling_field_element;
                             auto it = digest.cbegin();
                             marshalling_field_element.read(it, digest.size());
+                            return crypto3::marshalling::types::construct_field_element<field_type, endianness>(
+                                marshalling_field_element);
+                        }
+
+                        template<std::size_t DigistBits = digest_bits, std::size_t ModulusBits = modulus_bits,
+                                 typename std::enable_if<(DigistBits < ModulusBits), bool>::type = true>
+                        static inline result_type process(internal_accumulator_type &acc) {
+                            typename hash_type::digest_type digest =
+                                ::nil::crypto3::accumulators::extract::hash<hash_type>(acc);
+                            // TODO: creating copy of digest range of modulus_octets size is a bottleneck:
+                            //  extend marshaling interface by function supporting initialization from container which
+                            //  length is less than modulus_octets
+                            modulus_octets_container_type modulus_octets_container;
+                            modulus_octets_container.fill(0);
+                            std::copy(std::crbegin(digest), std::crend(digest), std::rbegin(modulus_octets_container));
+                            marshalling_field_element_type marshalling_field_element;
+                            auto it = modulus_octets_container.cbegin();
+                            marshalling_field_element.read(it, modulus_octets_container.size());
                             return crypto3::marshalling::types::construct_field_element<field_type, endianness>(
                                 marshalling_field_element);
                         }
@@ -103,7 +132,6 @@ namespace nil {
                             algebra::is_field<typename MsgReprType::field_type>::value &&
                             !algebra::is_extended_field<typename MsgReprType::field_type>::value>::type> {
                     protected:
-                        typedef Hash hash_type;
                         typedef typename MsgReprType::field_type field_type;
                         typedef ::nil::crypto3::marshalling::types::field_element<
                             ::nil::marshalling::field_type<::nil::marshalling::option::big_endian>, field_type>
@@ -111,6 +139,7 @@ namespace nil {
                         typedef emsa1_encoding_policy<MsgReprType, Hash> encoding_policy;
 
                     public:
+                        typedef Hash hash_type;
                         typedef MsgReprType msg_repr_type;
                         typedef typename encoding_policy::internal_accumulator_type internal_accumulator_type;
                         typedef bool result_type;
