@@ -50,7 +50,8 @@ namespace nil {
                 typedef secp_r1<192> secp192r1;
                 typedef secp_r1<224> secp224r1;
                 typedef secp_r1<256> secp256r1;
-
+                typedef secp_r1<384> secp384r1;
+                typedef secp_r1<521> secp521r1;
             }    // namespace curves
         }        // namespace algebra
     }            // namespace crypto3
