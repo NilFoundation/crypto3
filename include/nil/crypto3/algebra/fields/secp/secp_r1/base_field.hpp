@@ -46,6 +46,69 @@ namespace nil {
                 struct secp_r1_base_field;
 
                 template<>
+                struct secp_r1_base_field<160> : public field<160> {
+                    typedef field<160> policy_type;
+
+                    constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
+                    typedef typename policy_type::integral_type integral_type;
+
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
+
+                    constexpr static const std::size_t number_bits = policy_type::number_bits;
+                    typedef typename policy_type::modular_type modular_type;
+
+                    constexpr static const integral_type modulus =
+                        0xffffffffffffffffffffffffffffffff7fffffff_cppui160;
+
+                    typedef typename detail::element_fp<params<secp_r1_base_field<160>>> value_type;
+
+                    constexpr static const std::size_t value_bits = modulus_bits;
+                    constexpr static const std::size_t arity = 1;
+                };
+
+                template<>
+                struct secp_r1_base_field<192> : public field<192> {
+                    typedef field<192> policy_type;
+
+                    constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
+                    typedef typename policy_type::integral_type integral_type;
+
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
+
+                    constexpr static const std::size_t number_bits = policy_type::number_bits;
+                    typedef typename policy_type::modular_type modular_type;
+
+                    constexpr static const integral_type modulus =
+                        0xfffffffffffffffffffffffffffffffeffffffffffffffff_cppui192;
+
+                    typedef typename detail::element_fp<params<secp_r1_base_field<192>>> value_type;
+
+                    constexpr static const std::size_t value_bits = modulus_bits;
+                    constexpr static const std::size_t arity = 1;
+                };
+
+                template<>
+                struct secp_r1_base_field<224> : public field<224> {
+                    typedef field<224> policy_type;
+
+                    constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
+                    typedef typename policy_type::integral_type integral_type;
+
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
+
+                    constexpr static const std::size_t number_bits = policy_type::number_bits;
+                    typedef typename policy_type::modular_type modular_type;
+
+                    constexpr static const integral_type modulus =
+                        0xffffffffffffffffffffffffffffffff000000000000000000000001_cppui224;
+
+                    typedef typename detail::element_fp<params<secp_r1_base_field<224>>> value_type;
+
+                    constexpr static const std::size_t value_bits = modulus_bits;
+                    constexpr static const std::size_t arity = 1;
+                };
+
+                template<>
                 struct secp_r1_base_field<256> : public field<256> {
                     typedef field<256> policy_type;
 
@@ -66,16 +129,82 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
+                template<>
+                struct secp_r1_base_field<384> : public field<384> {
+                    typedef field<384> policy_type;
+
+                    constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
+                    typedef typename policy_type::integral_type integral_type;
+
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
+
+                    constexpr static const std::size_t number_bits = policy_type::number_bits;
+                    typedef typename policy_type::modular_type modular_type;
+
+                    constexpr static const integral_type modulus =
+                        0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffeffffffff0000000000000000ffffffff_cppui384;
+
+                    typedef typename detail::element_fp<params<secp_r1_base_field<384>>> value_type;
+
+                    constexpr static const std::size_t value_bits = modulus_bits;
+                    constexpr static const std::size_t arity = 1;
+                };
+
+                template<>
+                struct secp_r1_base_field<521> : public field<521> {
+                    typedef field<521> policy_type;
+
+                    constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
+                    typedef typename policy_type::integral_type integral_type;
+
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
+
+                    constexpr static const std::size_t number_bits = policy_type::number_bits;
+                    typedef typename policy_type::modular_type modular_type;
+
+                    constexpr static const integral_type modulus =
+                        0x01ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui521;
+
+                    typedef typename detail::element_fp<params<secp_r1_base_field<521>>> value_type;
+
+                    constexpr static const std::size_t value_bits = modulus_bits;
+                    constexpr static const std::size_t arity = 1;
+                };
+
                 // TODO: define nist_base_field for other base field sizes
 
                 template<std::size_t Version>
                 using secp_r1_fq = secp_r1_base_field<Version>;
+
+                constexpr typename std::size_t const secp_r1_fq<160>::modulus_bits;
+                constexpr typename std::size_t const secp_r1_fq<160>::number_bits;
+                constexpr typename std::size_t const secp_r1_fq<160>::value_bits;
+                constexpr typename secp_r1_fq<160>::integral_type const secp_r1_fq<160>::modulus;
+
+                constexpr typename std::size_t const secp_r1_fq<192>::modulus_bits;
+                constexpr typename std::size_t const secp_r1_fq<192>::number_bits;
+                constexpr typename std::size_t const secp_r1_fq<192>::value_bits;
+                constexpr typename secp_r1_fq<192>::integral_type const secp_r1_fq<192>::modulus;
+
+                constexpr typename std::size_t const secp_r1_fq<224>::modulus_bits;
+                constexpr typename std::size_t const secp_r1_fq<224>::number_bits;
+                constexpr typename std::size_t const secp_r1_fq<224>::value_bits;
+                constexpr typename secp_r1_fq<224>::integral_type const secp_r1_fq<224>::modulus;
 
                 constexpr typename std::size_t const secp_r1_fq<256>::modulus_bits;
                 constexpr typename std::size_t const secp_r1_fq<256>::number_bits;
                 constexpr typename std::size_t const secp_r1_fq<256>::value_bits;
                 constexpr typename secp_r1_fq<256>::integral_type const secp_r1_fq<256>::modulus;
 
+                constexpr typename std::size_t const secp_r1_fq<384>::modulus_bits;
+                constexpr typename std::size_t const secp_r1_fq<384>::number_bits;
+                constexpr typename std::size_t const secp_r1_fq<384>::value_bits;
+                constexpr typename secp_r1_fq<384>::integral_type const secp_r1_fq<384>::modulus;
+
+                constexpr typename std::size_t const secp_r1_fq<521>::modulus_bits;
+                constexpr typename std::size_t const secp_r1_fq<521>::number_bits;
+                constexpr typename std::size_t const secp_r1_fq<521>::value_bits;
+                constexpr typename secp_r1_fq<521>::integral_type const secp_r1_fq<521>::modulus;
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3
