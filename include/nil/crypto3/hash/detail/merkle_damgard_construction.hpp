@@ -125,7 +125,8 @@ namespace nil {
 
                     // Convert digest to byte representation
                     digest_type d;
-                    pack_from<endian_type, word_bits, octet_bits>(state_.begin(), state_.end(), d.begin());
+                    pack_from<endian_type, word_bits, octet_bits>(state_.begin(), state_.begin() + digest_words,
+                                                                  d.begin());
                     return d;
                 }
 
