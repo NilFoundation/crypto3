@@ -264,12 +264,9 @@ namespace nil {
                     encode<padding_type>(first, last, acc.second);
                 }
 
-                template<class T>
-                class TD;
                 inline signature_type sign(internal_accumulator_type &acc) const {
                     scalar_field_value_type encoded_m =
                         padding::accumulators::extract::encode<padding::encoding_policy<padding_type>>(acc.second);
-                    // std::cout << encoded_m.data << std::endl;
 
                     auto h = ::nil::crypto3::accumulators::extract::hash<hash_type>(acc.first);
                     generator_type gen(privkey, h);
@@ -282,16 +279,12 @@ namespace nil {
                     do {
                         while ((k = gen()).is_zero()) {
                         }
-                        // std::cout << k.data << std::endl;
-                        // std::cout << k.inversed().data << std::endl;
                         // TODO: review converting of kG x-coordinate to r - in case of 2^n order (binary) fields
                         //  procedure seems not to be trivial
                         r = scalar_field_value_type(scalar_modular_type(
                             static_cast<base_integral_type>((k * g1_value_type::one()).to_affine().X.data),
                             scalar_field_value_type::modulus));
-                        // std::cout << r.data << std::endl;
                         s = (privkey * r + encoded_m) / k;
-                        // std::cout << s.data << std::endl;
                     } while (r.is_zero() || s.is_zero());
 
                     return signature_type(r, s);
