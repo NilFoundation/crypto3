@@ -36,32 +36,42 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            using namespace boost::mpl::placeholders;
+            namespace padding {
+                using namespace boost::mpl::placeholders;
 
-            BOOST_TTI_HAS_TYPE(encoding_policy_type)
-            BOOST_TTI_HAS_TYPE(verification_policy_type)
-            BOOST_TTI_HAS_TYPE(decoding_policy_type)
-            BOOST_TTI_HAS_TYPE(recovering_policy_type)
+                BOOST_TTI_HAS_TYPE(encoding_policy_type)
+                BOOST_TTI_HAS_TYPE(verification_policy_type)
+                BOOST_TTI_HAS_TYPE(decoding_policy_type)
+                BOOST_TTI_HAS_TYPE(recovering_policy_type)
 
-            template<typename T>
-            struct is_emsa_policy : std::bool_constant<hash_type_encoding_policy_type<T>::value &&
-                                                       hash_type_verification_policy_type<T>::value> {
-                typedef T type;
-            };
+                BOOST_TTI_HAS_STATIC_MEMBER_DATA(dst)
 
-            template<typename T>
-            struct is_eme_policy : std::bool_constant<hash_type_encoding_policy_type<T>::value &&
-                                                      hash_type_decoding_policy_type<T>::value> {
-                typedef T type;
-            };
+                template<typename T>
+                struct is_emsa_policy : std::bool_constant<has_type_encoding_policy_type<T>::value &&
+                                                           has_type_verification_policy_type<T>::value> {
+                    typedef T type;
+                };
 
-            template<typename T>
-            struct is_emsr_policy : std::bool_constant<hash_type_encoding_policy_type<T>::value &&
-                                                       hash_type_recovering_policy_type<T>::value> {
-                typedef T type;
-            };
-        }    // namespace pubkey
-    }        // namespace crypto3
+                template<typename T>
+                struct is_eme_policy : std::bool_constant<has_type_encoding_policy_type<T>::value &&
+                                                          has_type_decoding_policy_type<T>::value> {
+                    typedef T type;
+                };
+
+                template<typename T>
+                struct is_emsr_policy : std::bool_constant<has_type_encoding_policy_type<T>::value &&
+                                                           has_type_recovering_policy_type<T>::value> {
+                    typedef T type;
+                };
+
+                template<typename T>
+                struct is_h2c_public_params
+                    : std::bool_constant<has_static_member_data_dst<T, std::vector<std::uint8_t>>::value> {
+                    typedef T type;
+                };
+            }    // namespace padding
+        }        // namespace pubkey
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_PK_PAD_TYPE_TRAITS_HPP

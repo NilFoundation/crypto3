@@ -59,6 +59,7 @@ namespace nil {
 
                             template<typename Args>
                             encode_impl(const Args &args) {
+                                processing_policy::init_accumulator(acc);
                             }
 
                             template<typename Args>
