@@ -72,6 +72,9 @@ namespace nil {
                         typedef accumulator_set<hash_type> internal_accumulator_type;
                         typedef msg_repr_type result_type;
 
+                        static inline void init_accumulator(internal_accumulator_type &acc) {
+                        }
+
                         template<typename InputRange>
                         static inline void update(internal_accumulator_type &acc, const InputRange &range) {
                             hash<hash_type>(range, acc);
@@ -143,6 +146,10 @@ namespace nil {
                         typedef MsgReprType msg_repr_type;
                         typedef typename encoding_policy::internal_accumulator_type internal_accumulator_type;
                         typedef bool result_type;
+
+                        static inline void init_accumulator(internal_accumulator_type &acc) {
+                            encoding_policy::init_accumulator(acc);
+                        }
 
                         template<typename InputRange>
                         static inline void update(internal_accumulator_type &acc, const InputRange &range) {
