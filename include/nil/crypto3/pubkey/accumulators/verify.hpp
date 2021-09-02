@@ -63,7 +63,8 @@ namespace nil {
 
                         template<typename Args>
                         verify_impl(const Args &args) :
-                            key(args[boost::accumulators::sample]), signature(args[pubkey::accumulators::signature]) {
+                            key(args[boost::accumulators::sample]),
+                            signature(args[::nil::crypto3::accumulators::signature]) {
                         }
 
                         template<typename Args>

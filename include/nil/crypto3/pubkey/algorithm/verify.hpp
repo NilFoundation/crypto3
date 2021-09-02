@@ -74,7 +74,7 @@ namespace nil {
         SchemeImpl verify(InputIterator first, InputIterator last,
                           const typename pubkey::public_key<Scheme>::signature_type &signature,
                           const pubkey::public_key<Scheme> &key) {
-            return SchemeImpl(first, last, VerificationAccumulator(key, pubkey::accumulators::signature = signature));
+            return SchemeImpl(first, last, VerificationAccumulator(key, accumulators::signature = signature));
         }
 
         /*!
@@ -98,7 +98,7 @@ namespace nil {
         SchemeImpl verify(const SinglePassRange &rng,
                           const typename pubkey::public_key<Scheme>::signature_type &signature,
                           const pubkey::public_key<Scheme> &key) {
-            return SchemeImpl(rng, VerificationAccumulator(key, pubkey::accumulators::signature = signature));
+            return SchemeImpl(rng, VerificationAccumulator(key, accumulators::signature = signature));
         }
 
         /*!
@@ -185,7 +185,7 @@ namespace nil {
             typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
             return SchemeImpl(first, last, std::move(out),
-                              VerificationAccumulator(key, pubkey::accumulators::signature = signature));
+                              VerificationAccumulator(key, accumulators::signature = signature));
         }
 
         /*!
@@ -213,8 +213,7 @@ namespace nil {
             typedef pubkey::detail::value_pubkey_impl<VerificationAccumulator> StreamSchemeImpl;
             typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
-            return SchemeImpl(rng, std::move(out),
-                              VerificationAccumulator(key, pubkey::accumulators::signature = signature));
+            return SchemeImpl(rng, std::move(out), VerificationAccumulator(key, accumulators::signature = signature));
         }
     }    // namespace crypto3
 }    // namespace nil

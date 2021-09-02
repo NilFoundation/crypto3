@@ -156,9 +156,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_conformity_test) {
     using scalar_field_type = typename curve_type::scalar_field_type;
     using scalar_field_value_type = typename scalar_field_type::value_type;
     using hash_type = hashes::sha2<256>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::algebraic_random_device<scalar_field_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
     using signature_type = typename pubkey::public_key<policy_type>::signature_type;
 
     generator_type key_gen;
@@ -187,9 +187,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp192r1_sha1_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha1;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -225,9 +225,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp192r1_sha224_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<224>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -263,9 +263,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp192r1_sha256_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<256>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -301,9 +301,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp192r1_sha384_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<384>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -339,9 +339,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp192r1_sha512_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<512>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -378,9 +378,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp224r1_sha1_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha1;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -418,9 +418,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp224r1_sha224_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<224>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -458,9 +458,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp224r1_sha256_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<256>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -498,9 +498,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp224r1_sha384_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<384>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -538,9 +538,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp224r1_sha512_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<512>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -579,9 +579,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256r1_sha1_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha1;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -619,9 +619,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256r1_sha224_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<224>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -659,9 +659,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256r1_sha256_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<256>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -699,9 +699,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256r1_sha384_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<384>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -739,9 +739,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256r1_sha512_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<512>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -780,9 +780,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp384r1_sha1_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha1;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -826,9 +826,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp384r1_sha224_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<224>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -872,9 +872,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp384r1_sha256_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<256>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -918,9 +918,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp384r1_sha384_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<384>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -964,9 +964,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp384r1_sha512_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<512>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -1011,9 +1011,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp521r1_sha1_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha1;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -1061,9 +1061,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp521r1_sha224_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<224>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -1111,9 +1111,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp521r1_sha256_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<256>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -1161,9 +1161,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp521r1_sha384_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<384>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -1211,9 +1211,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp521r1_sha512_range_sign) {
     using base_field_type = typename curve_type::base_field_type;
     using base_integral_type = typename base_field_type::integral_type;
     using hash_type = hashes::sha2<512>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -1259,9 +1259,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256k1_sha1_range_sign) {
     using scalar_field_value_type = typename scalar_field_type::value_type;
     using scalar_integral_type = typename scalar_field_type::integral_type;
     using hash_type = hashes::sha1;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -1291,9 +1291,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256k1_sha224_range_sign) {
     using scalar_field_value_type = typename scalar_field_type::value_type;
     using scalar_integral_type = typename scalar_field_type::integral_type;
     using hash_type = hashes::sha2<224>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -1323,9 +1323,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256k1_sha256_range_sign) {
     using scalar_field_value_type = typename scalar_field_type::value_type;
     using scalar_integral_type = typename scalar_field_type::integral_type;
     using hash_type = hashes::sha2<256>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -1355,9 +1355,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256k1_sha384_range_sign) {
     using scalar_field_value_type = typename scalar_field_type::value_type;
     using scalar_integral_type = typename scalar_field_type::integral_type;
     using hash_type = hashes::sha2<384>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
@@ -1387,9 +1387,9 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256k1_sha512_range_sign) {
     using scalar_field_value_type = typename scalar_field_type::value_type;
     using scalar_integral_type = typename scalar_field_type::integral_type;
     using hash_type = hashes::sha2<512>;
-    using padding_type = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
+    using padding_policy = pubkey::padding::emsa1<scalar_field_value_type, hash_type>;
     using generator_type = random::rfc6979<scalar_field_value_type, hash_type>;
-    using policy_type = pubkey::ecdsa<curve_type, padding_type, generator_type>;
+    using policy_type = pubkey::ecdsa<curve_type, padding_policy, generator_type>;
 
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;

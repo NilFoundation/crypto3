@@ -52,7 +52,7 @@ namespace nil {
             struct ecdsa {
                 typedef ecdsa<CurveType, Padding, GeneratorType, DistributionType> self_type;
                 typedef CurveType curve_type;
-                typedef Padding padding_type;
+                typedef Padding padding_policy;
                 typedef GeneratorType generator_type;
                 typedef DistributionType distribution_type;
                 typedef typename Padding::hash_type hash_type;
@@ -76,7 +76,7 @@ namespace nil {
                 typedef random::rfc6979<GeneratorResultType, GeneratorHash> generator_type;
                 typedef ecdsa<CurveType, Padding, generator_type, DistributionType> self_type;
                 typedef CurveType curve_type;
-                typedef Padding padding_type;
+                typedef Padding padding_policy;
                 typedef DistributionType distribution_type;
                 typedef typename Padding::hash_type hash_type;
 
@@ -89,9 +89,9 @@ namespace nil {
                 typedef ecdsa<CurveType, Padding, GeneratorType, DistributionType> policy_type;
 
                 typedef typename policy_type::curve_type curve_type;
-                typedef typename policy_type::padding_type padding_type;
+                typedef typename policy_type::padding_policy padding_policy;
 
-                typedef padding::encoding_accumulator_set<padding_type> internal_accumulator_type;
+                typedef padding::encoding_accumulator_set<padding_policy> internal_accumulator_type;
 
                 typedef typename curve_type::scalar_field_type scalar_field_type;
                 typedef typename scalar_field_type::value_type scalar_field_value_type;
@@ -108,17 +108,17 @@ namespace nil {
 
                 template<typename InputRange>
                 inline void update(internal_accumulator_type &acc, const InputRange &range) const {
-                    encode<padding_type>(range, acc);
+                    encode<padding_policy>(range, acc);
                 }
 
                 template<typename InputIterator>
                 inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) const {
-                    encode<padding_type>(first, last, acc);
+                    encode<padding_policy>(first, last, acc);
                 }
 
                 inline bool verify(internal_accumulator_type &acc, const signature_type &signature) const {
                     scalar_field_value_type encoded_m =
-                        padding::accumulators::extract::encode<padding::encoding_policy<padding_type>>(acc);
+                        padding::accumulators::extract::encode<padding::encoding_policy<padding_policy>>(acc);
 
                     scalar_field_value_type w = signature.second.inversed();
                     g1_value_type X = (encoded_m * w) * g1_value_type::one() + (signature.first * w) * pubkey;
@@ -151,12 +151,12 @@ namespace nil {
                 typedef public_key<policy_type> base_type;
 
                 typedef typename policy_type::curve_type curve_type;
-                typedef typename policy_type::padding_type padding_type;
+                typedef typename policy_type::padding_policy padding_policy;
                 typedef typename policy_type::generator_type generator_type;
                 typedef typename policy_type::distribution_type distribution_type;
                 typedef typename policy_type::hash_type hash_type;
 
-                typedef padding::encoding_accumulator_set<padding_type> internal_accumulator_type;
+                typedef padding::encoding_accumulator_set<padding_policy> internal_accumulator_type;
 
                 typedef typename base_type::scalar_field_value_type scalar_field_value_type;
                 typedef typename base_type::g1_value_type g1_value_type;
@@ -176,12 +176,12 @@ namespace nil {
 
                 template<typename InputRange>
                 inline void update(internal_accumulator_type &acc, const InputRange &range) const {
-                    encode<padding_type>(range, acc);
+                    encode<padding_policy>(range, acc);
                 }
 
                 template<typename InputIterator>
                 inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) const {
-                    encode<padding_type>(first, last, acc);
+                    encode<padding_policy>(first, last, acc);
                 }
 
                 // TODO: review to make blind signing
@@ -190,7 +190,7 @@ namespace nil {
                 inline signature_type sign(internal_accumulator_type &acc) const {
                     generator_type gen;
                     scalar_field_value_type encoded_m =
-                        padding::accumulators::extract::encode<padding::encoding_policy<padding_type>>(acc);
+                        padding::accumulators::extract::encode<padding::encoding_policy<padding_policy>>(acc);
 
                     // TODO: review behaviour if k, r or s generation produced zero, maybe return status instead cycled
                     //  generation
@@ -228,12 +228,12 @@ namespace nil {
                 typedef public_key<policy_type> base_type;
 
                 typedef typename policy_type::curve_type curve_type;
-                typedef typename policy_type::padding_type padding_type;
+                typedef typename policy_type::padding_policy padding_policy;
                 typedef typename policy_type::generator_type generator_type;
                 typedef typename policy_type::distribution_type distribution_type;
                 typedef typename policy_type::hash_type hash_type;
 
-                typedef std::pair<accumulator_set<hash_type>, padding::encoding_accumulator_set<padding_type>>
+                typedef std::pair<accumulator_set<hash_type>, padding::encoding_accumulator_set<padding_policy>>
                     internal_accumulator_type;
 
                 typedef typename base_type::scalar_field_value_type scalar_field_value_type;
@@ -255,18 +255,18 @@ namespace nil {
                 template<typename InputRange>
                 inline void update(internal_accumulator_type &acc, const InputRange &range) const {
                     hash<hash_type>(range, acc.first);
-                    encode<padding_type>(range, acc.second);
+                    encode<padding_policy>(range, acc.second);
                 }
 
                 template<typename InputIterator>
                 inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) const {
                     hash<hash_type>(first, last, acc.first);
-                    encode<padding_type>(first, last, acc.second);
+                    encode<padding_policy>(first, last, acc.second);
                 }
 
                 inline signature_type sign(internal_accumulator_type &acc) const {
                     scalar_field_value_type encoded_m =
-                        padding::accumulators::extract::encode<padding::encoding_policy<padding_type>>(acc.second);
+                        padding::accumulators::extract::encode<padding::encoding_policy<padding_policy>>(acc.second);
 
                     auto h = ::nil::crypto3::accumulators::extract::hash<hash_type>(acc.first);
                     generator_type gen(privkey, h);
