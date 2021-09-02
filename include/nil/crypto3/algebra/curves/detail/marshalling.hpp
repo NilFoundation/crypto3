@@ -71,7 +71,7 @@ namespace nil {
             static inline compressed_g1_octets point_to_octets_compress(const g1_value_type &point) {
                 compressed_g1_octets result = {0};
                 g1_affine_value_type point_affine = point.to_affine();
-                auto m_byte = evaluate_m_byte(point_affine, true);
+                auto m_byte = evaluate_m_byte(point, point_affine, true);
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
                     multiprecision::export_bits(
@@ -84,7 +84,7 @@ namespace nil {
             static inline uncompressed_g1_octets point_to_octets(const g1_value_type &point) {
                 uncompressed_g1_octets result = {0};
                 g1_affine_value_type point_affine = point.to_affine();
-                auto m_byte = evaluate_m_byte(point_affine, false);
+                auto m_byte = evaluate_m_byte(point, point_affine, false);
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
                     multiprecision::export_bits(
@@ -101,7 +101,7 @@ namespace nil {
             static inline compressed_g2_octets point_to_octets_compress(const g2_value_type &point) {
                 compressed_g2_octets result = {0};
                 g2_affine_value_type point_affine = point.to_affine();
-                auto m_byte = evaluate_m_byte(point_affine, true);
+                auto m_byte = evaluate_m_byte(point, point_affine, true);
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
                     multiprecision::export_bits(
@@ -118,7 +118,7 @@ namespace nil {
             static inline uncompressed_g2_octets point_to_octets(const g2_value_type &point) {
                 uncompressed_g2_octets result = {0};
                 g2_affine_value_type point_affine = point.to_affine();
-                auto m_byte = evaluate_m_byte(point_affine, false);
+                auto m_byte = evaluate_m_byte(point, point_affine, false);
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
                     multiprecision::export_bits(
@@ -319,8 +319,10 @@ namespace nil {
                 return sign_gf_p(v.data[1]);
             }
 
-            template<typename GroupValueType>
-            static inline std::uint8_t evaluate_m_byte(const GroupValueType &point, bool compression) {
+            template<typename GroupValueType, typename GroupAffineValueType>
+            static inline std::uint8_t evaluate_m_byte(const GroupValueType &point,
+                                                       const GroupAffineValueType &point_affine,
+                                                       bool compression) {
                 std::uint8_t result = 0;
                 if (compression) {
                     result |= C_bit;
@@ -328,7 +330,7 @@ namespace nil {
                 // TODO: check condition of infinite point
                 if (point.is_zero()) {
                     result |= I_bit;
-                } else if (compression && sign_gf_p(point.Y)) {
+                } else if (compression && sign_gf_p(point_affine.Y)) {
                     result |= S_bit;
                 }
                 return result;
