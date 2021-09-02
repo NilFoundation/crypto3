@@ -423,8 +423,7 @@ namespace nil {
                     template<std::size_t k, std::size_t len_in_bytes, typename Hash, typename PublicParams,
                              /// Hash::digest_type is required to be uint8_t[]
                              typename = typename std::enable_if<
-                                 std::is_same<std::uint8_t, typename Hash::digest_type::value_type>::value &&
-                                 is_h2c_public_params<PublicParams>::value>::type>
+                                 std::is_same<std::uint8_t, typename Hash::digest_type::value_type>::value>::type>
                     class expand_message_xmd {
                         // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-5.4.1
                         static_assert(Hash::block_bits % 8 == 0, "r_in_bytes is not a multiple of 8");
@@ -475,7 +474,7 @@ namespace nil {
                             hash<Hash>(std::array<std::uint8_t, 1> {0}, b0_acc);
                             hash<Hash>(PublicParams::dst, b0_acc);
                             hash<Hash>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(dst_size)}, b0_acc);
-                            typename Hash::digest_type b0 = accumulators::extract::hash<Hash>(b0_acc);
+                            typename Hash::digest_type b0 = ::nil::crypto3::accumulators::extract::hash<Hash>(b0_acc);
 
                             result_type uniform_bytes;
                             internal_accumulator_type bi_acc;
@@ -483,7 +482,7 @@ namespace nil {
                             hash<Hash>(std::array<std::uint8_t, 1> {1}, bi_acc);
                             hash<Hash>(PublicParams::dst, bi_acc);
                             hash<Hash>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(dst_size)}, bi_acc);
-                            typename Hash::digest_type bi = accumulators::extract::hash<Hash>(bi_acc);
+                            typename Hash::digest_type bi = ::nil::crypto3::accumulators::extract::hash<Hash>(bi_acc);
                             std::copy(bi.begin(), bi.end(), uniform_bytes.begin());
 
                             typename Hash::digest_type xored_b;
@@ -494,7 +493,7 @@ namespace nil {
                                 hash<Hash>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(i)}, bi_acc);
                                 hash<Hash>(PublicParams::dst, bi_acc);
                                 hash<Hash>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(dst_size)}, bi_acc);
-                                bi = accumulators::extract::hash<Hash>(bi_acc);
+                                bi = ::nil::crypto3::accumulators::extract::hash<Hash>(bi_acc);
                                 std::copy(bi.begin(), bi.end(), uniform_bytes.begin() + (i - 1) * b_in_bytes);
                             }
 
@@ -715,25 +714,19 @@ namespace nil {
                     };
                 }    // namespace detail
 
-                template<typename GroupType>
-                struct emsa_h2c_default_public_params {
-                    typedef detail::h2c_suite<GroupType> suite_type;
+                template<typename GroupType, UniformityCount _uniformity_count = UniformityCount::uniform_count,
+                         ExpandMsgVariant _expand_msg_variant = ExpandMsgVariant::rfc_xmd>
+                struct emsa_h2c_default_params {
+                    constexpr static UniformityCount uniformity_count = _uniformity_count;
+                    constexpr static ExpandMsgVariant expand_msg_variant = _expand_msg_variant;
 
+                    typedef detail::h2c_suite<GroupType> suite_type;
                     static inline std::vector<std::uint8_t> dst = []() {
                         std::string default_tag_str = "QUUX-V01-CS02-with-";
                         std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());
                         dst.insert(dst.end(), suite_type::suite_id.begin(), suite_type::suite_id.end());
                         return dst;
                     }();
-                };
-
-                template<typename PublicParams, UniformityCount _uniformity_count = UniformityCount::uniform_count,
-                         ExpandMsgVariant _expand_msg_variant = ExpandMsgVariant::rfc_xmd>
-                struct emsa_h2c_params {
-                    constexpr static UniformityCount uniformity_count = _uniformity_count;
-                    constexpr static ExpandMsgVariant expand_msg_variant = _expand_msg_variant;
-
-                    typedef PublicParams public_params;
                 };
 
                 /*!
@@ -745,17 +738,17 @@ namespace nil {
                  * @tparam l
                  */
                 template<typename MsgReprType,
-                         typename Params =
-                             emsa_h2c_params<emsa_h2c_default_public_params<typename MsgReprType::group_type>>>
+                         typename Params = emsa_h2c_default_params<typename MsgReprType::group_type>>
                 struct emsa_h2c {
                     typedef MsgReprType msg_repr_type;
                     typedef Params params_type;
+                    typedef typename detail::h2c_suite<typename MsgReprType::group_type>::hash_type hash_type;
 
-                    typedef detail::emsa_h2c_encoding_policy<MsgReprType, typename params_type::public_params,
+                    typedef detail::emsa_h2c_encoding_policy<MsgReprType, params_type,
                                                              params_type::uniformity_count,
                                                              params_type::expand_msg_variant>
                         encoding_policy;
-                    typedef detail::emsa_h2c_verification_policy<MsgReprType, typename params_type::public_params,
+                    typedef detail::emsa_h2c_verification_policy<MsgReprType, params_type,
                                                                  params_type::uniformity_count,
                                                                  params_type::expand_msg_variant>
                         verification_policy;

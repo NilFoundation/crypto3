@@ -63,12 +63,6 @@ namespace nil {
                                                            has_type_recovering_policy_type<T>::value> {
                     typedef T type;
                 };
-
-                template<typename T>
-                struct is_h2c_public_params
-                    : std::bool_constant<has_static_member_data_dst<T, std::vector<std::uint8_t>>::value> {
-                    typedef T type;
-                };
             }    // namespace padding
         }        // namespace pubkey
     }            // namespace crypto3
