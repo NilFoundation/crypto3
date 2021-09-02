@@ -26,53 +26,45 @@
 #ifndef CRYPTO3_PUBKEY_BLS_BASIC_POLICY_HPP
 #define CRYPTO3_PUBKEY_BLS_BASIC_POLICY_HPP
 
-#include <nil/crypto3/algebra/curves/detail/h2c/ep.hpp>
-#include <nil/crypto3/algebra/curves/detail/h2c/ep2.hpp>
-
-#include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
-
 #include <cstddef>
+
+#include <nil/crypto3/pkpad/emsa/emsa_h2c.hpp>
+
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
+#include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             namespace detail {
-                using namespace algebra::curves::detail;
-
-                template<typename CurveType, typename HashType,
-                         /// HashType::digest_type is required to be uint8_t[]
-                         typename = typename std::enable_if<
-                             std::is_same<std::uint8_t, typename HashType::digest_type::value_type>::value>::type>
+                template<typename CurveType>
                 struct bls_basic_policy {
                     typedef CurveType curve_type;
-                    typedef HashType hash_type;
 
-                    typedef typename curve_type::pairing pairing_type;
-                    typedef typename curve_type::scalar_field_type field_type;
-                    typedef typename field_type::value_type private_key_type;
-                    typedef typename private_key_type::modulus_type modulus_type;
-                    typedef typename pairing_type::gt_type::value_type gt_value_type;
+                    typedef typename curve_type::scalar_field_type scalar_field_type;
+                    typedef typename scalar_field_type::value_type private_key_type;
+                    typedef typename scalar_field_type::modular_type scalar_modular_type;
+                    typedef typename curve_type::gt_type::value_type gt_value_type;
 
-                    constexpr static std::size_t private_key_bits = field_type::modulus_bits;
-                    constexpr static modulus_type r = curve_type::q;
+                    constexpr static std::size_t private_key_bits = scalar_field_type::modulus_bits;
+                    constexpr static scalar_modular_type r = curve_type::q;
                 };
 
                 //
                 // Minimal-signature-size
                 // Random oracle version of hash-to-point
                 //
-                template<typename CurveType, typename HashType>
+                template<typename PublicParams, typename CurveType>
                 struct bls_mss_ro_policy {
-                    typedef bls_basic_policy<CurveType, HashType> basic_policy;
+                    typedef bls_basic_policy<CurveType> basic_policy;
 
                     typedef typename basic_policy::curve_type curve_type;
-                    typedef typename basic_policy::hash_type hash_type;
                     typedef typename basic_policy::gt_value_type gt_value_type;
-                    typedef typename basic_policy::pairing_type pairing_type;
-                    typedef typename basic_policy::modulus_type modulus_type;
+                    typedef typename basic_policy::scalar_modular_type scalar_modular_type;
 
-                    typedef typename curve_type::g2_type public_key_group_type;
-                    typedef typename curve_type::g1_type signature_group_type;
+                    // TODO: pass template parameters for Coordinates and Form of the group
+                    typedef typename curve_type::template g2_type<> public_key_group_type;
+                    typedef typename curve_type::template g1_type<> signature_group_type;
 
                     typedef nil::marshalling::curve_element_serializer<curve_type> bls_serializer;
 
@@ -85,14 +77,11 @@ namespace nil {
                     constexpr static const std::size_t public_key_bits = public_key_type::value_bits;
                     constexpr static const std::size_t signature_bits = signature_type::value_bits;
 
-                    template<typename MsgType, typename DstType>
-                    static inline signature_type hash_to_point(const MsgType &msg, const DstType &dst) {
-                        using hash_to_point_type = ep_map<signature_group_type>;
-                        return hash_to_point_type::hash_to_curve(msg, dst);
-                    }
+                    typedef padding::emsa_h2c<signature_type, PublicParams> padding_policy;
+                    typedef padding::encoding_accumulator_set<padding_policy> internal_accumulator_type;
 
                     static inline gt_value_type pairing(const signature_type &U, const public_key_type &V) {
-                        return pairing_type::pair_reduced(U, V);
+                        return algebra::pair_reduced<curve_type>(U, V);
                     }
 
                     static inline typename bls_serializer::compressed_g2_octets point_to_pubkey(const public_key_type &pubkey) {
@@ -108,18 +97,17 @@ namespace nil {
                 // Minimal-pubkey-size
                 // Random oracle version of hash-to-point
                 //
-                template<typename CurveType, typename HashType>
+                template<typename PublicParams, typename CurveType>
                 struct bls_mps_ro_policy {
-                    typedef bls_basic_policy<CurveType, HashType> basic_policy;
+                    typedef bls_basic_policy<CurveType> basic_policy;
 
                     typedef typename basic_policy::curve_type curve_type;
-                    typedef typename basic_policy::hash_type hash_type;
                     typedef typename basic_policy::gt_value_type gt_value_type;
-                    typedef typename basic_policy::pairing_type pairing_type;
-                    typedef typename basic_policy::modulus_type modulus_type;
+                    typedef typename basic_policy::scalar_modular_type scalar_modular_type;
 
-                    typedef typename curve_type::g1_type public_key_group_type;
-                    typedef typename curve_type::g2_type signature_group_type;
+                    // TODO: pass template parameters for Coordinates and Form of the group
+                    typedef typename curve_type::template g1_type<> public_key_group_type;
+                    typedef typename curve_type::template g2_type<> signature_group_type;
 
                     typedef nil::marshalling::curve_element_serializer<curve_type> bls_serializer;
 
@@ -132,14 +120,11 @@ namespace nil {
                     constexpr static const std::size_t public_key_bits = public_key_type::value_bits;
                     constexpr static const std::size_t signature_bits = signature_type::value_bits;
 
-                    template<typename MsgType, typename DstType>
-                    static inline signature_type hash_to_point(const MsgType &msg, const DstType &dst) {
-                        using hash_to_point_type = ep2_map<signature_group_type>;
-                        return hash_to_point_type::hash_to_curve(msg, dst);
-                    }
+                    typedef padding::emsa_h2c<signature_type, PublicParams> padding_policy;
+                    typedef padding::encoding_accumulator_set<padding_policy> internal_accumulator_type;
 
                     static inline gt_value_type pairing(const signature_type &U, const public_key_type &V) {
-                        return pairing_type::pair_reduced(V, U);
+                        return algebra::pair_reduced<curve_type>(V, U);
                     }
 
                     static inline typename bls_serializer::compressed_g1_octets point_to_pubkey(const public_key_type &pubkey) {
