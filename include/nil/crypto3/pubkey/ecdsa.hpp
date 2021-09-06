@@ -106,6 +106,9 @@ namespace nil {
                 public_key(const public_key_type &key) : pubkey(key) {
                 }
 
+                static inline void init_accumulator(internal_accumulator_type &acc) {
+                }
+
                 template<typename InputRange>
                 inline void update(internal_accumulator_type &acc, const InputRange &range) const {
                     encode<padding_policy>(range, acc);
@@ -172,6 +175,9 @@ namespace nil {
 
                 static inline public_key_type generate_public_key(const private_key_type &key) {
                     return key * public_key_type::one();
+                }
+
+                static inline void init_accumulator(internal_accumulator_type &acc) {
                 }
 
                 template<typename InputRange>
@@ -250,6 +256,9 @@ namespace nil {
 
                 static inline public_key_type generate_public_key(const private_key_type &key) {
                     return key * public_key_type::one();
+                }
+
+                static inline void init_accumulator(internal_accumulator_type &acc) {
                 }
 
                 template<typename InputRange>
