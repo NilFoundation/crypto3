@@ -45,22 +45,22 @@ namespace nil {
         namespace pubkey {
             namespace accumulators {
                 namespace impl {
-                    // TODO: consider different possible modes (aggregation)
                     template<typename ProcessingMode, typename = void>
                     struct sign_impl;
 
                     template<typename ProcessingMode>
                     struct sign_impl<ProcessingMode> : boost::accumulators::accumulator_base {
                     protected:
-                        typedef ProcessingMode processing_mode;
-                        typedef typename processing_mode::key_type key_type;
-                        typedef typename processing_mode::internal_accumulator_type internal_accumulator_type;
+                        typedef ProcessingMode processing_mode_type;
+                        typedef typename processing_mode_type::key_type key_type;
+                        typedef typename processing_mode_type::internal_accumulator_type internal_accumulator_type;
 
                     public:
-                        typedef typename processing_mode::result_type result_type;
+                        typedef typename processing_mode_type::result_type result_type;
 
                         template<typename Args>
                         sign_impl(const Args &args) : key(args[boost::accumulators::sample]) {
+                            processing_mode_type::init_accumulator(key, acc);
                         }
 
                         template<typename Args>
@@ -70,18 +70,18 @@ namespace nil {
                         }
 
                         inline result_type result(boost::accumulators::dont_care) const {
-                            return processing_mode::process(key, acc);
+                            return processing_mode_type::process(key, acc);
                         }
 
                     protected:
                         template<typename InputRange, typename InputIterator>
                         inline void resolve_type(const InputRange &range, InputIterator) {
-                            processing_mode::update(key, acc, range);
+                            processing_mode_type::update(key, acc, range);
                         }
 
                         template<typename InputIterator>
                         inline void resolve_type(InputIterator first, InputIterator last) {
-                            processing_mode::update(key, acc, first, last);
+                            processing_mode_type::update(key, acc, first, last);
                         }
 
                         key_type key;
@@ -92,12 +92,12 @@ namespace nil {
                 namespace tag {
                     template<typename ProcessingMode>
                     struct sign : boost::accumulators::depends_on<> {
-                        typedef ProcessingMode processing_mode;
+                        typedef ProcessingMode processing_mode_type;
 
                         /// INTERNAL ONLY
                         ///
 
-                        typedef boost::mpl::always<accumulators::impl::sign_impl<processing_mode>> impl;
+                        typedef boost::mpl::always<accumulators::impl::sign_impl<processing_mode_type>> impl;
                     };
                 }    // namespace tag
 

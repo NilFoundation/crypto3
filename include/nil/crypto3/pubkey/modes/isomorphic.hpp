@@ -30,7 +30,8 @@
 #include <type_traits>
 
 #include <nil/crypto3/pubkey/agreement_key.hpp>
-#include <nil/crypto3/pubkey/no_key_ops.hpp>
+#include <nil/crypto3/pubkey/aggregate_op.hpp>
+#include <nil/crypto3/pubkey/aggregate_verify_op.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,17 +49,23 @@ namespace nil {
                     typedef typename isomorphic_policy<Scheme>::scheme_type scheme_type;
 
                     typedef private_key<scheme_type> key_type;
+                    typedef void op_type;
                     typedef typename key_type::internal_accumulator_type internal_accumulator_type;
                     typedef typename key_type::signature_type result_type;
 
                     template<typename... Args>
-                    static inline result_type process(const key_type &key, Args &...args) {
-                        return key.sign(args...);
+                    static inline void init_accumulator(const key_type &key, Args &...args) {
+                        key.init_accumulator(args...);
                     }
 
                     template<typename... Args>
                     inline static void update(const key_type &key, Args &...args) {
                         key.update(args...);
+                    }
+
+                    template<typename... Args>
+                    static inline result_type process(const key_type &key, Args &...args) {
+                        return key.sign(args...);
                     }
                 };
 
@@ -67,17 +74,73 @@ namespace nil {
                     typedef typename isomorphic_policy<Scheme>::scheme_type scheme_type;
 
                     typedef public_key<scheme_type> key_type;
+                    typedef void op_type;
                     typedef typename key_type::internal_accumulator_type internal_accumulator_type;
                     typedef bool result_type;
 
                     template<typename... Args>
-                    static inline result_type process(const key_type &key, Args &...args) {
-                        return key.verify(args...);
+                    static inline void init_accumulator(const key_type &key, Args &...args) {
+                        key.init_accumulator(args...);
                     }
 
                     template<typename... Args>
                     inline static void update(const key_type &key, Args &...args) {
                         key.update(args...);
+                    }
+
+                    template<typename... Args>
+                    static inline result_type process(const key_type &key, Args &...args) {
+                        return key.verify(args...);
+                    }
+                };
+
+                template<typename Scheme>
+                struct isomorphic_aggregation_policy : public isomorphic_policy<Scheme> {
+                    typedef typename isomorphic_policy<Scheme>::scheme_type scheme_type;
+
+                    typedef void key_type;
+                    typedef aggregate_op<scheme_type> op_type;
+                    typedef typename op_type::internal_accumulator_type internal_accumulator_type;
+                    typedef typename op_type::signature_type result_type;
+
+                    template<typename... Args>
+                    static inline void init_accumulator(Args &...args) {
+                        op_type::init_accumulator(args...);
+                    }
+
+                    template<typename... Args>
+                    inline static void update(Args &...args) {
+                        op_type::update(args...);
+                    }
+
+                    template<typename... Args>
+                    static inline result_type process(Args &...args) {
+                        return op_type::aggregate(args...);
+                    }
+                };
+
+                template<typename Scheme>
+                struct isomorphic_aggregate_verification_policy : public isomorphic_policy<Scheme> {
+                    typedef typename isomorphic_policy<Scheme>::scheme_type scheme_type;
+
+                    typedef void key_type;
+                    typedef aggregate_verify_op<scheme_type> op_type;
+                    typedef typename op_type::internal_accumulator_type internal_accumulator_type;
+                    typedef bool result_type;
+
+                    template<typename... Args>
+                    static inline void init_accumulator(Args &...args) {
+                        op_type::init_accumulator(args...);
+                    }
+
+                    template<typename... Args>
+                    inline static void update(Args &...args) {
+                        op_type::update(args...);
+                    }
+
+                    template<typename... Args>
+                    static inline result_type process(Args &...args) {
+                        return op_type::aggregate_verify(args...);
                     }
                 };
 
@@ -88,17 +151,23 @@ namespace nil {
                 public:
                     typedef typename policy_type::scheme_type scheme_type;
                     typedef typename policy_type::key_type key_type;
+                    typedef typename policy_type::op_type op_type;
                     typedef typename policy_type::internal_accumulator_type internal_accumulator_type;
                     typedef typename policy_type::result_type result_type;
 
                     template<typename... Args>
-                    inline static result_type process(Args &...args) {
-                        return policy_type::process(args...);
+                    static inline void init_accumulator(Args &...args) {
+                        policy_type::init_accumulator(args...);
                     }
 
                     template<typename... Args>
                     inline static void update(Args &...args) {
                         policy_type::update(args...);
+                    }
+
+                    template<typename... Args>
+                    inline static result_type process(Args &...args) {
+                        return policy_type::process(args...);
                     }
                 };
             }    // namespace detail
@@ -123,6 +192,8 @@ namespace nil {
 
                     typedef detail::isomorphic_signing_policy<scheme_type> signing_policy;
                     typedef detail::isomorphic_verification_policy<scheme_type> verification_policy;
+                    typedef detail::isomorphic_aggregation_policy<scheme_type> aggregation_policy;
+                    typedef detail::isomorphic_aggregate_verification_policy<scheme_type> aggregate_verification_policy;
 
                     template<typename Policy>
                     struct bind {

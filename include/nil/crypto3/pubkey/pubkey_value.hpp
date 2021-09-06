@@ -37,8 +37,9 @@
 #include <boost/mpl/front.hpp>
 #include <boost/mpl/apply.hpp>
 
-#include <nil/crypto3/pubkey/accumulators/sign.hpp>
-#include <nil/crypto3/pubkey/accumulators/verify.hpp>
+#include <nil/crypto3/pubkey/agreement_key.hpp>
+#include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
+#include <nil/crypto3/pubkey/accumulators/parameters/key.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -104,6 +105,25 @@ namespace nil {
 
                         this->accumulator_set(first1, ::nil::crypto3::accumulators::iterator_last = last1);
                         this->accumulator_set(first2, ::nil::crypto3::accumulators::iterator_last = last2);
+                    }
+
+                    template<typename SinglePassRange, typename Scheme>
+                    range_pubkey_impl(const SinglePassRange &range, accumulator_set_type &&ise,
+                                      const public_key<Scheme> &pubkey) :
+                        SchemeStateImpl(std::forward<accumulator_set_type>(ise)) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+
+                        this->accumulator_set(range, ::nil::crypto3::accumulators::key = pubkey);
+                    }
+
+                    template<typename InputIterator, typename Scheme>
+                    range_pubkey_impl(InputIterator first, InputIterator last, accumulator_set_type &&ise,
+                                      const public_key<Scheme> &pubkey) :
+                        SchemeStateImpl(std::forward<accumulator_set_type>(ise)) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
+
+                        this->accumulator_set(first, ::nil::crypto3::accumulators::iterator_last = last,
+                                              ::nil::crypto3::accumulators::key = pubkey);
                     }
 
                     template<typename OutputRange>
@@ -175,6 +195,29 @@ namespace nil {
 
                         this->accumulator_set(first1, ::nil::crypto3::accumulators::iterator_last = last1);
                         this->accumulator_set(first2, ::nil::crypto3::accumulators::iterator_last = last2);
+                    }
+
+                    template<typename SinglePassRange, typename Scheme>
+                    itr_pubkey_impl(const SinglePassRange &range, OutputIterator out, accumulator_set_type &&ise,
+                                    const public_key<Scheme> &pubkey) :
+                        SchemeStateImpl(std::forward<accumulator_set_type>(ise)),
+                        out(std::move(out)) {
+                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+                        BOOST_CONCEPT_ASSERT((boost::OutputIteratorConcept<OutputIterator, result_type>));
+
+                        this->accumulator_set(range, ::nil::crypto3::accumulators::key = pubkey);
+                    }
+
+                    template<typename InputIterator, typename Scheme>
+                    itr_pubkey_impl(InputIterator first, InputIterator last, OutputIterator out,
+                                    accumulator_set_type &&ise, const public_key<Scheme> &pubkey) :
+                        SchemeStateImpl(std::forward<accumulator_set_type>(ise)),
+                        out(std::move(out)) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
+                        BOOST_CONCEPT_ASSERT((boost::OutputIteratorConcept<OutputIterator, result_type>));
+
+                        this->accumulator_set(first, ::nil::crypto3::accumulators::iterator_last = last,
+                                              ::nil::crypto3::accumulators::key = pubkey);
                     }
 
                     operator OutputIterator() const {

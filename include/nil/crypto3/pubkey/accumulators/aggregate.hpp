@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -45,94 +45,71 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace accumulators {
-            namespace impl {
-                // TODO: incremental computation
-                template<typename Mode>
-                struct aggregate_impl : boost::accumulators::accumulator_base {
-                protected:
-                    typedef Mode mode_type;
-                    typedef typename mode_type::scheme_type scheme_type;
-                    typedef typename mode_type::padding_type padding_type;
-                    typedef typename mode_type::key_type key_type;
+        namespace pubkey {
+            namespace accumulators {
+                namespace impl {
+                    template<typename ProcessingMode>
+                    struct aggregate_impl : boost::accumulators::accumulator_base {
+                    protected:
+                        typedef ProcessingMode processing_mode_type;
+                        typedef typename processing_mode_type::op_type op_type;
+                        typedef typename processing_mode_type::internal_accumulator_type internal_accumulator_type;
 
-                    constexpr static const auto block_bits = mode_type::input_block_bits;
-                    typedef typename mode_type::input_block_type input_block_type;
+                    public:
+                        typedef typename processing_mode_type::result_type result_type;
 
-                    constexpr static const auto value_bits = mode_type::input_value_bits;
-                    typedef typename mode_type::input_value_type input_value_type;
+                        template<typename Args>
+                        aggregate_impl(const Args &) {
+                            processing_mode_type::init_accumulator(acc);
+                        }
 
-                    typedef typename key_type::public_key_type public_key_type;
-                    typedef typename key_type::private_key_type private_key_type;
-                    typedef typename key_type::signature_type signature_type;
+                        template<typename Args>
+                        inline void operator()(const Args &args) {
+                            resolve_type(args[boost::accumulators::sample],
+                                         args[::nil::crypto3::accumulators::iterator_last | nullptr]);
+                        }
 
-                public:
-                    typedef typename mode_type::result_type result_type;
+                        inline result_type result(boost::accumulators::dont_care) const {
+                            return processing_mode_type::process(acc);
+                        }
 
-                    template<typename Args>
-                    aggregate_impl(const Args &) {
+                    protected:
+                        template<typename InputRange, typename InputIterator>
+                        inline void resolve_type(const InputRange &range, InputIterator) {
+                            processing_mode_type::update(acc, range);
+                        }
+
+                        template<typename InputIterator>
+                        inline void resolve_type(InputIterator first, InputIterator last) {
+                            processing_mode_type::update(acc, first, last);
+                        }
+
+                        mutable internal_accumulator_type acc;
+                    };
+                }    // namespace impl
+
+                namespace tag {
+                    template<typename ProcessingMode>
+                    struct aggregate : boost::accumulators::depends_on<> {
+                        typedef ProcessingMode processing_mode_type;
+
+                        /// INTERNAL ONLY
+                        ///
+
+                        typedef boost::mpl::always<accumulators::impl::aggregate_impl<processing_mode_type>> impl;
+                    };
+                }    // namespace tag
+
+                namespace extract {
+                    template<typename ProcessingMode, typename AccumulatorSet>
+                    typename boost::mpl::apply<AccumulatorSet, tag::aggregate<ProcessingMode>>::type::result_type
+                        aggregate(const AccumulatorSet &acc) {
+                        return boost::accumulators::extract_result<tag::aggregate<ProcessingMode>>(acc);
                     }
-
-                    template<typename Args>
-                    inline void operator()(const Args &args) {
-                        resolve_type(
-                            args[boost::accumulators::sample],
-                            args[::nil::crypto3::accumulators::iterator_last | typename input_block_type::iterator()]);
-                    }
-
-                    inline result_type result(boost::accumulators::dont_care) const {
-                        return mode_type::process(cache);
-                    }
-
-                protected:
-                    template<typename InputBlock, typename InputIterator>
-                    inline void resolve_type(const InputBlock &block, InputIterator) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const InputBlock>));
-                        resolve_type(block.cbegin(), block.cend());
-                    }
-
-                    template<
-                        typename ValueType,
-                        typename InputIterator,
-                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type = true>
-                    inline void resolve_type(const ValueType &value, InputIterator) {
-                        cache.emplace_back(value);
-                    }
-
-                    template<
-                        typename InputIterator,
-                        typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
-                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type = true>
-                    inline void resolve_type(InputIterator first, InputIterator last) {
-                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
-                        std::copy(first, last, std::back_inserter(cache));
-                    }
-
-                    input_block_type cache;
-                };
-            }    // namespace impl
-
-            namespace tag {
-                template<typename Mode>
-                struct aggregate : boost::accumulators::depends_on<> {
-                    typedef Mode mode_type;
-
-                    /// INTERNAL ONLY
-                    ///
-
-                    typedef boost::mpl::always<accumulators::impl::aggregate_impl<mode_type>> impl;
-                };
-            }    // namespace tag
-
-            namespace extract {
-                template<typename Mode, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::aggregate<Mode>>::type::result_type
-                    scheme(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::aggregate<Mode>>(acc);
-                }
-            }    // namespace extract
-        }        // namespace accumulators
-    }            // namespace crypto3
+                }    // namespace extract
+            }        // namespace accumulators
+        }            // namespace pubkey
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ACCUMULATORS_PUBKEY_AGGREGATE_HPP

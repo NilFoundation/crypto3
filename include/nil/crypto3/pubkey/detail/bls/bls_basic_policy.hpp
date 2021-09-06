@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -27,6 +27,8 @@
 #define CRYPTO3_PUBKEY_BLS_BASIC_POLICY_HPP
 
 #include <cstddef>
+#include <utility>
+#include <vector>
 
 #include <nil/crypto3/pkpad/emsa/emsa_h2c.hpp>
 
@@ -66,12 +68,13 @@ namespace nil {
                     typedef typename curve_type::template g2_type<> public_key_group_type;
                     typedef typename curve_type::template g1_type<> signature_group_type;
 
-                    typedef nil::marshalling::curve_element_serializer<curve_type> bls_serializer;
-
                     typedef typename basic_policy::private_key_type private_key_type;
                     typedef typename public_key_group_type::value_type public_key_type;
                     typedef typename signature_group_type::value_type signature_type;
-                    typedef typename bls_serializer::compressed_g2_octets pubkey_id_type;
+
+                    typedef nil::marshalling::curve_element_serializer<curve_type> bls_serializer;
+                    typedef typename bls_serializer::compressed_g2_octets public_key_serialized_type;
+                    typedef typename bls_serializer::compressed_g1_octets signature_serialized_type;
 
                     constexpr static const std::size_t private_key_bits = basic_policy::private_key_bits;
                     constexpr static const std::size_t public_key_bits = public_key_type::value_bits;
@@ -79,17 +82,11 @@ namespace nil {
 
                     typedef padding::emsa_h2c<signature_type, PublicParams> padding_policy;
                     typedef padding::encoding_accumulator_set<padding_policy> internal_accumulator_type;
+                    typedef std::pair<std::vector<public_key_type>, std::vector<internal_accumulator_type>>
+                        internal_aggregation_accumulator_type;
 
                     static inline gt_value_type pairing(const signature_type &U, const public_key_type &V) {
                         return algebra::pair_reduced<curve_type>(U, V);
-                    }
-
-                    static inline typename bls_serializer::compressed_g2_octets point_to_pubkey(const public_key_type &pubkey) {
-                        return bls_serializer::point_to_octets_compress(pubkey);
-                    }
-
-                    static inline typename bls_serializer::compressed_g1_octets point_to_signature(const signature_type &sig) {
-                        return bls_serializer::point_to_octets_compress(sig);
                     }
                 };
 
@@ -109,12 +106,13 @@ namespace nil {
                     typedef typename curve_type::template g1_type<> public_key_group_type;
                     typedef typename curve_type::template g2_type<> signature_group_type;
 
-                    typedef nil::marshalling::curve_element_serializer<curve_type> bls_serializer;
-
                     typedef typename basic_policy::private_key_type private_key_type;
                     typedef typename public_key_group_type::value_type public_key_type;
                     typedef typename signature_group_type::value_type signature_type;
-                    typedef typename bls_serializer::compressed_g1_octets pubkey_id_type;
+
+                    typedef nil::marshalling::curve_element_serializer<curve_type> bls_serializer;
+                    typedef typename bls_serializer::compressed_g1_octets public_key_serialized_type;
+                    typedef typename bls_serializer::compressed_g2_octets signature_serialized_type;
 
                     constexpr static const std::size_t private_key_bits = basic_policy::private_key_bits;
                     constexpr static const std::size_t public_key_bits = public_key_type::value_bits;
@@ -122,16 +120,18 @@ namespace nil {
 
                     typedef padding::emsa_h2c<signature_type, PublicParams> padding_policy;
                     typedef padding::encoding_accumulator_set<padding_policy> internal_accumulator_type;
+                    typedef std::pair<std::vector<public_key_type>, std::vector<internal_accumulator_type>>
+                        internal_aggregation_accumulator_type;
 
                     static inline gt_value_type pairing(const signature_type &U, const public_key_type &V) {
                         return algebra::pair_reduced<curve_type>(V, U);
                     }
 
-                    static inline typename bls_serializer::compressed_g1_octets point_to_pubkey(const public_key_type &pubkey) {
+                    static inline public_key_serialized_type point_to_pubkey(const public_key_type &pubkey) {
                         return bls_serializer::point_to_octets_compress(pubkey);
                     }
 
-                    static inline typename bls_serializer::compressed_g2_octets point_to_signature(const signature_type &sig) {
+                    static inline signature_serialized_type point_to_signature(const signature_type &sig) {
                         return bls_serializer::point_to_octets_compress(sig);
                     }
                 };

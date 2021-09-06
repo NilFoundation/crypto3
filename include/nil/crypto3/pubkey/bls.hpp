@@ -52,9 +52,9 @@
 
 #include <nil/crypto3/pubkey/detail/bls/bls_basic_policy.hpp>
 #include <nil/crypto3/pubkey/detail/bls/bls_basic_functions.hpp>
-#include <nil/crypto3/pubkey/detail/stream_processor.hpp>
 #include <nil/crypto3/pubkey/private_key.hpp>
-#include <nil/crypto3/pubkey/no_key_ops.hpp>
+#include <nil/crypto3/pubkey/aggregate_op.hpp>
+#include <nil/crypto3/pubkey/aggregate_verify_op.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -87,16 +87,19 @@ namespace nil {
                 typedef typename policy_type::private_key_type private_key_type;
                 typedef typename policy_type::public_key_type public_key_type;
                 typedef typename policy_type::signature_type signature_type;
-                typedef typename policy_type::pubkey_id_type pubkey_id_type;
 
                 typedef typename policy_type::internal_accumulator_type internal_accumulator_type;
-
-                static inline pubkey_id_type get_pubkey_id(const public_key_type &pubkey) {
-                    return basic_functions::get_pubkey_id(pubkey);
-                }
+                typedef
+                    typename policy_type::internal_aggregation_accumulator_type internal_aggregation_accumulator_type;
 
                 static inline public_key_type generate_public_key(const private_key_type &privkey) {
                     return basic_functions::privkey_to_pubkey(privkey);
+                }
+
+                static inline void init_accumulator(internal_accumulator_type &acc, const private_key_type &privkey) {
+                }
+
+                static inline void init_accumulator(internal_accumulator_type &acc, const public_key_type &pubkey) {
                 }
 
                 template<typename InputRange>
@@ -118,88 +121,92 @@ namespace nil {
                     return basic_functions::verify(acc, pubkey, sig);
                 }
 
-                // static inline signature_type aggregate(const signature_type &init_signature,
-                //                                        const signature_type &signature) {
-                //     return basic_functions::aggregate(init_signature, signature);
-                // }
-                //
-                // template<typename SignatureRange>
-                // static inline signature_type aggregate(const SignatureRange &signatures) {
-                //     return basic_functions::aggregate(signatures);
-                // }
-                //
-                // template<typename SignatureRange>
-                // static inline signature_type aggregate(const signature_type &init_signature,
-                //                                        const SignatureRange &signatures) {
-                //     return basic_functions::aggregate(init_signature, signatures);
-                // }
-                //
-                // template<typename PubkeyRange, typename MsgsRange>
-                // static inline bool aggregate_verify(const PubkeyRange &pubkeys, const MsgsRange &messages,
-                //                                     const signature_type &signature) {
-                //     // TODO: add check - If any two input messages are equal, return INVALID.
-                //     return basic_functions::aggregate_verify(pubkeys, messages, BlsParams::dst, signature);
-                // }
+                template<typename SignatureRange>
+                static inline void update_aggregate(signature_type &acc, const SignatureRange &signatures) {
+                    basic_functions::aggregate(acc, signatures);
+                }
+
+                template<typename SignatureIterator>
+                static inline void update_aggregate(signature_type &acc, SignatureIterator sig_first,
+                                                    SignatureIterator sig_last) {
+                    basic_functions::aggregate(acc, sig_first, sig_last);
+                }
+
+                static inline bool aggregate_verify(internal_aggregation_accumulator_type &acc,
+                                                    const signature_type &signature) {
+                    // TODO: add check - If any two input messages are equal, return INVALID.
+                    return basic_functions::aggregate_verify(acc.first, acc.second, signature);
+                }
             };
 
-            // /*!
-            //  * @brief
-            //  * @tparam SignatureVersion
-            //  * @tparam BlsParams
-            //  * @see https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.2
-            //  */
-            // template<typename SignatureVersion>
-            // struct bls_aug_scheme {
-            //     typedef SignatureVersion signature_version;
-            //     typedef typename signature_version::policy_type policy_type;
-            //     typedef typename signature_version::basic_functions basic_functions;
-            //
-            //     typedef typename policy_type::private_key_type private_key_type;
-            //     typedef typename policy_type::public_key_type public_key_type;
-            //     typedef typename policy_type::signature_type signature_type;
-            //     typedef typename policy_type::pubkey_id_type pubkey_id_type;
-            //
-            //     static inline pubkey_id_type pubkey_bits(const public_key_type &pubkey) {
-            //         return basic_functions::pubkey_bits(pubkey);
-            //     }
-            //
-            //     static inline public_key_type generate_public_key(const private_key_type &privkey) {
-            //         return basic_functions::privkey_to_pubkey(privkey);
-            //     }
-            //
-            //     // TODO: implement an interface that takes the public key as input
-            //     template<typename MsgRange>
-            //     static inline signature_type sign(const private_key_type &privkey, const MsgRange &message) {
-            //         public_key_type pubkey = generate_public_key(privkey);
-            //         return basic_functions::sign(privkey, basic_functions::pk_conc_msg(pubkey, message),
-            //                                      BlsParams::dst);
-            //     }
-            //
-            //     template<typename MsgRange>
-            //     static inline bool verify(const public_key_type &pubkey, const MsgRange &message,
-            //                               const signature_type &signature) {
-            //         return basic_functions::verify(pubkey, basic_functions::pk_conc_msg(pubkey, message),
-            //                                        BlsParams::dst, signature);
-            //     }
-            //
-            //     template<typename SignatureRange>
-            //     static inline signature_type aggregate(const SignatureRange &signatures) {
-            //         return basic_functions::aggregate(signatures);
-            //     }
-            //
-            //     template<typename SignatureRange>
-            //     static inline signature_type aggregate(const signature_type &init_signature,
-            //                                            const SignatureRange &signatures) {
-            //         return basic_functions::aggregate(init_signature, signatures);
-            //     }
-            //
-            //     template<typename PubkeyRange, typename MsgsRange>
-            //     static inline bool aggregate_verify(const PubkeyRange &pubkeys, const MsgsRange &messages,
-            //                                         const signature_type &signature) {
-            //         return basic_functions::aug_aggregate_verify(pubkeys, messages, BlsParams::dst, signature);
-            //     }
-            // };
-            //
+            /*!
+             * @brief
+             * @tparam SignatureVersion
+             * @tparam BlsParams
+             * @see https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.2
+             */
+            template<typename SignatureVersion>
+            struct bls_aug_scheme {
+                typedef SignatureVersion signature_version;
+                typedef typename signature_version::policy_type policy_type;
+                typedef typename signature_version::basic_functions basic_functions;
+
+                typedef typename policy_type::private_key_type private_key_type;
+                typedef typename policy_type::public_key_type public_key_type;
+                typedef typename policy_type::signature_type signature_type;
+
+                typedef typename policy_type::internal_accumulator_type internal_accumulator_type;
+                typedef
+                    typename policy_type::internal_aggregation_accumulator_type internal_aggregation_accumulator_type;
+
+                static inline public_key_type generate_public_key(const private_key_type &privkey) {
+                    return basic_functions::privkey_to_pubkey(privkey);
+                }
+
+                static inline void init_accumulator(internal_accumulator_type &acc, const private_key_type &privkey) {
+                    init_accumulator(acc, generate_public_key(privkey));
+                }
+
+                static inline void init_accumulator(internal_accumulator_type &acc, const public_key_type &pubkey) {
+                    basic_functions::update(acc, basic_functions::point_to_pubkey(pubkey));
+                }
+
+                template<typename InputRange>
+                static inline void update(internal_accumulator_type &acc, const InputRange &range) {
+                    basic_functions::update(acc, range);
+                }
+
+                template<typename InputIterator>
+                static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
+                    basic_functions::update(acc, first, last);
+                }
+
+                static inline signature_type sign(internal_accumulator_type &acc, const private_key_type &privkey) {
+                    return basic_functions::sign(acc, privkey);
+                }
+
+                static inline bool verify(internal_accumulator_type &acc, const public_key_type &pubkey,
+                                          const signature_type &sig) {
+                    return basic_functions::verify(acc, pubkey, sig);
+                }
+
+                template<typename SignatureRange>
+                static inline void update_aggregate(signature_type &acc, const SignatureRange &signatures) {
+                    basic_functions::aggregate(acc, signatures);
+                }
+
+                template<typename SignatureIterator>
+                static inline void update_aggregate(signature_type &acc, SignatureIterator sig_first,
+                                                    SignatureIterator sig_last) {
+                    basic_functions::aggregate(acc, sig_first, sig_last);
+                }
+
+                static inline bool aggregate_verify(internal_aggregation_accumulator_type &acc,
+                                                    const signature_type &signature) {
+                    return basic_functions::aggregate_verify(acc.first, acc.second, signature);
+                }
+            };
+
             // /*!
             //  * @brief Proof of possession BLS Scheme
             //  * @tparam SignatureVersion
@@ -307,8 +314,14 @@ namespace nil {
                      template<typename> class BlsScheme = bls_basic_scheme,
                      typename CurveType = algebra::curves::bls12_381>
             struct bls {
+                typedef bls<PublicParams, BlsVersion, BlsScheme, CurveType> self_type;
                 typedef BlsVersion<PublicParams, CurveType> bls_version_type;
                 typedef BlsScheme<bls_version_type> bls_scheme_type;
+
+                typedef public_key<self_type> public_key_type;
+                typedef private_key<self_type> private_key_type;
+                typedef aggregate_op<self_type> aggregate_op_policy;
+                typedef aggregate_verify_op<self_type> aggregate_verify_op_policy;
             };
 
             // TODO: add specialization for pop scheme
@@ -321,32 +334,17 @@ namespace nil {
                 typedef typename bls_scheme_type::private_key_type private_key_type;
                 typedef typename bls_scheme_type::public_key_type public_key_type;
                 typedef typename bls_scheme_type::signature_type signature_type;
-                typedef typename bls_scheme_type::pubkey_id_type pubkey_id_type;
 
                 typedef typename bls_scheme_type::internal_accumulator_type internal_accumulator_type;
 
                 typedef public_key_type key_type;
 
-                // typedef std::pair<public_key, input_block_type> aggregate_value_type;
-                // typedef std::map<public_key, input_block_type> aggregate_type;
-                //
-                // template<typename AggregateValueType, typename Pubkey = typename AggregateValueType::first_type,
-                //          typename BlockType = typename AggregateValueType::second_type,
-                //          typename std::enable_if<std::is_same<public_key, typename
-                //          std::remove_cv<Pubkey>::type>::value,
-                //                                  bool>::type = true,
-                //          typename std::enable_if<std::is_same<input_value_type, typename
-                //          BlockType::value_type>::value,
-                //                                  bool>::type = true>
-                // using check_aggregate_value_type =
-                //     typename std::enable_if<std::is_same<std::pair<Pubkey, BlockType>, AggregateValueType>::value,
-                //                             bool>::type;
-                //
-                // template<typename AggregateData>
-                // using check_aggregate_type = check_aggregate_value_type<typename AggregateData::value_type>;
-
                 public_key() = delete;
                 public_key(const key_type &pubkey) : pubkey(pubkey) {
+                }
+
+                inline void init_accumulator(internal_accumulator_type &acc) const {
+                    bls_scheme_type::init_accumulator(acc, pubkey);
                 }
 
                 template<typename InputRange>
@@ -363,68 +361,9 @@ namespace nil {
                     return bls_scheme_type::verify(acc, pubkey, sig);
                 }
 
-                // // TODO: fix me - std::reference_wrapper seems not to work
-                // template<typename AggregateData, check_aggregate_type<AggregateData> = true>
-                // static inline bool aggregate_verify(const AggregateData &agg_data, const signature_type &sig) {
-                //     using BlockType = typename AggregateData::value_type::second_type;
-                //     std::vector<std::reference_wrapper<const public_key_type>> pubkeys;
-                //     std::vector<std::reference_wrapper<const BlockType>> msgs;
-                //     for (const auto &pubkey_msg : agg_data) {
-                //         pubkeys.emplace_back(pubkey_msg.first.pubkey());
-                //         msgs.emplace_back(pubkey_msg.second);
-                //     }
-                //     return bls_scheme_type::aggregate_verify(pubkeys, msgs, sig);
-                // }
-                //
-                // inline pubkey_id_type pubkey_bits() const {
-                //     return bls_scheme_type::pubkey_bits(pubkey);
-                // }
-                //
-                // inline const public_key_type &pubkey() const {
-                //     return pubkey;
-                // }
-                //
-                // inline bool operator<(const public_key &other) const {
-                //     return pubkey_bits() < other.pubkey_bits();
-                // }
-                //
-                // template<typename AggregateData, typename InputIterator,
-                //          typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
-                //          check_aggregate_type<AggregateData> = true,
-                //          typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type =
-                //          true>
-                // inline void append_aggregate_data(AggregateData &agg_data, InputIterator first,
-                //                                   InputIterator last) const {
-                //     BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
-                //     auto count = agg_data.count(pubkey);
-                //     BOOST_ASSERT(0 == count || 1 == count);
-                //     if (!count) {
-                //         agg_data.emplace(*this, input_block_type(first, last));
-                //     } else if (1 == count) {
-                //         std::copy(first, last, std::back_inserter(agg_data.at(*this)));
-                //     }
-                // }
-                //
-                // template<typename AggregateData, typename InputBlock, check_aggregate_type<AggregateData> = true,
-                //          typename std::enable_if<std::is_same<input_value_type, typename
-                //          InputBlock::value_type>::value,
-                //                                  bool>::type = true>
-                // inline void append_aggregate_data(AggregateData &agg_data, const InputBlock &block) const {
-                //     BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const InputBlock>));
-                //     append_aggregate_data(agg_data, block.cbegin(), block.cend());
-                // }
-                //
-                // template<typename AggregateData, typename ValueType, check_aggregate_type<AggregateData> = true,
-                //          typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type =
-                //          true>
-                // inline void append_aggregate_data(AggregateData &agg_data, const ValueType &value) const {
-                //     auto count = agg_data.count(pubkey);
-                //     BOOST_ASSERT(0 == count || 1 == count);
-                //     if (!count) {
-                //         agg_data.emplace(*this, input_block_type());
-                //     }
-                //     agg_data.at(*this).emplace_back(value);
-                // }
+                inline public_key_type public_key_data() const {
+                    return pubkey;
+                }
 
             protected:
                 public_key_type pubkey;
@@ -452,6 +391,10 @@ namespace nil {
                     privkey(privkey), base_type(bls_scheme_type::generate_public_key(privkey)) {
                 }
 
+                inline void init_accumulator(internal_accumulator_type &acc) const {
+                    bls_scheme_type::init_accumulator(acc, privkey);
+                }
+
                 template<typename InputRange>
                 static inline void update(internal_accumulator_type &acc, const InputRange &range) {
                     bls_scheme_type::update(acc, range);
@@ -466,50 +409,97 @@ namespace nil {
                     return bls_scheme_type::sign(acc, privkey);
                 }
 
-                // inline const private_key_type &privkey() const {
-                //     return privkey;
-                // }
-
             protected:
                 private_key_type privkey;
             };
 
-            // template<typename SignatureVariant, typename PublicParams, template<typename, typename> class BlsScheme>
-            // struct no_key_ops<bls<SignatureVariant, BlsScheme, PublicParams>> {
-            //     typedef bls<SignatureVariant, BlsScheme, PublicParams> scheme_type;
-            //     typedef typename scheme_type::bls_scheme_type bls_scheme_type;
-            //
-            //     typedef typename bls_scheme_type::private_key_type private_key_type;
-            //     typedef typename bls_scheme_type::public_key_type public_key_type;
-            //     typedef typename bls_scheme_type::signature_type signature_type;
-            //
-            //     typedef std::vector<signature_type> input_block_type;
-            //     constexpr static const std::size_t input_block_bits = 0;    // non-restricted length
-            //
-            //     typedef typename input_block_type::value_type input_value_type;
-            //     constexpr static const std::size_t input_value_bits = 0;    // non-integral objects
-            //
-            //     static inline signature_type aggregate(const signature_type &init_signature,
-            //                                            const signature_type &signature) {
-            //         return bls_scheme_type::aggregate(init_signature, signature);
-            //     }
-            //
-            //     template<typename SignatureRange,
-            //              typename = typename std::enable_if<
-            //                  std::is_same<signature_type, typename SignatureRange::value_type>::value, bool>::type>
-            //     static inline signature_type aggregate(const SignatureRange &sigs) {
-            //         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SignatureRange>));
-            //         return bls_scheme_type::aggregate(sigs);
-            //     }
-            //
-            //     template<typename SignatureRange,
-            //              typename = typename std::enable_if<
-            //                  std::is_same<signature_type, typename SignatureRange::value_type>::value, bool>::type>
-            //     static inline signature_type aggregate(const signature_type &init_sig, SignatureRange &sigs) {
-            //         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SignatureRange>));
-            //         return bls_scheme_type::aggregate(init_sig, sigs);
-            //     }
-            // };
+            template<typename PublicParams, template<typename, typename> class BlsVersion,
+                     template<typename> class BlsScheme, typename CurveType>
+            struct aggregate_op<bls<PublicParams, BlsVersion, BlsScheme, CurveType>> {
+                typedef bls<PublicParams, BlsVersion, BlsScheme, CurveType> scheme_type;
+                typedef typename scheme_type::bls_scheme_type bls_scheme_type;
+
+                typedef typename bls_scheme_type::private_key_type private_key_type;
+                typedef typename bls_scheme_type::public_key_type public_key_type;
+                typedef typename bls_scheme_type::signature_type signature_type;
+
+                typedef signature_type internal_accumulator_type;
+
+                static inline void init_accumulator(internal_accumulator_type &acc) {
+                    acc = signature_type::zero();
+                }
+
+                template<typename InputRange>
+                static inline void update(internal_accumulator_type &acc, const InputRange &range) {
+                    bls_scheme_type::update_aggregate(acc, range);
+                }
+
+                template<typename InputIterator>
+                static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
+                    bls_scheme_type::update_aggregate(acc, first, last);
+                }
+
+                static inline signature_type aggregate(internal_accumulator_type &acc) {
+                    return acc;
+                }
+            };
+
+            template<typename PublicParams, template<typename, typename> class BlsVersion,
+                     template<typename> class BlsScheme, typename CurveType>
+            struct aggregate_verify_op<bls<PublicParams, BlsVersion, BlsScheme, CurveType>> {
+                typedef bls<PublicParams, BlsVersion, BlsScheme, CurveType> scheme_type;
+                typedef typename scheme_type::bls_scheme_type bls_scheme_type;
+                typedef public_key<scheme_type> scheme_public_key_type;
+
+                typedef typename bls_scheme_type::private_key_type private_key_type;
+                typedef typename bls_scheme_type::public_key_type public_key_type;
+                typedef typename bls_scheme_type::signature_type signature_type;
+
+                typedef typename bls_scheme_type::internal_accumulator_type _internal_accumulator_type;
+                typedef typename bls_scheme_type::internal_aggregation_accumulator_type
+                    _internal_aggregation_accumulator_type;
+                typedef _internal_aggregation_accumulator_type internal_accumulator_type;
+
+                static inline void init_accumulator(internal_accumulator_type &acc) {
+                }
+
+                template<typename InputIterator>
+                static inline void update(internal_accumulator_type &acc, const scheme_public_key_type &pubkey,
+                                          InputIterator first, InputIterator last) {
+                    auto index = get_index(acc, pubkey);
+                    bls_scheme_type::update(acc.second[index], first, last);
+                }
+
+                template<typename InputRange>
+                static inline void update(internal_accumulator_type &acc, const scheme_public_key_type &pubkey,
+                                          const InputRange &range) {
+                    auto index = get_index(acc, pubkey);
+                    bls_scheme_type::update(acc.second[index], range);
+                }
+
+                static inline bool aggregate_verify(internal_accumulator_type &acc, const signature_type &sig) {
+                    return bls_scheme_type::aggregate_verify(acc, sig);
+                }
+
+            protected:
+                static inline std::size_t get_index(internal_accumulator_type &acc,
+                                                    const scheme_public_key_type &pubkey) {
+                    assert(std::distance(std::cbegin(acc.first), std::cend(acc.first)) ==
+                           std::distance(std::cbegin(acc.second), std::cend(acc.second)));
+
+                    auto found_pos_it =
+                        std::find(std::cbegin(acc.first), std::cend(acc.first), pubkey.public_key_data());
+
+                    if (std::cend(acc.first) == found_pos_it) {
+                        acc.first.push_back(pubkey.public_key_data());
+                        acc.second.push_back(_internal_accumulator_type());
+                        bls_scheme_type::init_accumulator(acc.second.back(), acc.first.back());
+                        return std::size(acc.first) - 1;
+                    }
+
+                    return std::distance(std::cbegin(acc.first), found_pos_it);
+                }
+            };
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil

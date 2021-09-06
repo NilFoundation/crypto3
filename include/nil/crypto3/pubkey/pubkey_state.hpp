@@ -31,6 +31,8 @@
 
 #include <nil/crypto3/pubkey/accumulators/sign.hpp>
 #include <nil/crypto3/pubkey/accumulators/verify.hpp>
+#include <nil/crypto3/pubkey/accumulators/aggregate.hpp>
+#include <nil/crypto3/pubkey/accumulators/aggregate_verify.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -62,6 +64,34 @@ namespace nil {
             using verification_accumulator_set = boost::accumulators::accumulator_set<
                 typename ProcessingMode::result_type,
                 boost::accumulators::features<accumulators::tag::verify<ProcessingMode>>>;
+
+            /*!
+             * @brief Accumulator set with pre-defined aggregation accumulator params.
+             *
+             * Meets the requirements of AccumulatorSet
+             *
+             * @ingroup pubkey
+             *
+             * @tparam ProcessingMode
+             */
+            template<typename ProcessingMode>
+            using aggregation_accumulator_set = boost::accumulators::accumulator_set<
+                typename ProcessingMode::result_type,
+                boost::accumulators::features<accumulators::tag::aggregate<ProcessingMode>>>;
+
+            /*!
+             * @brief Accumulator set with pre-defined aggregate verification accumulator params.
+             *
+             * Meets the requirements of AccumulatorSet
+             *
+             * @ingroup pubkey
+             *
+             * @tparam ProcessingMode
+             */
+            template<typename ProcessingMode>
+            using aggregate_verification_accumulator_set = boost::accumulators::accumulator_set<
+                typename ProcessingMode::result_type,
+                boost::accumulators::features<accumulators::tag::aggregate_verify<ProcessingMode>>>;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
