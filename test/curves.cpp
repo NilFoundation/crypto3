@@ -55,6 +55,7 @@
 #include <nil/crypto3/algebra/curves/secp_r1.hpp>
 // #include <nil/crypto3/algebra/curves/sm2p_v1.hpp>
 // #include <nil/crypto3/algebra/curves/x962_p.hpp>
+#include <nil/crypto3/algebra/curves/curve25529.hpp>
 
 #include <nil/crypto3/algebra/fields/fp2.hpp>
 #include <nil/crypto3/algebra/fields/fp3.hpp>
@@ -83,6 +84,11 @@ void print_field_element(std::ostream &os, typename fields::detail::element_fp3<
 template<typename FpCurveGroupElement>
 void print_fp_curve_group_element(std::ostream &os, const FpCurveGroupElement &e) {
     os << "( " << e.X.data << " : " << e.Y.data << " : " << e.Z.data << " )";
+}
+
+template<typename FpCurveGroupElement>
+void print_fp_extended_curve_group_element(std::ostream &os, const FpCurveGroupElement &e) {
+    os << "( " << e.X.data << " : " << e.Y.data << " : " << e.T.data << " : " << e.Z.data << " )";
 }
 
 template<typename FpCurveGroupElement>
@@ -224,102 +230,141 @@ namespace boost {
                 }
             };
 
+            template<>
+            struct print_log_value<typename curves::curve25519::g1_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::curve25519::g1_type<>::value_type const &e) {
+                    print_fp_extended_curve_group_element(os, e);
+                }
+            };
+
             /*-----------------------Affine representations-----------------------*/
 
             template<>
             struct print_log_value<typename curves::edwards<183>::g1_type<curves::coordinates::affine>::value_type> {
-                void operator()(std::ostream &os, typename curves::edwards<183>::g1_type<curves::coordinates::affine>::value_type const &e) {
+                void operator()(
+                    std::ostream &os,
+                    typename curves::edwards<183>::g1_type<curves::coordinates::affine>::value_type const &e) {
                     print_fp_affine_curve_group_element(os, e);
                 }
             };
 
             template<>
             struct print_log_value<typename curves::mnt4<298>::g1_type<curves::coordinates::affine>::value_type> {
-                void operator()(std::ostream &os, typename curves::mnt4<298>::g1_type<curves::coordinates::affine>::value_type const &e) {
+                void operator()(std::ostream &os,
+                                typename curves::mnt4<298>::g1_type<curves::coordinates::affine>::value_type const &e) {
                     print_fp_affine_curve_group_element(os, e);
                 }
             };
 
             template<>
             struct print_log_value<typename curves::mnt6<298>::g1_type<curves::coordinates::affine>::value_type> {
-                void operator()(std::ostream &os, typename curves::mnt6<298>::g1_type<curves::coordinates::affine>::value_type const &e) {
+                void operator()(std::ostream &os,
+                                typename curves::mnt6<298>::g1_type<curves::coordinates::affine>::value_type const &e) {
                     print_fp_affine_curve_group_element(os, e);
                 }
             };
 
             template<>
             struct print_log_value<typename curves::alt_bn128<254>::g1_type<curves::coordinates::affine>::value_type> {
-                void operator()(std::ostream &os, typename curves::alt_bn128<254>::g1_type<curves::coordinates::affine>::value_type const &e) {
+                void operator()(
+                    std::ostream &os,
+                    typename curves::alt_bn128<254>::g1_type<curves::coordinates::affine>::value_type const &e) {
                     print_fp_affine_curve_group_element(os, e);
                 }
             };
 
             template<>
             struct print_log_value<typename curves::bls12<381>::g1_type<curves::coordinates::affine>::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<381>::g1_type<curves::coordinates::affine>::value_type const &e) {
+                void
+                    operator()(std::ostream &os,
+                               typename curves::bls12<381>::g1_type<curves::coordinates::affine>::value_type const &e) {
                     print_fp_affine_curve_group_element(os, e);
                 }
             };
 
             template<>
             struct print_log_value<typename curves::bls12<377>::g1_type<curves::coordinates::affine>::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<377>::g1_type<curves::coordinates::affine>::value_type const &e) {
+                void
+                    operator()(std::ostream &os,
+                               typename curves::bls12<377>::g1_type<curves::coordinates::affine>::value_type const &e) {
                     print_fp_affine_curve_group_element(os, e);
                 }
             };
 
             template<>
             struct print_log_value<typename curves::mnt4<298>::g2_type<curves::coordinates::affine>::value_type> {
-                void operator()(std::ostream &os, typename curves::mnt4<298>::g2_type<curves::coordinates::affine>::value_type const &e) {
+                void operator()(std::ostream &os,
+                                typename curves::mnt4<298>::g2_type<curves::coordinates::affine>::value_type const &e) {
                     print_fp2_affine_curve_group_element(os, e);
                 }
             };
 
             template<>
             struct print_log_value<typename curves::bls12<381>::g2_type<curves::coordinates::affine>::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<381>::g2_type<curves::coordinates::affine>::value_type const &e) {
+                void
+                    operator()(std::ostream &os,
+                               typename curves::bls12<381>::g2_type<curves::coordinates::affine>::value_type const &e) {
                     print_fp2_affine_curve_group_element(os, e);
                 }
             };
 
             template<>
             struct print_log_value<typename curves::bls12<377>::g2_type<curves::coordinates::affine>::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<377>::g2_type<curves::coordinates::affine>::value_type const &e) {
+                void
+                    operator()(std::ostream &os,
+                               typename curves::bls12<377>::g2_type<curves::coordinates::affine>::value_type const &e) {
                     print_fp2_affine_curve_group_element(os, e);
                 }
             };
 
             template<>
             struct print_log_value<typename curves::alt_bn128<254>::g2_type<curves::coordinates::affine>::value_type> {
-                void operator()(std::ostream &os, typename curves::alt_bn128<254>::g2_type<curves::coordinates::affine>::value_type const &e) {
+                void operator()(
+                    std::ostream &os,
+                    typename curves::alt_bn128<254>::g2_type<curves::coordinates::affine>::value_type const &e) {
                     print_fp2_affine_curve_group_element(os, e);
                 }
             };
 
             // template<>
             // struct print_log_value<typename curves::edwards<183>::g2_type<curves::coordinates::affine>::value_type> {
-            //     void operator()(std::ostream &os, typename curves::edwards<183>::g2_type<curves::coordinates::affine>::value_type const &e) {
+            //     void operator()(std::ostream &os, typename
+            //     curves::edwards<183>::g2_type<curves::coordinates::affine>::value_type const &e) {
             //         print_fp3_affine_curve_group_element(os, e);
             //     }
             // };
 
             template<>
             struct print_log_value<typename curves::mnt6<298>::g2_type<curves::coordinates::affine>::value_type> {
-                void operator()(std::ostream &os, typename curves::mnt6<298>::g2_type<curves::coordinates::affine>::value_type const &e) {
+                void operator()(std::ostream &os,
+                                typename curves::mnt6<298>::g2_type<curves::coordinates::affine>::value_type const &e) {
                     print_fp3_affine_curve_group_element(os, e);
                 }
             };
 
             template<>
             struct print_log_value<typename curves::secp_r1<256>::g1_type<curves::coordinates::affine>::value_type> {
-                void operator()(std::ostream &os, typename curves::secp_r1<256>::g1_type<curves::coordinates::affine>::value_type const &e) {
+                void operator()(
+                    std::ostream &os,
+                    typename curves::secp_r1<256>::g1_type<curves::coordinates::affine>::value_type const &e) {
                     print_fp_affine_curve_group_element(os, e);
                 }
             };
 
             template<>
             struct print_log_value<typename curves::secp_k1<256>::g1_type<curves::coordinates::affine>::value_type> {
-                void operator()(std::ostream &os, typename curves::secp_k1<256>::g1_type<curves::coordinates::affine>::value_type const &e) {
+                void operator()(
+                    std::ostream &os,
+                    typename curves::secp_k1<256>::g1_type<curves::coordinates::affine>::value_type const &e) {
+                    print_fp_affine_curve_group_element(os, e);
+                }
+            };
+
+            template<>
+            struct print_log_value<typename curves::curve25519::g1_type<curves::coordinates::affine>::value_type> {
+                void
+                    operator()(std::ostream &os,
+                               typename curves::curve25519::g1_type<curves::coordinates::affine>::value_type const &e) {
                     print_fp_affine_curve_group_element(os, e);
                 }
             };
@@ -452,7 +497,7 @@ void fp_curve_twisted_edwards_test_init(std::vector<typename FpCurveGroup::value
                                         std::vector<typename FpCurveGroup::field_type::integral_type> &constants,
                                         const TestSet &test_set) {
     typedef typename FpCurveGroup::field_type::value_type field_value_type;
-    std::array<field_value_type, 3> coordinates;
+    std::array<field_value_type, 2> coordinates;
 
     for (auto &point : test_set.second.get_child("point_coordinates")) {
         auto i = 0;
@@ -460,6 +505,31 @@ void fp_curve_twisted_edwards_test_init(std::vector<typename FpCurveGroup::value
             coordinates[i++] = field_value_type(typename field_value_type::integral_type(coordinate.second.data()));
         }
         points.emplace_back(typename FpCurveGroup::value_type(coordinates[0], coordinates[1]));
+    }
+
+    for (auto &constant : test_set.second.get_child("constants")) {
+        constants.emplace_back(typename FpCurveGroup::field_type::integral_type(constant.second.data()));
+    }
+}
+
+template<typename FpCurveGroup, typename TestSet>
+void fp_extended_curve_twisted_edwards_test_init(
+    std::vector<typename FpCurveGroup::value_type> &points,
+    std::vector<typename FpCurveGroup::field_type::integral_type> &constants,
+    const TestSet &test_set) {
+    typedef typename FpCurveGroup::field_type::value_type field_value_type;
+    typedef
+        typename FpCurveGroup::curve_type::template g1_type<curves::coordinates::affine, curves::forms::twisted_edwards>
+            group_affine_type;
+    std::array<field_value_type, 2> coordinates;
+
+    for (auto &point : test_set.second.get_child("point_coordinates")) {
+        auto i = 0;
+        for (auto &coordinate : point.second) {
+            coordinates[i++] = field_value_type(typename field_value_type::integral_type(coordinate.second.data()));
+        }
+        points.emplace_back(
+            typename group_affine_type::value_type(coordinates[0], coordinates[1]).to_extended_with_a_minus_1());
     }
 
     for (auto &constant : test_set.second.get_child("constants")) {
@@ -534,10 +604,11 @@ void curve_operation_test(const TestSet &test_set,
 }
 
 template<typename CurveGroup, typename TestSet>
-void curve_operation_test_twisted_edwards(const TestSet &test_set,
-                                          void (&test_init)(std::vector<typename CurveGroup::value_type> &,
-                                                            std::vector<typename CurveGroup::field_type::integral_type> &,
-                                                            const TestSet &)) {
+void curve_operation_test_twisted_edwards(
+    const TestSet &test_set,
+    void (&test_init)(std::vector<typename CurveGroup::value_type> &,
+                      std::vector<typename CurveGroup::field_type::integral_type> &,
+                      const TestSet &)) {
 
     std::vector<typename CurveGroup::value_type> points;
     std::vector<typename CurveGroup::field_type::integral_type> constants;
@@ -701,6 +772,13 @@ BOOST_DATA_TEST_CASE(curve_operation_test_secp256_k1_g1, string_data("curve_oper
     using policy_type = curves::secp_k1<256>::g1_type<>;
 
     curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
+}
+
+BOOST_DATA_TEST_CASE(curve_operation_test_edwards25519, string_data("curve_operation_test_edwards25519"), data_set) {
+    using policy_type = curves::curve25519::g1_type<>;
+
+    curve_operation_test_twisted_edwards<policy_type>(data_set,
+                                                      fp_extended_curve_twisted_edwards_test_init<policy_type>);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

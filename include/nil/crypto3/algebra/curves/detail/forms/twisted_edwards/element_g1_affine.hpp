@@ -190,6 +190,22 @@ namespace nil {
                         /** @brief
                          *
                          * @return return the corresponding element from affine coordinates to
+                         * extended coordinates with a=-1
+                         */
+                        constexpr curve_element<params_type, form,
+                                                typename curves::coordinates::extended_with_a_minus_1>
+                            to_extended_with_a_minus_1() const {
+
+                            using result_type =
+                                curve_element<params_type, form, typename curves::coordinates::extended_with_a_minus_1>;
+
+                            return result_type(X, Y, X * Y,
+                                               result_type::field_type::value_type::one());    // x=X/Z, y=Y/Z, x*y=T/Z
+                        }
+
+                        /** @brief
+                         *
+                         * @return return the corresponding element from affine coordinates to
                          * affine coordinates. Just for compatibility.
                          */
                         constexpr curve_element to_affine() const {
