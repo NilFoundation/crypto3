@@ -94,7 +94,7 @@ namespace nil {
                             marshalling_field_element_type marshalling_field_element;
                             auto it = digest.cbegin();
                             marshalling_field_element.read(it, digest.size());
-                            return crypto3::marshalling::types::construct_field_element<field_type, endianness>(
+                            return crypto3::marshalling::types::make_field_element<field_type, endianness>(
                                 marshalling_field_element);
                         }
 
@@ -112,7 +112,7 @@ namespace nil {
                             marshalling_field_element_type marshalling_field_element;
                             auto it = modulus_octets_container.cbegin();
                             marshalling_field_element.read(it, modulus_octets_container.size());
-                            return crypto3::marshalling::types::construct_field_element<field_type, endianness>(
+                            return crypto3::marshalling::types::make_field_element<field_type, endianness>(
                                 marshalling_field_element);
                         }
                     };
