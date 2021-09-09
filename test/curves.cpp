@@ -55,7 +55,7 @@
 #include <nil/crypto3/algebra/curves/secp_r1.hpp>
 // #include <nil/crypto3/algebra/curves/sm2p_v1.hpp>
 // #include <nil/crypto3/algebra/curves/x962_p.hpp>
-#include <nil/crypto3/algebra/curves/curve25529.hpp>
+#include <nil/crypto3/algebra/curves/curve25519.hpp>
 
 #include <nil/crypto3/algebra/fields/fp2.hpp>
 #include <nil/crypto3/algebra/fields/fp3.hpp>
