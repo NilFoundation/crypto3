@@ -1,15 +1,15 @@
 # These owners will be the default owners for everything in
 # the repo. Unless a later match takes precedence,
-# @nbering will be requested for review when someone 
+# @nkaskov will be requested for review when someone 
 # opens a pull request.
-*       @nbering
+*       @nkaskov
 
 # Order is important; the last matching pattern takes the most
 # precedence. When someone opens a pull request that only
 # these files, only @ilyas675 and not the global
 # owner(s) will be requested for a review.
 
-test/*	@nbering @ilyas675
+test/*	@nkaskov @ilyas675
 
 
 include/nil/crypto3/algebra/matrix*	@ilyas675
