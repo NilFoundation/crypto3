@@ -204,6 +204,8 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${${CURRENT_PROJECT_NAME}_INTERFACE_LIBRARIES}
 
                       ${CMAKE_WORKSPACE_NAME}::block
+                      ${CMAKE_WORKSPACE_NAME}::algebra
+                      marshalling::crypto3_algebra
 
                       ${Boost_LIBRARIES})
 

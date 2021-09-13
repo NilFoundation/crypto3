@@ -18,6 +18,8 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${${CURRENT_PROJECT_NAME}_INTERFACE_LIBRARIES}
 
                        ${CMAKE_WORKSPACE_NAME}::block
+                       ${CMAKE_WORKSPACE_NAME}::algebra
+                       marshalling::crypto3_algebra
 
                        ${Boost_LIBRARIES})
 
@@ -61,7 +63,8 @@ set(TESTS_NAMES
     "sha2"
     "sha3"
     "static_digest"
-    "tiger")
+    "tiger"
+    "h2c")
 
 if(CRYPTO3_HASH_POSEIDON)
     list(APPEND TESTS_NAMES poseidon)
