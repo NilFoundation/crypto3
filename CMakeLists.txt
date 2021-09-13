@@ -15,22 +15,20 @@ cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
-if(NOT Boost_FOUND OR NOT Boost_RANDOM_FOUND)
-    cm_find_package(Boost COMPONENTS random REQUIRED)
+if(NOT Boost_FOUND)
+    cm_find_package(Boost COMPONENTS)
 endif()
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_algebra)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_marshalling)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-     include/nil/crypto3/pkpad/algorithm/pad.hpp
-     include/nil/crypto3/pkpad/algorithm/unpad.hpp
-     include/nil/crypto3/pkpad/eme.hpp
-     include/nil/crypto3/pkpad/emsa.hpp)
+        include/nil/crypto3/pkpad/algorithm/encode.hpp
+        include/nil/crypto3/pkpad/algorithm/verify.hpp)
 
-list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
-
-     )
+list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
 
 option(CRYPTO3_PK_PAD_EME_OAEP "Build with EME OAEP support" TRUE)
 option(CRYPTO3_PK_PAD_EME_PKCS1 "Build with EME PKCS1 support" TRUE)
@@ -232,6 +230,8 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::codec
                       ${CMAKE_WORKSPACE_NAME}::hash
+                      ${CMAKE_WORKSPACE_NAME}::algebra
+                      marshalling::crypto3_algebra
 
                       ${Boost_LIBRARIES})
 

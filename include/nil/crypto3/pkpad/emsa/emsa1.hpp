@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -22,98 +23,179 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_EMSA1_HPP
-#define CRYPTO3_EMSA1_HPP
+#ifndef CRYPTO3_PK_PAD_EMSA1_HPP
+#define CRYPTO3_PK_PAD_EMSA1_HPP
 
-#include <nil/crypto3/pkpad/emsa.hpp>
+#include <iterator>
+#include <type_traits>
+
+#include <nil/crypto3/algebra/type_traits.hpp>
+
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+
+#include <nil/marshalling/field_type.hpp>
+#include <nil/crypto3/marshalling/types/algebra/field_element.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             namespace padding {
-                template<typename Scheme, typename Hash>
-                struct emsa1 : public emsa<Scheme, Hash> {
-                    template<typename UniformRandomBitGenerator, typename RandomNumberDistribution,
-                             typename InputIterator, typename OutputIterator>
-                    OutputIterator encode(InputIterator first, InputIterator last, OutputIterator out,
-                                          UniformRandomBitGenerator rand, RandomNumberDistribution dist) {
-                        std::ptrdiff_t distance = std::distance(first, last);
+                namespace detail {
+                    template<typename MsgReprType, typename Hash, typename = void>
+                    struct emsa1_encoding_policy;
 
-                        if (distance != Hash::policy_type::digest_bits / 8) {
-                            throw encoding_error("EMSA1::encoding_of: Invalid size for input");
-                        }
-                        return emsa1_encoding(first, last, output_bits);
-                    }
+                    template<typename MsgReprType, typename Hash>
+                    struct emsa1_encoding_policy<
+                        MsgReprType, Hash,
+                        typename std::enable_if<
+                            algebra::is_field<typename MsgReprType::field_type>::value &&
+                            !algebra::is_extended_field<typename MsgReprType::field_type>::value>::type> {
+                        typedef Hash hash_type;
 
-                    template<typename InputIterator1, typename InputIterator2>
-                    bool verify(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2,
-                                InputIterator2 last2, std::size_t key_bits) const {
-                        std::ptrdiff_t input_size = std::distance(first1, last1);
-                        std::ptrdiff_t raw_size = std::distance(first2, last2);
+                    protected:
+                        typedef typename MsgReprType::field_type field_type;
+                        typedef ::nil::marshalling::option::big_endian endianness;
+                        typedef ::nil::crypto3::marshalling::types::field_element<
+                            ::nil::marshalling::field_type<::nil::marshalling::option::big_endian>, field_type>
+                            marshalling_field_element_type;
 
-                        if (raw_size != Hash::policy_type::digest_bits) {
-                            return false;
-                        }
+                        constexpr static std::size_t digest_bits = hash_type::digest_bits;
 
-                        // Call emsa1_encoding to handle any required bit shifting
-                        const secure_vector<uint8_t> our_coding = emsa1_encoding(first2, last2, key_bits);
+                        constexpr static std::size_t modulus_bits = field_type::modulus_bits;
+                        constexpr static std::size_t modulus_octets =
+                            modulus_bits / 8 + static_cast<std::size_t>(modulus_bits % 8 != 0);
 
-                        if (our_coding.size() < input_size) {
-                            return false;
-                        }
+                        typedef std::array<std::uint8_t, modulus_octets> modulus_octets_container_type;
 
-                        const size_t offset = our_coding.size() - input_size;    // must be >= 0 per check above
+                    public:
+                        typedef MsgReprType msg_repr_type;
+                        typedef accumulator_set<hash_type> internal_accumulator_type;
+                        typedef msg_repr_type result_type;
 
-                        // If our encoding is longer, all the bytes in it must be zero
-                        for (size_t i = 0; i != offset; ++i) {
-                            if (our_coding[i] != 0) {
-                                return false;
-                            }
+                        static inline void init_accumulator(internal_accumulator_type &acc) {
                         }
 
-                        return constant_time_compare(input.data(), &our_coding[offset], input_size);
-                    }
-
-                    template<typename SinglePassRange1, typename SinglePassRange2>
-                    bool verify(const SinglePassRange1 &range1, const SinglePassRange2 &range2,
-                                std::size_t key_bits) const {
-                        return verify(boost::begin(range1), boost::end(range1), boost::begin(range2),
-                                      boost::end(range2), key_bits);
-                    }
-
-                protected:
-                    template<typename InputIterator, typename OutputIterator>
-                    OutputIterator emsa1_encoding(InputIterator first, InputIterator last, OutputIterator out,
-                                                  size_t output_bits) {
-                        std::ptrdiff_t message_size = std::distance(first, last);
-
-                        if (8 * message_size <= output_bits) {
-                            return std::move(first, last, out);
+                        template<typename InputRange>
+                        static inline void update(internal_accumulator_type &acc, const InputRange &range) {
+                            hash<hash_type>(range, acc);
                         }
 
-                        size_t shift = 8 * message_size - output_bits;
-
-                        size_t byte_shift = shift / 8, bit_shift = shift % 8;
-                        secure_vector<uint8_t> digest(message_size - byte_shift);
-
-                        for (size_t j = 0; j != message_size - byte_shift; ++j) {
-                            digest[j] = msg[j];
+                        template<typename InputIterator>
+                        static inline void update(internal_accumulator_type &acc, InputIterator first,
+                                                  InputIterator last) {
+                            hash<hash_type>(first, last, acc);
                         }
 
-                        if (bit_shift) {
-                            uint8_t carry = 0;
-                            for (size_t j = 0; j != digest.size(); ++j) {
-                                uint8_t temp = digest[j];
-                                digest[j] = (temp >> bit_shift) | carry;
-                                carry = (temp << (8 - bit_shift));
-                            }
+                        template<std::size_t DigistBits = digest_bits, std::size_t ModulusBits = modulus_bits,
+                                 typename std::enable_if<(DigistBits >= ModulusBits), bool>::type = true>
+                        static inline result_type process(internal_accumulator_type &acc) {
+                            typename hash_type::digest_type digest =
+                                ::nil::crypto3::accumulators::extract::hash<hash_type>(acc);
+                            marshalling_field_element_type marshalling_field_element;
+                            auto it = digest.cbegin();
+                            marshalling_field_element.read(it, digest.size());
+                            return crypto3::marshalling::types::make_field_element<field_type, endianness>(
+                                marshalling_field_element);
                         }
-                        return digest;
-                    }
+
+                        template<std::size_t DigistBits = digest_bits, std::size_t ModulusBits = modulus_bits,
+                                 typename std::enable_if<(DigistBits < ModulusBits), bool>::type = true>
+                        static inline result_type process(internal_accumulator_type &acc) {
+                            typename hash_type::digest_type digest =
+                                ::nil::crypto3::accumulators::extract::hash<hash_type>(acc);
+                            // TODO: creating copy of digest range of modulus_octets size is a bottleneck:
+                            //  extend marshaling interface by function supporting initialization from container which
+                            //  length is less than modulus_octets
+                            modulus_octets_container_type modulus_octets_container;
+                            modulus_octets_container.fill(0);
+                            std::copy(std::crbegin(digest), std::crend(digest), std::rbegin(modulus_octets_container));
+                            marshalling_field_element_type marshalling_field_element;
+                            auto it = modulus_octets_container.cbegin();
+                            marshalling_field_element.read(it, modulus_octets_container.size());
+                            return crypto3::marshalling::types::make_field_element<field_type, endianness>(
+                                marshalling_field_element);
+                        }
+                    };
+
+                    template<typename MsgReprType, typename Hash>
+                    struct emsa1_encoding_policy<
+                        MsgReprType, Hash,
+                        typename std::enable_if<
+                            algebra::is_field<MsgReprType>::value &&
+                            !algebra::is_extended_field<typename MsgReprType::field_type>::value>::type>
+                        : public emsa1_encoding_policy<typename MsgReprType::value_type, Hash> { };
+
+                    template<typename MsgReprType, typename Hash, typename = void>
+                    struct emsa1_verification_policy;
+
+                    template<typename MsgReprType, typename Hash>
+                    struct emsa1_verification_policy<
+                        MsgReprType, Hash,
+                        typename std::enable_if<
+                            algebra::is_field<typename MsgReprType::field_type>::value &&
+                            !algebra::is_extended_field<typename MsgReprType::field_type>::value>::type> {
+                    protected:
+                        typedef typename MsgReprType::field_type field_type;
+                        typedef ::nil::crypto3::marshalling::types::field_element<
+                            ::nil::marshalling::field_type<::nil::marshalling::option::big_endian>, field_type>
+                            marshalling_field_element_type;
+                        typedef emsa1_encoding_policy<MsgReprType, Hash> encoding_policy;
+
+                    public:
+                        typedef Hash hash_type;
+                        typedef MsgReprType msg_repr_type;
+                        typedef typename encoding_policy::internal_accumulator_type internal_accumulator_type;
+                        typedef bool result_type;
+
+                        static inline void init_accumulator(internal_accumulator_type &acc) {
+                            encoding_policy::init_accumulator(acc);
+                        }
+
+                        template<typename InputRange>
+                        static inline void update(internal_accumulator_type &acc, const InputRange &range) {
+                            encoding_policy::update(range, acc);
+                        }
+
+                        template<typename InputIterator>
+                        static inline void update(internal_accumulator_type &acc, InputIterator first,
+                                                  InputIterator last) {
+                            encoding_policy::update(first, last, acc);
+                        }
+
+                        static inline result_type process(internal_accumulator_type &acc,
+                                                          const msg_repr_type &msg_repr) {
+                            return encoding_policy::process(acc) == msg_repr;
+                        }
+                    };
+
+                    template<typename MsgReprType, typename Hash>
+                    struct emsa1_verification_policy<
+                        MsgReprType, Hash,
+                        typename std::enable_if<
+                            algebra::is_field<MsgReprType>::value &&
+                            !algebra::is_extended_field<typename MsgReprType::field_type>::value>::type>
+                        : public emsa1_verification_policy<typename MsgReprType::value_type, Hash> { };
+                }    // namespace detail
+
+                /*!
+                 * @brief EMSA1 from IEEE 1363.
+                 * Essentially, sign the hash directly
+                 *
+                 * @tparam MsgReprType
+                 * @tparam Hash
+                 * @tparam l
+                 */
+                template<typename MsgReprType, typename Hash, typename Params = void>
+                struct emsa1 {
+                    typedef MsgReprType msg_repr_type;
+                    typedef Hash hash_type;
+
+                    typedef detail::emsa1_encoding_policy<MsgReprType, Hash> encoding_policy;
+                    typedef detail::emsa1_verification_policy<MsgReprType, Hash> verification_policy;
                 };
             }    // namespace padding
         }        // namespace pubkey
     }            // namespace crypto3
 }    // namespace nil
 
-#endif
+#endif    // CRYPTO3_PK_PAD_EMSA1_HPP
