@@ -22,27 +22,29 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_HASH_STATE_HPP
-#define CRYPTO3_HASH_STATE_HPP
+#ifndef CRYPTO3_HASH_TO_CURVE_STATE_HPP
+#define CRYPTO3_HASH_TO_CURVE_STATE_HPP
 
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/framework/features.hpp>
 
-#include <nil/crypto3/detail/type_traits.hpp>
-
-#include <nil/crypto3/hash/accumulators/hash.hpp>
-
-#include <nil/crypto3/detail/static_digest.hpp>
+#include <nil/crypto3/hash/accumulators/to_curve.hpp>
 
 namespace nil {
     namespace crypto3 {
-        template<typename Hash, typename = typename std::enable_if<detail::is_hash<Hash>::value>::type>
-        struct accumulator_set
-            : public boost::accumulators::accumulator_set<static_digest<Hash::digest_bits>,
-                                                          boost::accumulators::features<accumulators::tag::hash<Hash>>,
-                                                          std::size_t> {
-            typedef Hash hash_type;
-        };
+        /*!
+         * @brief Accumulator set with pre-defined hashing to curve accumulator params.
+         *
+         * Meets the requirements of AccumulatorSet
+         *
+         * @ingroup hashes
+         *
+         * @tparam HashingPolicy
+         */
+        template<typename HashingPolicy>
+        using hashing_to_curve_accumulator_set = boost::accumulators::accumulator_set<
+            typename HashingPolicy::result_type,
+            boost::accumulators::features<hashes::accumulators::tag::to_curve<HashingPolicy>>>;
     }    // namespace crypto3
 }    // namespace nil
 

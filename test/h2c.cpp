@@ -38,8 +38,6 @@
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
-#include <nil/crypto3/hash/h2c.hpp>
-
 #include <nil/crypto3/hash/algorithm/to_curve.hpp>
 
 using namespace nil::crypto3;

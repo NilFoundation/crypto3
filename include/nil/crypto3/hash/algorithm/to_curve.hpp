@@ -22,13 +22,13 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_TO_CURVE_HPP
-#define CRYPTO3_TO_CURVE_HPP
+#ifndef CRYPTO3_HASH_TO_CURVE_HPP
+#define CRYPTO3_HASH_TO_CURVE_HPP
 
 #include <nil/crypto3/hash/h2c.hpp>
 
+#include <nil/crypto3/hash/to_curve_state.hpp>
 #include <nil/crypto3/hash/to_curve_value.hpp>
-#include <nil/crypto3/hash/hash_state.hpp>
 
 #include <nil/crypto3/detail/type_traits.hpp>
 
@@ -272,4 +272,4 @@ namespace nil {
     }    // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_TO_CURVE_HPP
+#endif    // CRYPTO3_HASH_TO_CURVE_HPP
