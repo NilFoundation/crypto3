@@ -47,9 +47,6 @@
 
 #include <nil/crypto3/hash/sha2.hpp>
 
-#include <nil/crypto3/pkpad/algorithms/encode.hpp>
-#include <nil/crypto3/pkpad/emsa/emsa_h2c.hpp>
-
 #include <nil/crypto3/pubkey/detail/bls/bls_basic_policy.hpp>
 #include <nil/crypto3/pubkey/detail/bls/bls_basic_functions.hpp>
 #include <nil/crypto3/pubkey/private_key.hpp>
@@ -296,11 +293,11 @@ namespace nil {
                 typedef detail::bls_basic_functions<policy_type> basic_functions;
             };
 
-            template<padding::UniformityCount _uniformity_count = padding::UniformityCount::uniform_count,
-                     padding::ExpandMsgVariant _expand_msg_variant = padding::ExpandMsgVariant::rfc_xmd>
+            template<hashes::UniformityCount _uniformity_count = hashes::UniformityCount::uniform_count,
+                     hashes::ExpandMsgVariant _expand_msg_variant = hashes::ExpandMsgVariant::rfc_xmd>
             struct bls_default_public_params {
-                constexpr static padding::UniformityCount uniformity_count = _uniformity_count;
-                constexpr static padding::ExpandMsgVariant expand_msg_variant = _expand_msg_variant;
+                constexpr static hashes::UniformityCount uniformity_count = _uniformity_count;
+                constexpr static hashes::ExpandMsgVariant expand_msg_variant = _expand_msg_variant;
 
                 // "BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_NUL_"
                 constexpr static std::array<std::uint8_t, 43> dst = {

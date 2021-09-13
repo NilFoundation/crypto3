@@ -37,7 +37,7 @@
 
 #include <boost/range/concepts.hpp>
 
-#include <nil/crypto3/pkpad/algorithms/encode.hpp>
+#include <nil/crypto3/hash/algorithm/to_curve.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
@@ -54,12 +54,12 @@ namespace nil {
                     typedef typename policy_type::private_key_type private_key_type;
                     typedef typename policy_type::public_key_type public_key_type;
                     typedef typename policy_type::signature_type signature_type;
+                    typedef typename policy_type::h2c_policy h2c_policy;
 
                     typedef typename policy_type::bls_serializer bls_serializer;
                     typedef typename policy_type::public_key_serialized_type public_key_serialized_type;
                     typedef typename policy_type::signature_serialized_type signature_serialized_type;
 
-                    typedef typename policy_type::padding_policy padding_policy;
                     typedef typename policy_type::internal_accumulator_type internal_accumulator_type;
                     typedef typename policy_type::internal_aggregation_accumulator_type
                         internal_aggregation_accumulator_type;
@@ -93,21 +93,20 @@ namespace nil {
                     static inline void update(internal_accumulator_type &acc, const InputRange &range) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<InputRange>));
 
-                        encode<padding_policy>(range, acc);
+                        to_curve<typename h2c_policy::group_type, typename h2c_policy::params_type>(range, acc);
                     }
 
                     template<typename InputIterator>
                     static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
-                        encode<padding_policy>(first, last, acc);
+                        to_curve<typename h2c_policy::group_type, typename h2c_policy::params_type>(first, last, acc);
                     }
 
                     static inline signature_type sign(internal_accumulator_type &acc, const private_key_type &sk) {
                         BOOST_ASSERT(validate_private_key(sk));
 
-                        signature_type Q =
-                            padding::accumulators::extract::encode<padding::encoding_policy<padding_policy>>(acc);
+                        signature_type Q = hashes::accumulators::extract::to_curve<h2c_policy>(acc);
                         return sk * Q;
                     }
 
@@ -120,8 +119,7 @@ namespace nil {
                         if (!validate_public_key(pk)) {
                             return false;
                         }
-                        signature_type Q =
-                            padding::accumulators::extract::encode<padding::encoding_policy<padding_policy>>(acc);
+                        signature_type Q = hashes::accumulators::extract::to_curve<h2c_policy>(acc);
                         auto C1 = policy_type::pairing(Q, pk);
                         auto C2 = policy_type::pairing(sig, public_key_type::one());
                         return C1 == C2;
@@ -177,9 +175,7 @@ namespace nil {
                             if (!validate_public_key(*pk_n_iter)) {
                                 return false;
                             }
-                            signature_type Q =
-                                padding::accumulators::extract::encode<padding::encoding_policy<padding_policy>>(
-                                    *acc_n_iter++);
+                            signature_type Q = hashes::accumulators::extract::to_curve<h2c_policy>(*acc_n_iter++);
                             C1 = C1 * policy_type::pairing(Q, *pk_n_iter++);
                         }
                         return C1 == policy_type::pairing(sig, public_key_type::one());

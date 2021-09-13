@@ -30,7 +30,7 @@
 #include <utility>
 #include <vector>
 
-#include <nil/crypto3/pkpad/emsa/emsa_h2c.hpp>
+#include <nil/crypto3/hash/algorithm/to_curve.hpp>
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 #include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
@@ -80,8 +80,8 @@ namespace nil {
                     constexpr static const std::size_t public_key_bits = public_key_type::value_bits;
                     constexpr static const std::size_t signature_bits = signature_type::value_bits;
 
-                    typedef padding::emsa_h2c<signature_type, PublicParams> padding_policy;
-                    typedef padding::encoding_accumulator_set<padding_policy> internal_accumulator_type;
+                    typedef hashes::h2c<signature_group_type, PublicParams> h2c_policy;
+                    typedef hashing_to_curve_accumulator_set<h2c_policy> internal_accumulator_type;
                     typedef std::pair<std::vector<public_key_type>, std::vector<internal_accumulator_type>>
                         internal_aggregation_accumulator_type;
 
@@ -118,8 +118,8 @@ namespace nil {
                     constexpr static const std::size_t public_key_bits = public_key_type::value_bits;
                     constexpr static const std::size_t signature_bits = signature_type::value_bits;
 
-                    typedef padding::emsa_h2c<signature_type, PublicParams> padding_policy;
-                    typedef padding::encoding_accumulator_set<padding_policy> internal_accumulator_type;
+                    typedef hashes::h2c<signature_group_type, PublicParams> h2c_policy;
+                    typedef hashing_to_curve_accumulator_set<h2c_policy> internal_accumulator_type;
                     typedef std::pair<std::vector<public_key_type>, std::vector<internal_accumulator_type>>
                         internal_aggregation_accumulator_type;
 
