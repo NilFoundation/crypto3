@@ -37,7 +37,6 @@ endmacro()
 
 set(TESTS_NAMES
         "emsa1"
-        "emsa_h2c"
         )
 
 foreach (TEST_NAME ${TESTS_NAMES})
