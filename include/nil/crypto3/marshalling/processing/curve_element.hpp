@@ -36,6 +36,9 @@
 
 #include <nil/crypto3/algebra/type_traits.hpp>
 
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/curves/curve25519.hpp>
+
 #include <nil/crypto3/marshalling/processing/integral.hpp>
 #include <nil/crypto3/marshalling/processing/detail/curve_element.hpp>
 
@@ -45,7 +48,11 @@ namespace nil {
             namespace processing {
 
                 template<std::size_t TSize, typename Endianness, typename G1GroupElement, typename TIter>
-                typename std::enable_if<algebra::is_g1_group_element<G1GroupElement>::value, void>::type
+                typename std::enable_if<std::is_same<typename algebra::curves::bls12_381::g1_type<
+                                                         typename G1GroupElement::coordinates,
+                                                         algebra::curves::forms::short_weierstrass>::value_type,
+                                                     G1GroupElement>::value,
+                                        void>::type
                     curve_element_write_data(const G1GroupElement &point, TIter &iter) {
 
                     using chunk_type = typename TIter::value_type;
@@ -70,7 +77,11 @@ namespace nil {
                 }
 
                 template<std::size_t TSize, typename Endianness, typename G2GroupElement, typename TIter>
-                typename std::enable_if<algebra::is_g2_group_element<G2GroupElement>::value, void>::type
+                typename std::enable_if<std::is_same<typename algebra::curves::bls12_381::g2_type<
+                                                         typename G2GroupElement::coordinates,
+                                                         algebra::curves::forms::short_weierstrass>::value_type,
+                                                     G2GroupElement>::value,
+                                        void>::type
                     curve_element_write_data(const G2GroupElement &point, TIter &iter) {
 
                     using chunk_type = typename TIter::value_type;
@@ -110,7 +121,49 @@ namespace nil {
                 }
 
                 template<std::size_t TSize, typename Endianness, typename G1GroupElement, typename TIter>
-                typename std::enable_if<algebra::is_g1_group_element<G1GroupElement>::value, G1GroupElement>::type
+                typename std::enable_if<
+
+                    std::is_same<typename algebra::curves::curve25519::g1_type<
+                                     typename G1GroupElement::coordinates,
+                                     algebra::curves::forms::twisted_edwards>::value_type,
+                                 G1GroupElement>::value &&
+                        std::is_same<std::uint8_t, typename std::iterator_traits<TIter>::value_type>::value &&
+                        std::is_same<nil::marshalling::endian::little_endian, Endianness>::value,
+                    void>::type
+                    curve_element_write_data(const G1GroupElement &point, TIter &iter) {
+                    using group_value_type = G1GroupElement;
+                    using group_type = typename group_value_type::group_type;
+                    using base_field_type = typename group_type::field_type;
+                    using base_integral_type = typename base_field_type::integral_type;
+                    using group_affine_value_type =
+                        typename algebra::curves::curve25519::g1_type<algebra::curves::coordinates::affine,
+                                                                      typename G1GroupElement::form>::value_type;
+                    // TODO: somehow add size check of container pointed by iter
+                    constexpr std::size_t encoded_size = 32;
+                    static_assert(encoded_size == (TSize / 8 + (TSize % 8 ? 1 : 0)), "wrong size");
+                    using encoded_value_type = std::array<std::uint8_t, encoded_size>;
+
+                    group_affine_value_type point_affine = point.to_affine();
+                    // TODO: remove crating of temporary array encoded_value
+                    encoded_value_type encoded_value;
+                    // TODO: remove lvalue iterator
+                    auto tmp_iter = std::begin(encoded_value);
+                    write_data<encoded_size, Endianness>(static_cast<base_integral_type>(point_affine.Y.data),
+                                                         tmp_iter);
+                    // TODO: throw catchable error, for example return status
+                    assert(!(encoded_value[encoded_size - 1] & 0x80));
+                    encoded_value[encoded_size - 1] |=
+                        (static_cast<std::uint8_t>(static_cast<base_integral_type>(point_affine.X.data) & 1) << 7);
+
+                    std::copy(std::cbegin(encoded_value), std::cend(encoded_value), iter);
+                }
+
+                template<std::size_t TSize, typename Endianness, typename G1GroupElement, typename TIter>
+                typename std::enable_if<std::is_same<typename algebra::curves::bls12_381::g1_type<
+                                                         typename G1GroupElement::coordinates,
+                                                         algebra::curves::forms::short_weierstrass>::value_type,
+                                                     G1GroupElement>::value,
+                                        G1GroupElement>::type
                     curve_element_read_data(TIter &iter) {
 
                     using chunk_type = typename TIter::value_type;
@@ -157,7 +210,11 @@ namespace nil {
                 }
 
                 template<std::size_t TSize, typename Endianness, typename G2GroupElement, typename TIter>
-                typename std::enable_if<algebra::is_g2_group_element<G2GroupElement>::value, G2GroupElement>::type
+                typename std::enable_if<std::is_same<typename algebra::curves::bls12_381::g2_type<
+                                                         typename G2GroupElement::coordinates,
+                                                         algebra::curves::forms::short_weierstrass>::value_type,
+                                                     G2GroupElement>::value,
+                                        G2GroupElement>::type
                     curve_element_read_data(TIter &iter) {
 
                     using chunk_type = typename TIter::value_type;
@@ -208,6 +265,37 @@ namespace nil {
                     g2_value_type result(x_mod, -y_mod, g2_field_value_type::one());
                     BOOST_ASSERT(result.is_well_formed());
                     return result;
+                }
+
+                template<std::size_t TSize, typename Endianness, typename G1GroupElement, typename TIter>
+                typename std::enable_if<
+                    std::is_same<typename algebra::curves::curve25519::g1_type<
+                                     typename G1GroupElement::coordinates,
+                                     algebra::curves::forms::twisted_edwards>::value_type,
+                                 G1GroupElement>::value &&
+                        std::is_same<std::uint8_t, typename std::iterator_traits<TIter>::value_type>::value &&
+                        std::is_same<nil::marshalling::endian::little_endian, Endianness>::value,
+                    G1GroupElement>::type
+                    curve_element_read_data(TIter &iter) {
+                    // somehow add size check of container pointed by iter
+                    // assert(TSize == std::distance(first, last));
+                    using group_value_type = G1GroupElement;
+                    using group_type = typename group_value_type::group_type;
+                    using base_field_type = typename group_type::field_type;
+                    using base_integral_type = typename base_field_type::integral_type;
+                    using group_affine_value_type =
+                        typename algebra::curves::curve25519::g1_type<algebra::curves::coordinates::affine,
+                                                                      typename G1GroupElement::form>::value_type;
+                    constexpr std::size_t encoded_size = 32;
+                    static_assert(encoded_size == (TSize / 8 + (TSize % 8 ? 1 : 0)), "wrong size");
+
+                    base_integral_type y = read_data<TSize, base_integral_type, Endianness>(iter);
+                    bool sign = *(iter + encoded_size - 1) & (1 << 7);
+                    group_affine_value_type decoded_point_affine = detail::recover_x<group_affine_value_type>(y, sign);
+
+                    // TODO: remove hard-coded call for type conversion, implement type conversion between coordinates
+                    //  through operator
+                    return decoded_point_affine.to_extended_with_a_minus_1();
                 }
             }    // namespace processing
         }        // namespace marshalling
