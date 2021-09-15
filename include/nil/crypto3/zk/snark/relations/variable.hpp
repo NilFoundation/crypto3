@@ -43,7 +43,6 @@ namespace nil {
                 /**
                  * Mnemonic typedefs.
                  */
-                typedef std::size_t var_index_t;
                 typedef long integer_coeff_t;
 
                 /**
@@ -66,9 +65,10 @@ namespace nil {
                 template<typename FieldType>
                 struct variable {
 
-                    var_index_t index;
+                    typedef std::size_t index_type;
+                    index_type index;
 
-                    variable(const var_index_t index = 0) : index(index) {};
+                    variable(const index_type index = 0) : index(index) {};
 
                     linear_term<FieldType> operator*(const integer_coeff_t int_coeff) const {
                         return linear_term<FieldType>(*this, int_coeff);
@@ -146,7 +146,7 @@ namespace nil {
                     typedef typename field_type::value_type field_value_type;
 
                 public:
-                    var_index_t index;
+                    typename variable<FieldType>::index_type index;
                     field_value_type coeff;
 
                     linear_term() {};

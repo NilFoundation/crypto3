@@ -136,7 +136,7 @@ namespace nil {
                         if (i >= num_gates - num_outputs) {
                             /* make gate a circuit output and fix */
                             gate.is_circuit_output = true;
-                            const var_index_t var_idx =
+                            const typename variable<FieldType>::index_type var_idx =
                                 std::rand() % (1 + primary_input_size + std::min(num_gates - num_outputs, i));
                             const field_value_type var_val =
                                 (var_idx == 0 ? field_value_type::one() : all_vals[var_idx - 1]);
