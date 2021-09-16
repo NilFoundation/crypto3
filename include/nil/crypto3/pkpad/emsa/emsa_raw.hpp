@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -22,74 +23,109 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_EMSA_RAW_HPP
-#define CRYPTO3_EMSA_RAW_HPP
+#ifndef CRYPTO3_PK_PAD_EMSA_RAW_HPP
+#define CRYPTO3_PK_PAD_EMSA_RAW_HPP
 
-#include <nil/crypto3/pkpad/emsa.hpp>
+#include <type_traits>
+#include <vector>
+#include <algorithm>
+
+#include <nil/marshalling/algorithms/pack.hpp>
+#include <nil/marshalling/types/integral.hpp>
+#include <nil/marshalling/types/optional.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             namespace padding {
+                namespace detail {
+                    template<typename ValueType, typename = void>
+                    struct emsa_raw_encoding_policy;
 
-                template<typename Scheme, typename Hash>
-                struct emsa_raw : public emsa<Scheme, Hash> {
-                    template<typename UniformRandomBitGenerator, typename RandomNumberDistribution,
-                             typename InputIterator, typename OutputIterator>
-                    OutputIterator encode(InputIterator first, InputIterator last, OutputIterator out,
-                                          UniformRandomBitGenerator rand, RandomNumberDistribution dist) {
-                        std::ptrdiff_t distance = std::distance(first, last);
+                    template<typename ValueType, typename = void>
+                    struct emsa_raw_verification_policy;
 
-                        if (Hash::policy_type::digest_bits / 8 && distance != Hash::policy_type::digest_bits / 8) {
-                            throw std::invalid_argument(
-                                "emsa_raw was configured to use a " + std::to_string(Hash::policy_type::digest_bits) +
-                                " byte hash but instead was used for a " + std::to_string(distance) + " hash");
+                    template<typename ValueType>
+                    struct emsa_raw_encoding_policy<ValueType,
+                                                    typename std::enable_if<std::is_integral<ValueType>::value>::type> {
+                        typedef std::vector<ValueType> internal_accumulator_type;
+                        typedef internal_accumulator_type result_type;
+
+                        static inline void init_accumulator(internal_accumulator_type &acc) {
                         }
 
-                        return std::move(first, last, out);
-                    }
-
-                    template<typename InputIterator1, typename InputIterator2>
-                    bool verify(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2,
-                                InputIterator2 last2, std::size_t key_bits) const {
-                        std::ptrdiff_t coded_size = std::distance(first1, last1);
-                        std::ptrdiff_t raw_size = std::distance(first2, last2);
-
-                        if (Hash::policy_type::digest_bits / 8 && raw_size != Hash::policy_type::digest_bits / 8) {
-                            return false;
+                        // TODO: pack data from input::value_type to accumulator::value_type
+                        template<typename InputRange>
+                        static inline typename std::enable_if<std::is_same<
+                            ValueType,
+                            typename std::iterator_traits<typename InputRange::iterator>::value_type>::value>::type
+                            update(internal_accumulator_type &acc, const InputRange &range) {
+                            std::copy(std::cbegin(range), std::cend(range), std::back_inserter(acc));
                         }
 
-                        if (coded_size == raw_size) {
-                            return (std::equal(first1, last1, first2, last2));
-                        } else if (coded_size > raw_size) {
-                            return false;
+                        // TODO: pack data from input::value_type to accumulator::value_type
+                        template<typename InputIterator>
+                        static inline typename std::enable_if<std::is_same<
+                            ValueType, typename std::iterator_traits<InputIterator>::value_type>::value>::type
+                            update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
+                            std::copy(first, last, std::back_inserter(acc));
                         }
 
-                        // handle zero padding differences
-                        const std::ptrdiff_t leading_zeros_expected = raw_size - coded_size;
+                        static inline result_type process(internal_accumulator_type &acc) {
+                            return acc;
+                        }
+                    };
 
-                        bool same_modulo_leading_zeros = true;
+                    template<typename ValueType>
+                    struct emsa_raw_verification_policy<
+                        ValueType, typename std::enable_if<std::is_integral<ValueType>::value>::type> {
+                    protected:
+                        typedef emsa_raw_encoding_policy<ValueType> encoding_policy;
 
-                        for (size_t i = 0; i != leading_zeros_expected; ++i) {
-                            if (raw[i]) {
-                                same_modulo_leading_zeros = false;
-                            }
+                    public:
+                        typedef typename encoding_policy::internal_accumulator_type internal_accumulator_type;
+                        typedef bool result_type;
+
+                        static inline void init_accumulator(internal_accumulator_type &acc) {
+                            encoding_policy::init_accumulator(acc);
                         }
 
-                        if (!constant_time_compare(coded.data(), raw.data() + leading_zeros_expected, coded_size)) {
-                            same_modulo_leading_zeros =
-                                constant_time_compare(coded.data(), raw.data() + leading_zeros_expected, coded_size);
+                        template<typename InputRange>
+                        static inline void update(internal_accumulator_type &acc, const InputRange &range) {
+                            encoding_policy::update(range, acc);
                         }
 
-                        return same_modulo_leading_zeros;
-                    }
+                        template<typename InputIterator>
+                        static inline void update(internal_accumulator_type &acc, InputIterator first,
+                                                  InputIterator last) {
+                            encoding_policy::update(first, last, acc);
+                        }
 
-                    template<typename SinglePassRange1, typename SinglePassRange2>
-                    bool verify(const SinglePassRange1 &range1, const SinglePassRange2 &range2,
-                                std::size_t key_bits) const {
-                        return verify(boost::begin(range1), boost::end(range1), boost::begin(range2),
-                                      boost::end(range2), key_bits);
-                    }
+                        template<typename InputRange>
+                        static inline typename std::enable_if<
+                            std::is_same<ValueType, typename std::iterator_traits<
+                                                        typename InputRange::iterator>::value_type>::value,
+                            result_type>::type
+                            process(internal_accumulator_type &acc, const InputRange &msg_repr) {
+                            return std::equal(std::cbegin(acc), std::cend(acc), std::cbegin(msg_repr),
+                                              std::cend(msg_repr));
+                        }
+                    };
+                }    // namespace detail
+
+                /*!
+                 * @brief EMSA raw.
+                 * Essentially, accumulate input data in the container with elements of ValueType and return it
+                 * unchanged.
+                 *
+                 * @tparam ValueType
+                 */
+                template<typename ValueType>
+                struct emsa_raw {
+                    typedef ValueType value_type;
+
+                    typedef detail::emsa_raw_encoding_policy<ValueType> encoding_policy;
+                    typedef detail::emsa_raw_verification_policy<ValueType> verification_policy;
                 };
             }    // namespace padding
         }        // namespace pubkey

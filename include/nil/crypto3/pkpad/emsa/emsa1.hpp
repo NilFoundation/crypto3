@@ -175,6 +175,68 @@ namespace nil {
                             algebra::is_field<MsgReprType>::value &&
                             !algebra::is_extended_field<typename MsgReprType::field_type>::value>::type>
                         : public emsa1_verification_policy<typename MsgReprType::value_type, Hash> { };
+
+                    template<typename MsgReprType, typename Hash>
+                    struct emsa1_encoding_policy<
+                        MsgReprType, Hash,
+                        typename std::enable_if<std::is_same<typename Hash::digest_type, MsgReprType>::value>::type> {
+                        typedef Hash hash_type;
+                        typedef MsgReprType msg_repr_type;
+                        typedef accumulator_set<hash_type> internal_accumulator_type;
+                        typedef msg_repr_type result_type;
+
+                        static inline void init_accumulator(internal_accumulator_type &acc) {
+                        }
+
+                        template<typename InputRange>
+                        static inline void update(internal_accumulator_type &acc, const InputRange &range) {
+                            hash<hash_type>(range, acc);
+                        }
+
+                        template<typename InputIterator>
+                        static inline void update(internal_accumulator_type &acc, InputIterator first,
+                                                  InputIterator last) {
+                            hash<hash_type>(first, last, acc);
+                        }
+
+                        static inline result_type process(internal_accumulator_type &acc) {
+                            return ::nil::crypto3::accumulators::extract::hash<hash_type>(acc);
+                        }
+                    };
+
+                    template<typename MsgReprType, typename Hash>
+                    struct emsa1_verification_policy<
+                        MsgReprType, Hash,
+                        typename std::enable_if<std::is_same<typename Hash::digest_type, MsgReprType>::value>::type> {
+                    protected:
+                        typedef emsa1_encoding_policy<MsgReprType, Hash> encoding_policy;
+
+                    public:
+                        typedef Hash hash_type;
+                        typedef MsgReprType msg_repr_type;
+                        typedef typename encoding_policy::internal_accumulator_type internal_accumulator_type;
+                        typedef bool result_type;
+
+                        static inline void init_accumulator(internal_accumulator_type &acc) {
+                            encoding_policy::init_accumulator(acc);
+                        }
+
+                        template<typename InputRange>
+                        static inline void update(internal_accumulator_type &acc, const InputRange &range) {
+                            encoding_policy::update(range, acc);
+                        }
+
+                        template<typename InputIterator>
+                        static inline void update(internal_accumulator_type &acc, InputIterator first,
+                                                  InputIterator last) {
+                            encoding_policy::update(first, last, acc);
+                        }
+
+                        static inline result_type process(internal_accumulator_type &acc,
+                                                          const msg_repr_type &msg_repr) {
+                            return encoding_policy::process(acc) == msg_repr;
+                        }
+                    };
                 }    // namespace detail
 
                 /*!
