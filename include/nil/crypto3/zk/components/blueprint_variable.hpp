@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Noam Yemini <@NoamDev at GitHub>
 //
 // MIT License
 //
@@ -44,7 +45,7 @@ namespace nil {
                 template<typename FieldType>
                 class blueprint_variable : public snark::variable<FieldType> {
                 public:
-                    blueprint_variable(const typename snark::var_index_t index = 0) :
+                    blueprint_variable(const typename snark::index_type index = 0) :
                         snark::variable<FieldType>(index) {};
 
                     void allocate(blueprint<FieldType> &bp) {
