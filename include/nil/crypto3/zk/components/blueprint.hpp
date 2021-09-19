@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Noam Yemini <@NoamDev at GitHub>
 //
 // MIT License
 //
@@ -47,7 +48,7 @@ namespace nil {
                                                                 allocated variable of the blueprint, *NOT* constant 1 */
                     typename FieldType::value_type constant_term;
 
-                    typename snark::var_index_t next_free_var;
+                    typename snark::index_type next_free_var;
                     lc_index_t next_free_lc;
                     std::vector<typename FieldType::value_type> lc_values;
                     snark::r1cs_constraint_system<FieldType> constraint_system;
@@ -140,7 +141,7 @@ namespace nil {
                     friend class blueprint_linear_combination<FieldType>;
 
                 private:
-                    typename snark::var_index_t allocate_var_index() {
+                    typename snark::index_type allocate_var_index() {
                         ++constraint_system.auxiliary_input_size;
                         values.emplace_back(FieldType::value_type::zero());
                         return next_free_var++;
