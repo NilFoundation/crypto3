@@ -118,6 +118,38 @@ struct test_eddsa_params_void {
     static inline const context_type context = {};
 };
 
+template<pubkey::EddsaVariant eddsa_variant,
+         typename Params,
+         typename InputRange,
+         typename Group = algebra::curves::curve25519::template g1_type<>>
+void check_eddsa(
+    const InputRange &msg,
+    const pubkey::private_key<pubkey::eddsa<Group, eddsa_variant, Params>> &private_key,
+    const pubkey::public_key<pubkey::eddsa<Group, eddsa_variant, Params>> &etalon_public_key,
+    const typename pubkey::private_key<pubkey::eddsa<Group, eddsa_variant, Params>>::signature_type &etalon_sig) {
+    using scheme_type = pubkey::eddsa<Group, eddsa_variant, Params>;
+    using private_key_type = pubkey::private_key<scheme_type>;
+    using public_key_type = pubkey::public_key<scheme_type>;
+    using _private_key_type = typename private_key_type::private_key_type;
+    using _public_key_type = typename public_key_type::public_key_type;
+
+    typename private_key_type::signature_type sig = sign<scheme_type>(msg, private_key);
+
+    BOOST_CHECK(etalon_public_key.public_key_data() == private_key.public_key_data());
+    BOOST_CHECK(etalon_sig == sig);
+    BOOST_CHECK(static_cast<bool>(verify<scheme_type>(msg, sig, private_key)));
+    // TODO: add checks after catching exceptions in marshalling will be fixed
+    // auto wrong_sig = sig;
+    // wrong_sig[1] = 0;
+    // BOOST_CHECK(!static_cast<bool>(verify<scheme_type>(msg, wrong_sig, private_key)));
+    // wrong_sig[1] = sig[1];
+    // wrong_sig[33] = 0;
+    // BOOST_CHECK(!static_cast<bool>(verify<scheme_type>(msg, wrong_sig, private_key)));
+    // wrong_sig[1] = 0;
+    // wrong_sig[33] = 0;
+    // BOOST_CHECK(!static_cast<bool>(verify<scheme_type>(msg, wrong_sig, private_key)));
+}
+
 BOOST_AUTO_TEST_SUITE(eddsa_conformity_test_suite)
 
 BOOST_AUTO_TEST_CASE(eddsa_key_gen_test) {
@@ -150,32 +182,6 @@ BOOST_AUTO_TEST_CASE(eddsa_key_gen_test) {
     std::array<std::uint8_t, 16> msg = {0xf7, 0x26, 0x93, 0x6d, 0x19, 0xc8, 0x00, 0x49,
                                         0x4e, 0x3f, 0xda, 0xff, 0x20, 0xb2, 0x76, 0xa8};
     typename private_key_type::signature_type sig = sign<scheme_type>(msg, private_key);
-
-    for (auto c : sig) {
-        std::cout << std::hex << int(c) << " ";
-    }
-    std::cout << std::endl;
-}
-
-template<pubkey::EddsaVariant eddsa_variant,
-         typename Params,
-         typename InputRange,
-         typename Group = algebra::curves::curve25519::template g1_type<>>
-void check_eddsa(
-    const InputRange &msg,
-    const pubkey::private_key<pubkey::eddsa<Group, eddsa_variant, Params>> &private_key,
-    const pubkey::public_key<pubkey::eddsa<Group, eddsa_variant, Params>> &etalon_public_key,
-    const typename pubkey::private_key<pubkey::eddsa<Group, eddsa_variant, Params>>::signature_type &etalon_sig) {
-    using scheme_type = pubkey::eddsa<Group, eddsa_variant, Params>;
-    using private_key_type = pubkey::private_key<scheme_type>;
-    using public_key_type = pubkey::public_key<scheme_type>;
-    using _private_key_type = typename private_key_type::private_key_type;
-    using _public_key_type = typename public_key_type::public_key_type;
-
-    typename private_key_type::signature_type sig = sign<scheme_type>(msg, private_key);
-
-    BOOST_CHECK(etalon_public_key.public_key_data() == private_key.public_key_data());
-    BOOST_CHECK(etalon_sig == sig);
 }
 
 // https://datatracker.ietf.org/doc/html/rfc8032#section-7.1

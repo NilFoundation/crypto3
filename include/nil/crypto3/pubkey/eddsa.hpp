@@ -167,9 +167,6 @@ namespace nil {
                 typedef nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<endianness>,
                                                                         scalar_field_type>
                     marshalling_scalar_field_value_type;
-                // typedef nil::crypto3::marshalling::types::integral<nil::marshalling::field_type<endianness>,
-                //                                                    scalar_integral_type>
-                //     marshalling_scalar_integral_type;
                 typedef nil::crypto3::marshalling::types::integral<nil::marshalling::field_type<endianness>,
                                                                    base_integral_type>
                     marshalling_base_integral_type;
@@ -185,7 +182,57 @@ namespace nil {
                 typedef std::array<std::uint8_t, signature_octets> signature_type;
 
                 public_key() = delete;
-                public_key(const public_key_type &key) : pubkey(key) {
+                public_key(const public_key_type &key) : pubkey_point(read_pubkey(key)), pubkey(key) {
+                }
+
+                static inline void init_accumulator(internal_accumulator_type &acc) {
+                }
+
+                template<typename InputRange>
+                inline void update(internal_accumulator_type &acc, const InputRange &range) const {
+                    encode<padding_policy>(range, acc);
+                }
+
+                template<typename InputIterator>
+                inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) const {
+                    encode<padding_policy>(first, last, acc);
+                }
+
+                // https://datatracker.ietf.org/doc/html/rfc8032#section-5.1.7
+                inline bool verify(internal_accumulator_type &acc, const signature_type &signature) const {
+                    // 1.
+                    marshalling_group_value_type marshalling_group_value_1;
+                    auto R_iter_1 = std::cbegin(signature);
+                    // TODO: process status
+                    nil::marshalling::status_type status =
+                        marshalling_group_value_1.read(R_iter_1, marshalling_group_value_type::bit_length());
+                    group_value_type R = marshalling_group_value_1.value();
+
+                    marshalling_scalar_field_value_type marshalling_scalar_field_value_1;
+                    auto S_iter_1 = std::cbegin(signature) + public_key_octets;
+                    // TODO: process status
+                    status = marshalling_scalar_field_value_1.read(S_iter_1,
+                                                                   marshalling_scalar_field_value_type::bit_length());
+                    scalar_field_value_type S = marshalling_scalar_field_value_1.value();
+
+                    // 2.
+                    auto ph_m = padding::accumulators::extract::encode<padding::encoding_policy<padding_policy>>(acc);
+                    accumulator_set<hash_type> hash_acc_2;
+                    hash<hash_type>(policy_type::get_dom(), hash_acc_2);
+                    hash<hash_type>(std::cbegin(signature), std::cbegin(signature) + public_key_octets, hash_acc_2);
+                    hash<hash_type>(this->pubkey, hash_acc_2);
+                    hash<hash_type>(ph_m, hash_acc_2);
+                    typename hash_type::digest_type h_2 =
+                        nil::crypto3::accumulators::extract::hash<hash_type>(hash_acc_2);
+                    marshalling_uint512_t_type marshalling_uint512_t_2;
+                    auto h_2_iter = std::cbegin(h_2);
+                    // TODO: process status
+                    status = marshalling_uint512_t_2.read(h_2_iter, hash_type::digest_bits);
+                    nil::crypto3::multiprecision::uint512_t k = marshalling_uint512_t_2.value();
+                    scalar_field_value_type k_reduced(k);
+
+                    // 3.
+                    return (S * group_value_type::one()) == (R + k_reduced * this->pubkey_point);
                 }
 
                 inline public_key_type public_key_data() const {
@@ -193,6 +240,16 @@ namespace nil {
                 }
 
             protected:
+                static inline group_value_type read_pubkey(const public_key_type &pubkey) {
+                    marshalling_group_value_type marshalling_group_value_1;
+                    auto pubkey_iter = std::cbegin(pubkey);
+                    // TODO: process status
+                    nil::marshalling::status_type status =
+                        marshalling_group_value_1.read(pubkey_iter, marshalling_group_value_type::bit_length());
+                    return marshalling_group_value_1.value();
+                }
+
+                group_value_type pubkey_point;
                 public_key_type pubkey;
             };
 
@@ -339,6 +396,7 @@ namespace nil {
                     return s;
                 }
 
+                // TODO: refactor eddsa private key internal fields
                 private_key_type privkey;
                 typename hash_type::digest_type h_privkey;
                 scalar_field_value_type s_reduced;
