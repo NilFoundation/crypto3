@@ -101,6 +101,7 @@ namespace nil {
                             encoding_policy::update(first, last, acc);
                         }
 
+                        // TODO: pack data from input::value_type to accumulator::value_type
                         template<typename InputRange>
                         static inline typename std::enable_if<
                             std::is_same<ValueType, typename std::iterator_traits<
