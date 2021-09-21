@@ -59,19 +59,10 @@ namespace nil {
                                 data_type({underlying_type::zero(), underlying_type::zero(), underlying_type::zero()});
                         }
 
-                        template<typename Number1,
-                                 typename Number2,
-                                 typename Number3,
-                                 typename std::enable_if<boost::is_integral<Number1>::value &&
-                                                             boost::is_integral<Number2>::value &&
-                                                             boost::is_integral<Number3>::value,
-                                                         bool>::type = true>
-                        constexpr element_fp3(Number1 in_data0, Number2 in_data1, Number3 in_data2) {
-                            data = data_type(
-                                {underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)});
-                        }
-
-                        constexpr element_fp3(integral_type in_data0, integral_type in_data1, integral_type in_data2) {
+                        template<typename Number1, typename Number2, typename Number3>
+                        constexpr element_fp3(const Number1 &in_data0,
+                                              const Number2 &in_data1,
+                                              const Number3 &in_data2) {
                             data = data_type(
                                 {underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)});
                         }
@@ -80,9 +71,9 @@ namespace nil {
                             data = data_type({in_data[0], in_data[1], in_data[2]});
                         };
 
-                        constexpr element_fp3(underlying_type in_data0,
-                                              underlying_type in_data1,
-                                              underlying_type in_data2) {
+                        constexpr element_fp3(const underlying_type &in_data0,
+                                              const underlying_type &in_data1,
+                                              const underlying_type &in_data2) {
                             data = data_type({in_data0, in_data1, in_data2});
                         }
 

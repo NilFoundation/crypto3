@@ -58,16 +58,8 @@ namespace nil {
                             data = data_type({underlying_type::zero(), underlying_type::zero()});
                         }
 
-                        template<typename Number1,
-                                 typename Number2,
-                                 typename std::enable_if<boost::is_integral<Number1>::value &&
-                                                             boost::is_integral<Number2>::value,
-                                                         bool>::type = true>
-                        constexpr element_fp2(Number1 in_data0, Number2 in_data1) {
-                            data = data_type({underlying_type(in_data0), underlying_type(in_data1)});
-                        }
-
-                        constexpr element_fp2(integral_type in_data0, integral_type in_data1) {
+                        template<typename Number1, typename Number2>
+                        constexpr element_fp2(const Number1 &in_data0, const Number2 &in_data1) {
                             data = data_type({underlying_type(in_data0), underlying_type(in_data1)});
                         }
 
@@ -75,7 +67,7 @@ namespace nil {
                             data = data_type({in_data[0], in_data[1]});
                         };
 
-                        constexpr element_fp2(underlying_type in_data0, underlying_type in_data1) {
+                        constexpr element_fp2(const underlying_type &in_data0, const underlying_type &in_data1) {
                             data = data_type({in_data0, in_data1});
                         }
 
