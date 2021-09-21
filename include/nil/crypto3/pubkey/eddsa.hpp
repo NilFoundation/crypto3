@@ -53,18 +53,13 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            enum class EddsaVariant { basic, ph, ctx };
+            enum class EddsaVariant { basic, ctx, ph };
 
-            template<
-                EddsaVariant, typename Params,
-                typename = typename std::enable_if<
-                    is_eddsa_params<Params>::value &&
-                    std::is_same<std::uint8_t, typename std::iterator_traits<
-                                                   typename Params::context_type::iterator>::value_type>::value>::type>
+            template<EddsaVariant, typename Params, typename = void>
             struct eddsa_policy;
 
             template<typename Params>
-            struct eddsa_policy<EddsaVariant::basic, Params, void> {
+            struct eddsa_policy<EddsaVariant::basic, Params> {
                 typedef Params params_type;
                 typedef std::vector<std::uint8_t> dom_type;
                 typedef hashes::sha2<512> hash_type;
@@ -76,7 +71,12 @@ namespace nil {
             };
 
             template<typename Params>
-            struct eddsa_policy<EddsaVariant::ph, Params> {
+            struct eddsa_policy<
+                EddsaVariant::ctx, Params,
+                typename std::enable_if<
+                    is_eddsa_params<Params>::value &&
+                    std::is_same<std::uint8_t, typename std::iterator_traits<typename Params::context_type::iterator>::
+                                                   value_type>::value>::type> {
                 typedef Params params_type;
                 typedef std::vector<std::uint8_t> dom_type;
                 typedef hashes::sha2<512> hash_type;
@@ -92,7 +92,7 @@ namespace nil {
                     std::string dom_prefix = "SigEd25519 no Ed25519 collisions";
                     dom_type dom(std::cbegin(dom_prefix), std::cend(dom_prefix));
                     dom.push_back(phflag);
-                    dom.push_back(context_len);
+                    dom.push_back(static_cast<std::uint8_t>(context_len));
                     std::copy(std::cbegin(params_type::context), std::cend(params_type::context),
                               std::back_inserter(dom));
 
@@ -101,7 +101,12 @@ namespace nil {
             };
 
             template<typename Params>
-            struct eddsa_policy<EddsaVariant::ctx, Params> {
+            struct eddsa_policy<
+                EddsaVariant::ph, Params,
+                typename std::enable_if<
+                    is_eddsa_params<Params>::value &&
+                    std::is_same<std::uint8_t, typename std::iterator_traits<typename Params::context_type::iterator>::
+                                                   value_type>::value>::type> {
                 typedef Params params_type;
                 typedef std::vector<std::uint8_t> dom_type;
                 typedef hashes::sha2<512> hash_type;
@@ -117,7 +122,7 @@ namespace nil {
                     std::string dom_prefix = "SigEd25519 no Ed25519 collisions";
                     dom_type dom(std::cbegin(dom_prefix), std::cend(dom_prefix));
                     dom.push_back(phflag);
-                    dom.push_back(context_len);
+                    dom.push_back(static_cast<std::uint8_t>(context_len));
                     std::copy(std::cbegin(params_type::context), std::cend(params_type::context),
                               std::back_inserter(dom));
 
@@ -156,24 +161,25 @@ namespace nil {
                 typedef typename scalar_field_type::integral_type scalar_integral_type;
 
                 typedef nil::marshalling::option::little_endian endianness;
-                typedef nil::crypto3::marshalling::types::curve_element<
-                    nil::marshalling::field_type<nil::marshalling::option::little_endian>, group_type>
+                typedef nil::crypto3::marshalling::types::curve_element<nil::marshalling::field_type<endianness>,
+                                                                        group_type>
                     marshalling_group_value_type;
-                typedef nil::crypto3::marshalling::types::field_element<
-                    nil::marshalling::field_type<nil::marshalling::option::little_endian>, scalar_field_type>
+                typedef nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<endianness>,
+                                                                        scalar_field_type>
                     marshalling_scalar_field_value_type;
-                typedef nil::crypto3::marshalling::types::integral<
-                    nil::marshalling::field_type<nil::marshalling::option::little_endian>, scalar_integral_type>
-                    marshalling_scalar_integral_type;
-                typedef nil::crypto3::marshalling::types::integral<
-                    nil::marshalling::field_type<nil::marshalling::option::little_endian>, base_integral_type>
+                // typedef nil::crypto3::marshalling::types::integral<nil::marshalling::field_type<endianness>,
+                //                                                    scalar_integral_type>
+                //     marshalling_scalar_integral_type;
+                typedef nil::crypto3::marshalling::types::integral<nil::marshalling::field_type<endianness>,
+                                                                   base_integral_type>
                     marshalling_base_integral_type;
-                typedef nil::crypto3::marshalling::types::integral<
-                    nil::marshalling::field_type<nil::marshalling::option::little_endian>,
-                    nil::crypto3::multiprecision::uint512_t>
+                typedef nil::crypto3::marshalling::types::integral<nil::marshalling::field_type<endianness>,
+                                                                   nil::crypto3::multiprecision::uint512_t>
                     marshalling_uint512_t_type;
 
-                static constexpr std::size_t public_key_octets = 32;
+                static constexpr std::size_t public_key_octets =
+                    base_field_type::modulus_bits / 8 + (base_field_type::modulus_bits % 8 ? 1 : 0);
+                static_assert(32 == public_key_octets, "wrong octet length of public key");
                 typedef std::array<std::uint8_t, public_key_octets> public_key_type;
                 static constexpr std::size_t signature_octets = 64;
                 typedef std::array<std::uint8_t, signature_octets> signature_type;
@@ -205,6 +211,7 @@ namespace nil {
                 typedef typename scheme_public_key_type::scalar_field_type scalar_field_type;
                 typedef typename scheme_public_key_type::scalar_field_value_type scalar_field_value_type;
                 typedef typename scheme_public_key_type::scalar_integral_type scalar_integral_type;
+                typedef typename scheme_public_key_type::base_field_type base_field_type;
                 typedef typename scheme_public_key_type::base_integral_type base_integral_type;
 
                 typedef typename scheme_public_key_type::endianness endianness;
@@ -214,7 +221,9 @@ namespace nil {
                 typedef typename scheme_public_key_type::marshalling_base_integral_type marshalling_base_integral_type;
                 typedef typename scheme_public_key_type::marshalling_uint512_t_type marshalling_uint512_t_type;
 
-                static constexpr std::size_t private_key_octets = 32;
+                static constexpr std::size_t private_key_octets =
+                    base_field_type::modulus_bits / 8 + (base_field_type::modulus_bits % 8 ? 1 : 0);
+                static_assert(32 == private_key_octets, "wrong octet length of private key");
                 typedef std::array<std::uint8_t, private_key_octets> private_key_type;
                 static constexpr std::size_t public_key_octets = scheme_public_key_type::public_key_octets;
                 typedef typename scheme_public_key_type::public_key_type public_key_type;
@@ -269,7 +278,8 @@ namespace nil {
                     hash<hash_type>(policy_type::get_dom(), hash_acc_2);
                     hash<hash_type>(std::cbegin(h_privkey) + private_key_octets, std::cend(h_privkey), hash_acc_2);
                     hash<hash_type>(ph_m, hash_acc_2);
-                    typename hash_type::digest_type h_2 = nil::crypto3::accumulators::extract::hash<hash_type>(hash_acc_2);
+                    typename hash_type::digest_type h_2 =
+                        nil::crypto3::accumulators::extract::hash<hash_type>(hash_acc_2);
                     marshalling_uint512_t_type marshalling_uint512_t_2;
                     auto h_2_it = std::cbegin(h_2);
                     // TODO: process status
@@ -280,27 +290,37 @@ namespace nil {
                     // 3.
                     group_value_type rB = r_reduced * group_value_type::one();
                     marshalling_group_value_type marshalling_group_value(rB);
-                    public_key_type R;
-                    auto write_iter = std::begin(R);
+                    signature_type signature;
+                    auto sig_iter_3 = std::begin(signature);
                     // TODO: process status
-                    status = marshalling_group_value.write(write_iter, public_key_octets * 8);
+                    status = marshalling_group_value.write(sig_iter_3, public_key_octets * 8);
 
                     // 4.
                     accumulator_set<hash_type> hash_acc_4;
                     hash<hash_type>(policy_type::get_dom(), hash_acc_4);
-                    hash<hash_type>(R, hash_acc_4);
+                    hash<hash_type>(std::cbegin(signature), std::cbegin(signature) + public_key_octets, hash_acc_4);
                     hash<hash_type>(this->pubkey, hash_acc_4);
                     hash<hash_type>(ph_m, hash_acc_4);
-                    typename hash_type::digest_type h_4 = nil::crypto3::accumulators::extract::hash<hash_type>(hash_acc_4);
+                    typename hash_type::digest_type h_4 =
+                        nil::crypto3::accumulators::extract::hash<hash_type>(hash_acc_4);
                     marshalling_uint512_t_type marshalling_uint512_t_4;
-                    auto h_4_it = std::cbegin(h_2);
+                    auto h_4_it = std::cbegin(h_4);
                     // TODO: process status
                     status = marshalling_uint512_t_4.read(h_4_it, hash_type::digest_bits);
                     nil::crypto3::multiprecision::uint512_t k = marshalling_uint512_t_4.value();
                     scalar_field_value_type k_reduced(k);
 
                     // 5.
-                    // scalar_field_value_type S = r_reduced + k_reduced *
+                    scalar_field_value_type S = r_reduced + k_reduced * s_reduced;
+
+                    // 6.
+                    marshalling_scalar_field_value_type marshalling_scalar_field_value_6 =
+                        nil::crypto3::marshalling::types::fill_field_element<scalar_field_type, endianness>(S);
+                    auto sig_iter_6 = std::begin(signature) + public_key_octets;
+                    // TODO: process status
+                    status = marshalling_scalar_field_value_6.write(sig_iter_6, private_key_octets * 8);
+
+                    return signature;
                 }
 
             protected:
