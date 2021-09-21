@@ -546,6 +546,11 @@ namespace nil {
                 typedef number<Backend, ExpressionTemplates> type;
             };
 
+            template<class T>
+            struct is_modular_number : public std::integral_constant<bool, false> { };
+
+            template<class Backend, expression_template_option ExpressionTemplates>
+            struct is_modular_number<number<backends::modular_adaptor<Backend>, ExpressionTemplates>> : public std::integral_constant<bool, true> { };
         }    // namespace multiprecision
     }        // namespace crypto3
 }    // namespace nil

@@ -334,15 +334,27 @@ namespace nil {
                     // this overloaded barrett_reduce is intended to work with built-in integral types
                     //
                     template<typename Backend1, typename Backend2>
-                    constexpr typename std::enable_if<boost::is_integral<Backend2>::value>::type
+                    constexpr typename std::enable_if<std::is_integral<Backend2>::value>::type
                         barrett_reduce(Backend1& result, Backend2 input) const {
                         using input_number_type = typename boost::mpl::if_c<
-                            bool(sizeof(int) * CHAR_BIT > MinBits),
-                            number<modular_fixed_cpp_int_backend<sizeof(int) * CHAR_BIT, SignType, Checked>>,
+                            bool(sizeof(Backend2) * CHAR_BIT > MinBits),
+                            number<modular_fixed_cpp_int_backend<sizeof(Backend2) * CHAR_BIT, SignType, Checked>>,
                             number_type>::type;
 
-                        input_number_type input_b(input);
-                        barrett_reduce(result, input_b.backend());
+                        input_number_type input_adjusted(input);
+                        barrett_reduce(result, input_adjusted.backend());
+                    }
+
+                    //
+                    // this overloaded barrett_reduce is intended to work with input Backend2 type of less precision
+                    // than modular Backend to satisfy constraints of core barrett_reduce overloading
+                    //
+                    template<typename Backend1, typename Backend2,
+                             typename boost::enable_if_c<
+                                 max_precision<Backend2>::value < max_precision<Backend>::value, bool>::type = true>
+                             constexpr void barrett_reduce(Backend1& result, const Backend2 &input) const {
+                        Backend input_adjusted(input);
+                        barrett_reduce(result, input_adjusted);
                     }
 
                     template<typename Backend1, typename Backend2,

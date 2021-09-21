@@ -66,8 +66,8 @@ namespace nil {
 #endif
 
                     template<typename Backend1, typename Backend2>
-                    constexpr modular_adaptor(const Backend1& b, const Backend2& m) : m_base(b), m_mod(m) {
-                        mod_data().adjust_modular(base_data());
+                    constexpr modular_adaptor(const Backend1& b, const Backend2& m) : m_mod(m) {
+                        mod_data().adjust_modular(base_data(), b);
                     }
 
                     constexpr explicit modular_adaptor(const Backend& m) :
