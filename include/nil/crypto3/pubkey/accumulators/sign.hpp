@@ -74,8 +74,8 @@ namespace nil {
                         }
 
                     protected:
-                        template<typename InputRange, typename InputIterator>
-                        inline void resolve_type(const InputRange &range, InputIterator) {
+                        template<typename InputRange>
+                        inline void resolve_type(const InputRange &range, std::nullptr_t) {
                             processing_mode_type::update(key, acc, range);
                         }
 

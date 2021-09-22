@@ -79,8 +79,8 @@ namespace nil {
                         }
 
                     protected:
-                        template<typename InputRange, typename InputIterator>
-                        inline void resolve_type(const InputRange &range, InputIterator) {
+                        template<typename InputRange>
+                        inline void resolve_type(const InputRange &range, std::nullptr_t) {
                             processing_mode_type::update(key, acc, range);
                         }
 
@@ -89,8 +89,7 @@ namespace nil {
                             processing_mode_type::update(key, acc, first, last);
                         }
 
-                        template<typename InputIterator>
-                        inline void resolve_type(const signature_type &new_signature, InputIterator) {
+                        inline void resolve_type(const signature_type &new_signature, std::nullptr_t) {
                             signature = new_signature;
                         }
 

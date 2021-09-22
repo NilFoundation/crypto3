@@ -81,41 +81,27 @@ namespace nil {
                         }
 
                     protected:
+                        //
+                        // set verified signature
+                        //
                         inline void resolve_type(const signature_type &new_sig, std::nullptr_t, std::nullptr_t) {
                             signature = new_sig;
                         }
 
+                        //
+                        // append verified msg of specified public key for aggregate verification
+                        //
                         template<typename InputRange>
                         inline void resolve_type(const InputRange &range, std::nullptr_t, const key_type &pubkey) {
                             processing_mode_type::update(acc, pubkey, range);
                         }
 
+                        //
+                        // append verified msg of specified public key for aggregate verification
+                        //
                         template<typename InputIterator>
                         inline void resolve_type(InputIterator first, InputIterator last, const key_type &pubkey) {
                             processing_mode_type::update(acc, pubkey, first, last);
-                        }
-
-                        // TODO: check method
-                        template<typename InputRange, typename InputIterator>
-                        inline typename std::enable_if<
-                            std::is_same<key_type,
-                                         typename std::iterator_traits<
-                                             typename InputRange::iterator>::value_type::first_type>::value>::type
-                            resolve_type(const InputRange &range, std::nullptr_t, std::nullptr_t) {
-                            for (const auto &[pubkey, r] : range) {
-                                resolve_type(r, nullptr, pubkey);
-                            }
-                        }
-
-                        // TODO: check method
-                        template<typename InputIterator>
-                        inline typename std::enable_if<std::is_same<
-                            key_type,
-                            typename std::iterator_traits<InputIterator>::value_type::first_type>::value>::type
-                            resolve_type(InputIterator first, InputIterator last, std::nullptr_t) {
-                            for (auto iter = first; iter != last; ++iter) {
-                                resolve_type((*iter).second, nullptr, (*iter).first);
-                            }
                         }
 
                         signature_type signature;

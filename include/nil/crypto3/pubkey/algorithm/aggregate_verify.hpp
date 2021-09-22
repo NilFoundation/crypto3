@@ -29,25 +29,11 @@
 #include <nil/crypto3/pubkey/pubkey_value.hpp>
 #include <nil/crypto3/pubkey/pubkey_state.hpp>
 
-#include <nil/crypto3/pubkey/aggregate_verify_op.hpp>
-
 #include <nil/crypto3/pubkey/modes/isomorphic.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            /*!
-             * @brief
-             *
-             * @ingroup pubkey_algorithms
-             *
-             * Signature verification. For document and signature data, the validity of the signature
-             * is determined using the public key. Verification of the signature is performed with a
-             * public key corresponding to the same private key that was used when signing.
-             *
-             * Funcion verify is a validation algorithm that outputs VALID if the signature is a
-             * valid public key message signature, and INVALID otherwise.
-             */
             template<typename Scheme>
             using aggregate_verification_policy =
                 typename pubkey::modes::isomorphic<Scheme>::aggregate_verification_policy;
@@ -100,61 +86,6 @@ namespace nil {
                                     const typename pubkey::public_key<Scheme>::signature_type &signature,
                                     const pubkey::public_key<Scheme> &key) {
             return SchemeImpl(rng, SchemeAccumulator(signature), key);
-        }
-
-        /*!
-         * @brief
-         *
-         * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme
-         * @tparam InputIterator
-         *
-         * @param first
-         * @param last
-         *
-         * @return
-         */
-        template<typename Scheme, typename InputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::aggregate_verification_policy<Scheme>>::type,
-                 typename SchemeAccumulator = pubkey::aggregate_verification_accumulator_set<ProcessingMode>,
-                 typename StreamSchemeImpl = pubkey::detail::value_pubkey_impl<SchemeAccumulator>,
-                 typename SchemeImpl = pubkey::detail::range_pubkey_impl<StreamSchemeImpl>>
-        typename std::enable_if<
-            std::is_same<pubkey::public_key<Scheme>,
-                         typename std::iterator_traits<InputIterator>::value_type::first_type>::value,
-            SchemeImpl>::type
-            aggregate_verify(InputIterator first, InputIterator last,
-                             const typename pubkey::public_key<Scheme>::signature_type &signature) {
-            return SchemeImpl(first, last, SchemeAccumulator(signature));
-        }
-
-        /*!
-         * @brief
-         *
-         * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         *
-         * @param rng
-         *
-         * @return
-         */
-        template<typename Scheme, typename SinglePassRange,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::aggregate_verification_policy<Scheme>>::type,
-                 typename SchemeAccumulator = pubkey::aggregate_verification_accumulator_set<ProcessingMode>,
-                 typename StreamSchemeImpl = pubkey::detail::value_pubkey_impl<SchemeAccumulator>,
-                 typename SchemeImpl = pubkey::detail::range_pubkey_impl<StreamSchemeImpl>>
-        typename std::enable_if<std::is_same<pubkey::public_key<Scheme>,
-                                             typename std::iterator_traits<
-                                                 typename SinglePassRange::iterator>::value_type::first_type>::value,
-                                SchemeImpl>::type
-            aggregate_verify(const SinglePassRange &rng,
-                             const typename pubkey::public_key<Scheme>::signature_type &signature) {
-            return SchemeImpl(rng, SchemeAccumulator(signature));
         }
 
         /*!
@@ -241,7 +172,7 @@ namespace nil {
             typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSchemeImpl;
             typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
-            return SchemeImpl(first, last, std::move(out), SchemeAccumulator(signature));
+            return SchemeImpl(first, last, std::move(out), SchemeAccumulator(signature), key);
         }
 
         /*!
@@ -269,7 +200,7 @@ namespace nil {
             typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSchemeImpl;
             typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
-            return SchemeImpl(rng, std::move(out), SchemeAccumulator(signature));
+            return SchemeImpl(rng, std::move(out), SchemeAccumulator(signature), key);
         }
     }    // namespace crypto3
 }    // namespace nil

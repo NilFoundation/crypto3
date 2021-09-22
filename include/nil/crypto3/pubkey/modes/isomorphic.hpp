@@ -32,6 +32,7 @@
 #include <nil/crypto3/pubkey/agreement_key.hpp>
 #include <nil/crypto3/pubkey/aggregate_op.hpp>
 #include <nil/crypto3/pubkey/aggregate_verify_op.hpp>
+#include <nil/crypto3/pubkey/aggregate_verify_single_msg_op.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -144,6 +145,31 @@ namespace nil {
                     }
                 };
 
+                template<typename Scheme>
+                struct isomorphic_single_msg_aggregate_verification_policy : public isomorphic_policy<Scheme> {
+                    typedef typename isomorphic_policy<Scheme>::scheme_type scheme_type;
+
+                    typedef void key_type;
+                    typedef aggregate_verify_single_msg_op<scheme_type> op_type;
+                    typedef typename op_type::internal_accumulator_type internal_accumulator_type;
+                    typedef bool result_type;
+
+                    template<typename... Args>
+                    static inline void init_accumulator(Args &...args) {
+                        op_type::init_accumulator(args...);
+                    }
+
+                    template<typename... Args>
+                    inline static void update(Args &...args) {
+                        op_type::update(args...);
+                    }
+
+                    template<typename... Args>
+                    static inline result_type process(Args &...args) {
+                        return op_type::aggregate_verify(args...);
+                    }
+                };
+
                 template<typename Policy>
                 class isomorphic {
                     typedef Policy policy_type;
@@ -194,6 +220,8 @@ namespace nil {
                     typedef detail::isomorphic_verification_policy<scheme_type> verification_policy;
                     typedef detail::isomorphic_aggregation_policy<scheme_type> aggregation_policy;
                     typedef detail::isomorphic_aggregate_verification_policy<scheme_type> aggregate_verification_policy;
+                    typedef detail::isomorphic_single_msg_aggregate_verification_policy<scheme_type>
+                        single_msg_aggregate_verification_policy;
 
                     template<typename Policy>
                     struct bind {
