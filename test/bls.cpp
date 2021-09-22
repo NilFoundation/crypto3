@@ -2269,90 +2269,116 @@ void self_test(const std::vector<private_key<Scheme>> &sks, const std::vector<Ms
     BOOST_CHECK_EQUAL(res, true);
 }
 
-template<typename Scheme, typename MsgRange>
-void conformity_pop_test(const std::vector<std::vector<private_key<Scheme>>> &sks_n,
-                         const std::vector<MsgRange> &msgs,
-                         const std::vector<std::vector<typename public_key<Scheme>::signature_type>> &etalon_sigs_n,
-                         const std::vector<typename public_key<Scheme>::signature_type> &etalon_agg_sigs) {
-    using scheme_type = Scheme;
-
-    using signing_mode = typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type>::template bind<
+template<typename SchemePopSign, typename SchemePopProve>
+struct conformity_pop_test_case {
+    template<typename Scheme = SchemePopSign>
+    using signing_mode = typename ::nil::crypto3::pubkey::modes::isomorphic<Scheme>::template bind<
         ::nil::crypto3::pubkey::signing_policy<Scheme>>::type;
-    using verification_mode = typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type>::template bind<
-        ::nil::crypto3::pubkey::verification_policy<scheme_type>>::type;
-    using aggregation_mode = typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type>::template bind<
+    template<typename Scheme = SchemePopSign>
+    using verification_mode = typename ::nil::crypto3::pubkey::modes::isomorphic<Scheme>::template bind<
+        ::nil::crypto3::pubkey::verification_policy<Scheme>>::type;
+    template<typename Scheme = SchemePopSign>
+    using aggregation_mode = typename ::nil::crypto3::pubkey::modes::isomorphic<Scheme>::template bind<
         ::nil::crypto3::pubkey::aggregation_policy<Scheme>>::type;
-    using aggregate_verification_mode = typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type>::template bind<
+    template<typename Scheme = SchemePopSign>
+    using aggregate_verification_mode = typename ::nil::crypto3::pubkey::modes::isomorphic<Scheme>::template bind<
         ::nil::crypto3::pubkey::aggregate_verification_policy<Scheme>>::type;
+    template<typename Scheme = SchemePopSign>
     using single_msg_aggregate_verification_mode = typename ::nil::crypto3::pubkey::modes::isomorphic<
-        scheme_type>::template bind<::nil::crypto3::pubkey::single_msg_aggregate_verification_policy<Scheme>>::type;
+        Scheme>::template bind<::nil::crypto3::pubkey::single_msg_aggregate_verification_policy<Scheme>>::type;
 
-    using verification_acc_set = verification_accumulator_set<verification_mode>;
-    using verification_acc = typename boost::mpl::front<typename verification_acc_set::features_type>::type;
-    using signing_acc_set = signing_accumulator_set<signing_mode>;
-    using signing_acc = typename boost::mpl::front<typename signing_acc_set::features_type>::type;
-    using aggregation_acc_set = aggregation_accumulator_set<aggregation_mode>;
-    using aggregation_acc = typename boost::mpl::front<typename aggregation_acc_set::features_type>::type;
-    using aggregate_verification_acc_set = aggregate_verification_accumulator_set<aggregate_verification_mode>;
+    template<typename Scheme = SchemePopSign>
+    using verification_acc_set = verification_accumulator_set<verification_mode<Scheme>>;
+    template<typename Scheme = SchemePopSign>
+    using verification_acc = typename boost::mpl::front<typename verification_acc_set<Scheme>::features_type>::type;
+    template<typename Scheme = SchemePopSign>
+    using signing_acc_set = signing_accumulator_set<signing_mode<Scheme>>;
+    template<typename Scheme = SchemePopSign>
+    using signing_acc = typename boost::mpl::front<typename signing_acc_set<Scheme>::features_type>::type;
+    template<typename Scheme = SchemePopSign>
+    using aggregation_acc_set = aggregation_accumulator_set<aggregation_mode<Scheme>>;
+    template<typename Scheme = SchemePopSign>
+    using aggregation_acc = typename boost::mpl::front<typename aggregation_acc_set<Scheme>::features_type>::type;
+    template<typename Scheme = SchemePopSign>
+    using aggregate_verification_acc_set = aggregate_verification_accumulator_set<aggregate_verification_mode<Scheme>>;
+    template<typename Scheme = SchemePopSign>
     using aggregate_verification_acc =
-        typename boost::mpl::front<typename aggregate_verification_acc_set::features_type>::type;
+        typename boost::mpl::front<typename aggregate_verification_acc_set<Scheme>::features_type>::type;
+    template<typename Scheme = SchemePopSign>
     using single_msg_aggregate_verification_acc_set =
-        aggregate_verification_accumulator_set<single_msg_aggregate_verification_mode>;
+        aggregate_verification_accumulator_set<single_msg_aggregate_verification_mode<Scheme>>;
+    template<typename Scheme = SchemePopSign>
     using single_msg_aggregate_verification_acc =
-        typename boost::mpl::front<typename single_msg_aggregate_verification_acc_set::features_type>::type;
+        typename boost::mpl::front<typename single_msg_aggregate_verification_acc_set<Scheme>::features_type>::type;
 
-    using privkey_type = private_key<scheme_type>;
-    using pubkey_type = public_key<scheme_type>;
+    template<typename Scheme = SchemePopSign>
+    using privkey_type = private_key<Scheme>;
+    template<typename Scheme = SchemePopSign>
+    using pubkey_type = public_key<Scheme>;
 
-    using _privkey_type = typename privkey_type::private_key_type;
-    using _pubkey_type = typename pubkey_type::public_key_type;
-    using signature_type = typename pubkey_type::signature_type;
-    using integral_type = typename _privkey_type::integral_type;
+    template<typename Scheme = SchemePopSign>
+    using _privkey_type = typename privkey_type<Scheme>::private_key_type;
+    template<typename Scheme = SchemePopSign>
+    using _pubkey_type = typename pubkey_type<Scheme>::public_key_type;
+    template<typename Scheme = SchemePopSign>
+    using signature_type = typename pubkey_type<Scheme>::signature_type;
+    template<typename Scheme = SchemePopSign>
+    using integral_type = typename _privkey_type<Scheme>::integral_type;
 
-    using msg_type = MsgRange;
+    template<typename MsgRange>
+    static inline void
+        process(const std::vector<std::vector<private_key<SchemePopSign>>> &sks_n,
+                const std::vector<MsgRange> &msgs,
+                const std::vector<std::vector<typename public_key<SchemePopSign>::signature_type>> &etalon_sigs_n,
+                const std::vector<typename public_key<SchemePopSign>::signature_type> &etalon_agg_sigs) {
 
-    auto sks_it = sks_n.begin();
-    // auto pks_it = pks_n.begin();
-    auto etalon_sigs_it = etalon_sigs_n.begin();
-    auto msgs_it = msgs.begin();
-    auto etalon_agg_sigs_it = etalon_agg_sigs.begin();
-    while (sks_it != sks_n.end() /*&& pks_it != pks_n.end()*/ && etalon_sigs_it != etalon_sigs_n.end() &&
-           msgs_it != msgs.end() && etalon_agg_sigs_it != etalon_agg_sigs.end()) {
-        auto sk_it = sks_it->begin();
-        // auto pk_it = pks_it->begin();
-        auto sig_it = etalon_sigs_it->begin();
+        using msg_type = MsgRange;
 
-        std::vector<signature_type> my_sigs;
-        std::vector<pubkey_type> my_pks;
-        std::vector<signature_type> my_proofs;
+        auto sks_it = sks_n.begin();
+        // auto pks_it = pks_n.begin();
+        auto etalon_sigs_it = etalon_sigs_n.begin();
+        auto msgs_it = msgs.begin();
+        auto etalon_agg_sigs_it = etalon_agg_sigs.begin();
+        while (sks_it != sks_n.end() /*&& pks_it != pks_n.end()*/ && etalon_sigs_it != etalon_sigs_n.end() &&
+               msgs_it != msgs.end() && etalon_agg_sigs_it != etalon_agg_sigs.end()) {
+            auto sk_it = sks_it->begin();
+            // auto pk_it = pks_it->begin();
+            auto sig_it = etalon_sigs_it->begin();
 
-        while (sk_it != sks_it->end() /*&& pk_it != pks_it->end()*/ && sig_it != etalon_sigs_it->end()) {
-            my_sigs.emplace_back(::nil::crypto3::sign(*sk_it, *msgs_it, PopSchemeDstMps));
-            my_pks.emplace_back(scheme_type::generate_public_key(*sk_it));
-            my_proofs.emplace_back(scheme_type::pop_prove(*sk_it, PopSchemeDstMps_hash_pubkey_to_point));
+            std::vector<signature_type<>> my_sigs;
+            // std::vector<pubkey_type> my_pks;
+            // std::vector<signature_type<>> my_proofs;
 
-            BOOST_CHECK_EQUAL(my_sigs.back(), *sig_it);
-            BOOST_CHECK_EQUAL(::nil::crypto3::verify(my_pks.back(), *msgs_it, PopSchemeDstMps, my_sigs.back()), true);
-            // BOOST_CHECK_EQUAL(scheme_type::pop_verify(*sk_it, PopSchemeDstMps_hash_pubkey_to_point,
-            // my_proofs.back()),
-            //                   true);
+            while (sk_it != sks_it->end() /*&& pk_it != pks_it->end()*/ && sig_it != etalon_sigs_it->end()) {
+                my_sigs.emplace_back(::nil::crypto3::sign(*msgs_it, *sk_it));
+                // my_pks.emplace_back(*sk_it);
+                // my_proofs.emplace_back(scheme_type::pop_prove(*sk_it, PopSchemeDstMps_hash_pubkey_to_point));
 
-            sk_it++;
-            // pk_it++;
-            sig_it++;
+                BOOST_CHECK_EQUAL(my_sigs.back(), *sig_it);
+                BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_it, my_sigs.back(), *sk_it)), true);
+                // BOOST_CHECK_EQUAL(scheme_type::pop_verify(*sk_it, PopSchemeDstMps_hash_pubkey_to_point,
+                // my_proofs.back()),
+                //                   true);
+
+                sk_it++;
+                // pk_it++;
+                sig_it++;
+            }
+            signature_type<> agg_sig = ::nil::crypto3::aggregate<SchemePopSign>(my_sigs);
+
+            BOOST_CHECK_EQUAL(agg_sig, *etalon_agg_sigs_it);
+            BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::aggregate_verify_single_msg<SchemePopSign>(
+                                  *msgs_it, *sks_it, agg_sig)),
+                              true);
+
+            sks_it++;
+            // pks_it++;
+            etalon_sigs_it++;
+            msgs_it++;
+            etalon_agg_sigs_it++;
         }
-        signature_type agg_sig = scheme_type::aggregate(my_sigs);
-
-        BOOST_CHECK_EQUAL(agg_sig.to_affine(), *etalon_agg_sigs_it);
-        BOOST_CHECK_EQUAL(::nil::crypto3::aggregate_verify_single_msg<>(*msgs_it, my_pks, agg_sig), true);
-
-        sks_it++;
-        // pks_it++;
-        etalon_sigs_it++;
-        msgs_it++;
-        etalon_agg_sigs_it++;
     }
-}
+};
 
 BOOST_AUTO_TEST_SUITE(bls_signature_public_interface_tests)
 
@@ -2753,10 +2779,960 @@ BOOST_AUTO_TEST_CASE(bls_aug_mss) {
 // BOOST_AUTO_TEST_CASE(bls_aug_mps) {
 //     // TODO: add test
 // }
-//
-// BOOST_AUTO_TEST_CASE(bls_pop_mss) {
-// }
-//
+
+BOOST_AUTO_TEST_CASE(bls_pop_mss) {
+    using curve_type = algebra::curves::bls12_381;
+    using scheme_type = bls<bls_pop_sign_default_public_params<>, bls_mss_ro_version, bls_pop_scheme, curve_type>;
+    using scheme_pop_prove_type =
+        bls<bls_pop_prove_default_public_params<>, bls_mss_ro_version, bls_pop_scheme, curve_type>;
+
+    using privkey_type = private_key<scheme_type>;
+    using pubkey_type = public_key<scheme_type>;
+    using _privkey_type = typename privkey_type::private_key_type;
+    using _pubkey_type = typename pubkey_type::public_key_type;
+    using signature_type = typename pubkey_type::signature_type;
+    using scalar_integral_type = typename _privkey_type::integral_type;
+    using base_integral_type = typename curve_type::base_field_type::integral_type;
+
+    std::vector<privkey_type> sks_0 = {
+        privkey_type(
+            scalar_integral_type("29176549297713285193980476492654453090922895038084043429400975439145351443151")),
+        privkey_type(
+            scalar_integral_type("40585117271250146059877388118684336732873186494264946880060291896577224725335")),
+        privkey_type(
+            scalar_integral_type("45886370217672527532777721877838391538229570137587047321202212328953149902472")),
+        privkey_type(
+            scalar_integral_type("19762266376499491078172889092632042203022319834135186210032537313920486879651")),
+        privkey_type(
+            scalar_integral_type("15724682387466220754989576158075623370205964683114512175646555875294878270040")),
+        privkey_type(
+            scalar_integral_type("33226416337304547706725914366309537312728030661591208707654637961767252809198")),
+        privkey_type(
+            scalar_integral_type("49982478890296611858471805110495423014777307019988548142462625941529678935904")),
+        privkey_type(
+            scalar_integral_type("39173047464264140957945480253099882536542601616650590859685482789716806668270")),
+        privkey_type(
+            scalar_integral_type("1736704745325545561810873045053838863182155822833148229111251876717780819270")),
+        privkey_type(
+            scalar_integral_type("28618215464539410203567768833379175107560454883328823227879971748180101456411")),
+    };
+    std::vector<privkey_type> sks_1 = {
+        privkey_type(
+            scalar_integral_type("2369504379624793579280006665574483344747601607445519063189631339703232443856")),
+        privkey_type(
+            scalar_integral_type("26871155931427555174449046914648624385219647251239028268944298662101320495545")),
+        privkey_type(
+            scalar_integral_type("28557033433071297165575355485758538098044359326430208338829921448041625494102")),
+        privkey_type(
+            scalar_integral_type("50207756579056080743427775554510920463002505646935699384775921010660882070083")),
+        privkey_type(
+            scalar_integral_type("4489814086703605856270857521235304813261914907164988789613159665246884038151")),
+        privkey_type(
+            scalar_integral_type("27999114484157470992294589518823692599033177781647483138012576021476400179333")),
+        privkey_type(
+            scalar_integral_type("42567019084926239122712818032193175076567424719134478834872414023296796320357")),
+        privkey_type(
+            scalar_integral_type("35298624111423141056388101307435062870108221684361714529106750723274377872863")),
+        privkey_type(
+            scalar_integral_type("6579153998468513419786359934020246770600406824170889850803198217728618698226")),
+        privkey_type(
+            scalar_integral_type("6539350955118550946575217625093029917954692652855633801961789114651890998661")),
+    };
+    std::vector<privkey_type> sks_2 = {
+        privkey_type(
+            scalar_integral_type("35957171001594694088720487987136287724516371500148041118758676624782950541343")),
+        privkey_type(
+            scalar_integral_type("22758694265525713398795984411245001581510004886536999679669107705015603678875")),
+        privkey_type(
+            scalar_integral_type("45144179501096972603440498362227784062141899540924159942809113340040390662877")),
+        privkey_type(
+            scalar_integral_type("1840469417843895170012914915960969486629325593345767920212426720811340372749")),
+        privkey_type(
+            scalar_integral_type("25604584184868343745303218004818491639807915381067307058328198626860270377388")),
+        privkey_type(
+            scalar_integral_type("47826508191159869425572828684997830703928546945691419236357419849825709340438")),
+        privkey_type(
+            scalar_integral_type("46752758778614664955976577481842353264403261116012689540942194703931606267073")),
+        privkey_type(
+            scalar_integral_type("1353045885643404754277593144812444225931415980755674844687045201544927533478")),
+        privkey_type(
+            scalar_integral_type("15234919244624245069026516906725720858085709457777593189146428458132347567163")),
+        privkey_type(
+            scalar_integral_type("35216920335569339620126246410692007502040656594756514612601109719761533811375")),
+    };
+    std::vector<privkey_type> sks_3 = {
+        privkey_type(
+            scalar_integral_type("44846790857179378636182807875786327214993897162360637724968697705025794642333")),
+        privkey_type(
+            scalar_integral_type("23870613015465401266444558440262015653740663903791315414716868119752738441220")),
+        privkey_type(
+            scalar_integral_type("23439173523683741500798160304221604560434765737708417109534517586766344880634")),
+        privkey_type(
+            scalar_integral_type("21288803441811270583623370562387713070152626197672433531200345326421712287533")),
+        privkey_type(
+            scalar_integral_type("32503256233997741173480644308025972731833278744104127493516486219753213387018")),
+        privkey_type(
+            scalar_integral_type("46811868463263528350462227616426434771578809045297619166691855405945470150361")),
+        privkey_type(
+            scalar_integral_type("6293628395975428984357543682843187494765636412012017794600244158401723471918")),
+        privkey_type(
+            scalar_integral_type("43895544712345759646206304247940760355319317187574944382914306227652374928961")),
+        privkey_type(
+            scalar_integral_type("48179455399056012869086846076571600159323457437342490463984270900442759634040")),
+        privkey_type(
+            scalar_integral_type("15244614054442559267920524022105573071383429957358030776946994041743591866706")),
+    };
+    std::vector<privkey_type> sks_4 = {
+        privkey_type(
+            scalar_integral_type("24671480881034555668621958391531162804947981507242463478650268716538708853016")),
+        privkey_type(
+            scalar_integral_type("35156860692258266859714933944184502459108001875120924441959754569840594064117")),
+        privkey_type(
+            scalar_integral_type("10009799081777253087427127013887456678691115252901131568711175816521662803996")),
+        privkey_type(
+            scalar_integral_type("26725745523140978681632350855299902164508999036874348590285573200318010911758")),
+        privkey_type(
+            scalar_integral_type("47369557198254831037546011708076336436882374536558104107399747848690464800093")),
+        privkey_type(
+            scalar_integral_type("18192560042083570853921100083230193051649804688722122954533392841165441419428")),
+        privkey_type(
+            scalar_integral_type("29409956613647379467023640788415265145553681481170181038736615819022702247736")),
+        privkey_type(
+            scalar_integral_type("23355486751239950547671156404592102200180636821914272620083087747398616652941")),
+        privkey_type(
+            scalar_integral_type("6190957438783997636927425558563693845765391731669345057514374198814430571383")),
+        privkey_type(
+            scalar_integral_type("18315077413398251993817593998878564091948630821724239467337386703960158955398")),
+    };
+    std::vector<privkey_type> sks_5 = {
+        privkey_type(
+            scalar_integral_type("43879387577444284867225374895412957121478660348999120715937378069682700264647")),
+        privkey_type(
+            scalar_integral_type("9365189757817316199500199904632334272336220006252986395633337300438822249536")),
+        privkey_type(
+            scalar_integral_type("16664568455936926898228475380796343651808382373568284937681967155518200670090")),
+        privkey_type(
+            scalar_integral_type("48512375444401302464882679853012371770681841086602238641703559283734980911072")),
+        privkey_type(
+            scalar_integral_type("47325847886939383467423719688864080013772927690427857050549502629497273469647")),
+        privkey_type(
+            scalar_integral_type("10944219016283652928750954331783106947798895292633751709762909351672457430933")),
+        privkey_type(
+            scalar_integral_type("12992404648299778389108195161446721984361718313799114280528673879344789372757")),
+        privkey_type(
+            scalar_integral_type("33957893568936936840281082256470251755882221502729648047853109120614137135512")),
+        privkey_type(
+            scalar_integral_type("37458692876367357108749299380400281720068573587532297343991292086984426369015")),
+        privkey_type(
+            scalar_integral_type("51166611183057827374512246291190133958554265767470596674109803397025983146067")),
+    };
+    std::vector<privkey_type> sks_6 = {
+        privkey_type(
+            scalar_integral_type("12725661857107102441780983287384238808278563198861104608788098082933381882746")),
+        privkey_type(
+            scalar_integral_type("44188672626552435485431094556632789464209692254273419678899723355398680884823")),
+        privkey_type(
+            scalar_integral_type("36299726244033767605886693744973562676839637466938488301971956775013048617049")),
+        privkey_type(
+            scalar_integral_type("24791239752789558856008694734770776950416505036747482257593301403756285906174")),
+        privkey_type(
+            scalar_integral_type("11248844888476761728957175688844865609115133744313063162359128615242399306476")),
+        privkey_type(
+            scalar_integral_type("29165656643790880221400020534001587571273105802552812484490664913996533881997")),
+        privkey_type(
+            scalar_integral_type("22725405117690258564083766734873051038927391979883011238345108964175939904139")),
+        privkey_type(
+            scalar_integral_type("3170544880906710447974347630412235304341948536772446892465032646567868631471")),
+        privkey_type(
+            scalar_integral_type("47684329279925942167853794985231439878227271636671029249162013670754139447039")),
+        privkey_type(
+            scalar_integral_type("44065288211512777303732797123407949920673752161085989729445186683764585835831")),
+    };
+    std::vector<privkey_type> sks_7 = {
+        privkey_type(
+            scalar_integral_type("46761622771097458983966977536111330884524778692941345889849364099197024282993")),
+        privkey_type(
+            scalar_integral_type("33508015279120063381285338995352668704730427122273333328622962453368104710804")),
+        privkey_type(
+            scalar_integral_type("44725039460708817115344423417052256045568291985638013980251525067997866857029")),
+        privkey_type(
+            scalar_integral_type("46833135132882600382154798661263761027158499201120613389419448951547141158407")),
+        privkey_type(
+            scalar_integral_type("20880673796762049924851435742171324131459080912134183778950724982881501083067")),
+        privkey_type(
+            scalar_integral_type("45394142255690604204714572257416332831892472888869385324878761977830621612343")),
+        privkey_type(
+            scalar_integral_type("51984015576088397996956284141615708947725329768364829309875758815228333196075")),
+        privkey_type(
+            scalar_integral_type("48293144431428700872268676964556096022212054327427228163098783485196515529202")),
+        privkey_type(
+            scalar_integral_type("36222815212116149677418064146507233881718761668382989691025766670825645985075")),
+        privkey_type(
+            scalar_integral_type("50759280419860417802055275065687093297038790247990902467795244595907892506092")),
+    };
+    std::vector<privkey_type> sks_8 = {
+        privkey_type(
+            scalar_integral_type("18746656845646859750561258867056424653369118452181987362435158421729226076698")),
+        privkey_type(
+            scalar_integral_type("31031560450659879786932526067256771604615387756442671123866002549871606679599")),
+        privkey_type(
+            scalar_integral_type("42494955329311697249572246104019625483038664646322441879590721841201771335870")),
+        privkey_type(
+            scalar_integral_type("43782052753664520569471160529173897961207108821566825393268891447596146054616")),
+        privkey_type(
+            scalar_integral_type("26363562248624265009458273612928610241976727325183610252378574293171777607284")),
+        privkey_type(
+            scalar_integral_type("8330605458902223354655609230515256436651802889371700166429602300903172948508")),
+        privkey_type(
+            scalar_integral_type("33631523381804483667922029118359379550752079336584633907397563557091336056406")),
+        privkey_type(
+            scalar_integral_type("38902873125533844275467523940118290304821263142325046482935001018436033904609")),
+        privkey_type(
+            scalar_integral_type("21186732187481406240755327814169836126584542394151303448634680901921963427400")),
+        privkey_type(
+            scalar_integral_type("7414415982747742360299276276780362021924698250402910656023926061967429270589")),
+    };
+    std::vector<privkey_type> sks_9 = {
+        privkey_type(
+            scalar_integral_type("9002517108680634148912198663388287630298040868446423873959280357965384444644")),
+        privkey_type(
+            scalar_integral_type("20769509770088624697168035266555805504367557410835986579877801358530423431840")),
+        privkey_type(
+            scalar_integral_type("10471598158849283370466963664073078956391340575269597786040249259208941155163")),
+        privkey_type(
+            scalar_integral_type("38298179342103490265542894264723183683640300774068241662807160748046234447335")),
+        privkey_type(
+            scalar_integral_type("38002822806114311455746644612018021287228960046070496107872097107976550634160")),
+        privkey_type(
+            scalar_integral_type("9717059311017176101883301475874953395225713545443461257602337754443483280802")),
+        privkey_type(
+            scalar_integral_type("33475308610895441921585083068864950299191740111413597957557228910270689634240")),
+        privkey_type(
+            scalar_integral_type("8905194960900233962941853200031185599184174289112152214189292652244170740907")),
+        privkey_type(
+            scalar_integral_type("52243467421328849929566262215650804220328323015916662092647174158778452994708")),
+        privkey_type(
+            scalar_integral_type("9092304683956881416251913178222695577348165263602981029776877633501622925022")),
+    };
+    std::vector<std::vector<privkey_type>> sks_n = {sks_0, sks_1, sks_2, sks_3, sks_4,
+                                                    sks_5, sks_6, sks_7, sks_8, sks_9};
+
+    std::vector<signature_type> sigs_0 = {
+        signature_type(
+            base_integral_type("2547146713482947039916893893068651683951139814726379827811800938009362708982078565"
+                               "053195613225684082094032804982792"),
+            base_integral_type("1837311166270744251444798206250478284977604394235484837169682717319945007757809079"
+                               "368167322913524080770329187111872"),
+            1),
+        signature_type(
+            base_integral_type("1010867827897947169097432198378450207519599111114814425532967991850836777968783031"
+                               "880639423745125611882304895259667"),
+            base_integral_type("3291444832807228096594534931551973002970667437958588449098310818647312230306746122"
+                               "090262191224531104092964358520071"),
+            1),
+        signature_type(
+            base_integral_type("2950207063301346386722837650633362137539715787120059249304252307480520351082199490"
+                               "260651463874170982816214005285183"),
+            base_integral_type("6466926560316411032759912390546726048613664988207309871860356384978112780321466878"
+                               "18141152216982368009066181005804"),
+            1),
+        signature_type(
+            base_integral_type("3460837294344853645952044576710721693646116997440386386619678385233685623897960839"
+                               "145881274192437104194519381931933"),
+            base_integral_type("6770858332384348159790511229519022135990138182888426020603710253440119052980890434"
+                               "74208852514052907552325098423475"),
+            1),
+        signature_type(
+            base_integral_type("1458245955189140365824557160920255687554215611565855516662542132238133282955650880"
+                               "17658911314934711184510783620792"),
+            base_integral_type("2519241143021779968266865629807328473384574675200698799454451133872115551178082267"
+                               "149820541868871989644650447770278"),
+            1),
+        signature_type(
+            base_integral_type("4715017534494436179381736884357727632497530550556889900985170870201869961554031817"
+                               "16139442386573851891323129641595"),
+            base_integral_type("3054230963154698015152846425982150226660456315167995101599639285345742396511543386"
+                               "75185592200974040567102170662681"),
+            1),
+        signature_type(
+            base_integral_type("1629015209442926753786771999675171747758454116545954533650863471792540587074642266"
+                               "535393551208513382231517839307616"),
+            base_integral_type("1794357822831171310100671989623184006250670856271801648596131286083349849633310690"
+                               "515662671375843172565180528075766"),
+            1),
+        signature_type(
+            base_integral_type("2040884477569369288523806125266390978058238133952306014163495740380429522199215907"
+                               "108222894058828849354648417903216"),
+            base_integral_type("3112517302690088767848459157746720300429203418699400995436684658112790086635008621"
+                               "687150473962812795609880140692449"),
+            1),
+        signature_type(
+            base_integral_type("3533328943456568480504184164672000600221679122390409074615265247807510688328845871"
+                               "83687278067185700449914789458705"),
+            base_integral_type("4320296960905316765219999278657860862589277783925247891468037314971455126971799221"
+                               "08511738962065878641318469092836"),
+            1),
+        signature_type(
+            base_integral_type("1355729387207465779270829710432638229015135180037028179505382192469414418587717078"
+                               "439069714140184522156850561908485"),
+            base_integral_type("1061162334530112847501648007204970188549317043317961561346181373243674770960235770"
+                               "328054871925984056646714808265834"),
+            1),
+    };
+    std::vector<signature_type> sigs_1 = {
+        signature_type(
+            base_integral_type("8927582583782023134263037760078923403624659578954531404269249766593369184665777300"
+                               "96673295957414271056926897764745"),
+            base_integral_type("1828576277144799754731103968231060695422856686479361709273635430833667847624697813"
+                               "92957815117533654197031882182107"),
+            1),
+        signature_type(
+            base_integral_type("5144354492728215020454643105583699539913524880241558462855810176812722818240727544"
+                               "00324230347402946484659666727267"),
+            base_integral_type("1251606356441000370934031362160869120737346129648189400902045233646188134164608119"
+                               "296830691454376395993655981155440"),
+            1),
+        signature_type(
+            base_integral_type("3118646307632408137420541317537008078351896283318477169288908703913783999331244149"
+                               "63127172704899183712434629549835"),
+            base_integral_type("3597393466831372348394529874057136542985529147725888953727336659007534986098374146"
+                               "062084911925830577430664269705602"),
+            1),
+        signature_type(
+            base_integral_type("7604698138225325528976350236644737884986080735106903448723685753886517082843547180"
+                               "55940734553907528835909052690401"),
+            base_integral_type("1494928579927125368227143636054629231507516311704402396325984637686386176478061417"
+                               "233950750174259537624847192247912"),
+            1),
+        signature_type(
+            base_integral_type("5042598354225754301793366287244447537661382164896692771876259431701789549454276589"
+                               "66516990437057248463272563425903"),
+            base_integral_type("6844479552105811037232292163779293867723292840510239871580098747018341832979373317"
+                               "6398977108124782106913265291328"),
+            1),
+        signature_type(
+            base_integral_type("3890062605503399428282829128441384596606314903815139669332135251972730732953369940"
+                               "733164472246001696352317740953025"),
+            base_integral_type("1345548421387422764152561045707440723992680373149083008394891423235404055579812619"
+                               "917649519745488988525857671521695"),
+            1),
+        signature_type(
+            base_integral_type("3264503130598638432965707615350490418449432300721310883896875667624396979838133171"
+                               "743227462501616169653342315397380"),
+            base_integral_type("1265014985588087965826802033564362550183947121442501567498886590037602833879269563"
+                               "897632218056986232055375349874895"),
+            1),
+        signature_type(
+            base_integral_type("2447348956485304338778002758651514341202640206119867769800031365951047317145492088"
+                               "54783001327287612944703606006488"),
+            base_integral_type("3689812036927950302447137570997786126812172597394790269928635813344902137113131559"
+                               "728777203775628188918770573126175"),
+            1),
+        signature_type(
+            base_integral_type("8698890930960684337740197742905608686587528111075968471492806802419694672110239454"
+                               "21528868515582276167826554972946"),
+            base_integral_type("2970633580527025347321357973617256413887902893275295449640830008406665171348095357"
+                               "274412985660328007691064865282462"),
+            1),
+        signature_type(
+            base_integral_type("4518542647477250349745916437438056619916298139241096746484650952975150940328290748"
+                               "97630183453128656708808440176048"),
+            base_integral_type("2898309105262984361006430712214625918620250363970508696071130865972117134030371674"
+                               "648770986448297464173812802469870"),
+            1),
+    };
+    std::vector<signature_type> sigs_2 = {
+        signature_type(
+            base_integral_type("3073415590818201520514803103984865610750543089370418811597050969569963445164408158"
+                               "698857767228639218345918562466945"),
+            base_integral_type("3775161657977032960497526371311293258751626435010603081163996018058840090813628940"
+                               "960455887576623088813747686044376"),
+            1),
+        signature_type(
+            base_integral_type("2251655673997594907206611824884081617267064660063400059065702941026880428919863427"
+                               "012178114265865689823971807810908"),
+            base_integral_type("2992421862669483131951316412266456735613528374873183818305532687765757862461920543"
+                               "415781594276564098930955494562035"),
+            1),
+        signature_type(
+            base_integral_type("3550219231603704593751451114256070341919519570077067865083329816155585259981733165"
+                               "876538809677149458008472280404826"),
+            base_integral_type("1239681602592857318156498767988117906112208379793887571487465253441702838050956621"
+                               "530486663766203269344564659912804"),
+            1),
+        signature_type(
+            base_integral_type("2922053209467030168685916041481392117176843676671179487587219940210712721430346453"
+                               "039207210027636615968804801850666"),
+            base_integral_type("9777936661319500762459295516850953757467253756975105466742108070022895336038525904"
+                               "90789729502709168209024159068282"),
+            1),
+        signature_type(
+            base_integral_type("1726146848933405198993865142485519423158661288561289520898924456319858125160934556"
+                               "96565587453694114056270665517125"),
+            base_integral_type("2792679660445417909168515651657019773119245251754424394873665834266716108103243918"
+                               "120555054216586592045727046372269"),
+            1),
+        signature_type(
+            base_integral_type("7852816550976698879538246621845247912787708510911915330640373072951642129005264068"
+                               "67317823415965849429234290612840"),
+            base_integral_type("1118892953174556533981060214310031284997234511264520436856800766700137433886215312"
+                               "619263099564687221105155589548092"),
+            1),
+        signature_type(
+            base_integral_type("2987827765930226744324160709234188039067993275312184930598027173694547318685295400"
+                               "59082047229965091041360305033460"),
+            base_integral_type("9457419959439992125717707807669497747672787830657744590413070193319663119508322422"
+                               "45002599112075197038185391906968"),
+            1),
+        signature_type(
+            base_integral_type("4876156085391007995965987129155621226188309464845224701791483308822870529308939536"
+                               "09364876332301591008313684293136"),
+            base_integral_type("3167655052930268032876438391824013119285068210960742308294704963610650770047916254"
+                               "623805722585761060437258975606416"),
+            1),
+        signature_type(
+            base_integral_type("3128681693470196532099754978203645328231078954072621313122446380697903278783935593"
+                               "400901439442893052399103954711491"),
+            base_integral_type("2096028726813768751656827159283251995818316712356559097257800184536015794348727381"
+                               "236400950013189303310638777463007"),
+            1),
+        signature_type(
+            base_integral_type("2910315279306811586346619288101461775968174273741226074933978173693981320794155169"
+                               "005060013725639632089550579908036"),
+            base_integral_type("3321812041197837928786780184652869275224234638764149038739428412537925791631849520"
+                               "355318752771690648243694239494949"),
+            1),
+    };
+    std::vector<signature_type> sigs_3 = {
+        signature_type(
+            base_integral_type("6310048338751151565354028998638485383012255413280542986468604145705896760073281477"
+                               "44847178970164992631333480909403"),
+            base_integral_type("3283015965234153100318039871147257714178755795525904246157714035865311415325603656"
+                               "111218434033869778210046150069035"),
+            1),
+        signature_type(
+            base_integral_type("3375018252152840483670739804066561916743697534301401819374134490570937793100458542"
+                               "627467268496752993244163287080024"),
+            base_integral_type("1166508995233965103981768800835003537190357467054297564634798284145476658741110726"
+                               "46293507796545724728211718948100"),
+            1),
+        signature_type(
+            base_integral_type("2165951107553224916040725192849120214272974886592315310025513602956264969117067782"
+                               "291921371619032816091918239061444"),
+            base_integral_type("3515213406517840982379699904275116130342248746480482601414380809775903960439387799"
+                               "022126459005911335374040311747168"),
+            1),
+        signature_type(
+            base_integral_type("2422424954037224387690023672341772993023350122258796012851054887990905319967822292"
+                               "312876357073175618026163032365503"),
+            base_integral_type("1686142189399731307825868917016483859423889913490134095777304701101927678087035759"
+                               "097803983044600758086796261771633"),
+            1),
+        signature_type(
+            base_integral_type("1922037110596973421849118266115803165788944984087299467351258158231898786508402468"
+                               "659543788260823954815547130540721"),
+            base_integral_type("2711751198126164379880940292752880675444254162005255403403891824446429437773154900"
+                               "087029379892356526347758495344310"),
+            1),
+        signature_type(
+            base_integral_type("1027577908944414794562345795366374279668364641283992140960483489136601290949237038"
+                               "685526901560368339443908378914309"),
+            base_integral_type("3713339954866241208806307605171594541440448264635917911871507884771108726420552539"
+                               "509852506445025567704602153075386"),
+            1),
+        signature_type(
+            base_integral_type("2831407188578763034043951066748728434501331110719233762764376164515818225395469541"
+                               "71843800057097296511038126615363"),
+            base_integral_type("1936100242858540591208117640929521199237068676340628428004042031767592713344996267"
+                               "686143382734410955206720497563392"),
+            1),
+        signature_type(
+            base_integral_type("6436789433815690158582156666446345031141561343304065274373910226016024147007640094"
+                               "52442038634030631257017098008703"),
+            base_integral_type("8233109182943107761977539615103041179260558624608427770229546659921026553383049809"
+                               "49433797918045837393765302508864"),
+            1),
+        signature_type(
+            base_integral_type("3540151563642218155534482026567473609246958490528539705155502748310238291757049436"
+                               "073237751975440454317423064461912"),
+            base_integral_type("2876247411770081889823739466854221855791452718539911658203911304138117748770784359"
+                               "154899155698729648064572055822233"),
+            1),
+        signature_type(
+            base_integral_type("3827670697754023229674690887274106490816736966172305740849847603849386628058341478"
+                               "951157088334186940078279561696933"),
+            base_integral_type("2244170619089108552354063879281432511581796568578251856271461325670010115543329384"
+                               "742218861706178837590431939850753"),
+            1),
+    };
+    std::vector<signature_type> sigs_4 = {
+        signature_type(
+            base_integral_type("5884672248768665838447976445291377248171371755191353702740412326853512248315250636"
+                               "7732384300273043926206770691641"),
+            base_integral_type("8637514742063852915692910788853920161605398418183572028362377800638129451318482212"
+                               "44296311363704542619086815894597"),
+            1),
+        signature_type(
+            base_integral_type("2741097311365095359895280436388859345127892200153729569120718872468001627017283079"
+                               "645096880067020372678886781502237"),
+            base_integral_type("1859074400532225340477459622936635995761539054839399251034357710000662449193141146"
+                               "352659040513191834623289856154563"),
+            1),
+        signature_type(
+            base_integral_type("9513656215051999740332400399407909848853563936399801399448254674363817835174131972"
+                               "77272162962604104114567873419071"),
+            base_integral_type("1955344218005362161774222713802980890815857957941712222566472654956639958646432856"
+                               "552251361525591629858087050906600"),
+            1),
+        signature_type(
+            base_integral_type("2637852349241191786250178856280685602822507375281257902813222583302291226646714453"
+                               "268050018376327122958505594437464"),
+            base_integral_type("1607111695747663042420530166306406591035055208722886757095981982923872512169019390"
+                               "549103889013179330227592139345111"),
+            1),
+        signature_type(
+            base_integral_type("3897100813895028914322560995854748747437091758218943699238207481445047789014314537"
+                               "657953846741109890488534771737025"),
+            base_integral_type("2077102326876940174051612399631267294136506639276376163603428145424184671531243846"
+                               "144732173247387689471082721410554"),
+            1),
+        signature_type(
+            base_integral_type("2881323095740416343105234694066856584860737900692080051790764890552137581148067203"
+                               "001568760317432817426586986486538"),
+            base_integral_type("4326498745371816319160179982472842229095758104965717858868727528309336199365693897"
+                               "807270379761586242933142628893"),
+            1),
+        signature_type(
+            base_integral_type("5957148522672285702615760842283342247932771997918155373063840765572399804471572177"
+                               "37544975188522059040060650471950"),
+            base_integral_type("3206569086454443498572408165252930823424436807111821683110446055166513547533331435"
+                               "970396926947499507670578163388756"),
+            1),
+        signature_type(
+            base_integral_type("2294740212496360056613172207129572207416659673157285799577329797890458736863230723"
+                               "474490135750982035929296943458679"),
+            base_integral_type("1746941429333732224736152599969133959903470259906693647160976333082119998778628296"
+                               "822428326650786673716187947015221"),
+            1),
+        signature_type(
+            base_integral_type("3203928604956218904380327800564935367343160082300860305705181034445774863124230065"
+                               "975789885550849231117463032992024"),
+            base_integral_type("3259905440480308210851123502251029941749083160876161156324307350158271545551052050"
+                               "760469246918357752717192019180016"),
+            1),
+        signature_type(
+            base_integral_type("3232305984222600364220379445979381561229545351529484379451097040094318174114825345"
+                               "759852965428134612315691025154662"),
+            base_integral_type("5274493986742024550650899294884802110909365273764009894884026532198815740817142660"
+                               "61691667343045533578979785180614"),
+            1),
+    };
+    std::vector<signature_type> sigs_5 = {
+        signature_type(
+            base_integral_type("1624980802471599693239080604031361774353428937533833997557968153331312229044144389"
+                               "304527649113999198909746153920633"),
+            base_integral_type("2767132940881224383154269602791219083509141937230253577557151348591993254924560161"
+                               "073165104084023867765858248764848"),
+            1),
+        signature_type(
+            base_integral_type("1446932322636169179392773164240655537436474339997242956591418544013277120427717247"
+                               "856550698069133432634160096835621"),
+            base_integral_type("3843090659205917613326369073847909359996127324010616409767737393955198026095416042"
+                               "606978356807145807602659116829420"),
+            1),
+        signature_type(
+            base_integral_type("3261351094965584362455105362965807735216212939737040281190961388946399845380046954"
+                               "784145154451289565314821232281910"),
+            base_integral_type("3293013734832178396174899451231429356738329228401794909317571490818343872587883599"
+                               "447158454480964496042043962237038"),
+            1),
+        signature_type(
+            base_integral_type("2156599883740101912396266639195793760208158483411117602313682092745981201774337977"
+                               "170051462268617931771454495097949"),
+            base_integral_type("6474580618768551435350174624791764360987253636113859574989194625674188673651506614"
+                               "15155470658319955395876659419428"),
+            1),
+        signature_type(
+            base_integral_type("3146586922283822151422758625050058325404183941019166745163485201518919966624555186"
+                               "13299723779814639130184663388685"),
+            base_integral_type("2143895093292562907547963666739911796802741558621299241479593574983318337651670764"
+                               "996649347876218831467788171005566"),
+            1),
+        signature_type(
+            base_integral_type("2043953950901207029935221043397552024073712877406913494810274716789754546243369244"
+                               "276601613962162023005126888373682"),
+            base_integral_type("4558700736061952233852207364977628234085528927177825166948969766488436036277241199"
+                               "65505490222006254436611593372945"),
+            1),
+        signature_type(
+            base_integral_type("1317456700940754031234408860019504581571635940011379972051907070542094505018746579"
+                               "970018944128200402386421138262005"),
+            base_integral_type("6193093990074004808718661098092047084503694081699777495021858986927136332479300467"
+                               "85255222025827519158922855983232"),
+            1),
+        signature_type(
+            base_integral_type("1975205547332108136697807964243044979675315129586082313570152299462861679159751811"
+                               "913235849139637018466870872010868"),
+            base_integral_type("2425545016366955409659158635188160781678158190857516071736240769603759138990904858"
+                               "526788106743213387002621389392568"),
+            1),
+        signature_type(
+            base_integral_type("2068776786022736271877218031769853195781024461596577190749938697831553939363679897"
+                               "628637043773600247511273410105570"),
+            base_integral_type("3837743299548170261962554187116587046804876287570441625285114645962378070767416674"
+                               "070243436958340071120605358131957"),
+            1),
+        signature_type(
+            base_integral_type("2155177881171244016481372629654764607095694422759658484031913239763089673061540621"
+                               "278575883679228277930490825973721"),
+            base_integral_type("4378435833884719447117190734118720568398854926502298794333363728916763425874677568"
+                               "97337818602005012267586853803287"),
+            1),
+    };
+    std::vector<signature_type> sigs_6 = {
+        signature_type(
+            base_integral_type("3255434475449552613370797574808893070866078650279159365915656942680237884011412055"
+                               "836898499690388729943673909287315"),
+            base_integral_type("4142059600905711524551433549509610143850101057406713385140651360079544837103743287"
+                               "87557080812013422151768976251128"),
+            1),
+        signature_type(
+            base_integral_type("1654240530116266051126183920610105138461968838667698886749025273863484400048033378"
+                               "38986727932954568592893191096866"),
+            base_integral_type("1021407893780456087005727755192817136790997296283452142814744853214399680577110345"
+                               "015853276273182836258858186776949"),
+            1),
+        signature_type(
+            base_integral_type("1613409969576133727840496825560357228456846293953766077673431326772851408363987072"
+                               "540940938118505910131854679450852"),
+            base_integral_type("2149717309162637042678417713878976532839945009794624969481954005421080260923271843"
+                               "469587949467270500170121627106328"),
+            1),
+        signature_type(
+            base_integral_type("1603816970152102519017718778408138882132547627143353055930192168403701049674969010"
+                               "527764291124757098853584299801838"),
+            base_integral_type("3557390238300117847593137946942098336657176808123461427026174112534242561176408358"
+                               "800161726146856881016714127400137"),
+            1),
+        signature_type(
+            base_integral_type("9244581670514817375277307446119142152338984816952816918989103999926405491282470510"
+                               "89610633772396220668387714436428"),
+            base_integral_type("8734929087708619804450435991471497214076106706561043675084512700314342951465940618"
+                               "70632882872337036158984518630650"),
+            1),
+        signature_type(
+            base_integral_type("2445041831146265426239250785890565703036313031400170415942615011874577858532009696"
+                               "974310770975655226489801041658571"),
+            base_integral_type("5512072826800374348492205244747802242777233761901561769625108364421878006386043154"
+                               "21209714362997473292812455613880"),
+            1),
+        signature_type(
+            base_integral_type("3506638768689499941634583114869094536083655531283988182220118108750630742526843236"
+                               "382635286564506336111909370443066"),
+            base_integral_type("2577776815196911857582710253252630526740298939464520185201437744049019876444799245"
+                               "80012865633593242708144125952361"),
+            1),
+        signature_type(
+            base_integral_type("1892190486275862743845721061372915227188352596381582382145758404285827112500751962"
+                               "028390729736749385403653271245445"),
+            base_integral_type("3296014034102811188040144598920562444803441403342133179687535122721422578551270038"
+                               "720431963458627938370318978783126"),
+            1),
+        signature_type(
+            base_integral_type("2745860126051790194714375972721391679480460754297119032151752092043491325128519698"
+                               "195659829754819985136159113840963"),
+            base_integral_type("2641902869242288348442903861551653277735078099612820308995467241753259823665056863"
+                               "517245556702486692790020263728658"),
+            1),
+        signature_type(
+            base_integral_type("1959372996471406452967311272413710243756668859351431041179640895242978805345383367"
+                               "515657665978963430972925164926744"),
+            base_integral_type("3360527811182000135278196179787363192032056380532166708309864435081048000087749416"
+                               "445030554993075062495425857556101"),
+            1),
+    };
+    std::vector<signature_type> sigs_7 = {
+        signature_type(
+            base_integral_type("2714645068492986981937317001061887269878226520905343218015139477715422259876927843"
+                               "062098815932414778862077273533208"),
+            base_integral_type("2943751645876776926624913737890060064122342911785057074115233881587077484923157790"
+                               "268914962210704754358539112741249"),
+            1),
+        signature_type(
+            base_integral_type("1872354537403656188164647231172727202009845951538893319747209357182774646765456505"
+                               "764840721724197965016178012446409"),
+            base_integral_type("2325827147262697698272031344226291837060418467386383087891101512387386225360641606"
+                               "766681985836305936176277029362475"),
+            1),
+        signature_type(
+            base_integral_type("3614166952606795429135646371115661735484217637660535414483684344770366411565212364"
+                               "66066240740844473210596468696501"),
+            base_integral_type("2603922876360263618559023765013698744514791298904943225857488825954475439185824320"
+                               "331425804755362739073540424940031"),
+            1),
+        signature_type(
+            base_integral_type("2871441357866235207412785242675272629179212875833101049583986921340551764687190907"
+                               "929878151870191411689005709841946"),
+            base_integral_type("2267597700902301544193554554217677414164756199520207287969373341593300924393743534"
+                               "304579202566418702490258294915964"),
+            1),
+        signature_type(
+            base_integral_type("1305332397067385841432802373421809028193955206788746652617527594607526028021586089"
+                               "19364825106217818598191640883554"),
+            base_integral_type("1963466956471531542443925487039413160958580369599617849257526629359035232511677776"
+                               "400562705255825184056004215549669"),
+            1),
+        signature_type(
+            base_integral_type("2566388299860777785985307070000982244384960731003980130731096972245131464702782421"
+                               "934216393470029795042630654239794"),
+            base_integral_type("5233673022526490183979853985023840198086968470095254733457281773720454143188987874"
+                               "53142097819338242588865507564019"),
+            1),
+        signature_type(
+            base_integral_type("1990225925163235803022407992912049836951129275877371273931425065115495353382018706"
+                               "201967714055127733332371842808442"),
+            base_integral_type("1519166378281180024901689127468771078101432373357612846672487394073495156002366983"
+                               "768282023863238837252781912635709"),
+            1),
+        signature_type(
+            base_integral_type("3200625396228613925508787978234849325833493087869912299416903565265792261043978166"
+                               "268128271198921649867206111744093"),
+            base_integral_type("3453297856893744972774705960485954995210897737358227269301852562082765907883937340"
+                               "100949684722187768262450362277012"),
+            1),
+        signature_type(
+            base_integral_type("3111171508045265895098917790506971202325704787220861581838886842527336389063481686"
+                               "999426589473048454266661105060597"),
+            base_integral_type("9563721349515934885574268225391354722454867848826429054472987288459790144799418413"
+                               "31461362867412528947158945391017"),
+            1),
+        signature_type(
+            base_integral_type("3820554594120294281492671047077755840725257790596625362457563540223453950818392591"
+                               "170267099168156562932183720563554"),
+            base_integral_type("1468232896136903865325266974484405794106096656198775402531086440310811950924983720"
+                               "044838323134938099256321336155863"),
+            1),
+    };
+    std::vector<signature_type> sigs_8 = {
+        signature_type(
+            base_integral_type("2821021631577065901420875031391460148941053911552361201165188961941834883227818289"
+                               "381777988186782643800523522609693"),
+            base_integral_type("2632293170696056542333892967280709916705622641650329247062694369599676143397746994"
+                               "261554387573180162640019376757904"),
+            1),
+        signature_type(
+            base_integral_type("5152429385048653245817093726718324190753820949783600825121013132697362339905493128"
+                               "32178072764427962961728891469210"),
+            base_integral_type("2445239057795842242228509997856338117206427430153004311425540152624277758636413407"
+                               "809574586442608105951807804671071"),
+            1),
+        signature_type(
+            base_integral_type("2839573097780069495370345713286265991759182375649877133328365960820825677660686600"
+                               "420931645675465236322393990913417"),
+            base_integral_type("3710946382885302657003443430679125175565099147647543169112102376834027682145571364"
+                               "951855803025666130357208636216685"),
+            1),
+        signature_type(
+            base_integral_type("1030397847263468446146339297821391784651697305655528828104869809960456379381965366"
+                               "943364512951451847699579664821694"),
+            base_integral_type("3001384274920418089203076308242048806687270796208387472388817775117452179970368884"
+                               "987391084723528884592498229405248"),
+            1),
+        signature_type(
+            base_integral_type("1994889288942240977253752512542997155284532514461634278543861300388339162032131190"
+                               "281546176198968260449280865769007"),
+            base_integral_type("1454342724354291351065426036338386574456921248206381127567496650542568323430762323"
+                               "780659404480016443533443215375228"),
+            1),
+        signature_type(
+            base_integral_type("4340257081572947127087361303148515285465091997743101368600299103860475550066682416"
+                               "73130756486884266288922881085820"),
+            base_integral_type("1164242790756046405933411010384237700216752635805943757061087484378058366114254951"
+                               "900416189435660612167703397136292"),
+            1),
+        signature_type(
+            base_integral_type("2447687993387838629767620519855329368115321127313059179901541513691618140144165251"
+                               "779500019952692464330799993003235"),
+            base_integral_type("3016535482385980109868983383411103613564155029435342234368799451743746443344597754"
+                               "217012707182142199203961050069854"),
+            1),
+        signature_type(
+            base_integral_type("9581258510963490577470518130049464656386242589069269808643208920650686599725668977"
+                               "87875025010056927698756330898448"),
+            base_integral_type("1922992107182576563563605987326712516709770411667771568104221817348269448086397602"
+                               "967230840022921212735834667140995"),
+            1),
+        signature_type(
+            base_integral_type("3684157182598355953984998059643952884799724774800935231418454519807563605375702827"
+                               "69067089512841389133316489051561"),
+            base_integral_type("2187103878253682473517477146428057255331389657820377470548866502052224698592921585"
+                               "184092173745939416794981531706644"),
+            1),
+        signature_type(
+            base_integral_type("3118929716927244707511405024709604047254128010235580841529986449039529112673696280"
+                               "909193332280375160708532033402481"),
+            base_integral_type("3417204373191715758647434869115349018977086210131909585967961096507128379563331676"
+                               "918338940342722146741486290327714"),
+            1),
+    };
+    std::vector<signature_type> sigs_9 = {
+        signature_type(
+            base_integral_type("3614191833619916771937923987471512697198222744507162350081951746328319780589900395"
+                               "458912858002735051573879504563188"),
+            base_integral_type("2957612112486862210580976612133903676085833054084162722154150038348055712519316088"
+                               "998898753172665720495306658672303"),
+            1),
+        signature_type(
+            base_integral_type("6943726045689118618096222349611532353884748204807953488478078405659721537975643728"
+                               "18627626696107469225671507869448"),
+            base_integral_type("3701297390156900680166476208723918861443941599901993776076227831303940373573517168"
+                               "321269059197013651971358807451287"),
+            1),
+        signature_type(
+            base_integral_type("2650479071999526992848542758364042760665513628631461254833862626415964485607296374"
+                               "943740358238008517365126876269927"),
+            base_integral_type("3591326866535656465313023764156507060720853300097670836551055205398935326270960441"
+                               "078893859264013022247331095073450"),
+            1),
+        signature_type(
+            base_integral_type("5160875849399631716879951871550446159357028147334627435376863508027637616730996272"
+                               "40258149684123873011698587975132"),
+            base_integral_type("2823239863847831444644387989234316681234527900150968908150474194417114881530396298"
+                               "092505917622537716356276275023746"),
+            1),
+        signature_type(
+            base_integral_type("2918724263140600644481002525779585398458601069205571861837827766299355378348192912"
+                               "731999196812695016913809235140951"),
+            base_integral_type("3580485954157131403971288202213620346843301369336526865759352040483915832892052494"
+                               "86141319735544452022012196399455"),
+            1),
+        signature_type(
+            base_integral_type("3398668435467482221330323377751204544476092841722944400779540654086089647027552765"
+                               "952114342045606573166385606159390"),
+            base_integral_type("3417009627450676516330431396768755613489120795842394123236986318972601991037550949"
+                               "677929891267097226142451271572226"),
+            1),
+        signature_type(
+            base_integral_type("3224820196462308014799966623517180452347678187615617464201165996281448855866083852"
+                               "333669567212637085945103105564616"),
+            base_integral_type("1381045428590297970041200208175636790105449136197177168238371249429929758505009282"
+                               "380858551471970071793568824051174"),
+            1),
+        signature_type(
+            base_integral_type("5515051754749126429573633829949935874026885124379607647399047220913948552357077639"
+                               "51850093224860259219896233079837"),
+            base_integral_type("1484882883889370710316213210462488753797517138959255741994012931293992163755424855"
+                               "5477534951337172364507581305546"),
+            1),
+        signature_type(
+            base_integral_type("1340378099469131217180864853371541239192743188962932860918801683642272204411306184"
+                               "982865159406328539849190784726569"),
+            base_integral_type("3988401522626426059515269685282046124317669750996005926241417738911838337373376167"
+                               "420168107673194398275253194898459"),
+            1),
+        signature_type(
+            base_integral_type("8425952664946501071739621016260311336618386468939924822353201445286604816918057719"
+                               "71421729740779857703450491072675"),
+            base_integral_type("2013128275611530836001289486095460793869288589729680474062638143008108329049490569"
+                               "037790962530078741015159323192067"),
+            1),
+    };
+    std::vector<std::vector<signature_type>> sigs_n = {sigs_0, sigs_1, sigs_2, sigs_3, sigs_4,
+                                                       sigs_5, sigs_6, sigs_7, sigs_8, sigs_9};
+
+    std::vector<std::uint8_t> msg_0 = {185, 220, 20,  6, 167, 235, 40,  21, 30,  81,  80,  215, 178, 4,   186, 167, 25,
+                                       212, 240, 145, 2, 18,  23,  219, 92, 241, 181, 200, 76,  79,  167, 26,  135};
+    std::vector<std::uint8_t> msg_1 = {100, 63,  6,  192, 153, 114, 7,   23,  29,  232, 103, 249, 214, 151, 191,
+                                       94,  166, 1,  26,  188, 206, 108, 140, 219, 33,  19,  148, 210, 192, 45,
+                                       208, 251, 96, 219, 90,  44,  23,  172, 61,  200, 88,  120, 169, 11,  237};
+    std::vector<std::uint8_t> msg_2 = {42,  173, 25, 200, 18,  12, 164, 20, 47, 182, 1,   159, 204, 236, 249,
+                                       250, 219, 4,  173, 224, 59, 52,  30, 63, 199, 114, 1,   179, 220, 149};
+    std::vector<std::uint8_t> msg_3 = {159, 14, 88, 112, 57, 19, 127};
+    std::vector<std::uint8_t> msg_4 = {79,  155, 160, 153, 141, 34,  25,  179, 186, 202, 17,
+                                       25,  64,  213, 36,  183, 207, 148, 103, 125, 108, 85,
+                                       119, 80,  250, 77,  185, 225, 7,   126, 237, 181, 186};
+    std::vector<std::uint8_t> msg_5 = {112, 63,  158, 165, 214, 184, 246, 124, 233, 224, 96,  247, 101, 83,
+                                       44,  50,  61,  176, 52,  236, 112, 13,  184, 25,  147, 111, 190, 111,
+                                       116, 159, 211, 124, 233, 39,  102, 63,  67,  148, 152, 201, 140, 81};
+    std::vector<std::uint8_t> msg_6 = {39, 116, 163, 178};
+    std::vector<std::uint8_t> msg_7 = {39,  99,  171, 210, 33,  237, 133, 216, 63,  145, 135, 175, 139, 158, 146,
+                                       143, 0,   222, 255, 66,  63,  255, 218, 219, 120, 110, 102, 120, 165, 154,
+                                       243, 5,   205, 192, 37,  70,  208, 248, 171, 70,  129, 172, 193, 240, 0,
+                                       105, 176, 196, 123, 188, 159, 19,  209, 47,  217, 65,  31,  141, 245, 50};
+    std::vector<std::uint8_t> msg_8 = {233};
+    std::vector<std::uint8_t> msg_9 = {43, 216, 54,  153, 246, 7,   65,  36,  72,  210, 2,   217, 72,  187, 17,
+                                       27, 173, 212, 86,  214, 128, 134, 255, 154, 89,  6,   234, 59,  44,  218,
+                                       65, 17,  211, 99,  131, 145, 247, 167, 177, 83,  238, 167, 122, 180, 114,
+                                       21, 214, 254, 19,  179, 80,  245, 159, 136, 76,  110, 49,  172, 8};
+    std::vector<std::vector<std::uint8_t>> msgs = {msg_0, msg_1, msg_2, msg_3, msg_4,
+                                                   msg_5, msg_6, msg_7, msg_8, msg_9};
+
+    std::vector<signature_type> agg_sigs = {
+        signature_type(
+            base_integral_type("1084917570002802763999237510539725659994871357035449444385093811995915316976445281"
+                               "292130656008639155395730412291658"),
+            base_integral_type("3886306453024106962210618574822438002507742324781378798145177640914851427480607773"
+                               "80324526627818863422254675106741"),
+            1),
+        signature_type(
+            base_integral_type("1334273933295198506579506466388518399757868713595298851455511991726529865559956852"
+                               "139535647293288864109223486269501"),
+            base_integral_type("2915143050271976741474346244282955959370160202462730084655401743968720393681037796"
+                               "212282376238149776988779619385728"),
+            1),
+        signature_type(
+            base_integral_type("1992226813233186161892841053730955713413330718396654770930615161245446330886348808"
+                               "375149142136621699710166186529599"),
+            base_integral_type("3792853260901743204349364966800584618293678374436330555441521901126225913302996074"
+                               "787985368120014089424818764350034"),
+            1),
+        signature_type(
+            base_integral_type("2273714389694683929793672845667364981885257753454257270925422420590663263362283897"
+                               "559197709998858963248068940797693"),
+            base_integral_type("7507214413513007609692689436408309286989826371582864950226511743165197870277975060"
+                               "2498390191538725175882329115209"),
+            1),
+        signature_type(
+            base_integral_type("3629662317305453527945814569531241916308551910395591700586345516594171820438063817"
+                               "619360333835424710455112141718887"),
+            base_integral_type("3977694355992175752758017157256345335610558907805754302645841748408524019079246693"
+                               "516486369282313108381864169850447"),
+            1),
+        signature_type(
+            base_integral_type("2743066008141784332448636417850442533444376990969234272262103820239974897235349447"
+                               "940848232836245269355081404970989"),
+            base_integral_type("1003768812584312775171898292160717609356818331948530343149025924229312799065943734"
+                               "731919710505333711189358653656122"),
+            1),
+        signature_type(
+            base_integral_type("1120060595279201597292489863360350939390846549261297899755461307631388272858656494"
+                               "70363583760043719107241961383627"),
+            base_integral_type("3032999153532165991682551028625187876282753540066198123454340275579278219322558692"
+                               "791110643868420991799030300916720"),
+            1),
+        signature_type(
+            base_integral_type("1827631294354850244539090463908521035964141492169605349156917800494545990061799040"
+                               "142059677171367430783523947795508"),
+            base_integral_type("1461596941678182387988133247119487583922045995621434700589940645198051782085659556"
+                               "164556176218490298266521640001681"),
+            1),
+        signature_type(
+            base_integral_type("4279615515140370040311679974410757722905208857087413242574315353971587570075791975"
+                               "16042030611508597429044635860148"),
+            base_integral_type("1483169406161183521857518773785313836760796098376071625472725178754507210694402765"
+                               "17299367081698862501290292015162"),
+            1),
+        signature_type(
+            base_integral_type("3897131325847469827104109262324942155320575380077985344861872795926599212115111988"
+                               "01911682524047046070189254233304"),
+            base_integral_type("1066950327548057040635477728785400668202524036698616416794176843313107716420767020"
+                               "768360276092814627500088544460485"),
+            1),
+    };
+
+    conformity_pop_test_case<scheme_type, scheme_pop_prove_type>::process(sks_n, msgs, sigs_n, agg_sigs);
+}
+
 // BOOST_AUTO_TEST_CASE(bls_pop_mps) {
 //     // TODO: add test
 // }

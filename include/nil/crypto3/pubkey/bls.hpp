@@ -542,23 +542,23 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                static inline typename std::enable_if<!std::is_same<
-                    scheme_public_key_type, typename std::iterator_traits<InputIterator>::value_type>::value>::type
+                static inline typename std::enable_if<!std::is_convertible<
+                    typename std::iterator_traits<InputIterator>::value_type, scheme_public_key_type>::value>::type
                     update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
                     bls_scheme_type::update(acc.second, first, last);
                 }
 
                 template<typename InputRange>
-                static inline typename std::enable_if<!std::is_same<
-                    scheme_public_key_type,
-                    typename std::iterator_traits<typename InputRange::iterator>::value_type>::value>::type
+                static inline typename std::enable_if<
+                    !std::is_convertible<typename std::iterator_traits<typename InputRange::iterator>::value_type,
+                                         scheme_public_key_type>::value>::type
                     update(internal_accumulator_type &acc, const InputRange &range) {
                     bls_scheme_type::update(acc.second, range);
                 }
 
                 template<typename InputIterator>
-                static inline typename std::enable_if<std::is_same<
-                    scheme_public_key_type, typename std::iterator_traits<InputIterator>::value_type>::value>::type
+                static inline typename std::enable_if<std::is_convertible<
+                    typename std::iterator_traits<InputIterator>::value_type, scheme_public_key_type>::value>::type
                     update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
                     for (auto iter = first; iter != last; ++iter) {
                         update(acc, *iter);
@@ -567,8 +567,8 @@ namespace nil {
 
                 template<typename InputRange>
                 static inline typename std::enable_if<
-                    std::is_same<scheme_public_key_type,
-                                 typename std::iterator_traits<typename InputRange::iterator>::value_type>::value>::type
+                    std::is_convertible<typename std::iterator_traits<typename InputRange::iterator>::value_type,
+                                        scheme_public_key_type>::value>::type
                     update(internal_accumulator_type &acc, const InputRange &range) {
                     for (const auto &scheme_pubkey : range) {
                         update(acc, scheme_pubkey);

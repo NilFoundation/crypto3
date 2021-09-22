@@ -106,14 +106,14 @@ namespace nil {
                         to_curve<typename h2c_policy::group_type, typename h2c_policy::params_type>(first, last, acc);
                     }
 
-                    static inline signature_type sign(internal_accumulator_type &acc, const private_key_type &sk) {
+                    static inline signature_type sign(const internal_accumulator_type &acc, const private_key_type &sk) {
                         BOOST_ASSERT(validate_private_key(sk));
 
                         signature_type Q = hashes::accumulators::extract::to_curve<h2c_policy>(acc);
                         return sk * Q;
                     }
 
-                    static inline bool verify(internal_accumulator_type &acc, const public_key_type &pk,
+                    static inline bool verify(const internal_accumulator_type &acc, const public_key_type &pk,
                                               const signature_type &sig) {
                         /// check if signature point is on the curve
                         if (!sig.is_well_formed()) {
