@@ -170,6 +170,52 @@ namespace nil {
                     }
                 };
 
+                template<typename Scheme>
+                struct isomorphic_pop_proving_policy : public isomorphic_policy<Scheme> {
+                    typedef typename isomorphic_policy<Scheme>::scheme_type scheme_type;
+
+                    typedef private_key<scheme_type> key_type;
+                    typedef void op_type;
+                    typedef bool internal_accumulator_type;
+                    typedef typename key_type::signature_type result_type;
+
+                    template<typename... Args>
+                    static inline void init_accumulator(const key_type &key, Args &...args) {
+                    }
+
+                    template<typename... Args>
+                    inline static void update(const key_type &key, Args &...args) {
+                    }
+
+                    template<typename... Args>
+                    static inline result_type process(const key_type &key, Args &...args) {
+                        return key.pop_prove();
+                    }
+                };
+
+                template<typename Scheme>
+                struct isomorphic_pop_verification_policy : public isomorphic_policy<Scheme> {
+                    typedef typename isomorphic_policy<Scheme>::scheme_type scheme_type;
+
+                    typedef public_key<scheme_type> key_type;
+                    typedef void op_type;
+                    typedef bool internal_accumulator_type;
+                    typedef bool result_type;
+
+                    template<typename... Args>
+                    static inline void init_accumulator(const key_type &key, Args &...args) {
+                    }
+
+                    template<typename... Args>
+                    inline static void update(const key_type &key, Args &...args) {
+                    }
+
+                    template<typename... Args>
+                    static inline result_type process(const key_type &key, Args &...args) {
+                        return key.pop_verify(args...);
+                    }
+                };
+
                 template<typename Policy>
                 class isomorphic {
                     typedef Policy policy_type;
@@ -222,6 +268,8 @@ namespace nil {
                     typedef detail::isomorphic_aggregate_verification_policy<scheme_type> aggregate_verification_policy;
                     typedef detail::isomorphic_single_msg_aggregate_verification_policy<scheme_type>
                         single_msg_aggregate_verification_policy;
+                    typedef detail::isomorphic_pop_proving_policy<scheme_type> pop_proving_policy;
+                    typedef detail::isomorphic_pop_verification_policy<scheme_type> pop_verification_policy;
 
                     template<typename Policy>
                     struct bind {

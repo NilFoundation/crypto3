@@ -36,21 +36,23 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            /*!
-             * @brief
-             *
-             * @ingroup pubkey_algorithms
-             *
-             * Signature verification. For document and signature data, the validity of the signature
-             * is determined using the public key. Verification of the signature is performed with a
-             * public key corresponding to the same private key that was used when signing.
-             *
-             * Funcion verify is a validation algorithm that outputs VALID if the signature is a
-             * valid public key message signature, and INVALID otherwise.
-             */
             template<typename Scheme>
             using verification_policy = typename pubkey::modes::isomorphic<Scheme>::verification_policy;
+
+            template<typename Scheme>
+            using pop_verification_policy = typename pubkey::modes::isomorphic<Scheme>::pop_verification_policy;
         }    // namespace pubkey
+
+        template<typename Scheme,
+                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
+                     pubkey::pop_verification_policy<Scheme>>::type,
+                 typename VerificationAccumulator = pubkey::verification_accumulator_set<ProcessingMode>,
+                 typename StreamSchemeImpl = pubkey::detail::value_pubkey_impl<VerificationAccumulator>,
+                 typename SchemeImpl = pubkey::detail::range_pubkey_impl<StreamSchemeImpl>>
+        SchemeImpl verify(const typename pubkey::public_key<Scheme>::signature_type &signature,
+                          const pubkey::public_key<Scheme> &key) {
+            return SchemeImpl(VerificationAccumulator(key, accumulators::signature = signature));
+        }
 
         /*!
          * @brief

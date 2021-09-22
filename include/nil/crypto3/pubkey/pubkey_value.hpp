@@ -80,6 +80,11 @@ namespace nil {
                     typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
                         result_type;
 
+                    range_pubkey_impl(accumulator_set_type &&ise) :
+                        SchemeStateImpl(std::forward<accumulator_set_type>(ise)) {
+                        this->accumulator_set();
+                    }
+
                     template<typename SinglePassRange>
                     range_pubkey_impl(const SinglePassRange &range, accumulator_set_type &&ise) :
                         SchemeStateImpl(std::forward<accumulator_set_type>(ise)) {

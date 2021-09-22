@@ -387,11 +387,23 @@ namespace nil {
                     return pubkey;
                 }
 
+                // TODO: refactor pop
+                template<typename FakeAccumulator>
+                inline bool pop_verify(FakeAccumulator, const signature_type &proof) const {
+                    return bls_scheme_type::pop_verify(pubkey, proof);
+                }
+
+                // FIXME: copy pubkey between equivalent public keys is a bottleneck
+                // TODO: support using of the same pubkey even if scheme policy differs in public params and scheme type
+                template<typename ToPublicParams, template<typename> class ToBlsScheme>
+                operator public_key<bls<ToPublicParams, BlsVersion, ToBlsScheme, CurveType>>() const {
+                    return public_key<bls<ToPublicParams, BlsVersion, BlsScheme, CurveType>>(pubkey);
+                }
+
             protected:
                 public_key_type pubkey;
             };
 
-            // TODO: add specialization for pop scheme
             template<typename PublicParams, template<typename, typename> class BlsVersion,
                      template<typename> class BlsScheme, typename CurveType>
             struct private_key<bls<PublicParams, BlsVersion, BlsScheme, CurveType>>
@@ -429,6 +441,18 @@ namespace nil {
 
                 inline signature_type sign(internal_accumulator_type &acc) const {
                     return bls_scheme_type::sign(acc, privkey);
+                }
+
+                inline signature_type pop_prove() const {
+                    return bls_scheme_type::pop_prove(privkey);
+                }
+
+                // FIXME: copy privkey between equivalent private keys is a bottleneck
+                // TODO: support using of the same privkey even if scheme policy differs in public params and scheme
+                //  type
+                template<typename ToPublicParams, template<typename> class ToBlsScheme>
+                operator private_key<bls<ToPublicParams, BlsVersion, ToBlsScheme, CurveType>>() const {
+                    return private_key<bls<ToPublicParams, BlsVersion, BlsScheme, CurveType>>(privkey);
                 }
 
             protected:

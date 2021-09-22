@@ -70,7 +70,7 @@ namespace nil {
 
                         template<typename Args>
                         inline void operator()(const Args &args) {
-                            resolve_type(args[boost::accumulators::sample],
+                            resolve_type(args[boost::accumulators::sample | nullptr],
                                          args[::nil::crypto3::accumulators::iterator_last | nullptr]);
                         }
 
@@ -79,6 +79,12 @@ namespace nil {
                         }
 
                     protected:
+                        //
+                        // pop verify
+                        //
+                        inline void resolve_type(std::nullptr_t, std::nullptr_t) {
+                        }
+
                         template<typename InputRange>
                         inline void resolve_type(const InputRange &range, std::nullptr_t) {
                             processing_mode_type::update(key, acc, range);

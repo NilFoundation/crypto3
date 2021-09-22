@@ -36,24 +36,22 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            /*!
-             * @brief
-             *
-             * @ingroup pubkey_algorithms
-             *
-             * A digital signature is a mathematical scheme for verifying the authenticity of
-             * digital messages or documents. A valid digital signature, where the prerequisites
-             * are satisfied, gives a recipient very strong reason to believe that the message
-             * was created by a known sender (authentication), and that the message was not altered
-             * in transit (integrity).
-             *
-             * The function sign takes as input parameters - a message to be signed, a private key for
-             * signing and an iterator for output the message. Once executed, the function returns a
-             * signed message.
-             */
             template<typename Scheme>
             using signing_policy = typename pubkey::modes::isomorphic<Scheme>::signing_policy;
+
+            template<typename Scheme>
+            using pop_proving_policy = typename pubkey::modes::isomorphic<Scheme>::pop_proving_policy;
         }    // namespace pubkey
+
+        template<typename Scheme,
+                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
+                     pubkey::pop_proving_policy<Scheme>>::type,
+                 typename SigningAccumulator = pubkey::signing_accumulator_set<ProcessingMode>,
+                 typename StreamSchemeImpl = pubkey::detail::value_pubkey_impl<SigningAccumulator>,
+                 typename SchemeImpl = pubkey::detail::range_pubkey_impl<StreamSchemeImpl>>
+        SchemeImpl sign(const pubkey::private_key<Scheme> &key) {
+            return SchemeImpl(SigningAccumulator(key));
+        }
 
         /*!
          * @brief
