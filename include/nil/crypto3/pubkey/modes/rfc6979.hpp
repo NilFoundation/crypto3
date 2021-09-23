@@ -32,7 +32,7 @@
 
 #include <nil/crypto3/pkpad/emsa.hpp>
 
-#include <nil/crypto3/pubkey/agreement_key.hpp>
+#include <nil/crypto3/pubkey/keys/agreement_key.hpp>
 
 #include <nil/crypto3/pubkey/detail/nonce_generator.hpp>
 

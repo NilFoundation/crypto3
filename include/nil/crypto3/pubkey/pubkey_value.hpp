@@ -37,7 +37,7 @@
 #include <boost/mpl/front.hpp>
 #include <boost/mpl/apply.hpp>
 
-#include <nil/crypto3/pubkey/agreement_key.hpp>
+#include <nil/crypto3/pubkey/keys/agreement_key.hpp>
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
 #include <nil/crypto3/pubkey/accumulators/parameters/key.hpp>
 

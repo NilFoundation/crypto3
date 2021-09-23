@@ -26,19 +26,17 @@
 #ifndef CRYPTO3_PUBKEY_VERIFY_SHARE_HPP
 #define CRYPTO3_PUBKEY_VERIFY_SHARE_HPP
 
-#include <nil/crypto3/pubkey/algorithm/pubkey.hpp>
+#include <nil/crypto3/pubkey/pubkey_value.hpp>
+#include <nil/crypto3/pubkey/secret_sharing_scheme_state.hpp>
 
-#include <nil/crypto3/pubkey/scheme_value.hpp>
-#include <nil/crypto3/pubkey/scheme_state.hpp>
-
-#include <nil/crypto3/pubkey/no_key_ops.hpp>
+#include <nil/crypto3/pubkey/modes/isomorphic.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Scheme>
             using share_verification_policy =
-                typename pubkey::modes::isomorphic<Scheme, nop_padding>::share_verification_policy;
+                typename pubkey::modes::isomorphic<Scheme>::share_verification_policy;
         }    // namespace pubkey
 
         /*!
@@ -62,16 +60,16 @@ namespace nil {
          */
         template<
             typename Scheme, typename InputIterator, typename Share, typename OutputIterator,
-            typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            typename pubkey::modes::isomorphic<Scheme>::template bind<
                 pubkey::share_verification_policy<Scheme>>::type::key_type::template check_share_type<Share> = true>
         OutputIterator verify_share(InputIterator first, InputIterator last, const Share &s, OutputIterator out) {
 
-            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            typedef typename pubkey::modes::isomorphic<Scheme>::template bind<
                 pubkey::share_verification_policy<Scheme>>::type ProcessingMode;
             typedef typename pubkey::share_verification_accumulator_set<ProcessingMode> SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::itr_pubkey_impl<StreamSignerImpl, OutputIterator> SignerImpl;
 
             return SignerImpl(first, last, std::move(out), SchemeAccumulator(s));
         }
@@ -94,16 +92,16 @@ namespace nil {
          */
         template<
             typename Scheme, typename SinglePassRange, typename Share, typename OutputIterator,
-            typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            typename pubkey::modes::isomorphic<Scheme>::template bind<
                 pubkey::share_verification_policy<Scheme>>::type::key_type::template check_share_type<Share> = true>
         OutputIterator verify_share(const SinglePassRange &rng, const Share &s, OutputIterator out) {
 
-            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            typedef typename pubkey::modes::isomorphic<Scheme>::template bind<
                 pubkey::share_verification_policy<Scheme>>::type ProcessingMode;
             typedef typename pubkey::share_verification_accumulator_set<ProcessingMode> SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::itr_pubkey_impl<StreamSignerImpl, OutputIterator> SignerImpl;
 
             return SignerImpl(rng, std::move(out), SchemeAccumulator(s));
         }
@@ -125,14 +123,14 @@ namespace nil {
          */
         template<typename Scheme, typename InputIterator,
                  typename OutputAccumulator = typename pubkey::share_verification_accumulator_set<
-                     typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                     typename pubkey::modes::isomorphic<Scheme>::template bind<
                          pubkey::share_verification_policy<Scheme>>::type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
             verify_share(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
 
             return SignerImpl(first, last, std::forward<OutputAccumulator>(acc));
         }
@@ -153,14 +151,14 @@ namespace nil {
          */
         template<typename Scheme, typename SinglePassRange,
                  typename OutputAccumulator = typename pubkey::share_verification_accumulator_set<
-                     typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                     typename pubkey::modes::isomorphic<Scheme>::template bind<
                          pubkey::share_verification_policy<Scheme>>::type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
             verify_share(const SinglePassRange &r, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
 
             return SignerImpl(r, std::forward<OutputAccumulator>(acc));
         }
@@ -185,17 +183,17 @@ namespace nil {
             typename Scheme, typename InputIterator, typename Share,
             typename SchemeAccumulator =
                 typename pubkey::share_verification_accumulator_set<typename pubkey::modes::isomorphic<
-                    Scheme, pubkey::nop_padding>::template bind<pubkey::share_verification_policy<Scheme>>::type>,
-            typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                    Scheme>::template bind<pubkey::share_verification_policy<Scheme>>::type>,
+            typename pubkey::modes::isomorphic<Scheme>::template bind<
                 pubkey::share_verification_policy<Scheme>>::type::key_type::template check_share_type<Share> = true>
-        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
+        pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
             verify_share(InputIterator first, InputIterator last, const Share &s) {
 
-            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            typedef typename pubkey::modes::isomorphic<Scheme>::template bind<
                 pubkey::share_verification_policy<Scheme>>::type ProcessingMode;
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
 
             return SignerImpl(first, last, SchemeAccumulator(s));
         }
@@ -218,17 +216,17 @@ namespace nil {
             typename Scheme, typename SinglePassRange, typename Share,
             typename SchemeAccumulator =
                 typename pubkey::share_verification_accumulator_set<typename pubkey::modes::isomorphic<
-                    Scheme, pubkey::nop_padding>::template bind<pubkey::share_verification_policy<Scheme>>::type>,
-            typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                    Scheme>::template bind<pubkey::share_verification_policy<Scheme>>::type>,
+            typename pubkey::modes::isomorphic<Scheme>::template bind<
                 pubkey::share_verification_policy<Scheme>>::type::key_type::template check_share_type<Share> = true>
-        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
+        pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
             verify_share(const SinglePassRange &r, const Share &s) {
 
-            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            typedef typename pubkey::modes::isomorphic<Scheme>::template bind<
                 pubkey::share_verification_policy<Scheme>>::type ProcessingMode;
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
 
             return SignerImpl(r, SchemeAccumulator(s));
         }

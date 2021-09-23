@@ -49,10 +49,10 @@
 
 #include <nil/crypto3/pubkey/detail/bls/bls_basic_policy.hpp>
 #include <nil/crypto3/pubkey/detail/bls/bls_basic_functions.hpp>
-#include <nil/crypto3/pubkey/private_key.hpp>
-#include <nil/crypto3/pubkey/aggregate_op.hpp>
-#include <nil/crypto3/pubkey/aggregate_verify_op.hpp>
-#include <nil/crypto3/pubkey/aggregate_verify_single_msg_op.hpp>
+#include <nil/crypto3/pubkey/keys/private_key.hpp>
+#include <nil/crypto3/pubkey/operations/aggregate_op.hpp>
+#include <nil/crypto3/pubkey/operations/aggregate_verify_op.hpp>
+#include <nil/crypto3/pubkey/operations/aggregate_verify_single_msg_op.hpp>
 
 namespace nil {
     namespace crypto3 {

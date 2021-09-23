@@ -29,10 +29,14 @@
 
 #include <type_traits>
 
-#include <nil/crypto3/pubkey/agreement_key.hpp>
-#include <nil/crypto3/pubkey/aggregate_op.hpp>
-#include <nil/crypto3/pubkey/aggregate_verify_op.hpp>
-#include <nil/crypto3/pubkey/aggregate_verify_single_msg_op.hpp>
+#include <nil/crypto3/pubkey/keys/agreement_key.hpp>
+#include <nil/crypto3/pubkey/operations/aggregate_op.hpp>
+#include <nil/crypto3/pubkey/operations/aggregate_verify_op.hpp>
+#include <nil/crypto3/pubkey/operations/aggregate_verify_single_msg_op.hpp>
+#include <nil/crypto3/pubkey/operations/deal_shares_op.hpp>
+#include <nil/crypto3/pubkey/operations/verify_share_op.hpp>
+#include <nil/crypto3/pubkey/operations/reconstruct_secret_op.hpp>
+#include <nil/crypto3/pubkey/operations/deal_share_op.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -216,6 +220,31 @@ namespace nil {
                     }
                 };
 
+                template<typename Scheme>
+                struct isomorphic_shares_dealing_policy : public isomorphic_policy<Scheme> {
+                    typedef typename isomorphic_policy<Scheme>::scheme_type scheme_type;
+
+                    typedef void key_type;
+                    typedef deal_shares_op<scheme_type> op_type;
+                    typedef typename op_type::internal_accumulator_type internal_accumulator_type;
+                    typedef typename op_type::shares_type result_type;
+
+                    template<typename... Args>
+                    static inline void init_accumulator(Args &...args) {
+                        op_type::init_accumulator(args...);
+                    }
+
+                    template<typename... Args>
+                    inline static void update(Args &...args) {
+                        op_type::update(args...);
+                    }
+
+                    template<typename... Args>
+                    static inline result_type process(Args &...args) {
+                        return op_type::aggregate(args...);
+                    }
+                };
+
                 template<typename Policy>
                 class isomorphic {
                     typedef Policy policy_type;
@@ -270,6 +299,7 @@ namespace nil {
                         single_msg_aggregate_verification_policy;
                     typedef detail::isomorphic_pop_proving_policy<scheme_type> pop_proving_policy;
                     typedef detail::isomorphic_pop_verification_policy<scheme_type> pop_verification_policy;
+                    typedef detail::isomorphic_shares_dealing_policy<scheme_type> shares_dealing_policy;
 
                     template<typename Policy>
                     struct bind {

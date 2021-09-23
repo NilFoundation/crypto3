@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -33,7 +33,7 @@
 #include <nil/crypto3/pubkey/detail/secret_sharing/weighted_shamir.hpp>
 #include <nil/crypto3/pubkey/detail/secret_sharing/feldman.hpp>
 
-#include <nil/crypto3/pubkey/no_key_ops.hpp>
+#include <nil/crypto3/pubkey/operations/deal_shares_op.hpp>
 
 namespace nil {
     namespace crypto3 {

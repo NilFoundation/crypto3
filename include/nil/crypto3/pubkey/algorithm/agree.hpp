@@ -30,7 +30,7 @@
 #include <nil/crypto3/pubkey/scheme_value.hpp>
 #include <nil/crypto3/pubkey/scheme_state.hpp>
 
-#include <nil/crypto3/pubkey/agreement_key.hpp>
+#include <nil/crypto3/pubkey/keys/agreement_key.hpp>
 
 namespace nil {
     namespace crypto3 {

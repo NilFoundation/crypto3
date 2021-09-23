@@ -32,34 +32,38 @@
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/framework/features.hpp>
 
-#include <nil/crypto3/pubkey/accumulators/secret_sharing.hpp>
+// #include <nil/crypto3/pubkey/accumulators/secret_sharing.hpp>
+#include <nil/crypto3/pubkey/accumulators/deal_shares.hpp>
+#include <nil/crypto3/pubkey/accumulators/verify_share.hpp>
+#include <nil/crypto3/pubkey/accumulators/reconstruct_secret.hpp>
+#include <nil/crypto3/pubkey/accumulators/deal_share.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            template<typename Mode>
+            template<typename ProcessingMode>
             using share_dealing_accumulator_set = boost::accumulators::accumulator_set<
-                typename Mode::scheme_type::share_type,
-                boost::accumulators::features<accumulators::tag::deal_share<Mode>>>;
+                typename ProcessingMode::scheme_type::share_type,
+                boost::accumulators::features<accumulators::tag::deal_share<ProcessingMode>>>;
 
             template<typename Scheme>
             using polynomial_recovering_accumulator_set =
                 boost::accumulators::accumulator_set<typename Scheme::public_element_type,
                                                      boost::accumulators::features<boost::accumulators::tag::sum>>;
 
-            template<typename Mode>
+            template<typename ProcessingMode>
             using shares_dealing_accumulator_set = boost::accumulators::accumulator_set<
-                typename Mode::scheme_type::shares_type,
-                boost::accumulators::features<accumulators::tag::deal_shares<Mode>>>;
+                typename ProcessingMode::scheme_type::shares_type,
+                boost::accumulators::features<accumulators::tag::deal_shares<ProcessingMode>>>;
 
-            template<typename Mode>
+            template<typename ProcessingMode>
             using secret_reconstructing_accumulator_set = boost::accumulators::accumulator_set<
-                typename Mode::scheme_type::private_element_type,
-                boost::accumulators::features<accumulators::tag::reconstruct_secret<Mode>>>;
+                typename ProcessingMode::scheme_type::private_element_type,
+                boost::accumulators::features<accumulators::tag::reconstruct_secret<ProcessingMode>>>;
 
-            template<typename Mode>
+            template<typename ProcessingMode>
             using share_verification_accumulator_set = boost::accumulators::accumulator_set<
-                bool, boost::accumulators::features<accumulators::tag::verify_share<Mode>>>;
+                bool, boost::accumulators::features<accumulators::tag::verify_share<ProcessingMode>>>;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil

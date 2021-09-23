@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_PUBKEY_FELDMAN_SSS_HPP
 #define CRYPTO3_PUBKEY_FELDMAN_SSS_HPP
 
-#include <nil/crypto3/pubkey/detail/secret_sharing/shamir.hpp>
+#include <nil/crypto3/pubkey/secret_sharing/shamir.hpp>
 
 namespace nil {
     namespace crypto3 {

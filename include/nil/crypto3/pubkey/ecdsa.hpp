@@ -33,7 +33,7 @@
 
 #include <nil/crypto3/pkpad/algorithms/encode.hpp>
 
-#include <nil/crypto3/pubkey/private_key.hpp>
+#include <nil/crypto3/pubkey/keys/private_key.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 

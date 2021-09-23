@@ -39,7 +39,7 @@
 #include <nil/crypto3/pkpad/emsa/emsa1.hpp>
 #include <nil/crypto3/pkpad/emsa/emsa_raw.hpp>
 
-#include <nil/crypto3/pubkey/private_key.hpp>
+#include <nil/crypto3/pubkey/keys/private_key.hpp>
 
 #include <nil/crypto3/pubkey/type_traits.hpp>
 

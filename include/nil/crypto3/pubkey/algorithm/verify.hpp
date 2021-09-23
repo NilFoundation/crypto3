@@ -29,7 +29,7 @@
 #include <nil/crypto3/pubkey/pubkey_value.hpp>
 #include <nil/crypto3/pubkey/pubkey_state.hpp>
 
-#include <nil/crypto3/pubkey/public_key.hpp>
+#include <nil/crypto3/pubkey/keys/public_key.hpp>
 
 #include <nil/crypto3/pubkey/modes/isomorphic.hpp>
 

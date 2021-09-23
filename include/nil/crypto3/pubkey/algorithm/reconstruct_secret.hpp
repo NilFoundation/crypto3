@@ -23,8 +23,13 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_DEAL_SHARE_HPP
-#define CRYPTO3_PUBKEY_DEAL_SHARE_HPP
+#ifndef CRYPTO3_PUBKEY_RECONSTRUCT_SECRET_HPP
+#define CRYPTO3_PUBKEY_RECONSTRUCT_SECRET_HPP
+
+#include <boost/assert.hpp>
+#include <boost/concept_check.hpp>
+
+#include <boost/range/concepts.hpp>
 
 #include <nil/crypto3/pubkey/pubkey_value.hpp>
 #include <nil/crypto3/pubkey/secret_sharing_scheme_state.hpp>
@@ -35,7 +40,8 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Scheme>
-            using share_dealing_policy = typename pubkey::modes::isomorphic<Scheme>::share_dealing_policy;
+            using secret_reconstructing_policy =
+                typename pubkey::modes::isomorphic<Scheme>::secret_reconstructing_policy;
         }
         /*!
          * @brief
@@ -44,24 +50,23 @@ namespace nil {
          *
          * @tparam Scheme
          * @tparam InputIterator
-         * @tparam Number1
-         * @tparam Number2
          * @tparam OutputIterator
          *
          * @param first
          * @param last
-         * @param n
-         * @param t
+         * @param key
          * @param out
          *
          * @return
          */
         template<typename Scheme, typename InputIterator, typename OutputIterator>
-        OutputIterator deal_share(InputIterator first, InputIterator last, OutputIterator out) {
+        typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
+                                OutputIterator>::type
+            reconstruct(InputIterator first, InputIterator last, OutputIterator out) {
 
             typedef typename pubkey::modes::isomorphic<Scheme>::template bind<
-                pubkey::share_dealing_policy<Scheme>>::type ProcessingMode;
-            typedef typename pubkey::share_dealing_accumulator_set<ProcessingMode> SchemeAccumulator;
+                pubkey::secret_reconstructing_policy<Scheme>>::type ProcessingMode;
+            typedef typename pubkey::secret_reconstructing_accumulator_set<ProcessingMode> SchemeAccumulator;
 
             typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::itr_pubkey_impl<StreamSignerImpl, OutputIterator> SignerImpl;
@@ -76,23 +81,22 @@ namespace nil {
          *
          * @tparam Scheme
          * @tparam SinglePassRange
-         * @tparam Number1
-         * @tparam Number2
          * @tparam OutputIterator
          *
          * @param rng
-         * @param n
-         * @param t
+         * @param key
          * @param out
          *
          * @return
          */
         template<typename Scheme, typename SinglePassRange, typename OutputIterator>
-        OutputIterator deal_share(const SinglePassRange &rng, OutputIterator out) {
+        typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
+                                OutputIterator>::type
+            reconstruct(const SinglePassRange &rng, OutputIterator out) {
 
             typedef typename pubkey::modes::isomorphic<Scheme>::template bind<
-                pubkey::share_dealing_policy<Scheme>>::type ProcessingMode;
-            typedef typename pubkey::share_dealing_accumulator_set<ProcessingMode> SchemeAccumulator;
+                pubkey::secret_reconstructing_policy<Scheme>>::type ProcessingMode;
+            typedef typename pubkey::secret_reconstructing_accumulator_set<ProcessingMode> SchemeAccumulator;
 
             typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::itr_pubkey_impl<StreamSignerImpl, OutputIterator> SignerImpl;
@@ -116,12 +120,12 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename InputIterator,
-                 typename OutputAccumulator =
-                     typename pubkey::share_dealing_accumulator_set<typename pubkey::modes::isomorphic<
-                         Scheme>::template bind<pubkey::share_dealing_policy<Scheme>>::type>>
+                 typename OutputAccumulator = typename pubkey::secret_reconstructing_accumulator_set<
+                     typename pubkey::modes::isomorphic<Scheme>::template bind<
+                         pubkey::secret_reconstructing_policy<Scheme>>::type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
-            deal_share(InputIterator first, InputIterator last, OutputAccumulator &acc) {
+            reconstruct(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
             typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
@@ -144,12 +148,12 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename SinglePassRange,
-                 typename OutputAccumulator =
-                     typename pubkey::share_dealing_accumulator_set<typename pubkey::modes::isomorphic<
-                         Scheme>::template bind<pubkey::share_dealing_policy<Scheme>>::type>>
+                 typename OutputAccumulator = typename pubkey::secret_reconstructing_accumulator_set<
+                     typename pubkey::modes::isomorphic<Scheme>::template bind<
+                         pubkey::secret_reconstructing_policy<Scheme>>::type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
-            deal_share(const SinglePassRange &r, OutputAccumulator &acc) {
+            reconstruct(const SinglePassRange &r, OutputAccumulator &acc) {
 
             typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
@@ -174,14 +178,14 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename InputIterator,
-                 typename SchemeAccumulator =
-                     typename pubkey::share_dealing_accumulator_set<typename pubkey::modes::isomorphic<
-                         Scheme>::template bind<pubkey::share_dealing_policy<Scheme>>::type>>
+                 typename SchemeAccumulator = typename pubkey::secret_reconstructing_accumulator_set<
+                     typename pubkey::modes::isomorphic<Scheme>::template bind<
+                         pubkey::secret_reconstructing_policy<Scheme>>::type>>
         pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
-            deal_share(InputIterator first, InputIterator last) {
+            reconstruct(InputIterator first, InputIterator last) {
 
             typedef typename pubkey::modes::isomorphic<Scheme>::template bind<
-                pubkey::share_dealing_policy<Scheme>>::type ProcessingMode;
+                pubkey::secret_reconstructing_policy<Scheme>>::type ProcessingMode;
 
             typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
@@ -204,14 +208,14 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename SinglePassRange,
-                 typename SchemeAccumulator =
-                     typename pubkey::share_dealing_accumulator_set<typename pubkey::modes::isomorphic<
-                         Scheme>::template bind<pubkey::share_dealing_policy<Scheme>>::type>>
+                 typename SchemeAccumulator = typename pubkey::secret_reconstructing_accumulator_set<
+                     typename pubkey::modes::isomorphic<Scheme>::template bind<
+                         pubkey::secret_reconstructing_policy<Scheme>>::type>>
         pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
-            deal_share(const SinglePassRange &r) {
+            reconstruct(const SinglePassRange &r) {
 
             typedef typename pubkey::modes::isomorphic<Scheme>::template bind<
-                pubkey::share_dealing_policy<Scheme>>::type ProcessingMode;
+                pubkey::secret_reconstructing_policy<Scheme>>::type ProcessingMode;
 
             typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
