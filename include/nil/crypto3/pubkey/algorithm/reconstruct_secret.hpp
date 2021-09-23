@@ -32,7 +32,7 @@
 #include <boost/range/concepts.hpp>
 
 #include <nil/crypto3/pubkey/pubkey_value.hpp>
-#include <nil/crypto3/pubkey/secret_sharing_scheme_state.hpp>
+#include <nil/crypto3/pubkey/secret_sharing_state.hpp>
 
 #include <nil/crypto3/pubkey/modes/isomorphic.hpp>
 
