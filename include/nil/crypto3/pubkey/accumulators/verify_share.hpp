@@ -39,10 +39,8 @@
 #include <nil/crypto3/pubkey/accumulators/parameters/threshold_value.hpp>
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
 
-#include <nil/crypto3/pubkey/secret_sharing.hpp>
-#include <nil/crypto3/pubkey/dkg.hpp>
-
-#include <nil/crypto3/pubkey/detail/modes/isomorphic.hpp>
+#include <nil/crypto3/pubkey/secret_sharing/feldman.hpp>
+// #include <nil/crypto3/pubkey/secret_sharing/pedersen.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -53,33 +51,26 @@ namespace nil {
                     struct verify_share_impl;
 
                     template<typename ProcessingMode>
-                    struct verify_share_impl<
-                        ProcessingMode,
-                        typename std::enable_if<
-                            std::is_same<typename ProcessingMode::scheme_type,
-                                         pubkey::feldman_sss<typename ProcessingMode::scheme_type::group_type>>::value ||
-                            std::is_same<typename ProcessingMode::scheme_type,
-                                         pubkey::pedersen_dkg<typename ProcessingMode::scheme_type::group_type>>::value>::type>
-                        : boost::accumulators::accumulator_base {
+                    struct verify_share_impl<ProcessingMode> : boost::accumulators::accumulator_base {
                     protected:
-                        typedef typename ProcessingMode::scheme_type scheme_type;
-                        typedef typename ProcessingMode::key_type key_type;
+                        typedef ProcessingMode processing_mode_type;
+                        typedef typename processing_mode_type::scheme_type scheme_type;
+                        typedef typename processing_mode_type::op_type op_type;
+                        typedef typename processing_mode_type::internal_accumulator_type internal_accumulator_type;
 
-                        typedef typename key_type::public_element_type public_element_type;
-                        typedef typename key_type::public_coeff_type public_coeff_type;
-                        typedef typename key_type::public_coeffs_type public_coeffs_type;
-                        typedef typename key_type::public_share_type public_share_type;
+                        typedef typename scheme_type::basic_policy basic_policy;
 
                     public:
-                        typedef bool result_type;
+                        typedef typename processing_mode_type::result_type result_type;
 
                         //
-                        // boost::accumulators::sample -- verified public share
+                        // boost::accumulators::sample -- verified public (or private) share
                         //
                         template<typename Args>
                         verify_share_impl(const Args &args) :
-                            public_share(key_type::get_public_share(args[boost::accumulators::sample])), seen_coeffs(0),
-                            verification_value(public_share.first, public_element_type::zero()) {
+                            public_share(basic_policy::get_public_share(args[boost::accumulators::sample])),
+                            seen_coeffs(0) {
+                            processing_mode_type::init_accumulator(acc, public_share.first);
                         }
 
                         //
@@ -89,46 +80,39 @@ namespace nil {
                         template<typename Args>
                         inline void operator()(const Args &args) {
                             resolve_type(args[boost::accumulators::sample],
-                                         args[::nil::crypto3::accumulators::iterator_last |
-                                              typename public_coeffs_type::iterator()]);
+                                         args[::nil::crypto3::accumulators::iterator_last | nullptr]);
                         }
 
                         inline result_type result(boost::accumulators::dont_care) const {
-                            return public_share == verification_value;
+                            return processing_mode_type::process(acc, public_share);
                         }
 
                     protected:
-                        template<typename PublicCoeff,
-                                 typename InputIterator,
-                                 typename key_type::template check_public_coeff_type<PublicCoeff> = true>
-                        inline void resolve_type(const PublicCoeff &public_coeff, InputIterator) {
-                            verification_value = key_type::partial_eval_verification_value(
-                                public_coeff, seen_coeffs, verification_value);
+                        inline void resolve_type(const typename basic_policy::public_coeff_t &public_coeff,
+                                                 std::nullptr_t = nullptr) {
+                            processing_mode_type::update(acc, public_coeff, seen_coeffs);
                             seen_coeffs++;
                         }
 
                         template<typename PublicCoeffs,
-                                 typename InputIterator,
-                                 typename key_type::template check_public_coeff_type<
-                                     typename PublicCoeffs::value_type> = true>
-                        inline void resolve_type(const PublicCoeffs &public_coeffs, InputIterator dont_care) {
+                                 typename basic_policy::template check_public_elements_t<PublicCoeffs> = true>
+                        inline void resolve_type(const PublicCoeffs &public_coeffs, std::nullptr_t) {
                             for (const auto &pc : public_coeffs) {
-                                resolve_type(pc, dont_care);
+                                resolve_type(pc);
                             }
                         }
 
                         template<typename InputIterator,
-                                 typename key_type::template check_public_coeff_type<
-                                     typename std::iterator_traits<InputIterator>::value_type> = true>
+                                 typename basic_policy::template check_public_element_iterator_t<InputIterator> = true>
                         inline void resolve_type(InputIterator first, InputIterator last) {
                             for (auto it = first; it != last; it++) {
-                                resolve_type(*it, last);
+                                resolve_type(*it);
                             }
                         }
 
-                        public_share_type public_share;
-                        public_share_type verification_value;
                         std::size_t seen_coeffs;
+                        typename basic_policy::public_share_t public_share;
+                        mutable internal_accumulator_type acc;
                     };
                 }    // namespace impl
 

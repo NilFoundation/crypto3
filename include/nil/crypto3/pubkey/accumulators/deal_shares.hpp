@@ -40,8 +40,9 @@
 #include <nil/crypto3/pubkey/accumulators/parameters/threshold_value.hpp>
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
 
-#include <nil/crypto3/pubkey/secret_sharing.hpp>
-#include <nil/crypto3/pubkey/dkg.hpp>
+#include <nil/crypto3/pubkey/secret_sharing/shamir.hpp>
+#include <nil/crypto3/pubkey/secret_sharing/feldman.hpp>
+// #include <nil/crypto3/pubkey/secret_sharing/pedersen.hpp>
 
 #include <nil/crypto3/pubkey/modes/isomorphic.hpp>
 
@@ -60,12 +61,17 @@ namespace nil {
                             std::is_same<typename ProcessingMode::scheme_type,
                                          pubkey::shamir_sss<typename ProcessingMode::scheme_type::group_type>>::value ||
                             std::is_same<typename ProcessingMode::scheme_type,
-                                         pubkey::feldman_sss<typename ProcessingMode::scheme_type::group_type>>::value ||
+                                         pubkey::feldman_sss<typename ProcessingMode::scheme_type::group_type>>::value/* ||
                             std::is_same<typename ProcessingMode::scheme_type,
-                                         pubkey::pedersen_dkg<typename ProcessingMode::scheme_type::group_type>>::value>::type>
+                                         pubkey::pedersen_dkg<typename ProcessingMode::scheme_type::group_type>>::value*/>::type>
                         : boost::accumulators::accumulator_base {
                     protected:
                         typedef ProcessingMode processing_mode_type;
+                        typedef typename processing_mode_type::scheme_type scheme_type;
+                        typedef typename processing_mode_type::op_type op_type;
+                        typedef typename processing_mode_type::internal_accumulator_type internal_accumulator_type;
+
+                        typedef typename scheme_type::basic_policy basic_policy;
 
                     public:
                         typedef typename processing_mode_type::result_type result_type;
@@ -76,20 +82,18 @@ namespace nil {
                         // nil::crypto3::accumulators::threshold_value -- threshold number of participants
                         //
                         template<typename Args>
-                        deal_shares_impl(const Args &args) : seen_coeffs(0) {
-                            assert(op_type::check_t(args[nil::crypto3::accumulators::threshold_value],
-                                                     args[boost::accumulators::sample]));
-                            n = args[boost::accumulators::sample];
-                            t = args[nil::crypto3::accumulators::threshold_value];
-                            std::size_t i = 1;
-                            std::generate_n(std::inserter(shares, shares.end()), n, [&i]() {
-                                return share_type(i++, private_element_type::zero());
-                            });
+                        deal_shares_impl(const Args &args) :
+                            seen_coeffs(0), n(args[boost::accumulators::sample]),
+                            t(args[nil::crypto3::accumulators::threshold_value]) {
+                            assert(basic_policy::check_threshold_value(t, n));
+
+                            processing_mode_type::init_accumulator(acc, n);
                         }
 
                         inline result_type result(boost::accumulators::dont_care) const {
                             assert(t == seen_coeffs);
-                            return shares;
+
+                            return processing_mode_type::process(acc);
                         }
 
                         //
@@ -98,155 +102,150 @@ namespace nil {
                         //
                         template<typename Args>
                         inline void operator()(const Args &args) {
-                            resolve_type(
-                                args[boost::accumulators::sample],
-                                args[::nil::crypto3::accumulators::iterator_last | typename coeffs_type::iterator()]);
+                            resolve_type(args[boost::accumulators::sample],
+                                         args[::nil::crypto3::accumulators::iterator_last | nullptr]);
                         }
 
                     protected:
-                        template<typename Coeff,
-                                 typename InputIterator,
-                                 typename op_type::template check_coeff_type<Coeff> = true>
-                        inline void resolve_type(const Coeff &coeff, InputIterator) {
-                            assert(t > seen_coeffs);
-                            auto shares_it = shares.begin();
-                            private_element_type e_i = private_element_type::one();
-                            while (shares_it != shares.end()) {
-                                shares_it->second = op_type::partial_eval_share(coeff, seen_coeffs, *shares_it).second;
-                                shares_it++;
+                        inline void resolve_type(const typename basic_policy::coeff_t &coeff,
+                                                 std::nullptr_t = nullptr) {
+                            if (t == seen_coeffs) {
+                                return;
                             }
+
+                            processing_mode_type::update(acc, seen_coeffs, coeff);
                             seen_coeffs++;
                         }
 
                         template<typename Coeffs,
-                                 typename InputIterator,
-                                 typename op_type::template check_coeff_type<typename Coeffs::value_type> = true>
-                        inline void resolve_type(const Coeffs &coeffs, InputIterator dont_care) {
+                                 typename basic_policy::template check_private_elements_t<Coeffs> = true>
+                        inline void resolve_type(const Coeffs &coeffs, std::nullptr_t) {
                             for (const auto &c : coeffs) {
-                                resolve_type(c, dont_care);
+                                resolve_type(c);
                             }
                         }
 
                         template<typename InputIterator,
-                                 typename op_type::template check_coeff_type<
-                                     typename std::iterator_traits<InputIterator>::value_type> = true>
+                                 typename basic_policy::template check_private_element_iterator_t<InputIterator> = true>
                         inline void resolve_type(InputIterator first, InputIterator last) {
                             for (auto it = first; it != last; it++) {
-                                resolve_type(*it, last);
+                                resolve_type(*it);
                             }
                         }
 
-                        result_type shares;
                         std::size_t n;
                         std::size_t t;
                         std::size_t seen_coeffs;
+                        mutable internal_accumulator_type acc;
                     };
 
-                    template<typename ProcessingMode>
-                    struct deal_shares_impl<
-                        ProcessingMode,
-                        typename std::enable_if<std::is_same<
-                            typename ProcessingMode::scheme_type,
-                            pubkey::weighted_shamir_sss<typename ProcessingMode::scheme_type::group_type>>::value>::type>
-                        : boost::accumulators::accumulator_base {
-                    protected:
-                        typedef typename ProcessingMode::scheme_type scheme_type;
-                        typedef typename ProcessingMode::op_type op_type;
-
-                        typedef typename op_type::coeffs_type coeffs_type;
-                        typedef typename op_type::weight_type weight_type;
-                        typedef typename op_type::weights_type weights_type;
-                        typedef typename op_type::shares_type shares_type;
-
-                    public:
-                        typedef shares_type result_type;
-
-                        //
-                        // boost::accumulators::sample -- participants number
-                        //
-                        // nil::crypto3::accumulators::threshold_value -- threshold number of participants
-                        //
-                        template<typename Args>
-                        deal_shares_impl(const Args &args) : seen_coeffs(0) {
-                            assert(op_type::check_t(args[nil::crypto3::accumulators::threshold_value],
-                                                     args[boost::accumulators::sample]));
-                            t = args[nil::crypto3::accumulators::threshold_value];
-                            n = args[boost::accumulators::sample];
-                            std::size_t i = 1;
-                            std::generate_n(std::inserter(shares_weights, shares_weights.end()), n, [&i]() {
-                                return weight_type(i++, 1);
-                            });
-                        }
-
-                        inline result_type result(boost::accumulators::dont_care) const {
-                            assert(t == seen_coeffs);
-                            return op_type::deal_shares(coeffs, shares_weights);
-                        }
-
-                        //
-                        // boost::accumulators::sample -- participant weight
-                        // or
-                        // boost::accumulators::sample -- polynomial coefficients
-                        // input coefficients should be supplied in increasing term degrees order
-                        //
-                        template<typename Args>
-                        inline void operator()(const Args &args) {
-                            resolve_type(
-                                args[boost::accumulators::sample],
-                                args[::nil::crypto3::accumulators::iterator_last | typename coeffs_type::iterator()]);
-                        }
-
-                    protected:
-                        template<typename Coeff,
-                                 typename InputIterator,
-                                 typename op_type::template check_coeff_type<Coeff> = true>
-                        inline void resolve_type(const Coeff &coeff, InputIterator) {
-                            assert(t > seen_coeffs);
-                            coeffs.emplace_back(coeff);
-                            seen_coeffs++;
-                        }
-
-                        template<typename Coeffs,
-                                 typename InputIterator,
-                                 typename op_type::template check_coeff_type<typename Coeffs::value_type> = true>
-                        inline void resolve_type(const Coeffs &coeffs, InputIterator dont_care) {
-                            for (const auto &c : coeffs) {
-                                resolve_type(c, dont_care);
-                            }
-                        }
-
-                        template<typename InputIterator,
-                                 typename op_type::template check_coeff_type<
-                                     typename std::iterator_traits<InputIterator>::value_type> = true>
-                        inline void resolve_type(InputIterator first, InputIterator last) {
-                            for (auto it = first; it != last; it++) {
-                                resolve_type(*it, last);
-                            }
-                        }
-
-                        template<typename Weight,
-                                 typename InputIterator,
-                                 typename op_type::template check_weight_type<Weight> = true>
-                        inline void resolve_type(const Weight &w, InputIterator) {
-                            assert(op_type::check_weight(w, n));
-                            shares_weights.insert_or_assign(w.first, w.second);
-                        }
-
-                        template<typename InputIterator,
-                                 typename op_type::template check_weight_type<
-                                     typename std::iterator_traits<InputIterator>::value_type> = true>
-                        inline void resolve_type(InputIterator first, InputIterator last) {
-                            for (auto it = first; it != last; it++) {
-                                resolve_type(*it, last);
-                            }
-                        }
-
-                        std::size_t t;
-                        std::size_t n;
-                        std::size_t seen_coeffs;
-                        coeffs_type coeffs;
-                        weights_type shares_weights;
-                    };
+                    // template<typename ProcessingMode>
+                    // struct deal_shares_impl<
+                    //     ProcessingMode,
+                    //     typename std::enable_if<std::is_same<
+                    //         typename ProcessingMode::scheme_type,
+                    //         pubkey::weighted_shamir_sss<typename
+                    //         ProcessingMode::scheme_type::group_type>>::value>::type>
+                    //     : boost::accumulators::accumulator_base {
+                    // protected:
+                    //     typedef typename ProcessingMode::scheme_type scheme_type;
+                    //     typedef typename ProcessingMode::op_type op_type;
+                    //
+                    //     typedef typename op_type::coeffs_type coeffs_type;
+                    //     typedef typename op_type::weight_type weight_type;
+                    //     typedef typename op_type::weights_type weights_type;
+                    //     typedef typename op_type::shares_type shares_type;
+                    //
+                    // public:
+                    //     typedef shares_type result_type;
+                    //
+                    //     //
+                    //     // boost::accumulators::sample -- participants number
+                    //     //
+                    //     // nil::crypto3::accumulators::threshold_value -- threshold number of participants
+                    //     //
+                    //     template<typename Args>
+                    //     deal_shares_impl(const Args &args) : seen_coeffs(0) {
+                    //         assert(op_type::check_t(args[nil::crypto3::accumulators::threshold_value],
+                    //                                  args[boost::accumulators::sample]));
+                    //         t = args[nil::crypto3::accumulators::threshold_value];
+                    //         n = args[boost::accumulators::sample];
+                    //         std::size_t i = 1;
+                    //         std::generate_n(std::inserter(shares_weights, shares_weights.end()), n, [&i]() {
+                    //             return weight_type(i++, 1);
+                    //         });
+                    //     }
+                    //
+                    //     inline result_type result(boost::accumulators::dont_care) const {
+                    //         assert(t == seen_coeffs);
+                    //         return op_type::deal_shares(coeffs, shares_weights);
+                    //     }
+                    //
+                    //     //
+                    //     // boost::accumulators::sample -- participant weight
+                    //     // or
+                    //     // boost::accumulators::sample -- polynomial coefficients
+                    //     // input coefficients should be supplied in increasing term degrees order
+                    //     //
+                    //     template<typename Args>
+                    //     inline void operator()(const Args &args) {
+                    //         resolve_type(
+                    //             args[boost::accumulators::sample],
+                    //             args[::nil::crypto3::accumulators::iterator_last | typename
+                    //             coeffs_type::iterator()]);
+                    //     }
+                    //
+                    // protected:
+                    //     template<typename Coeff,
+                    //              typename InputIterator,
+                    //              typename op_type::template check_coeff_type<Coeff> = true>
+                    //     inline void resolve_type(const Coeff &coeff, InputIterator) {
+                    //         assert(t > seen_coeffs);
+                    //         coeffs.emplace_back(coeff);
+                    //         seen_coeffs++;
+                    //     }
+                    //
+                    //     template<typename Coeffs,
+                    //              typename InputIterator,
+                    //              typename op_type::template check_coeff_type<typename Coeffs::value_type> = true>
+                    //     inline void resolve_type(const Coeffs &coeffs, InputIterator dont_care) {
+                    //         for (const auto &c : coeffs) {
+                    //             resolve_type(c, dont_care);
+                    //         }
+                    //     }
+                    //
+                    //     template<typename InputIterator,
+                    //              typename op_type::template check_coeff_type<
+                    //                  typename std::iterator_traits<InputIterator>::value_type> = true>
+                    //     inline void resolve_type(InputIterator first, InputIterator last) {
+                    //         for (auto it = first; it != last; it++) {
+                    //             resolve_type(*it, last);
+                    //         }
+                    //     }
+                    //
+                    //     template<typename Weight,
+                    //              typename InputIterator,
+                    //              typename op_type::template check_weight_type<Weight> = true>
+                    //     inline void resolve_type(const Weight &w, InputIterator) {
+                    //         assert(op_type::check_weight(w, n));
+                    //         shares_weights.insert_or_assign(w.first, w.second);
+                    //     }
+                    //
+                    //     template<typename InputIterator,
+                    //              typename op_type::template check_weight_type<
+                    //                  typename std::iterator_traits<InputIterator>::value_type> = true>
+                    //     inline void resolve_type(InputIterator first, InputIterator last) {
+                    //         for (auto it = first; it != last; it++) {
+                    //             resolve_type(*it, last);
+                    //         }
+                    //     }
+                    //
+                    //     std::size_t t;
+                    //     std::size_t n;
+                    //     std::size_t seen_coeffs;
+                    //     coeffs_type coeffs;
+                    //     weights_type shares_weights;
+                    // };
                 }    // namespace impl
 
                 namespace tag {

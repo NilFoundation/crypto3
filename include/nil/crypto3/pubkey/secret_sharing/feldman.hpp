@@ -28,85 +28,118 @@
 
 #include <nil/crypto3/pubkey/secret_sharing/shamir.hpp>
 
+#include <nil/crypto3/pubkey/operations/verify_share_op.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            namespace detail {
-                template<typename Group>
-                struct feldman_sss : shamir_sss<Group> {
-                    typedef shamir_sss<Group> base_type;
+            template<typename Group>
+            struct feldman_sss : shamir_sss<Group> {
+                typedef shamir_sss<Group> base_type;
+                typedef typename base_type::group_type group_type;
+                typedef typename base_type::basic_policy basic_policy;
+                // typedef typename group_type::curve_type::scalar_field_type::integral_type scalar_integral_type;
 
-                    typedef typename base_type::private_element_type private_element_type;
-                    typedef typename base_type::public_element_type public_element_type;
+                //===========================================================================
+                // share verification functions
 
-                    typedef typename base_type::share_type share_type;
-                    typedef typename base_type::public_share_type public_share_type;
-                    typedef typename base_type::public_coeff_type public_coeff_type;
+                //
+                //  verify public share
+                //
+                template<typename PublicCoeffs,
+                         typename basic_policy::template check_public_elements_t<PublicCoeffs> = true>
+                static inline bool verify_share(const PublicCoeffs &public_coeffs,
+                                                const typename basic_policy::public_share_t &public_share) {
+                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
 
-                    //===========================================================================
-                    // share verification functions
+                    return verify_share(public_coeffs.begin(), public_coeffs.end(), public_share);
+                }
 
-                    //
-                    //  verify public share
-                    //
-                    template<typename PublicCoeffs,
-                             typename base_type::template check_public_element_type<
-                                 typename std::iterator_traits<typename PublicCoeffs::iterator>::value_type> = true>
-                    static inline bool verify_share(const PublicCoeffs &public_coeffs,
-                                                    const public_share_type &public_share) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
-                        return verify_share(public_coeffs.begin(), public_coeffs.end(), public_share);
+                template<typename PublicCoeffsIt,
+                         typename basic_policy::template check_public_element_iterator_t<PublicCoeffsIt> = true>
+                static inline bool verify_share(PublicCoeffsIt first, PublicCoeffsIt last,
+                                                const typename basic_policy::public_share_t &public_share) {
+                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<PublicCoeffsIt>));
+                    assert(basic_policy::check_participant_index(public_share.first));
+                    assert(basic_policy::check_minimal_size(std::distance(first, last)));
+
+                    typename basic_policy::private_element_t e_i(public_share.first);
+                    typename basic_policy::private_element_t temp_mul = basic_policy::private_element_t::one();
+                    typename basic_policy::public_element_t verification_val = basic_policy::public_element_t::zero();
+
+                    for (auto it = first; it != last; it++) {
+                        verification_val = verification_val + *it * temp_mul;
+                        temp_mul = temp_mul * e_i;
                     }
+                    return public_share.second == verification_val;
+                }
 
-                    template<typename PublicCoeffsIterator,
-                             typename base_type::template check_public_element_type<
-                                 typename std::iterator_traits<PublicCoeffsIterator>::value_type> = true>
-                    static inline bool verify_share(PublicCoeffsIterator first, PublicCoeffsIterator last,
-                                                    const public_share_type &public_share) {
-                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<PublicCoeffsIterator>));
+                //
+                //  verify private share
+                //
+                template<typename PublicCoeffs,
+                         typename basic_policy::template check_public_elements_t<PublicCoeffs> = true>
+                static inline bool verify_share(const PublicCoeffs &public_coeffs,
+                                                const typename basic_policy::share_t &share) {
+                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
 
-                        assert(base_type::check_participant_index(public_share.first));
-                        assert(base_type::check_minimal_size(std::distance(first, last)));
+                    return verify_share(public_coeffs, basic_policy::get_public_share(share));
+                }
 
-                        private_element_type e_i(public_share.first);
-                        private_element_type temp_mul = private_element_type::one();
-                        public_element_type verification_val = public_element_type::zero();
+                //
+                //  partial computing of verification value
+                //
+                static inline typename basic_policy::public_share_t partial_eval_verification_value(
+                    const typename basic_policy::public_share_t &init_verification_value,
+                    const typename basic_policy::public_coeff_t &public_coeff,
+                    std::size_t exp) {
+                    assert(basic_policy::check_participant_index(init_verification_value.first));
+                    assert(basic_policy::check_exp(exp));
 
-                        for (auto it = first; it != last; it++) {
-                            verification_val = verification_val + *it * temp_mul;
-                            temp_mul = temp_mul * e_i;
-                        }
-                        return public_share.second == verification_val;
-                    }
+                    return typename basic_policy::public_share_t(
+                        init_verification_value.first,
+                        init_verification_value.second +
+                            typename basic_policy::private_element_t(init_verification_value.first).pow(exp) *
+                                public_coeff);
+                }
+            };
 
-                    //
-                    //  verify private share
-                    //
-                    template<typename PublicCoeffs, typename base_type::template check_public_element_type<
-                                                        typename PublicCoeffs::value_type> = true>
-                    static inline bool verify_share(const PublicCoeffs &public_coeffs, const share_type &share) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
-                        return verify_share(public_coeffs, base_type::get_public_share(share));
-                    }
+            template<typename Group>
+            struct deal_shares_op<feldman_sss<Group>> : public deal_shares_op<shamir_sss<Group>> {
+                typedef feldman_sss<Group> scheme_type;
+            };
 
-                    //
-                    //  partial computing of verification value
-                    //
-                    template<typename Number, typename base_type::template check_number_type<Number> = true>
-                    static inline public_share_type
-                        partial_eval_verification_value(const public_coeff_type &public_coeff, Number exp,
-                                                        const public_share_type &init_verification_value) {
-                        assert(base_type::check_participant_index(init_verification_value.first));
-                        assert(base_type::check_exp(exp));
-                        return public_share_type(init_verification_value.first,
-                                                 init_verification_value.second +
-                                                     private_element_type(init_verification_value.first).pow(exp) *
-                                                         public_coeff);
-                    }
-                };
-            }    // namespace detail
-        }        // namespace pubkey
-    }            // namespace crypto3
+            template<typename Group>
+            struct verify_share_op<feldman_sss<Group>> {
+                typedef feldman_sss<Group> scheme_type;
+                typedef typename scheme_type::basic_policy basic_policy;
+
+                typedef typename scheme_type::group_type group_type;
+
+                typedef typename basic_policy::public_share_t internal_accumulator_type;
+
+                static inline void init_accumulator(internal_accumulator_type &acc, std::size_t i) {
+                    acc.first = i;
+                    acc.second = basic_policy::public_element_t::zero();
+                }
+
+                static inline void update(internal_accumulator_type &acc,
+                                          const typename basic_policy::public_coeff_t &public_coeff, std::size_t exp) {
+                    acc.second = scheme_type::partial_eval_verification_value(acc, public_coeff, exp).second;
+                }
+
+                static inline bool process(const internal_accumulator_type &acc,
+                                           const typename basic_policy::public_share_t &public_share) {
+                    return acc == public_share;
+                }
+            };
+
+            template<typename Group>
+            struct reconstruct_secret_op<feldman_sss<Group>> : public reconstruct_secret_op<shamir_sss<Group>> {
+                typedef feldman_sss<Group> scheme_type;
+            };
+        }    // namespace pubkey
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_PUBKEY_FELDMAN_SSS_HPP

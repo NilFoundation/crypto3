@@ -39,10 +39,12 @@
 #include <nil/crypto3/pubkey/accumulators/parameters/threshold_value.hpp>
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
 
-#include <nil/crypto3/pubkey/secret_sharing.hpp>
-#include <nil/crypto3/pubkey/dkg.hpp>
+#include <nil/crypto3/pubkey/secret_sharing/shamir.hpp>
+#include <nil/crypto3/pubkey/secret_sharing/feldman.hpp>
+// #include <nil/crypto3/pubkey/secret_sharing/pedersen.hpp>
+// #include <nil/crypto3/pubkey/secret_sharing/weighted_shamir.hpp>
 
-#include <nil/crypto3/pubkey/detail/modes/isomorphic.hpp>
+#include <nil/crypto3/pubkey/modes/isomorphic.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -53,73 +55,58 @@ namespace nil {
                     struct reconstruct_secret_impl;
 
                     template<typename ProcessingMode>
-                    struct reconstruct_secret_impl<
-                        ProcessingMode,
-                        typename std::enable_if<
-                            std::is_same<typename ProcessingMode::scheme_type,
-                                         pubkey::shamir_sss<typename ProcessingMode::scheme_type::group_type>>::value ||
-                            std::is_same<typename ProcessingMode::scheme_type,
-                                         pubkey::feldman_sss<typename ProcessingMode::scheme_type::group_type>>::value ||
-                            std::is_same<typename ProcessingMode::scheme_type,
-                                         pubkey::weighted_shamir_sss<typename ProcessingMode::scheme_type::group_type>>::value ||
-                            std::is_same<typename ProcessingMode::scheme_type,
-                                         pubkey::pedersen_dkg<typename ProcessingMode::scheme_type::group_type>>::value>::type>
-                        : boost::accumulators::accumulator_base {
+                    struct reconstruct_secret_impl<ProcessingMode> : boost::accumulators::accumulator_base {
                     protected:
-                        typedef typename ProcessingMode::scheme_type scheme_type;
-                        typedef typename ProcessingMode::key_type key_type;
+                        typedef ProcessingMode processing_mode_type;
+                        typedef typename processing_mode_type::scheme_type scheme_type;
+                        typedef typename processing_mode_type::op_type op_type;
+                        typedef typename processing_mode_type::internal_accumulator_type internal_accumulator_type;
 
-                        typedef typename key_type::private_element_type private_element_type;
-                        typedef typename key_type::shares_type shares_type;
+                        typedef typename scheme_type::basic_policy basic_policy;
 
                     public:
-                        typedef private_element_type result_type;
+                        typedef typename processing_mode_type::result_type result_type;
 
                         template<typename Args>
                         reconstruct_secret_impl(const Args &args) : seen_shares(0) {
                         }
 
                         inline result_type result(boost::accumulators::dont_care) const {
-                            // assert(key_type::check_minimal_size(seen_shares));
-                            return key_type::reconstruct_secret(shares);
+                            return processing_mode_type::process(acc);
                         }
 
                         template<typename Args>
                         inline void operator()(const Args &args) {
-                            resolve_type(
-                                args[boost::accumulators::sample],
-                                args[::nil::crypto3::accumulators::iterator_last | typename shares_type::iterator()]);
+                            resolve_type(args[boost::accumulators::sample],
+                                         args[::nil::crypto3::accumulators::iterator_last | nullptr]);
                         }
 
                     protected:
-                        template<typename Share,
-                                 typename InputIterator,
-                                 typename key_type::template check_share_type<Share> = true>
-                        inline void resolve_type(const Share &share, InputIterator) {
-                            assert(shares.emplace(share).second);
+                        inline void resolve_type(const typename basic_policy::share_t &share,
+                                                 std::nullptr_t = nullptr) {
+                            processing_mode_type::update(acc, share);
                             seen_shares++;
                         }
 
                         template<typename Shares,
-                                 typename InputIterator,
-                                 typename key_type::template check_shares_type<Shares> = true>
-                        inline void resolve_type(const Shares &shares, InputIterator dont_care) {
+                                 typename basic_policy::template check_indexed_private_elements_t<Shares> = true>
+                        inline void resolve_type(const Shares &shares, std::nullptr_t) {
                             for (const auto &s : shares) {
-                                resolve_type(s, dont_care);
+                                resolve_type(s);
                             }
                         }
 
                         template<typename InputIterator,
-                                 typename key_type::template check_share_type<
-                                     typename std::iterator_traits<InputIterator>::value_type> = true>
+                                 typename basic_policy::template check_indexed_private_element_iterator_t<
+                                     InputIterator> = true>
                         inline void resolve_type(InputIterator first, InputIterator last) {
                             for (auto it = first; it != last; it++) {
-                                resolve_type(*it, last);
+                                resolve_type(*it);
                             }
                         }
 
                         std::size_t seen_shares;
-                        shares_type shares;
+                        mutable internal_accumulator_type acc;
                     };
                 }    // namespace impl
 
@@ -137,7 +124,8 @@ namespace nil {
 
                 namespace extract {
                     template<typename ProcessingMode, typename AccumulatorSet>
-                    typename boost::mpl::apply<AccumulatorSet, tag::reconstruct_secret<ProcessingMode>>::type::result_type
+                    typename boost::mpl::apply<AccumulatorSet,
+                                               tag::reconstruct_secret<ProcessingMode>>::type::result_type
                         reconstruct_secret(const AccumulatorSet &acc) {
                         return boost::accumulators::extract_result<tag::reconstruct_secret<ProcessingMode>>(acc);
                     }

@@ -36,13 +36,13 @@
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
-#include <nil/crypto3/pubkey/secret_sharing.hpp>
-#include <nil/crypto3/pubkey/dkg.hpp>
+#include <nil/crypto3/pubkey/secret_sharing/shamir.hpp>
+#include <nil/crypto3/pubkey/secret_sharing/feldman.hpp>
 
 #include <nil/crypto3/pubkey/algorithm/deal_shares.hpp>
 #include <nil/crypto3/pubkey/algorithm/verify_share.hpp>
-#include <nil/crypto3/pubkey/algorithm/reconstruct.hpp>
-#include <nil/crypto3/pubkey/algorithm/deal_share.hpp>
+#include <nil/crypto3/pubkey/algorithm/reconstruct_secret.hpp>
+// #include <nil/crypto3/pubkey/algorithm/deal_share.hpp>
 // #include <nil/crypto3/pubkey/algorithm/recover_polynomial.hpp>
 
 using namespace nil::crypto3::algebra;
@@ -66,7 +66,7 @@ void print_projective_curve_group_element(std::ostream &os, const CurveGroupElem
     print_field_element(e.Y);
     os << " : ";
     print_field_element(e.Z);
-    os << " )" << std::endl;
+    os << " )";
 }
 
 template<typename CurveGroupElement>
@@ -84,22 +84,16 @@ void print_extended_curve_group_element(std::ostream &os, const CurveGroupElemen
     print_field_element(e.T);
     os << " : ";
     print_field_element(e.Z);
-    os << " )" << std::endl;
+    os << " )";
 }
 
 template<typename CurveGroupElement>
-void print_fp_affine_curve_group_element(std::ostream &os, const CurveGroupElement &e) {
+void print_affine_curve_group_element(std::ostream &os, const CurveGroupElement &e) {
     os << "( ";
     print_field_element(e.X);
     os << " : ";
     print_field_element(e.Y);
-    os << " )" << std::endl;
-}
-
-template<typename CurveGroupElement>
-void print_fp2_projective_curve_group_element(std::ostream &os, const CurveGroupElement &e) {
-    os << std::hex << "(" << e.X.data[0].data << " , " << e.X.data[1].data << ") : (" << e.Y.data[0].data << " , "
-       << e.Y.data[1].data << ") : (" << e.Z.data[0].data << " , " << e.Z.data[1].data << ")" << std::endl;
+    os << " )";
 }
 
 namespace boost {
@@ -120,7 +114,7 @@ namespace boost {
                                 curves::detail::curve_element<CurveParams,
                                                               curves::forms::short_weierstrass,
                                                               curves::coordinates::jacobian_with_a4_0> const &p) {
-                    print_fp_extended_curve_group_element(os, p);
+                    print_projective_curve_group_element(os, p);
                 }
             };
             
@@ -132,7 +126,7 @@ namespace boost {
                                 curves::detail::curve_element<CurveParams,
                                                               curves::forms::short_weierstrass,
                                                               curves::coordinates::affine> const &p) {
-                    print_fp_affine_curve_group_element(os, p);
+                    print_affine_curve_group_element(os, p);
                 }
             };
 
@@ -154,16 +148,17 @@ BOOST_AUTO_TEST_CASE(feldman_sss) {
     using curve_type = curves::bls12_381;
     using group_type = typename curve_type::g1_type<>;
     using scheme_type = nil::crypto3::pubkey::feldman_sss<group_type>;
-    using key_type = no_key_ops<scheme_type>;
-    using shares_dealing_acc_type = shares_dealing_accumulator_set<
-        typename modes::isomorphic<scheme_type>::template bind<shares_dealing_policy<scheme_type>>::type>;
+
+    using shares_dealing_isomorphic_mode = typename modes::isomorphic<scheme_type>::template bind<shares_dealing_policy<scheme_type>>::type;
+    using share_verification_isomorphic_mode = typename modes::isomorphic<scheme_type>::template bind<share_verification_policy<scheme_type>>::type;
+    using secret_reconstructing_isomorphic_mode = typename modes::isomorphic<scheme_type>::template bind<secret_reconstructing_policy<scheme_type>>::type;
+
+    using shares_dealing_acc_type = shares_dealing_accumulator_set<shares_dealing_isomorphic_mode>;
     using shares_dealing_acc = typename boost::mpl::front<typename shares_dealing_acc_type::features_type>::type;
-    using share_verification_acc_type = share_verification_accumulator_set<typename modes::isomorphic<
-        scheme_type>::template bind<share_verification_policy<scheme_type>>::type>;
+    using share_verification_acc_type = share_verification_accumulator_set<share_verification_isomorphic_mode>;
     using share_verification_acc =
         typename boost::mpl::front<typename share_verification_acc_type::features_type>::type;
-    using secret_reconstructing_acc_type = secret_reconstructing_accumulator_set<typename modes::isomorphic<
-        scheme_type>::template bind<secret_reconstructing_policy<scheme_type>>::type>;
+    using secret_reconstructing_acc_type = secret_reconstructing_accumulator_set<secret_reconstructing_isomorphic_mode>;
     using secret_reconstructing_acc =
         typename boost::mpl::front<typename secret_reconstructing_acc_type::features_type>::type;
 
@@ -173,26 +168,27 @@ BOOST_AUTO_TEST_CASE(feldman_sss) {
     //===========================================================================
     // shares dealing
 
-    auto coeffs = key_type::get_poly(t, n);
-    auto pub_coeffs = key_type::get_public_coeffs(coeffs);
+    // TODO: add public functions for that operations
+    auto coeffs = scheme_type::get_poly(t, n);
+    auto pub_coeffs = scheme_type::get_public_coeffs(coeffs);
 
     // deal_shares(rng)
-    typename key_type::shares_type shares = nil::crypto3::deal_shares<scheme_type>(coeffs, n);
+    typename scheme_type::shares_type shares = nil::crypto3::deal_shares<scheme_type>(coeffs, n);
     // deal_shares(first, last)
-    typename key_type::shares_type shares1 = nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n);
+    typename scheme_type::shares_type shares1 = nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n);
     // deal_shares(rng, acc)
     shares_dealing_acc_type deal_shares_acc(n, nil::crypto3::accumulators::threshold_value = t);
     nil::crypto3::deal_shares<scheme_type>(coeffs, deal_shares_acc);
-    typename key_type::shares_type shares2 = boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc);
+    typename scheme_type::shares_type shares2 = boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc);
     // deal_shares(first, last, acc)
     shares_dealing_acc_type deal_shares_acc1(n, nil::crypto3::accumulators::threshold_value = t);
     nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), deal_shares_acc1);
-    typename key_type::shares_type shares3 = boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc1);
+    typename scheme_type::shares_type shares3 = boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc1);
     // deal_shares(rng, out)
-    std::vector<typename key_type::shares_type> shares_out;
+    std::vector<typename scheme_type::shares_type> shares_out;
     nil::crypto3::deal_shares<scheme_type>(coeffs, n, std::back_inserter(shares_out));
     // deal_shares(first, last, out)
-    std::vector<typename key_type::shares_type> shares_out1;
+    std::vector<typename scheme_type::shares_type> shares_out1;
     nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, std::back_inserter(shares_out1));
 
     BOOST_CHECK(shares == shares1);
@@ -234,25 +230,25 @@ BOOST_AUTO_TEST_CASE(feldman_sss) {
     // reconstructing secret using accumulator
 
     // reconstruct(rng)
-    typename scheme_type::private_element_type secret = nil::crypto3::reconstruct<scheme_type>(shares);
+    typename scheme_type::basic_policy::secret_t secret = nil::crypto3::reconstruct<scheme_type>(shares);
     // reconstruct(first, last)
-    typename scheme_type::private_element_type secret1 =
+    typename scheme_type::basic_policy::secret_t secret1 =
         nil::crypto3::reconstruct<scheme_type>(shares.begin(), shares.end());
     // reconstruct(rng, acc)
     secret_reconstructing_acc_type reconstruct_secret_acc;
-    typename scheme_type::private_element_type secret_acc =
+    typename scheme_type::basic_policy::secret_t secret_acc =
         boost::accumulators::extract_result<secret_reconstructing_acc>(
             nil::crypto3::reconstruct<scheme_type>(shares, reconstruct_secret_acc));
     // reconstruct(first, last, acc)
     secret_reconstructing_acc_type reconstruct_secret_acc1;
-    typename scheme_type::private_element_type secret_acc1 =
+    typename scheme_type::basic_policy::secret_t secret_acc1 =
         boost::accumulators::extract_result<secret_reconstructing_acc>(
             nil::crypto3::reconstruct<scheme_type>(shares.begin(), shares.end(), reconstruct_secret_acc1));
     // reconstruct(rng, out)
-    std::vector<typename scheme_type::private_element_type> secret_out;
+    std::vector<typename scheme_type::basic_policy::secret_t> secret_out;
     nil::crypto3::reconstruct<scheme_type>(shares, std::back_inserter(secret_out));
     // reconstruct(first, last, out)
-    std::vector<typename scheme_type::private_element_type> secret_out1;
+    std::vector<typename scheme_type::basic_policy::secret_t> secret_out1;
     nil::crypto3::reconstruct<scheme_type>(shares.begin(), shares.end(), std::back_inserter(secret_out1));
     BOOST_CHECK(coeffs.front() == secret);
     BOOST_CHECK(secret == secret1);
@@ -264,7 +260,7 @@ BOOST_AUTO_TEST_CASE(feldman_sss) {
     //===========================================================================
     // check impossibility of secret recovering with group weight less than threshold value
 
-    typename scheme_type::private_element_type wrong_secret =
+    typename scheme_type::basic_policy::secret_t wrong_secret =
         nil::crypto3::reconstruct<scheme_type>(shares.begin(), [t, &shares]() {
             auto it = shares.begin();
             for (auto i = 0; i < t - 1; i++) {

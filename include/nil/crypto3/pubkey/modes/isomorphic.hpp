@@ -180,6 +180,7 @@ namespace nil {
 
                     typedef private_key<scheme_type> key_type;
                     typedef void op_type;
+                    // TODO: refactor internal_accumulator_type
                     typedef bool internal_accumulator_type;
                     typedef typename key_type::signature_type result_type;
 
@@ -203,6 +204,7 @@ namespace nil {
 
                     typedef public_key<scheme_type> key_type;
                     typedef void op_type;
+                    // TODO: refactor internal_accumulator_type
                     typedef bool internal_accumulator_type;
                     typedef bool result_type;
 
@@ -235,13 +237,63 @@ namespace nil {
                     }
 
                     template<typename... Args>
-                    inline static void update(Args &...args) {
+                    static inline void update(Args &...args) {
                         op_type::update(args...);
                     }
 
                     template<typename... Args>
                     static inline result_type process(Args &...args) {
-                        return op_type::aggregate(args...);
+                        return op_type::process(args...);
+                    }
+                };
+
+                template<typename Scheme>
+                struct isomorphic_share_verification_policy : public isomorphic_policy<Scheme> {
+                    typedef typename isomorphic_policy<Scheme>::scheme_type scheme_type;
+
+                    typedef void key_type;
+                    typedef verify_share_op<scheme_type> op_type;
+                    typedef typename op_type::internal_accumulator_type internal_accumulator_type;
+                    typedef bool result_type;
+
+                    template<typename... Args>
+                    static inline void init_accumulator(Args &...args) {
+                        op_type::init_accumulator(args...);
+                    }
+
+                    template<typename... Args>
+                    static inline void update(Args &...args) {
+                        op_type::update(args...);
+                    }
+
+                    template<typename... Args>
+                    static inline result_type process(Args &...args) {
+                        return op_type::process(args...);
+                    }
+                };
+
+                template<typename Scheme>
+                struct isomorphic_secret_reconstructing_policy : public isomorphic_policy<Scheme> {
+                    typedef typename isomorphic_policy<Scheme>::scheme_type scheme_type;
+
+                    typedef void key_type;
+                    typedef reconstruct_secret_op<scheme_type> op_type;
+                    typedef typename op_type::internal_accumulator_type internal_accumulator_type;
+                    typedef typename op_type::secret_type result_type;
+
+                    template<typename... Args>
+                    static inline void init_accumulator(Args &...args) {
+                        op_type::init_accumulator(args...);
+                    }
+
+                    template<typename... Args>
+                    static inline void update(Args &...args) {
+                        op_type::update(args...);
+                    }
+
+                    template<typename... Args>
+                    static inline result_type process(Args &...args) {
+                        return op_type::process(args...);
                     }
                 };
 
@@ -300,6 +352,8 @@ namespace nil {
                     typedef detail::isomorphic_pop_proving_policy<scheme_type> pop_proving_policy;
                     typedef detail::isomorphic_pop_verification_policy<scheme_type> pop_verification_policy;
                     typedef detail::isomorphic_shares_dealing_policy<scheme_type> shares_dealing_policy;
+                    typedef detail::isomorphic_share_verification_policy<scheme_type> share_verification_policy;
+                    typedef detail::isomorphic_secret_reconstructing_policy<scheme_type> secret_reconstructing_policy;
 
                     template<typename Policy>
                     struct bind {
