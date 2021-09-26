@@ -62,8 +62,6 @@ namespace nil {
                         typedef typename processing_mode_type::op_type op_type;
                         typedef typename processing_mode_type::internal_accumulator_type internal_accumulator_type;
 
-                        typedef typename scheme_type::basic_policy basic_policy;
-
                     public:
                         typedef typename processing_mode_type::result_type result_type;
 
@@ -82,23 +80,19 @@ namespace nil {
                         }
 
                     protected:
-                        inline void resolve_type(const typename basic_policy::share_t &share,
-                                                 std::nullptr_t = nullptr) {
+                        inline void resolve_type(const share_sss<scheme_type> &share, std::nullptr_t = nullptr) {
                             processing_mode_type::update(acc, share);
                             seen_shares++;
                         }
 
-                        template<typename Shares,
-                                 typename basic_policy::template check_indexed_private_elements_t<Shares> = true>
-                        inline void resolve_type(const Shares &shares, std::nullptr_t) {
-                            for (const auto &s : shares) {
+                        template<typename InputRange>
+                        inline void resolve_type(const InputRange &range, std::nullptr_t) {
+                            for (const auto &s : range) {
                                 resolve_type(s);
                             }
                         }
 
-                        template<typename InputIterator,
-                                 typename basic_policy::template check_indexed_private_element_iterator_t<
-                                     InputIterator> = true>
+                        template<typename InputIterator>
                         inline void resolve_type(InputIterator first, InputIterator last) {
                             for (auto it = first; it != last; it++) {
                                 resolve_type(*it);

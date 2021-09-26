@@ -27,8 +27,10 @@
 #define CRYPTO3_PUBKEY_SHAMIR_SSS_HPP
 
 #include <vector>
+#include <tuple>
 #include <type_traits>
 #include <unordered_map>
+#include <unordered_set>
 #include <iterator>
 
 #include <boost/assert.hpp>
@@ -41,194 +43,52 @@
 #include <nil/crypto3/pubkey/operations/deal_shares_op.hpp>
 #include <nil/crypto3/pubkey/operations/reconstruct_secret_op.hpp>
 
+#include <nil/crypto3/pubkey/keys/share_sss.hpp>
+#include <nil/crypto3/pubkey/keys/secret_sss.hpp>
+
 #include <nil/crypto3/pubkey/secret_sharing/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Group>
-            struct shamir_sss {
+            struct shamir_sss : sss_basic_policy<Group> {
                 typedef Group group_type;
                 typedef sss_basic_policy<group_type> basic_policy;
 
                 //===========================================================================
                 // secret sharing scheme output types
 
-                typedef std::vector<typename basic_policy::coeff_t> coeffs_type;
-                typedef std::vector<typename basic_policy::public_coeff_t> public_coeffs_type;
-                typedef std::unordered_map<std::size_t, typename basic_policy::private_element_t> shares_type;
-                typedef std::unordered_map<std::size_t, typename basic_policy::public_element_t> public_shares_type;
-
-                //===========================================================================
-                // shares dealing functions
-
-                template<typename Coeffs, typename basic_policy::template check_private_elements_t<Coeffs> = true>
-                static inline shares_type deal_shares(const Coeffs &coeffs, std::size_t n) {
-                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Coeffs>));
-
-                    return deal_shares(coeffs.begin(), coeffs.end(), n);
-                }
-
-                template<typename CoeffsIt,
-                         typename basic_policy::template check_private_element_iterator_t<CoeffsIt> = true>
-                static inline shares_type deal_shares(CoeffsIt first, CoeffsIt last, std::size_t n) {
-                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<CoeffsIt>));
-
-                    std::size_t t = std::distance(first, last);
-                    assert(basic_policy::check_threshold_value(t, n));
-
-                    shares_type shares;
-                    for (std::size_t i = 1; i <= n; i++) {
-                        assert(shares.emplace(deal_share(first, last, i)).second);
-                    }
-                    return shares;
-                }
-
-                template<typename Coeffs, typename basic_policy::template check_private_elements_t<Coeffs> = true>
-                static inline typename basic_policy::share_t deal_share(const Coeffs &coeffs, std::size_t i) {
-                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Coeffs>));
-
-                    return deal_share(coeffs.begin(), coeffs.end(), i);
-                }
-
-                template<typename CoeffsIt,
-                         typename basic_policy::template check_private_element_iterator_t<CoeffsIt> = true>
-                static inline typename basic_policy::share_t deal_share(CoeffsIt first, CoeffsIt last, std::size_t i) {
-                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<CoeffsIt>));
-                    assert(basic_policy::check_participant_index(i));
-                    assert(check_minimal_size(std::distance(first, last)));
-
-                    typename basic_policy::private_element_t e_i(i);
-                    typename basic_policy::private_element_t temp = basic_policy::private_element_t::one();
-                    typename basic_policy::private_element_t share = basic_policy::private_element_t::zero();
-
-                    for (auto it = first; it != last; it++) {
-                        share = share + *it * temp;
-                        temp = temp * e_i;
-                    }
-                    return typename basic_policy::share_t(i, share);
-                }
+                typedef std::vector<typename basic_policy::coeff_type> coeffs_type;
+                typedef std::vector<typename basic_policy::public_coeff_type> public_coeffs_type;
 
                 //
                 //  0 <= k < t
                 //
-                static inline typename basic_policy::share_t
-                    partial_eval_share(const typename basic_policy::coeff_t &coeff, std::size_t exp,
-                                       const typename basic_policy::share_t &init_share_value) {
+                static inline typename basic_policy::share_type
+                    partial_eval_share(const typename basic_policy::coeff_type &coeff, std::size_t exp,
+                                       const typename basic_policy::share_type &init_share_value) {
                     assert(basic_policy::check_participant_index(init_share_value.first));
                     assert(basic_policy::check_exp(exp));
 
-                    return typename basic_policy::share_t(
+                    return typename basic_policy::share_type(
                         init_share_value.first,
                         init_share_value.second +
-                            coeff * typename basic_policy::private_element_t(init_share_value.first).pow(exp));
+                            coeff * typename basic_policy::private_element_type(init_share_value.first).pow(exp));
                 }
 
-                //===========================================================================
-                // secret recovering functions
-
-                template<typename Shares,
-                         typename basic_policy::template check_indexed_private_elements_t<Shares> = true>
-                static inline typename basic_policy::secret_t reconstruct_secret(const Shares &shares,
-                                                                                 std::size_t id_i = 0) {
-                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
-
-                    return reconstruct_secret(std::cbegin(shares), std::cend(shares), id_i);
-                }
-
-                template<typename SharesIt,
-                         typename basic_policy::template check_indexed_private_element_iterator_t<SharesIt> = true>
-                static inline typename basic_policy::secret_t reconstruct_secret(SharesIt first, SharesIt last,
-                                                                                 std::size_t id_i = 0) {
-                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<SharesIt>));
-
-                    typename basic_policy::secret_t secret = basic_policy::secret_t::zero();
-                    typename basic_policy::indexes_t indexes = basic_policy::get_indexes(first, last);
-                    for (auto it = first; it != last; it++) {
-                        secret = secret + it->second * eval_basis_poly(indexes, id_i ? id_i : it->first);
-                    }
-                    return secret;
-                }
-
-                template<typename PublicShares,
-                         typename basic_policy::template check_indexed_public_elements_t<PublicShares> = true>
-                static inline typename basic_policy::public_element_t
-                    reconstruct_public_element(const PublicShares &public_shares) {
-                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicShares>));
-
-                    return reconstruct_public_element(public_shares.begin(), public_shares.end());
-                }
-
-                template<typename PublicSharesIt,
-                         typename basic_policy::template check_indexed_public_element_iterator_t<PublicSharesIt> = true>
-                static inline typename basic_policy::public_element_t reconstruct_public_element(PublicSharesIt first,
-                                                                                                 PublicSharesIt last) {
-                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<PublicSharesIt>));
-
-                    typename basic_policy::public_element_t result = basic_policy::public_element_t::zero();
-                    typename basic_policy::indexes_t indexes = basic_policy::get_indexes(first, last);
-
-                    for (auto it = first; it != last; it++) {
-                        result = result + eval_basis_poly(indexes, it->first) * it->second;
-                    }
-                    return result;
-                }
-
-                static inline typename basic_policy::private_element_t
-                    eval_basis_poly(const typename basic_policy::indexes_t &indexes, std::size_t i) {
+                static inline typename basic_policy::private_element_type
+                    eval_basis_poly(const typename basic_policy::indexes_type &indexes, std::size_t i) {
                     assert(basic_policy::check_participant_index(i));
 
-                    typename basic_policy::private_element_t e_i(i);
-                    typename basic_policy::private_element_t result = basic_policy::private_element_t::one();
+                    typename basic_policy::private_element_type e_i(i);
+                    typename basic_policy::private_element_type result = basic_policy::private_element_type::one();
 
                     for (auto j : indexes) {
                         if (j != i) {
-                            result = result * (typename basic_policy::private_element_t(j) /
-                                               (typename basic_policy::private_element_t(j) - e_i));
+                            result = result * (typename basic_policy::private_element_type(j) /
+                                               (typename basic_policy::private_element_type(j) - e_i));
                         }
-                    }
-                    return result;
-                }
-
-                template<typename PublicElements,
-                         typename basic_policy::template check_public_elements_t<PublicElements> = true>
-                static inline typename basic_policy::public_element_t
-                    reduce_public_elements(const PublicElements &public_elements) {
-                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicElements>));
-
-                    return reduce_public_elements(public_elements.begin(), public_elements.end());
-                }
-
-                template<typename PublicElementsIt,
-                         typename basic_policy::template check_public_element_iterator_t<PublicElementsIt> = true>
-                static inline typename basic_policy::public_element_t reduce_public_elements(PublicElementsIt first,
-                                                                                             PublicElementsIt last) {
-                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<PublicElementsIt>));
-                    assert(check_minimal_size(std::distance(first, last)));
-
-                    return std::accumulate(first, last, basic_policy::public_element_t::zero());
-                }
-
-                template<typename IndexedPublicElements,
-                         typename basic_policy::template check_indexed_public_elements_t<IndexedPublicElements> = true>
-                static inline typename basic_policy::public_element_t
-                    reduce_public_elements(const IndexedPublicElements &indexed_public_elements) {
-                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedPublicElements>));
-
-                    return reduce_public_elements(indexed_public_elements.begin(), indexed_public_elements.end());
-                }
-
-                template<typename IndexedPublicElementsIt,
-                         typename basic_policy::template check_indexed_public_element_iterator_t<
-                             IndexedPublicElementsIt> = true>
-                static inline typename basic_policy::public_element_t
-                    reduce_public_elements(IndexedPublicElementsIt first, IndexedPublicElementsIt last) {
-                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<IndexedPublicElementsIt>));
-                    assert(check_minimal_size(std::distance(first, last)));
-
-                    typename basic_policy::public_element_t result = basic_policy::public_element_t::zero();
-                    for (auto it = first; it != last; it++) {
-                        result = result + it->second;
                     }
                     return result;
                 }
@@ -243,7 +103,7 @@ namespace nil {
                 }
 
                 template<
-                    typename Generator = random::algebraic_random_device<typename basic_policy::coeff_t::field_type>,
+                    typename Generator = random::algebraic_random_device<typename basic_policy::coeff_type::field_type>,
                     typename Distribution = void>
                 static inline coeffs_type get_poly(std::size_t t) {
                     assert(basic_policy::check_minimal_size(t));
@@ -278,76 +138,194 @@ namespace nil {
                     }
                     return public_coeffs;
                 }
+            };
 
-                template<typename Shares, typename basic_policy::template check_indexed_elements_t<Shares> = true>
-                static inline public_shares_type get_public_shares(const Shares &shares) {
+            template<typename Group>
+            struct public_share_sss<shamir_sss<Group>> {
+                typedef shamir_sss<Group> scheme_type;
+                typedef typename scheme_type::public_share_type public_share_type;
+
+                public_share_sss() = default;
+
+                public_share_sss(const public_share_type &in_public_share) : public_share(in_public_share) {
+                }
+
+                public_share_sss(typename public_share_type::first_type i,
+                                 const typename public_share_type::second_type &ps) :
+                    public_share(i, ps) {
+                }
+
+                inline typename public_share_type::first_type get_index() const {
+                    return public_share.first;
+                }
+
+                inline typename public_share_type::second_type get_value() const {
+                    return public_share.second;
+                }
+
+                bool operator==(const public_share_sss &other) const {
+                    return this->public_share == other.public_share;
+                }
+
+            protected:
+                public_share_type public_share;
+            };
+
+            template<typename Group>
+            struct share_sss<shamir_sss<Group>> : public virtual public_share_sss<shamir_sss<Group>> {
+                typedef public_share_sss<shamir_sss<Group>> base_type;
+                typedef typename base_type::scheme_type scheme_type;
+                typedef typename scheme_type::share_type share_type;
+
+                share_sss(const share_type &in_share) : share_sss(in_share.first, in_share.second) {
+                }
+
+                share_sss(typename share_type::first_type i, const typename share_type::second_type &s) :
+                    /// no need to call base constructor if dealing of share made by public interface as base type
+                    /// will be initialized in accumulator by the call of update_public_share_deal
+                    // base_type(i, s * base_type::public_share_type::second_type::one()),
+                    share(i, s) {
+                }
+
+                inline void update_share_deal(std::size_t exp, const typename scheme_type::coeff_type &coeff) {
+                    share.second = scheme_type::partial_eval_share(coeff, exp, share).second;
+                }
+
+                inline void update_public_share_deal() {
+                    this->public_share.second = share.second * base_type::public_share_type::second_type::one();
+                }
+
+                inline typename share_type::first_type get_index() const {
+                    return share.first;
+                }
+
+                inline typename share_type::second_type get_value() const {
+                    return share.second;
+                }
+
+                bool operator==(const share_sss &other) const {
+                    return this->share == other.share;
+                }
+
+            protected:
+                share_type share;
+            };
+
+            template<typename Group>
+            struct secret_sss<shamir_sss<Group>> {
+                typedef shamir_sss<Group> scheme_type;
+                typedef typename scheme_type::secret_type secret_type;
+                typedef typename scheme_type::indexes_type indexes_type;
+
+                template<typename Shares>
+                secret_sss(const Shares &shares, const indexes_type &indexes, std::size_t id_i = 0) :
+                    secret_sss(std::cbegin(shares), std::cend(shares), indexes, id_i) {
                     BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
-
-                    return get_public_shares(std::cbegin(shares), std::cend(shares));
                 }
 
-                template<typename SharesIt,
-                         typename basic_policy::template check_indexed_element_iterator_t<SharesIt> = true>
-                static inline public_shares_type get_public_shares(SharesIt first, SharesIt last) {
-                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<SharesIt>));
-                    assert(basic_policy::check_minimal_size(std::distance(first, last)));
+                template<typename ShareIt>
+                secret_sss(ShareIt first, ShareIt last, const indexes_type &indexes, std::size_t id_i = 0) :
+                    secret(secret_type::zero()) {
+                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<ShareIt>));
 
-                    public_shares_type public_shares;
                     for (auto it = first; it != last; it++) {
-                        assert(public_shares.emplace(basic_policy::get_public_share(*it)).second);
+                        secret = secret +
+                                 it->get_value() * scheme_type::eval_basis_poly(indexes, id_i ? id_i : it->get_index());
                     }
-                    return public_shares;
                 }
+
+                inline secret_type get_value() const {
+                    return secret;
+                }
+
+                bool operator==(const secret_sss &other) const {
+                    return this->secret == other.secret;
+                }
+
+            protected:
+                secret_type secret;
             };
 
             template<typename Group>
             struct deal_shares_op<shamir_sss<Group>> {
                 typedef shamir_sss<Group> scheme_type;
-                typedef typename scheme_type::basic_policy basic_policy;
-
-                typedef typename scheme_type::group_type group_type;
-                typedef typename scheme_type::shares_type shares_type;
-
+                typedef share_sss<scheme_type> share_type;
+                typedef std::vector<share_type> shares_type;
                 typedef shares_type internal_accumulator_type;
 
-                static inline void init_accumulator(internal_accumulator_type &acc, std::size_t n) {
+            protected:
+                template<typename Share, typename InternalAccumulator>
+                static inline void _init_accumulator(InternalAccumulator &acc, std::size_t n, std::size_t t) {
+                    assert(scheme_type::check_threshold_value(t, n));
                     std::size_t i = 1;
-                    std::generate_n(std::inserter(acc, std::end(acc)), n, [&i]() {
-                        return typename basic_policy::share_t(i++, basic_policy::private_element_t::zero());
-                    });
+                    std::generate_n(std::inserter(acc, std::end(acc)), n,
+                                    [&i]() { return Share(i++, Share::share_type::second_type::zero()); });
                 }
 
-                static inline void update(internal_accumulator_type &acc, std::size_t exp,
-                                          const typename basic_policy::coeff_t &coeff) {
+                template<typename InternalAccumulator>
+                static inline void _update(InternalAccumulator &acc, std::size_t exp,
+                                           const typename scheme_type::coeff_type &coeff) {
                     for (auto shares_iter = std::begin(acc); shares_iter != std::end(acc); ++shares_iter) {
-                        shares_iter->second = scheme_type::partial_eval_share(coeff, exp, *shares_iter).second;
+                        shares_iter->update_share_deal(exp, coeff);
                     }
                 }
 
-                static inline shares_type process(internal_accumulator_type &acc) {
+                template<typename Shares, typename InternalAccumulator>
+                static inline Shares _process(InternalAccumulator &acc) {
+                    for (auto &share : acc) {
+                        share.update_public_share_deal();
+                    }
                     return acc;
+                }
+
+            public:
+                static inline void init_accumulator(internal_accumulator_type &acc, std::size_t n, std::size_t t) {
+                    _init_accumulator<share_type>(acc, n, t);
+                }
+
+                static inline void update(internal_accumulator_type &acc, std::size_t exp,
+                                          const typename scheme_type::coeff_type &coeff) {
+                    _update(acc, exp, coeff);
+                }
+
+                static inline shares_type process(internal_accumulator_type &acc) {
+                    return _process<shares_type>(acc);
                 }
             };
 
             template<typename Group>
             struct reconstruct_secret_op<shamir_sss<Group>> {
                 typedef shamir_sss<Group> scheme_type;
-                typedef typename scheme_type::basic_policy basic_policy;
-                typedef typename scheme_type::shares_type shares_type;
+                typedef typename scheme_type::indexes_type indexes_type;
+                typedef share_sss<scheme_type> share_type;
+                typedef secret_sss<scheme_type> secret_type;
+                typedef std::pair<indexes_type, std::vector<share_type>> internal_accumulator_type;
 
-                typedef typename basic_policy::secret_t secret_type;
+            protected:
+                typedef typename share_type::share_type _share_type;
+                typedef typename secret_type::secret_type _secret_type;
 
-                typedef shares_type internal_accumulator_type;
+                template<typename InternalAccumulator, typename Share>
+                static inline void _update(InternalAccumulator &acc, const Share &share) {
+                    assert(acc.first.emplace(share.get_index()).second);
+                    acc.second.push_back(share);
+                }
 
+                template<typename Secret, typename InternalAccumulator>
+                static inline Secret _process(InternalAccumulator &acc) {
+                    return Secret(acc.second, acc.first);
+                }
+
+            public:
                 static inline void init_accumulator() {
                 }
 
-                static inline void update(internal_accumulator_type &acc, const typename basic_policy::share_t &share) {
-                    assert(acc.emplace(share).second);
+                static inline void update(internal_accumulator_type &acc, const share_type &share) {
+                    _update(acc, share);
                 }
 
                 static inline secret_type process(internal_accumulator_type &acc) {
-                    return scheme_type::reconstruct_secret(acc);
+                    return _process<secret_type>(acc);
                 }
             };
         }    // namespace pubkey

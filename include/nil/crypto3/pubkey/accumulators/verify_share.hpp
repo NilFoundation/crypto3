@@ -58,8 +58,6 @@ namespace nil {
                         typedef typename processing_mode_type::op_type op_type;
                         typedef typename processing_mode_type::internal_accumulator_type internal_accumulator_type;
 
-                        typedef typename scheme_type::basic_policy basic_policy;
-
                     public:
                         typedef typename processing_mode_type::result_type result_type;
 
@@ -68,9 +66,10 @@ namespace nil {
                         //
                         template<typename Args>
                         verify_share_impl(const Args &args) :
-                            public_share(basic_policy::get_public_share(args[boost::accumulators::sample])),
-                            seen_coeffs(0) {
-                            processing_mode_type::init_accumulator(acc, public_share.first);
+                            verified_public_share(args[boost::accumulators::sample]), seen_coeffs(0) {
+                            // TODO: replace with rvalue
+                            auto i = verified_public_share.get_index();
+                            processing_mode_type::init_accumulator(acc, i);
                         }
 
                         //
@@ -84,34 +83,34 @@ namespace nil {
                         }
 
                         inline result_type result(boost::accumulators::dont_care) const {
-                            return processing_mode_type::process(acc, public_share);
+                            return processing_mode_type::process(acc, verified_public_share);
                         }
 
                     protected:
-                        inline void resolve_type(const typename basic_policy::public_coeff_t &public_coeff,
+                        inline void resolve_type(const typename scheme_type::public_coeff_type &public_coeff,
                                                  std::nullptr_t = nullptr) {
-                            processing_mode_type::update(acc, public_coeff, seen_coeffs);
+                            processing_mode_type::update(acc, seen_coeffs, public_coeff);
                             seen_coeffs++;
                         }
 
                         template<typename PublicCoeffs,
-                                 typename basic_policy::template check_public_elements_t<PublicCoeffs> = true>
+                                 typename scheme_type::template check_public_coeffs_type<PublicCoeffs> = true>
                         inline void resolve_type(const PublicCoeffs &public_coeffs, std::nullptr_t) {
                             for (const auto &pc : public_coeffs) {
                                 resolve_type(pc);
                             }
                         }
 
-                        template<typename InputIterator,
-                                 typename basic_policy::template check_public_element_iterator_t<InputIterator> = true>
-                        inline void resolve_type(InputIterator first, InputIterator last) {
+                        template<typename PublicCoeffIt,
+                                 typename scheme_type::template check_public_coeff_iterator_type<PublicCoeffIt> = true>
+                        inline void resolve_type(PublicCoeffIt first, PublicCoeffIt last) {
                             for (auto it = first; it != last; it++) {
                                 resolve_type(*it);
                             }
                         }
 
                         std::size_t seen_coeffs;
-                        typename basic_policy::public_share_t public_share;
+                        public_share_sss<scheme_type> verified_public_share;
                         mutable internal_accumulator_type acc;
                     };
                 }    // namespace impl

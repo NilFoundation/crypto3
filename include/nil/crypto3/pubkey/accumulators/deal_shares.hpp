@@ -71,8 +71,6 @@ namespace nil {
                         typedef typename processing_mode_type::op_type op_type;
                         typedef typename processing_mode_type::internal_accumulator_type internal_accumulator_type;
 
-                        typedef typename scheme_type::basic_policy basic_policy;
-
                     public:
                         typedef typename processing_mode_type::result_type result_type;
 
@@ -85,9 +83,9 @@ namespace nil {
                         deal_shares_impl(const Args &args) :
                             seen_coeffs(0), n(args[boost::accumulators::sample]),
                             t(args[nil::crypto3::accumulators::threshold_value]) {
-                            assert(basic_policy::check_threshold_value(t, n));
+                            // assert(scheme_type::check_threshold_value(t, n));
 
-                            processing_mode_type::init_accumulator(acc, n);
+                            processing_mode_type::init_accumulator(acc, n, t);
                         }
 
                         inline result_type result(boost::accumulators::dont_care) const {
@@ -107,7 +105,7 @@ namespace nil {
                         }
 
                     protected:
-                        inline void resolve_type(const typename basic_policy::coeff_t &coeff,
+                        inline void resolve_type(const typename scheme_type::coeff_type &coeff,
                                                  std::nullptr_t = nullptr) {
                             if (t == seen_coeffs) {
                                 return;
@@ -117,16 +115,14 @@ namespace nil {
                             seen_coeffs++;
                         }
 
-                        template<typename Coeffs,
-                                 typename basic_policy::template check_private_elements_t<Coeffs> = true>
-                        inline void resolve_type(const Coeffs &coeffs, std::nullptr_t) {
-                            for (const auto &c : coeffs) {
+                        template<typename InputRange>
+                        inline void resolve_type(const InputRange &range, std::nullptr_t) {
+                            for (const auto &c : range) {
                                 resolve_type(c);
                             }
                         }
 
-                        template<typename InputIterator,
-                                 typename basic_policy::template check_private_element_iterator_t<InputIterator> = true>
+                        template<typename InputIterator>
                         inline void resolve_type(InputIterator first, InputIterator last) {
                             for (auto it = first; it != last; it++) {
                                 resolve_type(*it);
