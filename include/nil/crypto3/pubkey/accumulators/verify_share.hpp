@@ -93,17 +93,15 @@ namespace nil {
                             seen_coeffs++;
                         }
 
-                        template<typename PublicCoeffs,
-                                 typename scheme_type::template check_public_coeffs_type<PublicCoeffs> = true>
-                        inline void resolve_type(const PublicCoeffs &public_coeffs, std::nullptr_t) {
-                            for (const auto &pc : public_coeffs) {
+                        template<typename InputRange>
+                        inline void resolve_type(const InputRange &range, std::nullptr_t) {
+                            for (const auto &pc : range) {
                                 resolve_type(pc);
                             }
                         }
 
-                        template<typename PublicCoeffIt,
-                                 typename scheme_type::template check_public_coeff_iterator_type<PublicCoeffIt> = true>
-                        inline void resolve_type(PublicCoeffIt first, PublicCoeffIt last) {
+                        template<typename InputIterator>
+                        inline void resolve_type(InputIterator first, InputIterator last) {
                             for (auto it = first; it != last; it++) {
                                 resolve_type(*it);
                             }
