@@ -71,12 +71,6 @@ namespace nil {
                                  const typename base_type::public_share_type::second_type &ps) :
                     base_type(i, ps) {
                 }
-
-                inline void update_verify(std::size_t exp,
-                                          const typename scheme_type::public_coeff_type &public_coeff) {
-                    this->public_share.second =
-                        scheme_type::partial_eval_verification_value(public_coeff, exp, this->public_share).second;
-                }
             };
 
             template<typename Group>
@@ -126,7 +120,7 @@ namespace nil {
                 typedef feldman_sss<Group> scheme_type;
                 typedef share_sss<scheme_type> share_type;
                 typedef std::vector<share_type> shares_type;
-                typedef shares_type internal_accumulator_type;
+                typedef std::vector<typename share_type::share_type> internal_accumulator_type;
 
                 static inline void init_accumulator(internal_accumulator_type &acc, std::size_t n, std::size_t t) {
                     base_type::template _init_accumulator<share_type>(acc, n, t);
@@ -146,24 +140,22 @@ namespace nil {
             struct verify_share_op<feldman_sss<Group>> {
                 typedef feldman_sss<Group> scheme_type;
                 typedef public_share_sss<scheme_type> public_share_type;
-                typedef public_share_type internal_accumulator_type;
-
-            protected:
-                typedef typename public_share_type::public_share_type _public_share_type;
+                typedef typename public_share_type::public_share_type internal_accumulator_type;
 
             public:
                 static inline void init_accumulator(internal_accumulator_type &acc, std::size_t i) {
-                    acc = internal_accumulator_type(i, _public_share_type::second_type::zero());
+                    acc = internal_accumulator_type(i, public_share_type::public_share_type::second_type::zero());
                 }
 
                 static inline void update(internal_accumulator_type &acc, std::size_t exp,
                                           const typename scheme_type::public_coeff_type &public_coeff) {
-                    acc.update_verify(exp, public_coeff);
+                    acc.second = scheme_type::partial_eval_verification_value(public_coeff, exp, acc).second;
                 }
 
                 static inline bool process(const internal_accumulator_type &acc,
                                            const public_share_type &verified_public_share) {
-                    return acc == verified_public_share;
+                    return acc.first == verified_public_share.get_index() &&
+                           acc.second == verified_public_share.get_value();
                 }
             };
 

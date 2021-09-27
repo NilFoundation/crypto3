@@ -181,18 +181,7 @@ namespace nil {
                 }
 
                 share_sss(typename share_type::first_type i, const typename share_type::second_type &s) :
-                    /// no need to call base constructor if dealing of share made by public interface as base type
-                    /// will be initialized in accumulator by the call of update_public_share_deal
-                    // base_type(i, s * base_type::public_share_type::second_type::one()),
-                    share(i, s) {
-                }
-
-                inline void update_share_deal(std::size_t exp, const typename scheme_type::coeff_type &coeff) {
-                    share.second = scheme_type::partial_eval_share(coeff, exp, share).second;
-                }
-
-                inline void update_public_share_deal() {
-                    this->public_share.second = share.second * base_type::public_share_type::second_type::one();
+                    base_type(i, s * base_type::public_share_type::second_type::one()), share(i, s) {
                 }
 
                 inline typename share_type::first_type get_index() const {
@@ -214,6 +203,7 @@ namespace nil {
             template<typename Group>
             struct secret_sss<shamir_sss<Group>> {
                 typedef shamir_sss<Group> scheme_type;
+                // typedef share_sss<scheme_type> scheme
                 typedef typename scheme_type::secret_type secret_type;
                 typedef typename scheme_type::indexes_type indexes_type;
 
@@ -251,31 +241,33 @@ namespace nil {
                 typedef shamir_sss<Group> scheme_type;
                 typedef share_sss<scheme_type> share_type;
                 typedef std::vector<share_type> shares_type;
-                typedef shares_type internal_accumulator_type;
+                typedef std::vector<typename share_type::share_type> internal_accumulator_type;
 
             protected:
                 template<typename Share, typename InternalAccumulator>
                 static inline void _init_accumulator(InternalAccumulator &acc, std::size_t n, std::size_t t) {
                     assert(scheme_type::check_threshold_value(t, n));
                     std::size_t i = 1;
-                    std::generate_n(std::inserter(acc, std::end(acc)), n,
-                                    [&i]() { return Share(i++, Share::share_type::second_type::zero()); });
+                    std::generate_n(std::inserter(acc, std::end(acc)), n, [&i]() {
+                        return typename Share::share_type(i++, Share::share_type::second_type::zero());
+                    });
                 }
 
                 template<typename InternalAccumulator>
                 static inline void _update(InternalAccumulator &acc, std::size_t exp,
                                            const typename scheme_type::coeff_type &coeff) {
                     for (auto shares_iter = std::begin(acc); shares_iter != std::end(acc); ++shares_iter) {
-                        shares_iter->update_share_deal(exp, coeff);
+                        shares_iter->second = scheme_type::partial_eval_share(coeff, exp, *shares_iter).second;
                     }
                 }
 
                 template<typename Shares, typename InternalAccumulator>
                 static inline Shares _process(InternalAccumulator &acc) {
+                    Shares result;
                     for (auto &share : acc) {
-                        share.update_public_share_deal();
+                        result.emplace_back(share);
                     }
-                    return acc;
+                    return result;
                 }
 
             public:
