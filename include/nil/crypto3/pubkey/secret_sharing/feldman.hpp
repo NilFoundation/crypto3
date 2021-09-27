@@ -76,17 +76,16 @@ namespace nil {
             template<typename Group>
             struct share_sss<feldman_sss<Group>> : public virtual public_share_sss<feldman_sss<Group>>,
                                                    public virtual share_sss<shamir_sss<Group>> {
-                typedef feldman_sss<Group> scheme_type;
                 typedef public_share_sss<shamir_sss<Group>> base_type1;
                 typedef public_share_sss<feldman_sss<Group>> base_type2;
                 typedef share_sss<shamir_sss<Group>> base_type3;
+                typedef feldman_sss<Group> scheme_type;
+                typedef typename base_type3::share_type share_type;
 
-                share_sss(const typename base_type3::share_type &in_share) :
-                    share_sss(in_share.first, in_share.second) {
+                share_sss(const share_type &in_share) : share_sss(in_share.first, in_share.second) {
                 }
 
-                share_sss(typename base_type3::share_type::first_type i,
-                          const typename base_type3::share_type::second_type &s) :
+                share_sss(typename share_type::first_type i, const typename share_type::second_type &s) :
                     base_type1(i, s * base_type2::public_share_type::second_type::one()),
                     /// no need to initialize base_type2 as it virtually derived from base_type1
                     base_type2(), base_type3(i, s) {
@@ -95,20 +94,17 @@ namespace nil {
 
             template<typename Group>
             struct secret_sss<feldman_sss<Group>> : public secret_sss<shamir_sss<Group>> {
-                typedef feldman_sss<Group> scheme_type;
                 typedef secret_sss<shamir_sss<Group>> base_type;
+                typedef feldman_sss<Group> scheme_type;
 
                 template<typename Shares>
-                secret_sss(const Shares &shares,
-                           const typename base_type::indexes_type &indexes,
+                secret_sss(const Shares &shares, const typename base_type::indexes_type &indexes,
                            std::size_t id_i = 0) :
                     secret_sss(std::cbegin(shares), std::cend(shares), indexes, id_i) {
                 }
 
                 template<typename ShareIt>
-                secret_sss(ShareIt first,
-                           ShareIt last,
-                           const typename base_type::indexes_type &indexes,
+                secret_sss(ShareIt first, ShareIt last, const typename base_type::indexes_type &indexes,
                            std::size_t id_i = 0) :
                     base_type(first, last, indexes, id_i) {
                 }
@@ -142,20 +138,37 @@ namespace nil {
                 typedef public_share_sss<scheme_type> public_share_type;
                 typedef typename public_share_type::public_share_type internal_accumulator_type;
 
+            protected:
+                template<typename PublicShare, typename InternalAccumulator>
+                static inline void _init_accumulator(InternalAccumulator &acc, std::size_t i) {
+                    acc = internal_accumulator_type(i, PublicShare::public_share_type::second_type::zero());
+                }
+
+                template<typename InternalAccumulator>
+                static inline void _update(InternalAccumulator &acc, std::size_t exp,
+                                           const typename scheme_type::public_coeff_type &public_coeff) {
+                    acc.second = scheme_type::partial_eval_verification_value(public_coeff, exp, acc).second;
+                }
+
+                template<typename PublicShare, typename InternalAccumulator>
+                static inline bool _process(const InternalAccumulator &acc, const PublicShare &verified_public_share) {
+                    return acc.first == verified_public_share.get_index() &&
+                           acc.second == verified_public_share.get_value();
+                }
+
             public:
                 static inline void init_accumulator(internal_accumulator_type &acc, std::size_t i) {
-                    acc = internal_accumulator_type(i, public_share_type::public_share_type::second_type::zero());
+                    _init_accumulator<public_share_type>(acc, i);
                 }
 
                 static inline void update(internal_accumulator_type &acc, std::size_t exp,
                                           const typename scheme_type::public_coeff_type &public_coeff) {
-                    acc.second = scheme_type::partial_eval_verification_value(public_coeff, exp, acc).second;
+                    _update(acc, exp, public_coeff);
                 }
 
                 static inline bool process(const internal_accumulator_type &acc,
                                            const public_share_type &verified_public_share) {
-                    return acc.first == verified_public_share.get_index() &&
-                           acc.second == verified_public_share.get_value();
+                    return _process<public_share_type>(acc, verified_public_share);
                 }
             };
 
@@ -165,11 +178,8 @@ namespace nil {
                 typedef feldman_sss<Group> scheme_type;
                 typedef share_sss<scheme_type> share_type;
                 typedef secret_sss<scheme_type> secret_type;
-                typedef std::pair<typename base_type::indexes_type, std::vector<share_type>> internal_accumulator_type;
-
-            protected:
-                typedef typename share_type::share_type _share_type;
-                typedef typename secret_type::secret_type _secret_type;
+                typedef std::pair<typename scheme_type::indexes_type, std::vector<share_type>>
+                    internal_accumulator_type;
 
             public:
                 static inline void init_accumulator() {

@@ -297,6 +297,31 @@ namespace nil {
                     }
                 };
 
+                template<typename Scheme>
+                struct isomorphic_share_dealing_policy : public isomorphic_policy<Scheme> {
+                    typedef typename isomorphic_policy<Scheme>::scheme_type scheme_type;
+
+                    typedef void key_type;
+                    typedef deal_share_op<scheme_type> op_type;
+                    typedef typename op_type::internal_accumulator_type internal_accumulator_type;
+                    typedef typename op_type::share_type result_type;
+
+                    template<typename... Args>
+                    static inline void init_accumulator(Args &...args) {
+                        op_type::init_accumulator(args...);
+                    }
+
+                    template<typename... Args>
+                    static inline void update(Args &...args) {
+                        op_type::update(args...);
+                    }
+
+                    template<typename... Args>
+                    static inline result_type process(Args &...args) {
+                        return op_type::process(args...);
+                    }
+                };
+
                 template<typename Policy>
                 class isomorphic {
                     typedef Policy policy_type;
@@ -354,6 +379,7 @@ namespace nil {
                     typedef detail::isomorphic_shares_dealing_policy<scheme_type> shares_dealing_policy;
                     typedef detail::isomorphic_share_verification_policy<scheme_type> share_verification_policy;
                     typedef detail::isomorphic_secret_reconstructing_policy<scheme_type> secret_reconstructing_policy;
+                    typedef detail::isomorphic_share_dealing_policy<scheme_type> share_dealing_policy;
 
                     template<typename Policy>
                     struct bind {

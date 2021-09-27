@@ -56,17 +56,17 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename InputIterator, typename OutputIterator>
-        OutputIterator deal_share(InputIterator first, InputIterator last, OutputIterator out) {
+        template<typename Scheme, typename InputIterator, typename OutputIterator,
+                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
+                     pubkey::share_dealing_policy<Scheme>>::type>
+        OutputIterator deal_share(std::size_t i, InputIterator first, InputIterator last, OutputIterator out) {
 
-            typedef typename pubkey::modes::isomorphic<Scheme>::template bind<
-                pubkey::share_dealing_policy<Scheme>>::type ProcessingMode;
             typedef typename pubkey::share_dealing_accumulator_set<ProcessingMode> SchemeAccumulator;
 
             typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::itr_pubkey_impl<StreamSignerImpl, OutputIterator> SignerImpl;
 
-            return SignerImpl(first, last, std::move(out), SchemeAccumulator());
+            return SignerImpl(first, last, std::move(out), SchemeAccumulator(i));
         }
 
         /*!
@@ -87,17 +87,17 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename SinglePassRange, typename OutputIterator>
-        OutputIterator deal_share(const SinglePassRange &rng, OutputIterator out) {
+        template<typename Scheme, typename SinglePassRange, typename OutputIterator,
+                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
+                     pubkey::share_dealing_policy<Scheme>>::type>
+        OutputIterator deal_share(std::size_t i, const SinglePassRange &rng, OutputIterator out) {
 
-            typedef typename pubkey::modes::isomorphic<Scheme>::template bind<
-                pubkey::share_dealing_policy<Scheme>>::type ProcessingMode;
             typedef typename pubkey::share_dealing_accumulator_set<ProcessingMode> SchemeAccumulator;
 
             typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::itr_pubkey_impl<StreamSignerImpl, OutputIterator> SignerImpl;
 
-            return SignerImpl(rng, std::move(out), SchemeAccumulator());
+            return SignerImpl(rng, std::move(out), SchemeAccumulator(i));
         }
 
         /*!
@@ -116,9 +116,9 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename InputIterator,
-                 typename OutputAccumulator =
-                     typename pubkey::share_dealing_accumulator_set<typename pubkey::modes::isomorphic<
-                         Scheme>::template bind<pubkey::share_dealing_policy<Scheme>>::type>>
+                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
+                     pubkey::share_dealing_policy<Scheme>>::type,
+                 typename OutputAccumulator = typename pubkey::share_dealing_accumulator_set<ProcessingMode>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
             deal_share(InputIterator first, InputIterator last, OutputAccumulator &acc) {
@@ -144,9 +144,9 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename SinglePassRange,
-                 typename OutputAccumulator =
-                     typename pubkey::share_dealing_accumulator_set<typename pubkey::modes::isomorphic<
-                         Scheme>::template bind<pubkey::share_dealing_policy<Scheme>>::type>>
+                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
+                     pubkey::share_dealing_policy<Scheme>>::type,
+                 typename OutputAccumulator = typename pubkey::share_dealing_accumulator_set<ProcessingMode>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
             deal_share(const SinglePassRange &r, OutputAccumulator &acc) {
@@ -174,19 +174,16 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename InputIterator,
-                 typename SchemeAccumulator =
-                     typename pubkey::share_dealing_accumulator_set<typename pubkey::modes::isomorphic<
-                         Scheme>::template bind<pubkey::share_dealing_policy<Scheme>>::type>>
+                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
+                     pubkey::share_dealing_policy<Scheme>>::type,
+                 typename SchemeAccumulator = typename pubkey::share_dealing_accumulator_set<ProcessingMode>>
         pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
-            deal_share(InputIterator first, InputIterator last) {
-
-            typedef typename pubkey::modes::isomorphic<Scheme>::template bind<
-                pubkey::share_dealing_policy<Scheme>>::type ProcessingMode;
+            deal_share(std::size_t i, InputIterator first, InputIterator last) {
 
             typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
 
-            return SignerImpl(first, last, SchemeAccumulator());
+            return SignerImpl(first, last, SchemeAccumulator(i));
         }
 
         /*!
@@ -204,19 +201,16 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename SinglePassRange,
-                 typename SchemeAccumulator =
-                     typename pubkey::share_dealing_accumulator_set<typename pubkey::modes::isomorphic<
-                         Scheme>::template bind<pubkey::share_dealing_policy<Scheme>>::type>>
+                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
+                     pubkey::share_dealing_policy<Scheme>>::type,
+                 typename SchemeAccumulator = typename pubkey::share_dealing_accumulator_set<ProcessingMode>>
         pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
-            deal_share(const SinglePassRange &r) {
-
-            typedef typename pubkey::modes::isomorphic<Scheme>::template bind<
-                pubkey::share_dealing_policy<Scheme>>::type ProcessingMode;
+            deal_share(std::size_t i, const SinglePassRange &r) {
 
             typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
 
-            return SignerImpl(r, SchemeAccumulator());
+            return SignerImpl(r, SchemeAccumulator(i));
         }
     }    // namespace crypto3
 }    // namespace nil

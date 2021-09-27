@@ -55,16 +55,7 @@ namespace nil {
                     struct deal_shares_impl;
 
                     template<typename ProcessingMode>
-                    struct deal_shares_impl<
-                        ProcessingMode,
-                        typename std::enable_if<
-                            std::is_same<typename ProcessingMode::scheme_type,
-                                         pubkey::shamir_sss<typename ProcessingMode::scheme_type::group_type>>::value ||
-                            std::is_same<typename ProcessingMode::scheme_type,
-                                         pubkey::feldman_sss<typename ProcessingMode::scheme_type::group_type>>::value/* ||
-                            std::is_same<typename ProcessingMode::scheme_type,
-                                         pubkey::pedersen_dkg<typename ProcessingMode::scheme_type::group_type>>::value*/>::type>
-                        : boost::accumulators::accumulator_base {
+                    struct deal_shares_impl<ProcessingMode> : boost::accumulators::accumulator_base {
                     protected:
                         typedef ProcessingMode processing_mode_type;
                         typedef typename processing_mode_type::scheme_type scheme_type;

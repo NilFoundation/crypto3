@@ -174,7 +174,7 @@ namespace nil {
             template<typename Group>
             struct share_sss<shamir_sss<Group>> : public virtual public_share_sss<shamir_sss<Group>> {
                 typedef public_share_sss<shamir_sss<Group>> base_type;
-                typedef typename base_type::scheme_type scheme_type;
+                typedef shamir_sss<Group> scheme_type;
                 typedef typename scheme_type::share_type share_type;
 
                 share_sss(const share_type &in_share) : share_sss(in_share.first, in_share.second) {
@@ -203,7 +203,6 @@ namespace nil {
             template<typename Group>
             struct secret_sss<shamir_sss<Group>> {
                 typedef shamir_sss<Group> scheme_type;
-                // typedef share_sss<scheme_type> scheme
                 typedef typename scheme_type::secret_type secret_type;
                 typedef typename scheme_type::indexes_type indexes_type;
 
@@ -293,15 +292,12 @@ namespace nil {
             template<typename Group>
             struct reconstruct_secret_op<shamir_sss<Group>> {
                 typedef shamir_sss<Group> scheme_type;
-                typedef typename scheme_type::indexes_type indexes_type;
                 typedef share_sss<scheme_type> share_type;
                 typedef secret_sss<scheme_type> secret_type;
-                typedef std::pair<indexes_type, std::vector<share_type>> internal_accumulator_type;
+                typedef std::pair<typename scheme_type::indexes_type, std::vector<share_type>>
+                    internal_accumulator_type;
 
             protected:
-                typedef typename share_type::share_type _share_type;
-                typedef typename secret_type::secret_type _secret_type;
-
                 template<typename InternalAccumulator, typename Share>
                 static inline void _update(InternalAccumulator &acc, const Share &share) {
                     assert(acc.first.emplace(share.get_index()).second);
