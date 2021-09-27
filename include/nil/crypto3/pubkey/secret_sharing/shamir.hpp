@@ -213,7 +213,12 @@ namespace nil {
                     BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
                 }
 
-                template<typename ShareIt>
+                template<typename ShareIt,
+                         typename std::enable_if<
+                             std::is_convertible<typename std::remove_cv<typename std::remove_reference<
+                                                     typename std::iterator_traits<ShareIt>::value_type>::type>::type,
+                                                 share_sss<scheme_type>>::value,
+                             bool>::type = true>
                 secret_sss(ShareIt first, ShareIt last, const indexes_type &indexes, std::size_t id_i = 0) :
                     secret(secret_type::zero()) {
                     BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<ShareIt>));
