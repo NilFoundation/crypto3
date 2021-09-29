@@ -275,173 +275,181 @@ BOOST_AUTO_TEST_CASE(feldman_sss) {
     BOOST_CHECK(coeffs.front() != wrong_secret.get_value());
 }
 
-// BOOST_AUTO_TEST_CASE(shamir_weighted_sss) {
-//     using curve_type = curves::bls12_381;
-//     using group_type = typename curve_type::g1_type<>;
-//     using scheme_type = nil::crypto3::pubkey::weighted_shamir_sss<group_type>;
-//     using key_type = no_key_ops<scheme_type>;
-//     using shares_dealing_acc_type = shares_dealing_accumulator_set<
-//         typename modes::isomorphic<scheme_type>::template bind<shares_dealing_policy<scheme_type>>::type>;
-//     using shares_dealing_acc = typename boost::mpl::front<typename shares_dealing_acc_type::features_type>::type;
-//     using secret_reconstructing_acc_type = secret_reconstructing_accumulator_set<typename modes::isomorphic<
-//         scheme_type>::template bind<secret_reconstructing_policy<scheme_type>>::type>;
-//     using secret_reconstructing_acc =
-//         typename boost::mpl::front<typename secret_reconstructing_acc_type::features_type>::type;
-//
-//     auto t = 10;
-//     auto n = 20;
-//
-//     //===========================================================================
-//     // participants weights generation
-//
-//     auto i = 1;
-//     auto j = 1;
-//     typename scheme_type::weights_type weights;
-//     std::generate_n(std::inserter(weights, weights.end()), n, [&i, &j, &t]() {
-//         j = j >= t ? 1 : j;
-//         return typename scheme_type::weight_type(i++, j++);
-//     });
-//
-//     i = 1;
-//     typename scheme_type::weights_type weights_one;
-//     std::generate_n(std::inserter(weights_one, weights_one.end()), n,
-//                     [&i]() { return typename scheme_type::weight_type(i++, 1); });
-//
-//     //===========================================================================
-//     // polynomial generation
-//     auto coeffs = key_type::get_poly(t, n);
-//     auto pub_coeffs = key_type::get_public_coeffs(coeffs);
-//
-//     //===========================================================================
-//     // default shares dealing
-//
-//     // deal_shares(rng)
-//     typename key_type::shares_type shares_one = nil::crypto3::deal_shares<scheme_type>(coeffs, n);
-//     // deal_shares(first, last)
-//     typename key_type::shares_type shares_one1 =
-//         nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n);
-//     // deal_shares(rng, acc)
-//     shares_dealing_acc_type deal_shares_one_acc(n, nil::crypto3::accumulators::threshold_value = t);
-//     nil::crypto3::deal_shares<scheme_type>(coeffs, deal_shares_one_acc);
-//     typename key_type::shares_type shares_one2 =
-//         boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_one_acc);
-//     // deal_shares(first, last, acc)
-//     shares_dealing_acc_type deal_shares_one_acc1(n, nil::crypto3::accumulators::threshold_value = t);
-//     nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), deal_shares_one_acc1);
-//     typename key_type::shares_type shares_one3 =
-//         boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_one_acc1);
-//     // deal_shares(rng, out)
-//     std::vector<typename key_type::shares_type> shares_one_out;
-//     nil::crypto3::deal_shares<scheme_type>(coeffs, n, std::back_inserter(shares_one_out));
-//     // deal_shares(first, last, out)
-//     std::vector<typename key_type::shares_type> shares_one_out1;
-//     nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, std::back_inserter(shares_one_out1));
-//
-//     BOOST_CHECK(shares_one == shares_one1);
-//     BOOST_CHECK(shares_one == shares_one2);
-//     BOOST_CHECK(shares_one == shares_one3);
-//     BOOST_CHECK(shares_one == shares_one_out.front());
-//     BOOST_CHECK(shares_one == shares_one_out1.front());
-//
-//     //===========================================================================
-//     // weighted shares dealing
-//
-//     // deal_shares(rng, acc)
-//     shares_dealing_acc_type deal_shares_acc(n, nil::crypto3::accumulators::threshold_value = t);
-//     nil::crypto3::deal_shares<scheme_type>(coeffs, deal_shares_acc);
-//     for (const auto &w : weights) {
-//         deal_shares_acc(w);
-//     }
-//     typename key_type::shares_type shares = boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc);
-//     // deal_shares(first, last, acc)
-//     shares_dealing_acc_type deal_shares_acc1(n, nil::crypto3::accumulators::threshold_value = t);
-//     nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), deal_shares_acc1);
-//     for (const auto &w : weights) {
-//         deal_shares_acc1(w);
-//     }
-//     typename key_type::shares_type shares1 = boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc1);
-//     typename key_type::shares_type shares2 =
-//         nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), weights.begin(), weights.end(), n);
-//     BOOST_CHECK(shares == shares1);
-//     BOOST_CHECK(shares == shares2);
-//
-//     //===========================================================================
-//     // reconstructing secret
-//
-//     // reconstruct(rng)
-//     typename scheme_type::private_element_type secret_one = nil::crypto3::reconstruct<scheme_type>(shares_one);
-//     // reconstruct(first, last)
-//     typename scheme_type::private_element_type secret_one1 =
-//         nil::crypto3::reconstruct<scheme_type>(shares_one.begin(), shares_one.end());
-//     // reconstruct(rng, acc)
-//     secret_reconstructing_acc_type reconstruct_secret_one_acc;
-//     typename scheme_type::private_element_type secret_one_acc =
-//         boost::accumulators::extract_result<secret_reconstructing_acc>(
-//             nil::crypto3::reconstruct<scheme_type>(shares_one, reconstruct_secret_one_acc));
-//     // reconstruct(first, last, acc)
-//     secret_reconstructing_acc_type reconstruct_secret_one_acc1;
-//     typename scheme_type::private_element_type secret_one_acc1 =
-//         boost::accumulators::extract_result<secret_reconstructing_acc>(
-//             nil::crypto3::reconstruct<scheme_type>(shares_one.begin(), shares_one.end(), reconstruct_secret_one_acc1));
-//     // reconstruct(rng, out)
-//     std::vector<typename scheme_type::private_element_type> secret_one_out;
-//     nil::crypto3::reconstruct<scheme_type>(shares_one, std::back_inserter(secret_one_out));
-//     // reconstruct(first, last, out)
-//     std::vector<typename scheme_type::private_element_type> secret_one_out1;
-//     nil::crypto3::reconstruct<scheme_type>(shares_one.begin(), shares_one.end(), std::back_inserter(secret_one_out1));
-//     BOOST_CHECK(coeffs.front() == secret_one);
-//     BOOST_CHECK(secret_one == secret_one1);
-//     BOOST_CHECK(secret_one1 == secret_one_acc);
-//     BOOST_CHECK(secret_one_acc == secret_one_acc1);
-//     BOOST_CHECK(secret_one_acc1 == secret_one_out.back());
-//     BOOST_CHECK(secret_one_out.back() == secret_one_out1.back());
-//
-//     // reconstruct(rng)
-//     typename scheme_type::private_element_type secret = nil::crypto3::reconstruct<scheme_type>(shares);
-//     // reconstruct(first, last)
-//     typename scheme_type::private_element_type secret1 =
-//         nil::crypto3::reconstruct<scheme_type>(shares.begin(), shares.end());
-//     // reconstruct(rng, acc)
-//     secret_reconstructing_acc_type reconstruct_secret_acc;
-//     typename scheme_type::private_element_type secret_acc =
-//         boost::accumulators::extract_result<secret_reconstructing_acc>(
-//             nil::crypto3::reconstruct<scheme_type>(shares, reconstruct_secret_acc));
-//     // reconstruct(first, last, acc)
-//     secret_reconstructing_acc_type reconstruct_secret_acc1;
-//     typename scheme_type::private_element_type secret_acc1 =
-//         boost::accumulators::extract_result<secret_reconstructing_acc>(
-//             nil::crypto3::reconstruct<scheme_type>(shares.begin(), shares.end(), reconstruct_secret_acc1));
-//     // reconstruct(rng, out)
-//     std::vector<typename scheme_type::private_element_type> secret_out;
-//     nil::crypto3::reconstruct<scheme_type>(shares, std::back_inserter(secret_out));
-//     // reconstruct(first, last, out)
-//     std::vector<typename scheme_type::private_element_type> secret_out1;
-//     nil::crypto3::reconstruct<scheme_type>(shares.begin(), shares.end(), std::back_inserter(secret_out1));
-//     BOOST_CHECK(coeffs.front() == secret);
-//     BOOST_CHECK(secret == secret1);
-//     BOOST_CHECK(secret1 == secret_acc);
-//     BOOST_CHECK(secret_acc == secret_acc1);
-//     BOOST_CHECK(secret_acc1 == secret_out.back());
-//     BOOST_CHECK(secret_out.back() == secret_out1.back());
-//
-//     //===========================================================================
-//     // check impossibility of secret recovering with group weight less than threshold value
-//
-//     typename scheme_type::private_element_type wrong_secret =
-//         nil::crypto3::reconstruct<scheme_type>(shares.begin(), [t, &shares]() {
-//             auto it = shares.begin();
-//             auto weight = 0;
-//             while (true) {
-//                 weight += it->second.size();
-//                 if (weight >= t) {
-//                     break;
-//                 }
-//                 it++;
-//             }
-//             return it;
-//         }());
-//     BOOST_CHECK(coeffs.front() != wrong_secret);
-// }
+BOOST_AUTO_TEST_CASE(shamir_weighted_sss) {
+    using curve_type = curves::bls12_381;
+    // using group_type = typename curve_type::g1_type<>;
+    // using scheme_type = nil::crypto3::pubkey::weighted_shamir_sss<group_type>;
+    //
+    // using shares_dealing_isomorphic_mode = typename modes::isomorphic<scheme_type>::template bind<shares_dealing_policy<scheme_type>>::type;
+    // // using secret_reconstructing_isomorphic_mode = typename modes::isomorphic<scheme_type>::template bind<secret_reconstructing_policy<scheme_type>>::type;
+    //
+    // using shares_dealing_acc_type = shares_dealing_accumulator_set<shares_dealing_isomorphic_mode>;
+    // using shares_dealing_acc = typename boost::mpl::front<typename shares_dealing_acc_type::features_type>::type;
+    // // using secret_reconstructing_acc_type = secret_reconstructing_accumulator_set<secret_reconstructing_isomorphic_mode>;
+    // // using secret_reconstructing_acc =
+    // //     typename boost::mpl::front<typename secret_reconstructing_acc_type::features_type>::type;
+    //
+    // auto t = 10;
+    // auto n = 20;
+    //
+    // //===========================================================================
+    // // participants weights generation
+    //
+    // auto j = 1;
+    // typename scheme_type::weights_type weights;
+    // for (auto i = 0; i < n; ++i) {
+    //     j = (j >= t ? 1 : j);
+    //     weights.push_back(j++);
+    // }
+    //
+    // typename scheme_type::weights_type weights_one(n, 1);
+    //
+    // //===========================================================================
+    // // polynomial generation
+    //
+    // // TODO: add public functions for that operations
+    // auto coeffs = scheme_type::get_poly(t, n);
+    // auto pub_coeffs = scheme_type::get_public_coeffs(coeffs);
+    //
+    // //===========================================================================
+    // // default shares dealing
+    //
+    // // deal_shares(rng)
+    // typename shares_dealing_isomorphic_mode::result_type shares_one = nil::crypto3::deal_shares<scheme_type>(coeffs, n, weights_one);
+    // // deal_shares(first, last)
+    // typename shares_dealing_isomorphic_mode::result_type shares_one1 =
+    //     nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, weights_one);
+    // // deal_shares(rng, acc)
+    // shares_dealing_acc_type deal_shares_one_acc(n, nil::crypto3::accumulators::threshold_value = t, nil::crypto3::accumulators::weights = weights_one);
+    // nil::crypto3::deal_shares<scheme_type>(coeffs, deal_shares_one_acc);
+    // typename shares_dealing_isomorphic_mode::result_type shares_one2 =
+    //     boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_one_acc);
+    // // deal_shares(first, last, acc)
+    // shares_dealing_acc_type deal_shares_one_acc1(n, nil::crypto3::accumulators::threshold_value = t, nil::crypto3::accumulators::weights = weights_one);
+    // nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), deal_shares_one_acc1);
+    // typename shares_dealing_isomorphic_mode::result_type shares_one3 =
+    //     boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_one_acc1);
+    // // deal_shares(rng, out)
+    // std::vector<typename shares_dealing_isomorphic_mode::result_type> shares_one_out;
+    // nil::crypto3::deal_shares<scheme_type>(coeffs, n, weights_one, std::back_inserter(shares_one_out));
+    // // deal_shares(first, last, out)
+    // std::vector<typename shares_dealing_isomorphic_mode::result_type> shares_one_out1;
+    // nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, weights_one, std::back_inserter(shares_one_out1));
+    //
+    // BOOST_CHECK(shares_one == shares_one1);
+    // BOOST_CHECK(shares_one == shares_one2);
+    // BOOST_CHECK(shares_one == shares_one3);
+    // BOOST_CHECK(shares_one == shares_one_out.back());
+    // BOOST_CHECK(shares_one == shares_one_out1.back());
+    //
+    // //===========================================================================
+    // // weighted shares dealing
+    //
+    // // deal_shares(rng)
+    // typename shares_dealing_isomorphic_mode::result_type shares = nil::crypto3::deal_shares<scheme_type>(coeffs, n, weights);
+    // // deal_shares(first, last)
+    // typename shares_dealing_isomorphic_mode::result_type shares1 =
+    //     nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, weights);
+    // // deal_shares(rng, acc)
+    // shares_dealing_acc_type deal_shares_acc(n, nil::crypto3::accumulators::threshold_value = t, nil::crypto3::accumulators::weights = weights);
+    // nil::crypto3::deal_shares<scheme_type>(coeffs, deal_shares_acc);
+    // typename shares_dealing_isomorphic_mode::result_type shares2 =
+    //     boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc);
+    // // deal_shares(first, last, acc)
+    // shares_dealing_acc_type deal_shares_acc1(n, nil::crypto3::accumulators::threshold_value = t, nil::crypto3::accumulators::weights = weights);
+    // nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), deal_shares_acc1);
+    // typename shares_dealing_isomorphic_mode::result_type shares3 =
+    //     boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc1);
+    // // deal_shares(rng, out)
+    // std::vector<typename shares_dealing_isomorphic_mode::result_type> shares_out;
+    // nil::crypto3::deal_shares<scheme_type>(coeffs, n, weights, std::back_inserter(shares_out));
+    // // deal_shares(first, last, out)
+    // std::vector<typename shares_dealing_isomorphic_mode::result_type> shares_out1;
+    // nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, weights, std::back_inserter(shares_out1));
+    //
+    // BOOST_CHECK(shares == shares1);
+    // BOOST_CHECK(shares == shares2);
+    // BOOST_CHECK(shares == shares3);
+    // BOOST_CHECK(shares == shares_out.back());
+    // BOOST_CHECK(shares == shares_out1.back());
+
+    // //===========================================================================
+    // // reconstructing secret
+    //
+    // // reconstruct(rng)
+    // typename scheme_type::private_element_type secret_one = nil::crypto3::reconstruct<scheme_type>(shares_one);
+    // // reconstruct(first, last)
+    // typename scheme_type::private_element_type secret_one1 =
+    //     nil::crypto3::reconstruct<scheme_type>(shares_one.begin(), shares_one.end());
+    // // reconstruct(rng, acc)
+    // secret_reconstructing_acc_type reconstruct_secret_one_acc;
+    // typename scheme_type::private_element_type secret_one_acc =
+    //     boost::accumulators::extract_result<secret_reconstructing_acc>(
+    //         nil::crypto3::reconstruct<scheme_type>(shares_one, reconstruct_secret_one_acc));
+    // // reconstruct(first, last, acc)
+    // secret_reconstructing_acc_type reconstruct_secret_one_acc1;
+    // typename scheme_type::private_element_type secret_one_acc1 =
+    //     boost::accumulators::extract_result<secret_reconstructing_acc>(
+    //         nil::crypto3::reconstruct<scheme_type>(shares_one.begin(), shares_one.end(), reconstruct_secret_one_acc1));
+    // // reconstruct(rng, out)
+    // std::vector<typename scheme_type::private_element_type> secret_one_out;
+    // nil::crypto3::reconstruct<scheme_type>(shares_one, std::back_inserter(secret_one_out));
+    // // reconstruct(first, last, out)
+    // std::vector<typename scheme_type::private_element_type> secret_one_out1;
+    // nil::crypto3::reconstruct<scheme_type>(shares_one.begin(), shares_one.end(), std::back_inserter(secret_one_out1));
+    // BOOST_CHECK(coeffs.front() == secret_one);
+    // BOOST_CHECK(secret_one == secret_one1);
+    // BOOST_CHECK(secret_one1 == secret_one_acc);
+    // BOOST_CHECK(secret_one_acc == secret_one_acc1);
+    // BOOST_CHECK(secret_one_acc1 == secret_one_out.back());
+    // BOOST_CHECK(secret_one_out.back() == secret_one_out1.back());
+    //
+    // // reconstruct(rng)
+    // typename scheme_type::private_element_type secret = nil::crypto3::reconstruct<scheme_type>(shares);
+    // // reconstruct(first, last)
+    // typename scheme_type::private_element_type secret1 =
+    //     nil::crypto3::reconstruct<scheme_type>(shares.begin(), shares.end());
+    // // reconstruct(rng, acc)
+    // secret_reconstructing_acc_type reconstruct_secret_acc;
+    // typename scheme_type::private_element_type secret_acc =
+    //     boost::accumulators::extract_result<secret_reconstructing_acc>(
+    //         nil::crypto3::reconstruct<scheme_type>(shares, reconstruct_secret_acc));
+    // // reconstruct(first, last, acc)
+    // secret_reconstructing_acc_type reconstruct_secret_acc1;
+    // typename scheme_type::private_element_type secret_acc1 =
+    //     boost::accumulators::extract_result<secret_reconstructing_acc>(
+    //         nil::crypto3::reconstruct<scheme_type>(shares.begin(), shares.end(), reconstruct_secret_acc1));
+    // // reconstruct(rng, out)
+    // std::vector<typename scheme_type::private_element_type> secret_out;
+    // nil::crypto3::reconstruct<scheme_type>(shares, std::back_inserter(secret_out));
+    // // reconstruct(first, last, out)
+    // std::vector<typename scheme_type::private_element_type> secret_out1;
+    // nil::crypto3::reconstruct<scheme_type>(shares.begin(), shares.end(), std::back_inserter(secret_out1));
+    // BOOST_CHECK(coeffs.front() == secret);
+    // BOOST_CHECK(secret == secret1);
+    // BOOST_CHECK(secret1 == secret_acc);
+    // BOOST_CHECK(secret_acc == secret_acc1);
+    // BOOST_CHECK(secret_acc1 == secret_out.back());
+    // BOOST_CHECK(secret_out.back() == secret_out1.back());
+    //
+    // //===========================================================================
+    // // check impossibility of secret recovering with group weight less than threshold value
+    //
+    // typename scheme_type::private_element_type wrong_secret =
+    //     nil::crypto3::reconstruct<scheme_type>(shares.begin(), [t, &shares]() {
+    //         auto it = shares.begin();
+    //         auto weight = 0;
+    //         while (true) {
+    //             weight += it->second.size();
+    //             if (weight >= t) {
+    //                 break;
+    //             }
+    //             it++;
+    //         }
+    //         return it;
+    //     }());
+    // BOOST_CHECK(coeffs.front() != wrong_secret);
+}
 
 BOOST_AUTO_TEST_CASE(pedersen_dkg) {
     using curve_type = curves::bls12_381;

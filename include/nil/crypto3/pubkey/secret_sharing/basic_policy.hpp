@@ -41,7 +41,7 @@ namespace nil {
         namespace pubkey {
             template<typename Group>
             struct sss_basic_policy {
-            protected:
+            // protected:
                 //===========================================================================
                 // internal secret sharing scheme types
 
@@ -50,15 +50,15 @@ namespace nil {
                 using indexed_private_element_type = std::pair<std::size_t, private_element_type>;
                 using indexed_public_element_type = std::pair<std::size_t, public_element_type>;
 
-            public:
+            // public:
                 //===========================================================================
                 // public secret sharing scheme types
 
-                using secret_type = private_element_type;
+                // using secret_type = private_element_type;
                 using coeff_type = private_element_type;
                 using public_coeff_type = public_element_type;
-                using share_type = indexed_private_element_type;
-                using public_share_type = indexed_public_element_type;
+                // using share_type = indexed_private_element_type;
+                // using public_share_type = indexed_public_element_type;
                 using indexes_type = std::set<std::size_t>;
 
                 //===========================================================================
@@ -97,6 +97,10 @@ namespace nil {
                 static inline public_element_type get_public_element(const public_element_type &e) {
                     return e;
                 }
+                //
+                // static inline public_share_type get_public_share(const share_type &s) {
+                //     return public_share_type(s.first, get_public_element(s.second));
+                // }
             };
         }    // namespace pubkey
     }        // namespace crypto3

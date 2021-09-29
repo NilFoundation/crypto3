@@ -39,10 +39,12 @@
 
 #include <nil/crypto3/pubkey/accumulators/parameters/threshold_value.hpp>
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
+#include <nil/crypto3/pubkey/accumulators/parameters/weights.hpp>
 
 #include <nil/crypto3/pubkey/secret_sharing/shamir.hpp>
 #include <nil/crypto3/pubkey/secret_sharing/feldman.hpp>
-// #include <nil/crypto3/pubkey/secret_sharing/pedersen.hpp>
+#include <nil/crypto3/pubkey/secret_sharing/pedersen.hpp>
+#include <nil/crypto3/pubkey/secret_sharing/weighted_shamir.hpp>
 
 #include <nil/crypto3/pubkey/modes/isomorphic.hpp>
 
@@ -74,9 +76,13 @@ namespace nil {
                         deal_shares_impl(const Args &args) :
                             seen_coeffs(0), n(args[boost::accumulators::sample]),
                             t(args[nil::crypto3::accumulators::threshold_value]) {
-                            // assert(scheme_type::check_threshold_value(t, n));
-
-                            processing_mode_type::init_accumulator(acc, n, t);
+                            if constexpr (std::is_same<weighted_shamir_sss<typename scheme_type::group_type>,
+                                                       scheme_type>::value) {
+                                processing_mode_type::init_accumulator(
+                                    acc, n, t, args[nil::crypto3::accumulators::weights]);
+                            } else {
+                                processing_mode_type::init_accumulator(acc, n, t);
+                            }
                         }
 
                         inline result_type result(boost::accumulators::dont_care) const {

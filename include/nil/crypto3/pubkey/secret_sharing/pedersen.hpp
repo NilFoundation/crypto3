@@ -37,45 +37,10 @@ namespace nil {
             // https://dl.acm.org/citation.cfm?id=1754929
             //
             template<typename Group>
-            struct pedersen_dkg : feldman_sss<Group> {
+            struct pedersen_dkg : public feldman_sss<Group> {
                 typedef feldman_sss<Group> base_type;
-                typedef typename base_type::share_type share_type;
+                // typedef typename base_type::share_type share_type;
 
-                // typedef typename base_type::private_element_type private_element_type;
-                // typedef typename base_type::public_element_type public_element_type;
-                //
-                // template<typename Shares,
-                //          typename base_type::template check_indexed_private_element_type<
-                //              typename std::iterator_traits<typename Shares::iterator>::value_type> = true>
-                // static inline share_type deal_share(const Shares &shares) {
-                //     BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
-                //     return deal_share(shares.begin(), shares.end());
-                // }
-                //
-                // template<typename SharesIterator,
-                //          typename base_type::template check_indexed_private_element_type<
-                //              typename std::iterator_traits<SharesIterator>::value_type> = true>
-                // static inline share_type deal_share(SharesIterator first, SharesIterator last) {
-                //     BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<SharesIterator>));
-                //     auto n = std::distance(first, last);
-                //     assert(base_type::check_minimal_size(n));
-                //     auto index = first->first;
-                //     assert(base_type::check_participant_index(index, n));
-                //
-                //     private_element_type share = private_element_type::zero();
-                //     for (auto it = first; it != last; it++) {
-                //         assert(index == it->first);
-                //         share = share + it->second;
-                //     }
-                //     return share_type(index, share);
-                // }
-
-                static inline share_type partial_eval_share(const share_type &renewing_share,
-                                                            const share_type &init_share_value) {
-                    assert(renewing_share.first == init_share_value.first);
-
-                    return share_type(init_share_value.first, init_share_value.second + renewing_share.second);
-                }
             };
 
             template<typename Group>
@@ -116,6 +81,13 @@ namespace nil {
                 inline share_type get_data() const {
                     return this->share;
                 }
+
+                static inline share_type partial_eval_share(const share_type &renewing_share,
+                                                            const share_type &init_share_value) {
+                    assert(renewing_share.first == init_share_value.first);
+
+                    return share_type(init_share_value.first, init_share_value.second + renewing_share.second);
+                }
             };
 
             template<typename Group>
@@ -124,15 +96,13 @@ namespace nil {
                 typedef pedersen_dkg<Group> scheme_type;
 
                 template<typename Shares>
-                secret_sss(const Shares &shares, const typename base_type::indexes_type &indexes,
-                           std::size_t id_i = 0) :
-                    secret_sss(std::cbegin(shares), std::cend(shares), indexes, id_i) {
+                secret_sss(const Shares &shares, const typename base_type::indexes_type &indexes) :
+                    secret_sss(std::cbegin(shares), std::cend(shares), indexes) {
                 }
 
                 template<typename ShareIt>
-                secret_sss(ShareIt first, ShareIt last, const typename base_type::indexes_type &indexes,
-                           std::size_t id_i = 0) :
-                    base_type(first, last, indexes, id_i) {
+                secret_sss(ShareIt first, ShareIt last, const typename base_type::indexes_type &indexes) :
+                    base_type(first, last, indexes) {
                 }
             };
 
@@ -170,7 +140,7 @@ namespace nil {
                 }
 
                 static inline void update(internal_accumulator_type &acc, const share_type &renewing_share) {
-                    acc.second = scheme_type::partial_eval_share(renewing_share.get_data(), acc).second;
+                    acc.second = share_type::partial_eval_share(renewing_share.get_data(), acc).second;
                 }
 
                 static inline share_type process(const internal_accumulator_type &acc) {
