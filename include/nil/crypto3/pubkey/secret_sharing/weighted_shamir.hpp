@@ -37,11 +37,6 @@ namespace nil {
                 typedef sss_weighted_basic_policy<Group> basic_policy;
                 typedef shamir_sss<Group> base_type;
 
-                typedef typename basic_policy::share_type share_type;
-                typedef typename basic_policy::public_share_type public_share_type;
-                typedef typename basic_policy::coeff_type coeff_type;
-                typedef typename basic_policy::public_coeff_type public_coeff_type;
-
                 //===========================================================================
                 // shares dealing functions
 
@@ -82,16 +77,6 @@ namespace nil {
                 //     }
                 //     return shares;
                 // }
-
-                static inline void partial_eval_share(const coeff_type &coeff, std::size_t exp,
-                                                      share_type &share_value) {
-                    assert(basic_policy::check_participant_index(share_value.first));
-                    assert(basic_policy::check_exp(exp));
-
-                    for (auto &j_share : share_value.second) {
-                        j_share.second = base_type::partial_eval_share(coeff, exp, j_share).second;
-                    }
-                }
 
                 // // TODO: REFACTOR RECONSTRUCTION FUNCTIONAL
                 // using base_type::reconstruct_secret;
@@ -250,11 +235,19 @@ namespace nil {
             template<typename Group>
             struct public_share_sss<weighted_shamir_sss<Group>> {
                 typedef weighted_shamir_sss<Group> scheme_type;
-                typedef typename scheme_type::public_share_type public_share_type;
+                typedef typename scheme_type::indexed_weighted_public_element public_share_type;
 
                 public_share_sss() = default;
 
-                public_share_sss(const public_share_type &in_public_share) : public_share(in_public_share) {
+                template<typename PublicShares>
+                public_share_sss(const std::size_t i, const PublicShares &i_public_shares) :
+                    public_share_sss(i, std::cbegin(i_public_shares), std::cend(i_public_shares)) {
+                }
+
+                template<typename PublicShareIt>
+                public_share_sss(const std::size_t i, PublicShareIt first, PublicShareIt last) {
+                    public_share.first = i;
+                    std::copy(first, last, std::inserter(public_share.second, std::end(public_share.second)));
                 }
 
                 inline typename public_share_type::first_type get_index() const {
@@ -273,10 +266,21 @@ namespace nil {
             struct share_sss<weighted_shamir_sss<Group>> : public public_share_sss<weighted_shamir_sss<Group>> {
                 typedef public_share_sss<weighted_shamir_sss<Group>> base_type;
                 typedef weighted_shamir_sss<Group> scheme_type;
-                typedef typename scheme_type::share_type share_type;
+                typedef typename scheme_type::indexed_weighted_private_element share_type;
 
-                share_sss(const share_type &in_share) :
-                    base_type(scheme_type::get_weighted_public_share(in_share)), share(in_share) {
+                share_sss(const share_type &share) : share_sss(share.first, share.second) {
+                }
+
+                template<typename Shares>
+                share_sss(const std::size_t i, const Shares &i_shares) :
+                    share_sss(i, std::cbegin(i_shares), std::cend(i_shares)) {
+                }
+
+                template<typename ShareIt>
+                share_sss(const std::size_t i, ShareIt first, ShareIt last) :
+                    base_type(i, get_public_shares(first, last)) {
+                    share.first = i;
+                    std::copy(first, last, std::inserter(share.second, std::end(share.second)));
                 }
 
                 inline typename share_type::first_type get_index() const {
@@ -295,32 +299,93 @@ namespace nil {
                     return this->share == other.share;
                 }
 
+                static inline void partial_eval_share(const typename scheme_type::coeff_type &coeff, std::size_t exp,
+                                                      share_type &share_value) {
+                    assert(scheme_type::check_participant_index(share_value.first));
+                    assert(scheme_type::check_exp(exp));
+
+                    for (auto &j_share : share_value.second) {
+                        j_share.second = share_sss<shamir_sss<Group>>::partial_eval_share(coeff, exp, j_share).second;
+                    }
+                }
+
             protected:
+                template<typename ShareIt>
+                static inline typename base_type::public_share_type::second_type get_public_shares(ShareIt first,
+                                                                                                   ShareIt last) {
+                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<ShareIt>));
+
+                    typename base_type::public_share_type::second_type public_shares;
+                    for (auto iter = first; iter != last; ++iter) {
+                        assert(public_shares.emplace(scheme_type::get_indexed_public_element(*iter)).second);
+                    }
+                    return public_shares;
+                }
+
                 share_type share;
             };
 
             template<typename Group>
-            struct secret_sss<weighted_shamir_sss<Group>> : public secret_sss<shamir_sss<Group>> {
-                typedef secret_sss<shamir_sss<Group>> base_type;
+            struct secret_sss<weighted_shamir_sss<Group>> {
                 typedef weighted_shamir_sss<Group> scheme_type;
+                typedef typename scheme_type::private_element_type secret_type;
 
                 template<typename Shares>
-                secret_sss(const Shares &shares, const typename base_type::indexes_type &indexes) :
-                    secret_sss(std::cbegin(shares), std::cend(shares), indexes) {
+                secret_sss(const Shares &shares) : secret_sss(std::cbegin(shares), std::cend(shares)) {
                 }
 
-                template<typename ShareIt,
-                         typename std::enable_if<
-                             std::is_same<typename std::remove_cv<typename std::remove_reference<
-                                                     typename std::iterator_traits<ShareIt>::value_type>::type>::type,
-                                                 share_sss<scheme_type>>::value,
-                             bool>::type = true>
-                secret_sss(ShareIt first, ShareIt last, const typename base_type::indexes_type &indexes) :
-                    base_type(first, last, indexes) {
+                template<typename ShareIt>
+                secret_sss(ShareIt first, ShareIt last) : secret(reconstruct_secret(first, last)) {
+                }
+
+                //
+                // reconstruct participant secret
+                //
+                // template<typename Weights>
+                // secret_sss(const share_sss<scheme_type> &share, const Weights &weights) :
+                // secret(reconstruct_participant_secret(share, weights)) {
+                // }
+
+                inline secret_type get_value() const {
+                    return secret;
+                }
+
+                bool operator==(const secret_sss &other) const {
+                    return this->secret == other.secret;
                 }
 
             protected:
-                // static inline
+                template<typename ShareIt,
+                         typename std::enable_if<
+                             std::is_same<typename std::remove_cv<typename std::remove_reference<
+                                              typename std::iterator_traits<ShareIt>::value_type>::type>::type,
+                                          share_sss<scheme_type>>::value,
+                             bool>::type = true>
+                static inline secret_type reconstruct_secret(ShareIt first, ShareIt last) {
+                    std::unordered_map<std::size_t, typename scheme_type::private_element_type> _shares;
+                    for (auto it = first; it != last; it++) {
+                        for (const auto &participant_share_j : it->get_value()) {
+                            assert(_shares.emplace(participant_share_j).second);
+                        }
+                    }
+                    return reconstruct_secret(std::cbegin(_shares), std::cend(_shares),
+                                              scheme_type::get_indexes(_shares));
+                }
+
+                template<typename ShareIt>
+                static inline secret_type reconstruct_secret(ShareIt first, ShareIt last,
+                                                             const typename scheme_type::indexes_type &indexes) {
+                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<ShareIt>));
+
+                    secret_type secret = secret_type::zero();
+                    for (auto it = first; it != last; it++) {
+                        secret = secret + it->second * scheme_type::eval_basis_poly(indexes, it->first);
+                    }
+
+                    return secret;
+                }
+
+                secret_type secret;
             };
 
             template<typename Group>
@@ -354,7 +419,7 @@ namespace nil {
                 static inline void update(internal_accumulator_type &acc, std::size_t exp,
                                           const typename scheme_type::coeff_type &coeff) {
                     for (auto shares_iter = std::begin(acc); shares_iter != std::end(acc); ++shares_iter) {
-                        scheme_type::partial_eval_share(coeff, exp, *shares_iter);
+                        share_type::partial_eval_share(coeff, exp, *shares_iter);
                     }
                 }
 
@@ -367,26 +432,25 @@ namespace nil {
                 }
             };
 
-            // template<typename Group>
-            // struct reconstruct_secret_op<weighted_shamir_sss<Group>> {
-            //     typedef weighted_shamir_sss<Group> scheme_type;
-            //     typedef share_sss<scheme_type> share_type;
-            //     typedef secret_sss<scheme_type> secret_type;
-            //     typedef std::pair<typename scheme_type::indexes_type, std::vector<share_type>>
-            //         internal_accumulator_type;
-            //
-            // public:
-            //     static inline void init_accumulator() {
-            //     }
-            //
-            //     static inline void update(internal_accumulator_type &acc, const share_type &share) {
-            //         base_type::_update(acc, share);
-            //     }
-            //
-            //     static inline secret_type process(internal_accumulator_type &acc) {
-            //         return base_type::template _process<secret_type>(acc);
-            //     }
-            // };
+            template<typename Group>
+            struct reconstruct_secret_op<weighted_shamir_sss<Group>> {
+                typedef weighted_shamir_sss<Group> scheme_type;
+                typedef share_sss<scheme_type> share_type;
+                typedef secret_sss<scheme_type> secret_type;
+                typedef std::vector<share_type> internal_accumulator_type;
+
+            public:
+                static inline void init_accumulator() {
+                }
+
+                static inline void update(internal_accumulator_type &acc, const share_type &share) {
+                    acc.push_back(share);
+                }
+
+                static inline secret_type process(internal_accumulator_type &acc) {
+                    return acc;
+                }
+            };
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil

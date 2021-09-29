@@ -43,77 +43,39 @@ namespace nil {
                 // public weighted secret sharing scheme types
 
                 using weights_type = std::vector<std::size_t>;
-                // using share_type =
-                //     std::pair<std::size_t, std::unordered_map<std::size_t, typename base_type::private_element_type>>;
-                // using public_share_type =
-                //     std::pair<std::size_t, std::unordered_map<std::size_t, typename base_type::public_element_type>>;
+                using indexed_weighted_private_element =
+                    std::pair<std::size_t, std::unordered_map<std::size_t, typename base_type::private_element_type>>;
+                using indexed_weighted_public_element =
+                    std::pair<std::size_t, std::unordered_map<std::size_t, typename base_type::public_element_type>>;
 
-                //===========================================================================
-                // public constraints checking meta-functions
-
-                // //
-                // // check elements
-                // //
-                // template<typename Weight>
-                // using check_weight_t =
-                //     typename std::enable_if<std::is_unsigned<typename Weight::first_type>::value &&
-                //                                 std::is_unsigned<typename Weight::second_type>::value,
-                //                             bool>::type;
-                //
-                // template<typename Share,
-                //          typename base_type::template check_index_t<typename Share::first_type> = true,
-                //          typename ResultT =
-                //              typename base_type::template check_share_t<typename Share::second_type::value_type>>
-                // using check_share_t = ResultT;
-                //
-                // template<typename PublicShare,
-                //          typename base_type::template check_index_t<typename PublicShare::first_type> = true,
-                //          typename ResultT = typename base_type::template check_public_share_t<
-                //              typename PublicShare::second_type::value_type>>
-                // using check_public_share_t = ResultT;
-                //
-                // //
-                // // check iterators
-                // //
-                // template<typename WeightIt,
-                //          typename ResultT = check_weight_t<typename std::iterator_traits<WeightIt>::value_type>>
-                // using check_weight_iterator_t = ResultT;
-                //
-                // template<typename ShareIt,
-                //          typename ResultT = check_share_t<typename std::iterator_traits<ShareIt>::value_type>>
-                // using check_share_iterator_t = ResultT;
-                //
-                // template<typename PublicShareIt,
-                //          typename ResultT =
-                //              check_public_share_t<typename std::iterator_traits<PublicShareIt>::value_type>>
-                // using check_public_share_iterator_t = ResultT;
-                //
-                // //
-                // // check ranges
-                // //
-                // template<typename Weights, typename ResultT = check_weight_iterator_t<typename Weights::iterator>>
-                // using check_weights_t = ResultT;
-                //
-                // template<typename Shares, typename ResultT = check_share_t<typename Shares::iterator>>
-                // using check_shares_t = ResultT;
-                //
-                // template<typename PublicShares,
-                //          typename ResultT = check_public_share_t<typename PublicShares::iterator>>
-                // using check_public_shares_t = ResultT;
-                
                 static inline bool check_weight(const std::size_t &w) {
                     return 0 < w;
                 }
-                //
-                // static inline public_share_type get_weighted_public_share(const share_type &s) {
-                //     assert(base_type::check_participant_index(s.first));
-                //     public_share_type public_share;
-                //     public_share.first = s.first;
-                //     for (const auto &part_s : s.second) {
-                //         assert(public_share.second.emplace(base_type::get_public_share(part_s)).second);
-                //     }
-                //     return public_share;
-                // }
+
+                template<typename Weights>
+                typename base_type::indexes_type get_weighted_indexes(std::size_t t, const Weights &weights) {
+                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Weights>));
+
+                    return get_weighted_indexes(t, std::cbegin(weights), std::end(weights));
+                }
+
+                template<typename WeightIt>
+                static inline typename std::enable_if<
+                    std::is_unsigned<typename std::iterator_traits<WeightIt>::value_type>::value,
+                    typename base_type::indexes_type>::type
+                    get_weighted_indexes(std::size_t t, WeightIt first, WeightIt last) {
+                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<WeightIt>));
+
+                    typename base_type::indexes_type indexes;
+                    std::size_t i = 1;
+                    for (auto iter = first; iter != last; ++iter) {
+                        for (std::size_t j = 1; j <= *iter; ++j) {
+                            assert(indexes.emplace(i * t + j).second);
+                        }
+                        ++i;
+                    }
+                    return indexes;
+                }
             };
         }    // namespace pubkey
     }        // namespace crypto3

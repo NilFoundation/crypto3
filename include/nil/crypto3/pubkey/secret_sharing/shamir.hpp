@@ -206,9 +206,16 @@ namespace nil {
                 typedef typename scheme_type::indexes_type indexes_type;
 
                 template<typename Shares>
+                secret_sss(const Shares &shares) : secret_sss(std::cbegin(shares), std::cend(shares)) {
+                }
+
+                template<typename ShareIt>
+                secret_sss(ShareIt first, ShareIt last) : secret(reconstruct_secret(first, last)) {
+                }
+
+                template<typename Shares>
                 secret_sss(const Shares &shares, const indexes_type &indexes) :
                     secret_sss(std::cbegin(shares), std::cend(shares), indexes) {
-                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
                 }
 
                 template<typename ShareIt>
@@ -225,6 +232,11 @@ namespace nil {
                 }
 
             protected:
+                template<typename ShareIt>
+                static inline secret_type reconstruct_secret(ShareIt first, ShareIt last) {
+                    return reconstruct_secret(first, last, scheme_type::get_indexes(first, last));
+                }
+
                 template<typename ShareIt,
                          typename std::enable_if<
                              std::is_convertible<typename std::remove_cv<typename std::remove_reference<
