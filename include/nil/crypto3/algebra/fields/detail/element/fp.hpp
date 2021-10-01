@@ -61,13 +61,14 @@ namespace nil {
 
                         constexpr element_fp() : data(data_type(0, modulus)) {};
 
-                        constexpr element_fp(data_type data) : data(data) {};
-
-                        constexpr element_fp(integral_type data) : data(data, modulus) {};
+                        constexpr element_fp(const data_type &data) : data(data) {};
 
                         template<typename Number,
-                                 typename std::enable_if<boost::is_integral<Number>::value, bool>::type = true>
-                        constexpr element_fp(Number data) : data(data, modulus) {};
+                                 typename std::enable_if<(multiprecision::is_number<Number>::value &&
+                                                          !multiprecision::is_modular_number<Number>::value) ||
+                                                             std::is_integral<Number>::value,
+                                                         bool>::type = true>
+                        constexpr element_fp(const Number &data) : data(data, modulus) {};
 
                         constexpr element_fp(const element_fp &B) {
                             data = B.data;
