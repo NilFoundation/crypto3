@@ -18,6 +18,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${CMAKE_WORKSPACE_NAME}::mac
                        ${CMAKE_WORKSPACE_NAME}::stream
                        ${CMAKE_WORKSPACE_NAME}::multiprecision
+                       marshalling::crypto3_algebra
 
                        ${Boost_LIBRARIES})
 
@@ -34,5 +35,8 @@ set_target_properties(${CURRENT_PROJECT_NAME}_hash_test PROPERTIES CXX_STANDARD 
 
 cm_test(NAME ${CURRENT_PROJECT_NAME}_algebraic_engine_test SOURCES ${CURRENT_TEST_SOURCES_DIR}/algebraic_engine.cpp)
 set_target_properties(${CURRENT_PROJECT_NAME}_algebraic_engine_test PROPERTIES CXX_STANDARD 17)
+
+cm_test(NAME ${CURRENT_PROJECT_NAME}_rfc6979_engine_test SOURCES ${CURRENT_TEST_SOURCES_DIR}/rfc6979.cpp)
+set_target_properties(${CURRENT_PROJECT_NAME}_rfc6979_engine_test PROPERTIES CXX_STANDARD 17)
 
 include_directories(${CMAKE_WORKSPACE_SOURCES_DIR})

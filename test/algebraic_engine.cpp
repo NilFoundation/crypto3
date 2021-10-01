@@ -231,7 +231,7 @@ void test_RandomNumberEngine() {
     }
 }
 
-BOOST_AUTO_TEST_SUITE(algebraic_random_device_tests)
+BOOST_AUTO_TEST_SUITE(algebraic_random_device_interface_tests)
 
 BOOST_AUTO_TEST_CASE(mnt4_test) {
     using curve_type = algebra::curves::mnt4<298>;
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE(bls12_381_test) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(algebraic_engine_tests)
+BOOST_AUTO_TEST_SUITE(algebraic_engine_interface_tests)
 
 BOOST_AUTO_TEST_CASE(mnt4_test) {
     using curve_type = algebra::curves::mnt4<298>;

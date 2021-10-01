@@ -39,6 +39,7 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       crypto3::hash
                       crypto3::mac
                       crypto3::stream
+                      marshalling::crypto3_algebra
 
                       ${Boost_LIBRARIES})
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
