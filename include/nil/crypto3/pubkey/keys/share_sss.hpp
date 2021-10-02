@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -23,16 +23,18 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_NO_KEY_HPP
-#define CRYPTO3_PUBKEY_NO_KEY_HPP
+#ifndef CRYPTO3_PUBKEY_SSS_SHARE_HPP
+#define CRYPTO3_PUBKEY_SSS_SHARE_HPP
+
+#include <nil/crypto3/pubkey/keys/public_share_sss.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Scheme, typename = void>
-            struct no_key_ops;
+            struct share_sss;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_NO_KEY_HPP
+#endif    // CRYPTO3_PUBKEY_SSS_SHARE_HPP

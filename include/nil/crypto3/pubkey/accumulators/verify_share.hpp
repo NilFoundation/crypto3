@@ -23,105 +23,113 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_VERIFY_HPP
-#define CRYPTO3_ACCUMULATORS_PUBKEY_VERIFY_HPP
+#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_SSS_VERIFY_SHARE_HPP
+#define CRYPTO3_ACCUMULATORS_PUBKEY_SSS_VERIFY_SHARE_HPP
 
+#include <set>
+#include <utility>
+#include <algorithm>
 #include <iterator>
-#include <type_traits>
 
-#include <boost/parameter/value_type.hpp>
+#include <boost/concept_check.hpp>
 
 #include <boost/accumulators/framework/accumulator_base.hpp>
-#include <boost/accumulators/framework/extractor.hpp>
-#include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
+#include <nil/crypto3/pubkey/accumulators/parameters/threshold_value.hpp>
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
-#include <nil/crypto3/pubkey/accumulators/parameters/signature.hpp>
 
-#include <nil/crypto3/pubkey/modes/isomorphic.hpp>
+#include <nil/crypto3/pubkey/secret_sharing/feldman.hpp>
+// #include <nil/crypto3/pubkey/secret_sharing/pedersen.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             namespace accumulators {
                 namespace impl {
-                    // TODO: consider different possible modes (aggregation)
                     template<typename ProcessingMode, typename = void>
-                    struct verify_impl;
+                    struct verify_share_impl;
 
                     template<typename ProcessingMode>
-                    struct verify_impl<ProcessingMode> : boost::accumulators::accumulator_base {
+                    struct verify_share_impl<ProcessingMode> : boost::accumulators::accumulator_base {
                     protected:
                         typedef ProcessingMode processing_mode_type;
+                        typedef typename processing_mode_type::scheme_type scheme_type;
+                        typedef typename processing_mode_type::op_type op_type;
                         typedef typename processing_mode_type::internal_accumulator_type internal_accumulator_type;
-                        typedef typename processing_mode_type::key_type key_type;
-                        typedef typename key_type::signature_type signature_type;
 
                     public:
                         typedef typename processing_mode_type::result_type result_type;
 
+                        //
+                        // boost::accumulators::sample -- verified public (or private) share
+                        //
                         template<typename Args>
-                        verify_impl(const Args &args) :
-                            key(args[boost::accumulators::sample]),
-                            signature(args[::nil::crypto3::accumulators::signature]) {
-                            processing_mode_type::init_accumulator(key, acc);
+                        verify_share_impl(const Args &args) :
+                            verified_public_share(args[boost::accumulators::sample]), seen_coeffs(0) {
+                            // TODO: replace with rvalue
+                            auto i = verified_public_share.get_index();
+                            processing_mode_type::init_accumulator(acc, i);
                         }
 
+                        //
+                        // boost::accumulators::sample -- public polynomial coefficients
+                        // input coefficients should be supplied in increasing term degrees order
+                        //
                         template<typename Args>
                         inline void operator()(const Args &args) {
-                            resolve_type(args[boost::accumulators::sample | nullptr],
+                            resolve_type(args[boost::accumulators::sample],
                                          args[::nil::crypto3::accumulators::iterator_last | nullptr]);
                         }
 
                         inline result_type result(boost::accumulators::dont_care) const {
-                            return processing_mode_type::process(key, acc, signature);
+                            return processing_mode_type::process(acc, verified_public_share);
                         }
 
                     protected:
-                        //
-                        // pop verify
-                        //
-                        inline void resolve_type(std::nullptr_t, std::nullptr_t) {
+                        inline void resolve_type(const typename scheme_type::public_coeff_type &public_coeff,
+                                                 std::nullptr_t = nullptr) {
+                            processing_mode_type::update(acc, seen_coeffs, public_coeff);
+                            seen_coeffs++;
                         }
 
                         template<typename InputRange>
                         inline void resolve_type(const InputRange &range, std::nullptr_t) {
-                            processing_mode_type::update(key, acc, range);
+                            for (const auto &pc : range) {
+                                resolve_type(pc);
+                            }
                         }
 
                         template<typename InputIterator>
                         inline void resolve_type(InputIterator first, InputIterator last) {
-                            processing_mode_type::update(key, acc, first, last);
+                            for (auto it = first; it != last; it++) {
+                                resolve_type(*it);
+                            }
                         }
 
-                        inline void resolve_type(const signature_type &new_signature, std::nullptr_t) {
-                            signature = new_signature;
-                        }
-
-                        key_type key;
-                        signature_type signature;
+                        std::size_t seen_coeffs;
+                        public_share_sss<scheme_type> verified_public_share;
                         mutable internal_accumulator_type acc;
                     };
                 }    // namespace impl
 
                 namespace tag {
                     template<typename ProcessingMode>
-                    struct verify : boost::accumulators::depends_on<> {
-                        typedef ProcessingMode processing_mode_type;
+                    struct verify_share : boost::accumulators::depends_on<> {
+                        typedef ProcessingMode mode_type;
 
                         /// INTERNAL ONLY
                         ///
 
-                        typedef boost::mpl::always<accumulators::impl::verify_impl<processing_mode_type>> impl;
+                        typedef boost::mpl::always<accumulators::impl::verify_share_impl<mode_type>> impl;
                     };
                 }    // namespace tag
 
                 namespace extract {
                     template<typename ProcessingMode, typename AccumulatorSet>
-                    typename boost::mpl::apply<AccumulatorSet, tag::verify<ProcessingMode>>::type::result_type
-                        verify(const AccumulatorSet &acc) {
-                        return boost::accumulators::extract_result<tag::verify<ProcessingMode>>(acc);
+                    typename boost::mpl::apply<AccumulatorSet, tag::verify_share<ProcessingMode>>::type::result_type
+                        verify_share(const AccumulatorSet &acc) {
+                        return boost::accumulators::extract_result<tag::verify_share<ProcessingMode>>(acc);
                     }
                 }    // namespace extract
             }        // namespace accumulators
@@ -129,4 +137,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_VERIFY_HPP
+#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_SSS_VERIFY_SHARE_HPP

@@ -3,6 +3,9 @@ include(CMTest)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_multiprecision)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_algebra)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_pkpad)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_random)
 
 if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
     cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
@@ -14,8 +17,10 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${CMAKE_WORKSPACE_NAME}::hash
                        ${CMAKE_WORKSPACE_NAME}::algebra
                        ${CMAKE_WORKSPACE_NAME}::multiprecision
+                       ${CMAKE_WORKSPACE_NAME}::pkpad
+                       ${CMAKE_WORKSPACE_NAME}::random
 
-                       ${Boost_LIBRARIES})
+        ${Boost_LIBRARIES})
 
 macro(define_pubkey_test name)
     cm_test(NAME pubkey_${name}_test SOURCES ${name}.cpp)
@@ -40,6 +45,7 @@ set(TESTS_NAMES
     "ecdsa"
     "bls"
     "secret_sharing"
+    "eddsa"
 )
 
 foreach(TEST_NAME ${TESTS_NAMES})

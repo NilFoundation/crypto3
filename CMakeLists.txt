@@ -25,6 +25,7 @@ cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_mac)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_modes)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_pkpad)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_random)
 
 option(BUILD_TESTS "Build unit tests" FALSE)
 option(BUILD_EXAMPLES "Build examples" FALSE)
@@ -386,6 +387,7 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::modes
                       ${CMAKE_WORKSPACE_NAME}::multiprecision
                       ${CMAKE_WORKSPACE_NAME}::pkpad
+                      ${CMAKE_WORKSPACE_NAME}::random
 
                       ${Boost_LIBRARIES})
 

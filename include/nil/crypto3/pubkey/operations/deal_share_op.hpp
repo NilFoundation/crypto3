@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -23,30 +23,16 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_PRIVATE_KEY_HPP
-#define CRYPTO3_PUBKEY_PRIVATE_KEY_HPP
-
-#include <nil/crypto3/pubkey/public_key.hpp>
+#ifndef CRYPTO3_PUBKEY_DEAL_SHARE_OP_HPP
+#define CRYPTO3_PUBKEY_DEAL_SHARE_OP_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-
-		/*!
-         * @brief 
-         * 
-         * @ingroup pubkey_algorithms
-         * 
-         * Private key - a key known only to its owner. Only the user keeping his private key 
-         * secret guarantees the impossibility of forging a document and digital signature on 
-         * behalf of the certifier by an attacker.
-         *
-         */
-
             template<typename Scheme, typename = void>
-            struct private_key;
+            struct deal_share_op;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_PRIVATE_KEY_HPP
+#endif    // CRYPTO3_PUBKEY_DEAL_SHARE_OP_HPP

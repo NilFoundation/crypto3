@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PARAMETERS_ITERATOR_LAST_HPP
-#define CRYPTO3_ACCUMULATORS_PARAMETERS_ITERATOR_LAST_HPP
+#ifndef CRYPTO3_ACCUMULATORS_PARAMETERS_WEIGHTS_HPP
+#define CRYPTO3_ACCUMULATORS_PARAMETERS_WEIGHTS_HPP
 
 #include <boost/parameter/keyword.hpp>
 
@@ -33,10 +33,10 @@
 namespace nil {
     namespace crypto3 {
         namespace accumulators {
-            BOOST_PARAMETER_KEYWORD(tag, iterator_last)
-            BOOST_ACCUMULATORS_IGNORE_GLOBAL(iterator_last)
+            BOOST_PARAMETER_KEYWORD(tag, weights)
+            BOOST_ACCUMULATORS_IGNORE_GLOBAL(weights)
         }    // namespace accumulators
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_ACCUMULATORS_PARAMETERS_ITERATOR_LAST_HPP
+#endif    // CRYPTO3_ACCUMULATORS_PARAMETERS_WEIGHTS_HPP

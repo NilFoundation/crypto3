@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -23,20 +23,30 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PARAMETERS_ITERATOR_LAST_HPP
-#define CRYPTO3_ACCUMULATORS_PARAMETERS_ITERATOR_LAST_HPP
+#ifndef CRYPTO3_PUBKEY_PRIVATE_KEY_HPP
+#define CRYPTO3_PUBKEY_PRIVATE_KEY_HPP
 
-#include <boost/parameter/keyword.hpp>
-
-#include <boost/accumulators/accumulators_fwd.hpp>
+#include <nil/crypto3/pubkey/keys/public_key.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace accumulators {
-            BOOST_PARAMETER_KEYWORD(tag, iterator_last)
-            BOOST_ACCUMULATORS_IGNORE_GLOBAL(iterator_last)
-        }    // namespace accumulators
+        namespace pubkey {
+
+		/*!
+         * @brief 
+         * 
+         * @ingroup pubkey_algorithms
+         * 
+         * Private key - a key known only to its owner. Only the user keeping his private key 
+         * secret guarantees the impossibility of forging a document and digital signature on 
+         * behalf of the certifier by an attacker.
+         *
+         */
+
+            template<typename Scheme, typename = void>
+            struct private_key;
+        }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_ACCUMULATORS_PARAMETERS_ITERATOR_LAST_HPP
+#endif    // CRYPTO3_PUBKEY_PRIVATE_KEY_HPP

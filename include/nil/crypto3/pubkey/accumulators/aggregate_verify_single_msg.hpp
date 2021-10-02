@@ -23,11 +23,16 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_VERIFY_HPP
-#define CRYPTO3_ACCUMULATORS_PUBKEY_VERIFY_HPP
+#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_AGGREGATE_VERIFY_SINGLE_MSG_HPP
+#define CRYPTO3_ACCUMULATORS_PUBKEY_AGGREGATE_VERIFY_SINGLE_MSG_HPP
 
-#include <iterator>
 #include <type_traits>
+#include <iterator>
+
+#include <boost/assert.hpp>
+#include <boost/concept_check.hpp>
+
+#include <boost/range/concepts.hpp>
 
 #include <boost/parameter/value_type.hpp>
 
@@ -36,70 +41,68 @@
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
+#include <nil/crypto3/pubkey/accumulators/parameters/key.hpp>
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
-#include <nil/crypto3/pubkey/accumulators/parameters/signature.hpp>
 
-#include <nil/crypto3/pubkey/modes/isomorphic.hpp>
+#include <nil/crypto3/pubkey/keys/public_key.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             namespace accumulators {
                 namespace impl {
-                    // TODO: consider different possible modes (aggregation)
-                    template<typename ProcessingMode, typename = void>
-                    struct verify_impl;
-
                     template<typename ProcessingMode>
-                    struct verify_impl<ProcessingMode> : boost::accumulators::accumulator_base {
+                    struct aggregate_verify_single_msg_impl : boost::accumulators::accumulator_base {
                     protected:
                         typedef ProcessingMode processing_mode_type;
+                        typedef typename processing_mode_type::scheme_type scheme_type;
+                        typedef typename processing_mode_type::op_type op_type;
                         typedef typename processing_mode_type::internal_accumulator_type internal_accumulator_type;
-                        typedef typename processing_mode_type::key_type key_type;
-                        typedef typename key_type::signature_type signature_type;
+                        typedef typename op_type::signature_type signature_type;
+                        typedef public_key<scheme_type> key_type;
 
                     public:
                         typedef typename processing_mode_type::result_type result_type;
 
                         template<typename Args>
-                        verify_impl(const Args &args) :
-                            key(args[boost::accumulators::sample]),
-                            signature(args[::nil::crypto3::accumulators::signature]) {
-                            processing_mode_type::init_accumulator(key, acc);
+                        aggregate_verify_single_msg_impl(const Args &args) :
+                            signature(args[boost::accumulators::sample | signature_type::zero()]) {
                         }
 
                         template<typename Args>
                         inline void operator()(const Args &args) {
-                            resolve_type(args[boost::accumulators::sample | nullptr],
+                            resolve_type(args[boost::accumulators::sample],
                                          args[::nil::crypto3::accumulators::iterator_last | nullptr]);
                         }
 
                         inline result_type result(boost::accumulators::dont_care) const {
-                            return processing_mode_type::process(key, acc, signature);
+                            return processing_mode_type::process(acc, signature);
                         }
 
                     protected:
                         //
-                        // pop verify
+                        // set verified signature
                         //
-                        inline void resolve_type(std::nullptr_t, std::nullptr_t) {
+                        inline void resolve_type(const signature_type &new_sig, std::nullptr_t) {
+                            signature = new_sig;
                         }
 
+                        //
+                        // append verified msg or add public key for aggregate verification of single msg
+                        //
                         template<typename InputRange>
                         inline void resolve_type(const InputRange &range, std::nullptr_t) {
-                            processing_mode_type::update(key, acc, range);
+                            processing_mode_type::update(acc, range);
                         }
 
+                        //
+                        // append verified msg or add public key for aggregate verification of single msg
+                        //
                         template<typename InputIterator>
                         inline void resolve_type(InputIterator first, InputIterator last) {
-                            processing_mode_type::update(key, acc, first, last);
+                            processing_mode_type::update(acc, first, last);
                         }
 
-                        inline void resolve_type(const signature_type &new_signature, std::nullptr_t) {
-                            signature = new_signature;
-                        }
-
-                        key_type key;
                         signature_type signature;
                         mutable internal_accumulator_type acc;
                     };
@@ -107,21 +110,22 @@ namespace nil {
 
                 namespace tag {
                     template<typename ProcessingMode>
-                    struct verify : boost::accumulators::depends_on<> {
+                    struct aggregate_verify_single_msg : boost::accumulators::depends_on<> {
                         typedef ProcessingMode processing_mode_type;
 
                         /// INTERNAL ONLY
                         ///
 
-                        typedef boost::mpl::always<accumulators::impl::verify_impl<processing_mode_type>> impl;
+                        typedef boost::mpl::always<accumulators::impl::aggregate_verify_single_msg_impl<processing_mode_type>>
+                            impl;
                     };
                 }    // namespace tag
 
                 namespace extract {
                     template<typename ProcessingMode, typename AccumulatorSet>
-                    typename boost::mpl::apply<AccumulatorSet, tag::verify<ProcessingMode>>::type::result_type
-                        verify(const AccumulatorSet &acc) {
-                        return boost::accumulators::extract_result<tag::verify<ProcessingMode>>(acc);
+                    typename boost::mpl::apply<AccumulatorSet, tag::aggregate_verify_single_msg<ProcessingMode>>::type::result_type
+                        aggregate_verify_single_msg(const AccumulatorSet &acc) {
+                        return boost::accumulators::extract_result<tag::aggregate_verify_single_msg<ProcessingMode>>(acc);
                     }
                 }    // namespace extract
             }        // namespace accumulators
@@ -129,4 +133,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_VERIFY_HPP
+#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_AGGREGATE_VERIFY_SINGLE_MSG_HPP

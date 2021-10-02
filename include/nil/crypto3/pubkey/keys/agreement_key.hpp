@@ -25,7 +25,7 @@
 #ifndef CRYPTO3_AGREEMENT_KEY_HPP
 #define CRYPTO3_AGREEMENT_KEY_HPP
 
-#include <nil/crypto3/pubkey/private_key.hpp>
+#include <nil/crypto3/pubkey/keys/private_key.hpp>
 
 namespace nil {
     namespace crypto3 {

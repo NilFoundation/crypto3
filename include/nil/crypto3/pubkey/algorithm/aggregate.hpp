@@ -26,283 +26,31 @@
 #ifndef CRYPTO3_PUBKEY_AGGREGATE_HPP
 #define CRYPTO3_PUBKEY_AGGREGATE_HPP
 
-#include <nil/crypto3/pubkey/algorithm/pubkey.hpp>
+#include <nil/crypto3/pubkey/pubkey_value.hpp>
+#include <nil/crypto3/pubkey/pubkey_state.hpp>
 
-#include <nil/crypto3/pubkey/scheme_value.hpp>
-#include <nil/crypto3/pubkey/scheme_state.hpp>
+#include <nil/crypto3/pubkey/operations/aggregate_op.hpp>
 
-#include <nil/crypto3/pubkey/no_key_ops.hpp>
+#include <nil/crypto3/pubkey/modes/isomorphic.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-
-
-        /*!
-         * @brief 
-         * 
-         * @ingroup pubkey_algorithms
-         * 
-         * Given a list of signatures for a list of messages and public keys, an aggregation algorithm 
-         * generates one signature that authenticates the same list of messages and public keys.
-         *
-         *
-         *
-         */
-
-
-
+            /*!
+             * @brief
+             *
+             * @ingroup pubkey_algorithms
+             *
+             * Given a list of signatures for a list of messages and public keys, an aggregation algorithm
+             * generates one signature that authenticates the same list of messages and public keys.
+             *
+             *
+             *
+             */
             template<typename Scheme>
-            using aggregation_policy = typename pubkey::modes::isomorphic<Scheme, nop_padding>::aggregation_policy;
-        }
-        /*!
-         * @brief
-         *
-         * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam KeyIterator
-         * @tparam OutputIterator
-         *
-         * @param first
-         * @param last
-         * @param key_first
-         * @param key_last
-         * @param out
-         *
-         * @return
-         */
-        // template<typename Scheme, typename InputIterator, typename KeyInputIterator, typename OutputIterator>
-        // OutputIterator sign(InputIterator first, InputIterator last, KeyInputIterator key_first,
-        //                     KeyInputIterator key_last, OutputIterator out) {
-        //
-        //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::aggregation_policy<Scheme>>::type Mode;
-        //     typedef typename pubkey::aggregation_accumulator_set<Mode> SchemeAccumulator;
-        //
-        //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-        //     typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
-        //
-        //     return SignerImpl(first, last, std::move(out),
-        //                       SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key_first, key_last)))));
-        // }
+            using aggregation_policy = typename pubkey::modes::isomorphic<Scheme>::aggregation_policy;
+        }    // namespace pubkey
 
-        /*!
-         * @brief
-         *
-         * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam KeySinglePassRange
-         * @tparam OutputIterator
-         *
-         * @param first
-         * @param last
-         * @param key
-         * @param out
-         *
-         * @return
-         */
-        // template<typename Scheme, typename InputIterator, typename KeySinglePassRange, typename OutputIterator>
-        // OutputIterator sign(InputIterator first, InputIterator last, const KeySinglePassRange &key,
-        //                     OutputIterator out) {
-        //
-        //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::aggregation_policy<Scheme>>::type Mode;
-        //     typedef typename pubkey::aggregation_accumulator_set<Mode> SchemeAccumulator;
-        //
-        //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-        //     typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
-        //
-        //     return SignerImpl(first, last, std::move(out),
-        //                       SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key)))));
-        // }
-
-        /*!
-         * @brief
-         *
-         * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam KeyIterator
-         * @tparam SchemeAccumulator
-         *
-         * @param first
-         * @param last
-         * @param key_first
-         * @param key_last
-         *
-         * @return
-         */
-        // template<typename Scheme, typename InputIterator, typename KeyInputIterator,
-        //          typename SchemeAccumulator = typename pubkey::aggregation_accumulator_set<typename
-        //          pubkey::modes::isomorphic<
-        //              Scheme, pubkey::nop_padding>::template bind<pubkey::aggregation_policy<Scheme>>::type>>
-        // pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-        //     sign(InputIterator first, InputIterator last, KeyInputIterator key_first, KeyInputIterator key_last) {
-        //
-        //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::aggregation_policy<Scheme>>::type Mode;
-        //
-        //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-        //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
-        //
-        //     return SignerImpl(first, last,
-        //                       SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key_first, key_last)))));
-        // }
-
-        /*!
-         * @brief
-         *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam KeySinglePassRange
-         * @tparam SchemeAccumulator
-         *
-         * @param first
-         * @param last
-         * @param key
-         *
-         * @return
-         */
-        // template<typename Scheme, typename InputIterator, typename KeySinglePassRange,
-        //          typename SchemeAccumulator = typename pubkey::aggregation_accumulator_set<typename
-        //          pubkey::modes::isomorphic<
-        //              Scheme, pubkey::nop_padding>::template bind<pubkey::aggregation_policy<Scheme>>::type>>
-        // pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-        //     sign(InputIterator first, InputIterator last, const KeySinglePassRange &key) {
-        //
-        //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::aggregation_policy<Scheme>>::type Mode;
-        //
-        //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-        //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
-        //
-        //     return SignerImpl(first, last, SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key)))));
-        // }
-
-        /*!
-         * @brief
-         *
-         * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam KeyRange
-         * @tparam OutputIterator
-         *
-         * @param rng
-         * @param key
-         * @param out
-         *
-         * @return
-         */
-        // template<typename Scheme, typename SinglePassRange, typename KeySinglePassRange, typename OutputIterator>
-        // OutputIterator sign(const SinglePassRange &rng, const KeySinglePassRange &key, OutputIterator out) {
-        //
-        //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::aggregation_policy<Scheme>>::type Mode;
-        //     typedef typename pubkey::aggregation_accumulator_set<Mode> SchemeAccumulator;
-        //
-        //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-        //     typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
-        //
-        //     return SignerImpl(rng, std::move(out),
-        //     SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key)))));
-        // }
-
-        /*!
-         * @brief
-         *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam KeySinglePassRange
-         * @tparam OutputRange
-         *
-         * @param rng
-         * @param key
-         * @param out
-         *
-         * @return
-         */
-        // template<typename Scheme, typename SinglePassRange, typename KeySinglePassRange, typename OutputRange>
-        // OutputRange &sign(const SinglePassRange &rng, const KeySinglePassRange &key, OutputRange &out) {
-        //
-        //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::aggregation_policy<Scheme>>::type Mode;
-        //     typedef typename pubkey::aggregation_accumulator_set<Mode> SchemeAccumulator;
-        //
-        //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-        //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
-        //
-        //     return SignerImpl(rng, std::move(out),
-        //     SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key)))));
-        // }
-
-        /*!
-         * @brief
-         *
-         * * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam OutputRange
-         *
-         * @param rng
-         * @param key
-         * @param out
-         *
-         * @return
-         */
-        // template<typename Scheme, typename SinglePassRange, typename OutputRange>
-        // OutputRange &sign(const SinglePassRange &rng, const pubkey::private_key<Scheme> &key, OutputRange &out) {
-        //
-        //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::aggregation_policy<Scheme>>::type Mode;
-        //     typedef typename pubkey::aggregation_accumulator_set<Mode> SchemeAccumulator;
-        //
-        //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-        //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
-        //
-        //     return SignerImpl(rng, std::move(out),
-        //     SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key)))));
-        // }
-
-        /*!
-         * @brief
-         *
-         * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam KeyRange
-         * @tparam SchemeAccumulator
-         *
-         * @param r
-         * @param key
-         *
-         * @return
-         */
-        // template<typename Scheme, typename SinglePassRange, typename KeySinglePassRange,
-        //          typename SchemeAccumulator = typename pubkey::aggregation_accumulator_set<typename
-        //          pubkey::modes::isomorphic<
-        //              Scheme, pubkey::nop_padding>::template bind<pubkey::aggregation_policy<Scheme>>::type>>
-        // pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-        //     sign(const SinglePassRange &r, const KeySinglePassRange &key) {
-        //
-        //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::aggregation_policy<Scheme>>::type Mode;
-        //
-        //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-        //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
-        //
-        //     return SignerImpl(r, SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key)))));
-        // }
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////
         /*!
          * @brief
          *
@@ -323,14 +71,14 @@ namespace nil {
                                 OutputIterator>::type
             aggregate(InputIterator first, InputIterator last, OutputIterator out) {
 
-            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                pubkey::aggregation_policy<Scheme>>::type Mode;
-            typedef typename pubkey::aggregation_accumulator_set<Mode> SchemeAccumulator;
+            typedef typename pubkey::modes::isomorphic<Scheme>::template bind<pubkey::aggregation_policy<Scheme>>::type
+                ProcessingMode;
+            typedef typename pubkey::aggregation_accumulator_set<ProcessingMode> AggregationAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<AggregationAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
-            return SignerImpl(first, last, std::move(out), SchemeAccumulator(pubkey::no_key_ops<Scheme>()));
+            return SchemeImpl(first, last, std::move(out), AggregationAccumulator());
         }
 
         /*!
@@ -352,14 +100,14 @@ namespace nil {
                                 OutputIterator>::type
             aggregate(const SinglePassRange &rng, OutputIterator out) {
 
-            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                pubkey::aggregation_policy<Scheme>>::type Mode;
-            typedef typename pubkey::aggregation_accumulator_set<Mode> SchemeAccumulator;
+            typedef typename pubkey::modes::isomorphic<Scheme>::template bind<pubkey::aggregation_policy<Scheme>>::type
+                ProcessingMode;
+            typedef typename pubkey::aggregation_accumulator_set<ProcessingMode> AggregationAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<AggregationAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
-            return SignerImpl(rng, std::move(out), SchemeAccumulator(pubkey::no_key_ops<Scheme>()));
+            return SchemeImpl(rng, std::move(out), AggregationAccumulator());
         }
 
         /*!
@@ -377,18 +125,18 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename InputIterator,
-                 typename OutputAccumulator =
-                     typename pubkey::aggregation_accumulator_set<typename pubkey::modes::isomorphic<
-                         Scheme, pubkey::nop_padding>::template bind<pubkey::aggregation_policy<Scheme>>::type>>
+        template<
+            typename Scheme, typename InputIterator,
+            typename OutputAccumulator = typename pubkey::aggregation_accumulator_set<
+                typename pubkey::modes::isomorphic<Scheme>::template bind<pubkey::aggregation_policy<Scheme>>::type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
             aggregate(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::range_pubkey_impl<StreamSchemeImpl> SchemeImpl;
 
-            return SignerImpl(first, last, std::forward<OutputAccumulator>(acc));
+            return SchemeImpl(first, last, std::forward<OutputAccumulator>(acc));
         }
 
         /*!
@@ -406,17 +154,17 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename SinglePassRange,
-                 typename OutputAccumulator = typename pubkey::aggregation_accumulator_set<
-                     typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                         typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::signing_policy>::type>>
+                 typename OutputAccumulator =
+                     typename pubkey::aggregation_accumulator_set<typename pubkey::modes::isomorphic<
+                         Scheme>::template bind<typename pubkey::modes::isomorphic<Scheme>::signing_policy>::type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
             aggregate(const SinglePassRange &r, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::range_pubkey_impl<StreamSchemeImpl> SchemeImpl;
 
-            return SignerImpl(r, std::forward<OutputAccumulator>(acc));
+            return SchemeImpl(r, std::forward<OutputAccumulator>(acc));
         }
 
         /*!
@@ -426,27 +174,27 @@ namespace nil {
          *
          * @tparam Scheme
          * @tparam InputIterator
-         * @tparam SchemeAccumulator
+         * @tparam AggregationAccumulator
          *
          * @param first
          * @param last
          *
          * @return
          */
-        template<typename Scheme, typename InputIterator,
-                 typename SchemeAccumulator =
-                     typename pubkey::aggregation_accumulator_set<typename pubkey::modes::isomorphic<
-                         Scheme, pubkey::nop_padding>::template bind<pubkey::aggregation_policy<Scheme>>::type>>
-        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
+        template<
+            typename Scheme, typename InputIterator,
+            typename AggregationAccumulator = typename pubkey::aggregation_accumulator_set<
+                typename pubkey::modes::isomorphic<Scheme>::template bind<pubkey::aggregation_policy<Scheme>>::type>>
+        pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<AggregationAccumulator>>
             aggregate(InputIterator first, InputIterator last) {
 
-            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                pubkey::aggregation_policy<Scheme>>::type Mode;
+            typedef typename pubkey::modes::isomorphic<Scheme>::template bind<pubkey::aggregation_policy<Scheme>>::type
+                ProcessingMode;
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<AggregationAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::range_pubkey_impl<StreamSchemeImpl> SchemeImpl;
 
-            return SignerImpl(first, last, SchemeAccumulator(pubkey::no_key_ops<Scheme>()));
+            return SchemeImpl(first, last, AggregationAccumulator());
         }
 
         /*!
@@ -456,26 +204,26 @@ namespace nil {
          *
          * @tparam Scheme
          * @tparam SinglePassRange
-         * @tparam SchemeAccumulator
+         * @tparam AggregationAccumulator
          *
          * @param r
          *
          * @return
          */
-        template<typename Scheme, typename SinglePassRange,
-                 typename SchemeAccumulator =
-                     typename pubkey::aggregation_accumulator_set<typename pubkey::modes::isomorphic<
-                         Scheme, pubkey::nop_padding>::template bind<pubkey::aggregation_policy<Scheme>>::type>>
-        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
+        template<
+            typename Scheme, typename SinglePassRange,
+            typename AggregationAccumulator = typename pubkey::aggregation_accumulator_set<
+                typename pubkey::modes::isomorphic<Scheme>::template bind<pubkey::aggregation_policy<Scheme>>::type>>
+        pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<AggregationAccumulator>>
             aggregate(const SinglePassRange &r) {
 
-            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                pubkey::aggregation_policy<Scheme>>::type Mode;
+            typedef typename pubkey::modes::isomorphic<Scheme>::template bind<pubkey::aggregation_policy<Scheme>>::type
+                ProcessingMode;
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<AggregationAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::range_pubkey_impl<StreamSchemeImpl> SchemeImpl;
 
-            return SignerImpl(r, SchemeAccumulator(pubkey::no_key_ops<Scheme>()));
+            return SchemeImpl(r, AggregationAccumulator());
         }
     }    // namespace crypto3
 }    // namespace nil

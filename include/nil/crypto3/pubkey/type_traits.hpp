@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -23,20 +23,29 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PARAMETERS_ITERATOR_LAST_HPP
-#define CRYPTO3_ACCUMULATORS_PARAMETERS_ITERATOR_LAST_HPP
+#ifndef CRYPTO3_PUBKEY_TYPE_TRAITS_HPP
+#define CRYPTO3_PUBKEY_TYPE_TRAITS_HPP
 
-#include <boost/parameter/keyword.hpp>
-
-#include <boost/accumulators/accumulators_fwd.hpp>
+#include <boost/type_traits.hpp>
+#include <boost/tti/tti.hpp>
+#include <boost/mpl/placeholders.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace accumulators {
-            BOOST_PARAMETER_KEYWORD(tag, iterator_last)
-            BOOST_ACCUMULATORS_IGNORE_GLOBAL(iterator_last)
-        }    // namespace accumulators
+        namespace pubkey {
+
+            using namespace boost::mpl::placeholders;
+
+            BOOST_TTI_HAS_STATIC_MEMBER_DATA(context)
+
+            template<typename T>
+            struct is_eddsa_params {
+                static constexpr bool value = has_static_member_data_context<T, const typename T::context_type>::value;
+                typedef T type;
+            };
+        }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_ACCUMULATORS_PARAMETERS_ITERATOR_LAST_HPP
+#endif    // CRYPTO3_PUBKEY_TYPE_TRAITS_HPP
