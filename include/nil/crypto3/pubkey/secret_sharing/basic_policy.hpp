@@ -85,34 +85,10 @@ namespace nil {
                     return exp >= 0;
                 }
 
+                //===========================================================================
+                // TODO: refactor
                 static inline public_element_type get_public_element(const private_element_type &e) {
                     return e * public_element_type::one();
-                }
-
-                static inline public_element_type get_public_element(const public_element_type &e) {
-                    return e;
-                }
-
-                static inline indexed_public_element_type
-                    get_indexed_public_element(const indexed_private_element_type &s) {
-                    return indexed_public_element_type(s.first, get_public_element(s.second));
-                }
-
-                template<typename IndexedElements>
-                static inline indexes_type get_indexes(const IndexedElements &elements) {
-                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedElements>));
-                    return get_indexes(std::cbegin(elements), std::cend(elements));
-                }
-
-                template<typename IndexedElementsIterator>
-                static inline indexes_type get_indexes(IndexedElementsIterator first, IndexedElementsIterator last) {
-                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<IndexedElementsIterator>));
-
-                    indexes_type indexes;
-                    for (auto it = first; it != last; it++) {
-                        assert(check_participant_index(it->first) && indexes.emplace(it->first).second);
-                    }
-                    return indexes;
                 }
             };
         }    // namespace pubkey

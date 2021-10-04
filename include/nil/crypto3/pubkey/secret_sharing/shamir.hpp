@@ -79,6 +79,7 @@ namespace nil {
                 }
 
                 //===========================================================================
+                // TODO: refactor
                 // polynomial generation functions
 
                 static inline coeffs_type get_poly(std::size_t t, std::size_t n) {

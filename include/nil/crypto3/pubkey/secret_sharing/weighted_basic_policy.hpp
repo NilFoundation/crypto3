@@ -43,38 +43,9 @@ namespace nil {
                 // public weighted secret sharing scheme types
 
                 using weights_type = std::vector<std::size_t>;
-                using indexed_weighted_private_element =
-                    std::pair<std::size_t, std::unordered_map<std::size_t, typename base_type::private_element_type>>;
-                using indexed_weighted_public_element =
-                    std::pair<std::size_t, std::unordered_map<std::size_t, typename base_type::public_element_type>>;
 
                 static inline bool check_weight(const std::size_t &w) {
                     return 0 < w;
-                }
-
-                template<typename Weights>
-                typename base_type::indexes_type get_weighted_indexes(std::size_t t, const Weights &weights) {
-                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Weights>));
-
-                    return get_weighted_indexes(t, std::cbegin(weights), std::end(weights));
-                }
-
-                template<typename WeightIt>
-                static inline typename std::enable_if<
-                    std::is_unsigned<typename std::iterator_traits<WeightIt>::value_type>::value,
-                    typename base_type::indexes_type>::type
-                    get_weighted_indexes(std::size_t t, WeightIt first, WeightIt last) {
-                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<WeightIt>));
-
-                    typename base_type::indexes_type indexes;
-                    std::size_t i = 1;
-                    for (auto iter = first; iter != last; ++iter) {
-                        for (std::size_t j = 1; j <= *iter; ++j) {
-                            assert(indexes.emplace(i * t + j).second);
-                        }
-                        ++i;
-                    }
-                    return indexes;
                 }
             };
         }    // namespace pubkey
