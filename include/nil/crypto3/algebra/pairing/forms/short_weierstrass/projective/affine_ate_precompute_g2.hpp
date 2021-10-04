@@ -41,7 +41,7 @@ namespace nil {
                     using curve_type = CurveType;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::short_weierstrass_projective_types_policy<curve_type>;
+                    typedef detail::short_weierstrass_projective_types_policy<curve_type> policy_type;
 
                     using base_field_type = typename curve_type::base_field_type;
                     using g2_type = typename curve_type::template g2_type<>;
@@ -50,7 +50,7 @@ namespace nil {
                     using g2_field_type_value = typename g2_type::field_type::value_type;
 
                 public:
-                    using g2_precomputed_type = typename types_policy::affine_ate_g2_precomputation;
+                    using g2_precomputed_type = typename policy_type::affine_ate_g2_precomputation;
 
                     static g2_precomputed_type process(const typename g2_type::value_type &Q) {
 
@@ -73,7 +73,7 @@ namespace nil {
                                 continue;
                             }
 
-                            typename types_policy::affine_ate_coeffs c;
+                            typename policy_type::affine_ate_coeffs c;
                             c.old_RX = RX;
                             c.old_RY = RY;
                             g2_field_type_value old_RX_2 = c.old_RX.squared();
@@ -88,7 +88,7 @@ namespace nil {
                             RY = c.gamma * (c.old_RX - RX) - c.old_RY;
 
                             if (NAF[i] != 0) {
-                                typename types_policy::affine_ate_coeffs c;
+                                typename policy_type::affine_ate_coeffs c;
                                 c.old_RX = RX;
                                 c.old_RY = RY;
                                 if (NAF[i] > 0) {

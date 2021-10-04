@@ -36,12 +36,12 @@ namespace nil {
                 template<typename CurveType>
                 class short_weierstrass_jacobian_with_a4_0_ate_precompute_g1 {
                     using curve_type = CurveType;
-                    using types_policy = detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type>;
+                    typedef detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type> policy_type;
                     using g1_type = typename curve_type::template g1_type<>;
                     using g1_affine_type = typename curve_type::template g1_type<curves::coordinates::affine>;
 
                 public:
-                    using g1_precomputed_type = typename types_policy::ate_g1_precomputed_type;
+                    using g1_precomputed_type = typename policy_type::ate_g1_precomputed_type;
 
                     static g1_precomputed_type process(const typename g1_type::value_type &P) {
 

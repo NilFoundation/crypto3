@@ -41,23 +41,23 @@ namespace nil {
                     using curve_type = CurveType;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type>;
+                    typedef detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type> policy_type;
 
                     using gt_type = typename curve_type::gt_type;
 
                 public:
                     static typename gt_type::value_type
-                        process(const typename types_policy::ate_g1_precomputed_type &prec_P1,
-                                const typename types_policy::ate_g2_precomputed_type &prec_Q1,
-                                const typename types_policy::ate_g1_precomputed_type &prec_P2,
-                                const typename types_policy::ate_g2_precomputed_type &prec_Q2) {
+                        process(const typename policy_type::ate_g1_precomputed_type &prec_P1,
+                                const typename policy_type::ate_g2_precomputed_type &prec_Q1,
+                                const typename policy_type::ate_g1_precomputed_type &prec_P2,
+                                const typename policy_type::ate_g2_precomputed_type &prec_Q2) {
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 
                         bool found_one = false;
                         std::size_t idx = 0;
 
-                        const typename types_policy::integral_type &loop_count = params_type::ate_loop_count;
+                        const typename policy_type::integral_type &loop_count = params_type::ate_loop_count;
 
                         for (long i = params_type::integral_type_max_bits; i >= 0; --i) {
                             const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
@@ -71,8 +71,8 @@ namespace nil {
                                param_p (skipping leading zeros) in MSB to LSB
                                order */
 
-                            typename types_policy::ate_ell_coeffs c1 = prec_Q1.coeffs[idx];
-                            typename types_policy::ate_ell_coeffs c2 = prec_Q2.coeffs[idx];
+                            typename policy_type::ate_ell_coeffs c1 = prec_Q1.coeffs[idx];
+                            typename policy_type::ate_ell_coeffs c2 = prec_Q2.coeffs[idx];
                             ++idx;
 
                             f = f.squared();
@@ -81,8 +81,8 @@ namespace nil {
                             f = f.mul_by_045(c2.ell_0, prec_P2.PY * c2.ell_VW, prec_P2.PX * c2.ell_VV);
 
                             if (bit) {
-                                typename types_policy::ate_ell_coeffs c1 = prec_Q1.coeffs[idx];
-                                typename types_policy::ate_ell_coeffs c2 = prec_Q2.coeffs[idx];
+                                typename policy_type::ate_ell_coeffs c1 = prec_Q1.coeffs[idx];
+                                typename policy_type::ate_ell_coeffs c2 = prec_Q2.coeffs[idx];
                                 ++idx;
 
                                 f = f.mul_by_045(c1.ell_0, prec_P1.PY * c1.ell_VW, prec_P1.PX * c1.ell_VV);

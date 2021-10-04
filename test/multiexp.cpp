@@ -183,10 +183,10 @@ BOOST_AUTO_TEST_SUITE(multiexp_test_suite)
 BOOST_AUTO_TEST_CASE(multiexp_test_case) {
 
     std::cout << "Testing BLS12-381 G1" << std::endl;
-    print_performance_csv<curves::bls12<381>::g1_type, curves::bls12<381>::scalar_field_type>(2, 20, 14, true);
+    print_performance_csv<curves::bls12<381>::g1_type<>, curves::bls12<381>::scalar_field_type>(2, 20, 14, true);
 
     std::cout << "Testing BLS12-381 G2" << std::endl;
-    print_performance_csv<curves::bls12<381>::g2_type, curves::bls12<381>::scalar_field_type>(2, 20, 14, true);
+    print_performance_csv<curves::bls12<381>::g2_type<>, curves::bls12<381>::scalar_field_type>(2, 20, 14, true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

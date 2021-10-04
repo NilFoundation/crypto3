@@ -80,85 +80,85 @@ namespace boost {
         namespace tt_detail {
 
             template<>
-            struct print_log_value<typename curves::edwards<183>::g1_type::value_type> {
-                void operator()(std::ostream &os, typename curves::edwards<183>::g1_type::value_type const &e) {
+            struct print_log_value<typename curves::edwards<183>::g1_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::edwards<183>::g1_type<>::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::mnt4<298>::g1_type::value_type> {
-                void operator()(std::ostream &os, typename curves::mnt4<298>::g1_type::value_type const &e) {
+            struct print_log_value<typename curves::mnt4<298>::g1_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::mnt4<298>::g1_type<>::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::mnt6<298>::g1_type::value_type> {
-                void operator()(std::ostream &os, typename curves::mnt6<298>::g1_type::value_type const &e) {
+            struct print_log_value<typename curves::mnt6<298>::g1_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::mnt6<298>::g1_type<>::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::alt_bn128<254>::g1_type::value_type> {
-                void operator()(std::ostream &os, typename curves::alt_bn128<254>::g1_type::value_type const &e) {
+            struct print_log_value<typename curves::alt_bn128<254>::g1_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::alt_bn128<254>::g1_type<>::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::bls12<381>::g1_type::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<381>::g1_type::value_type const &e) {
+            struct print_log_value<typename curves::bls12<381>::g1_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::bls12<381>::g1_type<>::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::bls12<377>::g1_type::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<377>::g1_type::value_type const &e) {
+            struct print_log_value<typename curves::bls12<377>::g1_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::bls12<377>::g1_type<>::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::mnt4<298>::g2_type::value_type> {
-                void operator()(std::ostream &os, typename curves::mnt4<298>::g2_type::value_type const &e) {
+            struct print_log_value<typename curves::mnt4<298>::g2_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::mnt4<298>::g2_type<>::value_type const &e) {
                     print_fp2_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::bls12<381>::g2_type::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<381>::g2_type::value_type const &e) {
+            struct print_log_value<typename curves::bls12<381>::g2_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::bls12<381>::g2_type<>::value_type const &e) {
                     print_fp2_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::bls12<377>::g2_type::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<377>::g2_type::value_type const &e) {
+            struct print_log_value<typename curves::bls12<377>::g2_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::bls12<377>::g2_type<>::value_type const &e) {
                     print_fp2_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::alt_bn128<254>::g2_type::value_type> {
-                void operator()(std::ostream &os, typename curves::alt_bn128<254>::g2_type::value_type const &e) {
+            struct print_log_value<typename curves::alt_bn128<254>::g2_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::alt_bn128<254>::g2_type<>::value_type const &e) {
                     print_fp2_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::edwards<183>::g2_type::value_type> {
-                void operator()(std::ostream &os, typename curves::edwards<183>::g2_type::value_type const &e) {
+            struct print_log_value<typename curves::edwards<183>::g2_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::edwards<183>::g2_type<>::value_type const &e) {
                     print_fp3_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::mnt6<298>::g2_type::value_type> {
-                void operator()(std::ostream &os, typename curves::mnt6<298>::g2_type::value_type const &e) {
+            struct print_log_value<typename curves::mnt6<298>::g2_type<>::value_type> {
+                void operator()(std::ostream &os, typename curves::mnt6<298>::g2_type<>::value_type const &e) {
                     print_fp3_curve_group_element(os, e);
                 }
             };
@@ -176,7 +176,7 @@ namespace boost {
 BOOST_AUTO_TEST_SUITE(curves_manual_static_tests)
 
 BOOST_AUTO_TEST_CASE(curve_operation_test_bls12_381_g1) {
-    using curve_type = typename curves::bls12<381>::g1_type;
+    using curve_type = typename curves::bls12<381>::g1_type<>;
     using curve_value_type = typename curve_type::value_type;
     using field_type = typename curve_type::underlying_field_type;
     using field_value_type = typename field_type::value_type;
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_bls12_381_g1) {
 }
 
 BOOST_AUTO_TEST_CASE(curve_operation_test_bls12_381_g2) {
-    using curve_type = typename curves::bls12<381>::g2_type;
+    using curve_type = typename curves::bls12<381>::g2_type<>;
     using curve_value_type = typename curve_type::value_type;
     using field_type = typename curve_type::underlying_field_type;
     using field_value_type = typename field_type::value_type;
@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_bls12_381_g2) {
 }
 
 BOOST_AUTO_TEST_CASE(curve_operation_test_mnt4_g1) {
-    using curve_type = typename curves::mnt4<298>::g1_type;
+    using curve_type = typename curves::mnt4<298>::g1_type<>;
     using curve_value_type = typename curve_type::value_type;
     using field_type = typename curve_type::underlying_field_type;
     using field_value_type = typename field_type::value_type;
@@ -470,7 +470,7 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt4_g1) {
 }
 
 BOOST_AUTO_TEST_CASE(curve_operation_test_mnt4_g2) {
-    using curve_type = typename curves::mnt4<298>::g2_type;
+    using curve_type = typename curves::mnt4<298>::g2_type<>;
     using curve_value_type = typename curve_type::value_type;
     using field_type = typename curve_type::underlying_field_type;
     using field_value_type = typename field_type::value_type;
@@ -628,7 +628,7 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt4_g2) {
 }
 
 BOOST_AUTO_TEST_CASE(curve_operation_test_mnt6_g1) {
-    using curve_type = typename curves::mnt6<298>::g1_type;
+    using curve_type = typename curves::mnt6<298>::g1_type<>;
     using curve_value_type = typename curve_type::value_type;
     using field_type = typename curve_type::underlying_field_type;
     using field_value_type = typename field_type::value_type;
@@ -696,7 +696,7 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt6_g1) {
 }
 
 BOOST_AUTO_TEST_CASE(curve_operation_test_mnt6_g2) {
-    using curve_type = typename curves::mnt6<298>::g2_type;
+    using curve_type = typename curves::mnt6<298>::g2_type<>;
     using curve_value_type = typename curve_type::value_type;
     using field_type = typename curve_type::underlying_field_type;
     using field_value_type = typename field_type::value_type;

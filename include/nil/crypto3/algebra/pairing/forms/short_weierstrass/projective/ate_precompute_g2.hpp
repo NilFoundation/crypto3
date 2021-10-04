@@ -41,7 +41,7 @@ namespace nil {
                     using curve_type = CurveType;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::short_weierstrass_projective_types_policy<curve_type>;
+                    typedef detail::short_weierstrass_projective_types_policy<curve_type> policy_type;
 
                     using base_field_type = typename curve_type::base_field_type;
                     using g2_type = typename curve_type::template g2_type<>;
@@ -57,7 +57,7 @@ namespace nil {
                     };
 
                     static void doubling_step_for_flipped_miller_loop(extended_g2_projective &current,
-                                                                      typename types_policy::ate_dbl_coeffs &dc) {
+                                                                      typename policy_type::ate_dbl_coeffs &dc) {
 
                         const g2_field_type_value X = current.X, Y = current.Y, Z = current.Z, T = current.T;
 
@@ -86,7 +86,7 @@ namespace nil {
                                                                             const g2_field_type_value base_Y,
                                                                             const g2_field_type_value base_Y_squared,
                                                                             extended_g2_projective &current,
-                                                                            typename types_policy::ate_add_coeffs &ac) {
+                                                                            typename policy_type::ate_add_coeffs &ac) {
 
                         const g2_field_type_value X1 = current.X, Y1 = current.Y, Z1 = current.Z, T1 = current.T;
                         const g2_field_type_value &x2 = base_X, &y2 = base_Y, &y2_squared = base_Y_squared;
@@ -111,7 +111,7 @@ namespace nil {
                     }
 
                 public:
-                    using g2_precomputed_type = typename types_policy::ate_g2_precomputed_type;
+                    using g2_precomputed_type = typename policy_type::ate_g2_precomputed_type;
 
                     static g2_precomputed_type process(const typename g2_type::value_type &Q) {
 
@@ -142,11 +142,11 @@ namespace nil {
                                 continue;
                             }
 
-                            typename types_policy::ate_dbl_coeffs dc;
+                            typename policy_type::ate_dbl_coeffs dc;
                             doubling_step_for_flipped_miller_loop(R, dc);
                             result.dbl_coeffs.push_back(dc);
                             if (bit) {
-                                typename types_policy::ate_add_coeffs ac;
+                                typename policy_type::ate_add_coeffs ac;
                                 mixed_addition_step_for_flipped_miller_loop(result.QX, result.QY, result.QY2, R, ac);
                                 result.add_coeffs.push_back(ac);
                             }
@@ -159,7 +159,7 @@ namespace nil {
                             g2_field_type_value minus_R_affine_X = R.X * RZ2_inv;
                             g2_field_type_value minus_R_affine_Y = -R.Y * RZ3_inv;
                             g2_field_type_value minus_R_affine_Y2 = minus_R_affine_Y.squared();
-                            typename types_policy::ate_add_coeffs ac;
+                            typename policy_type::ate_add_coeffs ac;
                             mixed_addition_step_for_flipped_miller_loop(minus_R_affine_X, minus_R_affine_Y,
                                                                         minus_R_affine_Y2, R, ac);
                             result.add_coeffs.push_back(ac);

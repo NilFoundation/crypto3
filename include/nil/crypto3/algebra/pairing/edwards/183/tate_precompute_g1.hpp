@@ -46,7 +46,7 @@ namespace nil {
                     using curve_type = curves::edwards<183>;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    typedef detail::types_policy<curve_type> policy_type;
 
                     using base_field_type = typename curve_type::base_field_type;
                     using g1_type = typename curve_type::template g1_type<>;
@@ -62,7 +62,7 @@ namespace nil {
                     };
 
                     static void doubling_step_for_miller_loop(extended_g1_projective &current,
-                                                              typename types_policy::Fq_conic_coefficients &cc) {
+                                                              typename policy_type::Fq_conic_coefficients &cc) {
 
                         const g1_field_type_value &X = current.X, &Y = current.Y, &Z = current.Z, &T = current.T;
                         const g1_field_type_value A = X.squared();          // A    = X1^2
@@ -92,7 +92,7 @@ namespace nil {
 
                     static void full_addition_step_for_miller_loop(const extended_g1_projective &base,
                                                                    extended_g1_projective &current,
-                                                                   typename types_policy::Fq_conic_coefficients &cc) {
+                                                                   typename policy_type::Fq_conic_coefficients &cc) {
 
                         const g1_field_type_value &X1 = current.X, &Y1 = current.Y, &Z1 = current.Z, &T1 = current.T;
                         const g1_field_type_value &X2 = base.X, &Y2 = base.Y, &Z2 = base.Z, &T2 = base.T;
@@ -118,7 +118,7 @@ namespace nil {
 
                     static void mixed_addition_step_for_miller_loop(const extended_g1_projective &base,
                                                                     extended_g1_projective &current,
-                                                                    typename types_policy::Fq_conic_coefficients &cc) {
+                                                                    typename policy_type::Fq_conic_coefficients &cc) {
 
                         const g1_field_type_value &X1 = current.X, &Y1 = current.Y, &Z1 = current.Z, &T1 = current.T;
                         const g1_field_type_value &X2 = base.X, &Y2 = base.Y, &T2 = base.T;
@@ -143,11 +143,11 @@ namespace nil {
                     }
 
                 public:
-                    using g1_precomputed_type = typename types_policy::tate_g1_precomp;
+                    using g1_precomputed_type = typename policy_type::tate_g1_precomp;
 
-                    static typename types_policy::tate_g1_precomp process(const typename g1_type::value_type &P) {
+                    static typename policy_type::tate_g1_precomp process(const typename g1_type::value_type &P) {
 
-                        typename types_policy::tate_g1_precomp result;
+                        typename policy_type::tate_g1_precomp result;
 
                         typename g1_affine_type::value_type Pcopy = P.to_affine();
 
@@ -172,7 +172,7 @@ namespace nil {
                             /* code below gets executed for all bits (EXCEPT the MSB itself) of
                                params_type::scalar_field_modulus (skipping leading zeros) in MSB to LSB
                                order */
-                            types_policy::Fq_conic_coefficients cc;
+                            policy_type::Fq_conic_coefficients cc;
 
                             doubling_step_for_miller_loop(R, cc);
                             result.push_back(cc);

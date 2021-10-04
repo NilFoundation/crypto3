@@ -41,18 +41,18 @@ namespace nil {
                 class edwards_ate_precompute_g1<183> {
                     using curve_type = curves::edwards<183>;
 
-                    using types_policy = detail::types_policy<curve_type>;
+                    typedef detail::types_policy<curve_type> policy_type;
 
                     using g2_type = typename curve_type::template g2_type<>;
                     using g2_affine_type = typename curve_type::template g2_type<curves::coordinates::affine>;
 
                 public:
-                    using g2_precomputed_type = typename types_policy::tate_g2_precomp;
+                    using g2_precomputed_type = typename policy_type::tate_g2_precomp;
 
-                    static typename types_policy::tate_g2_precomp process(const typename g2_type::value_type &P) {
+                    static typename policy_type::tate_g2_precomp process(const typename g2_type::value_type &P) {
 
                         typename g2_affine_type::value_type Qcopy = Q.to_affine();
-                        typename types_policy::tate_g2_precomp result;
+                        typename policy_type::tate_g2_precomp result;
                         result.y0 = Qcopy.Y * Qcopy.Z.inversed();
                         result.eta = (Qcopy.Z + Qcopy.Y) * gt::mul_by_non_residue(Qcopy.X).inversed();
 

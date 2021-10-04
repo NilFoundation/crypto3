@@ -36,11 +36,11 @@ namespace nil {
 
                 template<std::size_t Version>
                 class secp_r1 {
-                    using types_policy = detail::secp_r1_types<Version>;
+                    typedef detail::secp_r1_types<Version> policy_type;
 
                 public:
-                    typedef typename types_policy::base_field_type base_field_type;
-                    typedef typename types_policy::scalar_field_type scalar_field_type;
+                    typedef typename policy_type::base_field_type base_field_type;
+                    typedef typename policy_type::scalar_field_type scalar_field_type;
 
                     template<typename Coordinates = coordinates::projective, typename Form = forms::short_weierstrass>
                     using g1_type = typename detail::secp_r1_g1<Version, Form, Coordinates>;

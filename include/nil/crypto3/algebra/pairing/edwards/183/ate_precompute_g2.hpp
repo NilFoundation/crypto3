@@ -46,7 +46,7 @@ namespace nil {
                     using curve_type = curves::edwards<183>;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    typedef detail::types_policy<curve_type> policy_type;
 
                     using base_field_type = typename curve_type::base_field_type;
                     using g2_type = typename curve_type::template g2_type<>;
@@ -63,7 +63,7 @@ namespace nil {
 
                     static void
                         doubling_step_for_flipped_miller_loop(extended_g2_projective &current,
-                                                              typename types_policy::Fq3_conic_coefficients &cc) {
+                                                              typename policy_type::Fq3_conic_coefficients &cc) {
 
                         const g2_field_type_value &X = current.X, &Y = current.Y, &Z = current.Z, &T = current.T;
                         const g2_field_type_value A = X.squared();          // A    = X1^2
@@ -98,7 +98,7 @@ namespace nil {
                     static void
                         full_addition_step_for_flipped_miller_loop(const extended_g2_projective &base,
                                                                    extended_g2_projective &current,
-                                                                   typename types_policy::Fq3_conic_coefficients &cc) {
+                                                                   typename policy_type::Fq3_conic_coefficients &cc) {
 
                         const g2_field_type_value &X1 = current.X, &Y1 = current.Y, &Z1 = current.Z, &T1 = current.T;
                         const g2_field_type_value &X2 = base.X, &Y2 = base.Y, &Z2 = base.Z, &T2 = base.T;
@@ -131,7 +131,7 @@ namespace nil {
                     static void
                         mixed_addition_step_for_flipped_miller_loop(const extended_g2_projective &base,
                                                                     extended_g2_projective &current,
-                                                                    typename types_policy::Fq3_conic_coefficients &cc) {
+                                                                    typename policy_type::Fq3_conic_coefficients &cc) {
 
                         const g2_field_type_value &X1 = current.X, &Y1 = current.Y, &Z1 = current.Z, &T1 = current.T;
                         const g2_field_type_value &X2 = base.X, &Y2 = base.Y, &T2 = base.T;
@@ -160,7 +160,7 @@ namespace nil {
                     }
 
                 public:
-                    using g2_precomputed_type = typename types_policy::ate_g2_precomputed_type;
+                    using g2_precomputed_type = typename policy_type::ate_g2_precomputed_type;
 
                     static g2_precomputed_type process(const typename g2_type::value_type &Q) {
 
@@ -174,7 +174,7 @@ namespace nil {
 
                         extended_g2_projective R = Q_ext;
 
-                        const typename types_policy::integral_type &loop_count = params_type::ate_loop_count;
+                        const typename policy_type::integral_type &loop_count = params_type::ate_loop_count;
 
                         bool found_one = false;
                         for (long i = params_type::integral_type_max_bits - 1; i >= 0; --i) {
@@ -185,7 +185,7 @@ namespace nil {
                                 continue;
                             }
 
-                            typename types_policy::Fq3_conic_coefficients cc;
+                            typename policy_type::Fq3_conic_coefficients cc;
                             doubling_step_for_flipped_miller_loop(R, cc);
                             result.push_back(cc);
                             if (bit) {

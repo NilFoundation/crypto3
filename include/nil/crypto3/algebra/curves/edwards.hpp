@@ -50,11 +50,11 @@ namespace nil {
                 template<std::size_t Version>
                 class edwards {
 
-                    using types_policy = detail::edwards_types<Version>;
+                    typedef detail::edwards_types<Version> policy_type;
 
                 public:
-                    typedef typename types_policy::base_field_type base_field_type;
-                    typedef typename types_policy::scalar_field_type scalar_field_type;
+                    typedef typename policy_type::base_field_type base_field_type;
+                    typedef typename policy_type::scalar_field_type scalar_field_type;
 
                     template<typename Coordinates = coordinates::inverted, typename Form = forms::twisted_edwards>
                     using g1_type = typename detail::edwards_g1<Version, Form, Coordinates>;
@@ -66,7 +66,7 @@ namespace nil {
                     //                                          pairing::detail::edwards_pairing_functions<Version>>
                     //     pairing;
 
-                    typedef typename types_policy::gt_field_type gt_type;
+                    typedef typename policy_type::gt_field_type gt_type;
 
                     constexpr static const bool has_affine_pairing = false;
                 };

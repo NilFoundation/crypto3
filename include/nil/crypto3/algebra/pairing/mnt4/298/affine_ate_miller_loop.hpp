@@ -45,13 +45,13 @@ namespace nil {
                 class mnt4_affine_ate_miller_loop<298> {
                     using curve_type = curves::mnt4<298>;
 
-                    using types_policy = detail::short_weierstrass_projective_types_policy<curve_type>;
+                    typedef detail::short_weierstrass_projective_types_policy<curve_type> policy_type;
                     using gt_type = typename curve_type::gt_type;
 
                 public:
                     static typename gt_type::value_type
-                        process(const typename types_policy::affine_ate_g1_precomputation &prec_P,
-                                const typename types_policy::affine_ate_g2_precomputation &prec_Q) {
+                        process(const typename policy_type::affine_ate_g1_precomputation &prec_P,
+                                const typename policy_type::affine_ate_g2_precomputation &prec_Q) {
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 
@@ -70,14 +70,14 @@ namespace nil {
                             /* code below gets executed for all bits (EXCEPT the MSB itself) of
                                param_p (skipping leading zeros) in MSB to LSB
                                order */
-                            typename types_policy::affine_ate_coeffs c = prec_Q.coeffs[idx++];
+                            typename policy_type::affine_ate_coeffs c = prec_Q.coeffs[idx++];
 
                             typename gt_type::value_type g_RR_at_P = typename gt_type::value_type(
                                 prec_P.PY_twist_squared, -prec_P.PX * c.gamma_twist + c.gamma_X - c.old_RY);
                             f = f.squared().mul_by_023(g_RR_at_P);
 
                             if (NAF[i] != 0) {
-                                typename types_policy::affine_ate_coeffs c = prec_Q.coeffs[idx++];
+                                typename policy_type::affine_ate_coeffs c = prec_Q.coeffs[idx++];
                                 typename gt_type::value_type g_RQ_at_P;
                                 if (NAF[i] > 0) {
                                     g_RQ_at_P = typename gt_type::value_type(

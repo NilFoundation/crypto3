@@ -41,7 +41,7 @@ namespace nil {
                     using curve_type = CurveType;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type>;
+                    typedef detail::short_weierstrass_jacobian_with_a4_0_types_policy<curve_type> policy_type;
 
                     using base_field_type = typename curve_type::base_field_type;
                     using g2_type = typename curve_type::template g2_type<>;
@@ -51,7 +51,7 @@ namespace nil {
 
                     static void doubling_step_for_miller_loop(const typename base_field_type::value_type &two_inv,
                                                               typename g2_type::value_type &current,
-                                                              typename types_policy::ate_ell_coeffs &c) {
+                                                              typename policy_type::ate_ell_coeffs &c) {
 
                         const g2_field_type_value X = current.X, Y = current.Y, Z = current.Z;
 
@@ -78,7 +78,7 @@ namespace nil {
 
                     static void mixed_addition_step_for_miller_loop(const typename g2_affine_type::value_type base,
                                                                     typename g2_type::value_type &current,
-                                                                    typename types_policy::ate_ell_coeffs &c) {
+                                                                    typename policy_type::ate_ell_coeffs &c) {
 
                         const g2_field_type_value X1 = current.X, Y1 = current.Y, Z1 = current.Z;
                         const g2_field_type_value &x2 = base.X, &y2 = base.Y;
@@ -100,7 +100,7 @@ namespace nil {
                     }
 
                 public:
-                    using g2_precomputed_type = typename types_policy::ate_g2_precomputed_type;
+                    using g2_precomputed_type = typename policy_type::ate_g2_precomputed_type;
 
                     static g2_precomputed_type process(const typename g2_type::value_type &Q) {
 
@@ -118,10 +118,10 @@ namespace nil {
                         R.Y = Qcopy.Y;
                         R.Z = g2_type::field_type::value_type::one();
 
-                        const typename types_policy::integral_type &loop_count = params_type::ate_loop_count;
+                        const typename policy_type::integral_type &loop_count = params_type::ate_loop_count;
 
                         bool found_one = false;
-                        typename types_policy::ate_ell_coeffs c;
+                        typename policy_type::ate_ell_coeffs c;
 
                         for (long i = params_type::integral_type_max_bits; i >= 0; --i) {
                             const bool bit = multiprecision::bit_test(loop_count, i);

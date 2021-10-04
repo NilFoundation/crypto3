@@ -46,22 +46,22 @@ namespace nil {
                     using curve_type = curves::edwards<183>;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    typedef detail::types_policy<curve_type> policy_type;
                     using gt_type = typename curve_type::gt_type;
 
                 public:
                     static typename gt_type::value_type
-                        process(const typename types_policy::ate_g1_precomputed_type &prec_P1,
-                                const typename types_policy::ate_g2_precomputed_type &prec_Q1,
-                                const typename types_policy::ate_g1_precomputed_type &prec_P2,
-                                const typename types_policy::ate_g2_precomputed_type &prec_Q2) {
+                        process(const typename policy_type::ate_g1_precomputed_type &prec_P1,
+                                const typename policy_type::ate_g2_precomputed_type &prec_Q1,
+                                const typename policy_type::ate_g1_precomputed_type &prec_P2,
+                                const typename policy_type::ate_g2_precomputed_type &prec_Q2) {
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 
                         bool found_one = false;
                         std::size_t idx = 0;
 
-                        const typename types_policy::integral_type &loop_count = params_type::ate_loop_count;
+                        const typename policy_type::integral_type &loop_count = params_type::ate_loop_count;
 
                         for (long i = params_type::integral_type_max_bits - 1; i >= 0; --i) {
                             const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
@@ -74,8 +74,8 @@ namespace nil {
                             /* code below gets executed for all bits (EXCEPT the MSB itself) of
                                param_p (skipping leading zeros) in MSB to LSB
                                order */
-                            typename types_policy::Fq3_conic_coefficients cc1 = prec_Q1[idx];
-                            typename types_policy::Fq3_conic_coefficients cc2 = prec_Q2[idx];
+                            typename policy_type::Fq3_conic_coefficients cc1 = prec_Q1[idx];
+                            typename policy_type::Fq3_conic_coefficients cc2 = prec_Q2[idx];
                             ++idx;
 
                             typename gt_type::value_type g_RR_at_P1 = typename gt_type::value_type(

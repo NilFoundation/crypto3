@@ -41,19 +41,19 @@ namespace nil {
                 class edwards_ate_precompute_g1<183> {
                     using curve_type = curves::edwards<183>;
 
-                    using types_policy = detail::types_policy<curve_type>;
+                    typedef detail::types_policy<curve_type> policy_type;
 
                     using g1_type = typename curve_type::template g1_type<>;
                     using g1_affine_type = typename curve_type::template g1_type<curves::coordinates::affine>;
 
                 public:
-                    using g1_precomputed_type = typename types_policy::ate_g1_precomputed_type;
+                    using g1_precomputed_type = typename policy_type::ate_g1_precomputed_type;
 
-                    static typename types_policy::ate_g1_precomputed_type
+                    static typename policy_type::ate_g1_precomputed_type
                         process(const typename g1_type::value_type &P) {
 
                         typename g1_affine_type::value_type Pcopy = P.to_affine();
-                        typename types_policy::ate_g1_precomputed_type result;
+                        typename policy_type::ate_g1_precomputed_type result;
                         result.P_XY = Pcopy.X * Pcopy.Y;
                         result.P_XZ = Pcopy.X;    // P.X * P.Z but P.Z = 1
                         result.P_ZZplusYZ =

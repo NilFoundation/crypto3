@@ -46,11 +46,11 @@ namespace nil {
                  */
                 class babyjubjub {
 
-                    using types_policy = detail::babyjubjub_types;
+                    typedef detail::babyjubjub_types policy_type;
 
                 public:
-                    typedef typename types_policy::base_field_type base_field_type;
-                    typedef typename types_policy::scalar_field_type scalar_field_type;
+                    typedef typename policy_type::base_field_type base_field_type;
+                    typedef typename policy_type::scalar_field_type scalar_field_type;
 
                     template<typename Coordinates = coordinates::affine, typename Form = forms::twisted_edwards>
                     using g1_type = typename detail::babyjubjub_g1<Form, Coordinates>;

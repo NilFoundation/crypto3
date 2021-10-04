@@ -43,7 +43,7 @@ namespace nil {
                     using curve_type = curves::edwards<183>;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    typedef detail::types_policy<curve_type> policy_type;
 
                     using base_field_type = typename curve_type::base_field_type;
                     using gt_type = typename curve_type::gt_type;

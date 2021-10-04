@@ -45,11 +45,11 @@ namespace nil {
                 template<std::size_t Version>
                 class mnt6 {
 
-                    using types_policy = detail::mnt6_types<Version>;
+                    typedef detail::mnt6_types<Version> policy_type;
 
                 public:
-                    typedef typename types_policy::base_field_type base_field_type;
-                    typedef typename types_policy::scalar_field_type scalar_field_type;
+                    typedef typename policy_type::base_field_type base_field_type;
+                    typedef typename policy_type::scalar_field_type scalar_field_type;
 
                     template<typename Coordinates = coordinates::projective, typename Form = forms::short_weierstrass>
                     using g1_type = typename detail::mnt6_g1<Version, Form, Coordinates>;
@@ -63,7 +63,7 @@ namespace nil {
 
                     // typedef typename pairing::pair_curve_type chained_on_curve_type;
 
-                    typedef typename types_policy::gt_field_type gt_type;
+                    typedef typename policy_type::gt_field_type gt_type;
 
                     constexpr static const bool has_affine_pairing = true;
                 };

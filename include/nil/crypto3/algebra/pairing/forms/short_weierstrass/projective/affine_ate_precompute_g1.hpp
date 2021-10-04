@@ -38,12 +38,12 @@ namespace nil {
                     using curve_type = CurveType;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::short_weierstrass_projective_<curve_type>;
+                    typedef detail::short_weierstrass_projective_<curve_type> policy_type;
                     using g1_type = typename curve_type::template g1_type<>;
                     using g1_affine_type = typename curve_type::template g1_type<curves::coordinates::affine>;
 
                 public:
-                    using g1_precomputed_type = typename types_policy::affine_ate_g1_precomputation;
+                    using g1_precomputed_type = typename policy_type::affine_ate_g1_precomputation;
 
                     static g1_precomputed_type process(const typename g1_type::value_type &P) {
 

@@ -39,13 +39,14 @@ namespace nil {
                  */
                 class curve25519 {
 
-                    using types_policy = detail::curve25519_types;
+                    typedef detail::curve25519_types policy_type;
 
                 public:
-                    typedef typename types_policy::base_field_type base_field_type;
-                    typedef typename types_policy::scalar_field_type scalar_field_type;
+                    typedef typename policy_type::base_field_type base_field_type;
+                    typedef typename policy_type::scalar_field_type scalar_field_type;
 
-                    template<typename Coordinates = coordinates::extended_with_a_minus_1, typename Form = forms::twisted_edwards>
+                    template<typename Coordinates = coordinates::extended_with_a_minus_1,
+                             typename Form = forms::twisted_edwards>
                     using g1_type = typename detail::curve25519_g1<Form, Coordinates>;
                 };
             }    // namespace curves

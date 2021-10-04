@@ -46,7 +46,7 @@ namespace nil {
                     using curve_type = curves::mnt4<298>;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::short_weierstrass_projective_types_policy<curve_type>;
+                    typedef detail::short_weierstrass_projective_types_policy<curve_type> policy_type;
 
                     using gt_type = typename curve_type::gt_type;
                     using base_field_type = typename curve_type::base_field_type;
@@ -58,10 +58,10 @@ namespace nil {
 
                 public:
                     static typename gt_type::value_type
-                        process(const typename types_policy::ate_g1_precomputed_type &prec_P1,
-                                const typename types_policy::ate_g2_precomputed_type &prec_Q1,
-                                const typename types_policy::ate_g1_precomputed_type &prec_P2,
-                                const typename types_policy::ate_g2_precomputed_type &prec_Q2) {
+                        process(const typename policy_type::ate_g1_precomputed_type &prec_P1,
+                                const typename policy_type::ate_g2_precomputed_type &prec_Q1,
+                                const typename policy_type::ate_g1_precomputed_type &prec_P2,
+                                const typename policy_type::ate_g2_precomputed_type &prec_Q2) {
 
                         g2_field_type_value L1_coeff1 =
                             g2_field_type_value(prec_P1.PX, g1_field_type_value::zero()) - prec_Q1.QX_over_twist;
@@ -86,8 +86,8 @@ namespace nil {
                             /* code below gets executed for all bits (EXCEPT the MSB itself) of
                                param_p (skipping leading zeros) in MSB to LSB
                                order */
-                            typename types_policy::ate_dbl_coeffs dc1 = prec_Q1.dbl_coeffs[dbl_idx];
-                            typename types_policy::ate_dbl_coeffs dc2 = prec_Q2.dbl_coeffs[dbl_idx];
+                            typename policy_type::ate_dbl_coeffs dc1 = prec_Q1.dbl_coeffs[dbl_idx];
+                            typename policy_type::ate_dbl_coeffs dc2 = prec_Q2.dbl_coeffs[dbl_idx];
                             ++dbl_idx;
 
                             typename gt_type::value_type g_RR_at_P1 = typename gt_type::value_type(
@@ -99,8 +99,8 @@ namespace nil {
                             f = f.squared() * g_RR_at_P1 * g_RR_at_P2;
 
                             if (bit) {
-                                typename types_policy::ate_add_coeffs ac1 = prec_Q1.add_coeffs[add_idx];
-                                typename types_policy::ate_add_coeffs ac2 = prec_Q2.add_coeffs[add_idx];
+                                typename policy_type::ate_add_coeffs ac1 = prec_Q1.add_coeffs[add_idx];
+                                typename policy_type::ate_add_coeffs ac2 = prec_Q2.add_coeffs[add_idx];
                                 ++add_idx;
 
                                 typename gt_type::value_type g_RQ_at_P1 = typename gt_type::value_type(
@@ -115,8 +115,8 @@ namespace nil {
                         }
 
                         if (params_type::ate_is_loop_count_neg) {
-                            typename types_policy::ate_add_coeffs ac1 = prec_Q1.add_coeffs[add_idx];
-                            typename types_policy::ate_add_coeffs ac2 = prec_Q2.add_coeffs[add_idx];
+                            typename policy_type::ate_add_coeffs ac1 = prec_Q1.add_coeffs[add_idx];
+                            typename policy_type::ate_add_coeffs ac2 = prec_Q2.add_coeffs[add_idx];
                             ++add_idx;
                             typename gt_type::value_type g_RnegR_at_P1 = typename gt_type::value_type(
                                 ac1.c_RZ * prec_P1.PY_twist,

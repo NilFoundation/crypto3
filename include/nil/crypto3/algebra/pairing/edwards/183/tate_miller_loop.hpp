@@ -46,12 +46,12 @@ namespace nil {
                     using curve_type = curves::edwards<183>;
 
                     using params_type = detail::pairing_params<curve_type>;
-                    using types_policy = detail::types_policy<curve_type>;
+                    typedef detail::types_policy<curve_type> policy_type;
                     using gt_type = typename curve_type::gt_type;
 
                 public:
-                    static typename gt_type::value_type process(const types_policy::tate_g1_precomp &prec_P,
-                                                                const types_policy::tate_g2_precomp &prec_Q) {
+                    static typename gt_type::value_type process(const policy_type::tate_g1_precomp &prec_P,
+                                                                const policy_type::tate_g2_precomp &prec_Q) {
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 
@@ -69,7 +69,7 @@ namespace nil {
                             /* code below gets executed for all bits (EXCEPT the MSB itself) of
                                policy_type::scalar_field_modulus (skipping leading zeros) in MSB to LSB
                                order */
-                            typename types_policy::Fq_conic_coefficients cc = prec_P[idx++];
+                            typename policy_type::Fq_conic_coefficients cc = prec_P[idx++];
                             typename gt_type::value_type g_RR_at_Q = typename gt_type::value_type(
                                 Fq3(cc.c_XZ, Fq(0l), Fq(0l)) + cc.c_XY * prec_Q.y0, cc.c_ZZ * prec_Q.eta);
                             f = f.squared() * g_RR_at_Q;
