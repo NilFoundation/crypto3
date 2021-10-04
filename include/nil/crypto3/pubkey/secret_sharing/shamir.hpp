@@ -300,7 +300,8 @@ namespace nil {
 
                     indexes_type indexes;
                     for (auto it = first; it != last; it++) {
-                        assert(check_participant_index(it->get_index()) && indexes.emplace(it->get_index()).second);
+                        bool emplace_status = indexes.emplace(it->get_index()).second;
+                        assert(check_participant_index(it->get_index()) && emplace_status);
                     }
                     return indexes;
                 }
@@ -363,7 +364,8 @@ namespace nil {
             protected:
                 template<typename InternalAccumulator, typename Share>
                 static inline void _update(InternalAccumulator &acc, const Share &share) {
-                    assert(acc.first.emplace(share.get_index()).second);
+                    bool emplace_status = acc.first.emplace(share.get_index()).second;
+                    assert(emplace_status);
                     acc.second.push_back(share);
                 }
 

@@ -230,8 +230,8 @@ namespace nil {
 
                     indexes_type indexes;
                     for (auto it = first; it != last; it++) {
-                        assert(scheme_type::check_participant_index(it->get_index()) &&
-                               indexes.emplace(it->get_index()).second);
+                        bool emplace_status = indexes.emplace(it->get_index()).second;
+                        assert(scheme_type::check_participant_index(it->get_index()) && emplace_status);
                     }
 
                     return indexes;
