@@ -260,11 +260,16 @@ namespace nil {
                 }
 
             protected:
-                template<typename ShareIt>
+                template<typename ShareIt,
+                         typename std::enable_if<
+                             std::is_convertible<typename std::remove_cv<typename std::remove_reference<
+                                                     typename std::iterator_traits<ShareIt>::value_type>::type>::type,
+                                                 share_sss<scheme_type>>::value,
+                             bool>::type = true>
                 static inline secret_type reconstruct_secret(ShareIt first, ShareIt last) {
                     BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<ShareIt>));
 
-                    return reconstruct_secret(first, last, scheme_type::get_indexes(first, last));
+                    return reconstruct_secret(first, last, get_indexes(first, last));
                 }
 
                 template<typename ShareIt,
@@ -282,6 +287,22 @@ namespace nil {
                     }
 
                     return secret;
+                }
+
+                template<typename ShareIt,
+                         typename std::enable_if<
+                             std::is_convertible<typename std::remove_cv<typename std::remove_reference<
+                                                     typename std::iterator_traits<ShareIt>::value_type>::type>::type,
+                                                 share_sss<scheme_type>>::value,
+                             bool>::type = true>
+                static inline indexes_type get_indexes(ShareIt first, ShareIt last) {
+                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<ShareIt>));
+
+                    indexes_type indexes;
+                    for (auto it = first; it != last; it++) {
+                        assert(check_participant_index(it->get_index()) && indexes.emplace(it->get_index()).second);
+                    }
+                    return indexes;
                 }
 
                 secret_type secret;
@@ -348,7 +369,7 @@ namespace nil {
 
                 template<typename Secret, typename InternalAccumulator>
                 static inline Secret _process(InternalAccumulator &acc) {
-                    return Secret(acc.second, acc.first);
+                    return Secret(acc.second /*, acc.first*/);
                 }
 
             public:
