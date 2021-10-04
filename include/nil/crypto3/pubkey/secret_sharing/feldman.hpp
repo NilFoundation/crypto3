@@ -39,37 +39,20 @@ namespace nil {
             };
 
             template<typename Group>
-            struct public_share_sss<feldman_sss<Group>> {
+            struct public_share_sss<feldman_sss<Group>> : public public_share_sss<shamir_sss<Group>> {
+                typedef public_share_sss<shamir_sss<Group>> base_type;
                 typedef feldman_sss<Group> scheme_type;
                 typedef typename scheme_type::indexed_public_element_type public_share_type;
 
                 public_share_sss() = default;
 
-                public_share_sss(typename public_share_type::first_type i) :
-                    public_share(i, public_share_type::second_type::zero()) {
-                    assert(scheme_type::check_participant_index(get_index()));
+                public_share_sss(std::size_t i) : base_type(i) {
                 }
 
-                public_share_sss(const public_share_type &in_public_share) : public_share(in_public_share) {
-                    assert(scheme_type::check_participant_index(get_index()));
+                public_share_sss(const public_share_type &in_public_share) : base_type(in_public_share) {
                 }
 
-                public_share_sss(typename public_share_type::first_type i,
-                                 const typename public_share_type::second_type &ps) :
-                    public_share(i, ps) {
-                    assert(scheme_type::check_participant_index(get_index()));
-                }
-
-                inline typename public_share_type::first_type get_index() const {
-                    return public_share.first;
-                }
-
-                inline const typename public_share_type::second_type &get_value() const {
-                    return public_share.second;
-                }
-
-                bool operator==(const public_share_sss &other) const {
-                    return this->public_share == other.public_share;
+                public_share_sss(std::size_t i, const typename public_share_type::second_type &ps) : base_type(i, ps) {
                 }
 
                 //
@@ -78,124 +61,52 @@ namespace nil {
                 inline void update(const typename scheme_type::public_coeff_type &public_coeff, std::size_t exp) {
                     assert(scheme_type::check_exp(exp));
 
-                    public_share.second =
-                        public_share.second +
-                        typename scheme_type::private_element_type(public_share.first).pow(exp) * public_coeff;
+                    this->public_share.second =
+                        this->public_share.second +
+                        typename scheme_type::private_element_type(this->public_share.first).pow(exp) * public_coeff;
                 }
-
-            private:
-                public_share_type public_share;
             };
 
             template<typename Group>
-            struct share_sss<feldman_sss<Group>> {
+            struct share_sss<feldman_sss<Group>> : public share_sss<shamir_sss<Group>> {
+                typedef share_sss<shamir_sss<Group>> base_type;
                 typedef feldman_sss<Group> scheme_type;
                 typedef typename scheme_type::indexed_private_element_type share_type;
 
                 share_sss() = default;
 
-                share_sss(typename share_type::first_type i) : share(i, share_type::second_type::zero()) {
-                    assert(scheme_type::check_participant_index(get_index()));
+                share_sss(std::size_t i) : base_type(i) {
                 }
 
-                share_sss(const share_type &in_share) : share(in_share) {
-                    assert(scheme_type::check_participant_index(get_index()));
+                share_sss(const share_type &in_share) : base_type(in_share) {
                 }
 
-                share_sss(typename share_type::first_type i, const typename share_type::second_type &s) : share(i, s) {
-                    assert(scheme_type::check_participant_index(get_index()));
+                share_sss(std::size_t i, const typename share_type::second_type &s) : base_type(i, s) {
                 }
-
-                inline typename share_type::first_type get_index() const {
-                    return share.first;
-                }
-
-                inline const typename share_type::second_type &get_value() const {
-                    return share.second;
-                }
-
-                operator public_share_sss<scheme_type>() const {
-                    using To = public_share_sss<scheme_type>;
-
-                    return To(share.first, share.second * To::public_share_type::second_type::one());
-                }
-
-                bool operator==(const share_sss &other) const {
-                    return this->share == other.share;
-                }
-
-                //
-                //  0 <= k < t
-                //
-                inline void update(const typename scheme_type::coeff_type &coeff, std::size_t exp) {
-                    assert(scheme_type::check_exp(exp));
-
-                    share.second =
-                        share.second + coeff * typename scheme_type::private_element_type(share.first).pow(exp);
-                }
-
-            private:
-                share_type share;
             };
 
             template<typename Group>
-            struct secret_sss<feldman_sss<Group>> {
+            struct secret_sss<feldman_sss<Group>> : public secret_sss<shamir_sss<Group>> {
+                typedef secret_sss<shamir_sss<Group>> base_type;
                 typedef feldman_sss<Group> scheme_type;
                 typedef typename scheme_type::private_element_type secret_type;
                 typedef typename scheme_type::indexes_type indexes_type;
 
                 template<typename Shares>
-                secret_sss(const Shares &shares) : secret_sss(std::cbegin(shares), std::cend(shares)) {
+                secret_sss(const Shares &shares) : base_type(shares) {
                 }
 
                 template<typename ShareIt>
-                secret_sss(ShareIt first, ShareIt last) : secret(reconstruct_secret(first, last)) {
+                secret_sss(ShareIt first, ShareIt last) : base_type(first, last) {
                 }
 
                 template<typename Shares>
-                secret_sss(const Shares &shares, const indexes_type &indexes) :
-                    secret_sss(std::cbegin(shares), std::cend(shares), indexes) {
+                secret_sss(const Shares &shares, const indexes_type &indexes) : base_type(shares, indexes) {
                 }
 
                 template<typename ShareIt>
-                secret_sss(ShareIt first, ShareIt last, const indexes_type &indexes) :
-                    secret(reconstruct_secret(first, last, indexes)) {
+                secret_sss(ShareIt first, ShareIt last, const indexes_type &indexes) : base_type(first, last, indexes) {
                 }
-
-                inline const secret_type &get_value() const {
-                    return secret;
-                }
-
-                bool operator==(const secret_sss &other) const {
-                    return this->secret == other.secret;
-                }
-
-            private:
-                template<typename ShareIt>
-                static inline secret_type reconstruct_secret(ShareIt first, ShareIt last) {
-                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<ShareIt>));
-
-                    return reconstruct_secret(first, last, scheme_type::get_indexes(first, last));
-                }
-
-                template<typename ShareIt,
-                         typename std::enable_if<
-                             std::is_same<typename std::remove_cv<typename std::remove_reference<
-                                              typename std::iterator_traits<ShareIt>::value_type>::type>::type,
-                                          share_sss<scheme_type>>::value,
-                             bool>::type = true>
-                static inline secret_type reconstruct_secret(ShareIt first, ShareIt last, const indexes_type &indexes) {
-                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<ShareIt>));
-
-                    secret_type secret = secret_type::zero();
-                    for (auto it = first; it != last; it++) {
-                        secret = secret + it->get_value() * scheme_type::eval_basis_poly(indexes, it->get_index());
-                    }
-
-                    return secret;
-                }
-
-                secret_type secret;
             };
 
             template<typename Group>

@@ -132,8 +132,7 @@ namespace nil {
 
                 public_share_sss() = default;
 
-                public_share_sss(typename public_share_type::first_type i) :
-                    public_share(i, public_share_type::second_type::zero()) {
+                public_share_sss(std::size_t i) : public_share(i, public_share_type::second_type::zero()) {
                     assert(scheme_type::check_participant_index(get_index()));
                 }
 
@@ -141,8 +140,7 @@ namespace nil {
                     assert(scheme_type::check_participant_index(get_index()));
                 }
 
-                public_share_sss(typename public_share_type::first_type i,
-                                 const typename public_share_type::second_type &ps) :
+                public_share_sss(std::size_t i, const typename public_share_type::second_type &ps) :
                     public_share(i, ps) {
                     assert(scheme_type::check_participant_index(get_index()));
                 }
@@ -163,7 +161,7 @@ namespace nil {
                     return this->get_index() < other.get_index();
                 }
 
-            private:
+            protected:
                 public_share_type public_share;
             };
 
@@ -174,7 +172,7 @@ namespace nil {
 
                 share_sss() = default;
 
-                share_sss(typename share_type::first_type i) : share(i, share_type::second_type::zero()) {
+                share_sss(std::size_t i) : share(i, share_type::second_type::zero()) {
                     assert(scheme_type::check_participant_index(get_index()));
                 }
 
@@ -182,7 +180,7 @@ namespace nil {
                     assert(scheme_type::check_participant_index(get_index()));
                 }
 
-                share_sss(typename share_type::first_type i, const typename share_type::second_type &s) : share(i, s) {
+                share_sss(std::size_t i, const typename share_type::second_type &s) : share(i, s) {
                     assert(scheme_type::check_participant_index(get_index()));
                 }
 
@@ -194,8 +192,14 @@ namespace nil {
                     return share.second;
                 }
 
-                operator public_share_sss<scheme_type>() const {
-                    using To = public_share_sss<scheme_type>;
+                template<
+                    typename Scheme,
+                    typename std::enable_if<
+                        std::is_convertible<typename std::remove_cv<typename std::remove_reference<Scheme>::type>::type,
+                                            scheme_type>::value,
+                        bool>::type = true>
+                operator public_share_sss<Scheme>() const {
+                    using To = public_share_sss<Scheme>;
 
                     return To(share.first, share.second * To::public_share_type::second_type::one());
                 }
@@ -218,7 +222,7 @@ namespace nil {
                         share.second + coeff * typename scheme_type::private_element_type(share.first).pow(exp);
                 }
 
-            private:
+            protected:
                 share_type share;
             };
 
@@ -254,7 +258,7 @@ namespace nil {
                     return this->secret == other.secret;
                 }
 
-            private:
+            protected:
                 template<typename ShareIt>
                 static inline secret_type reconstruct_secret(ShareIt first, ShareIt last) {
                     BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<ShareIt>));
@@ -264,9 +268,9 @@ namespace nil {
 
                 template<typename ShareIt,
                          typename std::enable_if<
-                             std::is_same<typename std::remove_cv<typename std::remove_reference<
-                                              typename std::iterator_traits<ShareIt>::value_type>::type>::type,
-                                          share_sss<scheme_type>>::value,
+                             std::is_convertible<typename std::remove_cv<typename std::remove_reference<
+                                                     typename std::iterator_traits<ShareIt>::value_type>::type>::type,
+                                                 share_sss<scheme_type>>::value,
                              bool>::type = true>
                 static inline secret_type reconstruct_secret(ShareIt first, ShareIt last, const indexes_type &indexes) {
                     BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<ShareIt>));
