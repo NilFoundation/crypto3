@@ -154,14 +154,13 @@ BOOST_AUTO_TEST_CASE(feldman_sss) {
     using secret_reconstructing_isomorphic_mode =
         typename modes::isomorphic<scheme_type>::template bind<secret_reconstructing_policy<scheme_type>>::type;
 
-    using shares_dealing_acc_type = shares_dealing_accumulator_set<shares_dealing_isomorphic_mode>;
-    using shares_dealing_acc = typename boost::mpl::front<typename shares_dealing_acc_type::features_type>::type;
-    using share_verification_acc_type = share_verification_accumulator_set<share_verification_isomorphic_mode>;
-    using share_verification_acc =
-        typename boost::mpl::front<typename share_verification_acc_type::features_type>::type;
-    using secret_reconstructing_acc_type = secret_reconstructing_accumulator_set<secret_reconstructing_isomorphic_mode>;
+    using shares_dealing_acc_set = shares_dealing_accumulator_set<shares_dealing_isomorphic_mode>;
+    using shares_dealing_acc = typename boost::mpl::front<typename shares_dealing_acc_set::features_type>::type;
+    using share_verification_acc_set = share_verification_accumulator_set<share_verification_isomorphic_mode>;
+    using share_verification_acc = typename boost::mpl::front<typename share_verification_acc_set::features_type>::type;
+    using secret_reconstructing_acc_set = secret_reconstructing_accumulator_set<secret_reconstructing_isomorphic_mode>;
     using secret_reconstructing_acc =
-        typename boost::mpl::front<typename secret_reconstructing_acc_type::features_type>::type;
+        typename boost::mpl::front<typename secret_reconstructing_acc_set::features_type>::type;
 
     auto t = 5;
     auto n = 10;
@@ -179,12 +178,12 @@ BOOST_AUTO_TEST_CASE(feldman_sss) {
     typename shares_dealing_isomorphic_mode::result_type shares1 =
         nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n);
     // deal_shares(rng, acc)
-    shares_dealing_acc_type deal_shares_acc(n, nil::crypto3::accumulators::threshold_value = t);
+    shares_dealing_acc_set deal_shares_acc(n, nil::crypto3::accumulators::threshold_value = t);
     nil::crypto3::deal_shares<scheme_type>(coeffs, deal_shares_acc);
     typename shares_dealing_isomorphic_mode::result_type shares2 =
         boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc);
     // deal_shares(first, last, acc)
-    shares_dealing_acc_type deal_shares_acc1(n, nil::crypto3::accumulators::threshold_value = t);
+    shares_dealing_acc_set deal_shares_acc1(n, nil::crypto3::accumulators::threshold_value = t);
     nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), deal_shares_acc1);
     typename shares_dealing_isomorphic_mode::result_type shares3 =
         boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc1);
@@ -215,11 +214,11 @@ BOOST_AUTO_TEST_CASE(feldman_sss) {
         BOOST_CHECK(
             static_cast<bool>(nil::crypto3::verify_share<scheme_type>(pub_coeffs.begin(), pub_coeffs.end(), s_i)));
         // verify_share(rng, acc)
-        share_verification_acc_type verify_share_acc(s_i);
+        share_verification_acc_set verify_share_acc(s_i);
         BOOST_CHECK(boost::accumulators::extract_result<share_verification_acc>(
             nil::crypto3::verify_share<scheme_type>(pub_coeffs, verify_share_acc)));
         // verify_share(first, last, acc)
-        share_verification_acc_type verify_share_acc1(s_i);
+        share_verification_acc_set verify_share_acc1(s_i);
         BOOST_CHECK(boost::accumulators::extract_result<share_verification_acc>(
             nil::crypto3::verify_share<scheme_type>(pub_coeffs.begin(), pub_coeffs.end(), verify_share_acc1)));
         // verify_share(rng, out)
@@ -241,11 +240,11 @@ BOOST_AUTO_TEST_CASE(feldman_sss) {
     // reconstruct(first, last)
     secret_sss<scheme_type> secret1 = nil::crypto3::reconstruct<scheme_type>(shares.begin(), shares.end());
     // reconstruct(rng, acc)
-    secret_reconstructing_acc_type reconstruct_secret_acc;
+    secret_reconstructing_acc_set reconstruct_secret_acc;
     secret_sss<scheme_type> secret_acc = boost::accumulators::extract_result<secret_reconstructing_acc>(
         nil::crypto3::reconstruct<scheme_type>(shares, reconstruct_secret_acc));
     // reconstruct(first, last, acc)
-    secret_reconstructing_acc_type reconstruct_secret_acc1;
+    secret_reconstructing_acc_set reconstruct_secret_acc1;
     secret_sss<scheme_type> secret_acc1 = boost::accumulators::extract_result<secret_reconstructing_acc>(
         nil::crypto3::reconstruct<scheme_type>(shares.begin(), shares.end(), reconstruct_secret_acc1));
     // reconstruct(rng, out)
@@ -284,11 +283,11 @@ BOOST_AUTO_TEST_CASE(shamir_weighted_sss) {
     using secret_reconstructing_isomorphic_mode =
         typename modes::isomorphic<scheme_type>::template bind<secret_reconstructing_policy<scheme_type>>::type;
 
-    using shares_dealing_acc_type = shares_dealing_accumulator_set<shares_dealing_isomorphic_mode>;
-    using shares_dealing_acc = typename boost::mpl::front<typename shares_dealing_acc_type::features_type>::type;
-    using secret_reconstructing_acc_type = secret_reconstructing_accumulator_set<secret_reconstructing_isomorphic_mode>;
-    using secret_reconstructing_acc =
-        typename boost::mpl::front<typename secret_reconstructing_acc_type::features_type>::type;
+    using shares_dealing_acc_set = shares_dealing_accumulator_set<shares_dealing_isomorphic_mode>;
+    using shares_dealing_acc = typename boost::mpl::front<typename shares_dealing_acc_set::features_type>::type;
+    using secret_reconstructing_acc_set =
+    secret_reconstructing_accumulator_set<secret_reconstructing_isomorphic_mode>; using secret_reconstructing_acc =
+        typename boost::mpl::front<typename secret_reconstructing_acc_set::features_type>::type;
 
     auto t = 10;
     auto n = 20;
@@ -322,13 +321,13 @@ BOOST_AUTO_TEST_CASE(shamir_weighted_sss) {
     typename shares_dealing_isomorphic_mode::result_type shares_one1 =
         nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, weights_one);
     // deal_shares(rng, acc)
-    shares_dealing_acc_type deal_shares_one_acc(n, nil::crypto3::accumulators::threshold_value = t,
+    shares_dealing_acc_set deal_shares_one_acc(n, nil::crypto3::accumulators::threshold_value = t,
                                                 nil::crypto3::accumulators::weights = weights_one);
     nil::crypto3::deal_shares<scheme_type>(coeffs, deal_shares_one_acc);
     typename shares_dealing_isomorphic_mode::result_type shares_one2 =
         boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_one_acc);
     // deal_shares(first, last, acc)
-    shares_dealing_acc_type deal_shares_one_acc1(n, nil::crypto3::accumulators::threshold_value = t,
+    shares_dealing_acc_set deal_shares_one_acc1(n, nil::crypto3::accumulators::threshold_value = t,
                                                  nil::crypto3::accumulators::weights = weights_one);
     nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), deal_shares_one_acc1);
     typename shares_dealing_isomorphic_mode::result_type shares_one3 =
@@ -357,13 +356,13 @@ BOOST_AUTO_TEST_CASE(shamir_weighted_sss) {
     typename shares_dealing_isomorphic_mode::result_type shares1 =
         nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, weights);
     // deal_shares(rng, acc)
-    shares_dealing_acc_type deal_shares_acc(n, nil::crypto3::accumulators::threshold_value = t,
+    shares_dealing_acc_set deal_shares_acc(n, nil::crypto3::accumulators::threshold_value = t,
                                             nil::crypto3::accumulators::weights = weights);
     nil::crypto3::deal_shares<scheme_type>(coeffs, deal_shares_acc);
     typename shares_dealing_isomorphic_mode::result_type shares2 =
         boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc);
     // deal_shares(first, last, acc)
-    shares_dealing_acc_type deal_shares_acc1(n, nil::crypto3::accumulators::threshold_value = t,
+    shares_dealing_acc_set deal_shares_acc1(n, nil::crypto3::accumulators::threshold_value = t,
                                              nil::crypto3::accumulators::weights = weights);
     nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), deal_shares_acc1);
     typename shares_dealing_isomorphic_mode::result_type shares3 =
@@ -373,7 +372,8 @@ BOOST_AUTO_TEST_CASE(shamir_weighted_sss) {
     nil::crypto3::deal_shares<scheme_type>(coeffs, n, weights, std::back_inserter(shares_out));
     // deal_shares(first, last, out)
     std::vector<typename shares_dealing_isomorphic_mode::result_type> shares_out1;
-    nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, weights, std::back_inserter(shares_out1));
+    nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, weights,
+    std::back_inserter(shares_out1));
 
     BOOST_CHECK(shares == shares1);
     BOOST_CHECK(shares == shares2);
@@ -387,13 +387,14 @@ BOOST_AUTO_TEST_CASE(shamir_weighted_sss) {
     // reconstruct(rng)
     secret_sss<scheme_type> secret_one = nil::crypto3::reconstruct<scheme_type>(shares_one);
     // reconstruct(first, last)
-    secret_sss<scheme_type> secret_one1 = nil::crypto3::reconstruct<scheme_type>(shares_one.begin(), shares_one.end());
+    secret_sss<scheme_type> secret_one1 = nil::crypto3::reconstruct<scheme_type>(shares_one.begin(),
+    shares_one.end());
     // reconstruct(rng, acc)
-    secret_reconstructing_acc_type reconstruct_secret_one_acc;
+    secret_reconstructing_acc_set reconstruct_secret_one_acc;
     secret_sss<scheme_type> secret_one_acc = boost::accumulators::extract_result<secret_reconstructing_acc>(
         nil::crypto3::reconstruct<scheme_type>(shares_one, reconstruct_secret_one_acc));
     // reconstruct(first, last, acc)
-    secret_reconstructing_acc_type reconstruct_secret_one_acc1;
+    secret_reconstructing_acc_set reconstruct_secret_one_acc1;
     secret_sss<scheme_type> secret_one_acc1 = boost::accumulators::extract_result<secret_reconstructing_acc>(
         nil::crypto3::reconstruct<scheme_type>(shares_one.begin(), shares_one.end(), reconstruct_secret_one_acc1));
     // reconstruct(rng, out)
@@ -401,8 +402,8 @@ BOOST_AUTO_TEST_CASE(shamir_weighted_sss) {
     nil::crypto3::reconstruct<scheme_type>(shares_one, std::back_inserter(secret_one_out));
     // reconstruct(first, last, out)
     std::vector<secret_sss<scheme_type>> secret_one_out1;
-    nil::crypto3::reconstruct<scheme_type>(shares_one.begin(), shares_one.end(), std::back_inserter(secret_one_out1));
-    BOOST_CHECK(coeffs.front() == secret_one.get_value());
+    nil::crypto3::reconstruct<scheme_type>(shares_one.begin(), shares_one.end(),
+    std::back_inserter(secret_one_out1)); BOOST_CHECK(coeffs.front() == secret_one.get_value());
     BOOST_CHECK(secret_one == secret_one1);
     BOOST_CHECK(secret_one1 == secret_one_acc);
     BOOST_CHECK(secret_one_acc == secret_one_acc1);
@@ -414,11 +415,11 @@ BOOST_AUTO_TEST_CASE(shamir_weighted_sss) {
     // reconstruct(first, last)
     secret_sss<scheme_type> secret1 = nil::crypto3::reconstruct<scheme_type>(shares.begin(), shares.end());
     // reconstruct(rng, acc)
-    secret_reconstructing_acc_type reconstruct_secret_acc;
+    secret_reconstructing_acc_set reconstruct_secret_acc;
     secret_sss<scheme_type> secret_acc = boost::accumulators::extract_result<secret_reconstructing_acc>(
         nil::crypto3::reconstruct<scheme_type>(shares, reconstruct_secret_acc));
     // reconstruct(first, last, acc)
-    secret_reconstructing_acc_type reconstruct_secret_acc1;
+    secret_reconstructing_acc_set reconstruct_secret_acc1;
     secret_sss<scheme_type> secret_acc1 = boost::accumulators::extract_result<secret_reconstructing_acc>(
         nil::crypto3::reconstruct<scheme_type>(shares.begin(), shares.end(), reconstruct_secret_acc1));
     // reconstruct(rng, out)
@@ -466,16 +467,15 @@ BOOST_AUTO_TEST_CASE(pedersen_dkg) {
     using share_dealing_isomorphic_mode =
         typename modes::isomorphic<scheme_type>::template bind<share_dealing_policy<scheme_type>>::type;
 
-    using shares_dealing_acc_type = shares_dealing_accumulator_set<shares_dealing_isomorphic_mode>;
-    using shares_dealing_acc = typename boost::mpl::front<typename shares_dealing_acc_type::features_type>::type;
-    using share_verification_acc_type = share_verification_accumulator_set<share_verification_isomorphic_mode>;
-    using share_verification_acc =
-        typename boost::mpl::front<typename share_verification_acc_type::features_type>::type;
-    using secret_reconstructing_acc_type = secret_reconstructing_accumulator_set<secret_reconstructing_isomorphic_mode>;
+    using shares_dealing_acc_set = shares_dealing_accumulator_set<shares_dealing_isomorphic_mode>;
+    using shares_dealing_acc = typename boost::mpl::front<typename shares_dealing_acc_set::features_type>::type;
+    using share_verification_acc_set = share_verification_accumulator_set<share_verification_isomorphic_mode>;
+    using share_verification_acc = typename boost::mpl::front<typename share_verification_acc_set::features_type>::type;
+    using secret_reconstructing_acc_set = secret_reconstructing_accumulator_set<secret_reconstructing_isomorphic_mode>;
     using secret_reconstructing_acc =
-        typename boost::mpl::front<typename secret_reconstructing_acc_type::features_type>::type;
-    using share_dealing_acc_type = share_dealing_accumulator_set<share_dealing_isomorphic_mode>;
-    using share_dealing_acc = typename boost::mpl::front<typename share_dealing_acc_type::features_type>::type;
+        typename boost::mpl::front<typename secret_reconstructing_acc_set::features_type>::type;
+    using share_dealing_acc_set = share_dealing_accumulator_set<share_dealing_isomorphic_mode>;
+    using share_dealing_acc = typename boost::mpl::front<typename share_dealing_acc_set::features_type>::type;
 
     auto t = 5;
     auto n = 10;
@@ -521,9 +521,9 @@ BOOST_AUTO_TEST_CASE(pedersen_dkg) {
     //===========================================================================
     // each participant calculate its share as sum of shares generated by others for him
 
-    std::vector<share_dealing_acc_type> P_shares_acc;
+    std::vector<share_dealing_acc_set> P_shares_acc;
     for (std::size_t i = 1; i <= n; ++i) {
-        P_shares_acc.emplace_back(share_dealing_acc_type(i));
+        P_shares_acc.emplace_back(share_dealing_acc_set(i));
     }
     for (const auto &i_generated_shares : P_generated_shares) {
         for (const auto &j_share : i_generated_shares) {
@@ -570,18 +570,16 @@ BOOST_AUTO_TEST_CASE(pedersen_dkg) {
         secret = secret + i_poly.front();
     }
 
-    BOOST_CHECK_EQUAL(static_cast<secret_sss<scheme_type>>(
-                          nil::crypto3::reconstruct<scheme_type>(P_shares.begin(), P_shares.begin() + t))
-                          .get_value(),
-                      secret);
+    secret_sss<scheme_type> reconstructed_secret =
+        nil::crypto3::reconstruct<scheme_type>(P_shares.begin(), P_shares.begin() + t);
+    BOOST_CHECK_EQUAL(reconstructed_secret.get_value(), secret);
 
     //===========================================================================
     // check impossibility of secret recovering with group weight less than threshold value
 
-    BOOST_CHECK_NE(static_cast<secret_sss<scheme_type>>(
-                       nil::crypto3::reconstruct<scheme_type>(P_shares.begin(), P_shares.begin() + t - 1))
-                       .get_value(),
-                   secret);
+    secret_sss<scheme_type> wrong_secret =
+        nil::crypto3::reconstruct<scheme_type>(P_shares.begin(), P_shares.begin() + t - 1);
+    BOOST_CHECK_NE(wrong_secret.get_value(), secret);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

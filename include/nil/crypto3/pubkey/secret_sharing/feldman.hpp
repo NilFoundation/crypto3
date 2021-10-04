@@ -36,77 +36,166 @@ namespace nil {
             template<typename Group>
             struct feldman_sss : public shamir_sss<Group> {
                 typedef shamir_sss<Group> base_type;
-                typedef typename base_type::group_type group_type;
-                typedef typename base_type::basic_policy basic_policy;
             };
 
             template<typename Group>
-            struct public_share_sss<feldman_sss<Group>> : public virtual public_share_sss<shamir_sss<Group>> {
-                typedef public_share_sss<shamir_sss<Group>> base_type;
+            struct public_share_sss<feldman_sss<Group>> {
                 typedef feldman_sss<Group> scheme_type;
-                typedef typename base_type::public_share_type public_share_type;
+                typedef typename scheme_type::indexed_public_element_type public_share_type;
 
                 public_share_sss() = default;
 
-                public_share_sss(const typename base_type::public_share_type &in_public_share) :
-                    public_share_sss<shamir_sss<Group>>(in_public_share) {
+                public_share_sss(typename public_share_type::first_type i) :
+                    public_share(i, public_share_type::second_type::zero()) {
+                    assert(scheme_type::check_participant_index(get_index()));
                 }
 
-                public_share_sss(typename base_type::public_share_type::first_type i,
-                                 const typename base_type::public_share_type::second_type &ps) :
-                    base_type(i, ps) {
+                public_share_sss(const public_share_type &in_public_share) : public_share(in_public_share) {
+                    assert(scheme_type::check_participant_index(get_index()));
+                }
+
+                public_share_sss(typename public_share_type::first_type i,
+                                 const typename public_share_type::second_type &ps) :
+                    public_share(i, ps) {
+                    assert(scheme_type::check_participant_index(get_index()));
+                }
+
+                inline typename public_share_type::first_type get_index() const {
+                    return public_share.first;
+                }
+
+                inline const typename public_share_type::second_type &get_value() const {
+                    return public_share.second;
+                }
+
+                bool operator==(const public_share_sss &other) const {
+                    return this->public_share == other.public_share;
                 }
 
                 //
-                //  partial computing of verification value
+                //  0 <= k < t
                 //
-                static inline public_share_type
-                    partial_eval_verification_value(const typename scheme_type::public_coeff_type &public_coeff,
-                                                    std::size_t exp, const public_share_type &init_verification_value) {
-                    assert(scheme_type::check_participant_index(init_verification_value.first));
+                inline void update(const typename scheme_type::public_coeff_type &public_coeff, std::size_t exp) {
                     assert(scheme_type::check_exp(exp));
 
-                    return public_share_type(
-                        init_verification_value.first,
-                        init_verification_value.second +
-                            typename scheme_type::private_element_type(init_verification_value.first).pow(exp) *
-                                public_coeff);
+                    public_share.second =
+                        public_share.second +
+                        typename scheme_type::private_element_type(public_share.first).pow(exp) * public_coeff;
                 }
+
+            private:
+                public_share_type public_share;
             };
 
             template<typename Group>
-            struct share_sss<feldman_sss<Group>> : public virtual public_share_sss<feldman_sss<Group>>,
-                                                   public virtual share_sss<shamir_sss<Group>> {
-                typedef public_share_sss<shamir_sss<Group>> base_type1;
-                typedef public_share_sss<feldman_sss<Group>> base_type2;
-                typedef share_sss<shamir_sss<Group>> base_type3;
+            struct share_sss<feldman_sss<Group>> {
                 typedef feldman_sss<Group> scheme_type;
-                typedef typename base_type3::share_type share_type;
+                typedef typename scheme_type::indexed_private_element_type share_type;
 
-                share_sss(const share_type &in_share) : share_sss(in_share.first, in_share.second) {
+                share_sss() = default;
+
+                share_sss(typename share_type::first_type i) : share(i, share_type::second_type::zero()) {
+                    assert(scheme_type::check_participant_index(get_index()));
                 }
 
-                share_sss(typename share_type::first_type i, const typename share_type::second_type &s) :
-                    base_type1(i, s * base_type2::public_share_type::second_type::one()),
-                    /// no need to initialize base_type2 as it virtually derived from base_type1
-                    base_type2(), base_type3(i, s) {
+                share_sss(const share_type &in_share) : share(in_share) {
+                    assert(scheme_type::check_participant_index(get_index()));
                 }
+
+                share_sss(typename share_type::first_type i, const typename share_type::second_type &s) : share(i, s) {
+                    assert(scheme_type::check_participant_index(get_index()));
+                }
+
+                inline typename share_type::first_type get_index() const {
+                    return share.first;
+                }
+
+                inline const typename share_type::second_type &get_value() const {
+                    return share.second;
+                }
+
+                operator public_share_sss<scheme_type>() const {
+                    using To = public_share_sss<scheme_type>;
+
+                    return To(share.first, share.second * To::public_share_type::second_type::one());
+                }
+
+                bool operator==(const share_sss &other) const {
+                    return this->share == other.share;
+                }
+
+                //
+                //  0 <= k < t
+                //
+                inline void update(const typename scheme_type::coeff_type &coeff, std::size_t exp) {
+                    assert(scheme_type::check_exp(exp));
+
+                    share.second =
+                        share.second + coeff * typename scheme_type::private_element_type(share.first).pow(exp);
+                }
+
+            private:
+                share_type share;
             };
 
             template<typename Group>
-            struct secret_sss<feldman_sss<Group>> : public secret_sss<shamir_sss<Group>> {
-                typedef secret_sss<shamir_sss<Group>> base_type;
+            struct secret_sss<feldman_sss<Group>> {
                 typedef feldman_sss<Group> scheme_type;
+                typedef typename scheme_type::private_element_type secret_type;
+                typedef typename scheme_type::indexes_type indexes_type;
 
                 template<typename Shares>
-                secret_sss(const Shares &shares, const typename base_type::indexes_type &indexes) :
+                secret_sss(const Shares &shares) : secret_sss(std::cbegin(shares), std::cend(shares)) {
+                }
+
+                template<typename ShareIt>
+                secret_sss(ShareIt first, ShareIt last) : secret(reconstruct_secret(first, last)) {
+                }
+
+                template<typename Shares>
+                secret_sss(const Shares &shares, const indexes_type &indexes) :
                     secret_sss(std::cbegin(shares), std::cend(shares), indexes) {
                 }
 
                 template<typename ShareIt>
-                secret_sss(ShareIt first, ShareIt last, const typename base_type::indexes_type &indexes) :
-                    base_type(first, last, indexes) {
+                secret_sss(ShareIt first, ShareIt last, const indexes_type &indexes) :
+                    secret(reconstruct_secret(first, last, indexes)) {
                 }
+
+                inline const secret_type &get_value() const {
+                    return secret;
+                }
+
+                bool operator==(const secret_sss &other) const {
+                    return this->secret == other.secret;
+                }
+
+            private:
+                template<typename ShareIt>
+                static inline secret_type reconstruct_secret(ShareIt first, ShareIt last) {
+                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<ShareIt>));
+
+                    return reconstruct_secret(first, last, scheme_type::get_indexes(first, last));
+                }
+
+                template<typename ShareIt,
+                         typename std::enable_if<
+                             std::is_same<typename std::remove_cv<typename std::remove_reference<
+                                              typename std::iterator_traits<ShareIt>::value_type>::type>::type,
+                                          share_sss<scheme_type>>::value,
+                             bool>::type = true>
+                static inline secret_type reconstruct_secret(ShareIt first, ShareIt last, const indexes_type &indexes) {
+                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<ShareIt>));
+
+                    secret_type secret = secret_type::zero();
+                    for (auto it = first; it != last; it++) {
+                        secret = secret + it->get_value() * scheme_type::eval_basis_poly(indexes, it->get_index());
+                    }
+
+                    return secret;
+                }
+
+                secret_type secret;
             };
 
             template<typename Group>
@@ -115,7 +204,7 @@ namespace nil {
                 typedef feldman_sss<Group> scheme_type;
                 typedef share_sss<scheme_type> share_type;
                 typedef std::vector<share_type> shares_type;
-                typedef std::vector<typename share_type::share_type> internal_accumulator_type;
+                typedef shares_type internal_accumulator_type;
 
                 static inline void init_accumulator(internal_accumulator_type &acc, std::size_t n, std::size_t t) {
                     base_type::template _init_accumulator<share_type>(acc, n, t);
@@ -123,7 +212,7 @@ namespace nil {
 
                 static inline void update(internal_accumulator_type &acc, std::size_t exp,
                                           const typename scheme_type::coeff_type &coeff) {
-                    base_type::_update(acc, exp, coeff);
+                    base_type::template _update<scheme_type>(acc, exp, coeff);
                 }
 
                 static inline shares_type process(internal_accumulator_type &acc) {
@@ -135,39 +224,38 @@ namespace nil {
             struct verify_share_op<feldman_sss<Group>> {
                 typedef feldman_sss<Group> scheme_type;
                 typedef public_share_sss<scheme_type> public_share_type;
-                typedef typename public_share_type::public_share_type internal_accumulator_type;
+                typedef public_share_type internal_accumulator_type;
 
             protected:
-                template<typename PublicShare, typename InternalAccumulator>
-                static inline void _init_accumulator(InternalAccumulator &acc, std::size_t i) {
-                    acc = internal_accumulator_type(i, PublicShare::public_share_type::second_type::zero());
-                }
-
                 template<typename InternalAccumulator>
-                static inline void _update(InternalAccumulator &acc, std::size_t exp,
-                                           const typename scheme_type::public_coeff_type &public_coeff) {
-                    acc.second = public_share_type::partial_eval_verification_value(public_coeff, exp, acc).second;
+                static inline void _init_accumulator(InternalAccumulator &acc, std::size_t i) {
+                    acc = InternalAccumulator(i);
                 }
 
-                template<typename PublicShare, typename InternalAccumulator>
+                template<typename Scheme, typename InternalAccumulator>
+                static inline void _update(InternalAccumulator &acc, std::size_t exp,
+                                           const typename Scheme::public_coeff_type &public_coeff) {
+                    acc.update(public_coeff, exp);
+                }
+
+                template<typename InternalAccumulator, typename PublicShare>
                 static inline bool _process(const InternalAccumulator &acc, const PublicShare &verified_public_share) {
-                    return acc.first == verified_public_share.get_index() &&
-                           acc.second == verified_public_share.get_value();
+                    return acc == verified_public_share;
                 }
 
             public:
                 static inline void init_accumulator(internal_accumulator_type &acc, std::size_t i) {
-                    _init_accumulator<public_share_type>(acc, i);
+                    _init_accumulator(acc, i);
                 }
 
                 static inline void update(internal_accumulator_type &acc, std::size_t exp,
                                           const typename scheme_type::public_coeff_type &public_coeff) {
-                    _update(acc, exp, public_coeff);
+                    _update<scheme_type>(acc, exp, public_coeff);
                 }
 
                 static inline bool process(const internal_accumulator_type &acc,
                                            const public_share_type &verified_public_share) {
-                    return _process<public_share_type>(acc, verified_public_share);
+                    return _process(acc, verified_public_share);
                 }
             };
 

@@ -68,6 +68,7 @@ namespace nil {
                         verify_share_impl(const Args &args) :
                             verified_public_share(args[boost::accumulators::sample]), seen_coeffs(0) {
                             // TODO: replace with rvalue
+                            // TODO: init accumulator without default constructor
                             auto i = verified_public_share.get_index();
                             processing_mode_type::init_accumulator(acc, i);
                         }
