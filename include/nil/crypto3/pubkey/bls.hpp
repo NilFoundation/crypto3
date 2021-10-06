@@ -357,6 +357,9 @@ namespace nil {
                 typedef typename bls_scheme_type::public_key_type public_key_type;
                 typedef typename bls_scheme_type::signature_type signature_type;
 
+                typedef typename public_key_type::group_type public_key_group_type;
+                typedef typename signature_type::group_type signature_group_type;
+
                 typedef typename bls_scheme_type::internal_accumulator_type internal_accumulator_type;
 
                 typedef public_key_type key_type;
