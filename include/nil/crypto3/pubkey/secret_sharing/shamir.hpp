@@ -49,13 +49,13 @@
 #include <nil/crypto3/pubkey/keys/public_share_sss.hpp>
 #include <nil/crypto3/pubkey/keys/public_secret_sss.hpp>
 
-#include <nil/crypto3/pubkey/secret_sharing/basic_policy.hpp>
+#include <nil/crypto3/pubkey/secret_sharing/weighted_basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Group>
-            struct shamir_sss : public sss_basic_policy<Group> {
+            struct shamir_sss : public sss_weighted_basic_policy<Group> {
                 typedef Group group_type;
                 typedef sss_basic_policy<group_type> basic_policy;
 

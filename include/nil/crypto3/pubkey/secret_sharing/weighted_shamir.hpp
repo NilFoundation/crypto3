@@ -26,14 +26,13 @@
 #ifndef CRYPTO3_PUBKEY_WEIGHTED_SHAMIR_SSS_HPP
 #define CRYPTO3_PUBKEY_WEIGHTED_SHAMIR_SSS_HPP
 
-#include <nil/crypto3/pubkey/secret_sharing/weighted_basic_policy.hpp>
 #include <nil/crypto3/pubkey/secret_sharing/shamir.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Group>
-            struct weighted_shamir_sss : public sss_weighted_basic_policy<Group>, public shamir_sss<Group> {
+            struct weighted_shamir_sss : public shamir_sss<Group> {
                 typedef sss_weighted_basic_policy<Group> basic_policy;
                 typedef shamir_sss<Group> base_type;
             };
@@ -199,7 +198,7 @@ namespace nil {
                     }
 
                     return reconstruct_secret(std::cbegin(_shares), std::cend(_shares),
-                                              get_indexes(std::cbegin(_shares), std::cend(_shares)));
+                                              scheme_type::get_indexes(std::cbegin(_shares), std::cend(_shares)));
                 }
 
                 template<typename ShareIt,
@@ -217,24 +216,6 @@ namespace nil {
                     }
 
                     return secret;
-                }
-
-                template<typename ShareIt,
-                         typename std::enable_if<
-                             std::is_same<typename std::remove_cv<typename std::remove_reference<
-                                              typename std::iterator_traits<ShareIt>::value_type>::type>::type,
-                                          typename share_sss<scheme_type>::part_share_type>::value,
-                             bool>::type = true>
-                static inline indexes_type get_indexes(ShareIt first, ShareIt last) {
-                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<ShareIt>));
-
-                    indexes_type indexes;
-                    for (auto it = first; it != last; it++) {
-                        bool emplace_status = indexes.emplace(it->get_index()).second;
-                        assert(scheme_type::check_participant_index(it->get_index()) && emplace_status);
-                    }
-
-                    return indexes;
                 }
 
                 secret_type secret;

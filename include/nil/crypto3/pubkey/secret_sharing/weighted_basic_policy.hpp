@@ -51,6 +51,8 @@ namespace nil {
                     return 0 < w;
                 }
 
+                using base_type::get_indexes;
+
                 template<typename WeightIt>
                 static inline typename base_type::indexes_type get_indexes(WeightIt first, WeightIt last,
                                                                            std::size_t t) {
