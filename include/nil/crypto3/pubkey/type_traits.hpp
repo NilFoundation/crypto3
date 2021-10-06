@@ -44,6 +44,54 @@ namespace nil {
                 static constexpr bool value = has_static_member_data_context<T, const typename T::context_type>::value;
                 typedef T type;
             };
+
+            template<typename PublicParams, template<typename, typename> class BlsVersion,
+                     template<typename> class BlsScheme, typename CurveType>
+            struct bls;
+
+            template<typename T>
+            struct is_bls : std::bool_constant<false> { };
+
+            template<typename PublicParams, template<typename, typename> class BlsVersion,
+                     template<typename> class BlsScheme, typename CurveType>
+            struct is_bls<bls<PublicParams, BlsVersion, BlsScheme, CurveType>> : std::bool_constant<true> { };
+
+            template<typename Group>
+            struct shamir_sss;
+
+            template<typename Group>
+            struct feldman_sss;
+
+            template<typename Group>
+            struct pedersen_dkg;
+
+            template<typename Group>
+            struct weighted_shamir_sss;
+
+            template<typename T>
+            struct is_shamir_sss : std::bool_constant<false> { };
+
+            template<typename Group>
+            struct is_shamir_sss<shamir_sss<Group>> : std::bool_constant<true> { };
+
+            template<typename T>
+            struct is_feldman_sss : std::bool_constant<false> { };
+
+            template<typename Group>
+            struct is_feldman_sss<feldman_sss<Group>> : std::bool_constant<true> { };
+
+            template<typename T>
+            struct is_pedersen_dkg : std::bool_constant<false> { };
+
+            template<typename Group>
+            struct is_pedersen_dkg<pedersen_dkg<Group>> : std::bool_constant<true> { };
+
+            template<typename T>
+            struct is_weighted_shamir_sss : std::bool_constant<false> { };
+
+            template<typename Group>
+            struct is_weighted_shamir_sss<weighted_shamir_sss<Group>> : std::bool_constant<true> { };
+
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
