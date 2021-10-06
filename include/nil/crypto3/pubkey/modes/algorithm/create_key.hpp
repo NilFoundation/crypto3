@@ -145,9 +145,10 @@ namespace nil {
                 ++public_coeffs_it;
                 ++share_it;
             }
-            return std::make_pair(pubkey::public_key<Scheme>(PK),
-                                  pubkey::private_key<Scheme>(static_cast<typename share_dealing_mode::result_type>(
-                                      nil::crypto3::deal_share<SecretSharingScheme>(first2, last2))));
+            return std::make_pair(
+                pubkey::public_key<Scheme>(PK),
+                pubkey::private_key<Scheme>(static_cast<typename share_dealing_mode::result_type>(
+                    nil::crypto3::deal_share<SecretSharingScheme>(first2->get_index(), first2, last2))));
         }
 
         //

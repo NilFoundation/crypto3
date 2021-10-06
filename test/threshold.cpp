@@ -117,24 +117,20 @@ namespace boost {
             };
 
             template<typename CurveParams>
-            struct print_log_value<curves::detail::curve_element<CurveParams,
-                                                                 curves::forms::short_weierstrass,
+            struct print_log_value<curves::detail::curve_element<CurveParams, curves::forms::short_weierstrass,
                                                                  curves::coordinates::jacobian_with_a4_0>> {
                 void operator()(std::ostream &os,
-                                curves::detail::curve_element<CurveParams,
-                                                              curves::forms::short_weierstrass,
+                                curves::detail::curve_element<CurveParams, curves::forms::short_weierstrass,
                                                               curves::coordinates::jacobian_with_a4_0> const &p) {
                     print_projective_curve_group_element(os, p);
                 }
             };
 
             template<typename CurveParams>
-            struct print_log_value<curves::detail::curve_element<CurveParams,
-                                                                 curves::forms::short_weierstrass,
+            struct print_log_value<curves::detail::curve_element<CurveParams, curves::forms::short_weierstrass,
                                                                  curves::coordinates::affine>> {
                 void operator()(std::ostream &os,
-                                curves::detail::curve_element<CurveParams,
-                                                              curves::forms::short_weierstrass,
+                                curves::detail::curve_element<CurveParams, curves::forms::short_weierstrass,
                                                               curves::coordinates::affine> const &p) {
                     print_affine_curve_group_element(os, p);
                 }
@@ -213,8 +209,8 @@ BOOST_AUTO_TEST_CASE(threshold_bls_feldman_self_test) {
     // threshold number of participants aggregate partial signatures
     // TODO: add simplified call interface for aggregate and verify
     typename pubkey_type::signature_type sig =
-        nil::crypto3::aggregate<scheme_type, decltype(part_signatures.begin()), aggregation_processing_mode_type>(
-            part_signatures.begin(), part_signatures.begin() + t);
+        nil::crypto3::aggregate<scheme_type, decltype(std::cbegin(part_signatures)), aggregation_processing_mode_type>(
+            std::cbegin(part_signatures), std::cbegin(part_signatures) + t);
     BOOST_CHECK(static_cast<bool>(
         nil::crypto3::verify<scheme_type, decltype(msg), verification_processing_mode_type>(msg, sig, PK)));
 
@@ -222,91 +218,112 @@ BOOST_AUTO_TEST_CASE(threshold_bls_feldman_self_test) {
     // less than threshold number of participants cannot aggregate partial signatures
     // TODO: add simplified call interface for aggregate and verify
     typename pubkey_type::signature_type wrong_sig =
-        nil::crypto3::aggregate<scheme_type, decltype(part_signatures.begin()), aggregation_processing_mode_type>(
-            part_signatures.begin(), part_signatures.begin() + t - 1);
+        nil::crypto3::aggregate<scheme_type, decltype(std::cbegin(part_signatures)), aggregation_processing_mode_type>(
+            std::cbegin(part_signatures), std::cbegin(part_signatures) + t - 1);
     BOOST_CHECK(!static_cast<bool>(
         nil::crypto3::verify<scheme_type, decltype(msg), verification_processing_mode_type>(msg, wrong_sig, PK)));
 }
 
-// BOOST_AUTO_TEST_CASE(threshold_bls_pedersen_self_test) {
-//     using curve_type = curves::bls12_381;
-//     using hash_type = sha2<256>;
-//     using bls_variant = bls_mps_ro_variant<curve_type, hash_type>;
-//     using base_scheme_type = bls<bls_variant, bls_basic_scheme>;
-//     using mode_type = modes::threshold<base_scheme_type, pedersen_dkg, nop_padding>;
-//     using scheme_type = typename mode_type::scheme_type;
-//     using privkey_type = private_key<scheme_type>;
-//     using pubkey_type = public_key<scheme_type>;
-//     using no_key_type = no_key_ops<scheme_type>;
-//     using sss_pubkey_group_type = typename privkey_type::sss_public_key_group_type;
-//     using sss_pubkey_no_key_type = typename privkey_type::sss_public_key_no_key_ops_type;
-//
-//     std::size_t n = 20;
-//     std::size_t t = 10;
-//
-//     //===========================================================================
-//     // every participant generates polynomial
-//
-//     std::vector<typename sss_pubkey_no_key_type::coeffs_type> P_polys;
-//     std::generate_n(std::back_inserter(P_polys), n, [t, n]() { return sss_pubkey_no_key_type::get_poly(t, n); });
-//
-//     //===========================================================================
-//     // each participant calculates public values representing coefficients of its polynomial,
-//     // then he broadcasts these values
-//
-//     std::vector<typename sss_pubkey_no_key_type::public_coeffs_type> P_public_polys;
-//     std::transform(P_polys.begin(), P_polys.end(), std::back_inserter(P_public_polys),
-//                    [](const auto &poly_i) { return sss_pubkey_no_key_type::get_public_coeffs(poly_i); });
-//
-//     //===========================================================================
-//     // every participant generates shares for each participant in group,
-//     // which he then transmits to the intended parties
-//
-//     std::vector<typename sss_pubkey_no_key_type::shares_type> P_generated_shares;
-//     std::transform(P_polys.begin(), P_polys.end(), std::back_inserter(P_generated_shares), [n, t](const auto &poly_i)
-//     {
-//         return static_cast<typename sss_pubkey_no_key_type::shares_type>(
-//             nil::crypto3::deal_shares<sss_pubkey_group_type>(poly_i, n));
-//     });
-//
-//     std::vector<std::vector<typename sss_pubkey_no_key_type::share_type>> P_received_shares(n);
-//     for (auto &i_generated_shares : P_generated_shares) {
-//         for (auto it = i_generated_shares.begin(); it != i_generated_shares.end(); it++) {
-//             P_received_shares.at(it->first - 1).emplace_back(*it);
-//         }
-//     }
-//
-//     //===========================================================================
-//     // each participant check received share and create key
-//
-//     std::vector<pubkey_type> PKs;
-//     std::vector<privkey_type> privkeys;
-//     for (auto &shares : P_received_shares) {
-//         auto [PK_temp, privkey] = nil::crypto3::create_key<scheme_type>(P_public_polys, shares, n);
-//         PKs.emplace_back(PK_temp);
-//         privkeys.emplace_back(privkey);
-//     }
-//
-//     //===========================================================================
-//     // participants sign messages and verify its signatures
-//     std::vector<typename privkey_type::part_signature_type> part_signatures;
-//     for (auto &sk : privkeys) {
-//         part_signatures.emplace_back(nil::crypto3::sign<mode_type>(msg, sk));
-//         BOOST_CHECK(static_cast<bool>(nil::crypto3::part_verify<mode_type>(msg, part_signatures.back(), sk)));
-//     }
-//
-//     //===========================================================================
-//     // threshold number of participants aggregate partial signatures
-//     typename no_key_type::signature_type sig =
-//         nil::crypto3::aggregate<mode_type>(part_signatures.begin(), part_signatures.begin() + t);
-//     BOOST_CHECK(static_cast<bool>(nil::crypto3::verify<mode_type>(msg, sig, PKs.back())));
-//
-//     //===========================================================================
-//     // less than threshold number of participants cannot aggregate partial signatures
-//     typename no_key_type::signature_type wrong_sig =
-//         nil::crypto3::aggregate<mode_type>(part_signatures.begin(), part_signatures.begin() + t - 1);
-//     BOOST_CHECK(!static_cast<bool>(nil::crypto3::verify<mode_type>(msg, wrong_sig, PKs.back())));
-// }
+BOOST_AUTO_TEST_CASE(threshold_bls_pedersen_self_test) {
+    using curve_type = algebra::curves::bls12_381;
+    using base_scheme_type = bls<bls_default_public_params<>, bls_mps_ro_version, bls_basic_scheme, curve_type>;
+
+    using mode_type = modes::threshold<base_scheme_type, pedersen_dkg>;
+    using scheme_type = typename mode_type::scheme_type;
+    using privkey_type = private_key<scheme_type>;
+    using pubkey_type = public_key<scheme_type>;
+
+    using sss_public_key_group_type = typename pubkey_type::sss_public_key_group_type;
+    using shares_dealing_processing_mode = typename pubkey::modes::isomorphic<sss_public_key_group_type>::template bind<
+        pubkey::shares_dealing_policy<sss_public_key_group_type>>::type;
+    using share_dealing_processing_mode = typename pubkey::modes::isomorphic<sss_public_key_group_type>::template bind<
+        pubkey::share_dealing_policy<sss_public_key_group_type>>::type;
+    using signing_processing_mode_type = typename mode_type::template bind<typename mode_type::signing_policy>::type;
+    using verification_processing_mode_type =
+        typename mode_type::template bind<typename mode_type::verification_policy>::type;
+    using aggregation_processing_mode_type =
+        typename mode_type::template bind<typename mode_type::aggregation_policy>::type;
+
+    std::size_t n = 20;
+    std::size_t t = 10;
+
+    //===========================================================================
+    // every participant generates polynomial
+
+    // TODO: add public interface for get_poly and get_public_coeffs
+    std::vector<typename sss_public_key_group_type::coeffs_type> P_polys;
+    std::generate_n(std::back_inserter(P_polys), n, [t, n]() { return sss_public_key_group_type::get_poly(t, n); });
+
+    //===========================================================================
+    // each participant calculates public values representing coefficients of its polynomial,
+    // then he broadcasts these values
+
+    std::vector<typename sss_public_key_group_type::public_coeffs_type> P_public_polys;
+    std::transform(P_polys.begin(), P_polys.end(), std::back_inserter(P_public_polys),
+                   [](const auto &poly_i) { return sss_public_key_group_type::get_public_coeffs(poly_i); });
+
+    //===========================================================================
+    // every participant generates shares for each participant in group,
+    // which he then transmits to the intended parties
+
+    std::vector<typename shares_dealing_processing_mode::result_type> P_generated_shares;
+    std::transform(std::cbegin(P_polys), std::cend(P_polys), std::back_inserter(P_generated_shares),
+                   [n, t](const auto &poly_i) {
+                       return static_cast<typename shares_dealing_processing_mode::result_type>(
+                           nil::crypto3::deal_shares<sss_public_key_group_type>(poly_i, n));
+                   });
+
+    std::vector<std::vector<share_sss<sss_public_key_group_type>>> P_received_shares(n);
+    for (auto &i_generated_shares : P_generated_shares) {
+        for (auto it = std::cbegin(i_generated_shares); it != std::cend(i_generated_shares); it++) {
+            P_received_shares.at(it->get_index() - 1).emplace_back(*it);
+        }
+    }
+
+    //===========================================================================
+    // each participant check received share and create key
+
+    std::vector<pubkey_type> PKs;
+    std::vector<privkey_type> privkeys;
+    for (auto &shares : P_received_shares) {
+        auto [PK_i, privkey] = nil::crypto3::create_key<scheme_type>(P_public_polys, shares, n);
+        PKs.emplace_back(PK_i);
+        privkeys.emplace_back(privkey);
+    }
+
+    //===========================================================================
+    // participants sign messages and verify its signatures
+
+    std::vector<typename privkey_type::part_signature_type> part_signatures;
+    for (auto &sk : privkeys) {
+        // TODO: add simplified call interface for sign
+        part_signatures.emplace_back(
+            nil::crypto3::sign<scheme_type, decltype(msg), signing_processing_mode_type>(msg, sk));
+        BOOST_CHECK(static_cast<bool>(nil::crypto3::part_verify<mode_type>(msg, part_signatures.back(), sk)));
+        BOOST_CHECK(!static_cast<bool>(nil::crypto3::part_verify<mode_type>(
+            msg, typename privkey_type::part_signature_type(part_signatures.back().get_index()), sk)));
+    }
+
+    //===========================================================================
+    // threshold number of participants aggregate partial signatures
+
+    // TODO: add simplified call interface for aggregate and verify
+    typename pubkey_type::signature_type sig =
+        nil::crypto3::aggregate<scheme_type, decltype(std::cbegin(part_signatures)), aggregation_processing_mode_type>(
+            std::cbegin(part_signatures), std::cbegin(part_signatures) + t);
+    BOOST_CHECK(static_cast<bool>(
+        nil::crypto3::verify<scheme_type, decltype(msg), verification_processing_mode_type>(msg, sig, PKs.back())));
+
+    //===========================================================================
+    // less than threshold number of participants cannot aggregate partial signatures
+
+    // TODO: add simplified call interface for aggregate and verify
+    typename pubkey_type::signature_type wrong_sig =
+        nil::crypto3::aggregate<scheme_type, decltype(std::cbegin(part_signatures)), aggregation_processing_mode_type>(
+            std::cbegin(part_signatures), std::cbegin(part_signatures) + t - 1);
+    BOOST_CHECK(!static_cast<bool>(nil::crypto3::verify<scheme_type, decltype(msg), verification_processing_mode_type>(
+        msg, wrong_sig, PKs.back())));
+}
 
 // BOOST_AUTO_TEST_CASE(threshold_bls_weighted_shamir_test) {
 //     using curve_type = curves::bls12_381;
