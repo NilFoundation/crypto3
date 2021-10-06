@@ -28,6 +28,9 @@
 
 #include <nil/crypto3/pubkey/modes/detail/threshold_scheme.hpp>
 
+#include <nil/crypto3/pubkey/keys/private_key.hpp>
+#include <nil/crypto3/pubkey/modes/part_public_key.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
@@ -35,7 +38,7 @@ namespace nil {
                 template<typename Scheme>
                 struct threshold_policy {
                     typedef std::size_t size_type;
-                    
+
                     typedef Scheme scheme_type;
                 };
 
@@ -93,7 +96,7 @@ namespace nil {
                 struct threshold_part_verification_policy : public threshold_policy<Scheme> {
                     typedef typename threshold_policy<Scheme>::scheme_type scheme_type;
 
-                    typedef public_key<scheme_type> key_type;
+                    typedef part_public_key<scheme_type> key_type;
                     typedef void op_type;
                     typedef typename key_type::internal_accumulator_type internal_accumulator_type;
                     typedef bool result_type;

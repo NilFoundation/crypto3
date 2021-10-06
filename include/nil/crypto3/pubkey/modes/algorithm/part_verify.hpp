@@ -29,7 +29,7 @@
 #include <nil/crypto3/pubkey/pubkey_value.hpp>
 #include <nil/crypto3/pubkey/modes/pubkey_state.hpp>
 
-#include <nil/crypto3/pubkey/keys/public_key.hpp>
+#include <nil/crypto3/pubkey/modes/part_public_key.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -56,8 +56,8 @@ namespace nil {
         template<typename Mode, typename SinglePassRange, typename OutputIterator>
         OutputIterator
             part_verify(const SinglePassRange &rng,
-                        const typename pubkey::public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
-                        const pubkey::public_key<typename Mode::scheme_type> &key, OutputIterator out) {
+                        const typename pubkey::part_public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
+                        const pubkey::part_public_key<typename Mode::scheme_type> &key, OutputIterator out) {
 
             typedef typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type ProcessingMode;
             typedef typename pubkey::part_verification_accumulator_set<ProcessingMode> ModeAccumulator;
@@ -88,8 +88,8 @@ namespace nil {
         template<typename Mode, typename InputIterator, typename OutputIterator>
         OutputIterator
             part_verify(InputIterator first, InputIterator last,
-                        const typename pubkey::public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
-                        const pubkey::public_key<typename Mode::scheme_type> &key, OutputIterator out) {
+                        const typename pubkey::part_public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
+                        const pubkey::part_public_key<typename Mode::scheme_type> &key, OutputIterator out) {
 
             typedef typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type ProcessingMode;
             typedef typename pubkey::part_verification_accumulator_set<ProcessingMode> ModeAccumulator;
@@ -178,8 +178,8 @@ namespace nil {
                      typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type>>
         pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<ModeAccumulator>>
             part_verify(InputIterator first, InputIterator last,
-                        const typename pubkey::public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
-                        const pubkey::public_key<typename Mode::scheme_type> &key) {
+                        const typename pubkey::part_public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
+                        const pubkey::part_public_key<typename Mode::scheme_type> &key) {
 
             typedef typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type ProcessingMode;
 
@@ -208,8 +208,8 @@ namespace nil {
                      typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type>>
         pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<ModeAccumulator>>
             part_verify(const SinglePassRange &r,
-                        const typename pubkey::public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
-                        const pubkey::public_key<typename Mode::scheme_type> &key) {
+                        const typename pubkey::part_public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
+                        const pubkey::part_public_key<typename Mode::scheme_type> &key) {
 
             typedef typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type ProcessingMode;
 
@@ -240,8 +240,8 @@ namespace nil {
         //              typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type>>
         // pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<ModeAccumulator>>
         //     part_verify(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2,
-        //                 const typename pubkey::public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
-        //                 const pubkey::public_key<typename Mode::scheme_type> &key) {
+        //                 const typename pubkey::part_public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
+        //                 const pubkey::part_public_key<typename Mode::scheme_type> &key) {
         //
         //     typedef typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type ProcessingMode;
         //
