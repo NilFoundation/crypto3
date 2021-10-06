@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2019-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2019-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -23,26 +23,23 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_THRESHOLD_SCHEME_HPP
-#define CRYPTO3_PUBKEY_THRESHOLD_SCHEME_HPP
-
-#include <nil/crypto3/pubkey/modes/detail/threshold_bls.hpp>
+#ifndef CRYPTO3_PUBKEY_MODES_THRESHOLD_SCHEME_HPP
+#define CRYPTO3_PUBKEY_MODES_THRESHOLD_SCHEME_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             namespace detail {
-                template<typename Scheme, template<typename> class SecretSharingScheme>
-                struct threshold_scheme;
+                template<typename BaseScheme, template<typename> class SecretSharingScheme, typename = void>
+                struct threshold_scheme {
+                    typedef BaseScheme base_scheme_type;
 
-                template<typename SignatureVariant, template<typename, typename> class BlsScheme, typename PublicParams,
-                    template<typename> class SecretSharingScheme>
-                struct threshold_scheme<bls<SignatureVariant, BlsScheme, PublicParams>, SecretSharingScheme> {
-                    typedef threshold_bls<bls<SignatureVariant, BlsScheme, PublicParams>, SecretSharingScheme> type;
+                    template<typename Group>
+                    using sss_type = SecretSharingScheme<Group>;
                 };
             }    // namespace detail
         }        // namespace pubkey
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_THRESHOLD_SCHEME_HPP
+#endif    // CRYPTO3_PUBKEY_MODES_THRESHOLD_SCHEME_HPP
