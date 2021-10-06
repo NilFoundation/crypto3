@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_RECONSTRUCT_SECRET_HPP
-#define CRYPTO3_PUBKEY_RECONSTRUCT_SECRET_HPP
+#ifndef CRYPTO3_PUBKEY_RECONSTRUCT_PUBLIC_SECRET_HPP
+#define CRYPTO3_PUBKEY_RECONSTRUCT_PUBLIC_SECRET_HPP
 
 #include <nil/crypto3/pubkey/pubkey_value.hpp>
 #include <nil/crypto3/pubkey/secret_sharing_state.hpp>
@@ -35,8 +35,8 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Scheme>
-            using secret_reconstructing_policy =
-                typename pubkey::modes::isomorphic<Scheme>::secret_reconstructing_policy;
+            using public_secret_reconstructing_policy =
+                typename pubkey::modes::isomorphic<Scheme>::public_secret_reconstructing_policy;
         }
         /*!
          * @brief
@@ -56,10 +56,10 @@ namespace nil {
          */
         template<typename Scheme, typename InputIterator, typename OutputIterator,
                  typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::secret_reconstructing_policy<Scheme>>::type>
+                     pubkey::public_secret_reconstructing_policy<Scheme>>::type>
         typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
                                 OutputIterator>::type
-            reconstruct_secret(InputIterator first, InputIterator last, OutputIterator out) {
+            reconstruct_public_secret(InputIterator first, InputIterator last, OutputIterator out) {
 
             typedef typename pubkey::reconstructing_accumulator_set<ProcessingMode> SchemeAccumulator;
 
@@ -86,10 +86,10 @@ namespace nil {
          */
         template<typename Scheme, typename SinglePassRange, typename OutputIterator,
                  typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::secret_reconstructing_policy<Scheme>>::type>
+                     pubkey::public_secret_reconstructing_policy<Scheme>>::type>
         typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
                                 OutputIterator>::type
-            reconstruct_secret(const SinglePassRange &rng, OutputIterator out) {
+            reconstruct_public_secret(const SinglePassRange &rng, OutputIterator out) {
 
             typedef typename pubkey::reconstructing_accumulator_set<ProcessingMode> SchemeAccumulator;
 
@@ -116,11 +116,11 @@ namespace nil {
          */
         template<typename Scheme, typename InputIterator,
                  typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::secret_reconstructing_policy<Scheme>>::type,
+                     pubkey::public_secret_reconstructing_policy<Scheme>>::type,
                  typename OutputAccumulator = typename pubkey::reconstructing_accumulator_set<ProcessingMode>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
-            reconstruct_secret(InputIterator first, InputIterator last, OutputAccumulator &acc) {
+            reconstruct_public_secret(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
             typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
@@ -144,11 +144,11 @@ namespace nil {
          */
         template<typename Scheme, typename SinglePassRange,
                  typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::secret_reconstructing_policy<Scheme>>::type,
+                     pubkey::public_secret_reconstructing_policy<Scheme>>::type,
                  typename OutputAccumulator = typename pubkey::reconstructing_accumulator_set<ProcessingMode>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
-            reconstruct_secret(const SinglePassRange &r, OutputAccumulator &acc) {
+            reconstruct_public_secret(const SinglePassRange &r, OutputAccumulator &acc) {
 
             typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
@@ -174,10 +174,10 @@ namespace nil {
          */
         template<typename Scheme, typename InputIterator,
                  typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::secret_reconstructing_policy<Scheme>>::type,
+                     pubkey::public_secret_reconstructing_policy<Scheme>>::type,
                  typename SchemeAccumulator = typename pubkey::reconstructing_accumulator_set<ProcessingMode>>
         pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
-            reconstruct_secret(InputIterator first, InputIterator last) {
+            reconstruct_public_secret(InputIterator first, InputIterator last) {
 
             typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
@@ -201,10 +201,10 @@ namespace nil {
          */
         template<typename Scheme, typename SinglePassRange,
                  typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::secret_reconstructing_policy<Scheme>>::type,
+                     pubkey::public_secret_reconstructing_policy<Scheme>>::type,
                  typename SchemeAccumulator = typename pubkey::reconstructing_accumulator_set<ProcessingMode>>
         pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
-            reconstruct_secret(const SinglePassRange &r) {
+            reconstruct_public_secret(const SinglePassRange &r) {
 
             typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;

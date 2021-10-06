@@ -34,7 +34,7 @@
 
 #include <nil/crypto3/pubkey/accumulators/deal_shares.hpp>
 #include <nil/crypto3/pubkey/accumulators/verify_share.hpp>
-#include <nil/crypto3/pubkey/accumulators/reconstruct_secret.hpp>
+#include <nil/crypto3/pubkey/accumulators/reconstruct.hpp>
 #include <nil/crypto3/pubkey/accumulators/deal_share.hpp>
 
 namespace nil {
@@ -51,9 +51,9 @@ namespace nil {
                 boost::accumulators::features<accumulators::tag::verify_share<ProcessingMode>>>;
 
             template<typename ProcessingMode>
-            using secret_reconstructing_accumulator_set = boost::accumulators::accumulator_set<
+            using reconstructing_accumulator_set = boost::accumulators::accumulator_set<
                 typename ProcessingMode::result_type,
-                boost::accumulators::features<accumulators::tag::reconstruct_secret<ProcessingMode>>>;
+                boost::accumulators::features<accumulators::tag::reconstruct<ProcessingMode>>>;
 
             template<typename ProcessingMode>
             using share_dealing_accumulator_set = boost::accumulators::accumulator_set<

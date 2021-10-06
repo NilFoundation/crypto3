@@ -90,6 +90,19 @@ namespace nil {
                 static inline public_element_type get_public_element(const private_element_type &e) {
                     return e * public_element_type::one();
                 }
+
+                template<typename IndexedElementIt>
+                static inline indexes_type get_indexes(IndexedElementIt first, IndexedElementIt last) {
+                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<IndexedElementIt>));
+
+                    indexes_type indexes;
+                    for (auto it = first; it != last; ++it) {
+                        bool emplace_status = indexes.emplace(it->get_index()).second;
+                        assert(check_participant_index(it->get_index()) && emplace_status);
+                    }
+
+                    return indexes;
+                }
             };
         }    // namespace pubkey
     }        // namespace crypto3

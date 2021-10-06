@@ -42,10 +42,33 @@ namespace nil {
                 //===========================================================================
                 // public weighted secret sharing scheme types
 
+                // TODO: make weights indexed
                 using weights_type = std::vector<std::size_t>;
 
-                static inline bool check_weight(const std::size_t &w) {
+                template<typename Weight>
+                static inline typename std::enable_if<std::is_unsigned<Weight>::value, bool>::type
+                    check_weight(Weight w) {
                     return 0 < w;
+                }
+
+                template<typename WeightIt>
+                static inline typename base_type::indexes_type get_indexes(WeightIt first, WeightIt last,
+                                                                           std::size_t t) {
+                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<WeightIt>));
+                    assert(base_type::check_threshold_value(t, std::distance(first, last)));
+
+                    typename base_type::indexes_type result;
+                    std::size_t i = 1;
+                    for (auto it = first; it != last; it++) {
+                        check_weight(*it);
+                        for (std::size_t j = 1; j <= *it; ++j) {
+                            bool emplace_status = result.emplace(i * t + j).second;
+                            assert(emplace_status);
+                        }
+                        ++i;
+                    }
+
+                    return result;
                 }
             };
         }    // namespace pubkey

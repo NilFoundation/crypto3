@@ -36,6 +36,7 @@
 #include <nil/crypto3/pubkey/operations/deal_shares_op.hpp>
 #include <nil/crypto3/pubkey/operations/verify_share_op.hpp>
 #include <nil/crypto3/pubkey/operations/reconstruct_secret_op.hpp>
+#include <nil/crypto3/pubkey/operations/reconstruct_public_secret_op.hpp>
 #include <nil/crypto3/pubkey/operations/deal_share_op.hpp>
 
 namespace nil {
@@ -298,6 +299,31 @@ namespace nil {
                 };
 
                 template<typename Scheme>
+                struct isomorphic_public_secret_reconstructing_policy : public isomorphic_policy<Scheme> {
+                    typedef typename isomorphic_policy<Scheme>::scheme_type scheme_type;
+
+                    typedef void key_type;
+                    typedef reconstruct_public_secret_op<scheme_type> op_type;
+                    typedef typename op_type::internal_accumulator_type internal_accumulator_type;
+                    typedef typename op_type::public_secret_type result_type;
+
+                    template<typename... Args>
+                    static inline void init_accumulator(Args &...args) {
+                        op_type::init_accumulator(args...);
+                    }
+
+                    template<typename... Args>
+                    static inline void update(Args &...args) {
+                        op_type::update(args...);
+                    }
+
+                    template<typename... Args>
+                    static inline result_type process(Args &...args) {
+                        return op_type::process(args...);
+                    }
+                };
+
+                template<typename Scheme>
                 struct isomorphic_share_dealing_policy : public isomorphic_policy<Scheme> {
                     typedef typename isomorphic_policy<Scheme>::scheme_type scheme_type;
 
@@ -379,6 +405,8 @@ namespace nil {
                     typedef detail::isomorphic_shares_dealing_policy<scheme_type> shares_dealing_policy;
                     typedef detail::isomorphic_share_verification_policy<scheme_type> share_verification_policy;
                     typedef detail::isomorphic_secret_reconstructing_policy<scheme_type> secret_reconstructing_policy;
+                    typedef detail::isomorphic_public_secret_reconstructing_policy<scheme_type>
+                        public_secret_reconstructing_policy;
                     typedef detail::isomorphic_share_dealing_policy<scheme_type> share_dealing_policy;
 
                     template<typename Policy>

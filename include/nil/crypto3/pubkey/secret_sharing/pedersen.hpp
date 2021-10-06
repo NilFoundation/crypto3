@@ -86,6 +86,32 @@ namespace nil {
             };
 
             template<typename Group>
+            struct public_secret_sss<pedersen_dkg<Group>> : public public_secret_sss<feldman_sss<Group>> {
+                typedef public_secret_sss<feldman_sss<Group>> base_type;
+                typedef pedersen_dkg<Group> scheme_type;
+                typedef typename scheme_type::public_element_type public_secret_type;
+                typedef typename scheme_type::indexes_type indexes_type;
+
+                template<typename PublicShares>
+                public_secret_sss(const PublicShares &public_shares) : base_type(public_shares) {
+                }
+
+                template<typename PublicShareIt>
+                public_secret_sss(PublicShareIt first, PublicShareIt last) : base_type(first, last) {
+                }
+
+                template<typename PublicShares>
+                public_secret_sss(const PublicShares &public_shares, const indexes_type &indexes) :
+                    base_type(public_shares, indexes) {
+                }
+
+                template<typename PublicShareIt>
+                public_secret_sss(PublicShareIt first, PublicShareIt last, const indexes_type &indexes) :
+                    base_type(first, last, indexes) {
+                }
+            };
+
+            template<typename Group>
             struct secret_sss<pedersen_dkg<Group>> : public secret_sss<feldman_sss<Group>> {
                 typedef secret_sss<feldman_sss<Group>> base_type;
                 typedef pedersen_dkg<Group> scheme_type;
@@ -173,13 +199,35 @@ namespace nil {
             };
 
             template<typename Group>
+            struct reconstruct_public_secret_op<pedersen_dkg<Group>>
+                : public reconstruct_public_secret_op<shamir_sss<Group>> {
+                typedef reconstruct_public_secret_op<shamir_sss<Group>> base_type;
+                typedef pedersen_dkg<Group> scheme_type;
+                typedef public_share_sss<scheme_type> public_share_type;
+                typedef public_secret_sss<scheme_type> public_secret_type;
+                typedef std::pair<typename scheme_type::indexes_type, std::set<public_share_type>>
+                    internal_accumulator_type;
+
+            public:
+                static inline void init_accumulator() {
+                }
+
+                static inline void update(internal_accumulator_type &acc, const public_share_type &public_share) {
+                    base_type::_update(acc, public_share);
+                }
+
+                static inline public_secret_type process(internal_accumulator_type &acc) {
+                    return base_type::template _process<public_secret_type>(acc);
+                }
+            };
+
+            template<typename Group>
             struct reconstruct_secret_op<pedersen_dkg<Group>> : public reconstruct_secret_op<shamir_sss<Group>> {
                 typedef reconstruct_secret_op<shamir_sss<Group>> base_type;
                 typedef pedersen_dkg<Group> scheme_type;
                 typedef share_sss<scheme_type> share_type;
                 typedef secret_sss<scheme_type> secret_type;
-                typedef std::pair<typename scheme_type::indexes_type, std::vector<share_type>>
-                    internal_accumulator_type;
+                typedef std::pair<typename scheme_type::indexes_type, std::set<share_type>> internal_accumulator_type;
 
             public:
                 static inline void init_accumulator() {

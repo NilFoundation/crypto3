@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_SSS_RECONSTRUCT_SECRET_HPP
-#define CRYPTO3_ACCUMULATORS_PUBKEY_SSS_RECONSTRUCT_SECRET_HPP
+#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_SSS_RECONSTRUCT_HPP
+#define CRYPTO3_ACCUMULATORS_PUBKEY_SSS_RECONSTRUCT_HPP
 
 #include <set>
 #include <utility>
@@ -39,10 +39,8 @@
 #include <nil/crypto3/pubkey/accumulators/parameters/threshold_value.hpp>
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
 
-#include <nil/crypto3/pubkey/secret_sharing/shamir.hpp>
-#include <nil/crypto3/pubkey/secret_sharing/feldman.hpp>
-// #include <nil/crypto3/pubkey/secret_sharing/pedersen.hpp>
-// #include <nil/crypto3/pubkey/secret_sharing/weighted_shamir.hpp>
+#include <nil/crypto3/pubkey/keys/share_sss.hpp>
+#include <nil/crypto3/pubkey/keys/public_share_sss.hpp>
 
 #include <nil/crypto3/pubkey/modes/isomorphic.hpp>
 
@@ -52,10 +50,10 @@ namespace nil {
             namespace accumulators {
                 namespace impl {
                     template<typename ProcessingMode, typename = void>
-                    struct reconstruct_secret_impl;
+                    struct reconstruct_impl;
 
                     template<typename ProcessingMode>
-                    struct reconstruct_secret_impl<ProcessingMode> : boost::accumulators::accumulator_base {
+                    struct reconstruct_impl<ProcessingMode> : boost::accumulators::accumulator_base {
                     protected:
                         typedef ProcessingMode processing_mode_type;
                         typedef typename processing_mode_type::scheme_type scheme_type;
@@ -66,7 +64,7 @@ namespace nil {
                         typedef typename processing_mode_type::result_type result_type;
 
                         template<typename Args>
-                        reconstruct_secret_impl(const Args &args) : seen_shares(0) {
+                        reconstruct_impl(const Args &args) : seen_shares(0) {
                         }
 
                         inline result_type result(boost::accumulators::dont_care) const {
@@ -82,6 +80,11 @@ namespace nil {
                     protected:
                         inline void resolve_type(const share_sss<scheme_type> &share, std::nullptr_t = nullptr) {
                             processing_mode_type::update(acc, share);
+                            seen_shares++;
+                        }
+
+                        inline void resolve_type(const public_share_sss<scheme_type> &public_share, std::nullptr_t = nullptr) {
+                            processing_mode_type::update(acc, public_share);
                             seen_shares++;
                         }
 
@@ -106,22 +109,21 @@ namespace nil {
 
                 namespace tag {
                     template<typename ProcessingMode>
-                    struct reconstruct_secret : boost::accumulators::depends_on<> {
+                    struct reconstruct : boost::accumulators::depends_on<> {
                         typedef ProcessingMode mode_type;
 
                         /// INTERNAL ONLY
                         ///
 
-                        typedef boost::mpl::always<accumulators::impl::reconstruct_secret_impl<mode_type>> impl;
+                        typedef boost::mpl::always<accumulators::impl::reconstruct_impl<mode_type>> impl;
                     };
                 }    // namespace tag
 
                 namespace extract {
                     template<typename ProcessingMode, typename AccumulatorSet>
-                    typename boost::mpl::apply<AccumulatorSet,
-                                               tag::reconstruct_secret<ProcessingMode>>::type::result_type
-                        reconstruct_secret(const AccumulatorSet &acc) {
-                        return boost::accumulators::extract_result<tag::reconstruct_secret<ProcessingMode>>(acc);
+                    typename boost::mpl::apply<AccumulatorSet, tag::reconstruct<ProcessingMode>>::type::result_type
+                        reconstruct(const AccumulatorSet &acc) {
+                        return boost::accumulators::extract_result<tag::reconstruct<ProcessingMode>>(acc);
                     }
                 }    // namespace extract
             }        // namespace accumulators
@@ -129,4 +131,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_SSS_RECONSTRUCT_SECRET_HPP
+#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_SSS_RECONSTRUCT_HPP
