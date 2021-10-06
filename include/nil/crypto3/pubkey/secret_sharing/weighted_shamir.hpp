@@ -46,13 +46,25 @@ namespace nil {
 
                 public_share_sss() = default;
 
-                template<typename PublicShares>
-                public_share_sss(std::size_t i, const PublicShares &i_public_shares) :
-                    public_share_sss(i, std::cbegin(i_public_shares), std::cend(i_public_shares)) {
+                public_share_sss(std::size_t i, std::size_t w, std::size_t threshold_number) : t(threshold_number) {
+                    public_share.first = i;
+                    assert(scheme_type::check_participant_index(get_index()));
+                    assert(scheme_type::check_weight(i, w));
+                    for (std::size_t j = 1; j <= w; ++j) {
+                        public_share.second.emplace_back(i * t + j);
+                        assert(indexes.emplace(public_share.second.back().get_index()).second);
+                    }
                 }
 
-                template<typename PublicShareIt>
-                public_share_sss(const std::size_t i, PublicShareIt first, PublicShareIt last) {
+                template<typename PartPublicShares>
+                public_share_sss(std::size_t i, std::size_t threshold_number, const PartPublicShares &i_public_shares) :
+                    public_share_sss(i, threshold_number, std::cbegin(i_public_shares), std::cend(i_public_shares)) {
+                }
+
+                template<typename PartPublicShareIt>
+                public_share_sss(const std::size_t i, std::size_t threshold_number, PartPublicShareIt first,
+                                 PartPublicShareIt last) :
+                    t(threshold_number) {
                     public_share.first = i;
                     assert(scheme_type::check_participant_index(get_index()));
                     for (auto iter = first; iter != last; ++iter) {
@@ -73,6 +85,14 @@ namespace nil {
                     return indexes;
                 }
 
+                inline std::size_t get_threshold_number() const {
+                    return t;
+                }
+
+                inline std::size_t get_weight() const {
+                    return std::size(indexes);
+                }
+
                 bool operator==(const public_share_sss &other) const {
                     return this->public_share == other.public_share;
                 }
@@ -81,7 +101,22 @@ namespace nil {
                     return this->get_index() < other.get_index();
                 }
 
+                inline part_public_share_type
+                    to_shamir(const typename scheme_type::weights_type &confirmed_weights) const {
+                    auto confirmed_indexes = scheme_type::get_indexes(confirmed_weights, t);
+
+                    typename scheme_type::public_element_type part_share = scheme_type::public_element_type::zero();
+                    for (const auto &public_share_j : public_share.second) {
+                        part_share = part_share +
+                                     public_share_j.get_value() *
+                                         scheme_type::eval_basis_poly(confirmed_indexes, public_share_j.get_index());
+                    }
+
+                    return part_public_share_type(public_share.first, part_share);
+                }
+
             private:
+                std::size_t t;
                 indexes_type indexes;
                 public_share_type public_share;
             };
@@ -95,10 +130,10 @@ namespace nil {
 
                 share_sss() = default;
 
-                share_sss(std::size_t i, std::size_t w, std::size_t t) {
+                share_sss(std::size_t i, std::size_t w, std::size_t threshold_number) : t(threshold_number) {
                     share.first = i;
                     assert(scheme_type::check_participant_index(get_index()));
-                    assert(scheme_type::check_weight(w));
+                    assert(scheme_type::check_weight(i, w));
                     for (std::size_t j = 1; j <= w; ++j) {
                         share.second.emplace_back(i * t + j);
                         assert(indexes.emplace(share.second.back().get_index()).second);
@@ -121,10 +156,18 @@ namespace nil {
                     return indexes;
                 }
 
+                inline std::size_t get_threshold_number() const {
+                    return t;
+                }
+
+                inline std::size_t get_weight() const {
+                    return std::size(indexes);
+                }
+
                 operator public_share_sss<scheme_type>() const {
                     using To = public_share_sss<scheme_type>;
 
-                    return To(share.first, share.second);
+                    return To(share.first, t, share.second);
                 }
 
                 bool operator==(const share_sss &other) const {
@@ -144,7 +187,20 @@ namespace nil {
                     }
                 }
 
+                inline part_share_type to_shamir(const typename scheme_type::weights_type &confirmed_weights) const {
+                    auto confirmed_indexes = scheme_type::get_indexes(confirmed_weights, t);
+
+                    typename scheme_type::private_element_type part_share = scheme_type::public_element_type::zero();
+                    for (const auto &share_j : share.second) {
+                        part_share = part_share + share_j.get_value() * scheme_type::eval_basis_poly(
+                                                                            confirmed_indexes, share_j.get_index());
+                    }
+
+                    return part_share_type(share.first, part_share);
+                }
+
             private:
+                std::size_t t;
                 indexes_type indexes;
                 share_type share;
             };
@@ -228,18 +284,13 @@ namespace nil {
                 typedef std::vector<share_type> shares_type;
                 typedef shares_type internal_accumulator_type;
 
-                template<typename Weights>
-                static inline typename std::enable_if<std::is_unsigned<
-                    typename std::iterator_traits<typename Weights::iterator>::value_type>::value>::type
-                    init_accumulator(internal_accumulator_type &acc, std::size_t n, std::size_t t,
-                                     const Weights &weights) {
-                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Weights>));
+                static inline void init_accumulator(internal_accumulator_type &acc, std::size_t n, std::size_t t,
+                                                    const typename scheme_type::weights_type &weights) {
                     assert(n == std::distance(std::cbegin(weights), std::cend(weights)));
                     assert(scheme_type::check_threshold_value(t, n));
 
-                    std::size_t i = 1;
-                    for (auto w_i : weights) {
-                        acc.emplace_back(i++, w_i, t);
+                    for (const auto &w_i : weights) {
+                        acc.emplace_back(w_i.first, w_i.second, t);
                     }
                 }
 

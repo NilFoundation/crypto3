@@ -42,32 +42,32 @@ namespace nil {
                 //===========================================================================
                 // public weighted secret sharing scheme types
 
-                // TODO: make weights indexed
-                using weights_type = std::vector<std::size_t>;
+                using weights_type = std::map<std::size_t, std::size_t>;
 
                 template<typename Weight>
-                static inline typename std::enable_if<std::is_unsigned<Weight>::value, bool>::type
-                    check_weight(Weight w) {
-                    return 0 < w;
+                static inline typename std::enable_if<std::is_unsigned<typename Weight::first_type>::value &&
+                                                          std::is_unsigned<typename Weight::second_type>::value,
+                                                      bool>::type
+                    check_weight(const Weight &w) {
+                    return check_weight(w.first, w.second);
+                }
+
+                static inline bool check_weight(std::size_t i, std::size_t w) {
+                    return base_type::check_participant_index(i) && 0 < w;
                 }
 
                 using base_type::get_indexes;
 
-                template<typename WeightIt>
-                static inline typename base_type::indexes_type get_indexes(WeightIt first, WeightIt last,
-                                                                           std::size_t t) {
-                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<WeightIt>));
-                    assert(base_type::check_threshold_value(t, std::distance(first, last)));
+                static inline typename base_type::indexes_type get_indexes(const weights_type &weights, std::size_t t) {
+                    assert(std::size(weights));
 
                     typename base_type::indexes_type result;
-                    std::size_t i = 1;
-                    for (auto it = first; it != last; it++) {
-                        check_weight(*it);
-                        for (std::size_t j = 1; j <= *it; ++j) {
-                            bool emplace_status = result.emplace(i * t + j).second;
+                    for (const auto &weight : weights) {
+                        check_weight(weight);
+                        for (std::size_t j = 1; j <= weight.second; ++j) {
+                            bool emplace_status = result.emplace(weight.first * t + j).second;
                             assert(emplace_status);
                         }
-                        ++i;
                     }
 
                     return result;
