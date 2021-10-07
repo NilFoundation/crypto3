@@ -190,7 +190,7 @@ namespace nil {
                 inline part_share_type to_shamir(const typename scheme_type::weights_type &confirmed_weights) const {
                     auto confirmed_indexes = scheme_type::get_indexes(confirmed_weights, t);
 
-                    typename scheme_type::private_element_type part_share = scheme_type::public_element_type::zero();
+                    typename scheme_type::private_element_type part_share = scheme_type::private_element_type::zero();
                     for (const auto &share_j : share.second) {
                         part_share = part_share + share_j.get_value() * scheme_type::eval_basis_poly(
                                                                             confirmed_indexes, share_j.get_index());

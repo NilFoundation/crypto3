@@ -173,11 +173,11 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename InputIterator, typename OutputIterator>
+        template<typename Scheme, typename InputIterator, typename OutputIterator,
+                 typename ProcessingMode =
+                     typename pubkey::modes::isomorphic<Scheme>::template bind<pubkey::signing_policy<Scheme>>::type>
         OutputIterator sign(InputIterator first, InputIterator last, const pubkey::private_key<Scheme> &key,
                             OutputIterator out) {
-            typedef typename pubkey::modes::isomorphic<Scheme>::template bind<pubkey::signing_policy<Scheme>>::type
-                ProcessingMode;
             typedef pubkey::signing_accumulator_set<ProcessingMode> SigningAccumulator;
 
             typedef pubkey::detail::value_pubkey_impl<SigningAccumulator> StreamSchemeImpl;
@@ -201,10 +201,10 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename SinglePassRange, typename OutputIterator>
+        template<typename Scheme, typename SinglePassRange, typename OutputIterator,
+                 typename ProcessingMode =
+                     typename pubkey::modes::isomorphic<Scheme>::template bind<pubkey::signing_policy<Scheme>>::type>
         OutputIterator sign(const SinglePassRange &rng, const pubkey::private_key<Scheme> &key, OutputIterator out) {
-            typedef typename pubkey::modes::isomorphic<Scheme>::template bind<pubkey::signing_policy<Scheme>>::type
-                ProcessingMode;
             typedef pubkey::signing_accumulator_set<ProcessingMode> SigningAccumulator;
 
             typedef pubkey::detail::value_pubkey_impl<SigningAccumulator> StreamSchemeImpl;
