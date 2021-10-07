@@ -297,7 +297,8 @@ namespace nil {
                 typedef public_share_sss<_sss_signature_group_type> part_signature_type;
                 typedef typename sss_public_key_group_type::weights_type weights_type;
 
-                typedef typename base_scheme_public_key_type::internal_accumulator_type internal_accumulator_type;
+                typedef std::pair<weights_type, typename base_scheme_private_key_type::internal_accumulator_type>
+                    internal_accumulator_type;
 
                 part_public_key() = default;
 
@@ -307,26 +308,27 @@ namespace nil {
                 part_public_key(const public_share_sss<sss_public_key_group_type> &key_data) : part_pubkey(key_data) {
                 }
 
-                inline void init_accumulator(internal_accumulator_type &acc) const {
+                inline void init_accumulator(internal_accumulator_type &acc,
+                                             const weights_type &confirmed_weights) const {
                     // TODO: somehow mark that such type of key cannot pre-initialize accumulator
                     //  because set of users aggregating final signature is not known at the moment of part key creating
+                    acc.first = confirmed_weights;
                 }
 
                 template<typename InputRange>
                 static inline void update(internal_accumulator_type &acc, const InputRange &range) {
-                    base_scheme_public_key_type::update(acc, range);
+                    base_scheme_public_key_type::update(acc.second, range);
                 }
 
                 template<typename InputIterator>
                 static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
-                    base_scheme_public_key_type::update(acc, first, last);
+                    base_scheme_public_key_type::update(acc.second, first, last);
                 }
 
-                inline bool part_verify(internal_accumulator_type &acc, const part_signature_type &part_sig,
-                                        const weights_type &confirmed_weights) const {
+                inline bool part_verify(internal_accumulator_type &acc, const part_signature_type &part_sig) const {
                     assert(part_pubkey.get_index() == part_sig.get_index());
-                    base_scheme_public_key_type VK_i(part_pubkey.to_shamir(confirmed_weights).get_value());
-                    return VK_i.verify(acc, part_sig.get_value());
+                    base_scheme_public_key_type VK_i(part_pubkey.to_shamir(acc.first).get_value());
+                    return VK_i.verify(acc.second, part_sig.get_value());
                 }
 
                 inline std::size_t get_weight() const {
@@ -364,8 +366,7 @@ namespace nil {
                 typedef shamir_sss<public_key_group_type> _sss_public_key_group_type;
                 typedef shamir_sss<signature_group_type> _sss_signature_group_type;
 
-                // typedef typename sss_public_key_no_key_ops_type::share_type private_key_type;
-                typedef base_scheme_private_key_type public_key_type;
+                typedef base_scheme_public_key_type public_key_type;
                 typedef typename base_scheme_public_key_type::signature_type signature_type;
 
                 typedef typename base_scheme_public_key_type::internal_accumulator_type internal_accumulator_type;
@@ -419,34 +420,35 @@ namespace nil {
                 typedef typename base_type::part_signature_type part_signature_type;
                 typedef typename base_type::weights_type weights_type;
 
-                typedef typename base_scheme_private_key_type::internal_accumulator_type internal_accumulator_type;
+                typedef typename base_type::internal_accumulator_type internal_accumulator_type;
 
                 private_key() {
                 }
 
                 private_key(const share_sss<sss_public_key_group_type> &key_data) :
-                    privkey(key_data.get_index(), base_scheme_private_key_type(key_data.get_value())),
-                    base_type(key_data) {
+                    privkey(key_data), base_type(key_data) {
                 }
 
-                inline void init_accumulator(internal_accumulator_type &acc) const {
-                    privkey.second.init_accumulator(acc);
+                inline void init_accumulator(internal_accumulator_type &acc,
+                                             const weights_type &confirmed_weights) const {
+                    // TODO: somehow mark that such type of key cannot pre-initialize accumulator
+                    //  because set of users aggregating final signature is not known at the moment of part key creating
+                    acc.first = confirmed_weights;
                 }
 
                 template<typename InputRange>
                 static inline void update(internal_accumulator_type &acc, const InputRange &range) {
-                    base_scheme_private_key_type::update(acc, range);
+                    base_scheme_private_key_type::update(acc.second, range);
                 }
 
                 template<typename InputIterator>
                 static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
-                    base_scheme_private_key_type::update(acc, first, last);
+                    base_scheme_private_key_type::update(acc.second, first, last);
                 }
 
-                inline part_signature_type sign(internal_accumulator_type &acc,
-                                                const weights_type &confirmed_weights) const {
-                    base_scheme_private_key_type s_i(privkey.to_shamir(confirmed_weights).get_value());
-                    return part_signature_type(privkey.first, s_i.sign(acc));
+                inline part_signature_type sign(internal_accumulator_type &acc) const {
+                    base_scheme_private_key_type s_i(privkey.to_shamir(acc.first).get_value());
+                    return part_signature_type(privkey.get_index(), s_i.sign(acc.second));
                 }
 
             protected:

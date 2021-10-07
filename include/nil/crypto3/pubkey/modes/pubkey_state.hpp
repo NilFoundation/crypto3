@@ -30,31 +30,20 @@
 #include <boost/accumulators/framework/features.hpp>
 
 #include <nil/crypto3/pubkey/modes/accumulators/part_verify.hpp>
+#include <nil/crypto3/pubkey/modes/accumulators/sign_weighted.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            /*!
-             * @brief Accumulator set with pre-defined block cipher accumulator params.
-             *
-             * Meets the requirements of AccumulatorSet
-             *
-             * @ingroup block
-             *
-             * @tparam Mode Cipher state preprocessing mode type (e.g. isomorphic_encryption_mode<aes128>)
-             * @tparam Endian
-             * @tparam ValueBits
-             * @tparam LengthBits
-             */
-            // template<typename ProcessingMode>
-            // using keys_accumulator_set = boost::accumulators::accumulator_set<
-            //     digest<ProcessingMode::input_block_bits>,
-            //     boost::accumulators::features<accumulators::tag::scheme_keys<ProcessingMode>>>;
-
             template<typename ProcessingMode>
             using part_verification_accumulator_set = boost::accumulators::accumulator_set<
                 typename ProcessingMode::result_type,
                 boost::accumulators::features<accumulators::tag::part_verify<ProcessingMode>>>;
+
+            template<typename ProcessingMode>
+            using weighted_signing_accumulator_set = boost::accumulators::accumulator_set<
+                typename ProcessingMode::result_type,
+                boost::accumulators::features<accumulators::tag::sign_weighted<ProcessingMode>>>;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
