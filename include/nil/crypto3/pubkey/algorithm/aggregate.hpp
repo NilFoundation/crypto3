@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_PUBKEY_AGGREGATE_HPP
 #define CRYPTO3_PUBKEY_AGGREGATE_HPP
 
+#include <nil/crypto3/pubkey/algorithm/pubkey.hpp>
+
 #include <nil/crypto3/pubkey/pubkey_value.hpp>
 #include <nil/crypto3/pubkey/pubkey_state.hpp>
 
@@ -36,19 +38,12 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            /*!
-             * @brief
-             *
-             * @ingroup pubkey_algorithms
-             *
-             * Given a list of signatures for a list of messages and public keys, an aggregation algorithm
-             * generates one signature that authenticates the same list of messages and public keys.
-             *
-             *
-             *
-             */
             template<typename Scheme>
             using aggregation_policy = typename pubkey::modes::isomorphic<Scheme>::aggregation_policy;
+
+            template<typename Scheme>
+            using aggregation_processing_mode_default =
+                typename modes::isomorphic<Scheme>::template bind<aggregation_policy<Scheme>>::type;
         }    // namespace pubkey
 
         /*!
@@ -67,8 +62,7 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename InputIterator, typename OutputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::aggregation_policy<Scheme>>::type>
+                 typename ProcessingMode = pubkey::aggregation_processing_mode_default<Scheme>>
         typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
                                 OutputIterator>::type
             aggregate(InputIterator first, InputIterator last, OutputIterator out) {
@@ -90,24 +84,23 @@ namespace nil {
          * @tparam SinglePassRange
          * @tparam OutputIterator
          *
-         * @param rng
+         * @param range
          * @param out
          *
          * @return
          */
         template<typename Scheme, typename SinglePassRange, typename OutputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::aggregation_policy<Scheme>>::type>
+                 typename ProcessingMode = pubkey::aggregation_processing_mode_default<Scheme>>
         typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
                                 OutputIterator>::type
-            aggregate(const SinglePassRange &rng, OutputIterator out) {
+            aggregate(const SinglePassRange &range, OutputIterator out) {
 
             typedef typename pubkey::aggregation_accumulator_set<ProcessingMode> AggregationAccumulator;
 
             typedef pubkey::detail::value_pubkey_impl<AggregationAccumulator> StreamSchemeImpl;
             typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
-            return SchemeImpl(rng, std::move(out), AggregationAccumulator());
+            return SchemeImpl(range, std::move(out), AggregationAccumulator());
         }
 
         /*!
@@ -126,8 +119,7 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename InputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::aggregation_policy<Scheme>>::type,
+                 typename ProcessingMode = pubkey::aggregation_processing_mode_default<Scheme>,
                  typename OutputAccumulator = typename pubkey::aggregation_accumulator_set<ProcessingMode>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
@@ -148,23 +140,22 @@ namespace nil {
          * @tparam SinglePassRange
          * @tparam OutputAccumulator
          *
-         * @param r
+         * @param range
          * @param acc
          *
          * @return
          */
         template<typename Scheme, typename SinglePassRange,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::aggregation_policy<Scheme>>::type,
+                 typename ProcessingMode = pubkey::aggregation_processing_mode_default<Scheme>,
                  typename OutputAccumulator = typename pubkey::aggregation_accumulator_set<ProcessingMode>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
-            aggregate(const SinglePassRange &r, OutputAccumulator &acc) {
+            aggregate(const SinglePassRange &range, OutputAccumulator &acc) {
 
             typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSchemeImpl;
             typedef pubkey::detail::range_pubkey_impl<StreamSchemeImpl> SchemeImpl;
 
-            return SchemeImpl(r, std::forward<OutputAccumulator>(acc));
+            return SchemeImpl(range, std::forward<OutputAccumulator>(acc));
         }
 
         /*!
@@ -182,15 +173,11 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename InputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::aggregation_policy<Scheme>>::type,
-                 typename AggregationAccumulator = typename pubkey::aggregation_accumulator_set<ProcessingMode>>
-        pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<AggregationAccumulator>>
-            aggregate(InputIterator first, InputIterator last) {
-
-            typedef pubkey::detail::value_pubkey_impl<AggregationAccumulator> StreamSchemeImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSchemeImpl> SchemeImpl;
-
+                 typename ProcessingMode = pubkey::aggregation_processing_mode_default<Scheme>,
+                 typename AggregationAccumulator = typename pubkey::aggregation_accumulator_set<ProcessingMode>,
+                 typename StreamSchemeImpl = pubkey::detail::value_pubkey_impl<AggregationAccumulator>,
+                 typename SchemeImpl = pubkey::detail::range_pubkey_impl<StreamSchemeImpl>>
+        SchemeImpl aggregate(InputIterator first, InputIterator last) {
             return SchemeImpl(first, last, AggregationAccumulator());
         }
 
@@ -203,21 +190,17 @@ namespace nil {
          * @tparam SinglePassRange
          * @tparam AggregationAccumulator
          *
-         * @param r
+         * @param range
          *
          * @return
          */
         template<typename Scheme, typename SinglePassRange,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::aggregation_policy<Scheme>>::type,
-                 typename AggregationAccumulator = typename pubkey::aggregation_accumulator_set<ProcessingMode>>
-        pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<AggregationAccumulator>>
-            aggregate(const SinglePassRange &r) {
-
-            typedef pubkey::detail::value_pubkey_impl<AggregationAccumulator> StreamSchemeImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSchemeImpl> SchemeImpl;
-
-            return SchemeImpl(r, AggregationAccumulator());
+                 typename ProcessingMode = pubkey::aggregation_processing_mode_default<Scheme>,
+                 typename AggregationAccumulator = typename pubkey::aggregation_accumulator_set<ProcessingMode>,
+                 typename StreamSchemeImpl = pubkey::detail::value_pubkey_impl<AggregationAccumulator>,
+                 typename SchemeImpl = pubkey::detail::range_pubkey_impl<StreamSchemeImpl>>
+        SchemeImpl aggregate(const SinglePassRange &range) {
+            return SchemeImpl(range, AggregationAccumulator());
         }
     }    // namespace crypto3
 }    // namespace nil

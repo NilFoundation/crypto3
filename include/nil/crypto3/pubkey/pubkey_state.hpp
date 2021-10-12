@@ -45,7 +45,7 @@ namespace nil {
              *
              * @ingroup pubkey
              *
-             * @tparam ProcessingMode
+             * @tparam ProcessingMode a policy representing a work mode of the scheme
              */
             template<typename ProcessingMode>
             using signing_accumulator_set = boost::accumulators::accumulator_set<
@@ -59,7 +59,7 @@ namespace nil {
              *
              * @ingroup pubkey
              *
-             * @tparam ProcessingMode
+             * @tparam ProcessingMode a policy representing a work mode of the scheme
              */
             template<typename ProcessingMode>
             using verification_accumulator_set = boost::accumulators::accumulator_set<
@@ -73,7 +73,7 @@ namespace nil {
              *
              * @ingroup pubkey
              *
-             * @tparam ProcessingMode
+             * @tparam ProcessingMode a policy representing a work mode of the scheme
              */
             template<typename ProcessingMode>
             using aggregation_accumulator_set = boost::accumulators::accumulator_set<
@@ -87,7 +87,7 @@ namespace nil {
              *
              * @ingroup pubkey
              *
-             * @tparam ProcessingMode
+             * @tparam ProcessingMode a policy representing a work mode of the scheme
              */
             template<typename ProcessingMode>
             using aggregate_verification_accumulator_set = boost::accumulators::accumulator_set<
@@ -101,7 +101,7 @@ namespace nil {
              *
              * @ingroup pubkey
              *
-             * @tparam ProcessingMode
+             * @tparam ProcessingMode a policy representing a work mode of the scheme
              */
             template<typename ProcessingMode>
             using single_msg_aggregate_verification_accumulator_set = boost::accumulators::accumulator_set<
