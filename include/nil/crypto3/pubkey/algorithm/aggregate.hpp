@@ -47,19 +47,21 @@ namespace nil {
         }    // namespace pubkey
 
         /*!
-         * @brief
+         * @brief Aggregation of the input signatures into one resulted signature and writing it in \p out
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam OutputIterator
+         * @tparam Scheme public key signature scheme
+         * @tparam InputIterator iterator representing input signatures
+         * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a aggregation operation as in specification
          *
-         * @param first
-         * @param last
-         * @param out
+         * @param first the beginning of the signatures range to aggregate
+         * @param last the end of the signatures range to aggregate
+         * @param out the beginning of the destination range
          *
-         * @return
+         * @return \p OutputIterator
          */
         template<typename Scheme, typename InputIterator, typename OutputIterator,
                  typename ProcessingMode = pubkey::aggregation_processing_mode_default<Scheme>>
@@ -76,18 +78,20 @@ namespace nil {
         }
 
         /*!
-         * @brief
+         * @brief Aggregation of the input signatures into one resulted signature and writing it in \p out
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam OutputIterator
+         * @tparam Scheme public key signature scheme
+         * @tparam SinglePassRange range representing input signatures
+         * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a aggregation operation as in specification
          *
-         * @param range
-         * @param out
+         * @param range the signatures range to aggregate
+         * @param out the beginning of the destination range
          *
-         * @return
+         * @return \p OutputIterator
          */
         template<typename Scheme, typename SinglePassRange, typename OutputIterator,
                  typename ProcessingMode = pubkey::aggregation_processing_mode_default<Scheme>>
@@ -104,19 +108,22 @@ namespace nil {
         }
 
         /*!
-         * @brief
+         * @brief Updating of accumulator set \p acc containing aggregation accumulator with input signatures
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam OutputAccumulator
+         * @tparam Scheme public key signature scheme
+         * @tparam InputIterator iterator representing input signatures
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a signing operation as in specification
+         * @tparam OutputAccumulator accumulator set initialized with aggregation accumulator (internal parameter)
          *
-         * @param first
-         * @param last
-         * @param acc
+         * @param first the beginning of the signatures range to aggregate
+         * @param last the end of the signatures range to aggregate
+         * @param acc accumulator set containing aggregation accumulator possibly pre-initialized with a part of
+         * signatures to aggregate
          *
-         * @return
+         * @return \p OutputAccumulator
          */
         template<typename Scheme, typename InputIterator,
                  typename ProcessingMode = pubkey::aggregation_processing_mode_default<Scheme>,
@@ -132,18 +139,21 @@ namespace nil {
         }
 
         /*!
-         * @brief
+         * @brief Updating of accumulator set \p acc containing aggregation accumulator with input signatures
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam OutputAccumulator
+         * @tparam Scheme public key signature scheme
+         * @tparam SinglePassRange range representing input signatures
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a signing operation as in specification
+         * @tparam OutputAccumulator accumulator set initialized with aggregation accumulator (internal parameter)
          *
-         * @param range
-         * @param acc
+         * @param range the signatures range to aggregate
+         * @param acc accumulator set containing aggregation accumulator possibly pre-initialized with a part of
+         * signatures to aggregate
          *
-         * @return
+         * @return \p OutputAccumulator
          */
         template<typename Scheme, typename SinglePassRange,
                  typename ProcessingMode = pubkey::aggregation_processing_mode_default<Scheme>,
@@ -159,18 +169,23 @@ namespace nil {
         }
 
         /*!
-         * @brief
+         * @brief Aggregation of the input signatures into one resulted signature
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam AggregationAccumulator
+         * @tparam Scheme public key signature scheme
+         * @tparam InputIterator iterator representing input signatures
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a aggregation operation as in specification
+         * @tparam AggregationAccumulator accumulator set initialized with aggregation accumulator (internal parameter)
+         * @tparam StreamSchemeImpl (internal parameter)
+         * @tparam SchemeImpl return type implicitly convertible to \p AggregationAccumulator or \p
+         * ProcessingMode::result_type (internal parameter)
          *
-         * @param first
-         * @param last
+         * @param first the beginning of the signatures range to aggregate
+         * @param last the end of the signatures range to aggregate
          *
-         * @return
+         * @return \p SchemeImpl
          */
         template<typename Scheme, typename InputIterator,
                  typename ProcessingMode = pubkey::aggregation_processing_mode_default<Scheme>,
@@ -182,17 +197,22 @@ namespace nil {
         }
 
         /*!
-         * @brief
+         * @brief Aggregation of the input signatures into one resulted signature
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam AggregationAccumulator
+         * @tparam Scheme public key signature scheme
+         * @tparam SinglePassRange range representing input signatures
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a aggregation operation as in specification
+         * @tparam AggregationAccumulator accumulator set initialized with aggregation accumulator (internal parameter)
+         * @tparam StreamSchemeImpl (internal parameter)
+         * @tparam SchemeImpl return type implicitly convertible to \p AggregationAccumulator or \p
+         * ProcessingMode::result_type (internal parameter)
          *
-         * @param range
+         * @param range the signatures range to aggregate
          *
-         * @return
+         * @return \p SchemeImpl
          */
         template<typename Scheme, typename SinglePassRange,
                  typename ProcessingMode = pubkey::aggregation_processing_mode_default<Scheme>,

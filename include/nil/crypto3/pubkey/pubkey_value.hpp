@@ -131,6 +131,14 @@ namespace nil {
                                               ::nil::crypto3::accumulators::key = pubkey);
                     }
 
+                    // TODO: fix
+                    template<typename Scheme>
+                    range_pubkey_impl(accumulator_set_type &&ise,
+                                      const typename public_key<Scheme>::signature_type &signature) :
+                        SchemeStateImpl(std::forward<accumulator_set_type>(ise)) {
+                        this->accumulator_set(signature);
+                    }
+
                     template<typename OutputRange>
                     operator OutputRange() const {
                         result_type result =
@@ -168,6 +176,10 @@ namespace nil {
 
                     typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
                         result_type;
+
+                    itr_pubkey_impl(OutputIterator out, accumulator_set_type &&ise) :
+                        SchemeStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
+                    }
 
                     template<typename SinglePassRange>
                     itr_pubkey_impl(const SinglePassRange &range, OutputIterator out, accumulator_set_type &&ise) :

@@ -469,6 +469,7 @@ void conformity_test(const std::vector<private_key<Scheme>> &sks,
 
     // TODO: extend public interface to be able to supply signature into accumulator
     agg_ver_acc(agg_sig);
+//    ::nil::crypto3::aggregate_verify<scheme_type>(agg_sig, agg_ver_acc);
     auto res = boost::accumulators::extract_result<aggregate_verification_acc>(agg_ver_acc);
     BOOST_CHECK_EQUAL(res, true);
 }
@@ -553,6 +554,7 @@ void self_test(const std::vector<private_key<Scheme>> &sks, const std::vector<Ms
 
     // TODO: extend public interface to be able to supply signature into accumulator
     agg_ver_acc(agg_sig);
+//    ::nil::crypto3::aggregate_verify<scheme_type>(agg_sig, agg_ver_acc);
     auto res = boost::accumulators::extract_result<aggregate_verification_acc>(agg_ver_acc);
     BOOST_CHECK_EQUAL(res, true);
 }

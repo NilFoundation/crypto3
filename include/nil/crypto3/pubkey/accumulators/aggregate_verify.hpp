@@ -71,7 +71,7 @@ namespace nil {
 
                         template<typename Args>
                         inline void operator()(const Args &args) {
-                            resolve_type(args[boost::accumulators::sample],
+                            resolve_type(args[boost::accumulators::sample | nullptr],
                                          args[::nil::crypto3::accumulators::iterator_last | nullptr],
                                          args[::nil::crypto3::accumulators::key | nullptr]);
                         }
@@ -81,6 +81,9 @@ namespace nil {
                         }
 
                     protected:
+                        inline void resolve_type(std::nullptr_t, std::nullptr_t, std::nullptr_t) {
+                        }
+
                         //
                         // set verified signature
                         //

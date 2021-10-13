@@ -96,8 +96,8 @@ namespace nil {
          * @tparam SchemeImpl return type implicitly convertible to \p VerificationAccumulator or \p
          * ProcessingMode::result_type (internal parameter)
          *
-         * @param first the beginning of the message range to verify
-         * @param last the end of the message range to verify
+         * @param first the beginning of the message range
+         * @param last the end of the message range
          * @param signature message signature to verify
          * @param key public key to be used for verification
          *
@@ -129,7 +129,7 @@ namespace nil {
          * @tparam SchemeImpl return type implicitly convertible to \p VerificationAccumulator or \p
          * ProcessingMode::result_type (internal parameter)
          *
-         * @param range the message range to verify
+         * @param range the message range
          * @param signature message signature to verify
          * @param key public key to be used for verification
          *
@@ -157,8 +157,8 @@ namespace nil {
          * executing a verification operation as in specification, another example is threshold mode
          * @tparam OutputAccumulator accumulator set initialized with verification accumulator (internal parameter)
          *
-         * @param first the beginning of the message range to verify
-         * @param last the end of the message range to verify
+         * @param first the beginning of the message range
+         * @param last the end of the message range
          * @param acc accumulator set containing verification accumulator initialized with public key and possibly
          * pre-initialized with the beginning of the message to verify
          *
@@ -182,12 +182,12 @@ namespace nil {
          * @ingroup pubkey_algorithms
          *
          * @tparam Scheme public key signature scheme
-         * @tparam SinglePassRange iterator representing input message
+         * @tparam SinglePassRange range representing input message
          * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
          * executing a verification operation as in specification, another example is threshold mode
          * @tparam OutputAccumulator accumulator set initialized with verification accumulator (internal parameter)
          *
-         * @param range the message range to verify
+         * @param range the message range
          * @param acc accumulator set containing verification accumulator initialized with public key and possibly
          * pre-initialized with the beginning of the message to verify
          *
@@ -216,8 +216,8 @@ namespace nil {
          * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
          * executing a verification operation as in specification, another example is threshold mode
          *
-         * @param first the beginning of the message range to verify
-         * @param last the end of the message range to verify
+         * @param first the beginning of the message range
+         * @param last the end of the message range
          * @param signature message signature to verify
          * @param key public key to be used for verification
          * @param out the beginning of the destination range
@@ -244,12 +244,12 @@ namespace nil {
          * @ingroup pubkey_algorithms
          *
          * @tparam Scheme public key signature scheme
-         * @tparam SinglePassRange iterator representing input message
+         * @tparam SinglePassRange range representing input message
          * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
          * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
          * executing a verification operation as in specification, another example is threshold mode
          *
-         * @param range the message range to verify
+         * @param range the message range
          * @param signature message signature to verify
          * @param key public key to be used for verification
          * @param out the beginning of the destination range

@@ -20,9 +20,9 @@ Pubkey library architecture consists of several parts listed below:
 1. Algorithms
 2. Asymmetric schemes policies
 3. Cryptographic material objects (keys, shares)
-4. Cryptographic operations policies (aggregation, aggregate verification, shares dealing etc.)
+4. Cryptographic operation policies (aggregation, aggregate verification, shares dealing etc.)
 5. Accumulators (signing, verification, aggregation and other accumulators)
-6. Processing Modes
+6. Processing Modes (isomorphic, threshold)
 
 The execution of any asymmetric operation (signing, verification, aggregation etc.) go through the following steps:
 
@@ -90,9 +90,12 @@ typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAc
 sign(InputIterator first, InputIterator last, OutputAccumulator &acc);
 ```
 
-Such interface is not the case when working with `std::transform` as it does not work with the accumulator concept.
-
 `OutputAccumulator` is a pre-initialized accumulator set.
+
+Such interface is not the case when working with `std::transform` as it does not work with the accumulator concept.
+Passed message is used to update state of passed accumulator `acc`. Such call of `sign` doesn't complete signing
+algorithm. To retrieve resulted signature accumulator should be finalized, i.e. in the case of accumulator concept it
+should be extracted.
 
 Another possible interface doesn't accept `OutputIterator` accumulator parameter:
 
@@ -102,9 +105,9 @@ template<typename Scheme, typename InputIterator, typename ProcessingMode, typen
 SchemeImpl sign(InputIterator first, InputIterator last, const pubkey::private_key<Scheme> &key);
 ```
 
-Such call return object of internal type (`range_pubkey_impl` or `itr_pubkey_impl`) which implicitly convertible to
-accumulator set type, pre-initialized with input data of `InputIterator` type, or
-to `typename ProcessingMode::result_type`, which represents result of algorithm execution.
+Such call return object of internal type (`range_pubkey_impl` or `itr_pubkey_impl`) which is implicitly convertible to
+accumulator set type, pre-initialized with input data of `InputIterator` type, or to `ProcessingMode::result_type`,
+which represents result of algorithm execution.
 
 Algorithms are no more than an internal structures initializer wrapper. In this particular case algorithm would
 initialize accumulator set with accumulator we [`need` ](@ref accumulators::pubkey) inside initialized with `key` and in
@@ -143,10 +146,24 @@ The signature should be supplied in the correct form, namely defined as `public_
 
 ### aggregate.hpp
 
-The algorithm for a given list of signatures for a some list of messages and public keys generates one signature that
-authenticates the same list of messages and public keys.
+The algorithm for a given list of signatures created for a some list of messages on some private keys generates one
+aggregated signature that authenticates the same list of messages on the corresponding public keys. Example of such
+algorithm see [here](https://datatracker.ietf.org/doc/draft-irtf-cfrg-bls-signature/).
 
-All signatures should be of type `public_key<Scheme>::signature_type`.
+All signatures should be of type `public_key<Scheme>::signature_type`. Resulted signature is of the same type.
+
+### aggregate_verify.hpp
+
+The algorithm verify aggregated signature, created for a given list of messages, using a corresponding list of public
+key. Example of such algorithm see [here](https://datatracker.ietf.org/doc/draft-irtf-cfrg-bls-signature/).
+
+The signature should be of the type `public_key<Scheme>::signature_type`.
+
+### aggregate_verify_single_msg.hpp
+
+The optimized version of aggregate verification algorithm which should be used if aggregated signatures were created for
+the same message on the all keys. Example of such algorithm
+see [here](https://datatracker.ietf.org/doc/draft-irtf-cfrg-bls-signature/).
 
 ## Pubkey Policies {#pubkey_policies}
 
