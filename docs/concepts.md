@@ -1,162 +1,221 @@
 # Concepts {#pubkey_concepts}
 
-
 @tableofcontents
 
-## PublicKeyScheme Concept ## {#pubkey_concept}
+## Public key scheme concept ## {#pubkey_concept}
 
-A ```PublicKeyScheme``` is a stateless public-keyed cryptographic scheme policy.
+A `PublicKeyScheme` is a stateless asymmetric crypto-scheme policy.
 
 ### Requirements ### {#pubkey_concepts_requirements}
 
-The type ```X``` satisfies ```PublicKeyScheme``` if:
+The type `X` satisfies `PublicKeyScheme` if at least there exist partial specializations of the templates `public_key<X>` and `private_key<X>` satisfying to the concepts `PublicKey` and `PrivateKey` accordingly.
+
+## Signature public key scheme concept ## {#pubkey_concept}
+
+A `SignaturePublicKeyScheme` is a stateless asymmetric crypto-scheme policy supporting algorithms of signature creation and verification.
+
+### Requirements ### {#pubkey_concepts_requirements}
+
+The type `X` satisfies `SignaturePublicKeyScheme` if it satisfies to the concept `PublicKeyScheme` and at least there exist partial specializations of the templates `public_key<X>` and `private_key<X>` satisfying to the concepts `VerificationPublicKey` and `SigningPrivateKey` accordingly.
+
+## Encryption public key scheme concept ## {#pubkey_concept}
+
+An `EncryptionPublicKeyScheme` is a stateless asymmetric crypto-scheme policy supporting asymmetric encryption and decryption algorithms.
+
+### Requirements ### {#pubkey_concepts_requirements}
+
+The type `X` satisfies `EncryptionPublicKeyScheme` if it satisfies to the concept `PublicKeyScheme` and at least there exist partial specializations of the templates `public_key<X>` and `private_key<X>` satisfying to the concepts `EncryptionPublicKey` and `DecryptionPrivateKey` accordingly.
+
+## Public key concept ## {#pubkey_concept}
+
+A `PublicKey` is a concept of a stateful object containing cryptographic material of public key and defining methods to execute cryptographic algorithms, of some asymmetric crypto-scheme, assuming the use of the public key (for example, signature verification or message encryption).
+
+Implementation of concept `PublicKey` for some asymmetric crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `public_key<Scheme>`.
+
+### Requirements ### {#pubkey_concepts_requirements}
+
+If the type `X` satisfies `PublicKey` concept then following expressions must be valid and have their specified effects.
+
+#### Member types
+
+|Expression|Requirements and Notes|
+|---|---|
+|`X::scheme_type`|type satisfying `PublicKeyScheme` concept|
+|`X::key_type`|type of internal representation of a public key material|
+|`X::internal_accumulator_type`|Type of object intended for accumulation of input message and performing any needed preparation of input data like padding, hashing or encoding|
+
+#### Other requirements
 
 Given
 
-* ```StreamProcessor```, the type template named by ```X::stream_processor```
-* ```PrivateKey```, the type named by ```X::private_key_type```
-* ```PublicKey```, the type named by ```X::public_key_type```
+* `x` object of type `X`
+* `k` object of type `X::key_type`
+* `acc` lvalue of type `X::internal_accumulator_type`
+* `r` object of the type satisfying [`SequenceContainer`](https://en.cppreference.com/w/cpp/named_req/SequenceContainer)concept
+* `i`, `j` objects of the type satisfying [`LegacyInputIterator`](https://en.cppreference.com/w/cpp/named_req/InputIterator) concept
+* `s` object of type `X::signature_type`
 
-The following type members must be valid and have their specified effects
+|Expression|Return type|Effects|
+|---|---|---|
+|`X(k)`|`X`|Constructs stateful `PublicKey` object with input public key material `k`|
+|`x.init_accumulator(acc)`| |Initialize accumulator `acc`. The method is supposed to be called before call to method `update`|
+|`x.update(acc, r)`| |Accumulate input message in `acc` to process it later by executing algorithms supported by `Scheme`|
+|`x.update(acc, i, j)`| |Accumulate input message in `acc` to process it later by executing algorithms supported by `Scheme`|
 
-|Name               |Type                    |Requirements and Notes |
-|-----------------------------|------------------------|-----------------------|
-|```X::stream_processor```          |```StreamProcessor```         |```StreamProcessor``` object splits the data to blocks, converts them and passes to accumulator reference as input data of required format.|
-|```X::private_key_type```          |```PrivateKey```         |```PrivateKey``` type satisfies ```private_key_concept``` concept.|
-|```X::publc_key_type```          |```PublicKey```         |```PublicKey``` type satisfies ```public_key_concept``` concept.|
+## Signature verification public key concept ## {#pubkey_concept}
 
+A `VerificationPublicKey` is a concept of a stateful object containing cryptographic material of public key and defining methods to execute cryptographic algorithms of particular asymmetric signature crypto-scheme.
 
-## Public key Concept ## {#public_key_concept}
-A ```PublicKey``` is function object performing operations with public key. For example: verify, encryption.
+Implementation of concept `VerificationPublicKey` for some asymmetric signature crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `public_key<Scheme>`.
 
-### Requirements ### {#public_concepts_requirements}
+### Requirements ### {#pubkey_concepts_requirements}
 
-The type ```X``` satisfies ``` PublicKey``` if:
+If the type `X` satisfies `VerificationPublicKey` concept then it satisfies to `PublicKey` and following expressions must be valid and have their specified effects.
 
-Given
+#### Member types
 
-* ```SchemeType```, the type named by ```X::scheme_type```
-* ```PrivateKeyType```, the type named by ```X::private_key_type```
-* ```PublicKeyType```, the type named by ```X::public_key_type```
-* ```SignatureType```, the type named by ```X::signature_type```
-* ```InputBlockType```, the type named by ```X::input_block_type```
-* ```InputValueType```, the type named by ```X::input_value_type```
+|Expression|Requirements and Notes|
+|---|---|
+|`X::scheme_type`|type satisfying `SignaturePublicKeyScheme` concept|
+|`X::signature_type`|type representing signature of used `Scheme`|
 
-
-|Expression                   |Type                    |Requirements and Notes |
-|-----------------------------|------------------------|-----------------------|
-|```X::scheme_type```         |```SchemeType```        |```SchemeType``` type satisfies ```PubKey``` concept|
-|```X::private_key_type```         |```PrivateKeyType```        |```PrivateKeyType``` type is a low-level representation of a private key object|
-|```X::public_key_type```         |```PublicKeyType```        |```PublicKeyType```  type is a low-level representation of a public key object|
-|```X::signature_key_type```         |```SignatureKeyType```        |```SignatureKeyType``` is type of signature object returned by signing function and taken by verification function|
-|```X::input_block_type```          |```InputBlockType```         |```InputBlockType``` type is a ```SequenceContainer``` of type ```T``` or ```std::vector<T>```|
-|```X::input_value_type```           |```InputValueType```          |```InputValueType``` type satisfies ```Integral``` concept|
-
-
-The following static data member definitions must be valid and have their specified effects
-
-|Expression          |Type             |Requirements and Notes                 |
-|--------------------|-----------------|---------------------------------------|
-|```X::input_value_bits```  |```std::size_t```|```Integral``` bits amount in ```InputValueType```|
-|```X::input_block_bits``` |```std::size_t```|```Integral``` bits amount in ```InputBlockType```|
-
-
-The following expressions must be valid and have their specified effects
-Given
-* ```BlockType```, the type satisfies ```SequenceContainer``` concept for which ```BlockType::value_type``` is of type ```X::input_value_type```
-
-
-|Expression                 |Requirements      |Return Type                    |
-|---------------------------|------------------|-------------------------------|
-|```X(X::public_key_type)```|Constructs stateful ```PublicKey``` object with input key of ```public_key_type```|```PublicKey```|
-|```X.verify(BlockType)```|Verify a block of data in decoded format specified for particular algorithm. A block can be of a variable size. Should be a non-mutating function depending only on a ```PublicKey``` object inner state of ```public_key_type``` type.|```PublicKey::signature_type```|
-|```X.encrypt(BlockType)```|Encrypts a block of data in encoded format specified for particular algorithm. A block can be of a variable size. Should be a non-mutating function depending only on a ```PublicKey``` object inner state of ```public_key_type``` type.|```BlockType```|
-
-## Private key Concept ## {#private_key_concept}
-A ```PrivateKey``` is function object performing operations with private key. For example: signing, decryption.
-
-### Requirements ### {#private_key_concepts_requirements}
-
-The type ```X``` satisfies ``` PrivateKey``` if:
-
-* The type ```X``` satisfies ```PublicKey```
+#### Other requirements
 
 Given
 
-* ```SchemeType```, the type named by ```X::scheme_type``` 
-* ```PrivateKeyType```, the type named by ```X::private_key_type``` 
-* ```PublicKeyType```, the type named by ```X::public_key_type``` 
-* ```SignatureType```, the type named by ```X::signature_type``` 
-* ```InputBlockType```, the type named by ```X::input_block_type``` 
-* ```InputValueType```, the type named by ```X::input_value_type``` 
+* `x` object of type `X`
+* `acc` lvalue of type `X::internal_accumulator_type`
+* `s` object of type `X::signature_type`
 
-|Expression                   |Type                    |Requirements and Notes |
-|-----------------------------|------------------------|-----------------------|
-|```X::scheme_type```         |```SchemeType```        |```SchemeType``` type satisfies ```PubKey``` concept|
-|```X::private_key_type```         |```PrivateKeyType```        |```PrivateKeyType``` type is a low-level representation of a private key object.|
-|```X::public_key_type```         |```PublicKeyType```        |```PublicKeyType```  type is a low-level representation of a public key object.|
-|```X::signature_key_type```         |```SignatureKeyType```        |```SignatureKeyType``` is type of signature object returned by signing function and taken by verification function.|
-|```X::input_block_type```          |```InputBlockType```         |```InputBlockType``` type is a ```SequenceContainer``` of type ```T``` or ```std::vector<T>```|
-|```X::input_value_type```           |```InputValueType```          |```InputValueType``` type satisfies ```Integral``` concept|
+|Expression|Return type|Effects|
+|---|---|---|
+|`x.verify(acc, s)`|`bool`|Extract accumulator `acc` and process verification using extracted data, input signature `s` and public key material stored in `x`|
 
+## Encryption public key concept ## {#pubkey_concept}
 
-The following static data member definitions must be valid and have their specified effects
+A `EncryptionPublicKey` is a concept of a stateful object containing cryptographic material of public key and defining methods to execute cryptographic algorithms, of particular asymmetric encryption crypto-scheme, assuming the use of the private key.
 
-|Expression          |Type             |Requirements and Notes                 |
-|--------------------|-----------------|---------------------------------------|
-|```X::input_value_bits```  |```std::size_t```|```Integral``` bits amount in ```InputValueType```|
-|```X::input_block_bits``` |```std::size_t```|```Integral``` bits amount in ```InputBlockType```|
+Implementation of concept `EncryptionPublicKey` for some asymmetric encryption crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `public_key<Scheme>`.
 
+### Requirements ### {#pubkey_concepts_requirements}
 
-The following expressions must be valid and have their specified effects
- Given
- * ```BlockType```, the type satisfies ```SequenceContainer``` concept for which ```BlockType::value_type``` is of type ```X::input_value_type```
+If the type `X` satisfies `EncryptionPublicKey` concept then it satisfies to `PublicKey` and following expressions must be valid and have their specified effects.
 
+#### Member types
 
-|Expression                 |Requirements      |Return Type                    |
-|---------------------------|------------------|-------------------------------|
-|```X(X::private_key_type)```|Constructs stateful ```PrivateKey``` object with input key of ```private_key_type```|```PrivateKey```|
-|```X.sign(BlockType)```|Sign a block of data in decoded format specified for particular algorithm. A block can be of a variable size. Should be a non-mutating function depending only on a ```PrivateKey``` object inner state of ```private_key_type``` type.|```X::signature_type```|
-|```X.decrypt(BlockType)```|Decrypts a block of data in encoded format specified for particular algorithm. A block can be of a variable size. Should be a non-mutating function depending only on a ```PrivateKey``` object inner state of ```private_key_type``` type.|```BlockType```|
+|Expression|Requirements and Notes|
+|---|---|
+|`X::scheme_type`|type satisfying `EncryptionPublicKeyScheme` concept|
+|`X::cipher_text_type`|type representing cipher-text of used `Scheme`|
 
-## No-key Concept ## {#non_key_concept}
-A ```NoKey``` is function object performing operations without using of any key. For example: aggregate.
-
-### Requirements ### {#non_key_concepts_requirements}
-
-The type ```X``` satisfies ``` NoKey``` if:
+#### Other requirements
 
 Given
 
-* ```SchemeType```, the type named by ```X::scheme_type``` 
-* ```PrivateKeyType```, the type named by ```X::private_key_type``` 
-* ```PublicKeyType```, the type named by ```X::public_key_type``` 
-* ```SignatureType```, the type named by ```X::signature_type``` 
-* ```InputBlockType```, the type named by ```X::input_block_type``` 
-* ```InputValueType```, the type named by ```X::input_value_type``` 
+* `x` object of type `X`
+* `acc` lvalue of type `X::internal_accumulator_type`
+* `s` object of type `X::signature_type`
 
+|Expression|Return type|Effects|
+|---|---|---|
+|`x.encrypt(acc)`|`X::cipher_text_type`|Extract accumulator `acc` and process encryption algorithm using extracted data and public key material stored in `x`|
 
-|Expression                   |Type                    |Requirements and Notes |
-|-----------------------------|------------------------|-----------------------|
-|```X::scheme_type```         |```SchemeType```        |```SchemeType``` type satisfies ```Pubkey``` concept|
-|```X::private_key_type```         |```PrivateKeyType```        |```PrivateKeyType``` type is a low-level representation of a private key object|
-|```X::public_key_type```         |```PublicKeyType```        |```PublicKeyType```  type is a low-level representation of a public key object|
-|```X::signature_key_type```         |```SignatureKeyType```        |```SignatureKeyType``` is type of signature object returned by signing function and taken by aggregation function|
-|```X::input_block_type```          |```InputBlockType```         |```InputBlockType``` type is a ```SequenceContainer``` of type ```T``` or ```std::vector<T>```|
-|```X::input_value_type```           |```InputValueType```          |```InputValueType``` type satisfies ```Integral``` concept|
+## Private key concept ## {#pubkey_concept}
 
+A `PrivateKey` is a concept of a stateful object containing cryptographic material of private key and defining methods to execute cryptographic algorithms, of particular asymmetric crypto-scheme, assuming the use of the private key (for example, signature creation or message decryption).
 
-The following static data member definitions must be valid and have their specified effects
+Implementation of concept `PrivateKey` for some asymmetric crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `private_key<Scheme>`.
 
-|Expression          |Type             |Requirements and Notes                 |
-|--------------------|-----------------|---------------------------------------|
-|```X::input_value_bits```  |```std::size_t```|```Integral``` bits amount in ```InputValueType```|
-|```X::input_block_bits``` |```std::size_t```|```Integral``` bits amount in ```InputBlockType```|
+### Requirements ### {#pubkey_concepts_requirements}
 
-The following expressions must be valid and have their specified effects
+If the type `X` satisfies `PrivateKey` concept then following expressions must be valid and have their specified effects.
+
+#### Member types
+
+|Expression|Requirements and Notes|
+|---|---|
+|`X::scheme_type`|type satisfying `PublicKeyScheme` concept|
+|`X::key_type`|type of internal representation of a private key material|
+|`X::internal_accumulator_type`|Type of object intended for accumulation of input message and possibly performing any needed preparation of input data like padding, hashing or encoding|
+
+#### Other requirements
+
 Given
- * ```BlockType```, the type satisfies ```SequenceContainer``` concept for which ```BlockType::value_type``` is of type ```X::input_value_type```
 
-|Expression                 |Requirements      |Return Type                    |
-|---------------------------|------------------|-------------------------------|
-|```X::aggregate(BlockType)```|Aggregate a block of signatures in decoded format specified for particular algorithm. A block can be of a variable size.|```X::signature_type```|
+* `x` object of type `X`
+* `k` object of type `X::key_type`
+* `acc` lvalue of type `X::internal_accumulator_type`
+* `r` object of the type satisfying [`SequenceContainer`](https://en.cppreference.com/w/cpp/named_req/SequenceContainer) concept
+* `i`, `j` objects of the type satisfying [`LegacyInputIterator`](https://en.cppreference.com/w/cpp/named_req/InputIterator) concept
+
+|Expression|Return type|Effects|
+|---|---|---|
+|`X(k)`|`X`|Constructs stateful `PrivateKey` object with input private key material `k`|
+|`x.init_accumulator(acc)`| |Initialize accumulator `acc`. The method is supposed to be called before call to method `update`|
+|`x.update(acc, r)`| |Accumulate input message in `acc` to process it later by executing algorithms supported by `Scheme`|
+|`x.update(acc, i, j)`| |Accumulate input message in `acc` to process it later by executing algorithms supported by `Scheme`|
+
+## Signing private key concept ## {#pubkey_concept}
+
+A `SigningPrivateKey` is a concept of a stateful object containing cryptographic material of private key and defining methods to execute cryptographic algorithms, of some asymmetric encryption crypto-scheme, assuming the use of the private key.
+
+Implementation of concept `SigningPrivateKey` for some asymmetric encryption crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `private_key<Scheme>`.
+
+### Requirements ### {#pubkey_concepts_requirements}
+
+If the type `X` satisfies `SigningPrivateKey` concept then it satisfies `PrivateKey` concept and following expressions must be valid and have their specified effects.
+
+#### Member types
+
+|Expression|Requirements and Notes|
+|---|---|
+|`X::scheme_type`|type satisfying `SignaturePublicKeyScheme` concept|
+|`X::signature_type`|type representing signature of used `Scheme`|
+
+#### Other requirements
+
+Given
+
+* `x` object of type `X`
+* `acc` lvalue of type `X::internal_accumulator_type`
+
+|Expression|Return type|Effects|
+|---|---|---|
+|`x.sign(acc)`|`X::signature_type`|Extract accumulator `acc` and process signing algorithm using extracted data and private key material stored in object `x`|
+
+## Decryption private key concept ## {#pubkey_concept}
+
+A `DecryptionPrivateKey` is a concept of a stateful object containing cryptographic material of private key and defining methods to execute cryptographic algorithms, of some asymmetric encryption crypto-scheme, assuming the use of the private key.
+
+Implementation of concept `DecryptionPrivateKey` for some asymmetric encryption crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `private_key<Scheme>`.
+
+### Requirements ### {#pubkey_concepts_requirements}
+
+If the type `X` satisfies `DecryptionPrivateKey` concept then it satisfies `PrivateKey` concept and following expressions must be valid and have their specified effects.
+
+#### Member types
+
+|Expression|Requirements and Notes|
+|---|---|
+|`X::scheme_type`|type satisfying `EncryptionPublicKeyScheme` concept|
+|`X::plain_text_type`|type representing plain-text (decryption result) of used `Scheme`|
+
+#### Other requirements
+
+Given
+
+* `x` object of type `X`
+* `acc` lvalue of type `X::internal_accumulator_type`
+
+|Expression|Return type|Effects|
+|---|---|---|
+|`x.decrypt(acc)`|`X::plain_text_type`|Extract accumulator `acc` and process decryption algorithm using extracted data and private key material stored in object `x`|
+
+## Cryptographic operation concept ## {#pubkey_concept}
+
+A `PrivateKey` is a concept of a stateful object containing cryptographic material of private key and defining methods to execute cryptographic algorithms, of particular asymmetric crypto-scheme, assuming the use of the private key (for example, signature creation or message decryption).
+
+Implementation of concept `PrivateKey` for some asymmetric crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `private_key<Scheme>`.
+
+### Requirements ### {#pubkey_concepts_requirements}
+
