@@ -26,6 +26,14 @@ An `EncryptionPublicKeyScheme` is a stateless asymmetric crypto-scheme policy su
 
 The type `X` satisfies `EncryptionPublicKeyScheme` if it satisfies to the concept `PublicKeyScheme` and at least there exist partial specializations of the templates `public_key<X>` and `private_key<X>` satisfying to the concepts `EncryptionPublicKey` and `DecryptionPrivateKey` accordingly.
 
+## Secret sharing scheme concept ## {#pubkey_concept}
+
+An `SecretSharingScheme` is a stateless secret sharing crypto-scheme policy.
+
+### Requirements ### {#pubkey_concepts_requirements}
+
+The type `X` satisfies `SecretSharingScheme` if at least there exist partial specializations of the templates `deal_shares_op<X>` satisfying to the concepts `PublicKeyOperation`, `share_sss<Scheme>` satisfying to the concepts `Share`, `public_share_sss<Scheme>` satisfying to the concepts `PublicShare`, `secret_sss<Scheme>` satisfying to the concepts `Secret`.
+
 ## Public key concept ## {#pubkey_concept}
 
 A `PublicKey` is a concept of a stateful object containing cryptographic material of public key and defining methods to execute cryptographic algorithms, of some asymmetric crypto-scheme, assuming the use of the public key (for example, signature verification or message encryption).
@@ -243,4 +251,106 @@ Given
 |`X::update(acc, r)`| |Accumulate input data in `acc` to process it later by executing algorithms supported by `Scheme`|
 |`X::update(acc, i, j)`| |Accumulate input data in `acc` to process it later by executing algorithms supported by `Scheme`|
 |`X::process(acc)`|Extract accumulator `acc` and process algorithm using extracted data|
+
+## Share concept ## {#pubkey_concept}
+
+A `Share` is a concept of a stateful object containing cryptographic material of share and defining methods to work with it of some secret sharing scheme.
+
+Implementation of concept `Share` for some secret sharing scheme policy `Scheme` is assumed to be done by defining partial specialization of template `share_sss<Scheme>`.
+
+### Requirements ### {#pubkey_concepts_requirements}
+
+If the type `X` satisfies `Share` concept then following expressions must be valid and have their specified effects.
+
+#### Member types
+
+|Expression|Requirements and Notes|
+|---|---|
+|`X::scheme_type`|type satisfying `SecretSharingScheme` concept|
+|`X::index_type`|integral type for index representation of particular share|
+|`X::value_type`|type of share material stored in the object|
+|`X::data_type`|type of data stored in the object, contains all of the data stored in the object|
+
+#### Other requirements
+
+|Expression|Return type|Effects|
+|---|---|---|
+|`x.get_index()`|`X::index_type`|return share index|
+|`x.get_value()`|`const X::value_type &`|return share value|
+|`x.get_data()`|`const X::data_type &`|return raw data stored in the `x`|
+|`static_cast<public_share<typename X::scheme_type>>(x)`|`public_share<typename X::scheme_type>`|convert share to public representative|
+
+## Public representative of share concept ## {#pubkey_concept}
+
+A `PublicShare` is a concept of a stateful object containing cryptographic material of public representative of share and defining methods to work with it for some secret sharing scheme.
+
+Implementation of concept `PublicShare` for some secret sharing scheme policy `Scheme` is assumed to be done by defining partial specialization of template `public_share_sss<Scheme>`.
+
+### Requirements ### {#pubkey_concepts_requirements}
+
+If the type `X` satisfies `PublicShare` concept then following expressions must be valid and have their specified effects.
+
+#### Member types
+
+|Expression|Requirements and Notes|
+|---|---|
+|`X::scheme_type`|type satisfying `SecretSharingScheme` concept|
+|`X::index_type`|integral type for index representation of particular share|
+|`X::value_type`|type of share material stored in the object|
+|`X::data_type`|type of data stored in the object, contains all of the data stored in the object|
+
+#### Other requirements
+
+|Expression|Return type|Effects|
+|---|---|---|
+|`x.get_index()`|`X::index_type`|return share index|
+|`x.get_value()`|`const X::value_type &`|return share value|
+|`x.get_data()`|`const X::data_type &`|return raw data stored in the `x`|
+
+## Secret concept ## {#pubkey_concept}
+
+A `Secret` is a concept of a stateful object containing cryptographic material of secret and defining methods to work with it for some secret sharing scheme.
+
+Implementation of concept `Secret` for some secret sharing scheme policy `Scheme` is assumed to be done by defining partial specialization of template `secret_sss<Scheme>`.
+
+### Requirements ### {#pubkey_concepts_requirements}
+
+If the type `X` satisfies `Secret` concept then following expressions must be valid and have their specified effects.
+
+#### Member types
+
+|Expression|Requirements and Notes|
+|---|---|
+|`X::scheme_type`|type satisfying `SecretSharingScheme` concept|
+|`X::value_type`|type of secret material stored in the object|
+
+#### Other requirements
+
+|Expression|Return type|Effects|
+|---|---|---|
+|`x.get_value()`|`const X::value_type &`|return share value|
+|`static_cast<public_secret<typename X::scheme_type>>(x)`|`public_secret<typename X::scheme_type>`|convert share to public representative|
+
+## Public representative of secret concept ## {#pubkey_concept}
+
+A `PublicSecret` is a concept of a stateful object containing cryptographic material of public representative of secret and defining methods to work with it for some secret sharing scheme.
+
+Implementation of concept `PublicSecret` for some secret sharing scheme policy `Scheme` is assumed to be done by defining partial specialization of template `public_secret_sss<Scheme>`.
+
+### Requirements ### {#pubkey_concepts_requirements}
+
+If the type `X` satisfies `PublicSecret` concept then following expressions must be valid and have their specified effects.
+
+#### Member types
+
+|Expression|Requirements and Notes|
+|---|---|
+|`X::scheme_type`|type satisfying `SecretSharingScheme` concept|
+|`X::value_type`|type of public representative of secret material stored in the object|
+
+#### Other requirements
+
+|Expression|Return type|Effects|
+|---|---|---|
+|`x.get_value()`|`const X::value_type &`|return share value|
 

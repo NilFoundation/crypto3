@@ -133,6 +133,9 @@ namespace nil {
             struct public_share_sss<shamir_sss<Group>> {
                 typedef shamir_sss<Group> scheme_type;
                 typedef typename scheme_type::indexed_public_element_type public_share_type;
+                typedef public_share_type data_type;
+                typedef typename public_share_type::first_type index_type;
+                typedef typename public_share_type::second_type value_type;
 
                 public_share_sss() = default;
 
@@ -149,12 +152,16 @@ namespace nil {
                     assert(scheme_type::check_participant_index(get_index()));
                 }
 
-                inline typename public_share_type::first_type get_index() const {
+                inline index_type get_index() const {
                     return public_share.first;
                 }
 
-                inline const typename public_share_type::second_type &get_value() const {
+                inline const value_type &get_value() const {
                     return public_share.second;
+                }
+
+                inline const data_type &get_data() const {
+                    return public_share;
                 }
 
                 bool operator==(const public_share_sss &other) const {
@@ -173,6 +180,9 @@ namespace nil {
             struct share_sss<shamir_sss<Group>> {
                 typedef shamir_sss<Group> scheme_type;
                 typedef typename scheme_type::indexed_private_element_type share_type;
+                typedef share_type data_type;
+                typedef typename share_type::first_type index_type;
+                typedef typename share_type::second_type value_type;
 
                 share_sss() = default;
 
@@ -188,12 +198,16 @@ namespace nil {
                     assert(scheme_type::check_participant_index(get_index()));
                 }
 
-                inline typename share_type::first_type get_index() const {
+                inline index_type get_index() const {
                     return share.first;
                 }
 
-                inline const typename share_type::second_type &get_value() const {
+                inline const value_type &get_value() const {
                     return share.second;
+                }
+
+                inline const data_type &get_data() const {
+                    return share;
                 }
 
                 template<
@@ -235,6 +249,7 @@ namespace nil {
                 typedef shamir_sss<Group> scheme_type;
                 typedef typename scheme_type::public_element_type public_secret_type;
                 typedef typename scheme_type::indexes_type indexes_type;
+                typedef public_secret_type value_type;
 
                 template<typename PublicShares>
                 public_secret_sss(const PublicShares &public_shares) :
@@ -256,7 +271,7 @@ namespace nil {
                     public_secret(reconstruct_public_secret(first, last, indexes)) {
                 }
 
-                inline const public_secret_type &get_value() const {
+                inline const value_type &get_value() const {
                     return public_secret;
                 }
 
@@ -310,6 +325,7 @@ namespace nil {
                 typedef shamir_sss<Group> scheme_type;
                 typedef typename scheme_type::private_element_type secret_type;
                 typedef typename scheme_type::indexes_type indexes_type;
+                typedef secret_type value_type;
 
                 template<typename Shares>
                 secret_sss(const Shares &shares) : secret_sss(std::cbegin(shares), std::cend(shares)) {
@@ -329,7 +345,7 @@ namespace nil {
                     secret(reconstruct_secret(first, last, indexes)) {
                 }
 
-                inline const secret_type &get_value() const {
+                inline const value_type &get_value() const {
                     return secret;
                 }
 
