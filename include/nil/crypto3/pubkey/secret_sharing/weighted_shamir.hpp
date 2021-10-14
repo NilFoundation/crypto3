@@ -283,6 +283,7 @@ namespace nil {
                 typedef share_sss<scheme_type> share_type;
                 typedef std::vector<share_type> shares_type;
                 typedef shares_type internal_accumulator_type;
+                typedef shares_type result_type;
 
                 static inline void init_accumulator(internal_accumulator_type &acc, std::size_t n, std::size_t t,
                                                     const typename scheme_type::weights_type &weights) {
@@ -301,7 +302,7 @@ namespace nil {
                     }
                 }
 
-                static inline shares_type process(internal_accumulator_type &acc) {
+                static inline result_type process(internal_accumulator_type &acc) {
                     return acc;
                 }
             };
@@ -312,6 +313,7 @@ namespace nil {
                 typedef share_sss<scheme_type> share_type;
                 typedef secret_sss<scheme_type> secret_type;
                 typedef std::vector<share_type> internal_accumulator_type;
+                typedef secret_type result_type;
 
             public:
                 static inline void init_accumulator() {
@@ -321,7 +323,7 @@ namespace nil {
                     acc.emplace_back(share);
                 }
 
-                static inline secret_type process(internal_accumulator_type &acc) {
+                static inline result_type process(internal_accumulator_type &acc) {
                     return acc;
                 }
             };

@@ -142,6 +142,7 @@ namespace nil {
                 typedef share_sss<scheme_type> share_type;
                 typedef std::vector<share_type> shares_type;
                 typedef shares_type internal_accumulator_type;
+                typedef shares_type result_type;
 
                 static inline void init_accumulator(internal_accumulator_type &acc, std::size_t n, std::size_t t) {
                     base_type::template _init_accumulator<share_type>(acc, n, t);
@@ -152,8 +153,8 @@ namespace nil {
                     base_type::template _update<scheme_type>(acc, exp, coeff);
                 }
 
-                static inline shares_type process(internal_accumulator_type &acc) {
-                    return base_type::template _process<shares_type>(acc);
+                static inline result_type process(internal_accumulator_type &acc) {
+                    return base_type::template _process<result_type>(acc);
                 }
             };
 
@@ -162,6 +163,7 @@ namespace nil {
                 typedef pedersen_dkg<Group> scheme_type;
                 typedef share_sss<scheme_type> share_type;
                 typedef share_type internal_accumulator_type;
+                typedef share_type result_type;
 
                 static inline void init_accumulator(internal_accumulator_type &acc, std::size_t i) {
                     acc = internal_accumulator_type(i);
@@ -171,7 +173,7 @@ namespace nil {
                     acc.update(renewing_share);
                 }
 
-                static inline share_type process(const internal_accumulator_type &acc) {
+                static inline result_type process(const internal_accumulator_type &acc) {
                     return acc;
                 }
             };
@@ -182,6 +184,7 @@ namespace nil {
                 typedef pedersen_dkg<Group> scheme_type;
                 typedef public_share_sss<scheme_type> public_share_type;
                 typedef public_share_type internal_accumulator_type;
+                typedef bool result_type;
 
                 static inline void init_accumulator(internal_accumulator_type &acc, std::size_t i) {
                     base_type::_init_accumulator(acc, i);
@@ -192,8 +195,8 @@ namespace nil {
                     base_type::template _update<scheme_type>(acc, exp, public_coeff);
                 }
 
-                static inline bool process(const internal_accumulator_type &acc,
-                                           const public_share_type &verified_public_share) {
+                static inline result_type process(const internal_accumulator_type &acc,
+                                                  const public_share_type &verified_public_share) {
                     return base_type::_process(acc, verified_public_share);
                 }
             };
@@ -207,6 +210,7 @@ namespace nil {
                 typedef public_secret_sss<scheme_type> public_secret_type;
                 typedef std::pair<typename scheme_type::indexes_type, std::set<public_share_type>>
                     internal_accumulator_type;
+                typedef public_secret_type result_type;
 
             public:
                 static inline void init_accumulator() {
@@ -216,8 +220,8 @@ namespace nil {
                     base_type::_update(acc, public_share);
                 }
 
-                static inline public_secret_type process(internal_accumulator_type &acc) {
-                    return base_type::template _process<public_secret_type>(acc);
+                static inline result_type process(internal_accumulator_type &acc) {
+                    return base_type::template _process<result_type>(acc);
                 }
             };
 
@@ -228,6 +232,7 @@ namespace nil {
                 typedef share_sss<scheme_type> share_type;
                 typedef secret_sss<scheme_type> secret_type;
                 typedef std::pair<typename scheme_type::indexes_type, std::set<share_type>> internal_accumulator_type;
+                typedef secret_type result_type;
 
             public:
                 static inline void init_accumulator() {
@@ -237,8 +242,8 @@ namespace nil {
                     base_type::_update(acc, share);
                 }
 
-                static inline secret_type process(internal_accumulator_type &acc) {
-                    return base_type::template _process<secret_type>(acc);
+                static inline result_type process(internal_accumulator_type &acc) {
+                    return base_type::template _process<result_type>(acc);
                 }
             };
         }    // namespace pubkey

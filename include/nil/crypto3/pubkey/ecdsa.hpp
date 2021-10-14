@@ -29,7 +29,6 @@
 #include <utility>
 
 #include <nil/crypto3/random/rfc6979.hpp>
-#include <nil/crypto3/random/type_traits.hpp>
 
 #include <nil/crypto3/pkpad/algorithms/encode.hpp>
 

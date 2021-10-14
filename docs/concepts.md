@@ -181,7 +181,7 @@ Given
 
 |Expression|Return type|Effects|
 |---|---|---|
-|`x.sign(acc)`|`X::signature_type`|Extract accumulator `acc` and process signing algorithm using extracted data and private key material stored in object `x`|
+|`x.sign(acc)`|`X::signature_type`| Extract accumulator `acc` and process signing algorithm using extracted data and private key material stored in object`x`|
 
 ## Decryption private key concept ## {#pubkey_concept}
 
@@ -213,9 +213,34 @@ Given
 
 ## Cryptographic operation concept ## {#pubkey_concept}
 
-A `PrivateKey` is a concept of a stateful object containing cryptographic material of private key and defining methods to execute cryptographic algorithms, of particular asymmetric crypto-scheme, assuming the use of the private key (for example, signature creation or message decryption).
+A `PublicKeyOperation` is a concept of a stateless policy defining methods to execute an algorithm, supported by some asymmetric crypto-scheme, not assuming the use of a single cryptographic key (for example, [the BLS scheme aggregation algorithm](https://datatracker.ietf.org/doc/draft-irtf-cfrg-bls-signature/)).
 
-Implementation of concept `PrivateKey` for some asymmetric crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `private_key<Scheme>`.
+Implementation of concept `PublicKeyOperation` for some asymmetric crypto-scheme policy `Scheme` is assumed to be done by declaration of template named like `algorithm_name_op` and defining partial specialization of this template `algorithm_name_op<Scheme>`.
 
 ### Requirements ### {#pubkey_concepts_requirements}
+
+If the type `X` satisfies `PublicKeyOperation` concept then following expressions must be valid and have their specified effects.
+
+#### Member types
+
+|Expression|Requirements and Notes|
+|---|---|
+|`X::scheme_type`|type satisfying `PublicKeyScheme` concept|
+|`X::internal_accumulator_type`|Type of object intended for accumulation of input message and possibly performing any needed preparation of input data like padding, hashing or encoding|
+|`X::result_type`|type of algorithm result|
+
+#### Other requirements
+
+Given
+
+* `acc` lvalue of type `X::internal_accumulator_type`
+* `r` object of the type satisfying [`SequenceContainer`](https://en.cppreference.com/w/cpp/named_req/SequenceContainer) concept
+* `i`, `j` objects of the type satisfying [`LegacyInputIterator`](https://en.cppreference.com/w/cpp/named_req/InputIterator) concept
+
+|Expression|Return type|Effects|
+|---|---|---|
+|`X::init_accumulator(acc)`| |Initialize accumulator `acc`. The method is supposed to be called before call to method `update`|
+|`X::update(acc, r)`| |Accumulate input data in `acc` to process it later by executing algorithms supported by `Scheme`|
+|`X::update(acc, i, j)`| |Accumulate input data in `acc` to process it later by executing algorithms supported by `Scheme`|
+|`X::process(acc)`|Extract accumulator `acc` and process algorithm using extracted data|
 

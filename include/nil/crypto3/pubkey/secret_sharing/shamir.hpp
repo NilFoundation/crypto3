@@ -392,6 +392,7 @@ namespace nil {
                 typedef share_sss<scheme_type> share_type;
                 typedef std::vector<share_type> shares_type;
                 typedef shares_type internal_accumulator_type;
+                typedef shares_type result_type;
 
             protected:
                 template<typename Share, typename InternalAccumulator>
@@ -410,8 +411,8 @@ namespace nil {
                     }
                 }
 
-                template<typename Shares, typename InternalAccumulator>
-                static inline Shares _process(InternalAccumulator &acc) {
+                template<typename ResultType, typename InternalAccumulator>
+                static inline ResultType _process(InternalAccumulator &acc) {
                     return acc;
                 }
 
@@ -425,8 +426,8 @@ namespace nil {
                     _update<scheme_type>(acc, exp, coeff);
                 }
 
-                static inline shares_type process(internal_accumulator_type &acc) {
-                    return _process<shares_type>(acc);
+                static inline result_type process(internal_accumulator_type &acc) {
+                    return _process<result_type>(acc);
                 }
             };
 
@@ -437,6 +438,7 @@ namespace nil {
                 typedef public_secret_sss<scheme_type> public_secret_type;
                 typedef std::pair<typename scheme_type::indexes_type, std::set<public_share_type>>
                     internal_accumulator_type;
+                typedef public_secret_type result_type;
 
             protected:
                 template<typename InternalAccumulator, typename PublicShare>
@@ -448,9 +450,9 @@ namespace nil {
                     assert(emplace_status);
                 }
 
-                template<typename PublicSecret, typename InternalAccumulator>
-                static inline PublicSecret _process(InternalAccumulator &acc) {
-                    return PublicSecret(acc.second /*, acc.first*/);
+                template<typename ResultType, typename InternalAccumulator>
+                static inline ResultType _process(InternalAccumulator &acc) {
+                    return ResultType(acc.second /*, acc.first*/);
                 }
 
             public:
@@ -461,8 +463,8 @@ namespace nil {
                     _update(acc, public_share);
                 }
 
-                static inline public_secret_type process(internal_accumulator_type &acc) {
-                    return _process<public_secret_type>(acc);
+                static inline result_type process(internal_accumulator_type &acc) {
+                    return _process<result_type>(acc);
                 }
             };
 
@@ -472,6 +474,7 @@ namespace nil {
                 typedef share_sss<scheme_type> share_type;
                 typedef secret_sss<scheme_type> secret_type;
                 typedef std::pair<typename scheme_type::indexes_type, std::set<share_type>> internal_accumulator_type;
+                typedef secret_type result_type;
 
             protected:
                 template<typename InternalAccumulator, typename Share>
@@ -483,9 +486,9 @@ namespace nil {
                     assert(emplace_status);
                 }
 
-                template<typename Secret, typename InternalAccumulator>
-                static inline Secret _process(InternalAccumulator &acc) {
-                    return Secret(acc.second /*, acc.first*/);
+                template<typename ResultType, typename InternalAccumulator>
+                static inline ResultType _process(InternalAccumulator &acc) {
+                    return ResultType(acc.second /*, acc.first*/);
                 }
 
             public:
@@ -496,8 +499,8 @@ namespace nil {
                     _update(acc, share);
                 }
 
-                static inline secret_type process(internal_accumulator_type &acc) {
-                    return _process<secret_type>(acc);
+                static inline result_type process(internal_accumulator_type &acc) {
+                    return _process<result_type>(acc);
                 }
             };
         }    // namespace pubkey

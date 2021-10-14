@@ -473,6 +473,7 @@ namespace nil {
                 typedef typename bls_scheme_type::signature_type signature_type;
 
                 typedef signature_type internal_accumulator_type;
+                typedef signature_type result_type;
 
                 static inline void init_accumulator(internal_accumulator_type &acc) {
                     acc = signature_type::zero();
@@ -488,7 +489,7 @@ namespace nil {
                     bls_scheme_type::update_aggregate(acc, first, last);
                 }
 
-                static inline signature_type aggregate(internal_accumulator_type &acc) {
+                static inline result_type process(internal_accumulator_type &acc) {
                     return acc;
                 }
             };
@@ -508,6 +509,7 @@ namespace nil {
                 typedef typename bls_scheme_type::internal_aggregation_accumulator_type
                     _internal_aggregation_accumulator_type;
                 typedef _internal_aggregation_accumulator_type internal_accumulator_type;
+                typedef bool result_type;
 
                 static inline void init_accumulator(internal_accumulator_type &acc) {
                 }
@@ -526,11 +528,11 @@ namespace nil {
                     bls_scheme_type::update(acc.second[index], range);
                 }
 
-                static inline bool aggregate_verify(internal_accumulator_type &acc, const signature_type &sig) {
+                static inline result_type process(internal_accumulator_type &acc, const signature_type &sig) {
                     return bls_scheme_type::aggregate_verify(acc, sig);
                 }
 
-            protected:
+            private:
                 static inline std::size_t get_public_key_index(internal_accumulator_type &acc,
                                                                const scheme_public_key_type &scheme_pubkey) {
                     assert(std::distance(std::cbegin(acc.first), std::cend(acc.first)) ==
@@ -564,6 +566,7 @@ namespace nil {
                 typedef typename bls_scheme_type::internal_fast_aggregation_accumulator_type
                     _internal_fast_aggregation_accumulator_type;
                 typedef _internal_fast_aggregation_accumulator_type internal_accumulator_type;
+                typedef bool result_type;
 
                 static inline void init_accumulator(internal_accumulator_type &acc) {
                 }
@@ -610,7 +613,7 @@ namespace nil {
                     }
                 }
 
-                static inline bool aggregate_verify(internal_accumulator_type &acc, const signature_type &sig) {
+                static inline result_type process(internal_accumulator_type &acc, const signature_type &sig) {
                     return bls_scheme_type::aggregate_verify(acc, sig);
                 }
             };
