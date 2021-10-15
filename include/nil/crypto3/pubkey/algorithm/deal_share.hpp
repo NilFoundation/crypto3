@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_PUBKEY_DEAL_SHARE_HPP
 #define CRYPTO3_PUBKEY_DEAL_SHARE_HPP
 
+#include <nil/crypto3/pubkey/algorithm/pubkey.hpp>
+
 #include <nil/crypto3/pubkey/pubkey_value.hpp>
 #include <nil/crypto3/pubkey/secret_sharing_state.hpp>
 

@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_PUBKEY_RECONSTRUCT_SECRET_HPP
 #define CRYPTO3_PUBKEY_RECONSTRUCT_SECRET_HPP
 
+#include <nil/crypto3/pubkey/algorithm/pubkey.hpp>
+
 #include <nil/crypto3/pubkey/pubkey_value.hpp>
 #include <nil/crypto3/pubkey/secret_sharing_state.hpp>
 
@@ -37,179 +39,191 @@ namespace nil {
             template<typename Scheme>
             using secret_reconstructing_policy =
                 typename pubkey::modes::isomorphic<Scheme>::secret_reconstructing_policy;
-        }
+
+            template<typename Scheme>
+            using secret_reconstructing_processing_mode_default =
+                typename modes::isomorphic<Scheme>::template bind<secret_reconstructing_policy<Scheme>>::type;
+        }    // namespace pubkey
+
         /*!
-         * @brief
+         * @brief Reconstruct secret using passed shares
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam OutputIterator
+         * @tparam Scheme secret sharing scheme
+         * @tparam InputIterator iterator representing input shares
+         * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a reconstruction operation as in specification
          *
-         * @param first
-         * @param last
-         * @param key
-         * @param out
+         * @param first the beginning of the shares range
+         * @param last the end of the shares range
+         * @param out the beginning of the destination range
          *
-         * @return
+         * @return OutputIterator
          */
         template<typename Scheme, typename InputIterator, typename OutputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::secret_reconstructing_policy<Scheme>>::type>
+                 typename ProcessingMode = pubkey::secret_reconstructing_processing_mode_default<Scheme>>
         typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
                                 OutputIterator>::type
             reconstruct_secret(InputIterator first, InputIterator last, OutputIterator out) {
 
-            typedef typename pubkey::reconstructing_accumulator_set<ProcessingMode> SchemeAccumulator;
+            typedef typename pubkey::reconstructing_accumulator_set<ProcessingMode> ReconstructionAccumulator;
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::itr_pubkey_impl<StreamSignerImpl, OutputIterator> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<ReconstructionAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
-            return SignerImpl(first, last, std::move(out), SchemeAccumulator());
+            return SchemeImpl(first, last, std::move(out), ReconstructionAccumulator());
         }
 
         /*!
-         * @brief
+         * @brief Reconstruct secret using passed shares
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam OutputIterator
+         * @tparam Scheme secret sharing scheme
+         * @tparam SinglePassRange range representing input shares
+         * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a reconstruction operation as in specification
          *
-         * @param rng
-         * @param key
-         * @param out
+         * @param range shares range
+         * @param out the beginning of the destination range
          *
-         * @return
+         * @return OutputIterator
          */
         template<typename Scheme, typename SinglePassRange, typename OutputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::secret_reconstructing_policy<Scheme>>::type>
+                 typename ProcessingMode = pubkey::secret_reconstructing_processing_mode_default<Scheme>>
         typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
                                 OutputIterator>::type
-            reconstruct_secret(const SinglePassRange &rng, OutputIterator out) {
+            reconstruct_secret(const SinglePassRange &range, OutputIterator out) {
 
-            typedef typename pubkey::reconstructing_accumulator_set<ProcessingMode> SchemeAccumulator;
+            typedef typename pubkey::reconstructing_accumulator_set<ProcessingMode> ReconstructionAccumulator;
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::itr_pubkey_impl<StreamSignerImpl, OutputIterator> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<ReconstructionAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
-            return SignerImpl(rng, std::move(out), SchemeAccumulator());
+            return SchemeImpl(range, std::move(out), ReconstructionAccumulator());
         }
 
         /*!
-         * @brief
+         * @brief Updating of reconstructing accumulator set using passed shares
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam OutputAccumulator
+         * @tparam Scheme secret sharing scheme
+         * @tparam InputIterator iterator representing input shares
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a reconstructing operation as in specification
+         * @tparam OutputAccumulator accumulator set initialized with reconstructing accumulator (internal parameter)
          *
-         * @param first
-         * @param last
-         * @param acc
+         * @param first the beginning of the shares range
+         * @param last the end of the shares range
+         * @param acc accumulator set containing secret reconstructing accumulator possibly pre-initialized with the
+         * beginning of shares range
          *
-         * @return
+         * @return OutputAccumulator
          */
         template<typename Scheme, typename InputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::secret_reconstructing_policy<Scheme>>::type,
+                 typename ProcessingMode = pubkey::secret_reconstructing_processing_mode_default<Scheme>,
                  typename OutputAccumulator = typename pubkey::reconstructing_accumulator_set<ProcessingMode>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
             reconstruct_secret(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
+            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::range_pubkey_impl<StreamSchemeImpl> SchemeImpl;
 
-            return SignerImpl(first, last, std::forward<OutputAccumulator>(acc));
+            return SchemeImpl(first, last, std::forward<OutputAccumulator>(acc));
         }
 
         /*!
-         * @brief
+         * @brief Updating of reconstructing accumulator set using passed shares
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam OutputAccumulator
+         * @tparam Scheme secret sharing scheme
+         * @tparam SinglePassRange range representing input shares
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a reconstructing operation as in specification
+         * @tparam OutputAccumulator accumulator set initialized with reconstructing accumulator (internal parameter)
          *
-         * @param r
-         * @param acc
+         * @param range shares range
+         * @param acc accumulator set containing secret reconstructing accumulator possibly pre-initialized with the
+         * beginning of shares range
          *
-         * @return
+         * @return OutputAccumulator
          */
         template<typename Scheme, typename SinglePassRange,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::secret_reconstructing_policy<Scheme>>::type,
+                 typename ProcessingMode = pubkey::secret_reconstructing_processing_mode_default<Scheme>,
                  typename OutputAccumulator = typename pubkey::reconstructing_accumulator_set<ProcessingMode>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
-            reconstruct_secret(const SinglePassRange &r, OutputAccumulator &acc) {
+            reconstruct_secret(const SinglePassRange &range, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
+            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::range_pubkey_impl<StreamSchemeImpl> SchemeImpl;
 
-            return SignerImpl(r, std::forward<OutputAccumulator>(acc));
+            return SchemeImpl(range, std::forward<OutputAccumulator>(acc));
         }
 
         /*!
-         * @brief
+         * @brief Reconstruct secret using passed shares
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam KeySinglePassRange
-         * @tparam SchemeAccumulator
+         * @tparam Scheme secret sharing scheme
+         * @tparam InputIterator iterator representing input shares
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a reconstruction operation as in specification
+         * * @tparam ReconstructionAccumulator accumulator set initialized with reconstruction accumulator (internal
+         * parameter)
+         * @tparam StreamSchemeImpl (internal parameter)
+         * @tparam SchemeImpl return type implicitly convertible to \p ReconstructionAccumulator or \p
+         * ProcessingMode::result_type (internal parameter)
          *
-         * @param first
-         * @param last
-         * @param key
+         * @param first the beginning of the shares range
+         * @param last the end of the shares range
          *
-         * @return
+         * @return SchemeImpl
          */
         template<typename Scheme, typename InputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::secret_reconstructing_policy<Scheme>>::type,
-                 typename SchemeAccumulator = typename pubkey::reconstructing_accumulator_set<ProcessingMode>>
-        pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
-            reconstruct_secret(InputIterator first, InputIterator last) {
+                 typename ProcessingMode = pubkey::secret_reconstructing_processing_mode_default<Scheme>,
+                 typename ReconstructionAccumulator = typename pubkey::reconstructing_accumulator_set<ProcessingMode>,
+                 typename StreamSchemeImpl = pubkey::detail::value_pubkey_impl<ReconstructionAccumulator>,
+                 typename SchemeImpl = pubkey::detail::range_pubkey_impl<StreamSchemeImpl>>
+        SchemeImpl reconstruct_secret(InputIterator first, InputIterator last) {
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
-
-            return SignerImpl(first, last, SchemeAccumulator());
+            return SchemeImpl(first, last, ReconstructionAccumulator());
         }
 
         /*!
-         * @brief
+         * @brief Reconstruct secret using passed shares
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam SchemeAccumulator
+         * @tparam Scheme secret sharing scheme
+         * @tparam SinglePassRange range representing input shares
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a reconstruction operation as in specification
+         * @tparam ReconstructionAccumulator accumulator set initialized with reconstruction accumulator (internal
+         * parameter)
+         * @tparam StreamSchemeImpl (internal parameter)
+         * @tparam SchemeImpl return type implicitly convertible to \p DealingAccumulator or \p
+         * ProcessingMode::result_type (internal parameter)
          *
-         * @param r
-         * @param key
+         * @param range shares range
          *
-         * @return
+         * @return SchemeImpl
          */
         template<typename Scheme, typename SinglePassRange,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::secret_reconstructing_policy<Scheme>>::type,
-                 typename SchemeAccumulator = typename pubkey::reconstructing_accumulator_set<ProcessingMode>>
-        pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
-            reconstruct_secret(const SinglePassRange &r) {
+                 typename ProcessingMode = pubkey::secret_reconstructing_processing_mode_default<Scheme>,
+                 typename ReconstructionAccumulator = typename pubkey::reconstructing_accumulator_set<ProcessingMode>,
+                 typename StreamSchemeImpl = pubkey::detail::value_pubkey_impl<ReconstructionAccumulator>,
+                 typename SchemeImpl = pubkey::detail::range_pubkey_impl<StreamSchemeImpl>>
+        SchemeImpl reconstruct_secret(const SinglePassRange &range) {
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
-
-            return SignerImpl(r, SchemeAccumulator());
+            return SchemeImpl(range, ReconstructionAccumulator());
         }
     }    // namespace crypto3
 }    // namespace nil
