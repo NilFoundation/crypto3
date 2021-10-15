@@ -171,10 +171,10 @@ Pubkey policies architecturally are completely stateless. Pubkey policies are re
 
 ## Objects, containing cryptographic material {#pubkey_objects}
 
-Execution of asymmetric algorithms requires the use of cryptographic material like keys in the cases of signature creation/verification and encryption/decryption crypto-schemes, or shares and secrets in the case of performing secret sharing protocols. To work with these objects several templates are defined in pubkey module:
+Execution of asymmetric algorithms requires the use of cryptographic material like keys in the cases of signature and encryption crypto-schemes, or shares and secrets in the case of performing secret sharing protocols. To work with these objects several templates are defined in pubkey module:
 
-* `private_key` - the template specialization should be defined for a chosen asymmetric crypto-scheme `Scheme`, i.e. `private_key<Scheme>`. The object of that type contains cryptographic material of the private key of a chosen `Scheme` and defines methods to execute crypto algorithms supported by the crypto-scheme using stored key material. Particular specialization of the `private_key` should satisfy to the one or several defined [concepts](@ref pubkey_concept) depending on which algorithms are supported by the chosen `Scheme`. For example, there exist `SigningPrivateKey` concept for asymmetric signature crypto-schemes, and `DecryptionPrivateKey` for asymmetric encryption crypto-schemes.
-* `public_key` - the same as for `private_key` template, but regarding public key material of some asymmetric crypto-scheme and algorithms assuming the use of the public key. Examples of public key concepts are `VerificationPublicKey` concept for asymmetric signature crypto-schemes, and `EncryptionPublicKey` for asymmetric encryption crypto-schemes.
+* `private_key` - the template specialization should be defined for a chosen asymmetric crypto-scheme `Scheme`, i.e. `private_key<Scheme>`. The object of that type contains cryptographic material of the private key for a chosen `Scheme` and defines methods to execute crypto algorithms supported by the crypto-scheme using stored key material. Particular specialization of the `private_key` should satisfy to the one or several defined [concepts](@ref pubkey_concept) depending on which algorithms are supported by the chosen `Scheme`. For example, there exist `SigningPrivateKey` concept for asymmetric signature crypto-schemes, and `DecryptionPrivateKey` for asymmetric encryption crypto-schemes.
+* `public_key` - the same as for `private_key` template, but regarding public key material for some asymmetric crypto-scheme and algorithms assuming the use of the public key. Examples of public key concepts are `VerificationPublicKey` concept for asymmetric signature crypto-schemes, and `EncryptionPublicKey` for asymmetric encryption crypto-schemes.
 * `share_sss` - the template specialization should be defined for a chosen secret sharing `Scheme`, i.e. `share_sss<Scheme>`, and it should satisfy to the `Share` concept.
 * `public_share_sss` - the template specialization should be defined for a chosen secret sharing `Scheme`, i.e. `public_share_sss<Scheme>`, and it should satisfy to the `PublicShare` concept.
 * `secret_sss` - the template specialization should be defined for a chosen secret sharing `Scheme`, i.e. `secret_sss<Scheme>`, and it should satisfy to the `Secret` concept.
@@ -182,7 +182,18 @@ Execution of asymmetric algorithms requires the use of cryptographic material li
 
 ## Cryptographic operation policies {#pubkey_operations}
 
+To execute algorithms supported by some asymmetric crypto-scheme but not requiring the use of single key (private or public) [`PublicKeyOperation` concept](@ref pubkey_concept) was introduced. Example of such operation is aggregation algorithm, which aggregate several signatures created for some list of messages into a single signature that authenticates all the messages, wherein no need to use any key. Secret sharing algorithms are the other examples of operations not requiring the use of a key material.
 
+Following types of operations are defined in pubkey module:
+
+* `aggregate_op`
+* `aggregate_verify_op`
+* `aggregate_verify_single_msg_op`
+* `deal_shares_op`
+* `deal_share_op`
+* `reconstruct_public_secret_op`
+* `reconstruct_secret_op`
+* `verify_share_op`
 
 ## Accumulators {#pubkey_accumulators}
 

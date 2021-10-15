@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_PUBKEY_DEAL_SHARES_HPP
 #define CRYPTO3_PUBKEY_DEAL_SHARES_HPP
 
+#include <nil/crypto3/pubkey/algorithm/pubkey.hpp>
+
 #include <nil/crypto3/pubkey/pubkey_value.hpp>
 #include <nil/crypto3/pubkey/secret_sharing_state.hpp>
 
@@ -36,318 +38,337 @@ namespace nil {
         namespace pubkey {
             template<typename Scheme>
             using shares_dealing_policy = typename modes::isomorphic<Scheme>::shares_dealing_policy;
-        }
+
+            template<typename Scheme>
+            using shares_dealing_processing_mode_default =
+                typename modes::isomorphic<Scheme>::template bind<shares_dealing_policy<Scheme>>::type;
+        }    // namespace pubkey
 
         /*!
-         * @brief
+         * @brief Deal shares using passed polynomial coefficients, threshold number of participants required to
+         * reconstruct secret equals to number of the coefficients
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam Number1
-         * @tparam Number2
-         * @tparam OutputIterator
+         * @tparam Scheme secret sharing scheme
+         * @tparam InputIterator iterator representing input polynomial coefficients
+         * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
          *
-         * @param first
-         * @param last
-         * @param n
-         * @param t
-         * @param out
+         * @param first the beginning of the polynomial coefficients range
+         * @param last the end of the polynomial coefficients range
+         * @param n number of participants
+         * @param out the beginning of the destination range
          *
-         * @return
+         * @return OutputIterator
          */
         template<typename Scheme, typename InputIterator, typename OutputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::shares_dealing_policy<Scheme>>::type>
+                 typename ProcessingMode = pubkey::shares_dealing_processing_mode_default<Scheme>>
         OutputIterator deal_shares(InputIterator first, InputIterator last, std::size_t n, OutputIterator out) {
 
-            typedef typename pubkey::shares_dealing_accumulator_set<ProcessingMode> SchemeAccumulator;
+            typedef typename pubkey::shares_dealing_accumulator_set<ProcessingMode> DealingAccumulator;
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::itr_pubkey_impl<StreamSignerImpl, OutputIterator> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<DealingAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
-            return SignerImpl(
+            return SchemeImpl(
                 first, last, std::move(out),
-                SchemeAccumulator(n, nil::crypto3::accumulators::threshold_value = std::distance(first, last)));
+                DealingAccumulator(n, nil::crypto3::accumulators::threshold_value = std::distance(first, last)));
         }
 
         /*!
-         * @brief
+         * @brief Deal shares using passed polynomial coefficients, threshold number of participants required to
+         * reconstruct secret equals to number of the coefficients
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam Number1
-         * @tparam Number2
-         * @tparam OutputIterator
+         * @tparam Scheme secret sharing scheme
+         * @tparam SinglePassRange range representing input polynomial coefficients
+         * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
          *
-         * @param rng
-         * @param n
-         * @param t
-         * @param out
+         * @param range the polynomial coefficients range
+         * @param n number of participants
+         * @param out the beginning of the destination range
          *
-         * @return
+         * @return OutputIterator
          */
         template<typename Scheme, typename SinglePassRange, typename OutputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::shares_dealing_policy<Scheme>>::type>
-        OutputIterator deal_shares(const SinglePassRange &rng, std::size_t n, OutputIterator out) {
+                 typename ProcessingMode = pubkey::shares_dealing_processing_mode_default<Scheme>>
+        OutputIterator deal_shares(const SinglePassRange &range, std::size_t n, OutputIterator out) {
 
-            typedef typename pubkey::shares_dealing_accumulator_set<ProcessingMode> SchemeAccumulator;
+            typedef typename pubkey::shares_dealing_accumulator_set<ProcessingMode> DealingAccumulator;
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::itr_pubkey_impl<StreamSignerImpl, OutputIterator> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<DealingAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
-            return SignerImpl(rng, std::move(out),
-                              SchemeAccumulator(n, nil::crypto3::accumulators::threshold_value = rng.size()));
+            return SchemeImpl(range, std::move(out),
+                              DealingAccumulator(n, nil::crypto3::accumulators::threshold_value = range.size()));
         }
 
         /*!
-         * @brief
+         * @brief Deal weighted shares using passed polynomial coefficients, threshold number of participants required
+         * to reconstruct secret equals to number of the coefficients
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam Number1
-         * @tparam Number2
-         * @tparam OutputIterator
+         * @tparam Scheme secret sharing scheme
+         * @tparam InputIterator iterator representing input polynomial coefficients
+         * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
          *
-         * @param first
-         * @param last
-         * @param n
-         * @param t
-         * @param out
+         * @param first the beginning of the polynomial coefficients range
+         * @param last the end of the polynomial coefficients range
+         * @param n number of participants
+         * @param weights participants weights
+         * @param out the beginning of the destination range
          *
-         * @return
+         * @return OutputIterator
          */
         template<typename Scheme, typename InputIterator, typename OutputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::shares_dealing_policy<Scheme>>::type>
+                 typename ProcessingMode = pubkey::shares_dealing_processing_mode_default<Scheme>>
         OutputIterator deal_shares(InputIterator first, InputIterator last, std::size_t n,
                                    const typename Scheme::weights_type &weights, OutputIterator out) {
 
-            typedef typename pubkey::shares_dealing_accumulator_set<ProcessingMode> SchemeAccumulator;
+            typedef typename pubkey::shares_dealing_accumulator_set<ProcessingMode> DealingAccumulator;
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::itr_pubkey_impl<StreamSignerImpl, OutputIterator> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<DealingAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
-            return SignerImpl(
+            return SchemeImpl(
                 first, last, std::move(out),
-                SchemeAccumulator(n, nil::crypto3::accumulators::threshold_value = std::distance(first, last),
-                                  nil::crypto3::accumulators::weights = weights));
+                DealingAccumulator(n, nil::crypto3::accumulators::threshold_value = std::distance(first, last),
+                                   nil::crypto3::accumulators::weights = weights));
         }
 
         /*!
-         * @brief
+         * @brief Deal weighted shares using passed polynomial coefficients, threshold number of participants required
+         * to reconstruct secret equals to number of the coefficients
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam Number1
-         * @tparam Number2
-         * @tparam OutputIterator
+         * @tparam Scheme secret sharing scheme
+         * @tparam SinglePassRange range representing input polynomial coefficients
+         * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
          *
-         * @param rng
-         * @param n
-         * @param t
-         * @param out
+         * @param range the polynomial coefficients range
+         * @param n number of participants
+         * @param weights participants weights
+         * @param out the beginning of the destination range
          *
-         * @return
+         * @return OutputIterator
          */
         template<typename Scheme, typename SinglePassRange, typename OutputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::shares_dealing_policy<Scheme>>::type>
-        OutputIterator deal_shares(const SinglePassRange &rng, std::size_t n,
+                 typename ProcessingMode = pubkey::shares_dealing_processing_mode_default<Scheme>>
+        OutputIterator deal_shares(const SinglePassRange &range, std::size_t n,
                                    const typename Scheme::weights_type &weights, OutputIterator out) {
 
-            typedef typename pubkey::shares_dealing_accumulator_set<ProcessingMode> SchemeAccumulator;
+            typedef typename pubkey::shares_dealing_accumulator_set<ProcessingMode> DealingAccumulator;
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::itr_pubkey_impl<StreamSignerImpl, OutputIterator> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<DealingAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
-            return SignerImpl(rng, std::move(out),
-                              SchemeAccumulator(n, nil::crypto3::accumulators::threshold_value = rng.size(),
-                                                nil::crypto3::accumulators::weights = weights));
+            return SchemeImpl(range, std::move(out),
+                              DealingAccumulator(n, nil::crypto3::accumulators::threshold_value = range.size(),
+                                                 nil::crypto3::accumulators::weights = weights));
         }
 
         /*!
-         * @brief
+         * @brief Updating shares dealing accumulator with polynomial coefficients
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam OutputAccumulator
+         * @tparam Scheme secret sharing scheme
+         * @tparam InputIterator iterator representing input polynomial coefficients
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
+         * @tparam OutputAccumulator accumulator set initialized with dealing accumulator (internal parameter)
          *
-         * @param first
-         * @param last
-         * @param acc
+         * @param first the beginning of the polynomial coefficients range
+         * @param last the end of the polynomial coefficients range
+         * @param acc accumulator set containing shares dealing accumulator possibly pre-initialized with the beginning
+         * of polynomial coefficients and participants number
          *
-         * @return
+         * @return OutputAccumulator
          */
         template<typename Scheme, typename InputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::shares_dealing_policy<Scheme>>::type,
+                 typename ProcessingMode = pubkey::shares_dealing_processing_mode_default<Scheme>,
                  typename OutputAccumulator = typename pubkey::shares_dealing_accumulator_set<ProcessingMode>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
             deal_shares(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
+            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::range_pubkey_impl<StreamSchemeImpl> SchemeImpl;
 
-            return SignerImpl(first, last, std::forward<OutputAccumulator>(acc));
+            return SchemeImpl(first, last, std::forward<OutputAccumulator>(acc));
         }
 
         /*!
-         * @brief
+         * @brief Updating shares dealing accumulator with polynomial coefficients
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam OutputAccumulator
+         * @tparam Scheme secret sharing scheme
+         * @tparam SinglePassRange range representing input polynomial coefficients
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
+         * @tparam OutputAccumulator accumulator set initialized with dealing accumulator (internal parameter)
          *
-         * @param r
-         * @param acc
+         * @param range the polynomial coefficients range
+         * @param acc accumulator set containing shares dealing accumulator possibly pre-initialized with the beginning
+         * of polynomial coefficients and participants number
          *
-         * @return
+         * @return OutputAccumulator
          */
         template<typename Scheme, typename SinglePassRange,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::shares_dealing_policy<Scheme>>::type,
+                 typename ProcessingMode = pubkey::shares_dealing_processing_mode_default<Scheme>,
                  typename OutputAccumulator = typename pubkey::shares_dealing_accumulator_set<ProcessingMode>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
-            deal_shares(const SinglePassRange &r, OutputAccumulator &acc) {
+            deal_shares(const SinglePassRange &range, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
+            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::range_pubkey_impl<StreamSchemeImpl> SchemeImpl;
 
-            return SignerImpl(r, std::forward<OutputAccumulator>(acc));
+            return SchemeImpl(range, std::forward<OutputAccumulator>(acc));
         }
 
         /*!
-         * @brief
+         * @brief Deal shares using passed polynomial coefficients, threshold number of participants required to
+         * reconstruct secret equals to number of the coefficients
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam KeySinglePassRange
-         * @tparam SchemeAccumulator
+         * @tparam Scheme secret sharing scheme
+         * @tparam InputIterator iterator representing input polynomial coefficients
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
+         * @tparam DealingAccumulator accumulator set initialized with shares dealing accumulator (internal parameter)
+         * @tparam StreamSchemeImpl (internal parameter)
+         * @tparam SchemeImpl return type implicitly convertible to \p DealingAccumulator or \p
+         * ProcessingMode::result_type (internal parameter)
          *
-         * @param first
-         * @param last
-         * @param key
+         * @param first the beginning of the polynomial coefficients range
+         * @param last the end of the polynomial coefficients range
+         * @param n number of participants
          *
-         * @return
+         * @return SchemeImpl
          */
         template<typename Scheme, typename InputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::shares_dealing_policy<Scheme>>::type,
-                 typename SchemeAccumulator = typename pubkey::shares_dealing_accumulator_set<ProcessingMode>>
-        pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
-            deal_shares(InputIterator first, InputIterator last, std::size_t n) {
+                 typename ProcessingMode = pubkey::shares_dealing_processing_mode_default<Scheme>,
+                 typename DealingAccumulator = typename pubkey::shares_dealing_accumulator_set<ProcessingMode>,
+                 typename StreamSchemeImpl = pubkey::detail::value_pubkey_impl<DealingAccumulator>,
+                 typename SchemeImpl = pubkey::detail::range_pubkey_impl<StreamSchemeImpl>>
+        SchemeImpl deal_shares(InputIterator first, InputIterator last, std::size_t n) {
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
-
-            return SignerImpl(
+            return SchemeImpl(
                 first, last,
-                SchemeAccumulator(n, nil::crypto3::accumulators::threshold_value = std::distance(first, last)));
+                DealingAccumulator(n, nil::crypto3::accumulators::threshold_value = std::distance(first, last)));
         }
 
         /*!
-         * @brief
+         * @brief Deal shares using passed polynomial coefficients, threshold number of participants required to
+         * reconstruct secret equals to number of the coefficients
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam SchemeAccumulator
+         * @tparam Scheme secret sharing scheme
+         * @tparam SinglePassRange range representing input polynomial coefficients
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
+         * @tparam DealingAccumulator accumulator set initialized with shares dealing accumulator (internal parameter)
+         * @tparam StreamSchemeImpl (internal parameter)
+         * @tparam SchemeImpl return type implicitly convertible to \p DealingAccumulator or \p
+         * ProcessingMode::result_type (internal parameter)
          *
-         * @param r
-         * @param key
+         * @param range the polynomial coefficients range
+         * @param n number of participants
          *
-         * @return
+         * @return SchemeImpl
          */
         template<typename Scheme, typename SinglePassRange,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::shares_dealing_policy<Scheme>>::type,
-                 typename SchemeAccumulator = typename pubkey::shares_dealing_accumulator_set<ProcessingMode>>
-        pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
-            deal_shares(const SinglePassRange &r, std::size_t n) {
+                 typename ProcessingMode = pubkey::shares_dealing_processing_mode_default<Scheme>,
+                 typename DealingAccumulator = typename pubkey::shares_dealing_accumulator_set<ProcessingMode>,
+                 typename StreamSchemeImpl = pubkey::detail::value_pubkey_impl<DealingAccumulator>,
+                 typename SchemeImpl = pubkey::detail::range_pubkey_impl<StreamSchemeImpl>>
+        SchemeImpl deal_shares(const SinglePassRange &range, std::size_t n) {
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
-
-            return SignerImpl(r, SchemeAccumulator(n, nil::crypto3::accumulators::threshold_value = r.size()));
+            return SchemeImpl(range, DealingAccumulator(n, nil::crypto3::accumulators::threshold_value = range.size()));
         }
 
         /*!
-         * @brief
+         * @brief Deal weighted shares using passed polynomial coefficients, threshold number of participants required
+         * to reconstruct secret equals to number of the coefficients
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam KeySinglePassRange
-         * @tparam SchemeAccumulator
+         * @tparam Scheme secret sharing scheme
+         * @tparam InputIterator iterator representing input polynomial coefficients
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
+         * @tparam DealingAccumulator accumulator set initialized with shares dealing accumulator (internal parameter)
+         * @tparam StreamSchemeImpl (internal parameter)
+         * @tparam SchemeImpl return type implicitly convertible to \p DealingAccumulator or \p
+         * ProcessingMode::result_type (internal parameter)
          *
-         * @param first
-         * @param last
-         * @param key
+         * @param first the beginning of the polynomial coefficients range
+         * @param last the end of the polynomial coefficients range
+         * @param n number of participants
+         * @param weights participants weights
          *
-         * @return
+         * @return SchemeImpl
          */
         template<typename Scheme, typename InputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::shares_dealing_policy<Scheme>>::type,
-                 typename SchemeAccumulator = typename pubkey::shares_dealing_accumulator_set<ProcessingMode>>
-        pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
-            deal_shares(InputIterator first, InputIterator last, std::size_t n,
-                        const typename Scheme::weights_type &weights) {
+                 typename ProcessingMode = pubkey::shares_dealing_processing_mode_default<Scheme>,
+                 typename DealingAccumulator = typename pubkey::shares_dealing_accumulator_set<ProcessingMode>,
+                 typename StreamSchemeImpl = pubkey::detail::value_pubkey_impl<DealingAccumulator>,
+                 typename SchemeImpl = pubkey::detail::range_pubkey_impl<StreamSchemeImpl>>
+        SchemeImpl deal_shares(InputIterator first, InputIterator last, std::size_t n,
+                               const typename Scheme::weights_type &weights) {
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
-
-            return SignerImpl(
+            return SchemeImpl(
                 first, last,
-                SchemeAccumulator(n, nil::crypto3::accumulators::threshold_value = std::distance(first, last),
-                                  nil::crypto3::accumulators::weights = weights));
+                DealingAccumulator(n, nil::crypto3::accumulators::threshold_value = std::distance(first, last),
+                                   nil::crypto3::accumulators::weights = weights));
         }
 
         /*!
-         * @brief
+         * @brief Deal weighted shares using passed polynomial coefficients, threshold number of participants required
+         * to reconstruct secret equals to number of the coefficients
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam SchemeAccumulator
+         * @tparam Scheme secret sharing scheme
+         * @tparam SinglePassRange range representing input polynomial coefficients
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
+         * @tparam DealingAccumulator accumulator set initialized with shares dealing accumulator (internal parameter)
+         * @tparam StreamSchemeImpl (internal parameter)
+         * @tparam SchemeImpl return type implicitly convertible to \p DealingAccumulator or \p
+         * ProcessingMode::result_type (internal parameter)
          *
-         * @param r
-         * @param key
+         * @param range the polynomial coefficients range
+         * @param n number of participants
+         * @param weights participants weights
          *
-         * @return
+         * @return SchemeImpl
          */
         template<typename Scheme, typename SinglePassRange,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::shares_dealing_policy<Scheme>>::type,
-                 typename SchemeAccumulator = typename pubkey::shares_dealing_accumulator_set<ProcessingMode>>
-        pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
-            deal_shares(const SinglePassRange &r, std::size_t n, const typename Scheme::weights_type &weights) {
+                 typename ProcessingMode = pubkey::shares_dealing_processing_mode_default<Scheme>,
+                 typename DealingAccumulator = typename pubkey::shares_dealing_accumulator_set<ProcessingMode>,
+                 typename StreamSchemeImpl = pubkey::detail::value_pubkey_impl<DealingAccumulator>,
+                 typename SchemeImpl = pubkey::detail::range_pubkey_impl<StreamSchemeImpl>>
+        SchemeImpl deal_shares(const SinglePassRange &range, std::size_t n,
+                               const typename Scheme::weights_type &weights) {
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
-
-            return SignerImpl(r, SchemeAccumulator(n, nil::crypto3::accumulators::threshold_value = r.size(),
-                                                   nil::crypto3::accumulators::weights = weights));
+            return SchemeImpl(range, DealingAccumulator(n, nil::crypto3::accumulators::threshold_value = range.size(),
+                                                        nil::crypto3::accumulators::weights = weights));
         }
     }    // namespace crypto3
 }    // namespace nil

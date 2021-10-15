@@ -36,181 +36,187 @@ namespace nil {
         namespace pubkey {
             template<typename Scheme>
             using share_dealing_policy = typename pubkey::modes::isomorphic<Scheme>::share_dealing_policy;
-        }
+
+            template<typename Scheme>
+            using share_dealing_processing_mode_default =
+                typename modes::isomorphic<Scheme>::template bind<share_dealing_policy<Scheme>>::type;
+        }    // namespace pubkey
+
         /*!
-         * @brief
+         * @brief Deal share of specified participant using passed shares, dealt by other participant for the current
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam Number1
-         * @tparam Number2
-         * @tparam OutputIterator
+         * @tparam Scheme distribution key generation scheme
+         * @tparam InputIterator iterator representing input shares
+         * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
          *
-         * @param first
-         * @param last
-         * @param n
-         * @param t
-         * @param out
+         * @param i participant index
+         * @param first the beginning of the shares range
+         * @param last the end of the shares range
+         * @param out the beginning of the destination range
          *
-         * @return
+         * @return OutputIterator
          */
         template<typename Scheme, typename InputIterator, typename OutputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::share_dealing_policy<Scheme>>::type>
+                 typename ProcessingMode = pubkey::share_dealing_processing_mode_default<Scheme>>
         OutputIterator deal_share(std::size_t i, InputIterator first, InputIterator last, OutputIterator out) {
 
-            typedef typename pubkey::share_dealing_accumulator_set<ProcessingMode> SchemeAccumulator;
+            typedef typename pubkey::share_dealing_accumulator_set<ProcessingMode> DealingAccumulator;
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::itr_pubkey_impl<StreamSignerImpl, OutputIterator> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<DealingAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
-            return SignerImpl(first, last, std::move(out), SchemeAccumulator(i));
+            return SchemeImpl(first, last, std::move(out), DealingAccumulator(i));
         }
 
         /*!
-         * @brief
+         * @brief Deal share of specified participant using passed shares, dealt by other participant for the current
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam Number1
-         * @tparam Number2
-         * @tparam OutputIterator
+         * @tparam Scheme distribution key generation scheme
+         * @tparam SinglePassRange range representing input shares
+         * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
          *
-         * @param rng
-         * @param n
-         * @param t
-         * @param out
+         * @param i participant index
+         * @param range shares range
+         * @param out the beginning of the destination range
          *
-         * @return
+         * @return OutputIterator
          */
         template<typename Scheme, typename SinglePassRange, typename OutputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::share_dealing_policy<Scheme>>::type>
-        OutputIterator deal_share(std::size_t i, const SinglePassRange &rng, OutputIterator out) {
+                 typename ProcessingMode = pubkey::share_dealing_processing_mode_default<Scheme>>
+        OutputIterator deal_share(std::size_t i, const SinglePassRange &range, OutputIterator out) {
 
-            typedef typename pubkey::share_dealing_accumulator_set<ProcessingMode> SchemeAccumulator;
+            typedef typename pubkey::share_dealing_accumulator_set<ProcessingMode> DealingAccumulator;
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::itr_pubkey_impl<StreamSignerImpl, OutputIterator> SignerImpl;
+            typedef pubkey::detail::value_pubkey_impl<DealingAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::itr_pubkey_impl<StreamSchemeImpl, OutputIterator> SchemeImpl;
 
-            return SignerImpl(rng, std::move(out), SchemeAccumulator(i));
+            return SchemeImpl(range, std::move(out), DealingAccumulator(i));
         }
 
         /*!
-         * @brief
+         * @brief Updating of share dealing accumulator set using shares, dealt by other participant for the current
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam OutputAccumulator
+         * @tparam Scheme distribution key generation scheme
+         * @tparam InputIterator iterator representing input shares
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
+         * @tparam OutputAccumulator accumulator set initialized with dealing accumulator (internal parameter)
          *
-         * @param first
-         * @param last
-         * @param acc
+         * @param first the beginning of the shares range
+         * @param last the end of the shares range
+         * @param acc accumulator set containing share dealing accumulator possibly pre-initialized with the beginning
+         * of shares, dealt by other participant for the current
          *
-         * @return
+         * @return OutputAccumulator
          */
         template<typename Scheme, typename InputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::share_dealing_policy<Scheme>>::type,
+                 typename ProcessingMode = pubkey::share_dealing_processing_mode_default<Scheme>,
                  typename OutputAccumulator = typename pubkey::share_dealing_accumulator_set<ProcessingMode>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
             deal_share(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
+            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::range_pubkey_impl<StreamSchemeImpl> SchemeImpl;
 
-            return SignerImpl(first, last, std::forward<OutputAccumulator>(acc));
+            return SchemeImpl(first, last, std::forward<OutputAccumulator>(acc));
         }
 
         /*!
-         * @brief
+         * @brief Updating of share dealing accumulator set using shares, dealt by other participant for the current
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam OutputAccumulator
+         * @tparam Scheme distribution key generation scheme
+         * @tparam SinglePassRange range representing input shares
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
+         * @tparam OutputAccumulator accumulator set initialized with dealing accumulator (internal parameter)
          *
-         * @param r
-         * @param acc
+         * @param range shares range
+         * @param acc accumulator set containing share dealing accumulator possibly pre-initialized with the beginning
+         * of shares, dealt by other participant for the current
          *
-         * @return
+         * @return OutputAccumulator
          */
         template<typename Scheme, typename SinglePassRange,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::share_dealing_policy<Scheme>>::type,
+                 typename ProcessingMode = pubkey::share_dealing_processing_mode_default<Scheme>,
                  typename OutputAccumulator = typename pubkey::share_dealing_accumulator_set<ProcessingMode>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
-            deal_share(const SinglePassRange &r, OutputAccumulator &acc) {
+            deal_share(const SinglePassRange &range, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
+            typedef pubkey::detail::ref_pubkey_impl<OutputAccumulator> StreamSchemeImpl;
+            typedef pubkey::detail::range_pubkey_impl<StreamSchemeImpl> SchemeImpl;
 
-            return SignerImpl(r, std::forward<OutputAccumulator>(acc));
+            return SchemeImpl(range, std::forward<OutputAccumulator>(acc));
         }
 
         /*!
-         * @brief
+         * @brief Deal share of specified participant using passed shares, dealt by other participant for the current
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam KeySinglePassRange
-         * @tparam SchemeAccumulator
+         * @tparam Scheme distribution key generation scheme
+         * @tparam InputIterator iterator representing input shares
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
+         * @tparam StreamSchemeImpl (internal parameter)
+         * @tparam SchemeImpl return type implicitly convertible to \p DealingAccumulator or \p
+         * ProcessingMode::result_type (internal parameter)
          *
-         * @param first
-         * @param last
-         * @param key
+         * @param i participant index
+         * @param first the beginning of the shares range
+         * @param last the end of the shares range
          *
-         * @return
+         * @return SchemeImpl
          */
         template<typename Scheme, typename InputIterator,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::share_dealing_policy<Scheme>>::type,
-                 typename SchemeAccumulator = typename pubkey::share_dealing_accumulator_set<ProcessingMode>>
-        pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
-            deal_share(std::size_t i, InputIterator first, InputIterator last) {
+                 typename ProcessingMode = pubkey::share_dealing_processing_mode_default<Scheme>,
+                 typename DealingAccumulator = typename pubkey::share_dealing_accumulator_set<ProcessingMode>,
+                 typename StreamSchemeImpl = pubkey::detail::value_pubkey_impl<DealingAccumulator>,
+                 typename SchemeImpl = pubkey::detail::range_pubkey_impl<StreamSchemeImpl>>
+        SchemeImpl deal_share(std::size_t i, InputIterator first, InputIterator last) {
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
-
-            return SignerImpl(first, last, SchemeAccumulator(i));
+            return SchemeImpl(first, last, DealingAccumulator(i));
         }
 
         /*!
-         * @brief
+         * @brief Deal share of specified participant using passed shares, dealt by other participant for the current
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam Scheme
-         * @tparam SinglePassRange
-         * @tparam SchemeAccumulator
+         * @tparam Scheme distribution key generation scheme
+         * @tparam SinglePassRange range representing input shares
+         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
+         * executing a dealing operation as in specification
+         * @tparam StreamSchemeImpl (internal parameter)
+         * @tparam SchemeImpl return type implicitly convertible to \p DealingAccumulator or \p
+         * ProcessingMode::result_type (internal parameter)
          *
-         * @param r
-         * @param key
+         * @param i participant index
+         * @param range shares range
          *
-         * @return
+         * @return SchemeImpl
          */
         template<typename Scheme, typename SinglePassRange,
-                 typename ProcessingMode = typename pubkey::modes::isomorphic<Scheme>::template bind<
-                     pubkey::share_dealing_policy<Scheme>>::type,
-                 typename SchemeAccumulator = typename pubkey::share_dealing_accumulator_set<ProcessingMode>>
-        pubkey::detail::range_pubkey_impl<pubkey::detail::value_pubkey_impl<SchemeAccumulator>>
-            deal_share(std::size_t i, const SinglePassRange &r) {
+                 typename ProcessingMode = pubkey::share_dealing_processing_mode_default<Scheme>,
+                 typename DealingAccumulator = typename pubkey::share_dealing_accumulator_set<ProcessingMode>,
+                 typename StreamSchemeImpl = pubkey::detail::value_pubkey_impl<DealingAccumulator>,
+                 typename SchemeImpl = pubkey::detail::range_pubkey_impl<StreamSchemeImpl>>
+        SchemeImpl deal_share(std::size_t i, const SinglePassRange &range) {
 
-            typedef pubkey::detail::value_pubkey_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_pubkey_impl<StreamSignerImpl> SignerImpl;
-
-            return SignerImpl(r, SchemeAccumulator(i));
+            return SchemeImpl(range, DealingAccumulator(i));
         }
     }    // namespace crypto3
 }    // namespace nil

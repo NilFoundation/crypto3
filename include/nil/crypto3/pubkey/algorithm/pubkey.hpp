@@ -32,14 +32,8 @@ namespace nil {
             /*!
              * @defgroup pubkey Asymmetric cryptography
              *
-             * @brief Hash functions are one-way functions, which map data of arbitrary size to a
-             * fixed output length. Most of the hashes functions in crypto3 are designed to be
-             * cryptographically secure, which means that it is computationally infeasible to
-             * create a collision (finding two inputs with the same hashes) or preimages (given a
-             * hashes output, generating an arbitrary input with the same hashes). But note that
-             * not all such hashes functions meet their goals, in particular @ref nil::crypto3::hashes::md4 "MD4" and
-             * @ref nil::crypto3::hashes::md5 "MD5" are trivially broken. However they are still included due to their
-             * wide adoption in various protocols.
+             * @brief Pubkey is responsible for asymmetric cryptography. It implements public key signature and
+             * encryption schemes and secret sharing schemes.
              *
              * @defgroup pubkey_algorithms Asymmetric algorithms
              * @ingroup pubkey

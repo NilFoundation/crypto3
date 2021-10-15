@@ -32,7 +32,30 @@ An `SecretSharingScheme` is a stateless secret sharing crypto-scheme policy.
 
 ### Requirements ### {#pubkey_concepts_requirements}
 
-The type `X` satisfies `SecretSharingScheme` if at least there exist partial specializations of the templates `deal_shares_op<X>` satisfying to the concepts `PublicKeyOperation`, `share_sss<Scheme>` satisfying to the concepts `Share`, `public_share_sss<Scheme>` satisfying to the concepts `PublicShare`, `secret_sss<Scheme>` satisfying to the concepts `Secret`.
+The type `X` satisfies `SecretSharingScheme` if at least there exist partial specializations of the templates `deal_shares_op<X>` satisfying to the concepts `PublicKeyOperation`, `share_sss<Scheme>` satisfying to the concepts `Share`, `public_share_sss<Scheme>` satisfying to the concepts `PublicShare`, `secret_sss<Scheme>` satisfying to the concepts `Secret` and following expressions must be valid and have their specified effects.
+
+#### Member types
+
+|Expression|Requirements and Notes|
+|---|---|
+|`X::coeff_type`|type of polynomial coefficients|
+|`X::public_coeff_type`|type of public representatives of polynomial coefficients|
+
+## Weighted secret sharing scheme concept ## {#pubkey_concept}
+
+An `WeightedSecretSharingScheme` is a stateless secret sharing crypto-scheme policy.
+
+### Requirements ### {#pubkey_concepts_requirements}
+
+The type `X` satisfies `WeightedSecretSharingScheme` if at least there exist partial specializations of the templates `deal_shares_op<X>` satisfying to the concepts `PublicKeyOperation`, `share_sss<Scheme>` satisfying to the concepts `WeightedShare`, `public_share_sss<Scheme>` satisfying to the concepts `WeightedPublicShare`, `secret_sss<Scheme>` satisfying to the concepts `Secret`.
+
+#### Member types
+
+|Expression|Requirements and Notes|
+|---|---|
+|`X::coeff_type`|type of polynomial coefficients|
+|`X::public_coeff_type`|type of public representatives of polynomial coefficients|
+|`X::weights_type`|type for defining weights of participants|
 
 ## Public key concept ## {#pubkey_concept}
 
@@ -306,6 +329,34 @@ If the type `X` satisfies `PublicShare` concept then following expressions must 
 |`x.get_index()`|`X::index_type`|return share index|
 |`x.get_value()`|`const X::value_type &`|return share value|
 |`x.get_data()`|`const X::data_type &`|return raw data stored in the `x`|
+
+## Weighted share concept ## {#pubkey_concept}
+
+A `WeightedShare` is a concept of a stateful object containing cryptographic material of share and defining methods to work with it of some weighted secret sharing scheme.
+
+Implementation of concept `WeightedShare` for some weighted secret sharing scheme policy `Scheme` is assumed to be done by defining partial specialization of template `share_sss<Scheme>`.
+
+### Requirements ### {#pubkey_concepts_requirements}
+
+If the type `X` satisfies `WeightedShare` concept then it satisfies to the `Share` concept and following expressions must be valid and have their specified effects.
+
+|Expression|Return type|Effects|
+|---|---|---|
+|`x.get_weight()`|`std::size_t`|return participant weight|
+
+## Public representative of weighted share concept ## {#pubkey_concept}
+
+A `WeightedPublicShare` is a concept of a stateful object containing cryptographic material of public representative of share and defining methods to work with it for some weighted secret sharing scheme.
+
+Implementation of concept `WeightedPublicShare` for some weighted secret sharing scheme policy `Scheme` is assumed to be done by defining partial specialization of template `public_share_sss<Scheme>`.
+
+### Requirements ### {#pubkey_concepts_requirements}
+
+If the type `X` satisfies `WeightedPublicShare` concept then it satisfies `PublicShare` concept following expressions must be valid and have their specified effects.
+
+|Expression|Return type|Effects|
+|---|---|---|
+|`x.get_weight()`|`std::size_t`|return participant weight|
 
 ## Secret concept ## {#pubkey_concept}
 

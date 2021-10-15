@@ -55,7 +55,7 @@ namespace nil {
          * @tparam InputIterator iterator representing input signatures
          * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
          * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
-         * executing a aggregation operation as in specification
+         * executing an aggregation operation as in specification
          *
          * @param first the beginning of the signatures range to aggregate
          * @param last the end of the signatures range to aggregate
@@ -86,7 +86,7 @@ namespace nil {
          * @tparam SinglePassRange range representing input signatures
          * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
          * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
-         * executing a aggregation operation as in specification
+         * executing an aggregation operation as in specification
          *
          * @param range the signatures range to aggregate
          * @param out the beginning of the destination range
@@ -115,7 +115,7 @@ namespace nil {
          * @tparam Scheme public key signature scheme
          * @tparam InputIterator iterator representing input signatures
          * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
-         * executing a signing operation as in specification
+         * executing an aggregation operation as in specification
          * @tparam OutputAccumulator accumulator set initialized with aggregation accumulator (internal parameter)
          *
          * @param first the beginning of the signatures range to aggregate
@@ -146,7 +146,7 @@ namespace nil {
          * @tparam Scheme public key signature scheme
          * @tparam SinglePassRange range representing input signatures
          * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
-         * executing a signing operation as in specification
+         * executing an aggregation operation as in specification
          * @tparam OutputAccumulator accumulator set initialized with aggregation accumulator (internal parameter)
          *
          * @param range the signatures range to aggregate
@@ -176,7 +176,7 @@ namespace nil {
          * @tparam Scheme public key signature scheme
          * @tparam InputIterator iterator representing input signatures
          * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
-         * executing a aggregation operation as in specification
+         * executing an aggregation operation as in specification
          * @tparam AggregationAccumulator accumulator set initialized with aggregation accumulator (internal parameter)
          * @tparam StreamSchemeImpl (internal parameter)
          * @tparam SchemeImpl return type implicitly convertible to \p AggregationAccumulator or \p
@@ -204,7 +204,7 @@ namespace nil {
          * @tparam Scheme public key signature scheme
          * @tparam SinglePassRange range representing input signatures
          * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
-         * executing a aggregation operation as in specification
+         * executing an aggregation operation as in specification
          * @tparam AggregationAccumulator accumulator set initialized with aggregation accumulator (internal parameter)
          * @tparam StreamSchemeImpl (internal parameter)
          * @tparam SchemeImpl return type implicitly convertible to \p AggregationAccumulator or \p
