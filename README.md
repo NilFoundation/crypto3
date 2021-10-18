@@ -1,6 +1,6 @@
-# Fast Fourier Transforms
+# Polynomial Arithmetics, Fast Fourier Transforms for =nil; Crypto3 C++ Cryptography Suite 
 
-nil; Foundation C++ Computer Algebra System Fast Fourier Transforms
+Crypto3.Math extends the =nil; Foundation's Crypto3.Algebra and provides a set of Fast Fourier Transforms evaluation algorithms and Polynomial Arithmetics implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.
 
 ## Building
 
@@ -17,8 +17,7 @@ library in a project it is required to:
 
 ### Internal
 
-* [Pairings](https://github.com/NilFoundation/pairing)
-* [Finite fields](https://github.com/NilFoundation/ff)
+* [Algebra](https://github.com/NilFoundation/crypto3-algebra)
 
 ### External
 
