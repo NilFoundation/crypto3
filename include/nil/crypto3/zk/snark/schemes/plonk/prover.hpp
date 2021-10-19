@@ -62,7 +62,7 @@ namespace nil {
                     work_queue queue;
                     bool uses_quotient_mid;
 
-                    waffle::plonk_proof proof;
+                    plonk_proof proof;
 
                 public:
 
@@ -252,34 +252,10 @@ namespace nil {
 
                     void execute_first_round() {
                         queue.flush_queue();
-#ifdef DEBUG_TIMING
-                        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-#endif
-#ifdef DEBUG_TIMING
-                        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-                        std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                        std::cout << "init quotient polys: " << diff.count() << "ms" << std::endl;
-#endif
-#ifdef DEBUG_TIMING
-                        start = std::chrono::steady_clock::now();
-#endif
-#ifdef DEBUG_TIMING
-                        end = std::chrono::steady_clock::now();
-                        diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                        std::cout << "compute wire coefficients: " << diff.count() << "ms" << std::endl;
-#endif
-#ifdef DEBUG_TIMING
-                        start = std::chrono::steady_clock::now();
-#endif
                         compute_wire_pre_commitments();
                         for (auto& widget : random_widgets) {
                             widget->compute_round_commitments(transcript, 1, queue);
                         }
-#ifdef DEBUG_TIMING
-                        end = std::chrono::steady_clock::now();
-                        diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                        std::cout << "compute wire commitments: " << diff.count() << "ms" << std::endl;
-#endif
                     }
 
                     void execute_second_round() {
@@ -293,17 +269,6 @@ namespace nil {
                     void execute_third_round() {
                         queue.flush_queue();
                         transcript.apply_fiat_shamir("beta");
-#ifdef DEBUG_TIMING
-                        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-#endif
-#ifdef DEBUG_TIMING
-                        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-                        std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                        std::cout << "compute z coefficients: " << diff.count() << "ms" << std::endl;
-#endif
-#ifdef DEBUG_TIMING
-                        start = std::chrono::steady_clock::now();
-#endif
                         for (auto& widget : random_widgets) {
                             widget->compute_round_commitments(transcript, 3, queue);
                         }
@@ -318,54 +283,18 @@ namespace nil {
                                 0,
                             });
                         }
-#ifdef DEBUG_TIMING
-                        end = std::chrono::steady_clock::now();
-                        diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                        std::cout << "compute z commitment: " << diff.count() << "ms" << std::endl;
-#endif
                     }
 
                     void execute_fourth_round() {
                         queue.flush_queue();
                         transcript.apply_fiat_shamir("alpha");
-#ifdef DEBUG_TIMING
-                        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-#endif
-#ifdef DEBUG_TIMING
-                        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-                        std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                        std::cout << "compute wire ffts: " << diff.count() << "ms" << std::endl;
-#endif
 
-#ifdef DEBUG_TIMING
-                        start = std::chrono::steady_clock::now();
-#endif
-#ifdef DEBUG_TIMING
-                        end = std::chrono::steady_clock::now();
-                        diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                        std::cout << "copy z: " << diff.count() << "ms" << std::endl;
-#endif
-#ifdef DEBUG_TIMING
-                        start = std::chrono::steady_clock::now();
-#endif
-#ifdef DEBUG_TIMING
-                        end = std::chrono::steady_clock::now();
-                        diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                        std::cout << "compute permutation grand product coeffs: " << diff.count() << "ms" << std::endl;
-#endif
                         typename TCurve::scalar_field_type::value_type alpha_base = 
-                            typename TCurve::scalar_field_type::value_type::serialize_from_buffer(transcript.get_challenge("alpha").begin());
+                            typename TCurve::scalar_field_type::value_type::serialize_from_buffer(
+                                transcript.get_challenge("alpha").begin());
 
                         for (auto& widget : random_widgets) {
-#ifdef DEBUG_TIMING
-                            std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-#endif
                             alpha_base = widget->compute_quotient_contribution(alpha_base, transcript);
-#ifdef DEBUG_TIMING
-                            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-                            std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                            std::cout << "widget " << i << " quotient compute time: " << diff.count() << "ms" << std::endl;
-#endif
                         }
                         for (auto& widget : transition_widgets) {
                             alpha_base = widget->compute_quotient_contribution(alpha_base, transcript);
@@ -373,60 +302,28 @@ namespace nil {
                         typename TCurve::scalar_field_type::value_type* q_mid = &key->quotient_mid[0];
                         typename TCurve::scalar_field_type::value_type* q_large = &key->quotient_large[0];
 
-#ifdef DEBUG_TIMING
-                        start = std::chrono::steady_clock::now();
-#endif
                         if constexpr (settings::uses_quotient_mid) {
                             math::polynomial_arithmetic::divide_by_pseudo_vanishing_polynomial(
                                 key->quotient_mid.get_coefficients(), key->small_domain, key->mid_domain);
                         }
                         math::polynomial_arithmetic::divide_by_pseudo_vanishing_polynomial(
                             key->quotient_large.get_coefficients(), key->small_domain, key->large_domain);
-#ifdef DEBUG_TIMING
-                        end = std::chrono::steady_clock::now();
-                        diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                        std::cout << "divide by vanishing polynomial: " << diff.count() << "ms" << std::endl;
-#endif
-#ifdef DEBUG_TIMING
-                        start = std::chrono::steady_clock::now();
-#endif
                         if (settings::uses_quotient_mid) {
                             key->quotient_mid.coset_ifft(key->mid_domain);
                         }
                         key->quotient_large.coset_ifft(key->large_domain);
-#ifdef DEBUG_TIMING
-                        end = std::chrono::steady_clock::now();
-                        diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                        std::cout << "final inverse fourier transforms: " << diff.count() << "ms" << std::endl;
-#endif
                         if (settings::uses_quotient_mid) {
                             ITERATE_OVER_DOMAIN_START(key->mid_domain);
                             q_large[i] += q_mid[i];
                             ITERATE_OVER_DOMAIN_END;
                         }
-#ifdef DEBUG_TIMING
-                        start = std::chrono::steady_clock::now();
-#endif
                         compute_quotient_pre_commitment();
-#ifdef DEBUG_TIMING
-                        end = std::chrono::steady_clock::now();
-                        diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                        std::cout << "compute quotient commitment: " << diff.count() << "ms" << std::endl;
-#endif
-                    } // namespace waffle
+                    }
 
                     void execute_fifth_round() {
                         queue.flush_queue();
                         transcript.apply_fiat_shamir("z"); // end of 4th round
-#ifdef DEBUG_TIMING
-                        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-#endif
                         compute_linearisation_coefficients();
-#ifdef DEBUG_TIMING
-                        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-                        std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                        std::cout << "compute linearisation coefficients: " << diff.count() << "ms" << std::endl;
-#endif
                     }
 
                     void execute_sixth_round() {
