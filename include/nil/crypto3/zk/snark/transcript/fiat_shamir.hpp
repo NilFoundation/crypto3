@@ -31,40 +31,48 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename ...>
-                struct fiat_shamir_heuristic_manifest {
-                    enum challenges_ids{
-
-                    }
-
-                    typedef ... preprocessor;
-
-                    typedef std::tuple<...> processors;
-
-                    struct transcript_manifest {
-                        using challenges_ids = typename Manifest::challenges_ids;
-
-                        using processors = typename Manifest::processors;
-
-                        using challenges = std::array<, std::tuple_size<processors>>;
-
-                        using result = typename Hash::digest_type;
-                    }
-                }
-
                 /*!
                  * @brief Fiat–Shamir heuristic.
                  * @tparam Hash Hash function, which serves as a non-interactive random oracle.
+                 * @tparam TManifest Fiat-Shamir Heuristic Manifest in the following form:
+                 * 
+                 * template<typename ...>
+                 * struct fiat_shamir_heuristic_manifest {
                  *
+                 *     typedef ... preprocessor;
+                 *
+                 *     struct transcript_manifest {
+                 *         std::size_t gammas_amount = 5;
+                 *       public:
+                 *         enum challenges_ids{
+                 *             alpha,
+                 *             beta,
+                 *             gamma = 10,
+                 *             delta = gamma + gammas_amount,
+                 *             epsilon
+                 *         }
+                 *
+                 *         typedef std::tuple<...> processors;
+                 *
+                 *         using challenges = std::array<, std::tuple_size<processors>>;
+                 *
+                 *     }
+                 * };
                  */
                 template<fiat_shamir_heuristic_manifest Manifest, typename Hash>
-                class fiat_shamir_heuristic : public transcript<typename Manifest::transcript_manifest>{
+                class fiat_shamir_heuristic : public transcript<typename TManifest::transcript_manifest>{
 
-                    typedef transcript<typename Manifest::transcript_manifest> transcript_type;
+                    typedef transcript<typename TManifest::transcript_manifest> transcript_type;
 
-                    template <typename Manifest::challenges_ids challenge_id>
-                    bool set_challenge(std::tuple_element<challenge_id, typename Manifest::transcript_manifest::challenges> value){
-                        return transcript_type::set_challenge(value);
+                    template <typename TManifest::challenges_ids challenge_id>
+                    bool set_challenge(std::tuple_element<challenge_id, typename TManifest::transcript_manifest::challenges> value){
+                        return transcript_type::set_challenge<challenge_id>(value);
+                    }
+
+                    template <typename TManifest::challenges_ids challenge_id, std::size_t Index>
+                    bool set_challenge(std::tuple_element<Index, 
+                        std::tuple_element<ChallengeId, typename TManifest::transcript_manifest::challenges>> value){
+                        return transcript_type::set_challenge<challenge_id, Index>(value);
                     }
 
                     preprocessor::input_type input_value 
@@ -77,25 +85,40 @@ namespace nil {
                         random_value = algebra::random_element<...>();
                     }
 
-                    template <typename Manifest::challenges_ids challenge_id>
-                    std::tuple_element<challenge_id, typename Manifest::transcript_manifest::challenges> get_challenge() const{
+                    template <typename TManifest::challenges_ids challenge_id>
+                    std::tuple_element<challenge_id, typename TManifest::transcript_manifest::challenges> get_challenge() const{
                         transcript_type::get_challenge<challenge_id>();
                     }
 
-                    template <typename Manifest::challenges_ids challenge_id>
-                    std::tuple_element<challenge_id, typename Manifest::processors>::result_type get_challenge_result(){
+                    template <typename TManifest::challenges_ids ChallengeId, std::size_t Index>
+                    std::tuple_element<Index, 
+                        std::tuple_element<ChallengeId, typename TManifest::transcript_manifest::challenges>> get_challenge() const{
+                        transcript_type::get_challenge<challenge_id, Index>();
+                    }
+
+                    template <typename TManifest::challenges_ids challenge_id>
+                    std::tuple_element<challenge_id, typename TManifest::processors>::result_type get_challenge_result(){
                         
                         set_challenge<challenge_id>(hash<Hash>(get_challenge_result<challenge_id - 1>()));
 
                         transcript_type::get_challenge_result();
                     }
 
+                    template <typename TManifest::challenges_ids challenge_id, std::size_t Index>
+                    std::tuple_element<Index, 
+                        std::tuple_element<ChallengeId, typename TManifest::processors>>::result_type get_challenge_result(){
+                        
+                        set_challenge<challenge_id, Index>(hash<Hash>(previous_result));
+
+                        transcript_type::get_challenge_result<challenge_id, Index>();
+                    }
+
                     template <>
-                    std::tuple_element<challenge_id, typename Manifest::processors>::result_type get_challenge_result<0>(){
+                    std::tuple_element<challenge_id, typename TManifest::processors>::result_type get_challenge_result<0>(){
                         return preprocessor(input_value, random_value);
                     }
 
-                    typename Manifest::result export(){
+                    typename TManifest::result export(){
 
                     }
                 };
