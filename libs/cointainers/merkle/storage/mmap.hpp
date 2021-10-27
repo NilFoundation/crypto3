@@ -27,135 +27,111 @@
 #ifndef FILECOIN_MMAP_HPP
 #define FILECOIN_MMAP_HPP
 
+#include <algorithm>
+#include <stdio.h>
+#include <vector>
+
 #include <boost/filesystem.hpp>
 
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 
+
+#include <nil/filecoin/storage/proofs/core/merkle/processing/storage/utilities.hpp>
+
 namespace nil {
     namespace filecoin {
         namespace storage {
-            struct storage {
-                virtual uint8_t const *read(uint64_t begin, uint64_t length, uint8_t *memcache = nullptr) = 0;
-                virtual void write(uint64_t begin, const uint8_t *memcache, uint64_t length) = 0;
-                virtual void resize(uint64_t new_size) = 0;
-                virtual std::string name() = 0;
-                virtual size_t size() = 0;
-                virtual void free() = 0;
-                virtual void close() = 0;
-                virtual ~storage() = default;
-            };
-
-            struct mmap_storage : public storage {
-                explicit mmap_storage(const boost::filesystem::path &filename,
-                                      boost::interprocess::mode_t mod = boost::interprocess::read_write,
-                                      const std::size_t file_size = 0) {
-                    filename_ = filename;
-                    mod_ = mod;
-                    alloc_space(file_size, !boost::filesystem::exists(filename));
-                    if (file_size != 0) {
-                        open(mod);
-                    }
-                }
-
-                void alloc_space(const std::size_t file_size, const bool truncate = false) {
-                    std::filebuf fbuf;
-                    std::ios_base::openmode open_flags = std::ios_base::in | std::ios_base::out | std::ios_base::binary;
-                    if (truncate)
-                        open_flags |= std::ios_base::trunc;
-                    fbuf.open(filename_.string().c_str(), open_flags);
-                    if (file_size != 0) {
+            class MmapStore: public Store {
+                MmapStore(size_t size, size_t branches, StoreConfig config, uint8_t *data = nullptr, size_t data_length = 0) {
+                    boost::filesystem::path data_path = StoreConfig::data_path(&config.path_, &config.id_);
+                    // If the specified file exists, load it from disk.
+                    if (!boost::filesystem::exists(data_path)) {
+                        std::filebuf fbuf;
+                        std::ios_base::openmode open_flags = std::ios_base::in | std::ios_base::out | std::ios_base::binary;
+                        fbuf.open(data_path.string().c_str(), open_flags);
                         fbuf.pubseekoff(file_size - 1, std::ios_base::beg);
                         fbuf.sputc(0);
+                        fbuf.close();
+                        len = 0;
                     }
-                    fbuf.close();
-                }
-
-                void open(boost::interprocess::mode_t mod) {
-                    f_ = boost::interprocess::file_mapping(filename_.string().c_str(), mod);
-                    region_ = boost::interprocess::mapped_region(f_, mod);
-                    addr = region_.get_address();
-                    s = region_.get_size();
-                    mod_ = mod;
-                }
-
-                mmap_storage(mmap_storage &&fd) noexcept {
-                    filename_ = std::move(fd.filename_);
-                    addr = fd.addr;
-                    s = fd.s;
-                    f_ = std::move(fd.f_);
-                }
-
-                mmap_storage(const mmap_storage &) = delete;
-
-                mmap_storage &operator=(const mmap_storage &) = delete;
-
-                void close() override {
-                    region_.flush();
-                    munmap(addr, s);
-                    addr = nullptr;
-                    s = 0;
-                }
-
-                ~mmap_storage() {
-                    close();
-                }
-
-                uint8_t const *read(uint64_t begin, uint64_t length, uint8_t *memcache) override {
-                    if (addr == nullptr) {
-                        open();
+                    file = boost::interprocess::file_mapping(data_path.string().c_str(), boost::interprocess::read_write);
+                    map = boost::interprocess::mapped_region(file, boost::interprocess::read_write);
+                    addr = map.get_address();
+                    if (!boost::filesystem::exists(data_path)) {
+                        len = region_.get_size();
                     }
-                    if (begin + length > s) {
-                        assert(false);
-                        throw invalid_value_exception("Read out of bounds");
-                    }
-                    memcpy(memcache, static_cast<char *>(addr) + begin, length);
-                    return nullptr;
-                }
+                    store_size = region_.get_size();
 
-                void write(uint64_t begin, const uint8_t *memcache, uint64_t length) override {
-                    if (s < begin + length) {
-                        resize(begin + length);
-                    }
-                    memcpy(static_cast<char *>(addr) + begin, memcache, length);
-                }
-
-                std::string name() override {
-                    return filename_.string();
-                }
-
-                size_t size() override {
-                    return s;
-                }
-
-                void resize(uint64_t new_size) override {
-                    if (s == new_size) {
-                        return;
-                    }
-                    if (new_size < s) {
-                        region_.shrink_by(s - new_size, true);
-                        addr = region_.get_address();
-                        s = region_.get_size();
-                        boost::filesystem::resize_file(filename_, new_size);
-                    } else {
-                        alloc_space(new_size);
-                        open();
+                    if (data != nullptr) {
+                        BOOST_ASSERT_MSG(data_length % Element::byte_len() == 0, "data size must be a multiple of {}", Element::byte_len());
+                        memcpy(static_cast<char *>(addr), data, data_length);
+                        len = data_length / Element::byte_len();
                     }
                 }
 
-                void free() override {
-                    region_.flush();
+                MmapStore(size_t size) {
+                    size_t store_size = Element::byte_len() * size;
+                    BOOST_BOOST_ASSERT_MSG_MSG(false, "Not valid");
+                }
+
+                void write_at(Element el, size_t index) {
+                    size_t start = index * Element::byte_len();
+                    memcpy(static_cast<char *>(addr) + start, el, Element::byte_len());
+                    len = std::max(len, index + 1);
+                }
+
+                void copy_from_slice(uint8_t *buf, size_t start) {
+                    BOOST_ASSERT_MSG(buf.len() % Element::byte_len() == 0, "buf size must be a multiple of {}", Element::byte_len());
+
+                    size_t start = start * Element::byte_len();
+
+                    memcpy(static_cast<char *>(addr) + start, buf, buf.len());
+                
+                    len = std::max(len, start + (buf.len() / Element::byte_len()));
+                }
+
+                MmapStore(size_t size, uint8_t *data) {
+                    BOOST_BOOST_ASSERT_MSG_MSG(false, "Not valid");
+                }
+
+                void read(std::pair<size_t, size_t> read, uint8_t *buf) {
+                    BOOST_ASSERT_MSG(read.first >= len || read.second >= len, "Invalid read range");
+                    memcpy(buf, static_cast<char *>(addr) + read.first, read.second - read.first);
+                }
+
+                bool loaded_from_disk() {
+                    return false;
+                }
+
+                void compact(size_t branches, StoreConfig config, uint32_t store_version) {
+                    BOOST_ASSERT_MSG("Not required here");
+                }
+
+                void reinit() {
+                    file = boost::interprocess::file_mapping(data_path.string().c_str(), boost::interprocess::read_write);
+                    map = boost::interprocess::mapped_region(file, boost::interprocess::read_write);
+                    addr = map.get_address();
+                }
+
+                bool is_empty() {
+                    return this->len == 0;
+                }
+
+                void push(Element el) {
+                    BOOST_ASSERT_MSG((len + 1) * Element::byte_len() <= store_size, "not enough space");
+                    write_at(el, len)
                 }
 
             private:
-                boost::filesystem::path filename_;
-                boost::interprocess::mod_t mod_;
-                boost::interprocess::file_mapping f_;
-                boost::interprocess::mapped_region region_;
+                boost::filesystem::path path;
+                boost::interprocess::file_mapping file;
+                boost::interprocess::mapped_region map;
+                size_t len;
+                size_t store_size;
                 void *addr = nullptr;
-                std::size_t s = 0;
             };
-        }    // namespace storage
+        }    // namespace merkletree
     }    // namespace filecoin
 }    // namespace nil
 

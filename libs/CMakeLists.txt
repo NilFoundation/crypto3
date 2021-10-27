@@ -56,7 +56,7 @@ if(NOT Boost_FOUND)
     cm_find_package(Boost REQUIRED COMPONENTS filesystem)
 endif()
 
-cm_project(storage_proofs WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
+cm_project(containers WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 option(BUILD_DOXYGEN_DOCS "Build with configuring Doxygen documentation compiler" TRUE)
 

@@ -31,68 +31,195 @@
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 
+#include <cmath>
+#include <sstream>
+#include <utility>
+
 namespace nil {
     namespace filecoin {
-        namespace merkletree {
-            struct ExternalReader {
-                size_t offset;
-                pub source: R;
+        namespace utilities {
 
-                size_t read(size_t start, size_t end, char* buf, source: &R) {
-                    (self.read_fn)(start + self.offset, end + self.offset, buf, &self.source)
-                }
 
-                ExternalReader(ReplicaConfig replica_config, size_t index) {
-                    let reader = OpenOptions::new().read(true).open(&replica_config.path)?;
-                    offset = replica_config.offsets[index];
-                    source = reader;
-                    self.offset = replica_config.offsets[index];
-                    self.source = reades;
-                    read_fn: |start, end, buf: &mut [u8], reader: &std::fs::File| {
-                            reader.read_exact_at(start as u64, &mut buf[0..end - start])?;
-
-                            Ok(end - start)};
+            // Row_Count calculation given the number of leafs in the tree and the branches.
+            size_t get_merkle_tree_row_count(size_t leafs, size_t branches) {
+                // Optimization
+                if (branches == 2) {
+                    return leafs * branches;
+                } else {
+                    return std::log(leafs) / std::log(branches);
                 }
             }
 
-            enum StoreConfigDataVersion {
-                One = 1,
-                Two = 2
-            };
+            // Tree length calculation given the number of leafs in the tree and the branches.
+            size_t get_merkle_tree_len(size_t leafs, size_t branches) {
+                BOOST_ASSERT_MSG(leafs >= branches, "leaf and branch mis-match");
+                BOOST_ASSERT_MSG(branches == next_pow2(branches), "branches must be a power of 2");
+
+                // Optimization
+                if (branches == 2) {
+                    BOOST_ASSERT_MSG(leafs == next_pow2(leafs), "leafs must be a power of 2");
+                    return 2 * leafs - 1;
+                }
+
+                size_t len = leafs;
+                size_t cur = leafs;
+                size_t shift = log2_pow2(branches);
+                if (shift == 0) {
+                    return len;
+                }
+
+                while (cur > 0) {
+                    cur >>= shift; // cur /= branches
+                    BOOST_ASSERT_MSG(cur < leafs, "invalid input provided");
+                    len += cur;
+                }
+
+                return len;
+            }
+
+            // Tree length calculation given the number of leafs in the tree, the
+            // rows_to_discard, and the branches.
+            size_t get_merkle_tree_cache_size(size_t leafs, size_t branches, size_t rows_to_discard) {
+                size_t shift = log2_pow2(branches);
+                size_t len = get_merkle_tree_len(leafs, branches)?;
+                size_t row_count = get_merkle_tree_row_count(leafs, branches);
+
+                BOOST_ASSERT_MSG(row_count - 1 > rows_to_discard,  "Cannot discard all rows except for the base");
+
+                // 'row_count - 1' means that we start discarding rows above the base
+                // layer, which is included in the current row_count.
+                size_t cache_base = row_count - 1 - rows_to_discard;
+
+                size_t cache_size = len;
+                size_t cur_leafs = leafs;
+
+                while (row_count > cache_base) {
+                    cache_size -= cur_leafs;
+                    cur_leafs >>= shift; // cur /= branches
+                    row_count -= 1;
+                }
+
+                return cache_size;
+            }
+
+            bool is_merkle_tree_size_valid(size_t leafs, size_t branches) {
+                if (branches == 0 || leafs != next_pow2(leafs) || branches != next_pow2(branches)) {
+                    return false;
+                }
+
+                size_t mut cur = leafs;
+                size_t shift = log2_pow2(branches);
+                while (cur != 1) {
+                    cur >>= shift; // cur /= branches
+                    if (cur > leafs || cur == 0) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            // Given a tree of 'row_count' with the specified number of 'branches',
+            // calculate the length of hashes required for the proof.
+            size_t get_merkle_proof_lemma_len(size_t row_count, size_t branches) {
+                return 2 + ((branches - 1) * (row_count - 1));
+            }
+
+            // This method returns the number of 'leafs' given a merkle tree
+            // length of 'len', where leafs must be a power of 2, respecting the
+            // number of branches.
+            size_t get_merkle_tree_leafs(size_t len, size_t branches) {
+                BOOST_ASSERT_MSG(branches == next_pow2(branches), "branches must be a power of 2");
+                size_t leafs = 0;
+                // Optimization:
+                if (branches == 2) {
+                    leafs = (len >> 1) + 1
+                } else {
+                    size_t leafs = 1;
+                    size_t cur = len;
+                    size_t shift = log2_pow2(branches);
+                    while (cur != 1) {
+                        leafs <<= shift; // leafs *= branches
+                        BOOST_ASSERT_MSG(cur > leafs, "Invalid tree length provided for the specified arity");
+                        cur -= leafs;
+                        BOOST_ASSERT_MSG(cur < len, "Invalid tree length provided for the specified arity");
+                    }
+                };
+
+                BOOST_ASSERT_MSG(leafs == next_pow2(leafs), "Invalid tree length provided for the specified arity");
+                return leafs;
+            }
+
+            // returns next highest power of two from a given number if it is not
+            // already a power of two.
+            size_t next_pow2(size_t n) {
+                return std::pow(2, std::ceil(std::log(n)));
+            }
+
+            // find power of 2 of a number which is power of 2
+            size_t log2_pow2(size_t n) {
+                return next_pow2(n);
+            }
+            //            struct ExternalReader {
+            //                size_t offset;
+            //                pub source: R;
+            //
+            //                size_t read(size_t start, size_t end, char* buf, source: &R) {
+            //                    (self.read_fn)(start + self.offset, end + self.offset, buf, &self.source)
+            //                }
+            //
+            //                ExternalReader(ReplicaConfig replica_config, size_t index) {
+            //                    let reader = OpenOptions::new().read(true).open(&replica_config.path)?;
+            //                    offset = replica_config.offsets[index];
+            //                    source = reader;
+            //                    self.offset = replica_config.offsets[index];
+            //                    self.source = reades;
+            //                    read_fn: |start, end, buf: &mut [u8], reader: &std::fs::File| {
+            //                            reader.read_exact_at(start as u64, &mut buf[0..end - start])?;
+            //
+            //                            Ok(end - start)};
+            //                }
+            //            };
+
+            enum StoreConfigDataVersion { One = 1, Two = 2 };
 
             const uint32_t DEFAULT_STORE_CONFIG_DATA_VERSION = StoreConfigDataVersion::Two;
 
-            struct ReplicaConfig  {
-                ReplicaConfig(boost::filesystem::path path, std::vector<size_t> offsets) {
-                    self.path = path;
-                    for (auto i: offsets) {
-                        self.offsets.push_back(i);
+            struct ReplicaConfig {
+                ReplicaConfig(boost::filesystem::path path, const std::vector<size_t> &offsets) {
+                    path = std::move(path);
+                    for (auto i : offsets) {
+                        offsets.push_back(i);
                     }
                 }
+
                 ReplicaConfig(boost::filesystem::path path) {
-                    self.path = path;
-                    self.offsets.push_back(0);
+                    path = std::move(path);
+                    offsets.push_back(0);
                 }
+
                 std::vector<size_t> offsets;
                 boost::filesystem::path path;
             };
 
             struct StoreConfig {
                 StoreConfig(boost::filesystem::path path, std::string id, size_t rows_to_discard) :
-                    path_(path), id_(id), rows_to_discard_(rows_to_discard) {};
+                    this->path(std::move(path)), this->id(std::move(id)), this->rows_to_discard(rows_to_discard) {};
                 // If the tree is large enough to use the default value
                 // (per-arity), use it.  If it's too small to cache anything
                 // (i.e. not enough rows), don't discard any.
-                size_t default_rows_to_discard(size_t leafs, size_t branches) {
-                    size_t =  = get_merkle_tree_row_count(leafs, branches);
+                static size_t default_rows_to_discard(size_t leafs, size_t branches) {
+                    size_t row_count = get_merkle_tree_row_count(leafs, branches);
                     if (row_count <= 2) {
                         // If a tree only has a root row and/or base, there is
                         // nothing to discard.
                         return 0;
-                    } else if row_count == 3 {
-                        // If a tree only has 1 row between the base and root,
-                        // it's all that can be discarded.
-                        return 1;
+                    } else {
+                        if (row_count == 3) {
+                            // If a tree only has 1 row between the base and root,
+                            // it's all that can be discarded.
+                            return 1;
+                        }
                     }
                     // row_count - 2 discounts the base layer (1) and root (1)
                     size_t max_rows_to_discard = row_count - 2;
@@ -100,422 +227,57 @@ namespace nil {
                     // differing by arity) while respecting the max number that
                     // the tree can support discarding.
                     if (branches == 2)
-                        return std::min(max_rows_to_discard, 7);
+                        return std::min(max_rows_to_discard, (size_t)7);
                     if (branches == 4)
-                        return std::min(max_rows_to_discard, 5);
-                    return std::min(max_rows_to_discard, 2);
+                        return std::min(max_rows_to_discard, (size_t)5);
+                    return std::min(max_rows_to_discard, (size_t)2);
                 }
                 // Deterministically create the data_path on-disk location from a
                 // path and specified id.
-                boost::filesystem::path data_path(boost::filesystem::path path, std::string id) {
+                static boost::filesystem::path data_path(const boost::filesystem::path &path, const std::string &id) {
                     std::ostringstream store_data_version;
-                    store_data_version << std::internal << std::setfill('0') << std::setw(2) << DEFAULT_STORE_CONFIG_DATA_VERSION;
+                    store_data_version << std::internal << std::setfill('0') << std::setw(2)
+                                       << DEFAULT_STORE_CONFIG_DATA_VERSION;
                     return boost::filesystem::path("sc-" + store_data_version.str() + "-data-" + id + ".dat");
                 }
 
-                StoreConfig(StoreConfig config, std::string id, size_t size = 0) {
-                    assert(size == 0);
-                    size_ = config.size;
-                    path_ = config.path;
-                    id_ = config.id_;
-                    rows_to_discard_ = config.rows_to_discard_;
+                StoreConfig(const StoreConfig &config, const std::string &id, size_t size = 0) {
+                    BOOST_ASSERT_MSG(size != 0, "Size must be positive");
+                    this->size = config.size;
+                    this->path = config.path;
+                    this->id = config.id;
+                    this->rows_to_discard = config.rows_to_discard;
                 }
                 /// A directory in which data (a merkle tree) can be persisted.
-                boost::filesystem::path path_;
+                boost::filesystem::path path;
                 /// A unique identifier used to help specify the on-disk store
                 /// location for this particular data.
-                std::string id_;
+                std::string id;
                 /// The number of elements in the DiskStore.  This field is
                 /// optional, and unused internally.
-                size_t size_;
+                size_t size;
                 /// The number of merkle tree rows_to_discard then cache on disk.
-                size_t rows_to_discard_;
-            }
+                size_t rows_to_discard;
+            };
 
             /// Backing store of the merkle tree.
-            template <typename Element>
             class Store {
-                /// Creates a new store which can store up to `size` elements.
-                Store(size_t size, size_t branches, StoreConfig config);
-                Store(size_t size);
-                Store(size_t size, size_t branches, char *data, StoreConfig config);
-                Store(size_t size, data: &[u8]);
-                Store(size_t size, size_t branches, StoreConfig config);
-                void write_at(el: E, size_t index);
-
-                // Used to reduce lock contention and do the `E` to `u8`
-                // conversion in `build` *outside* the lock.
-                // `buf` is a slice of converted `E`s and `start` is its
-                // position in `E` sizes (*not* in `u8`).
-                void copy_from_slice(buf: &[u8], size_t start);
-
+                virtual void write(std::pair<uint8_t *, uint8_t *> el, size_t index) = 0;
+                virtual void read(std::pair<size_t, size_t > read, uint8_t *buf)  = 0;
                 // compact/shrink resources used where possible.
-                bool compact(size_t branches, StoreConfig config, uint32_t store_version);
-
+                virtual bool compact(size_t branches, StoreConfig config, uint32_t store_version) = 0;
                 // re-instate resource usage where needed.
-                void reinit() {};
-
-                // Removes the store backing (does not require a mutable reference
-                // since the config should provide stateless context to what's
-                // needed to be removed -- with the exception of in memory stores,
-                // where this is arguably not important/needed).
-                void delete(StoreConfig config);
-
-                Element read_at(size_t index);
-                std::vector<Element> read_range(r: ops::Range<usize>);
-                void read_into(size_t pos, buf: &mut [u8]);
-                void read_range_into(size_t start, size_t end, buf: &mut [u8]);
-
-                size_t len();
-                bool loaded_from_disk();
-                bool is_empty();
-                void push(Element el);
-                Element last() {
-                    self.read_at(self.len() - 1)
-                }
-
+                virtual void reinit() {};
+                virtual size_t len() = 0;
+                virtual bool loaded_from_disk() = 0;
+                virtual bool is_empty() = 0;
+                virtual void pget_merkle_tree_lenush(std::pair<uint8_t *, uint8_t *> data) = 0;
                 // Sync contents to disk (if it exists). This function is used to avoid
                 // unnecessary flush calls at the cost of added code complexity.
-                void sync();
-
-                fn build_small_tree<A: Algorithm<E>, U: Unsigned>(size_t leafs, size_t row_count) {
-                    assert(leafs % 2 == 0, "Leafs must be a power of two");
-
-                    size_t level = 0;
-                    size_t width = leafs;
-                    size_t level_node_index = 0;
-                    size_t = U::to_usize();
-                    let shift = log2_pow2(branches);
-
-                    while (width > 1) {
-                        // Same indexing logic as `build`.
-                        let (layer, write_start) = {
-                        let (read_start, write_start) = if level == 0 {
-                        // Note that we previously asserted that data.len() == leafs.
-                            (0, Store::len(self))
-                        } else {
-                            (level_node_index, level_node_index + width)
-                        };
-
-                        let layer: Vec<_> = selfread_range(read_start..read_start + width)?.par_chunks(branches).map(|nodes| A::default().multi_node(&nodes, level)).collect();
-
-                            (layer, write_start)
-                        };
-
-                        for (i, node) in layer.into_iter().enumerate() {
-                            self.write_at(node, write_start + i)?;
-                        }
-
-                        level_node_index += width;
-                        level += 1;
-                        width >>= shift; // width /= branches;
-                    }
-
-                    assert(row_count == level + 1, "Invalid tree row_count");
-                    // The root isn't part of the previous loop so `row_count` is
-                    // missing one level.
-
-                    self.last()
-                }
-
-                void process_layer<A: Algorithm<E>, U: Unsigned>(size_t width, size_t level,
-                                                                 size_t read_start, size_t write_start)  
-                {
-                    size_t branches = U::to_usize();
-                    size_t data_lock = Arc::new(RwLock::new(self));
-
-                    // Allocate `width` indexes during operation (which is a negligible memory bloat
-                    // compared to the 32-bytes size of the nodes stored in the `Store`s) and hash each
-                    // pair of nodes to write them to the next level in concurrent threads.
-                    // Process `BUILD_CHUNK_NODES` nodes in each thread at a time to reduce contention,
-                    // optimized for big sector sizes (small ones will just have one thread doing all
-                    // the work).
-                    assert(BUILD_CHUNK_NODES % branches == 0, "Invalid chunk size");
-                    Vec::from_iter((read_start..read_start + width).step_by(BUILD_CHUNK_NODES))
-                    .par_iter()
-                    .try_for_each(|&chunk_index| -> Result<()> {
-                    let chunk_size = std::cmp::min(BUILD_CHUNK_NODES, read_start + width - chunk_index);
-
-                    let chunk_nodes = {
-                        // Read everything taking the lock once.
-                        data_lock
-                            .read()
-                            .unwrap()
-                            .read_range(chunk_index..chunk_index + chunk_size)?
-                    };
-
-                    // We write the hashed nodes to the next level in the
-                    // position that would be "in the middle" of the
-                    // previous pair (dividing by branches).
-                    let write_delta = (chunk_index - read_start) / branches;
-                    
-                    let nodes_size = (chunk_nodes.len() / branches) * E::byte_len();
-                    let hashed_nodes_as_bytes = chunk_nodes.chunks(branches).fold(
-                            Vec::with_capacity(nodes_size),
-                                                    |mut acc, nodes| {
-                        let h = A::default().multi_node(&nodes, level);
-                        acc.extend_from_slice(h.as_ref());
-                        acc
-                        },
-                    );
-
-                    // Check that we correctly pre-allocated the space.
-                    assert!(hashed_nodes_as_bytes.len() == chunk_size / branches * E::byte_len(), "Invalid hashed node length");
-
-                    // Write the data into the store.
-                    data_lock.write().unwrap().copy_from_slice(&hashed_nodes_as_bytes, write_start + write_delta)})
-                }
-
-                // Default merkle-tree build, based on store type.
-                Element build<A: Algorithm<E>, U: Unsigned>(size_t leafs, size_t row_count, StoreConfig _config) {
-                    size_t branches = U::to_usize();
-                    assert(next_pow2(branches) == branches, "branches MUST be a power of 2");
-                    assert(Store::len(self) == leafs, "Inconsistent data");
-                    assert(leafs % 2 == 0, "Leafs must be a power of two");
-                
-                    if (leafs <= SMALL_TREE_BUILD) {
-                        return self.build_small_tree::<A, U>(leafs, row_count);
-                    }
-                
-                    size_t shift = log2_pow2(branches);
-                
-                    // Process one `level` at a time of `width` nodes. Each level has half the nodes
-                    // as the previous one; the first level, completely stored in `data`, has `leafs`
-                    // nodes. We guarantee an even number of nodes per `level`, duplicating the last
-                    // node if necessary.
-                    size_t level = 0;
-                    size_t width = leafs;
-                    size_t level_node_index = 0;
-                    while (width > 1) {
-                        // Start reading at the beginning of the current level, and writing the next
-                        // level immediate after.  `level_node_index` keeps track of the current read
-                        // starts, and width is updated accordingly at each level so that we know where
-                        // to start writing.
-                        let (read_start, write_start) = if level == 0 {
-                            // Note that we previously asserted that data.len() == leafs.
-                            //(0, data_lock.read().unwrap().len())
-                            (0, Store::len(self))
-                        } else {
-                            (level_node_index, level_node_index + width)
-                        };
-                
-                        self.process_layer::<A, U>(width, level, read_start, write_start)?;
-
-                        level_node_index += width;
-                        level += 1;
-                        width >>= shift; // width /= branches;
-                    }
-                
-                    assert(row_count == level + 1, "Invalid tree row_count");
-                    // The root isn't part of the previous loop so `row_count` is
-                    // missing one level.
-
-                    // Return the root
-                    return self.last()
-                }
-
-//                // Using a macro as it is not possible to do a generic implementation for all stores.
-//
-//                macro_rules! impl_parallel_iter {
-//                    ($name:ident, $producer:ident, $iter:ident) => {
-//                        impl<E: Element> ParallelIterator for $name<E> {
-//                            type Item = E;
-//
-//                            fn drive_unindexed<C>(self, consumer: C) -> C::Result
-//                            where
-//                            C: UnindexedConsumer<Self::Item>,
-//                            {
-//                                bridge(self, consumer)
-//                            }
-//
-//                            fn opt_len(&self) -> Option<usize> {
-//                                Some(Store::len(self))
-//                            }
-//                        }
-//                        impl<'a, E: Element> ParallelIterator for &'a $name<E> {
-//                            type Item = E;
-//
-//                            fn drive_unindexed<C>(self, consumer: C) -> C::Result
-//                            where
-//                            C: UnindexedConsumer<Self::Item>,
-//                            {
-//                                bridge(self, consumer)
-//                            }
-//
-//                            fn opt_len(&self) -> Option<usize> {
-//                                Some(Store::len(*self))
-//                            }
-//                        }
-//
-//                        impl<E: Element> IndexedParallelIterator for $name<E> {
-//                            fn drive<C>(self, consumer: C) -> C::Result
-//                            where
-//                            C: Consumer<Self::Item>,
-//                            {
-//                                bridge(self, consumer)
-//                            }
-//
-//                            fn len(&self) -> usize {
-//                                Store::len(self)
-//                            }
-//
-//                            fn with_producer<CB>(self, callback: CB) -> CB::Output
-//                            where
-//                            CB: ProducerCallback<Self::Item>,
-//                            {
-//                                callback.callback(<$producer<E>>::new(0, Store::len(&self), &self))
-//                            }
-//                        }
-//
-//                        impl<'a, E: Element> IndexedParallelIterator for &'a $name<E> {
-//                            fn drive<C>(self, consumer: C) -> C::Result
-//                            where
-//                            C: Consumer<Self::Item>,
-//                            {
-//                                bridge(self, consumer)
-//                            }
-//
-//                            fn len(&self) -> usize {
-//                                Store::len(*self)
-//                            }
-//
-//                            fn with_producer<CB>(self, callback: CB) -> CB::Output
-//                            where
-//                            CB: ProducerCallback<Self::Item>,
-//                            {
-//                                callback.callback(<$producer<E>>::new(0, Store::len(self), self))
-//                            }
-//                        }
-//
-//#[derive(Debug, Clone)]
-//                        pub struct $producer<'data, E: 'data + Element> {
-//                            pub(crate) current: usize,
-//                                pub(crate) end: usize,
-//                                pub(crate) store: &'data $name<E>,
-//                        }
-//
-//                        impl<'data, E: 'data + Element> $producer<'data, E> {
-//                        pub fn new(current: usize, end: usize, store: &'data $name<E>) -> Self {
-//                        Self {
-//                            current,
-//                            end,
-//                            store,
-//                        }
-//                    }
-//
-//                    pub fn len(&self) -> usize {
-//                        self.end - self.current
-//                    }
-//
-//                    pub fn is_empty(&self) -> bool {
-//                        self.len() == 0
-//                    }
-//                }
-//
-//                impl<'data, E: 'data + Element> Producer for $producer<'data, E> {
-//                type Item = E;
-//                type IntoIter = $iter<'data, E>;
-//
-//                fn into_iter(self) -> Self::IntoIter {
-//                    let $producer {
-//                        current,
-//                        end,
-//                        store,
-//                    } = self;
-//
-//                    $iter {
-//                        current,
-//                        end,
-//                        store,
-//                        err: false,
-//                    }
-//                }
-//
-//                fn split_at(self, index: usize) -> (Self, Self) {
-//                    let len = self.len();
-//
-//                    if len == 0 {
-//                        return (
-//                        <$producer<E>>::new(0, 0, &self.store),
-//                        <$producer<E>>::new(0, 0, &self.store),
-//                        );
-//                    }
-//
-//                    let current = self.current;
-//                    let first_end = current + std::cmp::min(len, index);
-//
-//                    debug_assert!(first_end >= current);
-//                    debug_assert!(current + len >= first_end);
-//
-//                    (
-//                    <$producer<E>>::new(current, first_end, &self.store),
-//                    <$producer<E>>::new(first_end, current + len, &self.store),
-//                    )
-//                }
-//            }
-//            }
-//                pub struct $iter<'data, E: 'data + Element> {
-//                    current: usize,
-//                        end: usize,
-//                        err: bool,
-//                        store: &'data $name<E>,
-//                }
-//
-//                    impl<'data, E: 'data + Element> $iter<'data, E> {
-//                fn is_done(&self) -> bool {
-//                    !self.err && self.len() == 0
-//                }
-//            }
-//
-//                impl<'data, E: 'data + Element> Iterator for $iter<'data, E> {
-//            type Item = E;
-//
-//            fn next(&mut self) -> Option<Self::Item> {
-//            if self.is_done() {
-//                return None;
-//            }
-//
-//            match self.store.read_at(self.current) {
-//            Ok(el) => {
-//            self.current += 1;
-//            Some(el)
-//        }
-//        _ => {
-//        self.err = true;
-//        None
-//    }
-//}
-//}
-//}
-//
-//impl<'data, E: 'data + Element> ExactSizeIterator for $iter<'data, E> {
-//fn len(&self) -> usize {
-//debug_assert!(self.current <= self.end);
-//self.end - self.current
-//}
-//}
-//
-//impl<'data, E: 'data + Element> DoubleEndedIterator for $iter<'data, E> {
-//fn next_back(&mut self) -> Option<Self::Item> {
-//if self.is_done() {
-//    return None;
-//}
-//
-//match self.store.read_at(self.end - 1) {
-//Ok(el) => {
-//self.end -= 1;
-//Some(el)
-//}
-//_ => {
-//self.err = true;
-//None
-//}
-//}
-//}
-//}
-        }    // namespace merkletree
-    }    // namespace filecoin
-}    // namespace nil
+                virtual void sync() = 0;
+            };
+        }     // namespace utilities
+    }         // namespace filecoin
+}             // namespace nil
 
 #endif    // FILECOIN_STORAGE_PROOFS_CORE_MERKLE_TREE_STORAGE_UTILITIES_HPP
-
