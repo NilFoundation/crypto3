@@ -23,17 +23,76 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef FILECOIN_MERKLE_HPP
-#define FILECOIN_MERKLE_HPP
+#ifndef CRYPTO3_MERKLE_HPP
+#define CRYPTO3_MERKLE_HPP
 
-#include <nil/filecoin/storage/proofs/core/merkle/storage/utilities.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/optional.hpp>
-#include <nil/filecoin/storage/proofs/core/merkle/storage/vec.hpp>
+#include <vector>
+
+#include <nil/crypto3/detail/static_digest.hpp>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+#include <nil/merkle/utilities.hpp>
 
 namespace nil {
-    namespace filecoin {
+    namespace crypto3 {
         namespace merkletree {
+            struct Storage {
+                Storage(size_t size, size_t branches, utilities::StoreConfig config) {
+                    v.resize(size);
+                    store_size = size;
+                    len = 0;
+                }
+
+                Storage(size_t size) {
+                    v.resize(size);
+                    store_size = size;
+                    len = 0;
+                }
+
+                void write(std::pair<uint8_t *, uint8_t *> el, size_t start) {
+                    if (this->len < write + (el.second - el.first)) {
+                        v.resize(write + (el.second - el.first));
+                    }
+                    for (auto i = el.first; i < el.second; ++i) {
+                        v[write] = i;
+                        ++write;
+                    }
+                    len += (el.second - el.first);
+                }
+
+                Storage(size_t size, size_t branches, std::pair<uint8_t *, uint8_t *> data, utilities::StoreConfig config) {
+                    v.resize(size);
+                    store_size = size;
+                    self->write(data, 0);
+                }
+
+                Storage(size_t size, std::pair<uint8_t *, uint8_t *> data) {
+                    v.resize(size);
+                    store_size = size;
+                    self->write(data, 0);
+                }
+
+                void read(std::pair<size_t, size_t> read, uint8_t *buf) {
+                    uint8_t *buf_ptr = buf;
+                    for (size_t i = read.first; i < read.second; ++i) {
+                        buf_ptr = v[i];
+                        ++buf_ptr;
+                    }
+                }
+
+                bool is_empty() {
+                    return v.empty();
+                }
+
+                void push(std::pair<uint8_t *, uint8_t *> data) {
+                    self->write(data, len);
+                }
+
+            private:
+                size_t len;
+                size_t store_size;
+                std::vector<uint8_t> v;
+            };
+
             const size_t SMALL_TREE_BUILD = 1024;
 
             // Number of nodes to process in parallel during the `build` stage.
@@ -63,49 +122,16 @@ namespace nil {
             // ```
             //
             // Merkle root is always the last element in the array.
-            //
-            // The number of inputs must always be a power of two.
-            //
-            // This tree structure can consist of at most 3 layers of trees (of
-            // arity U, N and R, from bottom to top).
-            //
-            // This structure ties together multiple Merkle Trees and allows
-            // supported properties of the Merkle Trees across it.  The
-            // significance of this class is that it allows an arbitrary number
-            // of sub-trees to be constructed and proven against.
-            //
-            // To show an example, this structure can be used to create a single
-            // tree composed of 3 sub-trees, each that have branching factors /
-            // arity of 4.  Graphically, this may look like this:
-            //
-            // ```text
-            //                O
-            //       ________/|\_________
-            //      /         |          \
-            //     O          O           O
-            //  / / \ \    / / \ \     / / \ \
-            // O O  O  O  O O  O  O   O O  O  O
-            //
-            //
-            // At most, one more layer (top layer) can be constructed to group a
-            // number of the above sub-tree structures (not pictured).
-            //
-            // BaseTreeArity is the arity of the base layer trees [bottom].
-            // SubTreeArity is the arity of the sub-tree layer of trees [middle].
-            // TopTreeArity is the arity of the top layer of trees [top].
-            //
-            // With N and R defaulting to 0, the tree performs as a single base
-            // layer merkle tree without layers (i.e. a conventional merkle
-            // tree).
+
             template<typename Hash>
             struct MerkleTree_basic_policy {
                 typedef std::array<uint8_t, Hash::digest_size> hash_result_type;
                 constexpr static const std::size_t hash_digest_size = Hash::digest_size;
             };
 
-            template<typename Hash, typename Store, size_t BaseTreeArity = 2>
+            template<typename Hash, size_t BaseTreeArity = 2>
             struct MerkleTree {
-                Store data;
+                Storage data;
 
                 typedef typename MerkleTree_basic_policy<Hash>::hash_result_type element;
                 constexpr static const std::size_t element_size = MerkleTree_basic_policy<Hash>::hash_digest_size;
@@ -137,7 +163,6 @@ namespace nil {
                     size_t read_start;
                     size_t write_start;
                     while (width > 1) {
-                        // Same indexing logic as `build`.
                         if (level == 0) {
                             read_start = 0;
                             write_start = data.len();
@@ -355,24 +380,6 @@ namespace nil {
                     this->row_count = row_count;
                 }
 
-                // Build the tree given a slice of all leafs, in bytes form.
-                pub fn from_byte_slice(leafs : &[u8])->Result<Self> {
-                    BOOST_ASSERT_MSG(leafs.len() % element_size == 0, "{} is not a multiple of {}", leafs.len(), element_size);
-
-                    size_t leafs_count = leafs.len() / element_size;
-                    size_t branches = BaseTreeArity;
-                    BOOST_ASSERT_MSG(leafs_count > 1, "not enough leaves");
-                    BOOST_ASSERT_MSG(utilities::next_pow2(leafs_count) == leafs_count, "size MUST be a power of 2");
-                    BOOST_ASSERT_MSG(utilities::next_pow2(branches) == branches, "branches MUST be a power of 2");
-
-                    size_t row_count = utilities::get_merkle_tree_row_count(leafs_count, branches);
-                    this->root = S::build::<A, BaseTreeArity>(&mut data, leafs_count, row_count, None) ? ;
-                    this->data = Store(size, leafs);
-                    this->leafs = leafs_count;
-                    this->len = utilities::get_merkle_tree_len(leafs_count, branches);
-                    this->row_count = row_count;
-                }
-
                 // Attempts to create a new merkle tree using hashable objects yielded by
                 // the provided iterator. This method returns the first error yielded by
                 // the iterator, if the iterator yielded an error.
@@ -394,188 +401,8 @@ namespace nil {
                     self->row_count = row_count;
                 }
             };
-
-            template<typename Hash, typename Store, size_t BaseTreeArity = 2, size_t SubTreeArity = 2>
-            struct SubMerkleTree {
-                std::vector<MerkleTree<Hash, Store, BaseTreeArity>> data;
-
-                typedef typename MerkleTree_basic_policy<Hash>::hash_result_type element;
-                constexpr static const std::size_t element_size = MerkleTree_basic_policy<Hash>::hash_digest_size;
-
-                size_t leafs;
-                size_t len;
-                // Note: The former 'upstream' merkle_light project uses 'height'
-                // (with regards to the tree property) incorrectly, so we've
-                // renamed it since it's actually a 'row_count'.  For example, a
-                // tree with 2 leaf nodes and a single root node has a height of
-                // 1, but a row_count of 2.
-                //
-                // Internally, this code considers only the row_count.
-                size_t row_count;
-                // Cache with the `root` of the tree built from `data`. This allows to
-                // not access the `Store` (e.g., access to disks in `DiskStore`).
-                element root;
-
-                // Creates new compound merkle tree from a vector of merkle
-                // trees.  The ordering of the trees is significant, as trees are
-                // leaf indexed / addressable in the same sequence that they are
-                // provided here.
-                SubMerkleTree(std::vector<MerkleTree<Hash, Store, BaseTreeArity>> trees) {
-                    BOOST_ASSERT_MSG(SubTreeArity > 0,
-                                     "Cannot use from_trees if not constructing a structure with sub-trees");
-                    BOOST_ASSERT_MSG(trees.len() == SubTreeArity,
-                                     "Length of trees MUST equal the number of sub tree layer nodes");
-                    // Total number of leafs in the compound tree is the combined leafs total of all subtrees.
-                    size_t leafs = 0;
-                    // Total length of the compound tree is the combined length of all subtrees plus the root.
-                    size_t len = 0;
-                    // Total row_count of the compound tree is the row_count of any of the sub-trees to top-layer plus
-                    // root.
-                    size_t row_count = trees[0].row_count() + 1;
-                    for (size_t i = 0; i < trees.size(); ++i) {
-                        BOOST_ASSERT_MSG(trees[i].row_count() == trees[0].row_count(),
-                                         "All passed in trees must have the same row_count");
-                        BOOST_ASSERT_MSG(trees[i].len() == trees[0].len(),
-                                         "All passed in trees must have the same length");
-                        len += trees[i].len;
-                        leafs += trees[i].row_count;
-                    }
-
-                    // Calculate the compound root by hashing the top layer roots together.
-                    let roots : Vec<E> = trees.iter().map(| x | x.root()).collect();
-                    element root = A::default().multi_node(&roots, 1);
-
-                    this->data = Data::SubTree(trees);
-                    this->leafs = leafs;
-                    this->len = len;
-                    this->row_count = row_count;
-                    this->root = root;
-                }
-            };
-
-            template<typename Hash,
-                     typename Store,
-                     size_t BaseTreeArity = 2,
-                     size_t SubTreeArity = 2,
-                     size_t TopTreeArity = 2>
-            struct TopMerkleTree {
-                std::vector<SubMerkleTree<Hash, Store, BaseTreeArity, SubTreeArity>> data;
-
-                typedef typename MerkleTree_basic_policy<Hash>::hash_result_type element;
-                constexpr static const std::size_t element_size = MerkleTree_basic_policy<Hash>::hash_digest_size;
-
-                size_t leafs;
-                size_t len;
-                // Note: The former 'upstream' merkle_light project uses 'height'
-                // (with regards to the tree property) incorrectly, so we've
-                // renamed it since it's actually a 'row_count'.  For example, a
-                // tree with 2 leaf nodes and a single root node has a height of
-                // 1, but a row_count of 2.
-                //
-                // Internally, this code considers only the row_count.
-                size_t row_count;
-                // Cache with the `root` of the tree built from `data`. This allows to
-                // not access the `Store` (e.g., access to disks in `DiskStore`).
-                element root;
-
-                // Creates new top layer merkle tree from a vector of merkle
-                // trees with sub-trees.  The ordering of the trees is
-                // significant, as trees are leaf indexed / addressable in the
-                // same sequence that they are provided here.
-                TopMerkleTree(std::vector<SubMerkleTree<Hash, Store, BaseTreeArity, SubTreeArity>> trees) {
-                    BOOST_ASSERT_MSG(TopTreeArity > 0,
-                                     "Cannot use from_sub_trees if not constructing a structure with sub-trees");
-                    for (size_t i = 0; i < trees.size(); ++i) {
-                        BOOST_ASSERT_MSG(trees[i].row_count() == trees[0].row_count(),
-                                         "All passed in trees must have the same row_count");
-                        BOOST_ASSERT_MSG(trees[i].len() == trees[0].len(),
-                                         "All passed in trees must have the same length");
-                    }
-
-                    size_t top_layer_nodes = TopTreeArity;
-                    BOOST_ASSERT_MSG(trees.len() == top_layer_nodes,
-                                     "Length of trees MUST equal the number of top layer nodes");
-
-                    // If we are building a compound tree with no sub-trees,
-                    // all properties revert to the single tree properties.
-                    let(leafs, len, row_count, root) = {
-                        // Total number of leafs in the compound tree is the combined leafs total of all subtrees.
-                        size_t leafs = trees.iter().fold(0, | leafs, mt | leafs + mt.leafs());
-                    // Total length of the compound tree is the combined length of all subtrees plus the root.
-                    size_t len = trees.iter().fold(0, | len, mt | len + mt.len()) + 1;
-                    // Total row_count of the compound tree is the row_count of any of the sub-trees to top-layer plus
-                    // root.
-                    size_t row_count = trees[0].row_count() + 1;
-                    // Calculate the compound root by hashing the top layer roots together.
-                    let roots : Vec<E> = trees.iter().map(| x | x.root()).collect();
-                    element root = A::default().multi_node(&roots, 1);
-
-                    (leafs, len, row_count, root)
-                };
-                this->data = Data::TopTree(trees);
-                this->leafs = leafs;
-                this->len = len;
-                this->row_count = row_count;
-                this->root = root;
-            };
-
-            // Creates new top layer merkle tree from a vector of merkle
-            // trees by first constructing the appropriate sub-trees.  The
-            // ordering of the trees is significant, as trees are leaf
-            // indexed / addressable in the same sequence that they are
-            // provided here.
-            TopMerkleTree(std::vector<MerkleTree<Hash, Store, BaseTreeArity>> trees) {
-                BOOST_ASSERT_MSG(TopTreeArity > 0,
-                                 "Cannot use from_sub_trees if not constructing a structure with sub-trees");
-                for (size_t i = 0; i < trees.size(); ++i) {
-                    BOOST_ASSERT_MSG(trees[i].row_count() == trees[0].row_count(),
-                                     "All passed in trees must have the same row_count");
-                    BOOST_ASSERT_MSG(trees[i].len() == trees[0].len(), "All passed in trees must have the same length");
-                }
-
-                size_t sub_tree_count = TopTreeArity;
-                size_t top_layer_nodes = sub_tree_count * SubTreeArity;
-                BOOST_ASSERT_MSG(trees.len() == top_layer_nodes,
-                                 "Length of trees MUST equal the number of top layer nodes");
-
-                // Group the trees appropriately into sub-tree ready vectors.
-                let mut grouped_trees = Vec::with_capacity(sub_tree_count);
-                    for
-                        _ in(0..sub_tree_count).step_by(trees.len() / sub_tree_count) {
-                            grouped_trees.push(trees.split_off(trees.len() / sub_tree_count));
-                        }
-                    grouped_trees.insert(0, trees);
-
-                    let mut sub_trees : Vec<MerkleTree<E, A, S, BaseTreeArity, SubTreeArity>> =
-                                            Vec::with_capacity(sub_tree_count);
-                    for
-                        group in grouped_trees {
-                        sub_trees.push(MerkleTree::from_trees(group)?);
-                        }
-
-                    let(leafs, len, row_count, root) = {
-                        // Total number of leafs in the compound tree is the combined leafs total of all subtrees.
-                            let leafs = sub_trees.iter().fold(0, | leafs, mt | leafs + mt.leafs());
-                        // Total length of the compound tree is the combined length of all subtrees plus the root.
-                        let len = sub_trees.iter().fold(0, | len, mt | len + mt.len()) + 1;
-                        // Total row_count of the compound tree is the row_count of any of the sub-trees to top-layer plus
-                        // root.
-                        let row_count = sub_trees[0].row_count() + 1;
-                        // Calculate the compound root by hashing the top layer roots together.
-                        let roots : Vec<E> = sub_trees.iter().map(| x | x.root()).collect();
-                        let root = A::default().multi_node(&roots, 1);
-
-                        (leafs, len, row_count, root)
-                    }
-                this->data = Data::TopTree(sub_trees);
-                this->leafs = leafs;
-                this->len = len;
-                this->row_count = row_count;
-                this->root = root;
-            };
-        };
-    }    // namespace merkletree
-}    // namespace filecoin
+        }    // namespace merkletree
+    }    // namespace crypto3
 }    // namespace nil
 
-#endif    // FILECOIN_DISK_HPP
+#endif    // CRYPTO3_MERKLE_HPP

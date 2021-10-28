@@ -20,7 +20,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
 include(CMConfig)
 include(CMSetupVersion)
 
-cm_workspace(filecoin)
+cm_workspace(crypto3)
 
 macro(cm_find_package NAME)
     if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
@@ -58,5 +58,8 @@ if(BUILD_UNIT_TESTS)
     cm_find_package(Boost COMPONENTS REQUIRED unit_test_framework)
 endif()
 
+#add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/libs/marshalling")
+#add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/libs/crypto")
+add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/libs/containers")
 add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/libs")
 add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/bin")

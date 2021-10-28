@@ -83,18 +83,18 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
 
-                      crypto3::algebra
-                      crypto3::block
-                      crypto3::blueprint
-                      crypto3::codec
-                      crypto3::hash
-                      crypto3::multiprecision
-                      crypto3::zk
-
-                      marshalling::core
-                      marshalling::crypto3_algebra
-                      marshalling::crypto3_multiprecision
-                      marshalling::crypto3_zk
+#                      crypto3::algebra
+#                      crypto3::block
+#                      crypto3::blueprint
+#                      crypto3::codec
+#                      crypto3::hash
+#                      crypto3::multiprecision
+#                      crypto3::zk
+#
+#                      marshalling::core
+#                      marshalling::crypto3_algebra
+#                      marshalling::crypto3_multiprecision
+#                      marshalling::crypto3_zk
 
                       ${Boost_LIBRARIES})
 
