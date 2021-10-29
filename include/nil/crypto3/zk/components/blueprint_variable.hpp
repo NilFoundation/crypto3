@@ -44,7 +44,7 @@ namespace nil {
                 template<typename FieldType>
                 class blueprint_variable : public snark::variable<FieldType> {
                 public:
-                    blueprint_variable(const typename snark::var_index_t index = 0) :
+                    blueprint_variable(const typename snark::variable<FieldType>::index_type index = 0) :
                         snark::variable<FieldType>(index) {};
 
                     void allocate(blueprint<FieldType> &bp) {
