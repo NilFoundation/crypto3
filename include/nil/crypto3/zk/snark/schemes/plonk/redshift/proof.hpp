@@ -35,7 +35,12 @@ namespace nil {
 
                 template<typename TCurve>
                 struct redshift_proof {
-                    
+                    std::vector<std::fri_commitment_cheme<...>> f_commitments;
+
+                    std::fri_commitment_cheme<...> P_commitment;
+                    std::fri_commitment_cheme<...> Q_commitment;
+
+                    std::vector<math::polynomial::polynom<...>> T;
                 };
             }    // namespace snark
         }        // namespace zk

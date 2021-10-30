@@ -126,7 +126,7 @@ namespace nil {
 
                         math::polynomial::polynom Z = polynom_by_zeros(H_star);
 
-                        typename types_policy::verification_key_type vk(S_id, S_sigma, q_selectors, PI, Z);
+                        typename types_policy::verification_key_type vk(S_id, S_sigma, q_selectors, L_basis, PI, Z);
 
                         typename types_policy::proving_key_type pk(S_id, S_sigma, q_selectors, L_basis, f, Z);
 

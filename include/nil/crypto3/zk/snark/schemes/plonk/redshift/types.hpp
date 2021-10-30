@@ -88,9 +88,7 @@ namespace nil {
                                 beta,
                                 gamma,
                                 alpha,
-                                zeta = alpha + AlphasAmount,
-                                nu,
-                                u
+                                upsilon = alpha + AlphasAmount
                             };
                         };
                     };

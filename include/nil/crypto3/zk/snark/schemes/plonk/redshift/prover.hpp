@@ -41,10 +41,15 @@ namespace nil {
                     using transcript_manifest = types_policy::prover_fiat_shamir_heuristic_manifest<6>;
                 public:
 
-                    static inline proof_type process(const proving_key_type &proving_key,
-                                                     const primary_input_type &primary_input,
-                                                     const auxiliary_input_type &auxiliary_input) {
+                    static inline typename types_policy::proof_type process(
+                            const types_policy::proving_key_type &proving_key, 
+                            const types_policy::primary_input_type &primary_input,
+                            const types_policy::auxiliary_input_type &auxiliary_input) {
+
                         std::size_t N_wires = primary_input.size() + auxiliary_input.size();
+                        std::size_t N_perm = ...;
+                        std::size_t N_sel = ...;
+                        std::size_t N_const = ...;
 
                         fiat_shamir_heuristic<transcript_manifest, hashes::sha2> transcript;
                         
@@ -117,19 +122,18 @@ namespace nil {
                         transcript(Q_commitment);
 
                         std::array<typename TCurve::scalar_field_type::value_type, 6> alphas;
-                        std::vector<> alpha_bytes;
                         for (std::size_t i = 0; i < 6; i++){
                             hashes::sha2::digest_type alpha_bytes =
                                 transcript.get_challenge<transcript_manifest::challenges_ids::alpha, i>();
-                            alphas.push_back(algebra::marshalling<typename TCurve::scalar_field_type>(alpha_bytes));
+                            alphas[i] = (algebra::marshalling<typename TCurve::scalar_field_type>(alpha_bytes));
                         }
 
                         std::array<math::polynomial::polynom<...>, 6> F;
-                        F[0] = proving_key.L[1] * (P - 1);
-                        F[1] = proving_key.L[1] * (Q - 1);
+                        F[0] = proving_key.L_basis[1] * (P - 1);
+                        F[1] = proving_key.L_basis[1] * (Q - 1);
                         F[2] = P * p_1 - (P << 1);
                         F[3] = Q * q_1 - (Q << 1);
-                        F[4] = proving_key.L[n] * ((P << 1) - (Q << 1));
+                        F[4] = proving_key.L_basis[n] * ((P << 1) - (Q << 1));
                         F[5] = proving_key.PI;
 
                         for (std::size_t i = 0; i < N_sel; i++) {
@@ -140,20 +144,28 @@ namespace nil {
                             F[5] += proving_key.f_c[i];
                         }
 
-                        math::polynomial::polynom<...> F_precommit = 0;
+                        math::polynomial::polynom<...> F_consolidated = 0;
                         for (std::size_t i = 0; i < 6; i++) {
-                            F_precommit = a[i] * F[i];
+                            F_consolidated = a[i] * F[i];
                         }
 
-                        math::polynomial::polynom<...> T_precommit = F_precommit/Z;
+                        math::polynomial::polynom<...> T_consolidated = F_consolidated/Z;
 
                         std::vector<math::polynomial::polynom<...>> T(N_perm + 2);
-                        T = separate_T(T_precommit);
+                        T = separate_T(T_consolidated);
 
                         std::vector<std::fri_commitment_cheme<...>> T_commitments(N_perm + 2);
                         for (std::size_t i = 0; i < N_perm + 2){
                             T_commitments[i].commit(T[i]);
                         }
+
+                        ...
+
+                        typename types_policy::proof_type proof = typename types_policy::proof_type(
+                            std::move(f_commitments), std::move(P_commitment), 
+                            std::move(Q_commitment), std::move(T_commitments));
+
+                        return proof;
                     }
                 };
             }    // namespace snark
