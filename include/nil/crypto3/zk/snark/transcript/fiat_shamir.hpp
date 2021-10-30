@@ -39,8 +39,6 @@ namespace nil {
                  * template<typename ...>
                  * struct fiat_shamir_heuristic_manifest {
                  *
-                 *     typedef ... preprocessor;
-                 *
                  *     struct transcript_manifest {
                  *         std::size_t gammas_amount = 5;
                  *       public:
@@ -52,74 +50,34 @@ namespace nil {
                  *             epsilon
                  *         }
                  *
-                 *         typedef std::tuple<...> processors;
-                 *
-                 *         using challenges = std::array<, std::tuple_size<processors>>;
-                 *
                  *     }
                  * };
                  */
-                template<fiat_shamir_heuristic_manifest Manifest, typename Hash>
-                class fiat_shamir_heuristic : public transcript<typename TManifest::transcript_manifest>{
+                template<enum TChallenges, typename Hash = hashes::sha2>
+                class fiat_shamir_heuristic {
 
-                    typedef transcript<typename TManifest::transcript_manifest> transcript_type;
-
-                    template <typename TManifest::challenges_ids challenge_id>
-                    bool set_challenge(std::tuple_element<challenge_id, typename TManifest::transcript_manifest::challenges> value){
-                        return transcript_type::set_challenge<challenge_id>(value);
-                    }
-
-                    template <typename TManifest::challenges_ids challenge_id, std::size_t Index>
-                    bool set_challenge(std::tuple_element<Index, 
-                        std::tuple_element<ChallengeId, typename TManifest::transcript_manifest::challenges>> value){
-                        return transcript_type::set_challenge<challenge_id, Index>(value);
-                    }
-
-                    preprocessor::input_type input_value 
-                    preprocessor::random_value_type random_value;
-
+                    accumulators::accumulator_set<Hash> acc;
                 public:
                     
-                    fiat_shamir_heuristic(preprocessor::input_type input_value) 
-                        : transcript_type(), input_value(input_value){
-                        random_value = algebra::random_element<...>();
+                    fiat_shamir_heuristic() {
+                        acc();
                     }
 
-                    template <typename TManifest::challenges_ids challenge_id>
-                    std::tuple_element<challenge_id, typename TManifest::transcript_manifest::challenges> get_challenge() const{
-                        transcript_type::get_challenge<challenge_id>();
+                    template <typename TAny>
+                    operator (TAny data){
+                        acc(data);
                     }
 
-                    template <typename TManifest::challenges_ids ChallengeId, std::size_t Index>
-                    std::tuple_element<Index, 
-                        std::tuple_element<ChallengeId, typename TManifest::transcript_manifest::challenges>> get_challenge() const{
-                        transcript_type::get_challenge<challenge_id, Index>();
+                    template <challenges_ids ChallengeId>
+                    typename Hash::digest_type get_challenge(){
+                        acc(ChallengeId);
+                        return extract::hash<hash_t>(acc);
                     }
 
-                    template <typename TManifest::challenges_ids challenge_id>
-                    std::tuple_element<challenge_id, typename TManifest::processors>::result_type get_challenge_result(){
-                        
-                        set_challenge<challenge_id>(hash<Hash>(get_challenge_result<challenge_id - 1>()));
-
-                        transcript_type::get_challenge_result();
-                    }
-
-                    template <typename TManifest::challenges_ids challenge_id, std::size_t Index>
-                    std::tuple_element<Index, 
-                        std::tuple_element<ChallengeId, typename TManifest::processors>>::result_type get_challenge_result(){
-                        
-                        set_challenge<challenge_id, Index>(hash<Hash>(previous_result));
-
-                        transcript_type::get_challenge_result<challenge_id, Index>();
-                    }
-
-                    template <>
-                    std::tuple_element<challenge_id, typename TManifest::processors>::result_type get_challenge_result<0>(){
-                        return preprocessor(input_value, random_value);
-                    }
-
-                    typename TManifest::result export(){
-
+                    template <challenges_ids ChallengeId, std::size_t Index>
+                    typename Hash::digest_type get_challenge(){
+                        acc(ChallengeId + Index);
+                        return extract::hash<hash_t>(acc);
                     }
                 };
             }    // namespace snark
