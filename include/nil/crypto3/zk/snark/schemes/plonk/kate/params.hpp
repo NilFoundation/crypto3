@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_PARAMS_HPP
-#define CRYPTO3_ZK_PLONK_PARAMS_HPP
+#ifndef CRYPTO3_ZK_PLONK_BATCHED_KATE_PARAMS_HPP
+#define CRYPTO3_ZK_PLONK_BATCHED_KATE_PARAMS_HPP
 
 #include <memory>
 
@@ -95,4 +95,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_PROVER_HPP
+#endif    // CRYPTO3_ZK_PLONK_BATCHED_KATE_PARAMS_HPP

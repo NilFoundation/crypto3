@@ -23,10 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_PROVER_HPP
-#define CRYPTO3_ZK_PLONK_PROVER_HPP
+#ifndef CRYPTO3_ZK_PLONK_BATCHED_KATE_PROVER_HPP
+#define CRYPTO3_ZK_PLONK_BATCHED_KATE_PROVER_HPP
 
-#include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/batched_kate_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 namespace nil {
@@ -35,15 +35,13 @@ namespace nil {
             namespace snark {
 
                 template<typename TCurve,
-                         typename TConstraintSystem, 
                          typename TCommitment>
                 class plonk_prover;
 
-                template<typename TCurve,
-                         typename TConstraintSystem>
-                class plonk_prover<TCurve, TConstraintSystem, kate_commitment> {
-
-                    using commitment_scheme = kate_commitment;
+                template<typename TCurve>
+                class plonk_prover<TCurve, batched_kate_commitment_scheme<...>> {
+                    using commitment_scheme_type = batched_kate_commitment_scheme<...>;
+                    using constraint_system_type = plonk_constraint_system<typename TCurve::scalar_field_type>;
 
                     size_t n;
 
@@ -55,9 +53,9 @@ namespace nil {
                     std::vector<std::unique_ptr<widget::TransitionWidgetBase<typename TCurve::scalar_field_type>>> transition_widgets;
                     transcript::StandardTranscript transcript;
 
-                    std::shared_ptr<plonk_proving_key<TCurve, TConstraintSystem>> key;
+                    std::shared_ptr<plonk_proving_key<TCurve, commitment_scheme_type>> key;
                     std::shared_ptr<program_witness> witness;
-                    std::unique_ptr<CommitmentScheme> commitment_scheme;
+                    std::unique_ptr<commitment_scheme_type> commitment;
 
                     work_queue queue;
                     bool uses_quotient_mid;
@@ -66,7 +64,7 @@ namespace nil {
 
                 public:
 
-                    plonk_prover(std::shared_ptr<plonk_proving_key<TCurve, TConstraintSystem>> input_key,
+                    plonk_prover(std::shared_ptr<plonk_proving_key<TCurve, commitment_scheme_type>> input_key,
                                  std::shared_ptr<program_witness> input_witness,
                                  const transcript::Manifest& input_manifest)
                         : n(input_key == nullptr ? 0 : input_key->n)
@@ -94,7 +92,7 @@ namespace nil {
                         transcript = other.transcript;
                         key = std::move(other.key);
                         witness = std::move(other.witness);
-                        commitment_scheme = std::move(other.commitment_scheme);
+                        commitment = std::move(other.commitment);
 
                         queue = work_queue(key.get(), witness.get(), &transcript);
                         return *this;
@@ -105,7 +103,7 @@ namespace nil {
                         , transcript(other.transcript)
                         , key(std::move(other.key))
                         , witness(std::move(other.witness))
-                        , commitment_scheme(std::move(other.commitment_scheme))
+                        , commitment(std::move(other.commitment))
                         , queue(key.get(), witness.get(), &transcript)
                     {
                         for (size_t i = 0; i < other.random_widgets.size(); ++i) {
@@ -122,7 +120,7 @@ namespace nil {
                             std::string commit_tag = "W_" + std::to_string(i + 1);
                             typename TCurve::scalar_field_type::value_type* coefficients = 
                                 witness->wires.at(wire_tag).get_coefficients();
-                            commitment_scheme->commit(coefficients, commit_tag, 
+                            commitment->commit(coefficients, commit_tag, 
                                 typename TCurve::scalar_field_type::value_type::zero(), queue);
                         }
 
@@ -178,7 +176,7 @@ namespace nil {
                             const size_t offset = n * i;
                             typename TCurve::scalar_field_type::value_type* coefficients = &key->quotient_large.get_coefficients()[offset];
                             std::string quotient_tag = "T_" + std::to_string(i + 1);
-                            commitment_scheme->commit(coefficients, quotient_tag, 
+                            commitment->commit(coefficients, quotient_tag, 
                                 typename TCurve::scalar_field_type::value_type::zero(), queue);
                         }
 
@@ -187,7 +185,7 @@ namespace nil {
                         std::string quotient_tag = "T_" + std::to_string(program_width);
                         typename TCurve::scalar_field_type::value_type program_flag = 
                             program_width == 3 ? typename TCurve::scalar_field_type::value_type::one() : typename TCurve::scalar_field_type::value_type::zero();
-                        commitment_scheme->commit(coefficients, quotient_tag, program_flag, queue);
+                        commitment->commit(coefficients, quotient_tag, program_flag, queue);
                     }
 
                     void execute_preamble_round() {
@@ -330,7 +328,7 @@ namespace nil {
                         queue.flush_queue();
                         transcript.apply_fiat_shamir("nu");
 
-                        commitment_scheme->batch_open(transcript, queue, key, witness);
+                        commitment->batch_open(transcript, queue, key, witness);
                     }
 
                     typename TCurve::scalar_field_type::value_type compute_linearisation_coefficients() {
@@ -340,7 +338,7 @@ namespace nil {
 
                         math::polynomial& r = key->linear_poly;
 
-                        commitment_scheme->add_opening_evaluations_to_transcript(transcript, key, witness, false);
+                        commitment->add_opening_evaluations_to_transcript(transcript, key, witness, false);
                         typename TCurve::scalar_field_type::value_type t_eval = key->quotient_large.evaluate(zeta, 4 * n);
 
                         if constexpr (use_linearisation) {
@@ -391,4 +389,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_PROVER_HPP
+#endif    // CRYPTO3_ZK_PLONK_BATCHED_KATE_PROVER_HPP

@@ -23,10 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PLONK_PROVING_KEY_HPP
-#define CRYPTO3_PLONK_PROVING_KEY_HPP
+#ifndef CRYPTO3_PLONK_BATCHED_KATE_PROVING_KEY_HPP
+#define CRYPTO3_PLONK_BATCHED_KATE_PROVING_KEY_HPP
 
-#include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/batched_kate_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 namespace nil {
@@ -34,9 +34,11 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename TCurve
-                         typename TConstraintSystem = plonk_constraint_system<typename TCurve::scalar_field_type>>
-                struct plonk_proving_key_data {
+                template<typename TCurve, typename TCommitment>
+                struct plonk_proving_key_data;
+
+                template<typename TCurve>
+                struct plonk_proving_key_data<TCurve, batched_kate_commitment_scheme<...>> {
                     std::uint32_t n;
                     std::uint32_t num_public_inputs;
                     bool contains_recursive_proof;
@@ -60,9 +62,11 @@ namespace nil {
                            lhs.recursive_proof_public_input_indices == rhs.recursive_proof_public_input_indices;
                 }
 
-                template<typename TCurve,
-                         typename TConstraintSystem = plonk_constraint_system<typename TCurve::scalar_field_type>>
-                class plonk_proving_key {
+                template<typename TCurve, typename TCommitment>
+                class plonk_proving_key;
+
+                template<typename TCurve>
+                class plonk_proving_key<TCurve, batched_kate_commitment_scheme<...>> {
                     constexpr static const std::size_t scalar_bytes = TCurve::scalar_field_type::value_bits/BYTE_BITS;
 
                     std::size_t n;
@@ -307,4 +311,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PLONK_PROVING_KEY_HPP
+#endif    // CRYPTO3_PLONK_BATCHED_KATE_PROVING_KEY_HPP

@@ -23,28 +23,23 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_PROOF_HPP
-#define CRYPTO3_ZK_PLONK_PROOF_HPP
+#ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PROOF_HPP
+#define CRYPTO3_ZK_PLONK_REDSHIFT_PROOF_HPP
 
 #include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
-#include <nil/crypto3/zk/snark/commitments/kate_commitment.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                template<typename TCurve, 
-                         typename TCommitment>
-                class plonk_proof;
-
                 template<typename TCurve>
-                struct plonk_proof<TCurve, kate_commitment> {
-                    std::vector<std::uint8_t> data;
+                struct redshift_proof {
+                    
                 };
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_PROOF_HPP
+#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_PROOF_HPP

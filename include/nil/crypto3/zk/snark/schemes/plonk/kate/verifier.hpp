@@ -23,10 +23,9 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_VERIFIER_HPP
-#define CRYPTO3_ZK_PLONK_VERIFIER_HPP
+#ifndef CRYPTO3_ZK_PLONK_BATCHED_KATE_VERIFIER_HPP
+#define CRYPTO3_ZK_PLONK_BATCHED_KATE_VERIFIER_HPP
 
-#include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
 #include <nil/crypto3/zk/snark/commitments/kate_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
@@ -36,23 +35,24 @@ namespace nil {
             namespace snark {
 
                 template<typename TCurve,
-                         typename TConstraintSystem, 
                          typename TCommitment>
                 class plonk_verifier;
 
-                template<typename TCurve,
-                         typename TConstraintSystem>
-                class plonk_verifier<TCurve, TConstraintSystem, kate_commitment> {
+                template<typename TCurve>
+                class plonk_verifier<TCurve, batched_kate_commitment_scheme<...>> {
+                    using commitment_scheme_type = batched_kate_commitment_scheme<...>;
+                    using constraint_system_type = plonk_constraint_system<typename TCurve::scalar_field_type>;
+
                     transcript::Manifest manifest;
 
-                    std::shared_ptr<plonk_verification_key<TCurve, TConstraintSystem>> key;
+                    std::shared_ptr<plonk_verification_key<TCurve, commitment_scheme_type>> key;
                     std::map<std::string, typename TCurve::g1_type<affine>::value_type> kate_g1_elements;
                     std::map<std::string, typename TCurve::scalar_field_type::value_type> kate_fr_elements;
-                    std::unique_ptr<CommitmentScheme> commitment_scheme;
+                    std::unique_ptr<commitment_scheme_type> commitment;
 
                 public:
 
-                    plonk_verifier(std::shared_ptr<plonk_verification_key<TCurve, TConstraintSystem>> verifier_key,
+                    plonk_verifier(std::shared_ptr<plonk_verification_key<TCurve, commitment_scheme_type>> verifier_key,
                                              const transcript::Manifest& input_manifest)
                         : manifest(input_manifest)
                         , key(verifier_key)
@@ -61,7 +61,7 @@ namespace nil {
                     plonk_verifier& operator=(plonk_verifier&& other) {
                         key = other.key;
                         manifest = other.manifest;
-                        commitment_scheme = (std::move(other.commitment_scheme));
+                        commitment = (std::move(other.commitment));
                         kate_g1_elements.clear();
                         kate_fr_elements.clear();
                         return *this;
@@ -70,7 +70,7 @@ namespace nil {
                     plonk_verifier(plonk_verifier &&other)
                         : manifest(other.manifest)
                         , key(other.key)
-                        , commitment_scheme(std::move(other.commitment_scheme))
+                        , commitment(std::move(other.commitment))
                     {}
 
                     bool validate_commitments() {
@@ -167,7 +167,7 @@ namespace nil {
                         // Note that we do not actually compute the scalar multiplications but just accumulate the scalars
                         // and the group elements in different vectors.
                         //
-                        commitment_scheme->batch_verify(transcript, kate_g1_elements, kate_fr_elements, key);
+                        commitment->batch_verify(transcript, kate_g1_elements, kate_fr_elements, key);
 
                         // Step 9: Compute partial opening batch commitment [D]_1:
                         //         [D]_1 = (a_eval.b_eval.[qM]_1 + a_eval.[qL]_1 + b_eval.[qR]_1 + c_eval.[qO]_1 + [qC]_1) * nu_{linear} * α
@@ -279,4 +279,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_VERIFIER_HPP
+#endif    // CRYPTO3_ZK_PLONK_BATCHED_KATE_VERIFIER_HPP
