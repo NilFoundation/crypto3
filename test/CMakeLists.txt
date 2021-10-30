@@ -30,12 +30,8 @@ endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
-#                       crypto3::algebra
-#                       crypto3::block
-#                       crypto3::codec
-#                       crypto3::hash
-#                       crypto3::multiprecision
-#                       crypto3::zk
+                       ${CMAKE_WORKSPACE_NAME}::algebra
+                       ${CMAKE_WORKSPACE_NAME}::hash
 
                        ${Boost_LIBRARIES})
 
@@ -68,8 +64,9 @@ macro(define_storage_test test)
 endmacro()
 
 set(TESTS_NAMES
-#    "merkle/proof"
+    "merkle/hash"
     "merkle/graph"
+    "merkle/merkle"
 )
 
 foreach(TEST_NAME ${TESTS_NAMES})
