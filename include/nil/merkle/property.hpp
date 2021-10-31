@@ -26,29 +26,15 @@
 #ifndef CRYPTO3_PROPERTY_HPP
 #define CRYPTO3_PROPERTY_HPP
 
-#include <boost/property_map/property_map.hpp>
+#include <boost/config.hpp>
 
-namespace nil {
-    namespace crypto3 {
-        namespace property {
+enum vertex_hash_t
+{
+    vertex_hash
+};
 
-            enum vertex_hash_t
-            {
-                vertex_hash
-            };
-            namespace boost
-            {
-                BOOST_INSTALL_PROPERTY(vertex, hash);
-            }
-
-            template<typename Hash>
-            struct MerkleTree_basic_policy {
-                typedef std::array<uint8_t, Hash::digest_size> hash_result_type;
-                constexpr static const std::size_t hash_digest_size = Hash::digest_size;
-                typedef boost::property<hash_t, hash_result_type> hash_property;
-            };
-        }        // namespace property
-    }            // namespace crypto3
-}    // namespace nil
+namespace boost {
+    BOOST_INSTALL_PROPERTY(vertex, hash);
+}
 
 #endif    // CRYPTO3_PROPERTY_HPP

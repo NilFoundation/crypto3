@@ -106,29 +106,27 @@ namespace nil {
                 // not access the `Store` (e.g., access to disks in `DiskStore`).
 //                element root;
 
-                MerkleTree(std::vector<int> data) {
+                template <size_t Size>
+                MerkleTree(std::vector<std::array<char, Size> > data) {
                     BOOST_ASSERT_MSG(data.size() % Arity == 0, "Wrong leafs number");
 
                     leafs = data.size();
                     len = utilities::get_merkle_tree_len(leafs, Arity);
                     row_count = utilities::get_merkle_tree_row_count(leafs, Arity);
-                    std::cout << leafs << ' ' << len << ' ' << row_count << std::endl;
                     for (size_t i = 0; i < len; ++i) {
                         boost::add_vertex(Tree);
                     }
-                    std::array<char, 14> a = {'\x6d', '\x65', '\x73', '\x73', '\x61', '\x67', '\x65',
-                                              '\x20', '\x64', '\x69', '\x67', '\x65', '\x73', '\x74'};
                     size_t prev_layer_element = 0;
                     size_t start_layer_element = 0;
                     size_t layer_elements = leafs;
                     for (size_t row_number = 0; row_number < row_count; ++row_number) {
                         for (size_t current_element = start_layer_element; current_element < start_layer_element + layer_elements; ++current_element) {
                             if (row_number == 0) {
-                                hash_map[current_element] =  crypto3::hash<Hash>(a);
+                                hash_map[current_element] =  crypto3::hash<Hash>(data[current_element]);
                             } else {
-                                nil::crypto3::static_digest <element_size * Arity> new_input;
+//                                nil::crypto3::static_digest <element_size * Arity> new_input;
+                                std::array<uint8_t, element_size * Arity> new_input;
                                 for (size_t i = 0; i < Arity; ++i) {
-                                    std::cout << element_size << std::endl;
                                     size_t children_index = (current_element - start_layer_element) * Arity + prev_layer_element + i;
                                     std::copy(hash_map[children_index].begin(), hash_map[children_index].end(), new_input.begin() + i * element_size);
                                     add_edge(children_index, current_element, Tree);
@@ -144,24 +142,24 @@ namespace nil {
                     typename boost::graph_traits< graph_t >::vertex_iterator i, end;
                     typename boost::graph_traits< graph_t >::adjacency_iterator ai, a_end;
 
-                    for (boost::tie(i, end) = vertices(Tree); i != end; ++i)
-                    {
-                        std::cout << get(hash_map, *i);
-                        boost::tie(ai, a_end) = adjacent_vertices(*i, Tree);
-                        if (ai == a_end)
-                            std::cout << " has no children";
-                        else
-                            std::cout << " is the parent of ";
-                        for (; ai != a_end; ++ai)
-                        {
-                            std::cout << get(hash_map, *ai);
-                            if (boost::next(ai) != a_end)
-                                std::cout << ", ";
-                        }
-                        std::cout << std::endl;
-                    }
-
-                    print(Tree);
+//                    for (boost::tie(i, end) = vertices(Tree); i != end; ++i)
+//                    {
+//                        std::cout << get(hash_map, *i);
+//                        boost::tie(ai, a_end) = adjacent_vertices(*i, Tree);
+//                        if (ai == a_end)
+//                            std::cout << " has no children";
+//                        else
+//                            std::cout << " is the parent of ";
+//                        for (; ai != a_end; ++ai)
+//                        {
+//                            std::cout << get(hash_map, *ai);
+//                            if (boost::next(ai) != a_end)
+//                                std::cout << ", ";
+//                        }
+//                        std::cout << std::endl;
+//                    }
+//
+//                    print(Tree);
                 }
 
                 std::vector<size_t> children(size_t leaf_index) {
@@ -192,28 +190,6 @@ namespace nil {
                     while (ai != a_end) { // while not the root
                         res.push_back(get(hash_map, *ai));
                         boost::tie(ai, a_end) = adjacent_vertices(*ai, Tree);
-                    }
-                    return res;
-                }
-
-                std::vector<std::vector<element> > proof_path(size_t leaf_index) {
-                    std::vector<std::vector<element> > res(row_count - 1);
-
-                    typename boost::graph_traits< graph_t >::out_edge_iterator ei, edge_end;
-                    typename boost::graph_traits< graph_t >::in_edge_iterator ein, edgein_end;
-                    boost::tie(ei, edge_end) = out_edges(leaf_index, Tree);
-                    size_t cur_row = 0;
-                    size_t cur_leaf_index = leaf_index;
-                    for ( ; ei != edge_end; boost::tie(ei, edge_end) = out_edges(cur_leaf_index, Tree), ++cur_row) {
-                        size_t parent = target(*ei, Tree);
-                        size_t child = source(*ei, Tree);
-                        for (boost::tie(ein, edgein_end) = in_edges(parent, Tree); ein != edgein_end; ++ein) {
-                            size_t s = source(*ein, Tree);
-                            if (s != child) {
-                                res[cur_row].push_back(hash_map[s]);
-                            }
-                        }
-                        cur_leaf_index = parent;
                     }
                     return res;
                 }

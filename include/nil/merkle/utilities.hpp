@@ -38,25 +38,29 @@
 namespace nil {
     namespace crypto3 {
         namespace utilities {
-
+            // returns next highest power of two from a given number if it is not
+            // already a power of two.
+            size_t next_pow2(size_t n) {
+                return std::pow(2, std::ceil(std::log(n)));
+            }
+            // find power of 2 of a number which is power of 2
+            size_t log2_pow2(size_t n) {
+                return next_pow2(n);
+            }
             // Row_Count calculation given the number of leafs in the tree and the branches.
             size_t get_merkle_tree_row_count(size_t leafs, size_t branches) {
                 // Optimization
                 if (branches == 2) {
-                    return leafs * branches;
+                    return std::log2(leafs) + 1;
                 } else {
-                    return std::log(leafs) / std::log(branches);
+                    return std::log(leafs) / std::log(branches) + 1;
                 }
             }
 
             // Tree length calculation given the number of leafs in the tree and the branches.
             size_t get_merkle_tree_len(size_t leafs, size_t branches) {
-                BOOST_ASSERT_MSG(leafs >= branches, "leaf and branch mis-match");
-                BOOST_ASSERT_MSG(branches == next_pow2(branches), "branches must be a power of 2");
-
                 // Optimization
                 if (branches == 2) {
-                    BOOST_ASSERT_MSG(leafs == next_pow2(leafs), "leafs must be a power of 2");
                     return 2 * leafs - 1;
                 }
 
@@ -69,7 +73,6 @@ namespace nil {
 
                 while (cur > 0) {
                     cur >>= shift; // cur /= branches
-                    BOOST_ASSERT_MSG(cur < leafs, "invalid input provided");
                     len += cur;
                 }
 
@@ -80,10 +83,8 @@ namespace nil {
             // rows_to_discard, and the branches.
             size_t get_merkle_tree_cache_size(size_t leafs, size_t branches, size_t rows_to_discard) {
                 size_t shift = log2_pow2(branches);
-                size_t len = get_merkle_tree_len(leafs, branches)?;
+                size_t len = get_merkle_tree_len(leafs, branches);
                 size_t row_count = get_merkle_tree_row_count(leafs, branches);
-
-                BOOST_ASSERT_MSG(row_count - 1 > rows_to_discard,  "Cannot discard all rows except for the base");
 
                 // 'row_count - 1' means that we start discarding rows above the base
                 // layer, which is included in the current row_count.
@@ -106,7 +107,7 @@ namespace nil {
                     return false;
                 }
 
-                size_t mut cur = leafs;
+                size_t cur = leafs;
                 size_t shift = log2_pow2(branches);
                 while (cur != 1) {
                     cur >>= shift; // cur /= branches
@@ -128,36 +129,21 @@ namespace nil {
             // length of 'len', where leafs must be a power of 2, respecting the
             // number of branches.
             size_t get_merkle_tree_leafs(size_t len, size_t branches) {
-                BOOST_ASSERT_MSG(branches == next_pow2(branches), "branches must be a power of 2");
                 size_t leafs = 0;
                 // Optimization:
                 if (branches == 2) {
-                    leafs = (len >> 1) + 1
+                    leafs = (len >> 1) + 1;
                 } else {
                     size_t leafs = 1;
                     size_t cur = len;
                     size_t shift = log2_pow2(branches);
                     while (cur != 1) {
                         leafs <<= shift; // leafs *= branches
-                        BOOST_ASSERT_MSG(cur > leafs, "Invalid tree length provided for the specified arity");
                         cur -= leafs;
-                        BOOST_ASSERT_MSG(cur < len, "Invalid tree length provided for the specified arity");
                     }
                 };
 
-                BOOST_ASSERT_MSG(leafs == next_pow2(leafs), "Invalid tree length provided for the specified arity");
                 return leafs;
-            }
-
-            // returns next highest power of two from a given number if it is not
-            // already a power of two.
-            size_t next_pow2(size_t n) {
-                return std::pow(2, std::ceil(std::log(n)));
-            }
-
-            // find power of 2 of a number which is power of 2
-            size_t log2_pow2(size_t n) {
-                return next_pow2(n);
             }
         }     // namespace utilities
     }         // namespace crypto3
