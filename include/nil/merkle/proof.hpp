@@ -41,6 +41,7 @@
 namespace nil {
     namespace crypto3 {
         namespace merkletree {
+
             template<typename Hash>
             struct Proof_basic_policy {
                 typedef typename Hash::digest_type hash_result_type;
@@ -49,33 +50,22 @@ namespace nil {
 
             template<typename Hash, std::size_t Arity = 2>
             struct MerkleProof {
-                typedef typename Hash::digest_type element;
-                constexpr static const std::size_t element_size = Proof_basic_policy<Hash>::hash_digest_size;
-
-                size_t leaf_index;
-
-                element root;
-
-                struct path_element_t {
-                    path_element_t(element x, size_t pos) : hash(x), position(pos) {}
-                    element hash;
-                    size_t position;
-                };
-
-                std::vector<std::vector<path_element_t>> path;
 
                 MerkleProof(MerkleTree<Hash, Arity> tree, size_t leaf_idx) {
                     root = tree.root();
-                    path.resize(tree.row_count - 1);
+                    path.resize(tree.get_row_count() - 1);
                     leaf_index = leaf_idx;
                     size_t cur_leaf = leaf_idx;
                     size_t cur_row = 0;
-                    while (cur_leaf != tree.len - 1) {  // while it's not root
+                    while (cur_leaf != tree.get_len() - 1) {  // while it's not root
                         size_t parent = tree.parent(cur_leaf);
-                        std::vector<size_t> children = tree.children(parent);
-                        for (auto child: children) {
-                            if (cur_leaf != child) {
-                                path[cur_row].push_back(path_element_t(tree[child], child % Arity));
+                        std::array<size_t, Arity> children = tree.children(parent);
+                        size_t save_i = 0;
+                        for (size_t i = 0; i < Arity; ++i) {
+                            size_t current_child = children[i];
+                            if (cur_leaf != current_child) {
+                                path[cur_row][save_i] = path_element_t(tree[current_child], current_child % Arity);
+                                ++save_i;
                             }
                         }
                         cur_row++;
@@ -83,16 +73,16 @@ namespace nil {
                     }
                 }
 
-                template <size_t Size>
-                bool validate(std::array<char, Size> a) {
+                template <typename Hashable>
+                bool validate(Hashable a) {
                     element d = crypto3::hash<Hash>(a);
                     for (size_t cur_row = 0; cur_row < path.size(); ++cur_row) {
                         std::array<uint8_t, element_size * Arity> new_input;
-                        size_t missing_idx = Arity + 1;
+                        size_t missing_idx = Arity - 1; // If every previous index was fine - missing the last one.
                         for (size_t i = 0; i < Arity - 1; ++i) {
                             std::copy(path[cur_row][i].hash.begin(), path[cur_row][i].hash.end(),
                                       new_input.begin() + path[cur_row][i].position * element_size);
-                            if (path[cur_row][i].position != i && missing_idx == Arity + 1) {
+                            if (path[cur_row][i].position != i && missing_idx == Arity - 1) {
                                 missing_idx = i;
                             }
                         }
@@ -101,6 +91,27 @@ namespace nil {
                     }
                     return (d == root);
                 }
+
+                size_t get_leaf_index() {
+                    return leaf_index;
+                }
+
+                private:
+                    typedef typename Proof_basic_policy<Hash>::hash_result_type element;
+                    constexpr static const std::size_t element_size = Proof_basic_policy<Hash>::hash_digest_size;
+
+                    size_t leaf_index;
+
+                    element root;
+
+                    struct path_element_t {
+                        path_element_t(element x, size_t pos) : hash(x), position(pos) {}
+                        path_element_t() {}
+                        element hash;
+                        size_t position;
+                    };
+
+                    std::vector<std::array<path_element_t, Arity - 1>> path;
             };
         }    // namespace merkletree    
     }    // namespace crypto3
