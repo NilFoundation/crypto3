@@ -60,22 +60,16 @@ namespace nil {
             // Tree length calculation given the number of leafs in the tree and the branches.
             size_t get_merkle_tree_len(size_t leafs, size_t branches) {
                 // Optimization
-                if (branches == 2) {
-                    return 2 * leafs - 1;
-                }
-
                 size_t len = leafs;
-                size_t cur = leafs;
-                size_t shift = log2_pow2(branches);
-                if (shift == 0) {
-                    return len;
+                if (branches == 2) {
+                    len =  2 * leafs - 1;
+                } else {
+                    size_t cur = leafs;
+                    while (cur != 0) {
+                        cur /= branches;
+                        len += cur;
+                    }
                 }
-
-                while (cur > 0) {
-                    cur >>= shift; // cur /= branches
-                    len += cur;
-                }
-
                 return len;
             }
 

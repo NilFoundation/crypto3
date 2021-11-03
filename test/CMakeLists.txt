@@ -64,8 +64,6 @@ macro(define_storage_test test)
 endmacro()
 
 set(TESTS_NAMES
-    "merkle/hash"
-    "merkle/graph"
     "merkle/merkle"
 )
 
