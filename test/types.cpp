@@ -50,8 +50,10 @@
 #include <nil/marshalling/compile_control.hpp>
 #include <nil/marshalling/units.hpp>
 #include <nil/marshalling/version.hpp>
+#include <nil/marshalling/inference.hpp>
 
 #include <nil/marshalling/algorithms/pack.hpp>
+#include <nil/marshalling/algorithms/disperse.hpp>
 
 #include <nil/marshalling/container/array_view.hpp>
 #include <nil/marshalling/container/static_vector.hpp>

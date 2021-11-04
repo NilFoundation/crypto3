@@ -26,11 +26,14 @@
 #ifndef MARSHALLING_DEMARSHALL_HPP
 #define MARSHALLING_DEMARSHALL_HPP
 
+#include <type_traits>
+
 #include <nil/marshalling/marshalling_state.hpp>
 #include <nil/marshalling/accumulators/marshalling.hpp>
 #include <nil/marshalling/accumulators/parameters/buffer_length.hpp>
 #include <nil/marshalling/accumulators/parameters/expected_status.hpp>
 #include <nil/marshalling/type_traits.hpp>
+#include <nil/marshalling/inference.hpp>
 #include <nil/detail/type_traits.hpp>
 
 namespace nil {
@@ -83,8 +86,8 @@ namespace nil {
          * @ingroup marshalling_algorithms
          *
          * @tparam TEndian
-         * @tparam TInput A real type, not a marshalling type. For example, `int` or `uint8_t`
-         * @tparam OutputWordType
+         * @tparam TInput std::is_arithmetic type, not a marshalling type. For example, `int`, `uint8_t` or `double`
+         * @tparam OutputWordType A compatible with std::is_integral type
          *
          * @param val
          * @param status
@@ -92,15 +95,15 @@ namespace nil {
          * @return
          */
         template<typename TEndian, typename TInput, typename OutputWordType>
-        typename std::enable_if<std::is_integral<TInput>::value
+        typename std::enable_if<is_compatible<TInput>::value
+                                    && (!nil::detail::is_container<TInput>::value)
                                     && std::is_integral<OutputWordType>::value,
                                 std::vector<OutputWordType>>::type
             disperse(TInput val, status_type &status) {
 
-            using marhsalling_type = marshalling::types::integral<field_type<TEndian>, 
-                TInput>;
+            using marshalling_type = typename is_compatible<TInput>::template type<TEndian>;
 
-            marhsalling_type m_val = marhsalling_type(val);
+            marshalling_type m_val = marshalling_type(val);
             std::vector<OutputWordType> result(m_val.length());
             typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
             status = m_val.write(buffer_begin, result.size());
@@ -114,103 +117,37 @@ namespace nil {
          * @ingroup marshalling_algorithms
          *
          * @tparam TEndian
-         * @tparam TInput A real type, not a marshalling type. For example, `float` or `double`
-         * @tparam OutputWordType
+         * @tparam TContainer A compatible with nil::detail::is_container container type.
+         * @tparam OutputWordType A compatible with std::is_integral type
          *
          * @param val
          * @param status
          *
          * @return
          */
-        template<typename TEndian, typename TInput, typename OutputWordType>
-        typename std::enable_if<(std::is_same<float, TInput>::value || 
-                                 std::is_same<double, TInput>::value)
+        template<typename TEndian, typename TContainer, typename OutputWordType>
+        typename std::enable_if<is_compatible<TContainer>::value
+                                    && nil::detail::is_container<TContainer>::value
                                     && std::is_integral<OutputWordType>::value,
                                 std::vector<OutputWordType>>::type
-            disperse(TInput val, status_type &status) {
+            disperse(TContainer val, status_type &status) {
 
-            using marhsalling_type = marshalling::types::float_value<field_type<TEndian>, 
-                TInput>;
+            static_assert(!nil::detail::is_container<typename TContainer::value_type>::value);
 
-            marhsalling_type m_val = marhsalling_type(val);
+            using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
+            using marshalling_internal_type = typename marshalling_type::value_type;
+            
+            std::conditional<is_compatible<TContainer>::fixed_size, 
+                nil::marshalling::container::static_vector<marshalling_internal_type, marshalling_type::length()>, 
+                std::vector<marshalling_internal_type>> values;
+            for (const auto &val_i : val) {
+                values.push_back(marshalling_internal_type(val_i));
+            }
+
+            marshalling_type m_val = marshalling_type(values);
             std::vector<OutputWordType> result(m_val.length());
             typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
             status = m_val.write(buffer_begin, result.size());
-
-            return result;
-        }
-
-        /*!
-         * @brief
-         *
-         * @ingroup marshalling_algorithms
-         *
-         * @tparam TEndian
-         * @tparam TInput A type of container's internal value.
-         * @tparam OutputWordType
-         *
-         * @param val
-         * @param status
-         *
-         * @return
-         */
-        template<typename TEndian, typename TInput, typename OutputWordType>
-        typename std::enable_if<std::is_arithmetic<TInput>::value,
-                                    && std::is_integral<OutputWordType>::value,
-                                std::vector<OutputWordType>>::type
-            disperse(std::vector<TInput> val, status_type &status) {
-
-            using marhsalling_type = marshalling::types::array_list<
-                field_type<TEndian>,
-                types::integral<
-                    field_type<TEndian>, 
-                    TInput>>;
-            
-            ...
-
-            marhsalling_type m_val = marhsalling_type(prep_val);
-            std::vector<OutputWordType> result(prep_val.length());
-            typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
-            status = prep_val.write(buffer_begin, result.size());
-
-            return result;
-        }
-
-        /*!
-         * @brief
-         *
-         * @ingroup marshalling_algorithms
-         *
-         * @tparam TEndian
-         * @tparam TInput A type of container's internal value.
-         * @tparam TSize Size of the fixed size container's.
-         * @tparam OutputWordType
-         *
-         * @param val
-         * @param status
-         *
-         * @return
-         */
-        template<typename TEndian, typename TInput, typename TSize, typename OutputWordType>
-        typename std::enable_if<std::is_arithmetic<TInput>::value
-                                    && std::is_integral<OutputWordType>::value,
-                                std::vector<OutputWordType>>::type
-            disperse(std::array<TInput, TSize> val, status_type &status) {
-
-            using marhsalling_type = marshalling::types::array_list<
-                field_type<TEndian>,
-                types::integral<
-                    field_type<TEndian>, 
-                    TInput>, 
-                option::sequence_fixed_size<TSize>
-            >;
-            
-            ...
-
-            marhsalling_type m_val = marhsalling_type(prep_val);
-            std::vector<OutputWordType> result(prep_val.length());
-            typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
-            status = prep_val.write(buffer_begin, result.size());
 
             return result;
         }

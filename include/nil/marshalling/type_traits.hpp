@@ -246,6 +246,7 @@ namespace nil {
         public:
             constexpr static const bool value = (sizeof(test<T>(nullptr)) == sizeof(Yes));
         };
+
     }        // namespace marshalling
 }    // namespace nil
 
