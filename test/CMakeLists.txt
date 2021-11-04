@@ -2,6 +2,7 @@
 #  MIT License
 #
 #  Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+#  Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal

@@ -2,6 +2,7 @@
 #  MIT License
 #
 #  Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+#  Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -104,6 +105,11 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INCLUDE include NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/libs/crypto")
 
-#if(BUILD_TESTS)
+if(BUILD_TESTS)
     add_subdirectory(test)
-#endif()
+endif()
+
+if(BUILD_EXAMPLES)
+    add_subdirectory(example)
+endif()
+

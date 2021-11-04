@@ -36,24 +36,6 @@
 #include <nil/merkle/utilities.hpp>
 #include <nil/merkle/property.hpp>
 
-template<class Graph>
-void print(Graph &g) {
-    typename Graph::vertex_iterator i, end;
-    typename Graph::out_edge_iterator ei, edge_end;
-    typename Graph::in_edge_iterator ein, edgein_end;
-    for (boost::tie(i, end) = vertices(g); i != end; ++i) {
-        boost::tie(ein, edgein_end) = in_edges(*i, g);
-        if (ein == edgein_end) {
-            std::cout << *i << " --- leaf";
-        } else {
-            std::cout << *i << " <-- ";
-        }
-        for (; ein != edgein_end; ++ein)
-            std::cout << source(*ein, g) << "  ";
-        std::cout << std::endl;
-    }
-}
-
 namespace nil {
     namespace crypto3 {
         namespace merkletree {
@@ -114,7 +96,8 @@ namespace nil {
                     size_t layer_elements = leafs;
                     for (size_t row_number = 0; row_number < row_count; ++row_number) {
                         for (size_t current_element = start_layer_element;
-                             current_element < start_layer_element + layer_elements; ++current_element) {
+                             current_element < start_layer_element + layer_elements;
+                             ++current_element) {
                             if (row_number == 0) {
                                 hash_map[current_element] = crypto3::hash<Hash>(data[current_element]);
                             } else {
