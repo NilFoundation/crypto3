@@ -45,9 +45,9 @@ namespace nil {
                         constexpr static const typename babyjubjub_types::integral_type
                             a =                 ///< twisted Edwards elliptic curve
                             0x292FC_cppui18;    ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
-                        constexpr static const typename babyjubjub_types::integral_type d =
-                            0x292F8_cppui18;    ///< twisted Edwards elliptic curve
-                                                ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
+                        constexpr static const typename babyjubjub_types::integral_type
+                            d =                 ///< twisted Edwards elliptic curve
+                            0x292F8_cppui18;    ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
                     };
 
                     constexpr
@@ -61,13 +61,16 @@ namespace nil {
                         using scalar_field_type = typename babyjubjub_types::scalar_field_type;
 
                         // Montgomery representation constants a and b
-                        constexpr static const typename babyjubjub_types::integral_type a = 0x292FA_cppui18;
-                        constexpr static const typename babyjubjub_types::integral_type b = 0x01;
+                        constexpr static const typename babyjubjub_types::integral_type
+                            a =                 ///< Montgomery elliptic curve
+                            0x292FA_cppui18;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
+                        constexpr static const typename babyjubjub_types::integral_type
+                            b =      ///< Montgomery elliptic curve
+                            0x01;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
                     };
 
                     constexpr typename babyjubjub_types::integral_type const babyjubjub_params<forms::montgomery>::a;
-                    constexpr
-                        typename babyjubjub_types::integral_type const babyjubjub_params<forms::montgomery>::b;
+                    constexpr typename babyjubjub_types::integral_type const babyjubjub_params<forms::montgomery>::b;
 
                     template<>
                     struct babyjubjub_g1_params<forms::twisted_edwards>
@@ -99,7 +102,7 @@ namespace nil {
                         using field_type = typename babyjubjub_params<forms::montgomery>::base_field_type;
 
                         template<typename Coordinates>
-                        using group_type = babyjubjub_types::g1_type<forms::twisted_edwards, Coordinates>;
+                        using group_type = babyjubjub_types::g1_type<forms::montgomery, Coordinates>;
 
                         constexpr static const std::array<typename base_field_type::value_type, 2> one_fill = {
                             typename base_field_type::value_type(

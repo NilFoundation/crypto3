@@ -26,11 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_JUBJUB_PARAMS_HPP
 #define CRYPTO3_ALGEBRA_CURVES_JUBJUB_PARAMS_HPP
 
-#include <nil/crypto3/algebra/fields/jubjub/base_field.hpp>
-#include <nil/crypto3/algebra/fields/jubjub/scalar_field.hpp>
-
 #include <nil/crypto3/algebra/curves/forms.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/jubjub/types.hpp>
 
 #include <nil/crypto3/detail/literals.hpp>
 
@@ -39,20 +36,13 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-
-                    struct jubjub_basic_params {
-                        using base_field_type = fields::jubjub_fq;
-                        using scalar_field_type = fields::jubjub_fr;
-                    };
-
                     template<>
-                    struct jubjub_params<forms::twisted_edwards> : public jubjub_basic_params {
-
-                        using base_field_type = typename jubjub_basic_params::base_field_type;
-                        using scalar_field_type = typename jubjub_basic_params::scalar_field_type;
+                    struct jubjub_params<forms::twisted_edwards> {
+                        using base_field_type = typename jubjub_types::base_field_type;
+                        using scalar_field_type = typename jubjub_types::scalar_field_type;
 
                         // Edwards representation constants a and d
-                        constexpr static const typename base_field_type::integral_type
+                        constexpr static const typename jubjub_types::integral_type
                             a =    ///< twisted Edwards elliptic curve
                             0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000000_cppui255;    ///< described
                                                                                                             ///< by
@@ -61,7 +51,7 @@ namespace nil {
                                                                                                             ///< y^2 = 1
                                                                                                             ///< +
                                                                                                             ///< dx^2y^2
-                        constexpr static const typename base_field_type::integral_type
+                        constexpr static const typename jubjub_types::integral_type
                             d =    ///< twisted Edwards elliptic curve
                             0x2A9318E74BFA2B48F5FD9207E6BD7FD4292D7F6D37579D2601065FD6D6343EB1_cppui254;    ///< described
                                                                                                             ///< by
@@ -72,20 +62,28 @@ namespace nil {
                                                                                                             ///< dx^2y^2
                     };
 
+                    constexpr typename jubjub_types::integral_type const jubjub_params<forms::twisted_edwards>::a;
+                    constexpr typename jubjub_types::integral_type const jubjub_params<forms::twisted_edwards>::d;
+
                     template<>
-                    struct jubjub_params<forms::montgomery> : public jubjub_basic_params {
+                    struct jubjub_params<forms::montgomery> {
+                        using base_field_type = typename jubjub_types::base_field_type;
+                        using scalar_field_type = typename jubjub_types::scalar_field_type;
 
-                        using base_field_type = typename jubjub_basic_params::base_field_type;
-                        using scalar_field_type = typename jubjub_basic_params::scalar_field_type;
-
-                        // Montgomery representation constants A and scale
-                        constexpr static const typename base_field_type::integral_type A = 0xA002_cppui16;
-                        constexpr static const typename base_field_type::integral_type scale = 0x01;
+                        // Montgomery representation constants a and b
+                        constexpr static const typename jubjub_types::integral_type
+                            a =                ///< Montgomery elliptic curve
+                            0xA002_cppui16;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
+                        constexpr static const typename jubjub_types::integral_type
+                            b =      ///< Montgomery elliptic curve
+                            0x01;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
                     };
+
+                    constexpr typename jubjub_types::integral_type const jubjub_params<forms::montgomery>::a;
+                    constexpr typename jubjub_types::integral_type const jubjub_params<forms::montgomery>::b;
 
                     template<>
                     struct jubjub_g1_params<forms::twisted_edwards> : public jubjub_params<forms::twisted_edwards> {
-
                         using field_type = typename jubjub_params<forms::twisted_edwards>::base_field_type;
 
                         template<typename Coordinates>
@@ -102,21 +100,28 @@ namespace nil {
                                 0x1d523cf1ddab1a1793132e78c866c0c33e26ba5cc220fed7cc3f870e59d292aa_cppui253)};
                     };
 
-                    constexpr typename jubjub_params<forms::twisted_edwards>::base_field_type::integral_type const
-                        jubjub_params<forms::twisted_edwards>::a;
-                    constexpr typename jubjub_params<forms::twisted_edwards>::base_field_type::integral_type const
-                        jubjub_params<forms::twisted_edwards>::d;
-
-                    constexpr typename jubjub_params<forms::montgomery>::base_field_type::integral_type const
-                        jubjub_params<forms::montgomery>::A;
-                    constexpr typename jubjub_params<forms::montgomery>::base_field_type::integral_type const
-                        jubjub_params<forms::montgomery>::scale;
-
                     constexpr std::array<typename jubjub_g1_params<forms::twisted_edwards>::base_field_type::value_type,
                                          2> const jubjub_g1_params<forms::twisted_edwards>::zero_fill;
                     constexpr std::array<typename jubjub_g1_params<forms::twisted_edwards>::base_field_type::value_type,
                                          2> const jubjub_g1_params<forms::twisted_edwards>::one_fill;
 
+                    template<>
+                    struct jubjub_g1_params<forms::montgomery> : public jubjub_params<forms::montgomery> {
+                        using field_type = typename jubjub_params<forms::twisted_edwards>::base_field_type;
+
+                        template<typename Coordinates>
+                        using group_type = jubjub_types::g1_type<forms::montgomery, Coordinates>;
+
+                        // TODO: check correctness of the base point coordinates
+                        constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
+                            typename field_type::value_type(
+                                0x52a47af6ec47deb77d663b6a45b148d1ccdaa4e2299ecfbd5504c409b3ea62c0_cppui255),
+                            typename field_type::value_type(
+                                0x20bc4f2e8cff38006618840fd0f9b6d6e8ddec99c37916874e2fd6d5c6558938_cppui254)};
+                    };
+
+                    constexpr std::array<typename jubjub_g1_params<forms::montgomery>::base_field_type::value_type,
+                                         2> const jubjub_g1_params<forms::montgomery>::one_fill;
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

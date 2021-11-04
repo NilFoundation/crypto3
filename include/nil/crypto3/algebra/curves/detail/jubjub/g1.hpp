@@ -31,6 +31,7 @@
 
 #include <nil/crypto3/algebra/curves/forms.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/element_g1_affine.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/montgomery/element_g1_affine.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -38,11 +38,10 @@ namespace nil {
         namespace algebra {
             namespace curves {
 
-                /** @brief A struct representing a [BabyJubJub](https://eips.ethereum.org/EIPS/eip-2494)
+                /**
+                 * @brief A struct representing a [BabyJubJub](https://eips.ethereum.org/EIPS/eip-2494)
                  * twisted Edwards elliptic curve defined over alt_bn128 scalar field and described by equation ax^2 +
                  * y^2 = 1 + dx^2y^2
-                 *  @tparam Version version of the curve
-                 *
                  */
                 class babyjubjub {
 

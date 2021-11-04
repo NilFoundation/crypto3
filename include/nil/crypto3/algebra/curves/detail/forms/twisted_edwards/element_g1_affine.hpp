@@ -30,6 +30,7 @@
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
 #include <nil/crypto3/algebra/curves/forms.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/montgomery/coordinates.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -283,31 +284,30 @@ namespace nil {
                     public:
                         /*************************  Reducing operations  ***********************************/
 
-                        // /** @brief
-                        //  *
-                        //  * @return return the corresponding element from twisted edwards form and
-                        //  * affine coordinates to montgomery form and affine coordinates
-                        //  */
-                        // // This should be moved to montgomery form element constructor
-                        // curve_element<params_type,
-                        //     forms::montgomery, coordinates> to_montgomery() const {
-                        //     field_value_type p_out[3];
+                        /**
+                         * @brief Map point coordinates into Montgomery form according to birational equivalence map:
+                         *
+                         * Twisted Edwards -–> Montgomery
+                         *          (x, y) --> (u, v)
+                         *
+                         * u = (1+y)/(1-y)
+                         * v = (1+y)/((1-y)x)
+                         *
+                         * @return point in twisted Edwards form and affine coordinates
+                         */
+                        template<typename Group = typename group_type::curve_type::template g1_type<
+                                     curves::coordinates::affine, forms::montgomery>,
+                                 typename Params = typename Group::params_type>
+                        constexpr
+                            operator curve_element<Params, forms::montgomery, curves::coordinates::affine>() const {
+                            using result_type = curve_element<Params, forms::montgomery, curves::coordinates::affine>;
 
-                        //     // The only points on the curve with x=0 or y=1 (for which birational equivalence is not
-                        //     valid),
-                        //     // are (0,1) and (0,-1), both of which are of low order, and should therefore not occur.
-                        //     assert(!(this->X.is_zero()) && this->Y != field_value_type::one());
-
-                        //     // (x, y) -> (u, v) where
-                        //     //      u = (1 + y) / (1 - y)
-                        //     //      v = u / x
-                        //     field_value_type u =
-                        //         (field_value_type::one() + this->Y) *
-                        //         (field_value_type::one() - this->Y).inversed();
-                        //     return curve_element<params_type,
-                        //         forms::montgomery, coordinates>{u,
-                        //             params_type::scale * u * this->X.inversed()};
-                        // }
+                            return this->is_zero() ? result_type() :
+                                                     result_type((field_value_type::one() + this->Y) /
+                                                                     (field_value_type::one() - this->Y),
+                                                                 (field_value_type::one() + this->Y) /
+                                                                     ((field_value_type::one() - this->Y) * this->X));
+                        }
                     };
 
                 }    // namespace detail
