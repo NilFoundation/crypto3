@@ -59,23 +59,19 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                       EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                           "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                           "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>")
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                           $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                      ${Boost_LIBRARIES}
-
                       crypto3::multiprecision
                       crypto3::algebra
+
                       ${CMAKE_WORKSPACE_NAME}::crypto3_multiprecision
                       ${CMAKE_WORKSPACE_NAME}::core)
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
-
-add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/libs"
-                   SUBMODULE_DEFINITION_HEADER "cm_project\\(")
 
 if(BUILD_TESTS)
     add_subdirectory(test)
