@@ -60,7 +60,6 @@ namespace nil {
              * @return
              */
             inline void reverse_byte(byte_type &b) {
-
 #if (BOOST_ARCH_CURRENT_WORD_BITS == 32)
                 b = unbounded_shr<16>(((b * 0x0802LU & 0x22110LU) | (b * 0x8020LU & 0x88440LU)) * 0x10101LU);
 #elif (BOOST_ARCH_CURRENT_WORD_BITS == 64)
