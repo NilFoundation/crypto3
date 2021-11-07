@@ -52,9 +52,9 @@ if("${CMAKE_WORKSPACE_NAME}" STREQUAL "boost")
 
     add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
     set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-        EXPORT_NAME ${CURRENT_PROJECT_NAME}
-        CXX_STANDARD 11
-        CXX_STANDARD_REQUIRED TRUE)
+                          EXPORT_NAME ${CURRENT_PROJECT_NAME}
+                          CXX_STANDARD 11
+                          CXX_STANDARD_REQUIRED TRUE)
 
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::core)
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::static_assert)
@@ -78,15 +78,19 @@ else()
 
     cm_project(multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
-    find_package(Boost COMPONENTS REQUIRED random)
+    if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
+        cm_find_package(Boost COMPONENTS REQUIRED random)
+    endif()
 
     add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
     set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-        EXPORT_NAME ${CURRENT_PROJECT_NAME})
-#        CXX_STANDARD 11
-#        CXX_STANDARD_REQUIRED TRUE)
+                          EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${Boost_LIBRARIES})
+    target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                               $<$<BOOL:${Boost_FOUND}>:${Boost_INCLUDE_DIRS}>)
+
+    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                          ${Boost_LIBRARIES})
 endif()
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
