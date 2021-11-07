@@ -35,7 +35,7 @@ macro(cm_find_package NAME)
     endif()
 endmacro()
 
-if(NOT Boost_FOUND OR NOT Boost_CONTAINER_FOUND)
+if(NOT Boost_FOUND OR NOT Boost_CONTAINER_FOUND AND NOT CMAKE_CROSSCOMPILING)
     cm_find_package(Boost REQUIRED COMPONENTS container)
 endif()
 
@@ -119,8 +119,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/block/detail/exploder.hpp
      include/nil/crypto3/block/detail/imploder.hpp
      include/nil/crypto3/block/detail/state_adder.hpp
-     include/nil/crypto3/block/detail/unbounded_shift.hpp
-     )
+     include/nil/crypto3/block/detail/unbounded_shift.hpp)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
 
@@ -129,21 +128,18 @@ if(CRYPTO3_BLOCK_AES)
          include/nil/crypto3/block/rijndael.hpp
          include/nil/crypto3/block/detail/rijndael/rijndael_functions.hpp
          include/nil/crypto3/block/detail/rijndael/rijndael_impl.hpp
-         include/nil/crypto3/block/detail/rijndael/rijndael_policy.hpp
-         )
+         include/nil/crypto3/block/detail/rijndael/rijndael_policy.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL)
 
     if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")
         if(SSE2_FOUND)
             list(APPEND ${CURRENT_PROJECT_NAME}_RIJNDAEL_HEADERS
-                 include/nil/crypto3/block/detail/rijndael/rijndael_ni_impl.hpp
-                 )
+                 include/nil/crypto3/block/detail/rijndael/rijndael_ni_impl.hpp)
 
         elseif(SSSE3_FOUND)
             list(APPEND ${CURRENT_PROJECT_NAME}_RIJNDAEL_HEADERS
-                 include/nil/crypto3/block/detail/rijndael/rijndael_ssse3_impl.hpp
-                 )
+                 include/nil/crypto3/block/detail/rijndael/rijndael_ssse3_impl.hpp)
         endif()
     elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "armv8")
         list(APPEND ${CURRENT_PROJECT_NAME}_RIJNDAEL_HEADERS
@@ -159,16 +155,14 @@ if(CRYPTO3_BLOCK_AES)
          ${${CURRENT_PROJECT_NAME}_RIJNDAEL_HEADERS}
          )
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_RIJNDAEL_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_RIJNDAEL_SOURCES})
 endif()
 
 if(CRYPTO3_BLOCK_ARIA)
     list(APPEND ${CURRENT_PROJECT_NAME}_ARIA_HEADERS
          include/nil/crypto3/block/aria.hpp
          include/nil/crypto3/block/detail/aria/aria_functions.hpp
-         include/nil/crypto3/block/detail/aria/aria_policy.hpp
-         )
+         include/nil/crypto3/block/detail/aria/aria_policy.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_ARIA_SOURCES
 
@@ -485,7 +479,8 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
 
 if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")
     if(SSE2_FOUND)
-        target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_NI")
+        target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                                   "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_NI")
         target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "-maes;-mpclmul;-mssse3")
     elseif(SSSE3_FOUND)
         target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
@@ -493,21 +488,21 @@ if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR ${CMAKE_TARGET_ARCHITECTURE
         target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "-maes;-mpclmul;-mssse3")
     endif()
 elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "armv8")
-    target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_ARMV8")
+    target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                               "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_ARMV8")
 elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "ppc64")
     target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                                "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_POWER8")
 endif()
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-
-                      ${Boost_LIBRARIES})
+                      $<$<BOOL:${Boost_FOUND}>:${Boost_LIBRARIES}>)
 
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                           "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                           "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                           $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
 
-                           "${Boost_INCLUDE_DIRS}")
+                           $<$<BOOL:${Boost_FOUND}>:${Boost_INCLUDE_DIRS}>)
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
