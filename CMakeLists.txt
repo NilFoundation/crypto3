@@ -38,10 +38,6 @@ macro(cm_find_package NAME)
     endif()
 endmacro()
 
-if(NOT Boost_FOUND OR NOT Boost_CONTAINER_FOUND)
-    cm_find_package(Boost REQUIRED COMPONENTS container)
-endif()
-
 include(TargetArchitecture)
 include(TargetConfiguration)
 include(PlatformConfiguration)
@@ -76,7 +72,7 @@ if(UNIX AND BUILD_WITH_CCACHE)
     endif(CCACHE_FOUND)
 endif()
 
-if(NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND)
+if(NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
     cm_find_package(Boost REQUIRED COMPONENTS container)
 endif()
 
@@ -132,13 +128,16 @@ cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_
 add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${Boost_LIBRARIES})
+
 set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                       EXPORT_NAME ${CURRENT_PROJECT_NAME})
+
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
-                           ${Boost_INCLUDE_DIRS})
+                           $<$<BOOL:${Boost_FOUND}>:${Boost_INCLUDE_DIRS}>)
+
 if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR
    ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")
     if(CXX_HAS_AVX_2)
