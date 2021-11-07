@@ -38,6 +38,10 @@ endmacro()
 
 cm_project(algebra WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES ASM C CXX)
 
+if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
+    cm_find_package(Boost)
+endif()
+
 cm_find_package(CM)
 include(CMDeploy)
 
@@ -60,10 +64,10 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                       EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                           "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                           "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                           $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
 
-                           ${Boost_INCLUDE_DIRS})
+                           $<$<BOOL:${Boost_FOUND}>:${Boost_INCLUDE_DIRS}>)
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::hash
@@ -71,7 +75,9 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
 
                       ${Boost_LIBRARIES})
 
-cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INCLUDE include NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
+cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+          INCLUDE include
+          NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
 if(BUILD_TESTS)
     add_subdirectory(test)
