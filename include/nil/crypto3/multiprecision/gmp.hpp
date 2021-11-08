@@ -3003,4 +3003,6 @@ namespace std {
 
 }    // namespace std
 
+#include <nil/crypto3/multiprecision/jacobi_gmp.hpp>
+
 #endif
