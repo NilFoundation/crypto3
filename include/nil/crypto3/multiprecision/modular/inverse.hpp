@@ -14,9 +14,6 @@
 
 #include <nil/crypto3/multiprecision/detail/default_ops.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/cpp_int/cpp_int_config.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace multiprecision {

@@ -533,6 +533,22 @@ namespace nil {
                     result.mod_data().adjust_modular(result.base_data(), tmp);
                 }
 
+//                template<typename Backend, expression_template_option ExpressionTemplates>
+                template<typename Backend>
+                constexpr modular_adaptor<Backend> eval_ressol(const modular_adaptor<Backend>& input) {
+
+//                    number<Backend, ExpressionTemplates> new_base, res;
+//                    number<modular_adaptor<Backend>, ExpressionTemplates> res_mod;
+                    number<Backend> new_base, res;
+                    number<modular_adaptor<Backend>> res_mod;
+
+                    input.mod_data().adjust_regular(new_base.backend(), input.base_data());
+                    res = eval_ressol(new_base.backend(), input.mod_data().get_mod().backend());
+                    assign_components(res_mod.backend(), res.backend(), input.mod_data().get_mod().backend());
+
+                    return res_mod.backend();
+                }
+
             }    // namespace backends
 
             using nil::crypto3::multiprecision::backends::modular_adaptor;

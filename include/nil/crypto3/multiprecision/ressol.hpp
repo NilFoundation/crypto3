@@ -15,8 +15,8 @@
 #include <nil/crypto3/multiprecision/detail/default_ops.hpp>
 
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
-#include <nil/crypto3/multiprecision/modular/modular_params.hpp>
-#include <nil/crypto3/multiprecision/modular/modular_params_gmp.hpp>
+//#include <nil/crypto3/multiprecision/modular/modular_params.hpp>
+//#include <nil/crypto3/multiprecision/modular/modular_params_gmp.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -160,8 +160,8 @@ namespace nil {
 
                 template<unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked>
                 constexpr cpp_int_backend<MinBits, MaxBits, SignType, Checked, void>
-                    eval_ressol(const cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> &a,
-                                const cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> &p) {
+                eval_ressol(const cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> &a,
+                            const cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> &p) {
                     using Backend = cpp_int_backend<MinBits, MaxBits, SignType, Checked, void>;
                     using Backend_padded = cpp_int_backend<MinBits + 1, MaxBits + 1, SignType, Checked, void>;
                     using default_ops::eval_add;
@@ -297,14 +297,13 @@ namespace nil {
                     return res;
                 }
             }
-
             /**
              * Compute the square root of x modulo a prime using the
              * Shanks-Tonnelli algorithm
              *
              * @param a the input
              * @param p the prime
-             * @return y such that (y*y)%p == x, or -1 if no such integer
+             * @return y such that (y*y)%p == a, or -1 if no such integer
              */
             template<typename Backend, expression_template_option ExpressionTemplates>
             constexpr number<Backend, ExpressionTemplates> ressol(const number<Backend, ExpressionTemplates>& a,
@@ -316,22 +315,32 @@ namespace nil {
              * Compute the square root of x modulo a prime using the
              * Shanks-Tonnelli algorithm
              *
-             * @param a the prime
+             * @param modular such modular number with p - prime field, and x - current value
              * @return y such that (y*y)%p == x, or -1 if no such integer
              */
 
             template<typename Backend, expression_template_option ExpressionTemplates>
             constexpr number<modular_adaptor<Backend>, ExpressionTemplates>
                 ressol(const number<modular_adaptor<Backend>, ExpressionTemplates>& modular) {
-                number<Backend, ExpressionTemplates> new_base, res;
-                number<modular_adaptor<Backend>, ExpressionTemplates> res_mod;
 
-                modular.backend().mod_data().adjust_regular(new_base.backend(), modular.backend().base_data());
-                res = backends::eval_ressol(new_base.backend(), modular.backend().mod_data().get_mod().backend());
-                assign_components(res_mod.backend(), res.backend(), modular.backend().mod_data().get_mod().backend());
-
-                return res_mod;
+                return number<modular_adaptor<Backend>, ExpressionTemplates>(backends::eval_ressol(modular.backend()));
+//                return number<modular_adaptor<Backend>, ExpressionTemplates>(backends::eval_ressol(modular.backend()));
+//                number<Backend, ExpressionTemplates> new_base, res;
+//                number<modular_adaptor<Backend>, ExpressionTemplates> res_mod;
+//
+//                modular.backend().mod_data().adjust_regular(new_base.backend(), modular.backend().base_data());
+//                res = backends::eval_ressol(new_base.backend(), modular.backend().mod_data().get_mod().backend());
+//                assign_components(res_mod.backend(), res.backend(), modular.backend().mod_data().get_mod().backend());
+//
+//                return res_mod;
             }
+
+            /*
+             * For tommath:
+             * The implementation is split for two different cases:
+                1. if p mod 4 == 3 we apply Handbook of Applied Cryptography algorithm 3.36 and compute r directly as r = n(p+1)/4 mod p
+                2. otherwise we use Tonelli-Shanks algorithm
+             */
 
         }    // namespace multiprecision
     }        // namespace crypto3

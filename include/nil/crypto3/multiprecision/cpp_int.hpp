@@ -2654,5 +2654,6 @@ namespace nil {
 #include <nil/crypto3/multiprecision/cpp_int/serialize.hpp>
 #include <nil/crypto3/multiprecision/cpp_int/import_export.hpp>
 #include <nil/crypto3/multiprecision/cpp_int/eval_jacobi.hpp>
+//#include <nil/crypto3/multiprecision/cpp_int/eval_ressol.hpp>
 
 #endif

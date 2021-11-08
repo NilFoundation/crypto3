@@ -12,7 +12,6 @@
 
 #include <nil/crypto3/multiprecision/detail/default_ops.hpp>
 
-#include <nil/crypto3/multiprecision/modular/modular_functions_fixed.hpp>
 
 namespace nil {
     namespace crypto3 {
