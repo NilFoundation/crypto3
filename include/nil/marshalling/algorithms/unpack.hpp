@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_MARSHALL_HPP
-#define MARSHALLING_MARSHALL_HPP
+#ifndef MARSHALLING_DEMARSHALL_HPP
+#define MARSHALLING_DEMARSHALL_HPP
 
 #include <type_traits>
 
@@ -55,23 +55,23 @@ namespace nil {
          *
          * @ingroup marshalling_algorithms
          *
-         * @tparam InputWordType
-         * @tparam TMarshallingOutnput
+         * @tparam OutputWordType
+         * @tparam TMarshallingInput
          *
          * @param val
          * @param status
          *
          * @return
          */
-        template<typename TMarshallingOutnput, typename InputWordType>
-        typename std::enable_if<marshalling::is_marshalling_type<TMarshallingOutnput>::value
-                                    && std::is_integral<InputWordType>::value,
-                                TMarshallingOutnput>::type
-            marshal(std::vector<InputWordType> val, status_type &status) {
+        template<typename OutputWordType, typename TMarshallingInput>
+        typename std::enable_if<marshalling::is_marshalling_type<TMarshallingInput>::value
+                                    && std::is_integral<OutputWordType>::value,
+                                std::vector<OutputWordType>>::type
+            unpack(TMarshallingInput val, status_type &status) {
 
-            TMarshallingOutnput result;
-            typename std::vector<InputWordType>::iterator buffer_begin = val.begin();
-            status = result.read(buffer_begin, val.size());
+            std::vector<OutputWordType> result(val.length());
+            typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
+            status = val.write(buffer_begin, result.size());
 
             return result;
         }
@@ -82,28 +82,29 @@ namespace nil {
          * @ingroup marshalling_algorithms
          *
          * @tparam TEndian
-         * @tparam InputWordType A compatible with std::is_integral type
-         * @tparam TOutput std::is_arithmetic type, not a marshalling type. For example, `int`, `uint8_t` or `double`
+         * @tparam OutputWordType A compatible with std::is_integral type
+         * @tparam TInput std::is_arithmetic type, not a marshalling type. For example, `int`, `uint8_t` or `double`
          *
          * @param val
          * @param status
          *
          * @return
          */
-        template<typename TEndian, typename TOutput, typename InputWordType>
-        typename std::enable_if<is_compatible<TOutput>::value
-                                    && std::is_arithmetic<TOutput>::value
-                                    && std::is_integral<InputWordType>::value,
-                                TOutput>::type
-            marshal(std::vector<InputWordType> val, status_type &status) {
+        template<typename TEndian, typename OutputWordType, typename TInput>
+        typename std::enable_if<is_compatible<TInput>::value
+                                    && std::is_arithmetic<TInput>::value
+                                    && std::is_integral<OutputWordType>::value,
+                                std::vector<OutputWordType>>::type
+            unpack(TInput val, status_type &status) {
 
-            using marshalling_type = typename is_compatible<TOutput>::template type<TEndian>;
+            using marshalling_type = typename is_compatible<TInput>::template type<TEndian>;
 
-            marshalling_type m_val;
-            typename std::vector<InputWordType>::iterator buffer_begin = val.begin();
-            status = m_val.read(buffer_begin, val.size());
+            marshalling_type m_val = marshalling_type(val);
+            std::vector<OutputWordType> result(m_val.length());
+            typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
+            status = m_val.write(buffer_begin, result.size());
 
-            return m_val.value();
+            return result;
         }
 
         /*!
@@ -112,7 +113,7 @@ namespace nil {
          * @ingroup marshalling_algorithms
          *
          * @tparam TEndian
-         * @tparam InputWordType A compatible with std::is_integral type
+         * @tparam OutputWordType A compatible with std::is_integral type
          * @tparam TContainer A compatible with nil::detail::is_container container type.
          *
          * @param val
@@ -120,26 +121,30 @@ namespace nil {
          *
          * @return
          */
-        template<typename TEndian, typename TContainer, typename InputWordType>
+        template<typename TEndian, typename OutputWordType, typename TContainer>
         typename std::enable_if<is_compatible<TContainer>::value
                                     // && nil::detail::is_container<TContainer>::value
                                     && (!std::is_arithmetic<TContainer>::value)
-                                    && std::is_integral<InputWordType>::value,
-                                TContainer>::type
-            marshal(std::vector<InputWordType> val, status_type &status) {
+                                    && std::is_integral<OutputWordType>::value,
+                                std::vector<OutputWordType>>::type
+            unpack(TContainer val, status_type &status) {
 
             // static_assert(std::is_arithmetic<typename TContainer::value_type>::value);
 
             using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
+            using marshalling_internal_type = typename marshalling_type::element_type;
 
-            marshalling_type m_val;
-            typename std::vector<InputWordType>::iterator buffer_begin = val.begin();
-            status = m_val.read(buffer_begin, val.size());
-
-            TContainer result;
-            for (const auto &val_i : m_val.value()) {
-                result.push_back(val_i.value());
+            typename std::conditional<is_compatible<TContainer>::fixed_size, 
+                nil::marshalling::container::static_vector<marshalling_internal_type, marshalling_type::max_length()>, 
+                std::vector<marshalling_internal_type>>::type values;
+            for (const auto &val_i : val) {
+                values.push_back(marshalling_internal_type(val_i));
             }
+
+            marshalling_type m_val = marshalling_type(values);
+            std::vector<OutputWordType> result(m_val.length());
+            typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
+            status = m_val.write(buffer_begin, result.size());
 
             return result;
         }
@@ -147,4 +152,4 @@ namespace nil {
     }    // namespace marshalling
 }    // namespace nil
 
-#endif    // MARSHALLING_MARSHALL_HPP
+#endif    // MARSHALLING_DEMARSHALL_HPP
