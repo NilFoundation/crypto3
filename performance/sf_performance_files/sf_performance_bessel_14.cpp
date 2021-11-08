@@ -5,9 +5,8 @@
 
 #include "../sf_performance.hpp"
 
-void bessel_tests_14()
-{
+void bessel_tests_14() {
 #ifdef TEST_MPF
-   time_proc("Bessel Functions (100 digit precision)", "mpf_float_100", test_bessel<mpf_float_100>);
+    time_proc("Bessel Functions (100 digit precision)", "mpf_float_100", test_bessel<mpf_float_100>);
 #endif
 }

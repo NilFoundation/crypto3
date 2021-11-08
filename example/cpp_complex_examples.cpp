@@ -4,22 +4,22 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 /*`This example demonstrates the usage of the MPC backend for multiprecision complex numbers.
-In the following, we will show how using MPC backend allows for the same operations as the C++ standard library complex numbers.
+In the following, we will show how using MPC backend allows for the same operations as the C++ standard library complex
+numbers.
 */
 
 //[cpp_complex_eg
 #include <iostream>
 #include <complex>
-#include <boost/multiprecision/cpp_complex.hpp>
+#include <nil/crypto3/multiprecision/cpp_complex.hpp>
 
 template<class Complex>
-void complex_number_examples()
-{
-    Complex z1{0, 1};
+void complex_number_examples() {
+    Complex z1 {0, 1};
     std::cout << std::setprecision(std::numeric_limits<typename Complex::value_type>::digits10);
     std::cout << std::scientific << std::fixed;
     std::cout << "Print a complex number: " << z1 << std::endl;
-    std::cout << "Square it             : " << z1*z1 << std::endl;
+    std::cout << "Square it             : " << z1 * z1 << std::endl;
     std::cout << "Real part             : " << z1.real() << " = " << real(z1) << std::endl;
     std::cout << "Imaginary part        : " << z1.imag() << " = " << imag(z1) << std::endl;
     using std::abs;
@@ -27,7 +27,7 @@ void complex_number_examples()
     std::cout << "Argument              : " << arg(z1) << std::endl;
     std::cout << "Norm                  : " << norm(z1) << std::endl;
     std::cout << "Complex conjugate     : " << conj(z1) << std::endl;
-    std::cout << "Projection onto Riemann sphere: " <<  proj(z1) << std::endl;
+    std::cout << "Projection onto Riemann sphere: " << proj(z1) << std::endl;
     typename Complex::value_type r = 1;
     typename Complex::value_type theta = 0.8;
     using std::polar;
@@ -71,12 +71,11 @@ void complex_number_examples()
     std::cout << "atanh(z1) = " << atanh(z1) << std::endl;
 }
 
-int main()
-{
+int main() {
     std::cout << "First, some operations we usually perform with std::complex:\n";
     complex_number_examples<std::complex<double>>();
     std::cout << "\nNow the same operations performed using quad precision complex numbers:\n";
-    complex_number_examples<boost::multiprecision::cpp_complex_quad>();
+    complex_number_examples<nil::crypto3::multiprecision::cpp_complex_quad>();
 
     return 0;
 }

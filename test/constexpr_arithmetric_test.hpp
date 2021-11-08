@@ -4,7 +4,7 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/config.hpp>
-#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
 #include <limits>
 
 // clang-format off
@@ -60,7 +60,7 @@ BOOST_CXX14_CONSTEXPR T test_constexpr_add_subtract(T a)
    a -= do_test_constexpr_add_subtract(a, static_cast<unsigned __int128>(2));
 #endif
 
-   if constexpr (boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_floating_point)
+   if constexpr (nil::crypto3::multiprecision::number_category<T>::value == nil::crypto3::multiprecision::number_kind_floating_point)
    {
       a += do_test_constexpr_add_subtract(a, static_cast<float>(2));
       a += do_test_constexpr_add_subtract(a, static_cast<double>(2));
@@ -90,7 +90,7 @@ BOOST_CXX14_CONSTEXPR T do_test_constexpr_mul_divide(T a, U b)
       a /= -b;
       a = a / -b;
    }
-   if constexpr (boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_integer && boost::multiprecision::number_category<U>::value == boost::multiprecision::number_kind_integer)
+   if constexpr (nil::crypto3::multiprecision::number_category<T>::value == nil::crypto3::multiprecision::number_kind_integer && nil::crypto3::multiprecision::number_category<U>::value == nil::crypto3::multiprecision::number_kind_integer)
    {
       a %= b;
       a = a % b;
@@ -120,7 +120,7 @@ BOOST_CXX14_CONSTEXPR T test_constexpr_mul_divide(T a)
    a -= do_test_constexpr_mul_divide(a, static_cast<unsigned __int128>(2));
 #endif
 
-   if constexpr (boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_floating_point)
+   if constexpr (nil::crypto3::multiprecision::number_category<T>::value == nil::crypto3::multiprecision::number_kind_floating_point)
    {
       a += do_test_constexpr_mul_divide(a, static_cast<float>(2));
       a += do_test_constexpr_mul_divide(a, static_cast<double>(2));
@@ -282,7 +282,7 @@ BOOST_CXX14_CONSTEXPR T test_constexpr_compare(T a)
    a -= do_test_constexpr_compare(a, static_cast<unsigned __int128>(2));
 #endif
 
-   if constexpr (boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_floating_point)
+   if constexpr (nil::crypto3::multiprecision::number_category<T>::value == nil::crypto3::multiprecision::number_kind_floating_point)
    {
       a += do_test_constexpr_compare(a, static_cast<float>(2));
       a += do_test_constexpr_compare(a, static_cast<double>(2));

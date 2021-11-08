@@ -5,12 +5,11 @@
 
 #include "../performance_test.hpp"
 #if defined(TEST_CPP_DEC_FLOAT)
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_dec_float.hpp>
 #endif
 
-void test31()
-{
+void test31() {
 #ifdef TEST_CPP_DEC_FLOAT
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<500> > >("cpp_dec_float", 500);
+    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<500>>>("cpp_dec_float", 500);
 #endif
 }

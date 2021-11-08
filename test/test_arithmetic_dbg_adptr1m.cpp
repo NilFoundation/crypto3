@@ -9,12 +9,12 @@
 
 #define MIXED_OPS_ONLY
 
-#include <boost/multiprecision/debug_adaptor.hpp>
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <nil/crypto3/multiprecision/debug_adaptor.hpp>
+#include <nil/crypto3/multiprecision/cpp_dec_float.hpp>
 #include "test_arithmetic.hpp"
 
-int main()
-{
-   test<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::cpp_dec_float<50> > > >();
-   return boost::report_errors();
+int main() {
+    test<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::debug_adaptor<nil::crypto3::multiprecision::cpp_dec_float<50>>>>();
+    return boost::report_errors();
 }

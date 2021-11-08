@@ -13,22 +13,19 @@
 
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/current_function.hpp>
-#include <boost/static_assert.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_unsigned.hpp>
-#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
 
 namespace detail {
 
 template <class T>
-inline typename boost::disable_if_c<boost::is_unsigned<T>::value || boost::multiprecision::is_unsigned_number<T>::value, T>::type
+inline typename std::enable_if<!(nil::crypto3::multiprecision::detail::is_unsigned<T>::value || nil::crypto3::multiprecision::is_unsigned_number<T>::value), T>::type
 abs(const T& a)
 {
    return a < 0 ? -a : a;
 }
 
 template <class T>
-inline typename boost::enable_if_c<boost::is_unsigned<T>::value || boost::multiprecision::is_unsigned_number<T>::value, T>::type
+inline typename std::enable_if<nil::crypto3::multiprecision::detail::is_unsigned<T>::value || nil::crypto3::multiprecision::is_unsigned_number<T>::value, T>::type
 abs(const T& a)
 {
    return a;
@@ -37,13 +34,13 @@ abs(const T& a)
 } // namespace detail
 
 template <class T>
-typename boost::enable_if_c<boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_integer, T>::type relative_error(T a, T b)
+typename std::enable_if<nil::crypto3::multiprecision::number_category<T>::value == nil::crypto3::multiprecision::number_kind_integer, T>::type relative_error(T a, T b)
 {
    return a > b ? a - b : b - a;
 }
 
 template <class T>
-typename boost::disable_if_c<(boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_integer) || boost::multiprecision::is_interval_number<T>::value, T>::type relative_error(T a, T b)
+typename std::enable_if<!((nil::crypto3::multiprecision::number_category<T>::value == nil::crypto3::multiprecision::number_kind_integer) || nil::crypto3::multiprecision::is_interval_number<T>::value), T>::type relative_error(T a, T b)
 {
    using ::detail::abs;
    using std::abs;
@@ -87,19 +84,19 @@ typename boost::disable_if_c<(boost::multiprecision::number_category<T>::value =
 }
 
 template <class T, class U>
-typename boost::mpl::if_c<boost::is_convertible<T, U>::value, U, T>::type
+typename std::conditional<std::is_convertible<T, U>::value, U, T>::type
 relative_error(T a, U b)
 {
-   typedef typename boost::mpl::if_c<boost::is_convertible<T, U>::value, U, T>::type cast_type;
+   typedef typename std::conditional<std::is_convertible<T, U>::value, U, T>::type cast_type;
    return relative_error<cast_type>(static_cast<cast_type>(a), static_cast<cast_type>(b));
 }
 
 template <class T>
-typename boost::enable_if_c<boost::multiprecision::is_interval_number<T>::value, T>::type relative_error(T a, T b)
+typename std::enable_if<nil::crypto3::multiprecision::is_interval_number<T>::value, T>::type relative_error(T a, T b)
 {
-   typename boost::multiprecision::component_type<T>::type am = median(a);
-   typename boost::multiprecision::component_type<T>::type bm = median(b);
-   return relative_error<typename boost::multiprecision::component_type<T>::type>(am, bm);
+   typename nil::crypto3::multiprecision::component_type<T>::type am = median(a);
+   typename nil::crypto3::multiprecision::component_type<T>::type bm = median(b);
+   return relative_error<typename nil::crypto3::multiprecision::component_type<T>::type>(am, bm);
 }
 
 enum
@@ -112,7 +109,7 @@ enum
 template <class T>
 inline T epsilon_of(const T&)
 {
-   BOOST_STATIC_ASSERT(std::numeric_limits<T>::is_specialized);
+   static_assert(std::numeric_limits<T>::is_specialized, "No numeric_limits support");
    return std::numeric_limits<T>::is_integer ? static_cast<T>(1) : std::numeric_limits<T>::epsilon();
 }
 

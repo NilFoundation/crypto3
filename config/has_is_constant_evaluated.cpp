@@ -17,7 +17,7 @@
 #include <boost/config.hpp>
 #include <boost/config/pragma_message.hpp>
 
-#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
 
 #ifdef __has_builtin
 BOOST_PRAGMA_MESSAGE (" __has_builtin is defined.")

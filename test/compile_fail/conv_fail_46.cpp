@@ -5,15 +5,14 @@
 
 #ifdef TEST_GMP
 
-#include <boost/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
 
-using namespace boost::multiprecision;
+using namespace nil::crypto3::multiprecision;
 
-int main()
-{
-   mpf_t   f;
-   mpz_int i;
-   i = f;
+int main() {
+    mpf_t f;
+    mpz_int i;
+    i = f;
 }
 
 #else

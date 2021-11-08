@@ -6,163 +6,164 @@
 #ifndef BOOST_MATH_SKELETON_BACKEND_HPP
 #define BOOST_MATH_SKELETON_BACKEND_HPP
 
-#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
 #include <boost/container_hash/hash.hpp>
 
 namespace boost {
-namespace multiprecision {
-namespace backends {
+    namespace multiprecision {
+        namespace backends {
 
-/*
-This header defines one type - skeleton_backend - which declares the minimal
-interface to qualify as a backend for class number.  In addition you'll find
-optional interfaces declared commented out - you can enable these or not as
-needed.
+            /*
+            This header defines one type - skeleton_backend - which declares the minimal
+            interface to qualify as a backend for class number.  In addition you'll find
+            optional interfaces declared commented out - you can enable these or not as
+            needed.
 
-The process of writing a new backend for class number then reduces to a search
-and replace to change the name of this class to something meaningful, followed
-by "filling in the blanks" of each of the methods.
+            The process of writing a new backend for class number then reduces to a search
+            and replace to change the name of this class to something meaningful, followed
+            by "filling in the blanks" of each of the methods.
 
-NOTE: all of the methods shown below are simple declarations, be sure to make them
-inline, constexpr and/or noexcept as appropriate - as these annotations propogate
-upwards to operations on number<>'s.
+            NOTE: all of the methods shown below are simple declarations, be sure to make them
+            inline, constexpr and/or noexcept as appropriate - as these annotations propogate
+            upwards to operations on number<>'s.
 
-If the backend is to be itself a template, thn you will have rather more editing to
-do to add all the "template<...>" prefixes to the functions.
+            If the backend is to be itself a template, thn you will have rather more editing to
+            do to add all the "template<...>" prefixes to the functions.
 
-*/
+            */
 
+            struct skeleton_backend {
+                //
+                // Each backend need to declare 3 type lists which declare the types
+                // with which this can interoperate.  These lists must at least contain
+                // the widest type in each category - so "long long" must be the final
+                // type in the signed_types list for example.  Any narrower types if not
+                // present in the list will get promoted to the next wider type that is
+                // in the list whenever mixed arithmetic involving that type is encountered.
+                //
+                typedef boost::mpl::list</*signed char, short, int, long,*/ long long> signed_types;
+                typedef boost::mpl::list</* unsigned char, unsigned short, unsigned, unsigned long,*/ unsigned long long>
+                    unsigned_types;
+                typedef boost::mpl::list</*float, double,*/ long double> float_types;
+                //
+                // This typedef is only required if this is a floating point type, it is the type
+                // which holds the exponent:
+                //
+                typedef int exponent_type;
 
-struct skeleton_backend
-{
-   //
-   // Each backend need to declare 3 type lists which declare the types
-   // with which this can interoperate.  These lists must at least contain
-   // the widest type in each category - so "long long" must be the final
-   // type in the signed_types list for example.  Any narrower types if not
-   // present in the list will get promoted to the next wider type that is
-   // in the list whenever mixed arithmetic involving that type is encountered.
-   //
-   typedef mpl::list</*signed char, short, int, long,*/ long long>                                     signed_types;
-   typedef mpl::list</* unsigned char, unsigned short, unsigned, unsigned long,*/ unsigned long long>  unsigned_types;
-   typedef mpl::list</*float, double,*/ long double>                                                   float_types;
-   //
-   // This typedef is only required if this is a floating point type, it is the type
-   // which holds the exponent:
-   //
-   typedef int                                                         exponent_type;
-
-   // We must have a default constructor:
-   skeleton_backend();
-   skeleton_backend(const skeleton_backend& o);
+                // We must have a default constructor:
+                skeleton_backend();
+                skeleton_backend(const skeleton_backend& o);
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-   skeleton_backend(skeleton_backend&& o);
+                skeleton_backend(skeleton_backend&& o);
 #endif
 
-   // Optional constructors, we can make this type slightly more efficient
-   // by providing constructors from any type we can handle natively.
-   // These will also cause number<> to be implicitly constructible
-   // from these types unless we make such constructors explicit.
-   //
-   // skeleton_backend(int o);  // If there's an efficient initialisation from int for example.
+                // Optional constructors, we can make this type slightly more efficient
+                // by providing constructors from any type we can handle natively.
+                // These will also cause number<> to be implicitly constructible
+                // from these types unless we make such constructors explicit.
+                //
+                // skeleton_backend(int o);  // If there's an efficient initialisation from int for example.
 
-   //
-   // In the absense of converting constructors, operator= takes the strain.
-   // In addition to the usual suspects, there must be one operator= for each type
-   // listed in signed_types, unsigned_types, and float_types plus a string constructor.
-   //
-   skeleton_backend& operator=(const skeleton_backend& o);
+                //
+                // In the absense of converting constructors, operator= takes the strain.
+                // In addition to the usual suspects, there must be one operator= for each type
+                // listed in signed_types, unsigned_types, and float_types plus a string constructor.
+                //
+                skeleton_backend& operator=(const skeleton_backend& o);
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-   skeleton_backend& operator=(skeleton_backend&& o);
+                skeleton_backend& operator=(skeleton_backend&& o);
 #endif
-   skeleton_backend& operator=(unsigned long long i);
-   skeleton_backend& operator=(long long i);
-   skeleton_backend& operator=(long double i);
-   skeleton_backend& operator=(const char* s);
+                skeleton_backend& operator=(unsigned long long i);
+                skeleton_backend& operator=(long long i);
+                skeleton_backend& operator=(long double i);
+                skeleton_backend& operator=(const char* s);
 
-   void swap(skeleton_backend& o);
-   std::string str(std::streamsize digits, std::ios_base::fmtflags f) const;
-   void        negate();
-   int         compare(const skeleton_backend& o) const;
-   //
-   // Comparison with arithmetic types, default just constructs a temporary:
-   //
-   template <class A>
-   typename enable_if<is_arithmetic<A>, int>::type compare(A i) const
-   {
-      skeleton_backend t;
-      t = i;  //  Note: construct directly from i if supported.
-      return compare(t);
-   }
-};
+                void swap(skeleton_backend& o);
+                std::string str(std::streamsize digits, std::ios_base::fmtflags f) const;
+                void negate();
+                int compare(const skeleton_backend& o) const;
+                //
+                // Comparison with arithmetic types, default just constructs a temporary:
+                //
+                template<class A>
+                typename boost::enable_if<boost::is_arithmetic<A>, int>::type compare(A i) const {
+                    skeleton_backend t;
+                    t = i;    //  Note: construct directly from i if supported.
+                    return compare(t);
+                }
+            };
 
-//
-// Required non-members:
-//
-void eval_add(skeleton_backend& a, const skeleton_backend& b);
-void eval_subtract(skeleton_backend& a, const skeleton_backend& b);
-void eval_multiply(skeleton_backend& a, const skeleton_backend& b);
-void eval_divide(skeleton_backend& a, const skeleton_backend& b);
-//
-// Required only for integer types:
-//
-void eval_modulus(skeleton_backend& a, const skeleton_backend& b);
-void eval_bitwise_and(skeleton_backend& a, const skeleton_backend& b);
-void eval_bitwise_or(skeleton_backend& a, const skeleton_backend& b);
-void eval_bitwise_xor(skeleton_backend& a, const skeleton_backend& b);
-void eval_complement(skeleton_backend& a, const skeleton_backend& b);
-void eval_left_shift(skeleton_backend& a, unsigned shift);
-void eval_right_shift(skeleton_backend& a, unsigned shift);
-//
-// Conversions: must include at least unsigned long long, long long and long double.
-// Everything else is entirely optional:
-//
-void eval_convert_to(unsigned long long* result, const skeleton_backend& backend);
-void eval_convert_to(long long* result, const skeleton_backend& backend);
-void eval_convert_to(long double* result, const skeleton_backend& backend);
+            //
+            // Required non-members:
+            //
+            void eval_add(skeleton_backend& a, const skeleton_backend& b);
+            void eval_subtract(skeleton_backend& a, const skeleton_backend& b);
+            void eval_multiply(skeleton_backend& a, const skeleton_backend& b);
+            void eval_divide(skeleton_backend& a, const skeleton_backend& b);
+            //
+            // Required only for integer types:
+            //
+            void eval_modulus(skeleton_backend& a, const skeleton_backend& b);
+            void eval_bitwise_and(skeleton_backend& a, const skeleton_backend& b);
+            void eval_bitwise_or(skeleton_backend& a, const skeleton_backend& b);
+            void eval_bitwise_xor(skeleton_backend& a, const skeleton_backend& b);
+            void eval_complement(skeleton_backend& a, const skeleton_backend& b);
+            void eval_left_shift(skeleton_backend& a, unsigned shift);
+            void eval_right_shift(skeleton_backend& a, unsigned shift);
+            //
+            // Conversions: must include at least unsigned long long, long long and long double.
+            // Everything else is entirely optional:
+            //
+            void eval_convert_to(unsigned long long* result, const skeleton_backend& backend);
+            void eval_convert_to(long long* result, const skeleton_backend& backend);
+            void eval_convert_to(long double* result, const skeleton_backend& backend);
 
-//void eval_convert_to(unsigned long* result, const skeleton_backend& backend);
-//void eval_convert_to(unsigned* result, const skeleton_backend& backend);
-//void eval_convert_to(unsigned short* result, const skeleton_backend& backend);
-//void eval_convert_to(unsigned char* result, const skeleton_backend& backend);
+            // void eval_convert_to(unsigned long* result, const skeleton_backend& backend);
+            // void eval_convert_to(unsigned* result, const skeleton_backend& backend);
+            // void eval_convert_to(unsigned short* result, const skeleton_backend& backend);
+            // void eval_convert_to(unsigned char* result, const skeleton_backend& backend);
 
-//void eval_convert_to(char* result, const skeleton_backend& backend);
+            // void eval_convert_to(char* result, const skeleton_backend& backend);
 
-//void eval_convert_to(long* result, const skeleton_backend& backend);
-//void eval_convert_to(int* result, const skeleton_backend& backend);
-//void eval_convert_to(short* result, const skeleton_backend& backend);
-//void eval_convert_to(signed char* result, const skeleton_backend& backend);
+            // void eval_convert_to(long* result, const skeleton_backend& backend);
+            // void eval_convert_to(int* result, const skeleton_backend& backend);
+            // void eval_convert_to(short* result, const skeleton_backend& backend);
+            // void eval_convert_to(signed char* result, const skeleton_backend& backend);
 
-//void eval_convert_to(double* result, const skeleton_backend& backend);
-//void eval_convert_to(float* result, const skeleton_backend& backend);
+            // void eval_convert_to(double* result, const skeleton_backend& backend);
+            // void eval_convert_to(float* result, const skeleton_backend& backend);
 
-//
-// Operations which are required *only* if we have a floating point type:
-//
-void eval_frexp(skeleton_backend& result, const skeleton_backend& arg, skeleton_backend::exponent_type* p_exponent);
-void eval_frexp(skeleton_backend& result, const skeleton_backend& arg, int* p_exponent);  // throws a runtime_error if the exponent is too large for an int
-void eval_ldexp(skeleton_backend& result, const skeleton_backend& arg, skeleton_backend::exponent_type exponent);
-void eval_ldexp(skeleton_backend& result, const skeleton_backend& arg, int exponent);
-void eval_floor(skeleton_backend& result, const skeleton_backend& arg);
-void eval_ceil(skeleton_backend& result, const skeleton_backend& arg);
-void eval_sqrt(skeleton_backend& result, const skeleton_backend& arg);
-//
-// Operations defined *only* if we have a complex number type, type
-// skeleton_real_type is assumed to be the real number type matching
-// this type.
-//
-void eval_conj(skeleton_backend& result, const skeleton_backend& arg);
-void eval_proj(skeleton_backend& result, const skeleton_backend& arg);
-//void eval_real(skeleton_real_type& result, const skeleton_backend& arg);
-//void eval_set_real(skeleton_real_type& result, const skeleton_backend& arg);
-//void eval_imag(skeleton_real_type& result, const skeleton_backend& arg);
-//void eval_set_real(skeleton_type& result, const skeleton_real_type& arg);
-//void eval_set_imag(skeleton_type& result, const skeleton_real_type& arg);
+            //
+            // Operations which are required *only* if we have a floating point type:
+            //
+            void eval_frexp(skeleton_backend& result, const skeleton_backend& arg,
+                            skeleton_backend::exponent_type* p_exponent);
+            void eval_frexp(skeleton_backend& result, const skeleton_backend& arg,
+                            int* p_exponent);    // throws a runtime_error if the exponent is too large for an int
+            void eval_ldexp(skeleton_backend& result, const skeleton_backend& arg,
+                            skeleton_backend::exponent_type exponent);
+            void eval_ldexp(skeleton_backend& result, const skeleton_backend& arg, int exponent);
+            void eval_floor(skeleton_backend& result, const skeleton_backend& arg);
+            void eval_ceil(skeleton_backend& result, const skeleton_backend& arg);
+            void eval_sqrt(skeleton_backend& result, const skeleton_backend& arg);
+            //
+            // Operations defined *only* if we have a complex number type, type
+            // skeleton_real_type is assumed to be the real number type matching
+            // this type.
+            //
+            void eval_conj(skeleton_backend& result, const skeleton_backend& arg);
+            void eval_proj(skeleton_backend& result, const skeleton_backend& arg);
+            // void eval_real(skeleton_real_type& result, const skeleton_backend& arg);
+            // void eval_set_real(skeleton_real_type& result, const skeleton_backend& arg);
+            // void eval_imag(skeleton_real_type& result, const skeleton_backend& arg);
+            // void eval_set_real(skeleton_type& result, const skeleton_real_type& arg);
+            // void eval_set_imag(skeleton_type& result, const skeleton_real_type& arg);
 
-//
-// Hashing support, not strictly required, but it is used in our tests:
-//
-std::size_t hash_value(const skeleton_backend& arg);
+            //
+            // Hashing support, not strictly required, but it is used in our tests:
+            //
+            std::size_t hash_value(const skeleton_backend& arg);
 //
 // We're now into strictly optional requirements, everything that follows is
 // nice to have, but can be synthesised from the operators above if required.
@@ -172,11 +173,11 @@ std::size_t hash_value(const skeleton_backend& arg);
 // assign_components: required number types with 2 seperate components (rationals and complex numbers).
 // Type skeleton_component_type is whatever the corresponding backend type for the components is:
 //
-//void assign_conponents(skeleton_backend& result, skeleton_component_type const& a, skeleton_component_type const& b);
+// void assign_conponents(skeleton_backend& result, skeleton_component_type const& a, skeleton_component_type const& b);
 //
 // Again for arithmetic types, overload for whatever arithmetic types are directly supported:
 //
-//void assign_conponents(skeleton_backend& result, double a, double b);
+// void assign_conponents(skeleton_backend& result, double a, double b);
 //
 // Optional comparison operators:
 //
@@ -551,15 +552,14 @@ void eval_multiply_subtract(skeleton_backend& result, float b, const skeleton_ba
 //
 // Increment and decrement:
 //
-//void eval_increment(skeleton_backend& arg);
-//void eval_decrement(skeleton_backend& arg);
+// void eval_increment(skeleton_backend& arg);
+// void eval_decrement(skeleton_backend& arg);
 //
 // abs/fabs:
 //
 // void eval_abs(skeleton_backend& result, const skeleton_backend& arg);
 // void eval_fabs(skeleton_backend& result, const skeleton_backend& arg);
 //
-
 
 //
 // Now operations on Integer types, starting with modulus:
@@ -764,12 +764,13 @@ void eval_bitwise_xor(skeleton_backend& result, float b, const skeleton_backend&
 //
 // left and right shift:
 //
-//void eval_left_shift(skeleton_backend& result, const skeleton_backend& arg, std::size_t shift);
-//void eval_right_shift(skeleton_backend& result, const skeleton_backend& arg, std::size_t shift);
+// void eval_left_shift(skeleton_backend& result, const skeleton_backend& arg, std::size_t shift);
+// void eval_right_shift(skeleton_backend& result, const skeleton_backend& arg, std::size_t shift);
 //
 // Quotient and remainder:
 //
-// void eval_qr(const skeleton_backend& numerator, const skeleton_backend& denominator, skeleton_backend& quotient, skeleteon_backend& remainder);
+// void eval_qr(const skeleton_backend& numerator, const skeleton_backend& denominator, skeleton_backend& quotient,
+// skeleteon_backend& remainder);
 //
 // Misc integer ops:
 //
@@ -875,16 +876,17 @@ void eval_powm(skeleton_backend& result, const skeleton_backend& a, int b, int c
 void eval_powm(skeleton_backend& result, const skeleton_backend& a, short b, short c);
 void eval_powm(skeleton_backend& result, const skeleton_backend& a, signed char b, signed char c);
 #endif
-//
-// Integer sqrt:
-//
-// void eval_integer_sqrt(skeleton_backend& result, const skeleton_backend& arg, skeleton_backend& remainder);
+            //
+            // Integer sqrt:
+            //
+            // void eval_integer_sqrt(skeleton_backend& result, const skeleton_backend& arg, skeleton_backend&
+            // remainder);
 
-/*********************************************************************************************
+            /*********************************************************************************************
 
-     FLOATING POINT FUNCTIONS
+                 FLOATING POINT FUNCTIONS
 
-***********************************************************************************************/
+            ***********************************************************************************************/
 
 #if 0
 
@@ -1071,92 +1073,91 @@ void eval_rint(skeleton_backend& result, const skeleton_backend& arg);
 void eval_log2(skeleton_backend& result, const skeleton_backend& arg);
 #endif
 
+        }    // namespace backends
 
-} // namespace backends
+        //
+        // Import the backend into this namespace:
+        //
+        using nil::crypto3::multiprecision::backends::skeleton_backend;
+        //
+        // Typedef whatever number's make use of this backend:
+        //
+        typedef number<skeleton_backend, et_off> skeleton_number;
+        //
+        // Define a category for this number type, one of:
+        //
+        //    number_kind_integer
+        //    number_kind_floating_point
+        //    number_kind_rational
+        //    number_kind_fixed_point
+        //    number_kind_complex
+        //
+        template<>
+        struct number_category<skeleton_backend> : public boost::mpl::int_<number_kind_floating_point> { };
 
-//
-// Import the backend into this namespace:
-//
-using boost::multiprecision::backends::skeleton_backend;
-//
-// Typedef whatever number's make use of this backend:
-//
-typedef number<skeleton_backend, et_off> skeleton_number;
-//
-// Define a category for this number type, one of:
-// 
-//    number_kind_integer
-//    number_kind_floating_point
-//    number_kind_rational
-//    number_kind_fixed_point
-//    number_kind_complex
-//
-template<>
-struct number_category<skeleton_backend > : public mpl::int_<number_kind_floating_point>
-{};
+        //
+        // These 2 traits classes are required for complex types only:
+        //
+        /*
+        template <expression_template_option ExpressionTemplates>
+        struct component_type<number<skeleton_backend, ExpressionTemplates> >
+        {
+           typedef number<skeleton_real_type, ExpressionTemplates> type;
+        };
 
-//
-// These 2 traits classes are required for complex types only:
-//
-/*
-template <expression_template_option ExpressionTemplates>
-struct component_type<number<skeleton_backend, ExpressionTemplates> >
-{
-   typedef number<skeleton_real_type, ExpressionTemplates> type;
-};
+        template <expression_template_option ExpressionTemplates>
+        struct complex_result_from_scalar<number<skeleton_real_type, ExpressionTemplates> >
+        {
+           typedef number<skeleton_backend, ExpressionTemplates> type;
+        };
+        */
 
-template <expression_template_option ExpressionTemplates>
-struct complex_result_from_scalar<number<skeleton_real_type, ExpressionTemplates> >
-{
-   typedef number<skeleton_backend, ExpressionTemplates> type;
-};
-*/
+        /**************************************************************
 
-/**************************************************************
+        OVERLOADABLE FUNCTIONS - FLOATING POINT TYPES ONLY
 
-OVERLOADABLE FUNCTIONS - FLOATING POINT TYPES ONLY
-
-****************************************************************/
+        ****************************************************************/
 
 #if 0
 
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 int sign(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 int signbit(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> changesign(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> copysign(const number<skeleton_backend, ExpressionTemplates>& a, const number<skeleton_backend, ExpressionTemplates>& b);
 
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> cbrt(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> erf(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> erfc(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> expm1(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> log1p(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> tgamma(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> lgamma(const number<skeleton_backend, ExpressionTemplates>& arg);
 
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 long lrint(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 long long llrint(const number<skeleton_backend, ExpressionTemplates>& arg);
 
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> nextafter(const number<skeleton_backend, ExpressionTemplates>& a, const number<skeleton_backend, ExpressionTemplates>& b);
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> nexttoward(const number<skeleton_backend, ExpressionTemplates>& a, const number<skeleton_backend, ExpressionTemplates>& b);
 
 #endif
 
-}} // namespace boost::multiprecision
+    }    // namespace multiprecision
+}    // namespace boost
 
 /**********************************************************************************
 
@@ -1166,32 +1167,32 @@ Nice to have stuff for better integration with Boost.Math.
 ***********************************************************************************/
 
 namespace boost {
-namespace math {
-namespace tools {
+    namespace math {
+        namespace tools {
 
 #if 0
 
 template <>
-int digits<boost::multiprecision::number<boost::multiprecision::skeleton_number> >();
+int digits<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::skeleton_number> >();
 
 template <>
-boost::multiprecision::mpfr_float max_value<boost::multiprecision::skeleton_number>();
+nil::crypto3::multiprecision::mpfr_float max_value<nil::crypto3::multiprecision::skeleton_number>();
 
 template <>
-boost::multiprecision::mpfr_float min_value<boost::multiprecision::skeleton_number>();
+nil::crypto3::multiprecision::mpfr_float min_value<nil::crypto3::multiprecision::skeleton_number>();
 
 #endif
 
-} // namespace tools
+        }    // namespace tools
 
-namespace constants {
-namespace detail {
+        namespace constants {
+            namespace detail {
 
 #if 0
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-struct constant_pi<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >
+template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+struct constant_pi<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> result_type;
+   typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates> result_type;
    //
    // Fixed N-digit precision, return reference to internal/cached object:
    //
@@ -1207,103 +1208,127 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::skeleton
 //
 #endif
 
-} // namespace detail
-} // namespace constants
+            }    // namespace detail
+        }        // namespace constants
 
-}} // namespace boost::math
-
+    }    // namespace math
+}    // namespace boost
 
 namespace std {
 
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >
-{
-   typedef boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> number_type;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    class numeric_limits<
+        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>> {
+        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::skeleton_backend,
+                                                     ExpressionTemplates>
+            number_type;
 
- public:
-   BOOST_STATIC_CONSTEXPR bool is_specialized = true;
-   static number_type(min)();
-   static number_type(max)();
-   static number_type lowest();
-   BOOST_STATIC_CONSTEXPR int                digits       = 0;
-   BOOST_STATIC_CONSTEXPR int                digits10     = 0;
-   BOOST_STATIC_CONSTEXPR int                max_digits10 = 0;
-   BOOST_STATIC_CONSTEXPR bool               is_signed    = false;
-   BOOST_STATIC_CONSTEXPR bool               is_integer   = false;
-   BOOST_STATIC_CONSTEXPR bool               is_exact     = false;
-   BOOST_STATIC_CONSTEXPR int                radix        = 2;
-   static number_type                        epsilon();
-   static number_type                        round_error();
-   BOOST_STATIC_CONSTEXPR int                min_exponent      = 0;
-   BOOST_STATIC_CONSTEXPR int                min_exponent10    = 0;
-   BOOST_STATIC_CONSTEXPR int                max_exponent      = 0;
-   BOOST_STATIC_CONSTEXPR int                max_exponent10    = 0;
-   BOOST_STATIC_CONSTEXPR bool               has_infinity      = false;
-   BOOST_STATIC_CONSTEXPR bool               has_quiet_NaN     = false;
-   BOOST_STATIC_CONSTEXPR bool               has_signaling_NaN = false;
-   BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm        = denorm_absent;
-   BOOST_STATIC_CONSTEXPR bool               has_denorm_loss   = false;
-   static number_type                        infinity();
-   static number_type                        quiet_NaN();
-   static number_type                        signaling_NaN();
-   static number_type                        denorm_min();
-   BOOST_STATIC_CONSTEXPR bool               is_iec559       = false;
-   BOOST_STATIC_CONSTEXPR bool               is_bounded      = false;
-   BOOST_STATIC_CONSTEXPR bool               is_modulo       = false;
-   BOOST_STATIC_CONSTEXPR bool               traps           = false;
-   BOOST_STATIC_CONSTEXPR bool               tinyness_before = false;
-   BOOST_STATIC_CONSTEXPR float_round_style  round_style     = round_toward_zero;
-};
+    public:
+        BOOST_STATIC_CONSTEXPR bool is_specialized = true;
+        static number_type(min)();
+        static number_type(max)();
+        static number_type lowest();
+        BOOST_STATIC_CONSTEXPR int digits = 0;
+        BOOST_STATIC_CONSTEXPR int digits10 = 0;
+        BOOST_STATIC_CONSTEXPR int max_digits10 = 0;
+        BOOST_STATIC_CONSTEXPR bool is_signed = false;
+        BOOST_STATIC_CONSTEXPR bool is_integer = false;
+        BOOST_STATIC_CONSTEXPR bool is_exact = false;
+        BOOST_STATIC_CONSTEXPR int radix = 2;
+        static number_type epsilon();
+        static number_type round_error();
+        BOOST_STATIC_CONSTEXPR int min_exponent = 0;
+        BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
+        BOOST_STATIC_CONSTEXPR int max_exponent = 0;
+        BOOST_STATIC_CONSTEXPR int max_exponent10 = 0;
+        BOOST_STATIC_CONSTEXPR bool has_infinity = false;
+        BOOST_STATIC_CONSTEXPR bool has_quiet_NaN = false;
+        BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
+        BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
+        BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
+        static number_type infinity();
+        static number_type quiet_NaN();
+        static number_type signaling_NaN();
+        static number_type denorm_min();
+        BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
+        BOOST_STATIC_CONSTEXPR bool is_bounded = false;
+        BOOST_STATIC_CONSTEXPR bool is_modulo = false;
+        BOOST_STATIC_CONSTEXPR bool traps = false;
+        BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
+        BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
+    };
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::digits;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::digits10;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::max_digits10;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::is_signed;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::is_integer;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::is_exact;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::radix;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::min_exponent;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::min_exponent10;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::max_exponent;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::max_exponent10;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::has_infinity;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::has_quiet_NaN;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::has_signaling_NaN;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::has_denorm;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::has_denorm_loss;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::is_iec559;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::is_bounded;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::is_modulo;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::traps;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::tinyness_before;
-template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >::round_style;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::digits;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::digits10;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::max_digits10;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::is_signed;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::is_integer;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::is_exact;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::radix;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::min_exponent;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::min_exponent10;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::max_exponent;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::max_exponent10;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::has_infinity;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::has_quiet_NaN;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::has_signaling_NaN;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::has_denorm;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::has_denorm_loss;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::is_iec559;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::is_bounded;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::is_modulo;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::traps;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::tinyness_before;
+    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::round_style;
 
 #endif
 
-} // namespace std
+}    // namespace std
 
 #endif

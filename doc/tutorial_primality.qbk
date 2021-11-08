@@ -12,7 +12,7 @@
 
 The library implements a Miller-Rabin test for primality:
 
-   #include <boost/multiprecision/miller_rabin.hpp>
+   #include <nil/crypto3/multiprecision/miller_rabin.hpp>
 
    template <class Backend, expression_template_option ExpressionTemplates, class Engine>
    bool miller_rabin_test(const number<Backend, ExpressionTemplates>& n, unsigned trials, Engine& gen);

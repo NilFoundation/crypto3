@@ -5,12 +5,11 @@
 
 #include "../performance_test.hpp"
 #if defined(TEST_MPF)
-#include <boost/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
 #endif
 
-void test02()
-{
+void test02() {
 #ifdef TEST_MPF
-   test<boost::multiprecision::mpf_float_50>("gmp_float", 50);
+    test<nil::crypto3::multiprecision::mpf_float_50>("gmp_float", 50);
 #endif
 }

@@ -5,21 +5,20 @@
 
 #include "../performance_test.hpp"
 #if defined(TEST_TOMMATH)
-#include <boost/multiprecision/tommath.hpp>
+#include <nil/crypto3/multiprecision/tommath.hpp>
 #endif
 
-void test44()
-{
+void test44() {
 #ifdef TEST_TOMMATH
-   test<boost::multiprecision::tom_int>("tommath_int", 1024*4);
-   /*
-   //
-   // These are actually too slow to test!!!
-   //
-   test<boost::multiprecision::tom_rational>("tom_rational", 128);
-   test<boost::multiprecision::tom_rational>("tom_rational", 256);
-   test<boost::multiprecision::tom_rational>("tom_rational", 512);
-   test<boost::multiprecision::tom_rational>("tom_rational", 1024);
-   */
+    test<nil::crypto3::multiprecision::tom_int>("tommath_int", 1024 * 4);
+    /*
+    //
+    // These are actually too slow to test!!!
+    //
+    test<nil::crypto3::multiprecision::tom_rational>("tom_rational", 128);
+    test<nil::crypto3::multiprecision::tom_rational>("tom_rational", 256);
+    test<nil::crypto3::multiprecision::tom_rational>("tom_rational", 512);
+    test<nil::crypto3::multiprecision::tom_rational>("tom_rational", 1024);
+    */
 #endif
 }

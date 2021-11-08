@@ -5,15 +5,15 @@
 
 //[safe_prime
 
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/miller_rabin.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/miller_rabin.hpp>
 #include <iostream>
 #include <iomanip>
 
 int main()
 {
    using namespace boost::random;
-   using namespace boost::multiprecision;
+   using namespace nil::crypto3::multiprecision;
 
    typedef cpp_int int_type;
    mt11213b base_gen(clock());

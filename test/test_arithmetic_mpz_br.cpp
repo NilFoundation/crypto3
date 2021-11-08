@@ -7,7 +7,7 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
 
 #define NO_MIXED_OPS
 #define BOOST_MP_NOT_TESTING_NUMBER
@@ -15,20 +15,21 @@
 #include "test_arithmetic.hpp"
 #include <boost/rational.hpp>
 
-template <class T>
-struct is_boost_rational<boost::rational<T> > : public boost::mpl::true_
-{};
+template<class T>
+struct is_boost_rational<boost::rational<T>> : public boost::mpl::true_ { };
 
-namespace boost { namespace multiprecision {
+namespace nil {
+    namespace crypto3 {
+        namespace multiprecision {
 
-template <>
-struct number_category<rational<mpz_int> > : public mpl::int_<number_kind_rational>
-{};
+            template<>
+            struct number_category<boost::rational<mpz_int>> : public boost::mpl::int_<number_kind_rational> { };
 
-}} // namespace boost::multiprecision
+        }    // namespace multiprecision
+    }        // namespace crypto3
+}    // namespace nil
 
-int main()
-{
-   test<boost::rational<boost::multiprecision::mpz_int> >();
-   return boost::report_errors();
+int main() {
+    test<boost::rational<nil::crypto3::multiprecision::mpz_int>>();
+    return boost::report_errors();
 }

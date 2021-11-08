@@ -7,13 +7,13 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/gmp.hpp>
-#include <boost/multiprecision/rational_adaptor.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/rational_adaptor.hpp>
 
 #include "test_arithmetic.hpp"
 
-int main()
-{
-   test<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::gmp_int> > >();
-   return boost::report_errors();
+int main() {
+    test<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::rational_adaptor<nil::crypto3::multiprecision::gmp_int>>>();
+    return boost::report_errors();
 }

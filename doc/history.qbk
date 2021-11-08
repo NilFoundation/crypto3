@@ -418,7 +418,7 @@ Open question - what should be the default - int32_t or int64_t?  (done 2012/09/
    tied to the actual data representation used.]]
  [[How do I choose between Boost.Multiprecision `cpp_bin_50` and `cpp_dec_50`?]
    [Unless you have a specific reason to choose `cpp_dec_`, then the default choice should be `cpp_bin_`, 
-   for example using the convenience `typedefs` like `boost::multiprecision::cpp_bin_50` or `boost::multiprecision::cpp_bin_100`.
+   for example using the convenience `typedefs` like `nil::crypto3::multiprecision::cpp_bin_50` or `nil::crypto3::multiprecision::cpp_bin_100`.
 
   In general, both work well and give the same results and at roughly the same speed with `cpp_dec_50` sometimes faster.
 

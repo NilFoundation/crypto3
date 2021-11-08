@@ -5,12 +5,13 @@
 
 #include "../performance_test.hpp"
 #if defined(TEST_CPP_INT)
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 #endif
 
-void test41()
-{
+void test41() {
 #ifdef TEST_CPP_INT
-   test<boost::multiprecision::cpp_int>("cpp_int", (boost::multiprecision::backends::karatsuba_cutoff + 2) * sizeof(boost::multiprecision::limb_type) * CHAR_BIT);
+    test<nil::crypto3::multiprecision::cpp_int>("cpp_int",
+                                                (nil::crypto3::multiprecision::backends::karatsuba_cutoff + 2) *
+                                                    sizeof(nil::crypto3::multiprecision::limb_type) * CHAR_BIT);
 #endif
 }

@@ -10,7 +10,7 @@ In the following, we will show how using MPC backend allows for the same operati
 //[mpc_eg
 #include <iostream>
 #include <complex>
-#include <boost/multiprecision/mpc.hpp>
+#include <nil/crypto3/multiprecision/mpc.hpp>
 
 template<class Complex>
 void complex_number_examples()
@@ -76,7 +76,7 @@ int main()
     std::cout << "First, some operations we usually perform with std::complex:\n";
     complex_number_examples<std::complex<double>>();
     std::cout << "\nNow the same operations performed using the MPC backend:\n";
-    complex_number_examples<boost::multiprecision::mpc_complex_50>();
+    complex_number_examples<nil::crypto3::multiprecision::mpc_complex_50>();
 
     return 0;
 }

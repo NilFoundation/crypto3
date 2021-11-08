@@ -7,23 +7,20 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
 
 #include "test_arithmetic.hpp"
 
-template <unsigned D>
-struct related_type<boost::multiprecision::number<boost::multiprecision::gmp_float<D> > >
-{
-   typedef boost::multiprecision::number<boost::multiprecision::gmp_float<D / 2> > type;
+template<unsigned D>
+struct related_type<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::gmp_float<D>>> {
+    typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::gmp_float<D / 2>> type;
 };
-template <>
-struct related_type<boost::multiprecision::mpf_float>
-{
-   typedef boost::multiprecision::mpz_int type;
+template<>
+struct related_type<nil::crypto3::multiprecision::mpf_float> {
+    typedef nil::crypto3::multiprecision::mpz_int type;
 };
 
-int main()
-{
-   test<boost::multiprecision::mpf_float_50>();
-   return boost::report_errors();
+int main() {
+    test<nil::crypto3::multiprecision::mpf_float_50>();
+    return boost::report_errors();
 }

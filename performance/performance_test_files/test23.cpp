@@ -5,12 +5,11 @@
 
 #include "../performance_test.hpp"
 #if defined(TEST_MPQ)
-#include <boost/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
 #endif
 
-void test23()
-{
+void test23() {
 #ifdef TEST_MPQ
-   test<boost::multiprecision::mpq_rational>("mpq_rational", 512);
+    test<nil::crypto3::multiprecision::mpq_rational>("mpq_rational", 512);
 #endif
 }

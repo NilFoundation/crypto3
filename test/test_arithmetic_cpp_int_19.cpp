@@ -3,16 +3,19 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 #include "test_arithmetic.hpp"
 
-template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-struct is_twos_complement_integer<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::checked, Allocator>, ExpressionTemplates> > : public boost::mpl::false_
-{};
+template<unsigned MinBits, unsigned MaxBits, nil::crypto3::multiprecision::cpp_integer_type SignType, class Allocator,
+         nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+struct is_twos_complement_integer<nil::crypto3::multiprecision::number<
+    nil::crypto3::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, nil::crypto3::multiprecision::checked,
+                                                  Allocator>,
+    ExpressionTemplates>> : public boost::mpl::false_ { };
 
-int main()
-{
-   test<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::int128_t::backend_type> > >();
-   return boost::report_errors();
+int main() {
+    test<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::rational_adaptor<nil::crypto3::multiprecision::int128_t::backend_type>>>();
+    return boost::report_errors();
 }

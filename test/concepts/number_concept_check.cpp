@@ -13,13 +13,16 @@
 #pragma warning(disable : 4512)
 #pragma warning(disable : 4127)
 #pragma warning(disable : 4512)
-#pragma warning(disable : 4503) // decorated name length exceeded, name was truncated
+#pragma warning(disable : 4503)    // decorated name length exceeded, name was truncated
 #endif
 
 #include <boost/container_hash/hash.hpp>
 #include <libs/math/test/compile_test/poison.hpp>
 
-#if !defined(TEST_MPF_50) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50) && !defined(TEST_MPFR_6) && !defined(TEST_MPFR_15) && !defined(TEST_MPFR_17) && !defined(TEST_MPFR_30) && !defined(TEST_CPP_DEC_FLOAT_NO_ET) && !defined(TEST_LOGGED_ADAPTER) && !defined(TEST_CPP_BIN_FLOAT)
+#if !defined(TEST_MPF_50) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_DEC_FLOAT) && \
+    !defined(TEST_MPFR_50) && !defined(TEST_MPFR_6) && !defined(TEST_MPFR_15) && !defined(TEST_MPFR_17) &&   \
+    !defined(TEST_MPFR_30) && !defined(TEST_CPP_DEC_FLOAT_NO_ET) && !defined(TEST_LOGGED_ADAPTER) &&         \
+    !defined(TEST_CPP_BIN_FLOAT)
 #define TEST_MPF_50
 #define TEST_BACKEND
 #define TEST_MPZ
@@ -43,209 +46,215 @@
 #endif
 
 #if defined(TEST_MPF_50) || defined(TEST_MPZ)
-#include <boost/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
 #endif
 #ifdef TEST_BACKEND
-#include <boost/multiprecision/concepts/mp_number_archetypes.hpp>
+#include <nil/crypto3/multiprecision/concepts/mp_number_archetypes.hpp>
 #endif
 #if defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_DEC_FLOAT_NO_ET) || defined(TEST_LOGGED_ADAPTER)
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_dec_float.hpp>
 #endif
 #if defined(TEST_CPP_BIN_FLOAT)
-#include <boost/multiprecision/cpp_bin_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
 #endif
-#if defined(TEST_MPFR_50) || defined(TEST_MPFR_6) || defined(TEST_MPFR_15) || defined(TEST_MPFR_17) || defined(TEST_MPFR_30)
-#include <boost/multiprecision/mpfr.hpp>
+#if defined(TEST_MPFR_50) || defined(TEST_MPFR_6) || defined(TEST_MPFR_15) || defined(TEST_MPFR_17) || \
+    defined(TEST_MPFR_30)
+#include <nil/crypto3/multiprecision/mpfr.hpp>
 #endif
 #ifdef TEST_LOGGED_ADAPTER
-#include <boost/multiprecision/logged_adaptor.hpp>
+#include <nil/crypto3/multiprecision/logged_adaptor.hpp>
 #endif
 
 #include <boost/math/concepts/real_type_concept.hpp>
 
-template <class T>
-void test_extra(T)
-{
-   T t = 1;
-   t   = abs(t);
-   t   = abs(t * t);
+template<class T>
+void test_extra(T) {
+    T t = 1;
+    t = abs(t);
+    t = abs(t * t);
 
-   t = fabs(t);
-   t = fabs(t * t);
+    t = fabs(t);
+    t = fabs(t * t);
 
-   t = sqrt(t);
-   t = sqrt(t * t);
+    t = sqrt(t);
+    t = sqrt(t * t);
 
-   t = floor(t);
-   t = floor(t * t);
+    t = floor(t);
+    t = floor(t * t);
 
-   t = ceil(t);
-   t = ceil(t * t);
+    t = ceil(t);
+    t = ceil(t * t);
 
-   t = trunc(t);
-   t = trunc(t * t);
+    t = trunc(t);
+    t = trunc(t * t);
 
-   t = round(t);
-   t = round(t * t);
+    t = round(t);
+    t = round(t * t);
 
-   t = exp(t);
-   t = exp(t * t);
+    t = exp(t);
+    t = exp(t * t);
 
-   t = log(t);
-   t = log(t * t);
+    t = log(t);
+    t = log(t * t);
 
-   t = log10(t);
-   t = log10(t * t);
+    t = log10(t);
+    t = log10(t * t);
 
-   t = cos(t);
-   t = cos(t * t);
+    t = cos(t);
+    t = cos(t * t);
 
-   t = sin(t);
-   t = sin(t * t);
+    t = sin(t);
+    t = sin(t * t);
 
-   t = tan(t);
-   t = tan(t * t);
+    t = tan(t);
+    t = tan(t * t);
 
-   t = asin(t);
-   t = asin(t * t);
+    t = asin(t);
+    t = asin(t * t);
 
-   t = atan(t);
-   t = atan(t * t);
+    t = atan(t);
+    t = atan(t * t);
 
-   t = acos(t);
-   t = acos(t * t);
+    t = acos(t);
+    t = acos(t * t);
 
-   t = cosh(t);
-   t = cosh(t * t);
+    t = cosh(t);
+    t = cosh(t * t);
 
-   t = sinh(t);
-   t = sinh(t * t);
+    t = sinh(t);
+    t = sinh(t * t);
 
-   t = tanh(t);
-   t = tanh(t * t);
+    t = tanh(t);
+    t = tanh(t * t);
 
-   double dval = 2;
-   t           = pow(t, t);
-   t           = pow(t, t * t);
-   t           = pow(t, dval);
-   t           = pow(t * t, t);
-   t           = pow(t * t, t * t);
-   t           = pow(t * t, dval);
-   t           = pow(dval, t);
-   t           = pow(dval, t * t);
+    double dval = 2;
+    t = pow(t, t);
+    t = pow(t, t * t);
+    t = pow(t, dval);
+    t = pow(t * t, t);
+    t = pow(t * t, t * t);
+    t = pow(t * t, dval);
+    t = pow(dval, t);
+    t = pow(dval, t * t);
 
-   t = atan2(t, t);
-   t = atan2(t, t * t);
-   t = atan2(t, dval);
-   t = atan2(t * t, t);
-   t = atan2(t * t, t * t);
-   t = atan2(t * t, dval);
-   t = atan2(dval, t);
-   t = atan2(dval, t * t);
+    t = atan2(t, t);
+    t = atan2(t, t * t);
+    t = atan2(t, dval);
+    t = atan2(t * t, t);
+    t = atan2(t * t, t * t);
+    t = atan2(t * t, dval);
+    t = atan2(dval, t);
+    t = atan2(dval, t * t);
 
-   t = fmod(t, t);
-   t = fmod(t, t * t);
-   t = fmod(t, dval);
-   t = fmod(t * t, t);
-   t = fmod(t * t, t * t);
-   t = fmod(t * t, dval);
-   t = fmod(dval, t);
-   t = fmod(dval, t * t);
+    t = fmod(t, t);
+    t = fmod(t, t * t);
+    t = fmod(t, dval);
+    t = fmod(t * t, t);
+    t = fmod(t * t, t * t);
+    t = fmod(t * t, dval);
+    t = fmod(dval, t);
+    t = fmod(dval, t * t);
 
-   typedef typename T::backend_type             backend_type;
-   typedef typename backend_type::exponent_type exp_type;
-   exp_type                                     e = 0;
-   int                                          i = 0;
+    typedef typename T::backend_type backend_type;
+    typedef typename backend_type::exponent_type exp_type;
+    exp_type e = 0;
+    int i = 0;
 
-   t = ldexp(t, i);
-   t = ldexp(t * t, i);
-   t = ldexp(t, e);
-   t = ldexp(t * t, e);
+    t = ldexp(t, i);
+    t = ldexp(t * t, i);
+    t = ldexp(t, e);
+    t = ldexp(t * t, e);
 
-   t = frexp(t, &i);
-   t = frexp(t * t, &i);
-   t = frexp(t, &e);
-   t = frexp(t * t, &e);
+    t = frexp(t, &i);
+    t = frexp(t * t, &i);
+    t = frexp(t, &e);
+    t = frexp(t * t, &e);
 
-   t = scalbn(t, i);
-   t = scalbn(t * t, i);
-   t = scalbn(t, e);
-   t = scalbn(t * t, e);
+    t = scalbn(t, i);
+    t = scalbn(t * t, i);
+    t = scalbn(t, e);
+    t = scalbn(t * t, e);
 
-   t = logb(t);
-   t = logb(t * t);
-   e = ilogb(t);
-   e = ilogb(t * t);
+    t = logb(t);
+    t = logb(t * t);
+    e = ilogb(t);
+    e = ilogb(t * t);
 }
 
-void foo()
-{
+void foo() {
 #ifdef TEST_BACKEND
-   test_extra(boost::multiprecision::concepts::mp_number_float_architype());
+    test_extra(nil::crypto3::multiprecision::concepts::mp_number_float_architype());
 #endif
 #ifdef TEST_MPF_50
-   test_extra(boost::multiprecision::mpf_float_50());
+    test_extra(nil::crypto3::multiprecision::mpf_float_50());
 #endif
 #ifdef TEST_MPFR_50
-   test_extra(boost::multiprecision::mpfr_float_50());
+    test_extra(nil::crypto3::multiprecision::mpfr_float_50());
 #endif
 #ifdef TEST_MPFR_6
-   test_extra(boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<6> >());
+    test_extra(nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<6>>());
 #endif
 #ifdef TEST_MPFR_15
-   test_extra(boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<15> >());
+    test_extra(nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<15>>());
 #endif
 #ifdef TEST_MPFR_17
-   test_extra(boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<17> >());
+    test_extra(nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<17>>());
 #endif
 #ifdef TEST_MPFR_30
-   test_extra(boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<30> >());
+    test_extra(nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<30>>());
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-   test_extra(boost::multiprecision::cpp_dec_float_50());
+    test_extra(nil::crypto3::multiprecision::cpp_dec_float_50());
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
-   test_extra(boost::multiprecision::cpp_bin_float_50());
+    test_extra(nil::crypto3::multiprecision::cpp_bin_float_50());
 #endif
 #ifdef TEST_CPP_DEC_FLOAT_NO_ET
-   test_extra(boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, boost::multiprecision::et_off>());
+    test_extra(nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<100>,
+                                                    nil::crypto3::multiprecision::et_off>());
 #endif
 }
 
-int main()
-{
+int main() {
 #ifdef TEST_BACKEND
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::concepts::mp_number_float_architype>));
+    BOOST_CONCEPT_ASSERT(
+        (boost::math::concepts::RealTypeConcept<nil::crypto3::multiprecision::concepts::mp_number_float_architype>));
 #endif
 #ifdef TEST_MPF_50
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpf_float_50>));
+    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<nil::crypto3::multiprecision::mpf_float_50>));
 #endif
 #ifdef TEST_MPFR_50
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpfr_float_50>));
+    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<nil::crypto3::multiprecision::mpfr_float_50>));
 #endif
 #ifdef TEST_MPFR_6
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<6> > >));
+    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<
+                          nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<6>>>));
 #endif
 #ifdef TEST_MPFR_15
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<15> > >));
+    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<
+                          nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<15>>>));
 #endif
 #ifdef TEST_MPFR_17
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<17> > >));
+    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<
+                          nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<17>>>));
 #endif
 #ifdef TEST_MPFR_30
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<30> > >));
+    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<
+                          nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<30>>>));
 #endif
 #ifdef TEST_MPFR_50
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpfr_float_50>));
+    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<nil::crypto3::multiprecision::mpfr_float_50>));
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::cpp_dec_float_50>));
+    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<nil::crypto3::multiprecision::cpp_dec_float_50>));
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::cpp_bin_float_50>));
+    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<nil::crypto3::multiprecision::cpp_bin_float_50>));
 #endif
 #ifdef TEST_LOGGED_ADAPTER
-   typedef boost::multiprecision::number<boost::multiprecision::logged_adaptor<boost::multiprecision::cpp_dec_float<50> > > num_t;
-   test_extra(num_t());
+    typedef nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::logged_adaptor<nil::crypto3::multiprecision::cpp_dec_float<50>>>
+        num_t;
+    test_extra(num_t());
 #endif
 }

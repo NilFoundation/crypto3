@@ -96,10 +96,10 @@
 </table></div>
 <h5>
 <a name="boost_multiprecision.tut.limits.constants.h2"></a>
-          <span class="phrase"><a name="boost_multiprecision.tut.limits.constants.is_signed"></a></span><a class="link" href="constants.html#boost_multiprecision.tut.limits.constants.is_signed">is_signed</a>
+          <span class="phrase"><a name="boost_multiprecision.tut.limits.constants.is_signed"></a></span><a class="link" href="constants.html#boost_multiprecision.tut.limits.constants.is_signed">boost::is_signed</a>
         </h5>
 <p>
-          <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">is_signed</span> <span class="special">==</span>
+          <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">boost::is_signed</span> <span class="special">==</span>
           <span class="keyword">true</span></code> if the type <code class="computeroutput"><span class="identifier">T</span></code>
           is signed.
         </p>
@@ -457,7 +457,7 @@
 
 <span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">cpp_dec_float_50</span><span class="special">;</span> <span class="comment">// 50 decimal digits.</span>
 
-<span class="comment">// or using boost::multiprecision::cpp_dec_float_50;</span>
+<span class="comment">// or using nil::crypto3::multiprecision::cpp_dec_float_50;</span>
 
 <span class="identifier">cpp_dec_float_50</span> <span class="identifier">pi</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">constants</span><span class="special">::</span><span class="identifier">pi</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float_50</span><span class="special">&gt;();</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span><span class="special">.</span><span class="identifier">precision</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float_50</span><span class="special">&gt;::</span><span class="identifier">max_digits10</span><span class="special">);</span>

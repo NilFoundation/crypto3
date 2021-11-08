@@ -12,15 +12,15 @@
 #endif
 
 #ifdef TEST_MPZ
-#include <boost/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
 #endif
 #ifdef TEST_TOMMATH
-#include <boost/multiprecision/tommath.hpp>
+#include <nil/crypto3/multiprecision/tommath.hpp>
 #endif
 #ifdef TEST_CPP_INT
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 #endif
-#include <boost/multiprecision/miller_rabin.hpp>
+#include <nil/crypto3/multiprecision/miller_rabin.hpp>
 #include <boost/chrono.hpp>
 #include <map>
 
@@ -68,7 +68,7 @@ boost::chrono::duration<double> test_miller_rabin(const char* name)
    for (unsigned i = 0; i < 1000; ++i)
    {
       IntType n = gen();
-      if (boost::multiprecision::miller_rabin_test(n, 25, gen2))
+      if (nil::crypto3::multiprecision::miller_rabin_test(n, 25, gen2))
          ++result_count;
    }
    boost::chrono::duration<double> t = c.elapsed();

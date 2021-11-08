@@ -6,7 +6,7 @@
 
 //[special_data_example
 
-#include <boost/multiprecision/mpfr.hpp>
+#include <nil/crypto3/multiprecision/mpfr.hpp>
 #include <boost/math/tools/test_data.hpp>
 #include <boost/test/included/prg_exec_monitor.hpp>
 #include <boost/math/tools/tuple.hpp>
@@ -15,7 +15,7 @@
 using namespace boost::math::tools;
 using namespace boost::math;
 using namespace std;
-using namespace boost::multiprecision;
+using namespace nil::crypto3::multiprecision;
 
 typedef number<mpfr_float_backend<1000> > mp_type;
 

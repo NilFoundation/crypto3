@@ -5,11 +5,10 @@
 
 #include "../miller_rabin_performance.hpp"
 
-void test10()
-{
-   using namespace boost::multiprecision;
+void test10() {
+    using namespace nil::crypto3::multiprecision;
 #ifdef TEST_MPZ
-   test_miller_rabin<mpz_int>("mpz_int");
-   std::cout << "Time for mpz_int (native Miller Rabin Test) = " << test_miller_rabin_gmp() << std::endl;
+    test_miller_rabin<mpz_int>("mpz_int");
+    std::cout << "Time for mpz_int (native Miller Rabin Test) = " << test_miller_rabin_gmp() << std::endl;
 #endif
 }

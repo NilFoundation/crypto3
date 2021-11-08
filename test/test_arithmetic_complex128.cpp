@@ -5,15 +5,14 @@
 
 #include <boost/config.hpp>
 #ifdef BOOST_HAS_FLOAT128
-#include <boost/multiprecision/complex128.hpp>
+#include <nil/crypto3/multiprecision/complex128.hpp>
 #endif
 
 #include "libs/multiprecision/test/test_arithmetic.hpp"
 
-int main()
-{
+int main() {
 #ifdef BOOST_HAS_FLOAT128
-   test<boost::multiprecision::complex128>();
+    test<nil::crypto3::multiprecision::complex128>();
 #endif
-   return boost::report_errors();
+    return boost::report_errors();
 }

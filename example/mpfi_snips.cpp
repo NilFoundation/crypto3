@@ -4,13 +4,13 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 //[mpfi_eg
-#include <boost/multiprecision/mpfi.hpp>
+#include <nil/crypto3/multiprecision/mpfi.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #include <iostream>
 
 int main()
 {
-   using namespace boost::multiprecision;
+   using namespace nil::crypto3::multiprecision;
 
    // Operations at variable precision and no numeric_limits support:
    mpfi_float a = 2;

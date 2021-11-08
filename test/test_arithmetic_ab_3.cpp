@@ -11,8 +11,7 @@
 
 #include "test_arithmetic.hpp"
 
-int main()
-{
-   test<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<unsigned int> > >();
-   return boost::report_errors();
+int main() {
+    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::arithmetic_backend<unsigned int>>>();
+    return boost::report_errors();
 }

@@ -13,17 +13,19 @@
 
 namespace boost {
 
-void throw_exception(std::exception const& e)
-{
-   std::cerr << "Terminating with exception: " << e.what() << std::endl;
-}
+    void throw_exception(std::exception const& e) {
+        std::cerr << "Terminating with exception: " << e.what() << std::endl;
+    }
 
-} // namespace boost
+}    // namespace boost
 
 #else
 
-namespace boost { namespace detail {
-void dummy_proc() {}
-}} // namespace boost::detail
+namespace boost {
+    namespace detail {
+        void dummy_proc() {
+        }
+    }    // namespace detail
+}    // namespace boost
 
 #endif

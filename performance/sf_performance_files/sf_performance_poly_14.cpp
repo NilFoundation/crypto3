@@ -5,9 +5,9 @@
 
 #include "../sf_performance.hpp"
 
-void poly_tests_14()
-{
+void poly_tests_14() {
 #ifdef TEST_MPF
-   time_proc("Polynomial Evaluation (100 digit precision)", "mpf_float_100 (no expression templates", test_polynomial<number<gmp_float<100>, et_off> >);
+    time_proc("Polynomial Evaluation (100 digit precision)", "mpf_float_100 (no expression templates",
+              test_polynomial<number<gmp_float<100>, et_off>>);
 #endif
 }

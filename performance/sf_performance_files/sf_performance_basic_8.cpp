@@ -5,9 +5,8 @@
 
 #include "../sf_performance.hpp"
 
-void basic_tests_8()
-{
+void basic_tests_8() {
 #ifdef TEST_MPREAL
-   poly_allocation_test("mpfr::mpreal", mpfr::mpreal(2));
+    poly_allocation_test("mpfr::mpreal", mpfr::mpreal(2));
 #endif
 }

@@ -10,7 +10,7 @@
 
 [section:logged_adaptor logged_adaptor]
 
-`#include <boost/multiprecision/logged_adaptor.hpp>`
+`#include <nil/crypto3/multiprecision/logged_adaptor.hpp>`
 
    namespace boost{ namespace multiprecision{
 

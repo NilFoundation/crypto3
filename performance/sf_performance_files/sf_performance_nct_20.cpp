@@ -5,9 +5,8 @@
 
 #include "../sf_performance.hpp"
 
-void nct_tests_20()
-{
+void nct_tests_20() {
 #ifdef TEST_MPREAL
-   time_proc("Non-central T Distribution (100 digit precision)", "mpfr::mpreal", test_nct<mpfr::mpreal>);
+    time_proc("Non-central T Distribution (100 digit precision)", "mpfr::mpreal", test_nct<mpfr::mpreal>);
 #endif
 }

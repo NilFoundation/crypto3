@@ -14,7 +14,7 @@ There is one currently only one interval number type supported - [mpfi].
 
 [section:mpfi mpfi_float]
 
-`#include <boost/multiprecision/mpfi.hpp>`
+`#include <nil/crypto3/multiprecision/mpfi.hpp>`
 
    namespace boost{ namespace multiprecision{
 

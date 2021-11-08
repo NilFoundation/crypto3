@@ -9,26 +9,26 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/cpp_bin_float.hpp>
-#include <boost/multiprecision/cpp_dec_float.hpp>
-#include <boost/multiprecision/debug_adaptor.hpp>
-#include <boost/multiprecision/logged_adaptor.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_dec_float.hpp>
+#include <nil/crypto3/multiprecision/debug_adaptor.hpp>
+#include <nil/crypto3/multiprecision/logged_adaptor.hpp>
 
 #ifdef TEST_FLOAT128
-#include <boost/multiprecision/float128.hpp>
+#include <nil/crypto3/multiprecision/float128.hpp>
 #endif
 #ifdef TEST_GMP
-#include <boost/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
 #endif
 #ifdef TEST_MPFR
-#include <boost/multiprecision/mpfr.hpp>
+#include <nil/crypto3/multiprecision/mpfr.hpp>
 #endif
 #ifdef TEST_MPFI
-#include <boost/multiprecision/mpfi.hpp>
+#include <nil/crypto3/multiprecision/mpfi.hpp>
 #endif
 #ifdef TEST_TOMMATH
-#include <boost/multiprecision/tommath.hpp>
+#include <nil/crypto3/multiprecision/tommath.hpp>
 #endif
 
 #include <boost/functional/hash.hpp>
@@ -37,62 +37,63 @@
 #include <iostream>
 #include <iomanip>
 
-template <class T>
-void test()
-{
-   T           val = 23;
-   std::size_t t1  = boost::hash<T>()(val);
-   BOOST_CHECK(t1);
+template<class T>
+void test() {
+    T val = 23;
+    std::size_t t1 = boost::hash<T>()(val);
+    BOOST_CHECK(t1);
 
 #ifndef BOOST_NO_CXX11_HDR_FUNCTIONAL
-   std::size_t t2 = std::hash<T>()(val);
-   BOOST_CHECK_EQUAL(t1, t2);
+    std::size_t t2 = std::hash<T>()(val);
+    BOOST_CHECK_EQUAL(t1, t2);
 #endif
-   val            = -23;
-   std::size_t t3 = boost::hash<T>()(val);
-   BOOST_CHECK_NE(t1, t3);
+    val = -23;
+    std::size_t t3 = boost::hash<T>()(val);
+    BOOST_CHECK_NE(t1, t3);
 #ifndef BOOST_NO_CXX11_HDR_FUNCTIONAL
-   t2 = std::hash<T>()(val);
-   BOOST_CHECK_EQUAL(t3, t2);
+    t2 = std::hash<T>()(val);
+    BOOST_CHECK_EQUAL(t3, t2);
 #endif
 }
 
-int main()
-{
-   test<boost::multiprecision::cpp_int>();
-   test<boost::multiprecision::checked_int1024_t>();
-   //test<boost::multiprecision::checked_uint512_t >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> > >();
+int main() {
+    test<nil::crypto3::multiprecision::cpp_int>();
+    test<nil::crypto3::multiprecision::checked_int1024_t>();
+    // test<nil::crypto3::multiprecision::checked_uint512_t >();
+    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
+        64, 64, nil::crypto3::multiprecision::signed_magnitude, nil::crypto3::multiprecision::checked, void>>>();
 
-   test<boost::multiprecision::cpp_bin_float_100>();
-   test<boost::multiprecision::cpp_dec_float_100>();
+    test<nil::crypto3::multiprecision::cpp_bin_float_100>();
+    test<nil::crypto3::multiprecision::cpp_dec_float_100>();
 
-   test<boost::multiprecision::cpp_rational>();
+    test<nil::crypto3::multiprecision::cpp_rational>();
 
-   test<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::cpp_int::backend_type> > >();
+    test<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::debug_adaptor<nil::crypto3::multiprecision::cpp_int::backend_type>>>();
 
-   test<boost::multiprecision::number<boost::multiprecision::logged_adaptor<boost::multiprecision::cpp_int::backend_type> > >();
+    test<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::logged_adaptor<nil::crypto3::multiprecision::cpp_int::backend_type>>>();
 
 #ifdef TEST_FLOAT128
-   test<boost::multiprecision::float128>();
+    test<nil::crypto3::multiprecision::float128>();
 #endif
 #ifdef TEST_GMP
-   test<boost::multiprecision::mpz_int>();
-   test<boost::multiprecision::mpq_rational>();
-   test<boost::multiprecision::mpf_float>();
+    test<nil::crypto3::multiprecision::mpz_int>();
+    test<nil::crypto3::multiprecision::mpq_rational>();
+    test<nil::crypto3::multiprecision::mpf_float>();
 #endif
 
 #ifdef TEST_MPFR
-   test<boost::multiprecision::mpfr_float_50>();
+    test<nil::crypto3::multiprecision::mpfr_float_50>();
 #endif
 #ifdef TEST_MPFI
-   test<boost::multiprecision::mpfi_float_50>();
+    test<nil::crypto3::multiprecision::mpfi_float_50>();
 #endif
 
 #ifdef TEST_TOMMATH
-   test<boost::multiprecision::tom_int>();
-   test<boost::multiprecision::tom_rational>();
+    test<nil::crypto3::multiprecision::tom_int>();
+    test<nil::crypto3::multiprecision::tom_rational>();
 #endif
 
-   return boost::report_errors();
+    return boost::report_errors();
 }

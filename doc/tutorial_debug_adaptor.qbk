@@ -10,7 +10,7 @@
 
 [section:debug_adaptor debug_adaptor]
 
-`#include <boost/multiprecision/debug_adaptor.hpp>`
+`#include <nil/crypto3/multiprecision/debug_adaptor.hpp>`
 
    namespace boost{ namespace multiprecision{
 

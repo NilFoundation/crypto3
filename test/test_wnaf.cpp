@@ -24,20 +24,19 @@
 #endif
 
 #if defined(TEST_GMP)
-#include <boost/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
 #endif
 #if defined(TEST_TOMMATH)
-#include <boost/multiprecision/tommath.hpp>
+#include <nil/crypto3/multiprecision/tommath.hpp>
 #endif
 #if defined(TEST_CPP_INT)
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 #endif
 
-#include <boost/multiprecision/wnaf.hpp>
+#include <nil/crypto3/multiprecision/wnaf.hpp>
 
-int main()
-{
-   using namespace boost::multiprecision;
+int main() {
+    using namespace nil::crypto3::multiprecision;
 
 #if defined(TEST_CPP_INT)
 #endif
@@ -46,5 +45,5 @@ int main()
 #if defined(TEST_TOMMATH)
 #endif
 
-   return boost::report_errors();
+    return boost::report_errors();
 }

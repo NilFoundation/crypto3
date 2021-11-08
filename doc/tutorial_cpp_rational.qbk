@@ -10,7 +10,7 @@
 
 [section:cpp_rational cpp_rational]
 
-`#include <boost/multiprecision/cpp_int.hpp>`
+`#include <nil/crypto3/multiprecision/cpp_int.hpp>`
 
    namespace boost{ namespace multiprecision{
 
@@ -20,7 +20,7 @@
 
    }} // namespaces
 
-The `cpp_rational_backend` type is used via the typedef `boost::multiprecision::cpp_rational`.  It provides
+The `cpp_rational_backend` type is used via the typedef `nil::crypto3::multiprecision::cpp_rational`.  It provides
 a rational number type that is a drop-in replacement for the native C++ number types, but with unlimited precision.
 
 As well as the usual conversions from arithmetic and string types, instances of `cpp_rational` are copy constructible
