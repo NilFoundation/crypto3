@@ -47,10 +47,9 @@ namespace nil {
                     struct curve_element;
 
                     /**
-                     * @brief A struct representing an element from the group G1 of twisted Edwards curve of
+                     * @brief A struct representing an element from the group G1 of Montgomery curve of
                      *  affine coordinates representation.
-                     *  Montgomery curves introduced on TODO
-                     *  Description: TODO
+                     *  Description: https://hyperelliptic.org/EFD/g1p/auto-montgom.html
                      *
                      */
                     template<typename CurveParams>
@@ -150,8 +149,8 @@ namespace nil {
                                 field_value_type XX = this->X.squared();
                                 field_value_type YY = this->Y.squared();
 
-                                return (field_value_type(params_type::b) * YY) ==
-                                       (XX * this->X + field_value_type(params_type::a) * XX + this->X);
+                                return (field_value_type(params_type::B) * YY) ==
+                                       (XX * this->X + field_value_type(params_type::A) * XX + this->X);
                             }
                         }
 
@@ -241,8 +240,8 @@ namespace nil {
                             } else {
                                 const field_value_type two(2);
                                 const field_value_type three(3);
-                                const field_value_type A(params_type::a);
-                                const field_value_type B(params_type::b);
+                                const field_value_type A(params_type::A);
+                                const field_value_type B(params_type::B);
 
                                 const field_value_type temp1 = two * B * this->Y;
                                 const field_value_type temp2 =
@@ -269,8 +268,8 @@ namespace nil {
                          */
                         constexpr curve_element add(const curve_element &other) const {
                             const field_value_type two(2);
-                            const field_value_type A(params_type::a);
-                            const field_value_type B(params_type::b);
+                            const field_value_type A(params_type::A);
+                            const field_value_type B(params_type::B);
 
                             const field_value_type temp1 = (other.Y) - (this->Y);
                             const field_value_type temp2 = (other.X) - (this->X);
@@ -286,29 +285,70 @@ namespace nil {
                         /*************************  Reducing operations  ***********************************/
 
                         /**
-                         * @brief Map point coordinates into twisted Edwards form according to birational equivalence
-                         * map:
+                         * @brief Convert point coordinates into twisted Edwards form according to birational
+                         * equivalence map:
                          *
-                         * Montgomery -–> Twisted Edwards
-                         *     (u, v) --> (x, y)
+                         * - Montgomery(A', B') -–> Twisted Edwards(a, d)
+                         *             (u', v') --> (x, y)
+                         *   where
+                         *   A' = 2 * (a + d) / (a - d)
+                         *   B' = 4 / (a - d)
                          *
-                         * x = u/v
-                         * y = (u-1)/(u+1)
+                         *   x = u' / v'
+                         *   y = (u' - 1) / (u' + 1)
                          *
-                         * @return point in twisted Edwards form and affine coordinates
+                         * - Montgomery(A', B') -–> Montgomery(A, B)
+                         *             (u', v') --> (u, v)
+                         *   where
+                         *   A == A'
+                         *   B = s^2 * B' (mod p) <=> s = (B / B').sqrt() (mod p)
+                         *
+                         *   u = u'
+                         *   s * v = v'
+                         *
+                         * - Montgomery(A, B) -–> Twisted Edwards(a, d)
+                         *             (u, v) --> (x, y)
+                         *
+                         *   x = u' / v' = u / (s * v)
+                         *   y = (u - 1) / (u + 1)
+                         *
+                         * See
+                         * https://math.stackexchange.com/questions/1391732/birational-equvalence-of-twisted-edwards-and-montgomery-curves
+                         * See
+                         * https://math.stackexchange.com/questions/1392277/point-conversion-between-twisted-edwards-and-montgomery-curves
+                         *
+                         * @return point in affine coordinates of twisted Edwards form
                          */
-                        template<typename Group = typename group_type::curve_type::
-                                     template g1_type<curves::coordinates::affine, forms::twisted_edwards>,
-                                 typename Params = typename Group::params_type>
-                        constexpr operator curve_element<Params, forms::twisted_edwards, curves::coordinates::affine>()
-                            const {
+                        constexpr auto to_twisted_edwards() const {
+                            using result_params =
+                                typename group_type::curve_type::template g1_type<curves::coordinates::affine,
+                                                                                  forms::twisted_edwards>::params_type;
                             using result_type =
-                                curve_element<Params, forms::twisted_edwards, curves::coordinates::affine>;
+                                typename group_type::curve_type::template g1_type<curves::coordinates::affine,
+                                                                                  forms::twisted_edwards>::value_type;
 
-                            return this->is_zero() ? result_type() :
-                                                     result_type(this->X / this->Y,
-                                                                 (this->X - field_value_type::one()) /
-                                                                     (this->X + field_value_type::one()));
+                            if (this->is_zero()) {
+                                return result_type();
+                            }
+
+                            assert(static_cast<field_value_type>(params_type::A) ==
+                                   static_cast<field_value_type>(2) *
+                                       (static_cast<field_value_type>(result_params::a) +
+                                        static_cast<field_value_type>(result_params::d)) /
+                                       (static_cast<field_value_type>(result_params::a) -
+                                        static_cast<field_value_type>(result_params::d)));
+
+                            field_value_type s_inv = field_value_type::one();
+                            field_value_type B_ =
+                                static_cast<field_value_type>(4) / (static_cast<field_value_type>(result_params::a) -
+                                                                    static_cast<field_value_type>(result_params::d));
+                            if (static_cast<field_value_type>(params_type::B) != B_) {
+                                s_inv = (B_ / static_cast<field_value_type>(params_type::B)).sqrt();
+                            }
+
+                            return result_type(s_inv * this->X / this->Y,
+                                               (this->X - field_value_type::one()) /
+                                                   (this->X + field_value_type::one()));
                         }
                     };
                 }    // namespace detail

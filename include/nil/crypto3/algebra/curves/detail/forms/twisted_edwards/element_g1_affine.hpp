@@ -285,28 +285,71 @@ namespace nil {
                         /*************************  Reducing operations  ***********************************/
 
                         /**
-                         * @brief Map point coordinates into Montgomery form according to birational equivalence map:
+                         * @brief Convert point coordinates into Montgomery form according to birational equivalence
+                         * map:
                          *
-                         * Twisted Edwards -–> Montgomery
-                         *          (x, y) --> (u, v)
+                         * - Twisted Edwards(a, d) -–> Montgomery(A', B')
+                         *                  (x, y) --> (u', v')
+                         *   where
+                         *   A' = 2 * (a + d) / (a - d)
+                         *   B' = 4 / (a - d)
                          *
-                         * u = (1+y)/(1-y)
-                         * v = (1+y)/((1-y)x)
+                         *   u' = (1 + y) / (1 - y)
+                         *   v' = (1 + y) / ((1 - y) * x)
                          *
-                         * @return point in twisted Edwards form and affine coordinates
+                         * - Montgomery(A', B') -–> Montgomery(A, B)
+                         *             (u', v') --> (u, v)
+                         *   where
+                         *   A == A'
+                         *   B = s^2 * B' (mod p) <=> s = (B / B').sqrt() (mod p)
+                         *
+                         *   u = u'
+                         *   s * v = v'
+                         *
+                         * - Twisted Edwards(a, d) -–> Montgomery(A, B)
+                         *                  (x, y) --> (u, v)
+                         *
+                         *   u = u' = (1 + y) / (1 - y)
+                         *   v = v' / s = (1 + y) / ((1 - y) * x * s)
+                         *
+                         * See
+                         * https://math.stackexchange.com/questions/1391732/birational-equvalence-of-twisted-edwards-and-montgomery-curves
+                         * See
+                         * https://math.stackexchange.com/questions/1392277/point-conversion-between-twisted-edwards-and-montgomery-curves
+                         *
+                         * @return point in affine coordinates of Montgomery form
                          */
-                        template<typename Group = typename group_type::curve_type::template g1_type<
-                                     curves::coordinates::affine, forms::montgomery>,
-                                 typename Params = typename Group::params_type>
-                        constexpr
-                            operator curve_element<Params, forms::montgomery, curves::coordinates::affine>() const {
-                            using result_type = curve_element<Params, forms::montgomery, curves::coordinates::affine>;
+                        constexpr auto to_montgomery() const {
+                            using result_params =
+                                typename group_type::curve_type::template g1_type<curves::coordinates::affine,
+                                                                                  forms::montgomery>::params_type;
+                            using result_type =
+                                typename group_type::curve_type::template g1_type<curves::coordinates::affine,
+                                                                                  forms::montgomery>::value_type;
 
-                            return this->is_zero() ? result_type() :
-                                                     result_type((field_value_type::one() + this->Y) /
-                                                                     (field_value_type::one() - this->Y),
-                                                                 (field_value_type::one() + this->Y) /
-                                                                     ((field_value_type::one() - this->Y) * this->X));
+                            if (this->is_zero()) {
+                                return result_type();
+                            }
+
+                            assert(static_cast<field_value_type>(result_params::A) ==
+                                   static_cast<field_value_type>(2) *
+                                       (static_cast<field_value_type>(params_type::a) +
+                                        static_cast<field_value_type>(params_type::d)) /
+                                       (static_cast<field_value_type>(params_type::a) -
+                                        static_cast<field_value_type>(params_type::d)));
+
+                            field_value_type s_inv = field_value_type::one();
+                            field_value_type B_ =
+                                static_cast<field_value_type>(4) / (static_cast<field_value_type>(params_type::a) -
+                                                                    static_cast<field_value_type>(params_type::d));
+                            if (static_cast<field_value_type>(result_params::B) != B_) {
+                                s_inv = (B_ / static_cast<field_value_type>(result_params::B)).sqrt();
+                            }
+
+                            return result_type((field_value_type::one() + this->Y) /
+                                                   (field_value_type::one() - this->Y),
+                                               s_inv * ((field_value_type::one() + this->Y) /
+                                                        (this->X * (field_value_type::one() - this->Y))));
                         }
                     };
 

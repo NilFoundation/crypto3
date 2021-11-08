@@ -60,17 +60,17 @@ namespace nil {
                         using base_field_type = typename babyjubjub_types::base_field_type;
                         using scalar_field_type = typename babyjubjub_types::scalar_field_type;
 
-                        // Montgomery representation constants a and b
+                        // Montgomery representation constants A and B
                         constexpr static const typename babyjubjub_types::integral_type
-                            a =                 ///< Montgomery elliptic curve
+                            A =                 ///< Montgomery elliptic curve
                             0x292FA_cppui18;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
                         constexpr static const typename babyjubjub_types::integral_type
-                            b =      ///< Montgomery elliptic curve
+                            B =      ///< Montgomery elliptic curve
                             0x01;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
                     };
 
-                    constexpr typename babyjubjub_types::integral_type const babyjubjub_params<forms::montgomery>::a;
-                    constexpr typename babyjubjub_types::integral_type const babyjubjub_params<forms::montgomery>::b;
+                    constexpr typename babyjubjub_types::integral_type const babyjubjub_params<forms::montgomery>::A;
+                    constexpr typename babyjubjub_types::integral_type const babyjubjub_params<forms::montgomery>::B;
 
                     template<>
                     struct babyjubjub_g1_params<forms::twisted_edwards>

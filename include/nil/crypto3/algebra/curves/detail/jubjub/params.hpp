@@ -70,17 +70,17 @@ namespace nil {
                         using base_field_type = typename jubjub_types::base_field_type;
                         using scalar_field_type = typename jubjub_types::scalar_field_type;
 
-                        // Montgomery representation constants a and b
+                        // Montgomery representation constants A and B
                         constexpr static const typename jubjub_types::integral_type
-                            a =                ///< Montgomery elliptic curve
+                            A =                ///< Montgomery elliptic curve
                             0xA002_cppui16;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
                         constexpr static const typename jubjub_types::integral_type
-                            b =      ///< Montgomery elliptic curve
+                            B =      ///< Montgomery elliptic curve
                             0x01;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
                     };
 
-                    constexpr typename jubjub_types::integral_type const jubjub_params<forms::montgomery>::a;
-                    constexpr typename jubjub_types::integral_type const jubjub_params<forms::montgomery>::b;
+                    constexpr typename jubjub_types::integral_type const jubjub_params<forms::montgomery>::A;
+                    constexpr typename jubjub_types::integral_type const jubjub_params<forms::montgomery>::B;
 
                     template<>
                     struct jubjub_g1_params<forms::twisted_edwards> : public jubjub_params<forms::twisted_edwards> {
@@ -117,7 +117,7 @@ namespace nil {
                             typename field_type::value_type(
                                 0x52a47af6ec47deb77d663b6a45b148d1ccdaa4e2299ecfbd5504c409b3ea62c0_cppui255),
                             typename field_type::value_type(
-                                0x20bc4f2e8cff38006618840fd0f9b6d6e8ddec99c37916874e2fd6d5c6558938_cppui254)};
+                                0x399b020832f6a499ba9d5334ca932dc9faaeea860e9a49a8f8854f55f3b676d4_cppui254)};
                     };
 
                     constexpr std::array<typename jubjub_g1_params<forms::montgomery>::base_field_type::value_type,
