@@ -138,7 +138,7 @@ namespace nil {
                 nil::marshalling::container::static_vector<marshalling_internal_type, marshalling_type::max_length()>, 
                 std::vector<marshalling_internal_type>>::type values;
             for (const auto &val_i : val) {
-                values.push_back(marshalling_internal_type(val_i));
+                values.emplace_back(val_i);
             }
 
             marshalling_type m_val = marshalling_type(values);
