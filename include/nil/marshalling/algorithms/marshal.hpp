@@ -28,10 +28,6 @@
 
 #include <type_traits>
 
-#include <nil/marshalling/marshalling_state.hpp>
-#include <nil/marshalling/accumulators/marshalling.hpp>
-#include <nil/marshalling/accumulators/parameters/buffer_length.hpp>
-#include <nil/marshalling/accumulators/parameters/expected_status.hpp>
 #include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/inference.hpp>
 #include <nil/detail/type_traits.hpp>
@@ -67,7 +63,7 @@ namespace nil {
          *
          * @return
          */
-        template<typename InputWordType, typename TMarshallingOutnput>
+        template<typename TMarshallingOutnput, typename InputWordType>
         typename std::enable_if<marshalling::is_marshalling_type<TMarshallingOutnput>::value
                                     && std::is_integral<InputWordType>::value,
                                 TMarshallingOutnput>::type
@@ -85,8 +81,8 @@ namespace nil {
          *
          * @ingroup marshalling_algorithms
          *
-         * @tparam InputWordType A compatible with std::is_integral type
          * @tparam TEndian
+         * @tparam InputWordType A compatible with std::is_integral type
          * @tparam TOutput std::is_arithmetic type, not a marshalling type. For example, `int`, `uint8_t` or `double`
          *
          * @param val
@@ -94,9 +90,9 @@ namespace nil {
          *
          * @return
          */
-        template<typename InputWordType, typename TEndian, typename TOutput>
+        template<typename TEndian, typename TOutput, typename InputWordType>
         typename std::enable_if<is_compatible<TOutput>::value
-                                    && (!nil::detail::is_container<TOutput>::value)
+                                    && std::is_arithmetic<TOutput>::value
                                     && std::is_integral<InputWordType>::value,
                                 TOutput>::type
             marshal(std::vector<InputWordType> val, status_type &status) {
@@ -115,8 +111,8 @@ namespace nil {
          *
          * @ingroup marshalling_algorithms
          *
-         * @tparam InputWordType A compatible with std::is_integral type
          * @tparam TEndian
+         * @tparam InputWordType A compatible with std::is_integral type
          * @tparam TContainer A compatible with nil::detail::is_container container type.
          *
          * @param val
@@ -124,14 +120,15 @@ namespace nil {
          *
          * @return
          */
-        template<typename InputWordType, typename TEndian, typename TContainer>
+        template<typename TEndian, typename TContainer, typename InputWordType>
         typename std::enable_if<is_compatible<TContainer>::value
-                                    && nil::detail::is_container<TContainer>::value
+                                    // && nil::detail::is_container<TContainer>::value
+                                    && (!std::is_arithmetic<TContainer>::value)
                                     && std::is_integral<InputWordType>::value,
                                 TContainer>::type
             marshal(std::vector<InputWordType> val, status_type &status) {
 
-            static_assert(!nil::detail::is_container<typename TContainer::value_type>::value);
+            // static_assert(std::is_arithmetic<typename TContainer::value_type>::value);
 
             using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
 

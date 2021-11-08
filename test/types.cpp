@@ -54,6 +54,7 @@
 
 #include <nil/marshalling/algorithms/pack.hpp>
 #include <nil/marshalling/algorithms/disperse.hpp>
+#include <nil/marshalling/algorithms/marshal.hpp>
 
 #include <nil/marshalling/container/array_view.hpp>
 #include <nil/marshalling/container/static_vector.hpp>

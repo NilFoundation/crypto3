@@ -37,16 +37,16 @@ namespace nil {
         template<typename T, typename Enabled = void>
         class is_compatible;
 
-        template<typename T>
-        class is_compatible <T, void>{
-            using default_endianness = option::big_endian;
-        public:
-            template <typename TEndian = default_endianness>
-            using type = typename types::no_value<field_type<TEndian>>::type;
+        // template<typename T>
+        // class is_compatible <T, void>{
+        //     using default_endianness = option::big_endian;
+        // public:
+        //     template <typename TEndian = default_endianness>
+        //     using type = typename types::no_value<field_type<TEndian>>::type;
 
-            static const bool value = false;
-            static const bool fixed_size = true;
-        };
+        //     static const bool value = false;
+        //     static const bool fixed_size = true;
+        // };
 
         template<typename T>
         class is_compatible <T, typename std::enable_if<std::is_integral<T>::value>::type> {
@@ -76,7 +76,7 @@ namespace nil {
             template <typename TEndian = default_endianness>
             using type = typename types::array_list<
                 field_type<TEndian>,
-                typename is_compatible<T>::type>;
+                typename is_compatible<T>::template type<TEndian>>;
             static const bool value = true;
             static const bool fixed_size = false;
         };
@@ -89,7 +89,7 @@ namespace nil {
             template <typename TEndian = default_endianness>
             using type = typename types::array_list<
                 field_type<TEndian>,
-                typename is_compatible<T>::type, 
+                typename is_compatible<T>::template type<TEndian>, 
                 option::sequence_fixed_size<TSize>>;
             static const bool value = true;
             static const bool fixed_size = true;
