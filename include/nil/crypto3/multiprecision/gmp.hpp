@@ -1780,6 +1780,10 @@ namespace nil {
                     return result;
                 }
 
+                inline int eval_jacobi(const gmp_int &a, const gmp_int &b) {
+                    return mpz_jacobi(a.data(), b.data());
+                }
+
                 struct gmp_rational;
                 void eval_add(gmp_rational& t, const gmp_rational& o);
 
@@ -3002,7 +3006,5 @@ namespace std {
 #endif
 
 }    // namespace std
-
-#include <nil/crypto3/multiprecision/jacobi_gmp.hpp>
 
 #endif

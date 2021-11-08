@@ -716,6 +716,12 @@ namespace nil {
                     return result;
                 }
 
+                inline int eval_jacobi(const tommath_int &a, const tommath_int &b) {
+                    int result;
+                     mp_jacobi(const_cast<::mp_int*>(&a.data()), const_cast<::mp_int*>(&b.data()), &result);
+                     return result;
+                }
+
             }    // namespace backends
 
             using nil::crypto3::multiprecision::backends::tommath_int;
