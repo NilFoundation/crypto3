@@ -31,23 +31,13 @@
 
 #include <nil/marshalling/types/integral.hpp>
 #include <nil/marshalling/types/float_value.hpp>
+#include <nil/marshalling/types/array_list.hpp>
 
 namespace nil {
     namespace marshalling {
 
         template<typename T, typename Enabled = void>
         class is_compatible;
-
-        // template<typename T>
-        // class is_compatible <T, void>{
-        //     using default_endianness = option::big_endian;
-        // public:
-        //     template <typename TEndian = default_endianness>
-        //     using type = typename types::no_value<field_type<TEndian>>::type;
-
-        //     static const bool value = false;
-        //     static const bool fixed_size = true;
-        // };
 
         template<typename T>
         class is_compatible <T, typename std::enable_if<std::is_integral<T>::value>::type> {
@@ -91,7 +81,7 @@ namespace nil {
             using type = typename types::array_list<
                 field_type<TEndian>,
                 typename is_compatible<T>::template type<TEndian>, 
-                option::sequence_fixed_size<TSize>>;
+                option::fixed_size_storage<TSize>>;
             static const bool value = true;
             static const bool fixed_size = true;
         };

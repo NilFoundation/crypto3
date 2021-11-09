@@ -92,7 +92,7 @@ namespace nil {
          */
         template<typename TEndian, typename TOutput, typename InputWordType>
         typename std::enable_if<is_compatible<TOutput>::value
-                                    && std::is_arithmetic<TOutput>::value
+                                    && (!nil::marshalling::is_container<typename is_compatible<TOutput>::template type<>>::value)
                                     && std::is_integral<InputWordType>::value,
                                 TOutput>::type
             pack(std::vector<InputWordType> val, status_type &status) {
@@ -113,7 +113,7 @@ namespace nil {
          *
          * @tparam TEndian
          * @tparam InputWordType A compatible with std::is_integral type
-         * @tparam TContainer A compatible with nil::detail::is_container container type.
+         * @tparam TContainer std::vector
          *
          * @param val
          * @param status
@@ -122,13 +122,12 @@ namespace nil {
          */
         template<typename TEndian, typename TContainer, typename InputWordType>
         typename std::enable_if<is_compatible<TContainer>::value
-                                    // && nil::detail::is_container<TContainer>::value
-                                    && (!std::is_arithmetic<TContainer>::value)
+                                    && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
+                                    && (!nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>::element_type>::value)
+                                    && (!is_compatible<TContainer>::fixed_size)
                                     && std::is_integral<InputWordType>::value,
                                 TContainer>::type
             pack(std::vector<InputWordType> val, status_type &status) {
-
-            // static_assert(std::is_arithmetic<typename TContainer::value_type>::value);
 
             using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
 
@@ -140,6 +139,44 @@ namespace nil {
             TContainer result;
             for (const auto &val_i : m_val.value()) {
                 result.push_back(val_i.value());
+            }
+
+            return result;
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup marshalling_algorithms
+         *
+         * @tparam TEndian
+         * @tparam InputWordType A compatible with std::is_integral type
+         * @tparam TContainer std::array
+         *
+         * @param val
+         * @param status
+         *
+         * @return
+         */
+        template<typename TEndian, typename TContainer, typename InputWordType>
+        typename std::enable_if<is_compatible<TContainer>::value
+                                    && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
+                                    && is_compatible<TContainer>::fixed_size
+                                    && std::is_integral<InputWordType>::value,
+                                TContainer>::type
+            pack(std::vector<InputWordType> val, status_type &status) {
+
+            using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
+
+            marshalling_type m_val;
+            typename std::vector<InputWordType>::iterator buffer_begin = val.begin();
+
+            status = m_val.read(buffer_begin, val.size());
+            auto values = m_val.value();
+
+            TContainer result;
+            for (std::size_t i = 0; i < values.size(); i++) {
+                result[i] = values[i].value();
             }
 
             return result;

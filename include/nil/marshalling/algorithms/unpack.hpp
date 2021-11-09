@@ -90,9 +90,9 @@ namespace nil {
          *
          * @return
          */
-        template<typename TEndian, typename OutputWordType, typename TInput>
+        template<typename TEndian, typename OutputWordType = std::uint8_t, typename TInput>
         typename std::enable_if<is_compatible<TInput>::value
-                                    && std::is_arithmetic<TInput>::value
+                                    && (!nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value)
                                     && std::is_integral<OutputWordType>::value,
                                 std::vector<OutputWordType>>::type
             unpack(TInput val, status_type &status) {
@@ -121,15 +121,14 @@ namespace nil {
          *
          * @return
          */
-        template<typename TEndian, typename OutputWordType, typename TContainer>
+        template<typename TEndian, typename OutputWordType = std::uint8_t, typename TContainer>
         typename std::enable_if<is_compatible<TContainer>::value
-                                    // && nil::detail::is_container<TContainer>::value
-                                    && (!std::is_arithmetic<TContainer>::value)
+                                    && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
+                                    && (!nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>::element_type>::value 
+                                        || is_compatible<TContainer>::fixed_size)
                                     && std::is_integral<OutputWordType>::value,
                                 std::vector<OutputWordType>>::type
             unpack(TContainer val, status_type &status) {
-
-            // static_assert(std::is_arithmetic<typename TContainer::value_type>::value);
 
             using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
             using marshalling_internal_type = typename marshalling_type::element_type;

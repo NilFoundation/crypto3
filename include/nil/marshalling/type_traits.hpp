@@ -175,12 +175,28 @@ namespace nil {
                 boost::is_base_of<detail::field_base<>, T>::value;
         };
 
+        template<typename T, typename Enabled = void>
+        struct is_container;
+
+        template<typename T>
+        struct is_container <T, typename std::enable_if<nil::marshalling::is_integral<T>::value
+                                                || is_float_value<T>::value>::type> {
+            static const bool value = false;
+        };
+
+        template<typename T>
+        struct is_container <T, typename std::enable_if<is_array_list<T>::value
+                                                || is_bundle<T>::value>::type> {
+            static const bool value = true;
+        };
+
         template<typename T>
         struct is_supported_representation_type {
             static const bool value = std::is_same<std::uint8_t, T>::value
                                       || std::is_same<std::int8_t, T>::value
                                       || std::is_same<char, T>::value;
         };
+
 
         // The following four functions we need only because of absence of BOOST_TTI_HAS_MEMBER_FUNCTION for std::string
         template<typename T>
