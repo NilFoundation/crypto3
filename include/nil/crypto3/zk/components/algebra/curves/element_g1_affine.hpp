@@ -54,13 +54,15 @@ namespace nil {
                     using form = Form;
                     using coordinates = algebra::curves::coordinates::affine;
                     using group_type = typename curve_type::template g1_type<coordinates, form>;
-                    using group_value_type = typename group_type::value_type;
                     using field_type = typename curve_type::base_field_type;
+                    using group_value_type = typename group_type::value_type;
+                    using field_value_type = typename field_type::value_type;
 
                     using underlying_element_type = element_fp<field_type>;
 
                     using addition_component = element_g1_addition<curve_type, form, coordinates>;
                     using is_well_formed_component = element_g1_is_well_formed<curve_type, form, coordinates>;
+                    using to_twisted_edwards_component = element_g1_to_twisted_edwards<curve_type, form, coordinates>;
 
                     underlying_element_type X;
                     underlying_element_type Y;

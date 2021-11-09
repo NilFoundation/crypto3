@@ -60,6 +60,10 @@ BOOST_AUTO_TEST_CASE(babyjubjub_test) {
         integral_type("6669854856059550313288855374895200898734184719090215367165264323940796559798"));
 
     check_affine_montgomery_g1_operations<curve_type>({p1, p2, p1_plus_p2});
+    // TODO: there is a little cheat applied, twisted Edwards equivalent points had better calculate separately and
+    //  hard-code into the test
+    check_montgomery_to_twisted_edwards_component<curve_type>(
+        {p1, p2, p1_plus_p2}, {p1.to_twisted_edwards(), p2.to_twisted_edwards(), p1_plus_p2.to_twisted_edwards()});
 }
 
 BOOST_AUTO_TEST_CASE(jubjub_test) {
@@ -79,6 +83,10 @@ BOOST_AUTO_TEST_CASE(jubjub_test) {
         integral_type("50113340805577397178918081218860537289046253010504685476128585225439863641470"));
 
     check_affine_montgomery_g1_operations<curve_type>({p1, p2, p1_plus_p2});
+    // TODO: there is a little cheat applied, twisted Edwards equivalent points had better calculate separately and
+    //  hard-code into the test
+    check_montgomery_to_twisted_edwards_component<curve_type>(
+        {p1, p2, p1_plus_p2}, {p1.to_twisted_edwards(), p2.to_twisted_edwards(), p1_plus_p2.to_twisted_edwards()});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

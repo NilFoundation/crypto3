@@ -26,6 +26,11 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_CURVES_TEST_UTILS_HPP
 #define CRYPTO3_ZK_BLUEPRINT_CURVES_TEST_UTILS_HPP
 
+#include <vector>
+
+#include <boost/iterator/zip_iterator.hpp>
+#include <boost/tuple/tuple.hpp>
+
 #include <nil/crypto3/zk/components/algebra/curves/element_g1_affine.hpp>
 
 using namespace nil::crypto3::zk;
@@ -110,6 +115,42 @@ void check_is_well_formed_component(const std::vector<typename ElementComponent:
         is_well_component_copy.generate_r1cs_constraints();
         BOOST_CHECK(!bp_copy.is_satisfied());
     }
+}
+
+template<
+    typename Curve,
+    typename FromElementComponent =
+        components::element_g1<Curve, curves::forms::montgomery, curves::coordinates::affine>,
+    typename ToElementComponent = typename FromElementComponent::to_twisted_edwards_component::to_element_component>
+void check_montgomery_to_twisted_edwards_component(
+    const std::vector<typename FromElementComponent::group_value_type> &points_from,
+    const std::vector<typename ToElementComponent::group_value_type> &points_to) {
+    using curve_type = Curve;
+    using field_type = typename FromElementComponent::field_type;
+
+    assert(points_from.size() == points_to.size());
+    check_input_points<Curve, FromElementComponent>(points_from);
+    check_input_points<Curve, ToElementComponent>(points_to);
+
+    // TODO: extend test to check wrong values
+    std::for_each(boost::make_zip_iterator(boost::make_tuple(std::cbegin(points_from), std::cbegin(points_to))),
+                  boost::make_zip_iterator(boost::make_tuple(std::cend(points_from), std::cend(points_to))),
+                  [&](const boost::tuple<const typename FromElementComponent::group_value_type &,
+                                         const typename ToElementComponent::group_value_type &> &t) {
+                      components::blueprint<field_type> bp, bp_copy;
+                      FromElementComponent p_component(bp, t.template get<0>());
+                      typename FromElementComponent::to_twisted_edwards_component to_tw_edwards_component(bp,
+                                                                                                          p_component);
+                      to_tw_edwards_component.generate_r1cs_witness();
+                      to_tw_edwards_component.generate_r1cs_constraints();
+
+                      bp.add_r1cs_constraint(
+                          snark::r1cs_constraint<field_type>(t.template get<1>().X, 1, to_tw_edwards_component.p_to.X));
+                      bp.add_r1cs_constraint(
+                          snark::r1cs_constraint<field_type>(t.template get<1>().Y, 1, to_tw_edwards_component.p_to.Y));
+
+                      BOOST_CHECK(bp.is_satisfied());
+                  });
 }
 
 template<typename Curve, typename ElementComponent =

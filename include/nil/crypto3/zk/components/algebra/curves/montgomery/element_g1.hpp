@@ -39,7 +39,8 @@ namespace nil {
         namespace zk {
             namespace components {
                 /**
-                 * @brief Component that creates constraints for the addition of two elements from G1. (if element from group G1 lies on the elliptic curve)
+                 * @brief Component that creates constraints for the addition of two elements from G1. (if element from
+                 * group G1 lies on the elliptic curve)
                  */
                 template<typename Curve>
                 struct element_g1_addition<Curve,
@@ -74,81 +75,87 @@ namespace nil {
 
                     void generate_r1cs_constraints() {
                         // lambda = (y' - y) / (x' - x)
-                        this->bp.add_r1cs_constraint(
-                            snark::r1cs_constraint<field_type>({p2.X - p1.X}, {lambda}, {p2.Y - p1.Y}));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
+                            {this->p2.X - this->p1.X}, {this->lambda}, {this->p2.Y - this->p1.Y}));
                         // (lambda) * (lambda) = (A + x + x' + x'')
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
-                            {lambda}, {lambda}, {group_type::params_type::A + p1.X + p2.X + result.X}));
+                            {this->lambda},
+                            {this->lambda},
+                            {group_type::params_type::A + this->p1.X + this->p2.X + this->result.X}));
                         // y'' = -(y + lambda(x'' - x))
-                        this->bp.add_r1cs_constraint(
-                            snark::r1cs_constraint<field_type>({p1.X - result.X}, lambda, {result.Y + p1.Y}));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
+                            {this->p1.X - this->result.X}, this->lambda, {this->result.Y + this->p1.Y}));
                     }
 
                     void generate_r1cs_witness() {
-                        this->bp.lc_val(lambda) = (this->bp.lc_val(p2.Y) - this->bp.lc_val(p1.Y)) *
-                                                  (this->bp.lc_val(p2.X) - this->bp.lc_val(p1.X)).inversed();
-                        this->bp.lc_val(result.X) = this->bp.lc_val(lambda).squared() -
-                                                    curve_type::template g1_type<coordinates, form>::params_type::A -
-                                                    this->bp.lc_val(p1.X) - this->bp.lc_val(p2.X);
-                        this->bp.lc_val(result.Y) =
-                            -(this->bp.lc_val(p1.Y) +
-                              (this->bp.lc_val(lambda) * (this->bp.lc_val(result.X) - this->bp.lc_val(p1.X))));
+                        this->bp.lc_val(this->lambda) =
+                            (this->bp.lc_val(this->p2.Y) - this->bp.lc_val(this->p1.Y)) *
+                            (this->bp.lc_val(this->p2.X) - this->bp.lc_val(this->p1.X)).inversed();
+                        this->bp.lc_val(this->result.X) = this->bp.lc_val(this->lambda).squared() -
+                                                          group_type::params_type::A - this->bp.lc_val(this->p1.X) -
+                                                          this->bp.lc_val(this->p2.X);
+                        this->bp.lc_val(this->result.Y) =
+                            -(this->bp.lc_val(this->p1.Y) +
+                              (this->bp.lc_val(this->lambda) *
+                               (this->bp.lc_val(this->result.X) - this->bp.lc_val(this->p1.X))));
                     }
                 };
 
-                // /**
-                //  * Gadget to verify the conversion between the Montgomery form of a point and its twisted Edwards
-                //  form.
-                //  */
-                // template<typename Curve>
-                // struct element_g1_to_edwards<Curve,
-                //                             algebra::curves::forms::montgomery,
-                //                             algebra::curves::coordinates::affine>
-                //     : public component<typename element_g1<Curve,
-                //                                            algebra::curves::forms::montgomery,
-                //                                            algebra::curves::coordinates::affine>::field_type> {
-                //     using curve_type = Curve;
-                //     using form = algebra::curves::forms::montgomery;
-                //     using coordinates = algebra::curves::coordinates::affine;
-                //
-                //     using element_component = element_g1<curve_type, form, coordinates>;
-                //
-                //     using field_type = typename element_component::field_type;
-                //     using group_type = typename element_component::group_type;
-                //
-                //     // Input point
-                //     element_g1<curve_type, representation_type> P_montgomery;
-                //
-                //     // Output point
-                //     element_g1<curve_type, algebra::curves::representations::edwards> P_edwards;
-                //
-                //     element_g1_montgomery_to_edwards(blueprint<field_type> &bp,
-                //                                      element_g1<curve_type, representation_type>
-                //                                          P_montgomery,
-                //                                      element_g1<curve_type,
-                //                                      algebra::curves::representations::edwards>
-                //                                          P_edwards) :
-                //         detail::basic_element_g1_operation<curve_type, representation_type>(bp),
-                //         P_montgomery(P_montgomery), P_edwards(P_edwards) {
-                //     }
-                //
-                //     void generate_r1cs_constraints() {
-                //         this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
-                //             {P_montgomery.Y}, {P_edwards.X}, {P_montgomery.X * this->field_element_scale}));
-                //         this->bp.add_r1cs_constraint(
-                //             snark::r1cs_constraint<field_type>({P_montgomery.X + field_type::value_type::one()},
-                //                                                {P_edwards.Y},
-                //                                                {P_montgomery.X - field_type::value_type::one()}));
-                //     }
-                //     void generate_r1cs_witness() {
-                //         this->bp.lc_val(P_edwards.X) = this->field_element_scale * this->bp.lc_val(P_montgomery.X) *
-                //                                        this->bp.lc_val(P_montgomery.Y).inversed();
-                //         this->bp.lc_val(P_edwards.Y) =
-                //             (this->bp.lc_val(P_montgomery.X) - field_type::value_type::one()) *
-                //             (this->bp.lc_val(P_montgomery.X) + field_type::value_type::one()).inversed();
-                //     }
-                // };
+                /**
+                 * Gadget to convert affine Montgomery coordinates into affine twisted Edwards coordinates.
+                 */
+                template<typename Curve>
+                struct element_g1_to_twisted_edwards<Curve,
+                                                     algebra::curves::forms::montgomery,
+                                                     algebra::curves::coordinates::affine>
+                    : public component<typename element_g1<Curve,
+                                                           algebra::curves::forms::montgomery,
+                                                           algebra::curves::coordinates::affine>::field_type> {
+                    using curve_type = Curve;
+                    using form = algebra::curves::forms::montgomery;
+                    using coordinates = algebra::curves::coordinates::affine;
 
+                    using element_component = element_g1<curve_type, form, coordinates>;
+                    using to_element_component =
+                        element_g1<curve_type, algebra::curves::forms::twisted_edwards, coordinates>;
+
+                    using field_type = typename element_component::field_type;
+                    using group_type = typename element_component::group_type;
+                    using to_group_type = typename to_element_component::group_type;
+
+                    // Input point
+                    element_component p_from;
+                    // Output point
+                    to_element_component p_to;
+                    // intermediate variables
+                    typename field_type::value_type scale;
+
+                    element_g1_to_twisted_edwards(blueprint<field_type> &bp, const element_component &in_p_from) :
+                        component<field_type>(bp), p_from(in_p_from), p_to(bp),
+                        scale((static_cast<typename field_type::value_type>(4) /
+                               (static_cast<typename field_type::value_type>(to_group_type::params_type::a) -
+                                static_cast<typename field_type::value_type>(to_group_type::params_type::d)) /
+                               static_cast<typename field_type::value_type>(group_type::params_type::B))
+                                  .sqrt()) {
+                    }
+
+                    void generate_r1cs_constraints() {
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
+                            {this->p_from.Y}, {this->p_to.X}, {this->p_from.X * this->scale}));
+                        this->bp.add_r1cs_constraint(
+                            snark::r1cs_constraint<field_type>({this->p_from.X + field_type::value_type::one()},
+                                                               {this->p_to.Y},
+                                                               {this->p_from.X - field_type::value_type::one()}));
+                    }
+
+                    void generate_r1cs_witness() {
+                        typename to_group_type::value_type p_to_XY =
+                            typename group_type::value_type(this->bp.lc_val(p_from.X), this->bp.lc_val(p_from.Y))
+                                .to_twisted_edwards();
+                        this->bp.lc_val(p_to.X) = p_to_XY.X;
+                        this->bp.lc_val(p_to.Y) = p_to_XY.Y;
+                    }
+                };
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
