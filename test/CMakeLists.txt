@@ -65,6 +65,10 @@ set(FIELDS_TESTS_FILES
     #"algebra/fields/exponentiation"
     )
 
+set(CURVES_TESTS_FILES
+    "algebra/curves/montgomery"
+    )
+
 set(HASHES_TESTS_FILES
     "hashes/knapsack"
     "hashes/knapsack_verification"
@@ -93,6 +97,7 @@ set(BASIC_COMPONENTS_TESTS_FILES
 
 SET(ALGEBRA_TESTS_FILES 
     ${FIELDS_TESTS_FILES}
+    ${CURVES_TESTS_FILES}
     ${PAIRING_TESTS_FILES})
 
 SET(ALL_TESTS_FILES 
