@@ -58,8 +58,8 @@ namespace nil {
                     using field_type = typename element_component::field_type;
                     using group_type = typename element_component::group_type;
 
-                    element_component p1;
-                    element_component p2;
+                    const element_component p1;
+                    const element_component p2;
                     element_component result;
                     element_fp<field_type> lambda;
 
@@ -124,7 +124,7 @@ namespace nil {
                     using to_group_type = typename to_element_component::group_type;
 
                     // Input point
-                    element_component p_from;
+                    const element_component p_from;
                     // Output point
                     to_element_component p_to;
                     // intermediate variables

@@ -147,7 +147,7 @@ namespace nil {
                             /* push in the new bit */
                             const field_value_type v = bp.val((*this)[this->size() - 1 - i]);
                             assert(v.is_zero() || v.is_one());
-                            result += result + v;
+                            result = result + (result + v);
                         }
 
                         return result;

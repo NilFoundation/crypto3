@@ -57,8 +57,8 @@ namespace nil {
                     using field_type = typename element_component::field_type;
                     using group_type = typename element_component::group_type;
 
-                    element_component p1;
-                    element_component p2;
+                    const element_component p1;
+                    const element_component p2;
                     element_component result;
 
                     // intermediate variables
@@ -168,7 +168,7 @@ namespace nil {
                     using field_type = typename element_component::field_type;
                     using group_type = typename element_component::group_type;
 
-                    element_component p;
+                    const element_component p;
 
                     // intermediate variables:
                     element_fp<field_type> XX;
@@ -259,11 +259,11 @@ namespace nil {
                     using field_type = typename element_component::field_type;
                     using group_type = typename element_component::group_type;
 
-                    element_component p1;
-                    element_component p2;
+                    const element_component p1;
+                    const element_component p2;
                     element_component result;
 
-                    blueprint_variable<field_type> can_add;
+                    const blueprint_variable<field_type> can_add;
 
                     // intermediate variables
                     element_component p_to_add;
