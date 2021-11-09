@@ -51,6 +51,7 @@ namespace nil {
 
                         using base_impl_type = TTypeBase;
 
+                        std::size_t cur_length = 0;
                     public:
                         using value_type = T;
                         using serialized_type = value_type;
@@ -58,6 +59,10 @@ namespace nil {
                         basic_integral() = default;
 
                         explicit basic_integral(value_type val) : value_(val) {
+
+                            std::size_t bits_count = multiprecision::msb(val) + 1;
+
+                            cur_length = bits_count / 8 + (bits_count%8?1:0);
                         }
 
                         basic_integral(const basic_integral &) = default;
@@ -78,8 +83,8 @@ namespace nil {
                             return value_;
                         }
 
-                        static constexpr std::size_t length() {
-                            return sizeof(serialized_type);
+                        std::size_t length() {
+                            return cur_length;
                         }
 
                         static constexpr std::size_t min_length() {
@@ -105,20 +110,22 @@ namespace nil {
                             // }
 
                             read_no_status(iter, size);
+                            iter += size;
+                            cur_length += size;
                             return nil::marshalling::status_type::success;
                         }
 
-                        template<typename TIter>
-                        void read_no_status(TIter &iter) {
-                            read_no_status(length());
-                        }
+                        // template<typename TIter>
+                        // void read_no_status(TIter &iter) {
+                        //     read_no_status(length());
+                        // }
 
                     private:
                         template<typename TIter>
                         void read_no_status(TIter &iter, std::size_t size) {
                             value_ =
                                 crypto3::marshalling::processing::read_data<T, typename base_impl_type::endian_type>(
-                                    iter, size);
+                                    iter, size * 8);
                         }
 
                     public:
@@ -129,6 +136,7 @@ namespace nil {
                             // }
 
                             write_no_status(iter);
+                            iter += size;
                             return nil::marshalling::status_type::success;
                         }
 

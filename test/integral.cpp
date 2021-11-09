@@ -39,6 +39,9 @@
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
 
+// #include <nil/crypto3/marshalling/algorithms/pack.hpp>
+#include <nil/marshalling/algorithms/pack.hpp>
+#include <nil/marshalling/algorithms/unpack.hpp>
 #include <nil/crypto3/marshalling/types/integral.hpp>
 
 template<class T>
@@ -102,20 +105,16 @@ void test_round_trip_fixed_precision_big_endian(T val) {
 
     export_bits(val, cv.begin() + begin_index, units_bits, true);
 
-    auto read_iter = cv.begin();
-    nil::marshalling::status_type status = test_val.read(read_iter, cv.size() * units_bits);
+    nil::marshalling::status_type status;
+    T test_val1 = nil::marshalling::pack<nil::marshalling::option::big_endian, T>(cv, status);
+
+    BOOST_CHECK(val == test_val1);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    BOOST_CHECK(val == test_val.value());
+    std::vector<unit_type> test_cv = nil::marshalling::unpack<nil::marshalling::option::big_endian, unit_type>(val, status);
 
-    std::vector<unit_type> test_val_byteblob;
-    test_val_byteblob.resize(cv.size());
-    auto write_iter = test_val_byteblob.begin();
-
-    status = test_val.write(write_iter, test_val_byteblob.size() * units_bits);
+    BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
-
-    BOOST_CHECK(cv == test_val_byteblob);
 }
 
 template<class T>
@@ -133,24 +132,23 @@ void test_round_trip_fixed_precision_little_endian(T val) {
     export_bits(val, std::back_inserter(cv), units_bits, false);
     cv.resize(unitblob_size, 0x00);
 
-    auto read_iter = cv.begin();
-    nil::marshalling::status_type status = test_val.read(read_iter, cv.size() * units_bits);
+    nil::marshalling::status_type status;
+    T test_val1 = nil::marshalling::pack<nil::marshalling::option::little_endian, T>(cv, status);
+
+    BOOST_CHECK(val == test_val1);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    BOOST_CHECK(val == test_val.value());
+    std::vector<unit_type> test_cv = nil::marshalling::unpack<nil::marshalling::option::little_endian, unit_type>(val, status);
 
-    std::vector<unit_type> test_val_byteblob;
-    test_val_byteblob.resize(cv.size());
-    auto write_iter = test_val_byteblob.begin();
-
-    status = test_val.write(write_iter, test_val_byteblob.size() * units_bits);
+    BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
-
-    BOOST_CHECK(cv == test_val_byteblob);
 }
 
 template<class T>
 void test_round_trip_fixed_precision() {
+
+    static_assert(nil::marshalling::is_compatible<T>::value);
+
     std::cout << std::hex;
     std::cerr << std::hex;
     for (unsigned i = 0; i < 1000; ++i) {
@@ -160,72 +158,40 @@ void test_round_trip_fixed_precision() {
     }
 }
 
-template<class T>
-void test_round_trip_non_fixed_precision_big_endian(T val) {
+template<typename TEndianness, class T>
+void test_round_trip_non_fixed_precision(T val) {
     using namespace nil::crypto3::marshalling;
 
     std::size_t units_bits = 8;
     using unit_type = unsigned char;
-    using integral_type = types::integral<nil::marshalling::field_type<nil::marshalling::option::big_endian>, T>;
-
-    integral_type test_val;
 
     std::vector<unit_type> cv;
-    export_bits(val, std::back_inserter(cv), units_bits, true);
+    export_bits(val, std::back_inserter(cv), units_bits, 
+        std::is_same<TEndianness, nil::marshalling::option::big_endian>::value?true:false);
 
-    auto read_iter = cv.begin();
-    nil::marshalling::status_type status = test_val.read(read_iter, cv.size() * units_bits);
+    nil::marshalling::status_type status;
+    T test_val1 = nil::marshalling::pack<TEndianness, T>(cv, status);
+
+    BOOST_CHECK(val == test_val1);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    BOOST_CHECK(val == test_val.value());
+    std::vector<unit_type> test_cv = nil::marshalling::unpack<TEndianness, unit_type>(val, status);
 
-    std::vector<unit_type> test_val_byteblob;
-    test_val_byteblob.resize(cv.size());
-    auto write_iter = test_val_byteblob.begin();
-
-    status = test_val.write(write_iter, test_val_byteblob.size() * units_bits);
+    BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
-
-    BOOST_CHECK(cv == test_val_byteblob);
-}
-
-template<class T>
-void test_round_trip_non_fixed_precision_little_endian(T val) {
-    using namespace nil::crypto3::marshalling;
-
-    std::size_t units_bits = 8;
-    using unit_type = unsigned char;
-    using integral_type = types::integral<nil::marshalling::field_type<nil::marshalling::option::little_endian>, T>;
-
-    integral_type test_val;
-
-    std::vector<unsigned char> cv;
-    export_bits(val, std::back_inserter(cv), units_bits, false);
-
-    auto read_iter = cv.begin();
-    nil::marshalling::status_type status = test_val.read(read_iter, cv.size() * units_bits);
-    BOOST_CHECK(status == nil::marshalling::status_type::success);
-
-    BOOST_CHECK(val == test_val.value());
-
-    std::vector<unsigned char> test_val_byteblob;
-    test_val_byteblob.resize(cv.size());
-    auto write_iter = test_val_byteblob.begin();
-
-    status = test_val.write(write_iter, test_val_byteblob.size() * units_bits);
-    BOOST_CHECK(status == nil::marshalling::status_type::success);
-
-    BOOST_CHECK(cv == test_val_byteblob);
 }
 
 template<class T>
 void test_round_trip_non_fixed_precision() {
+
+    static_assert(nil::marshalling::is_compatible<T>::value);
+
     std::cout << std::hex;
     std::cerr << std::hex;
     for (unsigned i = 0; i < 1000; ++i) {
         T val = generate_random<T>();
-        test_round_trip_non_fixed_precision_big_endian(val);
-        test_round_trip_non_fixed_precision_little_endian(val);
+        test_round_trip_non_fixed_precision<nil::marshalling::option::big_endian>(val);
+        test_round_trip_non_fixed_precision<nil::marshalling::option::little_endian>(val);
     }
 }
 

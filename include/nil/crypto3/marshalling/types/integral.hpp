@@ -44,6 +44,7 @@
 
 #include <nil/crypto3/marshalling/types/detail/integral/basic_fixed_precision_type.hpp>
 #include <nil/crypto3/marshalling/types/detail/integral/basic_non_fixed_precision_type.hpp>
+#include <nil/crypto3/marshalling/inference.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -154,7 +155,7 @@ namespace nil {
 
                     /// @brief Get length required to serialise the current field value.
                     /// @return Number of bytes it will take to serialise the field value.
-                    static constexpr std::size_t length() {
+                    std::size_t length() {
                         return base_impl_type::length();
                     }
 
