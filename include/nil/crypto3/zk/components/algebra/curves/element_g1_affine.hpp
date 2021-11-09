@@ -23,10 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for G1 components.
-//
-// The components verify curve arithmetic in G1 = E(F) where E/F: b * y^2 = x^3 + a * x^2 + x
-// is an elliptic curve over F in Montgomery form.
+// @file Declaration of affine G1 element component.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_BLUEPRINT_G1_AFFINE_COMPONENT_HPP
@@ -63,6 +60,7 @@ namespace nil {
                     using underlying_element_type = element_fp<field_type>;
 
                     using addition_component = element_g1_addition<curve_type, form, coordinates>;
+                    using is_well_formed_component = element_g1_is_well_formed<curve_type, form, coordinates>;
 
                     underlying_element_type X;
                     underlying_element_type Y;

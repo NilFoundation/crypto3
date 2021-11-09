@@ -35,52 +35,13 @@
 
 #include <nil/crypto3/zk/components/algebra/curves/montgomery/element_g1.hpp>
 
+#include "test_utils.hpp"
+
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
-enum : std::size_t {
-    p1,
-    p2,
-    p1_plus_p2,
-};
-
-template<
-    typename Curve,
-    typename ElementComponent = components::element_g1<Curve, curves::forms::montgomery, curves::coordinates::affine>>
-void check_affine_montgomery_operations(const std::vector<typename ElementComponent::group_value_type> &points) {
-    using curve_type = Curve;
-    using element_component = ElementComponent;
-    using field_type = typename element_component::field_type;
-    using integral_type = typename field_type::integral_type;
-    using group_value_type = typename element_component::group_value_type;
-
-    for (const auto &p : points) {
-        BOOST_CHECK(p.is_well_formed());
-    }
-    BOOST_CHECK(points[p1] + points[p2] == points[p1_plus_p2]);
-
-    components::blueprint<field_type> bp;
-    element_component p1_component(bp, points[p1]);
-    element_component p2_component(bp, points[p2]);
-    element_component p1_plus_p2_component(bp, points[p1_plus_p2]);
-    typename element_component::addition_component add_component(bp, p1_component, p2_component);
-
-    add_component.generate_r1cs_witness();
-    add_component.generate_r1cs_constraints();
-
-    bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
-        {points[p1_plus_p2].X}, {field_type::value_type::one()}, {add_component.result.X}));
-    bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
-        {points[p1_plus_p2].Y}, {field_type::value_type::one()}, {add_component.result.Y}));
-    BOOST_CHECK(bp.is_satisfied());
-
-    bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
-        {-(points[p1_plus_p2].Y)}, {field_type::value_type::one()}, {add_component.result.Y}));
-    BOOST_CHECK(!bp.is_satisfied());
-}
-
-BOOST_AUTO_TEST_SUITE(blueprint_montgomery_addition_manual_test_suite)
+BOOST_AUTO_TEST_SUITE(blueprint_montgomery_operations_manual_test_suite)
 
 BOOST_AUTO_TEST_CASE(babyjubjub_test) {
     using curve_type = curves::babyjubjub;
@@ -98,7 +59,7 @@ BOOST_AUTO_TEST_CASE(babyjubjub_test) {
         integral_type("15566970094137508604402505312544881598484695740314362381445040160425553677096"),
         integral_type("6669854856059550313288855374895200898734184719090215367165264323940796559798"));
 
-    check_affine_montgomery_operations<curve_type>({p1, p2, p1_plus_p2});
+    check_affine_montgomery_g1_operations<curve_type>({p1, p2, p1_plus_p2});
 }
 
 BOOST_AUTO_TEST_CASE(jubjub_test) {
@@ -117,7 +78,7 @@ BOOST_AUTO_TEST_CASE(jubjub_test) {
         integral_type("31338886305606494662271397096913232944110804555543936006670599257012320678243"),
         integral_type("50113340805577397178918081218860537289046253010504685476128585225439863641470"));
 
-    check_affine_montgomery_operations<curve_type>({p1, p2, p1_plus_p2});
+    check_affine_montgomery_g1_operations<curve_type>({p1, p2, p1_plus_p2});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

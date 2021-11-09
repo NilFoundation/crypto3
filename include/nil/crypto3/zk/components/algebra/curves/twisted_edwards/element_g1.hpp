@@ -113,11 +113,11 @@ namespace nil {
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
                             {group_type::params_type::a}, {this->X1X2}, {this->aX1X2}));
                         this->bp.add_r1cs_constraint(
-                            snark::r1cs_constraint<field_type>({this->p1pp2.Y},
+                            snark::r1cs_constraint<field_type>({this->result.Y},
                                                                {field_type::value_type::one(), -(this->dX1X2Y1Y2)},
                                                                {this->Y1Y2, -(this->aX1X2)}));
                         this->bp.add_r1cs_constraint(
-                            snark::r1cs_constraint<field_type>({this->p1pp2.X},
+                            snark::r1cs_constraint<field_type>({this->result.X},
                                                                {field_type::value_type::one(), this->dX1X2Y1Y2},
                                                                {this->X1Y2, this->Y1X2}));
                     }
@@ -133,8 +133,12 @@ namespace nil {
                         this->bp.lc_val(Y1Y2) = y1 * y2;
                         this->bp.lc_val(Y1X2) = y1 * x2;
                         this->bp.lc_val(X1X2Y1Y2) = this->bp.lc_val(X1X2) * this->bp.lc_val(Y1Y2);
-                        this->bp.lc_val(dX1X2Y1Y2) = group_type::params_type::d * this->bp.lc_val(X1X2Y1Y2);
-                        this->bp.lc_val(aX1X2) = group_type::params_type::a * this->bp.lc_val(X1X2);
+                        this->bp.lc_val(dX1X2Y1Y2) =
+                            static_cast<typename field_type::value_type>(group_type::params_type::d) *
+                            this->bp.lc_val(X1X2Y1Y2);
+                        this->bp.lc_val(aX1X2) =
+                            static_cast<typename field_type::value_type>(group_type::params_type::a) *
+                            this->bp.lc_val(X1X2);
                         this->bp.lc_val(this->result.X) =
                             (this->bp.lc_val(X1Y2) + this->bp.lc_val(Y1X2)) *
                             (field_type::value_type::one() + this->bp.lc_val(dX1X2Y1Y2)).inversed();
@@ -224,9 +228,13 @@ namespace nil {
 
                         this->bp.lc_val(this->XX) = x * x;
                         this->bp.lc_val(this->YY) = y * y;
-                        this->bp.lc_val(this->aXX) = group_type::params_type::a * this->bp.lc_val(this->XX);
+                        this->bp.lc_val(this->aXX) =
+                            static_cast<typename field_type::value_type>(group_type::params_type::a) *
+                            this->bp.lc_val(this->XX);
                         this->bp.lc_val(this->lhs) = this->bp.lc_val(this->aXX) + this->bp.lc_val(this->YY);
-                        this->bp.lc_val(this->dXX) = group_type::params_type::d * this->bp.lc_val(this->XX);
+                        this->bp.lc_val(this->dXX) =
+                            static_cast<typename field_type::value_type>(group_type::params_type::d) *
+                            this->bp.lc_val(this->XX);
                         this->bp.lc_val(this->dXXYY) = this->bp.lc_val(this->dXX) * this->bp.lc_val(this->YY);
                         this->bp.lc_val(this->rhs) = this->bp.lc_val(this->dXXYY) + field_type::value_type::one();
                     }
@@ -266,10 +274,10 @@ namespace nil {
                     // TODO: refactor
                     // std::shared_ptr<element_g1_add<CurveType>> el_add;
 
-                    element_g1_conditional_add(blueprint<field_type> &bp,
-                                               const element_g1<CurveType> &in_p1,
-                                               const element_g1<CurveType> &in_p2,
-                                               const blueprint_variable<field_type> &in_can_add) :
+                    element_g1_conditional_addition(blueprint<field_type> &bp,
+                                                    const element_component &in_p1,
+                                                    const element_component &in_p2,
+                                                    const blueprint_variable<field_type> &in_can_add) :
                         component<field_type>(bp),
                         p1(in_p1), p2(in_p2), can_add(in_can_add), p_to_add(bp) {
                         blueprint_variable<field_type> Y_intermediate_to_add1_var, Y_intermediate_to_add2_var;

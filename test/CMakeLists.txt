@@ -67,6 +67,7 @@ set(FIELDS_TESTS_FILES
 
 set(CURVES_TESTS_FILES
     "algebra/curves/montgomery"
+    "algebra/curves/twisted_edwards"
     )
 
 set(HASHES_TESTS_FILES
