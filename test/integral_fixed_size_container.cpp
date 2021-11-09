@@ -41,6 +41,8 @@
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
 
+#include <nil/marshalling/algorithms/pack.hpp>
+#include <nil/marshalling/algorithms/unpack.hpp>
 #include <nil/crypto3/marshalling/types/integral.hpp>
 
 template<class T>
@@ -89,7 +91,7 @@ void print_byteblob(TIter iter_begin, TIter iter_end) {
 
 template<class T, std::size_t TSize>
 void test_round_trip_fixed_size_container_fixed_precision_big_endian(
-    nil::marshalling::container::static_vector<T, TSize> val_container) {
+    std::array<T, TSize> val_container) {
     using namespace nil::crypto3::marshalling;
     std::size_t units_bits = 8;
     using unit_type = unsigned char;
@@ -115,27 +117,24 @@ void test_round_trip_fixed_size_container_fixed_precision_big_endian(
         export_bits(val_container[i], cv.begin() + unitblob_size * i + begin_index, units_bits, true);
     }
 
-    auto read_iter = cv.begin();
-    nil::marshalling::status_type status = test_val_container.read(read_iter, cv.size());
+    nil::marshalling::status_type status;
+    std::array<T, TSize> test_val = 
+        nil::marshalling::pack<nil::marshalling::option::big_endian, 
+        std::array<T, TSize>>(cv, status);
+
+    BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), test_val.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    for (std::size_t i = 0; i < val_container.size(); i++) {
-        BOOST_CHECK(val_container[i] == test_val_container.value()[i].value());
-    }
+    std::vector<unit_type> test_cv = 
+        nil::marshalling::unpack<nil::marshalling::option::big_endian, unit_type>(val_container, status);
 
-    std::vector<unit_type> test_val_byteblob;
-    test_val_byteblob.resize(cv.size());
-    auto write_iter = test_val_byteblob.begin();
-
-    status = test_val_container.write(write_iter, test_val_byteblob.size() * units_bits);
+    BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
-
-    BOOST_CHECK(cv == test_val_byteblob);
 }
 
 template<class T, std::size_t TSize>
 void test_round_trip_fixed_size_container_fixed_precision_little_endian(
-    nil::marshalling::container::static_vector<T, TSize> val_container) {
+    std::array<T, TSize> val_container) {
     using namespace nil::crypto3::marshalling;
     std::size_t units_bits = 8;
     using unit_type = unsigned char;
@@ -158,22 +157,19 @@ void test_round_trip_fixed_size_container_fixed_precision_little_endian(
         export_bits(val_container[i], cv.begin() + unitblob_size * i, units_bits, false);
     }
 
-    auto read_iter = cv.begin();
-    nil::marshalling::status_type status = test_val_container.read(read_iter, cv.size());
+    nil::marshalling::status_type status;
+    std::array<T, TSize> test_val = 
+        nil::marshalling::pack<nil::marshalling::option::little_endian, 
+        std::array<T, TSize>>(cv, status);
+
+    BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), test_val.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    for (std::size_t i = 0; i < val_container.size(); i++) {
-        BOOST_CHECK(val_container[i] == test_val_container.value()[i].value());
-    }
+    std::vector<unit_type> test_cv = 
+        nil::marshalling::unpack<nil::marshalling::option::little_endian, unit_type>(val_container, status);
 
-    std::vector<unit_type> test_val_byteblob;
-    test_val_byteblob.resize(cv.size());
-    auto write_iter = test_val_byteblob.begin();
-
-    status = test_val_container.write(write_iter, test_val_byteblob.size() * units_bits);
+    BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
-
-    BOOST_CHECK(cv == test_val_byteblob);
 }
 
 template<class T, std::size_t TSize>
@@ -181,9 +177,9 @@ void test_round_trip_fixed_size_container_fixed_precision() {
     std::cout << std::hex;
     std::cerr << std::hex;
     for (unsigned i = 0; i < 1000; ++i) {
-        nil::marshalling::container::static_vector<T, TSize> val_container;
+        std::array<T, TSize> val_container;
         for (std::size_t i = 0; i < TSize; i++) {
-            val_container.push_back(generate_random<T>());
+            val_container[i] = generate_random<T>();
         }
         test_round_trip_fixed_size_container_fixed_precision_big_endian<T, TSize>(val_container);
         test_round_trip_fixed_size_container_fixed_precision_little_endian<T, TSize>(val_container);

@@ -96,7 +96,6 @@ void test_round_trip_fixed_precision_big_endian(T val) {
     using integral_type = types::integral<nil::marshalling::field_type<nil::marshalling::option::big_endian>, T>;
     std::size_t unitblob_size =
         integral_type::bit_length() / units_bits + ((integral_type::bit_length() % units_bits) ? 1 : 0);
-    integral_type test_val;
 
     std::vector<unit_type> cv;
     cv.resize(unitblob_size, 0x00);
@@ -106,9 +105,9 @@ void test_round_trip_fixed_precision_big_endian(T val) {
     export_bits(val, cv.begin() + begin_index, units_bits, true);
 
     nil::marshalling::status_type status;
-    T test_val1 = nil::marshalling::pack<nil::marshalling::option::big_endian, T>(cv, status);
+    T test_val = nil::marshalling::pack<nil::marshalling::option::big_endian, T>(cv, status);
 
-    BOOST_CHECK(val == test_val1);
+    BOOST_CHECK(val == test_val);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     std::vector<unit_type> test_cv = nil::marshalling::unpack<nil::marshalling::option::big_endian, unit_type>(val, status);
@@ -125,7 +124,6 @@ void test_round_trip_fixed_precision_little_endian(T val) {
     using integral_type = types::integral<nil::marshalling::field_type<nil::marshalling::option::little_endian>, T>;
     std::size_t unitblob_size =
         integral_type::bit_length() / units_bits + ((integral_type::bit_length() % units_bits) ? 1 : 0);
-    integral_type test_val;
 
     std::vector<unit_type> cv;
 
@@ -133,9 +131,9 @@ void test_round_trip_fixed_precision_little_endian(T val) {
     cv.resize(unitblob_size, 0x00);
 
     nil::marshalling::status_type status;
-    T test_val1 = nil::marshalling::pack<nil::marshalling::option::little_endian, T>(cv, status);
+    T test_val = nil::marshalling::pack<nil::marshalling::option::little_endian, T>(cv, status);
 
-    BOOST_CHECK(val == test_val1);
+    BOOST_CHECK(val == test_val);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     std::vector<unit_type> test_cv = nil::marshalling::unpack<nil::marshalling::option::little_endian, unit_type>(val, status);
@@ -170,9 +168,9 @@ void test_round_trip_non_fixed_precision(T val) {
         std::is_same<TEndianness, nil::marshalling::option::big_endian>::value?true:false);
 
     nil::marshalling::status_type status;
-    T test_val1 = nil::marshalling::pack<TEndianness, T>(cv, status);
+    T test_val = nil::marshalling::pack<TEndianness, T>(cv, status);
 
-    BOOST_CHECK(val == test_val1);
+    BOOST_CHECK(val == test_val);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     std::vector<unit_type> test_cv = nil::marshalling::unpack<TEndianness, unit_type>(val, status);

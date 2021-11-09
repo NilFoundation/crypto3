@@ -101,7 +101,7 @@ namespace nil {
                          multiprecision::expression_template_option ExpressionTemplates,
                          typename... TOptions>
                 class integral<TTypeBase, multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
-                    : private ::nil::marshalling::types::detail::adapt_basic_field_type<
+                    : public ::nil::marshalling::types::detail::adapt_basic_field_type<
                           crypto3::marshalling::types::detail::basic_integral<TTypeBase, Backend, ExpressionTemplates>,
                           TOptions...> {
 
@@ -153,11 +153,11 @@ namespace nil {
                         return base_impl_type::value();
                     }
 
-                    /// @brief Get length required to serialise the current field value.
-                    /// @return Number of bytes it will take to serialise the field value.
-                    std::size_t length() {
-                        return base_impl_type::length();
-                    }
+                    // /// @brief Get length required to serialise the current field value.
+                    // /// @return Number of bytes it will take to serialise the field value.
+                    // std::size_t length() {
+                    //     return base_impl_type::length();
+                    // }
 
                     /// @brief Get length required to serialise the current field value.
                     /// @return Number of bytes it will take to serialise the field value.
