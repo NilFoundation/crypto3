@@ -122,6 +122,18 @@ namespace nil {
                     has_function_doubled<T, T>::value;
             };
 
+            namespace curves {
+                namespace detail {
+                    template<typename CurveParams, typename Form, typename Coordinates>
+                    struct curve_element;
+                }    // namespace detail
+            }        // namespace curves
+            
+            template<typename CurveParams, typename Form, typename Coordinates>
+            struct is_group_element<curves::detail::curve_element<CurveParams, Form, Coordinates>> {
+                static const bool value = true;
+            };
+
             template<typename T>
             struct is_g1_group_element {
                 static const bool value = boost::is_same<
