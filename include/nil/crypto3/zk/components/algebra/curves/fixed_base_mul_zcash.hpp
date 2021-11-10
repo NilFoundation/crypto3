@@ -105,13 +105,11 @@ namespace nil {
                     std::vector<element_fp<field_type>> m_windows_x;
                     std::vector<lookup_component> m_windows_y;
 
-                private:
                     /// Number of segments
                     std::size_t basepoints_required(std::size_t n_bits) {
                         return std::ceilf(n_bits / float(lookup_component::chunk_bits * chunks_per_base_point));
                     }
 
-                public:
                     template<typename BasePoints,
                              typename std::enable_if<
                                  std::is_same<
@@ -186,6 +184,7 @@ namespace nil {
                             start = current.doubled().doubled();
                         }
 
+                        // TODO: why doesn't i begin from 0?
                         // Chain adders within one segment together via montgomery adders
                         for (std::size_t i = 1; i < n_windows; ++i) {
                             if (i % chunks_per_base_point == 0) {
@@ -220,7 +219,7 @@ namespace nil {
                         for (std::size_t i = segment_width; i < this->montgomery_adders.size(); i += segment_width) {
                             this->point_converters.emplace_back(this->bp, this->montgomery_adders[i - 1].result);
                         }
-                        // TODO: check
+                        // TODO: Last point seems to be added twice later if n_windows % chunks_per_base_point == 0
                         // The last segment might be incomplete
                         this->point_converters.emplace_back(this->bp, this->montgomery_adders.back().result);
 
