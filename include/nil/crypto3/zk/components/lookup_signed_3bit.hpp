@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
@@ -32,6 +32,7 @@
 #include <vector>
 #include <iterator>
 #include <algorithm>
+#include <type_traits>
 
 #include <nil/crypto3/zk/components/component.hpp>
 #include <nil/crypto3/zk/components/blueprint_variable.hpp>
@@ -42,19 +43,26 @@ namespace nil {
         namespace zk {
             namespace components {
                 template<typename Field>
-                struct lookup_signed_3bit_gadget : public component<Field> {
+                struct lookup_signed_3bit : public component<Field> {
                     using field_type = Field;
                     using field_value_type = typename field_type::value_type;
+
+                    static constexpr std::size_t chunk_bits = 3;
+                    static constexpr std::size_t lookup_bits = 2;
 
                     std::vector<field_value_type> c;
                     const blueprint_variable_vector<field_type> b;
                     blueprint_variable<field_type> b0b1;
                     blueprint_variable<field_type> r;
 
-                    template<typename Constants>
-                    lookup_signed_3bit_gadget(blueprint<field_type> &bp,
-                                              const Constants &in_constants,
-                                              const blueprint_variable_vector<field_type> &in_bits) :
+                    template<typename Constants,
+                             typename std::enable_if<
+                                 std::is_same<field_value_type, typename std::iterator_traits<
+                                                                    typename Constants::iterator>::value_type>::value,
+                                 bool>::type = true>
+                    lookup_signed_3bit(blueprint<field_type> &bp,
+                                       const Constants &in_constants,
+                                       const blueprint_variable_vector<field_type> &in_bits) :
                         component<field_type>(bp),
                         b(in_bits) {
                         this->b0b1.allocate(this->bp);
@@ -63,10 +71,12 @@ namespace nil {
                     }
 
                     void generate_r1cs_constraints() {
-                        // b0b1 = b[0] * b[1]
-                        bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(this->b[0], this->b[1], this->b0b1));
+                        /// b0b1 = b[0] * b[1]
+                        this->bp.add_r1cs_constraint(
+                            snark::r1cs_constraint<field_type>(this->b[0], this->b[1], this->b0b1));
 
-                        // y_lc = c[0] + b[0] * (c[1]-c0) + b[1] * (c[2]-c[0]) + b[0]&b[1] * (c[3] - c[2] - c[1] + c[0])
+                        /// y_lc = c[0] + b[0] * (c[1]-c0) + b[1] * (c[2]-c[0]) + b[0]&b[1] * (c[3] - c[2] - c[1] +
+                        /// c[0])
                         blueprint_linear_combination<field_type> y_lc;
                         y_lc.assign(this->bp, snark::linear_term<field_type>(field_value_type::one(), this->c[0]) +
                                                   snark::linear_term<field_type>(this->b[0], this->c[1] - this->c[0]) +
@@ -74,8 +84,8 @@ namespace nil {
                                                   snark::linear_term<field_type>(
                                                       this->b0b1, this->c[3] - this->c[2] - this->c[1] + this->c[0]));
 
-                        // (y_lc + y_lc) * b[2] == y_lc - r
-                        bp.add_r1cs_constraint(
+                        /// (y_lc + y_lc) * b[2] == y_lc - r
+                        this->bp.add_r1cs_constraint(
                             snark::r1cs_constraint<field_type>({y_lc + y_lc}, this->b[2], {y_lc - this->r}));
                     }
 

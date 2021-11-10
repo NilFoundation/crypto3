@@ -29,8 +29,6 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_ELEMENT_OPS_COMPONENT_HPP
 #define CRYPTO3_ZK_BLUEPRINT_ELEMENT_OPS_COMPONENT_HPP
 
-#include <nil/crypto3/zk/components/algebra/curves/element_g1_affine.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
