@@ -44,10 +44,12 @@
 #include <nil/crypto3/zk/components/blueprint_variable.hpp>
 #include <nil/crypto3/zk/components/blueprint_linear_combination.hpp>
 
+#include <nil/crypto3/zk/components/lookup_signed_3bit.hpp>
+
+#include <nil/crypto3/zk/components/algebra/fields/element_fp.hpp>
+
 #include <nil/crypto3/zk/components/algebra/curves/element_ops.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/element_g1_affine.hpp>
-
-#include <nil/crypto3/zk/components/lookup_signed_3bit.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -100,7 +102,7 @@ namespace nil {
                     std::vector<typename montgomery_element_component::addition_component> montgomery_adders;
                     std::vector<typename montgomery_element_component::to_twisted_edwards_component> point_converters;
                     std::vector<typename twisted_edwards_element_component::addition_component> edward_adders;
-                    std::vector<blueprint_linear_combination<field_type>> m_windows_x;
+                    std::vector<element_fp<field_type>> m_windows_x;
                     std::vector<lookup_component> m_windows_y;
 
                 private:
@@ -185,8 +187,8 @@ namespace nil {
                         }
 
                         // Chain adders within one segment together via montgomery adders
-                        for (int i = 1; i < n_windows; i++) {
-                            if (i % CHUNKS_PER_BASE_POINT == 0) {
+                        for (std::size_t i = 1; i < n_windows; ++i) {
+                            if (i % chunks_per_base_point == 0) {
                                 if (i + 1 < n_windows) {
                                     // 0th lookup will be used in the next iteration to connect
                                     // the first two adders of a new base point.
@@ -195,68 +197,59 @@ namespace nil {
                                     // This is the last point. No need to add it to anything in its
                                     // montgomery form, but we have to make sure it will be part of
                                     // the final edwards addition at the end
-                                    point_converters.emplace_back(
-                                        this->bp, in_params, m_windows_x[i], m_windows_y[i].result(),
-                                        FMT(this->annotation_prefix, ".point_conversion_segment_with_single_triplet"));
+                                    this->point_converters.emplace_back(
+                                        this->bp, montgomery_element_component(this->m_windows_x[i],
+                                                                               this->m_windows_y[i].result));
                                 }
-                            } else if (i % CHUNKS_PER_BASE_POINT == 1) {
-                                montgomery_adders.emplace_back(this->bp, in_params, m_windows_x[i - 1],
-                                                               m_windows_y[i - 1].result(), m_windows_x[i],
-                                                               m_windows_y[i].result(),
-                                                               FMT(this->annotation_prefix, ".mg_adders[%d]", i));
+                            } else if (i % chunks_per_base_point == 1) {
+                                this->montgomery_adders.emplace_back(
+                                    this->bp,
+                                    montgomery_element_component(this->m_windows_x[i - 1],
+                                                                 this->m_windows_y[i - 1].result),
+                                    montgomery_element_component(this->m_windows_x[i], this->m_windows_y[i].result));
                             } else {
-                                montgomery_adders.emplace_back(this->bp, in_params, montgomery_adders.back().result_x(),
-                                                               montgomery_adders.back().result_y(), m_windows_x[i],
-                                                               m_windows_y[i].result(),
-                                                               FMT(this->annotation_prefix, ".mg_adders[%d]", i));
+                                this->montgomery_adders.emplace_back(
+                                    this->bp, this->montgomery_adders.back().result,
+                                    montgomery_element_component(this->m_windows_x[i], this->m_windows_y[i].result));
                             }
                         }
 
                         // Convert every point at the end of a segment back to edwards format
-                        const size_t segment_width = CHUNKS_PER_BASE_POINT - 1;
+                        const std::size_t segment_width = chunks_per_base_point - 1;
 
-                        for (size_t i = segment_width; i < montgomery_adders.size(); i += segment_width) {
-                            point_converters.emplace_back(this->bp, in_params, montgomery_adders[i - 1].result_x(),
-                                                          montgomery_adders[i - 1].result_y(),
-                                                          FMT(this->annotation_prefix, ".point_conversion[%d]", i));
+                        for (std::size_t i = segment_width; i < this->montgomery_adders.size(); i += segment_width) {
+                            this->point_converters.emplace_back(this->bp, this->montgomery_adders[i - 1].result);
                         }
+                        // TODO: check
                         // The last segment might be incomplete
-                        point_converters.emplace_back(this->bp, in_params, montgomery_adders.back().result_x(),
-                                                      montgomery_adders.back().result_y(),
-                                                      FMT(this->annotation_prefix, ".point_conversion_final"));
+                        this->point_converters.emplace_back(this->bp, this->montgomery_adders.back().result);
 
                         // Chain adders of converted segment tails together
-                        for (size_t i = 1; i < point_converters.size(); i++) {
+                        for (std::size_t i = 1; i < this->point_converters.size(); ++i) {
                             if (i == 1) {
-                                edward_adders.emplace_back(this->bp, in_params, point_converters[i - 1].result_x(),
-                                                           point_converters[i - 1].result_y(),
-                                                           point_converters[i].result_x(),
-                                                           point_converters[i].result_y(),
-                                                           FMT(this->annotation_prefix, ".edward_adder[%d]", i));
+                                this->edward_adders.emplace_back(this->bp, this->point_converters[i - 1].result,
+                                                                 this->point_converters[i].result);
                             } else {
-                                edward_adders.emplace_back(this->bp, in_params, edward_adders[i - 2].result_x(),
-                                                           edward_adders[i - 2].result_y(),
-                                                           point_converters[i].result_x(),
-                                                           point_converters[i].result_y(),
-                                                           FMT(this->annotation_prefix, ".edward_adder[%d]", i));
+                                this->edward_adders.emplace_back(this->bp, this->edward_adders[i - 2].result,
+                                                                 this->point_converters[i].result);
                             }
                         }
                     }
 
                     void generate_r1cs_constraints() {
-                        for (auto &lut_y : m_windows_y) {
+                        for (auto &lut_y : this->m_windows_y) {
                             lut_y.generate_r1cs_constraints();
                         }
 
-                        for (auto &adder : montgomery_adders) {
+                        for (auto &adder : this->montgomery_adders) {
                             adder.generate_r1cs_constraints();
                         }
 
-                        for (auto &converter : point_converters) {
+                        for (auto &converter : this->point_converters) {
                             converter.generate_r1cs_constraints();
                         }
 
-                        for (auto &adder : edward_adders) {
+                        for (auto &adder : this->edward_adders) {
                             adder.generate_r1cs_constraints();
                         }
                     }
@@ -264,42 +257,35 @@ namespace nil {
                     void generate_r1cs_witness() {
                         // y lookups have to be solved first, because
                         // x depends on the `b0 && b1` constraint.
-                        for (auto &lut_y : m_windows_y) {
+                        for (auto &lut_y : this->m_windows_y) {
                             lut_y.generate_r1cs_witness();
                         }
 
-                        for (auto &lut_x : m_windows_x) {
-                            lut_x.evaluate(this->pb);
+                        for (auto &lut_x : this->m_windows_x) {
+                            lut_x.evaluate(this->bp);
                         }
 
-                        for (auto &adder : montgomery_adders) {
+                        for (auto &adder : this->montgomery_adders) {
                             adder.generate_r1cs_witness();
                         }
 
-                        for (auto &converter : point_converters) {
+                        for (auto &converter : this->point_converters) {
                             converter.generate_r1cs_witness();
                         }
 
-                        for (auto &adder : edward_adders) {
+                        for (auto &adder : this->edward_adders) {
                             adder.generate_r1cs_witness();
                         }
                     }
 
-                    const VariableT &result_x() const {
-                        return edward_adders.size() ? edward_adders.back().result_x() :
-                                                      point_converters.back().result_x();
-                    }
-
-                    const VariableT &result_y() const {
-                        return edward_adders.size() ? edward_adders.back().result_y() :
-                                                      point_converters.back().result_y();
+                    const twisted_edwards_element_component &result() const {
+                        return this->edward_adders.size() ? this->edward_adders.back().result :
+                                                            this->point_converters.back().result;
                     }
                 };
-
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-// CRYPTO3_ZK_BLUEPRINT_FIXED_BASE_MUL_ZCASH_COMPONENT_HPP
-#endif
+#endif    // CRYPTO3_ZK_BLUEPRINT_FIXED_BASE_MUL_ZCASH_COMPONENT_HPP

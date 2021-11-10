@@ -82,6 +82,12 @@ namespace nil {
                         this->bp.lc_val(this->Y) = p.Y.data;
                     }
 
+                    element_g1(blueprint<field_type> &bp, const underlying_element_type &in_X,
+                               const underlying_element_type &in_Y) :
+                        component<field_type>(bp),
+                        X(in_X), Y(in_Y) {
+                    }
+
                     // (See a comment in r1cs_ppzksnark_verifier_component.hpp about why
                     // we mark this function noinline.) TODO: remove later
                     static std::size_t __attribute__((noinline)) size_in_bits() {

@@ -53,7 +53,7 @@ namespace nil {
                     std::vector<field_value_type> c;
                     const blueprint_variable_vector<field_type> b;
                     blueprint_variable<field_type> b0b1;
-                    blueprint_variable<field_type> r;
+                    blueprint_variable<field_type> result;
 
                     template<typename Constants,
                              typename std::enable_if<
@@ -66,7 +66,7 @@ namespace nil {
                         component<field_type>(bp),
                         b(in_bits) {
                         this->b0b1.allocate(this->bp);
-                        this->r.allocate(this->bp);
+                        this->result.allocate(this->bp);
                         std::copy(std::cbegin(in_constants), std::cend(in_constants), std::back_inserter(this->c));
                     }
 
@@ -84,9 +84,9 @@ namespace nil {
                                                   snark::linear_term<field_type>(
                                                       this->b0b1, this->c[3] - this->c[2] - this->c[1] + this->c[0]));
 
-                        /// (y_lc + y_lc) * b[2] == y_lc - r
+                        /// (y_lc + y_lc) * b[2] == y_lc - result
                         this->bp.add_r1cs_constraint(
-                            snark::r1cs_constraint<field_type>({y_lc + y_lc}, this->b[2], {y_lc - this->r}));
+                            snark::r1cs_constraint<field_type>({y_lc + y_lc}, this->b[2], {y_lc - this->result}));
                     }
 
                     void generate_r1cs_witness() {
@@ -96,7 +96,7 @@ namespace nil {
                             result = result * (-field_value_type::one());
                         }
                         this->bp.val(this->b0b1) = this->bp.val(this->b[0]) * this->bp.val(this->b[1]);
-                        this->bp.val(this->r) = result;
+                        this->bp.val(this->result) = result;
                     }
                 };
             }    // namespace components
