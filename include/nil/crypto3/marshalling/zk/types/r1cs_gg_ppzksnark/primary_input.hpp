@@ -1,8 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2021 Noam Yemini <@NoamDev at GitHub>
-
 //
 // MIT License
 //
@@ -25,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MARSHALLING_R1CS_GG_PPZKSNARK_AUXILIARY_INPUT_HPP
-#define CRYPTO3_MARSHALLING_R1CS_GG_PPZKSNARK_AUXILIARY_INPUT_HPP
+#ifndef CRYPTO3_MARSHALLING_R1CS_GG_PPZKSNARK_PRIMARY_INPUT_HPP
+#define CRYPTO3_MARSHALLING_R1CS_GG_PPZKSNARK_PRIMARY_INPUT_HPP
 
 #include <ratio>
 #include <limits>
@@ -44,7 +42,7 @@
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
-#include <nil/crypto3/marshalling/types/algebra/field_element.hpp>
+#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -52,21 +50,21 @@ namespace nil {
             namespace types {
 
                 template<typename TTypeBase,
-                         typename AuxiliaryInput,
+                         typename PrimaryInput,
                          typename = typename std::enable_if<
-                             std::is_same<AuxiliaryInput,
-                                zk::snark::r1cs_auxiliary_input<
-                                    typename AuxiliaryInput::value_type::field_type
+                             std::is_same<PrimaryInput,
+                                zk::snark::r1cs_primary_input<
+                                    typename PrimaryInput::value_type::field_type
                                 >
                              >::value,
                              bool>::type,
                          typename... TOptions>
-                using r1cs_gg_ppzksnark_auxiliary_input =
+                using r1cs_gg_ppzksnark_primary_input =
                     nil::marshalling::types::array_list<
                         TTypeBase,
                         field_element<
                             TTypeBase,
-                            typename AuxiliaryInput::value_type::field_type
+                            typename PrimaryInput::value_type::field_type
                         >,
                         nil::marshalling::option::sequence_size_field_prefix<
                             nil::marshalling::types::integral<
@@ -76,30 +74,30 @@ namespace nil {
                         >
                     >;
 
-                template <typename AuxiliaryInput,
+                template <typename PrimaryInput,
                           typename Endianness>
-                r1cs_gg_ppzksnark_auxiliary_input<nil::marshalling::field_type<
+                r1cs_gg_ppzksnark_primary_input<nil::marshalling::field_type<
                                 Endianness>,
-                                AuxiliaryInput>
-                    fill_r1cs_gg_ppzksnark_auxiliary_input(AuxiliaryInput r1cs_gg_ppzksnark_auxiliary_input_inp){
+                                PrimaryInput>
+                    fill_r1cs_gg_ppzksnark_primary_input(PrimaryInput r1cs_gg_ppzksnark_primary_input_inp){
 
-                    return fill_field_element_vector<typename AuxiliaryInput::value_type::field_type,
-                                Endianness>(r1cs_gg_ppzksnark_auxiliary_input_inp);
+                    return fill_field_element_vector<typename PrimaryInput::value_type::field_type,
+                                Endianness>(r1cs_gg_ppzksnark_primary_input_inp);
                 }
 
-                template <typename AuxiliaryInput,
+                template <typename PrimaryInput,
                           typename Endianness>
-                AuxiliaryInput
-                    make_r1cs_gg_ppzksnark_auxiliary_input(
-                        r1cs_gg_ppzksnark_auxiliary_input<nil::marshalling::field_type<
+                PrimaryInput
+                    make_r1cs_gg_ppzksnark_primary_input(
+                        r1cs_gg_ppzksnark_primary_input<nil::marshalling::field_type<
                                 Endianness>,
-                                AuxiliaryInput> filled_r1cs_gg_ppzksnark_auxiliary_input){
+                                PrimaryInput> filled_r1cs_gg_ppzksnark_primary_input){
 
-                    return make_field_element_vector<typename AuxiliaryInput::value_type::field_type, Endianness>(
-                        filled_r1cs_gg_ppzksnark_auxiliary_input);
+                    return make_field_element_vector<typename PrimaryInput::value_type::field_type, Endianness>(
+                        filled_r1cs_gg_ppzksnark_primary_input);
                 }
             }    // namespace types
         }        // namespace marshalling
     }        // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_MARSHALLING_R1CS_GG_PPZKSNARK_AUXILIARY_INPUT_HPP
+#endif    // CRYPTO3_MARSHALLING_R1CS_GG_PPZKSNARK_PRIMARY_INPUT_HPP

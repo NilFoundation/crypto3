@@ -42,8 +42,8 @@
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 
-#include <nil/crypto3/marshalling/types/algebra/curve_element.hpp>
-#include <nil/crypto3/marshalling/types/zk/sparse_vector.hpp>
+#include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
+#include <nil/crypto3/marshalling/zk/types/sparse_vector.hpp>
 
 namespace nil {
     namespace crypto3 {

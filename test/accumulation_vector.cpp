@@ -46,7 +46,7 @@
 #include <nil/crypto3/zk/snark/sparse_vector.hpp>
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 
-#include <nil/crypto3/marshalling/types/zk/accumulation_vector.hpp>
+#include <nil/crypto3/marshalling/zk/types/accumulation_vector.hpp>
 
 template<typename TIter>
 void print_byteblob(TIter iter_begin, TIter iter_end) {

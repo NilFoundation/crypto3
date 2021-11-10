@@ -43,9 +43,9 @@
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/verification_key.hpp>
 
-#include <nil/crypto3/marshalling/types/algebra/field_element.hpp>
-#include <nil/crypto3/marshalling/types/algebra/curve_element.hpp>
-#include <nil/crypto3/marshalling/types/zk/accumulation_vector.hpp>
+#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
+#include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
+#include <nil/crypto3/marshalling/zk/types/accumulation_vector.hpp>
 
 namespace nil {
     namespace crypto3 {

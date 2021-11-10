@@ -45,7 +45,7 @@
 
 #include <nil/crypto3/zk/snark/sparse_vector.hpp>
 
-#include <nil/crypto3/marshalling/types/zk/sparse_vector.hpp>
+#include <nil/crypto3/marshalling/zk/types/sparse_vector.hpp>
 
 template<typename TIter>
 void print_byteblob(TIter iter_begin, TIter iter_end) {
