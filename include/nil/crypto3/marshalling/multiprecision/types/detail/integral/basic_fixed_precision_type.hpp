@@ -36,8 +36,8 @@
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/traits/max_digits10.hpp>
 
-#include <nil/crypto3/marshalling/processing/integral.hpp>
-#include <nil/crypto3/marshalling/types/detail/integral/basic_type.hpp>
+#include <nil/crypto3/marshalling/multiprecision/processing/integral.hpp>
+#include <nil/crypto3/marshalling/multiprecision/types/detail/integral/basic_type.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -121,9 +121,9 @@ namespace nil {
 
                         template<typename TIter>
                         nil::marshalling::status_type read(TIter &iter, std::size_t size) {
-                            // if (size < length()) {
-                            //     return nil::marshalling::status_type::not_enough_data;
-                            // }
+                            if (size < length()) {
+                                return nil::marshalling::status_type::not_enough_data;
+                            }
 
                             read_no_status(iter);
                             iter += max_length();
@@ -138,9 +138,9 @@ namespace nil {
 
                         template<typename TIter>
                         nil::marshalling::status_type write(TIter &iter, std::size_t size) const {
-                            // if (size < length()) {
-                            //     return nil::marshalling::status_type::buffer_overflow;
-                            // }
+                            if (size < length()) {
+                                return nil::marshalling::status_type::buffer_overflow;
+                            }
 
                             write_no_status(iter);
 

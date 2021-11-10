@@ -32,17 +32,16 @@
 #include <iostream>
 #include <iomanip>
 
-#include <nil/marshalling/types/integral.hpp>
-#include <nil/marshalling/types/array_list.hpp>
 #include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/container/static_vector.hpp>
-#include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
 
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
 
-#include <nil/crypto3/marshalling/types/integral.hpp>
+#include <nil/marshalling/algorithms/pack.hpp>
+#include <nil/marshalling/algorithms/unpack.hpp>
+
+#include <nil/crypto3/marshalling/multiprecision/types/integral.hpp>
 
 template<class T>
 struct unchecked_type {
@@ -92,51 +91,22 @@ void print_byteblob(TIter iter_begin, TIter iter_end) {
 }
 
 template<typename Endianness, class T, std::size_t TSize>
-void test_round_trip_non_fixed_size_container_fixed_precision(nil::marshalling::container::static_vector<T, TSize>
+void test_round_trip_non_fixed_size_container_fixed_precision(std::vector<T>
                                                                   val_container) {
     using namespace nil::crypto3::marshalling;
-    std::size_t units_bits = 8;
     using unit_type = unsigned char;
-    using integral_type = types::integral<nil::marshalling::field_type<Endianness>, T>;
 
-    using container_type = nil::marshalling::types::array_list<
-        nil::marshalling::field_type<Endianness>,
-        integral_type,
-        nil::marshalling::option::sequence_size_field_prefix<
-            nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>;
+    nil::marshalling::status_type status;
+    std::vector<unit_type> cv = 
+        nil::marshalling::unpack<Endianness, unit_type>(val_container, status);
 
-    std::vector<T> val_vector(TSize);
-    std::copy(val_container.begin(), val_container.end(), val_vector.begin());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    container_type filled_val = types::fill_integral_vector<T, Endianness>(val_vector);
+    std::vector<T> test_val = nil::marshalling::pack<Endianness, std::vector<T>>(cv, status);
 
-    std::vector<T> constructed_val = types::make_integral_vector<T, Endianness>(filled_val);
-    BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), constructed_val.begin()));
-
-    std::size_t unitblob_size =
-        integral_type::bit_length() / units_bits + ((integral_type::bit_length() % units_bits) ? 1 : 0);
-
-    std::vector<unit_type> cv;
-    cv.resize(unitblob_size * TSize + sizeof(std::size_t), 0x00);
-
-    std::vector<integral_type> container_data;
-
-    for (std::size_t i = 0; i < TSize; i++) {
-        container_data.push_back(integral_type(val_container[i]));
-    }
-
-    container_type test_val = container_type(container_data);
-
-    auto write_iter = cv.begin();
-
-    nil::marshalling::status_type status = test_val.write(write_iter, cv.size());
-
-    container_type test_val_read;
-
-    auto read_iter = cv.begin();
-    status = test_val_read.read(read_iter, cv.size());
-
-    BOOST_CHECK(std::equal(test_val.value().begin(), test_val.value().end(), test_val_read.value().begin()));
+    BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), test_val.begin()));
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
+    
 }
 
 template<typename Endianness, class T, std::size_t TSize>
@@ -147,7 +117,7 @@ void test_round_trip_non_fixed_size_container_fixed_precision() {
         if (!(i % 128) && i) {
             std::cout << std::dec << i << " tested" << std::endl;
         }
-        nil::marshalling::container::static_vector<T, TSize> val_container;
+        std::vector<T> val_container (TSize);
         for (std::size_t i = 0; i < TSize; i++) {
             val_container.push_back(generate_random<T>());
         }
