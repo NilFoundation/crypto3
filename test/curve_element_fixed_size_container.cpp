@@ -33,17 +33,13 @@
 #include <iomanip>
 
 #include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/types/array_list.hpp>
-#include <nil/marshalling/container/static_vector.hpp>
-#include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
-
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/number.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
+
+#include <nil/marshalling/algorithms/pack.hpp>
+#include <nil/marshalling/algorithms/unpack.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 
@@ -65,42 +61,26 @@ void print_fp2_curve_group_element(Fp2CurveGroupElement e) {
               << e.Y.data[1].data << ") (" << e.Z.data[0].data << " " << e.Z.data[1].data << ")" << std::endl;
 }
 
-template<class CurveGroupElement, std::size_t TSize>
-void test_curve_element_fixed_size_container_big_endian(std::array<CurveGroupElement, TSize> val_container) {
+template<class T, std::size_t TSize>
+void test_curve_element_fixed_size_container_big_endian(std::array<T, TSize> val_container) {
     using namespace nil::crypto3::marshalling;
-    std::size_t units_bits = 8;
+
+    using Endianness = nil::marshalling::option::big_endian;
+
     using unit_type = unsigned char;
-    using curve_element_type = types::curve_element<nil::marshalling::field_type<nil::marshalling::option::big_endian>,
-                                                    typename CurveGroupElement::group_type>;
-    using curve_type = typename CurveGroupElement::group_type::curve_type;
 
-    using container_type =
-        nil::marshalling::types::array_list<nil::marshalling::field_type<nil::marshalling::option::little_endian>,
-                                            curve_element_type,
-                                            nil::marshalling::option::fixed_size_storage<TSize>>;
+    static_assert(nil::marshalling::is_compatible<T>::value);
 
-    std::size_t unitblob_size =
-        curve_element_type::bit_length() / units_bits + ((curve_element_type::bit_length() % units_bits) ? 1 : 0);
-    std::vector<unit_type> cv;
-    cv.resize(unitblob_size * TSize, 0x00);
+    nil::marshalling::status_type status;
+    std::vector<unit_type> cv = 
+        nil::marshalling::unpack<Endianness, unit_type>(val_container, status);
 
-    nil::marshalling::container::static_vector<curve_element_type, TSize> container_data;
-    for (std::size_t i = 0; i < TSize; i++) {
-        container_data.push_back(curve_element_type(val_container[i]));
-    }
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    container_type test_val = container_type(container_data);
+    std::array<T, TSize> test_val = nil::marshalling::pack<Endianness, std::array<T, TSize>>(cv, status);
 
-    auto write_iter = cv.begin();
-
-    nil::marshalling::status_type status = test_val.write(write_iter, cv.size());
-
-    container_type test_val_read;
-
-    auto read_iter = cv.begin();
-    status = test_val_read.read(read_iter, cv.size());
-
-    BOOST_CHECK(std::equal(test_val.value().begin(), test_val.value().end(), test_val_read.value().begin()));
+    BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), test_val.begin()));
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 }
 
 template<class CurveGroup, std::size_t TSize>
