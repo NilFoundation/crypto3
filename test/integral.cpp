@@ -39,10 +39,10 @@
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
 
-// #include <nil/crypto3/marshalling/algorithms/pack.hpp>
 #include <nil/marshalling/algorithms/pack.hpp>
 #include <nil/marshalling/algorithms/unpack.hpp>
-#include <nil/crypto3/marshalling/types/integral.hpp>
+
+#include <nil/crypto3/marshalling/multiprecision/types/integral.hpp>
 
 template<class T>
 struct unchecked_type {

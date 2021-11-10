@@ -42,9 +42,9 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 
-#include <nil/crypto3/marshalling/types/detail/integral/basic_fixed_precision_type.hpp>
-#include <nil/crypto3/marshalling/types/detail/integral/basic_non_fixed_precision_type.hpp>
-#include <nil/crypto3/marshalling/inference.hpp>
+#include <nil/crypto3/marshalling/multiprecision/types/detail/integral/basic_fixed_precision_type.hpp>
+#include <nil/crypto3/marshalling/multiprecision/types/detail/integral/basic_non_fixed_precision_type.hpp>
+#include <nil/crypto3/marshalling/multiprecision/inference.hpp>
 
 namespace nil {
     namespace crypto3 {

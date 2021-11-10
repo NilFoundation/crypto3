@@ -36,8 +36,8 @@
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/traits/max_digits10.hpp>
 
-#include <nil/crypto3/marshalling/processing/integral.hpp>
-#include <nil/crypto3/marshalling/types/detail/integral/basic_type.hpp>
+#include <nil/crypto3/marshalling/multiprecision/processing/integral.hpp>
+#include <nil/crypto3/marshalling/multiprecision/types/detail/integral/basic_type.hpp>
 
 namespace nil {
     namespace crypto3 {
