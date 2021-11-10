@@ -30,8 +30,8 @@
 #include <boost/type_traits/is_same.hpp>
 
 #include <nil/crypto3/algebra/type_traits.hpp>
-#include <nil/crypto3/marshalling/types/algebra/curve_element.hpp>
-#include <nil/crypto3/marshalling/types/algebra/field_element.hpp>
+#include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
+#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 namespace nil {
     namespace marshalling {

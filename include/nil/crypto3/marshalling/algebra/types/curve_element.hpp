@@ -37,7 +37,7 @@
 #include <nil/marshalling/types/tag.hpp>
 #include <nil/marshalling/types/detail/adapt_basic_field.hpp>
 
-#include <nil/crypto3/marshalling/types/algebra/detail/curve_element/basic_type.hpp>
+#include <nil/crypto3/marshalling/algebra/types/detail/curve_element/basic_type.hpp>
 
 namespace nil {
     namespace crypto3 {

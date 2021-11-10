@@ -43,7 +43,8 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
 
-#include <nil/crypto3/marshalling/types/algebra/field_element.hpp>
+#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
+#include <nil/crypto3/marshalling/algebra/inference.hpp>
 
 template<typename TIter>
 void print_byteblob(TIter iter_begin, TIter iter_end) {
@@ -60,6 +61,9 @@ void test_field_element(typename FieldType::value_type val) {
     std::size_t units_bits = 8;
     using unit_type = unsigned char;
     using field_element_type = types::field_element<nil::marshalling::field_type<Endianness>, FieldType>;
+
+    // template <typename TEndian = default_endianness>
+    // using type = nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<TEndian>, T>;
 
     field_element_type test_val = types::fill_field_element<FieldType, Endianness>(val);
 

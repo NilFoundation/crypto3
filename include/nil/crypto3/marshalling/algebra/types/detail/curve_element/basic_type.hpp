@@ -30,7 +30,7 @@
 
 #include <nil/marshalling/status_type.hpp>
 
-#include <nil/crypto3/marshalling/processing/curve_element.hpp>
+#include <nil/crypto3/marshalling/algebra/processing/curve_element.hpp>
 
 namespace nil {
     namespace crypto3 {

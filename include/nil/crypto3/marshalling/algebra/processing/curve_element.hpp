@@ -39,8 +39,9 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/curve25519.hpp>
 
-#include <nil/crypto3/marshalling/processing/integral.hpp>
-#include <nil/crypto3/marshalling/processing/detail/curve_element.hpp>
+#include <nil/crypto3/marshalling/multiprecision/processing/integral.hpp>
+
+#include <nil/crypto3/marshalling/algebra/processing/detail/curve_element.hpp>
 
 namespace nil {
     namespace crypto3 {
