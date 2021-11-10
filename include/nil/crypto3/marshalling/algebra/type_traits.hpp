@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
 //
 // MIT License
 //
@@ -23,13 +22,13 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MARSHALLING_ALGEBRA_INFERENCE_TYPE_TRAITS_HPP
-#define CRYPTO3_MARSHALLING_ALGEBRA_INFERENCE_TYPE_TRAITS_HPP
+#ifndef CRYPTO3_MARSHALLING_ALGEBRA_TYPE_TRAITS_HPP
+#define CRYPTO3_MARSHALLING_ALGEBRA_TYPE_TRAITS_HPP
 
 #include <boost/type_traits.hpp>
 #include <boost/type_traits/is_same.hpp>
 
-#include <nil/crypto3/algebra/type_traits.hpp>
+#include <nil/marshalling/type_traits.hpp>
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 namespace nil {
@@ -43,32 +42,33 @@ namespace nil {
     }            // namespace crypto3
     namespace marshalling {
 
-        template<typename T, typename Enabled>
-        class is_compatible;
-
+        /// @brief Compile time check function of whether a provided type is any
+        ///     variant of nil::crypto3::marshalling::types::curve_element.
+        /// @tparam T Any type.
+        /// @return true in case provided type is any variant of @ref curve_element
+        /// @related nil::crypto3::marshalling::types::curve_element
         template<typename T>
-        class is_compatible <T, typename std::enable_if<nil::crypto3::algebra::is_group_element<T>::value>::type> {
-            using default_endianness = option::big_endian;
-        public:
-            template <typename TEndian = default_endianness>
-            using type = typename nil::crypto3::marshalling::types::curve_element<field_type<TEndian>, typename T::group_type>;
-            static const bool value = true;
-            static const bool fixed_size = true;
+        struct is_curve_element {
+
+            static const bool value = false;
         };
 
-        template<typename T>
-        class is_compatible <T, typename std::enable_if<nil::crypto3::algebra::is_field<T>::value>::type> {
-            using default_endianness = option::big_endian;
-        public:
-            template <typename TEndian = default_endianness>
-            using type = nil::crypto3::marshalling::types::field_element<
-                nil::marshalling::field_type<TEndian>, 
-                T>;
+        template<typename TTypeBase, typename CurveGroupType, typename... TOptions>
+        struct is_curve_element<nil::crypto3::marshalling::types::curve_element<TTypeBase, 
+            CurveGroupType, TOptions...>> {
+
             static const bool value = true;
-            static const bool fixed_size = true;
+        };
+
+        template<typename T, typename Enabled>
+        struct is_container;
+
+        template<typename T>
+        struct is_container <T, typename std::enable_if<is_curve_element<T>::value>::type> {
+            static const bool value = false;
         };
 
     }        // namespace marshalling
 }    // namespace nil
 
-#endif    // CRYPTO3_MARSHALLING_ALGEBRA_INFERENCE_TYPE_TRAITS_HPP
+#endif    // CRYPTO3_MARSHALLING_ALGEBRA_TYPE_TRAITS_HPP
