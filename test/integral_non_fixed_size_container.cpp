@@ -32,11 +32,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include <nil/marshalling/types/integral.hpp>
-#include <nil/marshalling/types/array_list.hpp>
 #include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/container/static_vector.hpp>
-#include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
 
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
@@ -98,9 +94,7 @@ template<typename Endianness, class T, std::size_t TSize>
 void test_round_trip_non_fixed_size_container_fixed_precision(std::vector<T>
                                                                   val_container) {
     using namespace nil::crypto3::marshalling;
-    std::size_t units_bits = 8;
     using unit_type = unsigned char;
-    using integral_type = types::integral<nil::marshalling::field_type<Endianness>, T>;
 
     nil::marshalling::status_type status;
     std::vector<unit_type> cv = 
