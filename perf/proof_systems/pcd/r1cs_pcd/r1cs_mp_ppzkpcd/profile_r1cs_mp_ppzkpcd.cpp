@@ -24,8 +24,8 @@
 //---------------------------------------------------------------------------//
 
 #include <nil/crypto3/zk/snark/default_types/r1cs_ppzkpcd_pp.hpp>
-#include <nil/crypto3/zk/snark/schemes/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/examples/run_r1cs_mp_ppzkpcd.hpp>
-#include <nil/crypto3/zk/snark/schemes/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd.hpp>
+#include <nil/crypto3/zk/snark/systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/examples/run_r1cs_mp_ppzkpcd.hpp>
+#include <nil/crypto3/zk/snark/systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd.hpp>
 
 using namespace nil::crypto3::zk::snark;
 

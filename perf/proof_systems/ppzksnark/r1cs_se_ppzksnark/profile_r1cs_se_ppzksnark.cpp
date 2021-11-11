@@ -28,7 +28,7 @@
 
 #include <nil/crypto3/zk/snark/default_types/r1cs_se_ppzksnark_pp.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/examples/r1cs_examples.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/examples/run_r1cs_se_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_se_ppzksnark/examples/run_r1cs_se_ppzksnark.hpp>
 
 using namespace nil::crypto3::zk::snark;
 

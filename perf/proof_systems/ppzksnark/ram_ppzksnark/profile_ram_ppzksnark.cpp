@@ -33,7 +33,7 @@
 #include <nil/crypto3/zk/snark/default_types/ram_ppzksnark_pp.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/examples/ram_examples.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/tinyram/tinyram_params.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/ram_ppzksnark/examples/run_ram_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/ram_ppzksnark/examples/run_ram_ppzksnark.hpp>
 
 using namespace nil::crypto3::zk::snark;
 

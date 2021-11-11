@@ -53,19 +53,21 @@ set(TESTS_NAMES
     "relations/numeric/sap"
     "relations/numeric/ssp"
 
-    "schemes/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
-    "schemes/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"
+    "systems/plonk/pickles"
 
-    "schemes/ppzksnark/bacs_ppzksnark/bacs_ppzksnark"
-    "schemes/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark"
-    "schemes/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_marshalling"
-    "schemes/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_tvm_marshalling"
-    "schemes/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark"
-    "schemes/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark"
-    "schemes/ppzksnark/ram_ppzksnark/ram_ppzksnark"
-    "schemes/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark"
-    "schemes/ppzksnark/uscs_ppzksnark/uscs_ppzksnark"
-    "schemes/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity")
+    "systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
+    "systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"
+
+    "systems/ppzksnark/bacs_ppzksnark/bacs_ppzksnark"
+    "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark"
+    "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_marshalling"
+    "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_tvm_marshalling"
+    "systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark"
+    "systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark"
+    "systems/ppzksnark/ram_ppzksnark/ram_ppzksnark"
+    "systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark"
+    "systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark"
+    "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_zk_test(${TEST_NAME})
