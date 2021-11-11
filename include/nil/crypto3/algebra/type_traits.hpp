@@ -128,9 +128,74 @@ namespace nil {
                     struct curve_element;
                 }    // namespace detail
             }        // namespace curves
-            
+
             template<typename CurveParams, typename Form, typename Coordinates>
             struct is_group_element<curves::detail::curve_element<CurveParams, Form, Coordinates>> {
+                static const bool value = true;
+            };
+
+            namespace fields {
+                namespace detail {
+                    template<typename FieldParams>
+                    struct element_fp;
+
+                    template<typename FieldParams>
+                    struct element_fp2;
+
+                    template<typename FieldParams>
+                    struct element_fp3;
+
+                    template<typename FieldParams>
+                    struct element_fp4;
+
+                    template<typename FieldParams>
+                    struct element_fp6_2over3;
+
+                    template<typename FieldParams>
+                    struct element_fp6_3over2;
+
+                    template<typename FieldParams>
+                    struct element_fp12_2over3over2;
+                }    // namespace detail
+            }        // namespace curves
+
+            template<typename FieldParams>
+            struct is_field_element {
+                static const bool value = false;
+            };
+
+            template<typename FieldParams>
+            struct is_field_element<fields::detail::element_fp<FieldParams>> {
+                static const bool value = true;
+            };
+
+            template<typename FieldParams>
+            struct is_field_element<fields::detail::element_fp2<FieldParams>> {
+                static const bool value = true;
+            };
+
+            template<typename FieldParams>
+            struct is_field_element<fields::detail::element_fp3<FieldParams>> {
+                static const bool value = true;
+            };
+
+            template<typename FieldParams>
+            struct is_field_element<fields::detail::element_fp4<FieldParams>> {
+                static const bool value = true;
+            };
+
+            template<typename FieldParams>
+            struct is_field_element<fields::detail::element_fp6_2over3<FieldParams>> {
+                static const bool value = true;
+            };
+
+            template<typename FieldParams>
+            struct is_field_element<fields::detail::element_fp6_3over2<FieldParams>> {
+                static const bool value = true;
+            };
+
+            template<typename FieldParams>
+            struct is_field_element<fields::detail::element_fp12_2over3over2<FieldParams>> {
                 static const bool value = true;
             };
 
