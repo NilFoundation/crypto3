@@ -57,7 +57,8 @@ namespace nil {
                     typedef detail::redshift_types<TCurve> types_policy;
 
                     // static inline math::polynomial::polynom<...> tau(
-                    //     std::size_t input, std::size_t n, std::array<typename TCurve::scalar_field_type::value_type, 3> &k){
+                    //     std::size_t input, std::size_t n, std::array<typename TCurve::scalar_field_type::value_type,
+                    //     3> &k){
 
                     //     std::size_t i = input % n;
                     //     std::size_t j = (input - i)/n + 1;
@@ -67,7 +68,8 @@ namespace nil {
                     // }
 
                     // static inline std::size_t tau_reverted(
-                    //     math::polynomial::polynom<...> k_jgi, std::size_t n, std::array<typename TCurve::scalar_field_type::value_type, 3> &k){
+                    //     math::polynomial::polynom<...> k_jgi, std::size_t n, std::array<typename
+                    //     TCurve::scalar_field_type::value_type, 3> &k){
 
                     //     std::size_t i = math::polynomial::get_index_of_non_zero_coeff(k_jgi);
 
@@ -77,48 +79,56 @@ namespace nil {
                     // }
 
                     // static inline std::size_t sigma_p1_permutation(
-                    //     std::size_t input, std::size_t n, std::array<typename TCurve::scalar_field_type::value_type, 3> &k){
+                    //     std::size_t input, std::size_t n, std::array<typename TCurve::scalar_field_type::value_type,
+                    //     3> &k){
                     //     ...
                     // }
 
                     // static inline math::polynomial::polynom<...> sigma_p2_permutation(
-                    //     math::polynomial::polynom<...> input, std::size_t n, std::array<typename TCurve::scalar_field_type::value_type, 3> &k){
-                        
+                    //     math::polynomial::polynom<...> input, std::size_t n, std::array<typename
+                    //     TCurve::scalar_field_type::value_type, 3> &k){
+
                     //     return (tau(sigma_p1_permutation(tau_reverted(input, n, k), n, k), n, k));
                     // }
 
                 public:
-
                     template<typename DistributionType =
                                  boost::random::uniform_int_distribution<typename scalar_field_type::integral_type>,
                              typename GeneratorType = boost::random::mt19937>
-                    static inline keypair_type process(const typename types_policy::constraint_system_type &constraint_system) {
+                    static inline keypair_type
+                        process(const typename types_policy::constraint_system_type &constraint_system) {
 
-                        std::array<typename TCurve::scalar_field_type::value_type, 3> k = get_cosets_generators<typename TCurve::scalar_field_type>();
+                        std::array<typename TCurve::scalar_field_type::value_type, 3> k =
+                            get_cosets_generators<typename TCurve::scalar_field_type>();
 
                         std::array<math::permutation<...>::polynomial, 3> S_id;
                         std::array<math::permutation<...>::polynomial, 3> S_sigma;
 
-                        typename TCurve::scalar_field_type::value_type omega = algebra::get_root_of_unity<scalar_field_type>();
-                        typename TCurve::scalar_field_type::value_type delta = algebra::get_root_of_unity<scalar_field_type>();
+                        typename TCurve::scalar_field_type::value_type omega =
+                            algebra::get_root_of_unity<scalar_field_type>();
+                        typename TCurve::scalar_field_type::value_type delta =
+                            algebra::get_root_of_unity<scalar_field_type>();
 
                         std::size_t Nperm = ...;
 
-                        for (std::size_t i = 0; i < 3; i++){
-                            std::vector<std::pair<typename TCurve::scalar_field_type::value_type, 
-                                typename TCurve::scalar_field_type::value_type>> interpolation_points (Nperm);
-                            for (std::size_t j = 0; j < Nperm; j++){
+                        for (std::size_t i = 0; i < 3; i++) {
+                            std::vector<std::pair<typename TCurve::scalar_field_type::value_type,
+                                                  typename TCurve::scalar_field_type::value_type>>
+                                interpolation_points(Nperm);
+                            for (std::size_t j = 0; j < Nperm; j++) {
                                 interpolation_points.push_back(std::make_pair(omega.pow(j), delta??? * omega.pow(j)));
                             }
 
                             S_id[i] = math::polynomial::Lagrange_interpolation(interpolation_points);
                         }
 
-                        for (std::size_t i = 0; i < 3; i++){
-                            std::vector<std::pair<typename TCurve::scalar_field_type::value_type, 
-                                typename TCurve::scalar_field_type::value_type>> interpolation_points (Nperm);
-                            for (std::size_t j = 0; j < Nperm; j++){
-                                interpolation_points.push_back(std::make_pair(omega.pow(j), delta.pow(i) * omega.pow(j)));
+                        for (std::size_t i = 0; i < 3; i++) {
+                            std::vector<std::pair<typename TCurve::scalar_field_type::value_type,
+                                                  typename TCurve::scalar_field_type::value_type>>
+                                interpolation_points(Nperm);
+                            for (std::size_t j = 0; j < Nperm; j++) {
+                                interpolation_points.push_back(
+                                    std::make_pair(omega.pow(j), delta.pow(i) * omega.pow(j)));
                             }
 
                             S_sigma[i] = math::polynomial::Lagrange_interpolation(interpolation_points);

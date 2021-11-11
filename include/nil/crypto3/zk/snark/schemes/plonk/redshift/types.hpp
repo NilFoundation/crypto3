@@ -82,14 +82,9 @@ namespace nil {
                          */
                         typedef redshift_proof<TCurve> proof_type;
 
-                        template <std::size_t AlphasAmount = 6>
+                        template<std::size_t AlphasAmount = 6>
                         struct prover_fiat_shamir_heuristic_manifest {
-                            enum challenges_ids{
-                                beta,
-                                gamma,
-                                alpha,
-                                upsilon = alpha + AlphasAmount
-                            };
+                            enum challenges_ids { beta, gamma, alpha, upsilon = alpha + AlphasAmount };
                         };
                     };
                 }    // namespace detail

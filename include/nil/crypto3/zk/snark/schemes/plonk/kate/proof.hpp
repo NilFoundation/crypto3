@@ -33,8 +33,7 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename TCurve, 
-                         typename TCommitment>
+                template<typename TCurve, typename TCommitment>
                 class plonk_proof;
 
                 template<typename TCurve>

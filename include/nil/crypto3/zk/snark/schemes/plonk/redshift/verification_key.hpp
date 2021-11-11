@@ -36,14 +36,13 @@ namespace nil {
                 template<typename TCurve>
                 class redshift_verification_key {
                     using constraint_system_type = plonk_constraint_system<typename TCurve::scalar_field_type>;
-                public:
 
+                public:
                     std::array<math::permutation<...>, 3> S_id;
                     std::array<math::permutation<...>, 3> S_sigma;
                     std::array<math::permutation<...>, n> L_basis;
-                    
-                    math::polynom<...> PI; // public inputs polynomial
-                    
+
+                    math::polynom<...> PI;    // public inputs polynomial
                 };
             }    // namespace snark
         }        // namespace zk

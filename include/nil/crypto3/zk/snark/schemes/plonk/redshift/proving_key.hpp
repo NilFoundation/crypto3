@@ -37,14 +37,13 @@ namespace nil {
                 class redshift_proving_key {
                     using constraint_system_type = plonk_constraint_system<typename TCurve::scalar_field_type>;
                     constexpr static const std::size_t n = ...;
+
                 public:
-                    
                     std::array<math::permutation<...>, 3> S_id;
                     std::array<math::permutation<...>, 3> S_sigma;
                     std::array<math::permutation<...>, n> L_basis;
 
-                    std::array<math::polynom<...>, 3> f_witness_wire; // witness-wire polynomials f_L, f_R, f_O
-                    
+                    std::array<math::polynom<...>, 3> f_witness_wire;    // witness-wire polynomials f_L, f_R, f_O
                 };
             }    // namespace snark
         }        // namespace zk

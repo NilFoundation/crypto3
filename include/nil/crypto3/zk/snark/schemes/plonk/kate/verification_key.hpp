@@ -47,11 +47,10 @@ namespace nil {
                     std::vector<std::uint32_t> recursive_proof_public_input_indices;
                 };
 
-                inline bool operator==(plonk_verification_key_data const& lhs, plonk_verification_key_data const& rhs)
-                {
+                inline bool operator==(plonk_verification_key_data const &lhs, plonk_verification_key_data const &rhs) {
                     return lhs.n == rhs.n && lhs.num_public_inputs == rhs.num_public_inputs &&
-                       lhs.constraint_selectors == rhs.constraint_selectors &&
-                       lhs.permutation_selectors == rhs.permutation_selectors;
+                           lhs.constraint_selectors == rhs.constraint_selectors &&
+                           lhs.permutation_selectors == rhs.permutation_selectors;
                 }
 
                 template<typename TCurve, typename TCommitment>
@@ -61,7 +60,7 @@ namespace nil {
                 class plonk_verification_key<TCurve, batched_kate_commitment_scheme<...>> {
                     using commitment_scheme_type = batched_kate_commitment_scheme<...>;
 
-                    constexpr static const std::size_t scalar_bytes = TCurve::scalar_field_type::value_bits/BYTE_BITS;
+                    constexpr static const std::size_t scalar_bytes = TCurve::scalar_field_type::value_bits / BYTE_BITS;
 
                     std::size_t n;
                     std::size_t num_public_inputs;
@@ -83,33 +82,30 @@ namespace nil {
                     bool contains_recursive_proof = false;
                     std::vector<std::uint32_t> recursive_proof_public_input_indices;
                     std::size_t program_width = 3;
+
                 public:
-
                     plonk_verification_key(const std::size_t num_gates,
-                                   const std::size_t num_inputs,
-                                   std::shared_ptr<VerifierReferenceString> const& crs)
-                        : n(num_gates)
-                        , num_public_inputs(num_inputs)
-                        , domain(n)
-                        , reference_string(crs)
-                    {}
-
-                    plonk_verification_key(plonk_verification_key_data<TCurve, commitment_scheme_type>&& data, 
-                                           std::shared_ptr<VerifierReferenceString> const& crs)
-                        : n(data.n)
-                        , num_public_inputs(data.num_public_inputs)
-                        , domain(n)
-                        , reference_string(crs)
-                        , constraint_selectors(std::move(data.constraint_selectors))
-                        , permutation_selectors(std::move(data.permutation_selectors))
-                        , contains_recursive_proof(data.contains_recursive_proof)
-                        , recursive_proof_public_input_indices(std::move(data.recursive_proof_public_input_indices))
-                    {
-                        // TODO: Currently only supporting TurboComposer in serialization!
-                        std::copy(turbo_polynomial_manifest, turbo_polynomial_manifest + 20, std::back_inserter(polynomial_manifest));
+                                           const std::size_t num_inputs,
+                                           std::shared_ptr<VerifierReferenceString> const &crs) :
+                        n(num_gates),
+                        num_public_inputs(num_inputs), domain(n), reference_string(crs) {
                     }
 
-                    plonk_verification_key& operator=(plonk_verification_key&& other) {
+                    plonk_verification_key(plonk_verification_key_data<TCurve, commitment_scheme_type> &&data,
+                                           std::shared_ptr<VerifierReferenceString> const &crs) :
+                        n(data.n),
+                        num_public_inputs(data.num_public_inputs), domain(n), reference_string(crs),
+                        constraint_selectors(std::move(data.constraint_selectors)),
+                        permutation_selectors(std::move(data.permutation_selectors)),
+                        contains_recursive_proof(data.contains_recursive_proof),
+                        recursive_proof_public_input_indices(std::move(data.recursive_proof_public_input_indices)) {
+                        // TODO: Currently only supporting TurboComposer in serialization!
+                        std::copy(turbo_polynomial_manifest,
+                                  turbo_polynomial_manifest + 20,
+                                  std::back_inserter(polynomial_manifest));
+                    }
+
+                    plonk_verification_key &operator=(plonk_verification_key &&other) {
                         n = other.n;
                         num_public_inputs = other.num_public_inputs;
                         reference_string = std::move(other.reference_string);
@@ -122,38 +118,32 @@ namespace nil {
                         return *this;
                     }
 
-                    plonk_verification_key(const plonk_verification_key &other)
-                        : n(other.n)
-                        , num_public_inputs(other.num_public_inputs)
-                        , domain(other.domain)
-                        , reference_string(other.reference_string)
-                        , constraint_selectors(other.constraint_selectors)
-                        , permutation_selectors(other.permutation_selectors)
-                        , polynomial_manifest(other.polynomial_manifest)
-                        , contains_recursive_proof(other.contains_recursive_proof)
-                        , recursive_proof_public_input_indices(other.recursive_proof_public_input_indices)
-                    {}
-                    
-                    plonk_verification_key(plonk_verification_key &&other) 
-                        : n(other.n)
-                        , num_public_inputs(other.num_public_inputs)
-                        , domain(other.domain)
-                        , reference_string(other.reference_string)
-                        , constraint_selectors(other.constraint_selectors)
-                        , permutation_selectors(other.permutation_selectors)
-                        , polynomial_manifest(other.polynomial_manifest)
-                        , contains_recursive_proof(other.contains_recursive_proof)
-                        , recursive_proof_public_input_indices(other.recursive_proof_public_input_indices)
-                    {}
+                    plonk_verification_key(const plonk_verification_key &other) :
+                        n(other.n), num_public_inputs(other.num_public_inputs), domain(other.domain),
+                        reference_string(other.reference_string), constraint_selectors(other.constraint_selectors),
+                        permutation_selectors(other.permutation_selectors),
+                        polynomial_manifest(other.polynomial_manifest),
+                        contains_recursive_proof(other.contains_recursive_proof),
+                        recursive_proof_public_input_indices(other.recursive_proof_public_input_indices) {
+                    }
+
+                    plonk_verification_key(plonk_verification_key &&other) :
+                        n(other.n), num_public_inputs(other.num_public_inputs), domain(other.domain),
+                        reference_string(other.reference_string), constraint_selectors(other.constraint_selectors),
+                        permutation_selectors(other.permutation_selectors),
+                        polynomial_manifest(other.polynomial_manifest),
+                        contains_recursive_proof(other.contains_recursive_proof),
+                        recursive_proof_public_input_indices(other.recursive_proof_public_input_indices) {
+                    }
 
                     std::size_t size_in_bits() const {
-                        ???;
+                        ? ? ? ;
                     }
 
                     bool operator==(const plonk_verification_key &other) const {
                         return this->n == rhs.n && this->num_public_inputs == rhs.num_public_inputs &&
-                           this->constraint_selectors == rhs.constraint_selectors &&
-                           this->permutation_selectors == rhs.permutation_selectors;
+                               this->constraint_selectors == rhs.constraint_selectors &&
+                               this->permutation_selectors == rhs.permutation_selectors;
                     }
                 };
             }    // namespace snark

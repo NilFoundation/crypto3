@@ -33,11 +33,9 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            namespace snark { }    // namespace snark
+        }                          // namespace zk
+    }                              // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_PLONK_REDSHIFT_PARAMS_HPP
