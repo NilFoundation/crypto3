@@ -15,8 +15,6 @@
 #include <nil/crypto3/multiprecision/detail/default_ops.hpp>
 
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
-//#include <nil/crypto3/multiprecision/modular/modular_params.hpp>
-//#include <nil/crypto3/multiprecision/modular/modular_params_gmp.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -324,15 +322,6 @@ namespace nil {
                 ressol(const number<modular_adaptor<Backend>, ExpressionTemplates>& modular) {
 
                 return number<modular_adaptor<Backend>, ExpressionTemplates>(backends::eval_ressol(modular.backend()));
-//                return number<modular_adaptor<Backend>, ExpressionTemplates>(backends::eval_ressol(modular.backend()));
-//                number<Backend, ExpressionTemplates> new_base, res;
-//                number<modular_adaptor<Backend>, ExpressionTemplates> res_mod;
-//
-//                modular.backend().mod_data().adjust_regular(new_base.backend(), modular.backend().base_data());
-//                res = backends::eval_ressol(new_base.backend(), modular.backend().mod_data().get_mod().backend());
-//                assign_components(res_mod.backend(), res.backend(), modular.backend().mod_data().get_mod().backend());
-//
-//                return res_mod;
             }
 
             /*

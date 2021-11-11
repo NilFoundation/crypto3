@@ -32,7 +32,7 @@ namespace nil {
                 // (or real size of such objects should be adjusted then)
                 //
                 template<typename Backend>
-                constexpr typename boost::mpl::if_c<is_trivial_cpp_int<Backend>::value,
+                constexpr typename std::conditional<is_trivial_cpp_int<Backend>::value,
                                                     typename trivial_limb_type<max_precision<Backend>::value>::type,
                                                     limb_type>::type
                     get_limb_value(const Backend& b, const std::size_t i) {
@@ -336,7 +336,7 @@ namespace nil {
                     template<typename Backend1, typename Backend2>
                     constexpr typename std::enable_if<std::is_integral<Backend2>::value>::type
                         barrett_reduce(Backend1& result, Backend2 input) const {
-                        using input_number_type = typename boost::mpl::if_c<
+                        using input_number_type = typename std::conditional<
                             bool(sizeof(Backend2) * CHAR_BIT > MinBits),
                             number<modular_fixed_cpp_int_backend<sizeof(Backend2) * CHAR_BIT, SignType, Checked>>,
                             number_type>::type;

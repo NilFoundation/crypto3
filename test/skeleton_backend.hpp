@@ -41,10 +41,10 @@ namespace boost {
                 // present in the list will get promoted to the next wider type that is
                 // in the list whenever mixed arithmetic involving that type is encountered.
                 //
-                typedef boost::mpl::list</*signed char, short, int, long,*/ long long> signed_types;
-                typedef boost::mpl::list</* unsigned char, unsigned short, unsigned, unsigned long,*/ unsigned long long>
+                typedef std::tuple</*signed char, short, int, long,*/ long long> signed_types;
+                typedef std::tuple</* unsigned char, unsigned short, unsigned, unsigned long,*/ unsigned long long>
                     unsigned_types;
-                typedef boost::mpl::list</*float, double,*/ long double> float_types;
+                typedef std::tuple</*float, double,*/ long double> float_types;
                 //
                 // This typedef is only required if this is a floating point type, it is the type
                 // which holds the exponent:
@@ -1093,7 +1093,7 @@ void eval_log2(skeleton_backend& result, const skeleton_backend& arg);
         //    number_kind_complex
         //
         template<>
-        struct number_category<skeleton_backend> : public boost::mpl::int_<number_kind_floating_point> { };
+        struct number_category<skeleton_backend> : public std::integral_constant<int, number_kind_floating_point> { };
 
         //
         // These 2 traits classes are required for complex types only:

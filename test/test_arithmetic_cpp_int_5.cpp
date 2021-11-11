@@ -12,14 +12,14 @@ template<unsigned MinBits, unsigned MaxBits, nil::crypto3::multiprecision::cpp_i
 struct is_checked_cpp_int<nil::crypto3::multiprecision::number<
     nil::crypto3::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, nil::crypto3::multiprecision::checked,
                                                   Allocator>,
-    ET>> : public boost::mpl::true_ { };
+    ET>> : public std::integral_constant<bool, true> { };
 
 template<unsigned MinBits, unsigned MaxBits, nil::crypto3::multiprecision::cpp_integer_type SignType, class Allocator,
          nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
 struct is_twos_complement_integer<nil::crypto3::multiprecision::number<
     nil::crypto3::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, nil::crypto3::multiprecision::checked,
                                                   Allocator>,
-    ExpressionTemplates>> : public boost::mpl::false_ { };
+    ExpressionTemplates>> : public std::integral_constant<bool, false> { };
 
 template<>
 struct related_type<nil::crypto3::multiprecision::cpp_int> {

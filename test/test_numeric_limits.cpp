@@ -71,7 +71,7 @@
 #define PRINT(x) std::cout << BOOST_STRINGIZE(x) << " = " << std::numeric_limits<Number>::x << std::endl;
 
 template<class Number>
-void test_specific(const boost::mpl::int_<nil::crypto3::multiprecision::number_kind_floating_point>&) {
+void test_specific(const std::integral_constant<int, nil::crypto3::multiprecision::number_kind_floating_point>&) {
     Number minv, maxv;
     minv = (std::numeric_limits<Number>::min)();
     maxv = (std::numeric_limits<Number>::max)();
@@ -142,7 +142,7 @@ void test_specific(const boost::mpl::int_<nil::crypto3::multiprecision::number_k
 }
 
 template<class Number>
-void test_specific(const boost::mpl::int_<nil::crypto3::multiprecision::number_kind_integer>&) {
+void test_specific(const std::integral_constant<int, nil::crypto3::multiprecision::number_kind_integer>&) {
     if (std::numeric_limits<Number>::is_modulo) {
         if (!std::numeric_limits<Number>::is_signed) {
             BOOST_TEST(1 + (std::numeric_limits<Number>::max)() == 0);
@@ -157,9 +157,9 @@ void test_specific(const T&) {
 
 template<class Number>
 void test() {
-    typedef typename boost::mpl::if_c<std::numeric_limits<Number>::is_specialized,
+    typedef typename std::conditional<std::numeric_limits<Number>::is_specialized,
                                       typename nil::crypto3::multiprecision::number_category<Number>::type,
-                                      boost::mpl::int_<500>    // not a number type
+                                      std::integral_constant<int, 500>    // not a number type
                                       >::type fp_test_type;
 
     test_specific<Number>(fp_test_type());

@@ -75,12 +75,12 @@ T atan2_def(T y, T x) {
 }
 
 template<class T>
-struct is_mpfr_type : public boost::mpl::false_ { };
+struct is_mpfr_type : public std::integral_constant<bool, false> { };
 
 #ifdef TEST_MPFR_50
 template<unsigned Digits10>
 struct is_mpfr_type<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<Digits10>>>
-    : public boost::mpl::true_ { };
+    : public std::integral_constant<bool, true> { };
 #endif
 
 template<class T>

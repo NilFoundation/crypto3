@@ -17,14 +17,14 @@
 #include <boost/rational.hpp>
 
 template<class T>
-struct is_boost_rational<boost::rational<T>> : public boost::mpl::true_ { };
+struct is_boost_rational<boost::rational<T>> : public std::integral_constant<bool, true> { };
 
 namespace nil {
     namespace crypto3 {
         namespace multiprecision {
 
             template<>
-            struct number_category<boost::rational<tom_int>> : public boost::mpl::int_<number_kind_rational> { };
+            struct number_category<boost::rational<tom_int>> : public std::integral_constant<int, number_kind_rational> { };
 
         }    // namespace multiprecision
     }        // namespace crypto3

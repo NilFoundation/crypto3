@@ -67,6 +67,7 @@ void test() {
                                "9640661454554977296311391480858037121987999716643812574028291115057151")),
                       T("5128001483797946816458955548662741861156429216952843873274631897232136999791540518339021539968"
                         "609345897897688700798659762992302941280478805021587896033442584"));
+    // TODO: check if number prime?
     BOOST_CHECK_EQUAL(ressol(T(4),
                              T("686479766013060971498190079908139321726943530014330540939446345918554318339765605212255"
                                "9640661454554977296311391480858037121987999716643812574028291115057149")),
@@ -349,10 +350,10 @@ int main() {
     constexpr bool res2 = test_backend_static();
 #endif
 #ifdef TEST_GMP
-    test<nil::crypto3::multiprecision::mpz_int>();
+//    test<nil::crypto3::multiprecision::mpz_int>();
 #endif
 #if defined(TEST_TOMMATH)
-    test<nil::crypto3::multiprecision::tom_int>();
+//    test<nil::crypto3::multiprecision::tom_int>();
 #endif
 
     return boost::report_errors();

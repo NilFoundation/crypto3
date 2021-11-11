@@ -49,11 +49,11 @@ namespace Eigen {
         static Real lowest() {
             return (std::numeric_limits<Real>::min)();
         }
-        static int digits10_imp(const boost::mpl::true_&) {
+        static int digits10_imp(const std::integral_constant<bool, true>&) {
             return std::numeric_limits<Real>::digits10;
         }
         template<bool B>
-        static int digits10_imp(const boost::mpl::bool_<B>&) {
+        static int digits10_imp(const std::integral_constant<bool, B>&) {
             return Real::default_precision();
         }
         static int digits10() {
@@ -101,7 +101,7 @@ namespace Eigen {
       static_assert(
          nil::crypto3::multiprecision::is_compatible_arithmetic_type<nil::crypto3::multiprecision::number<Backend2, ExpressionTemplates2>, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> >::value
          || nil::crypto3::multiprecision::is_compatible_arithmetic_type<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, nil::crypto3::multiprecision::number<Backend2, ExpressionTemplates2> >::value, "Interoperability with this arithmetic type is not supported.");
-      typedef typename boost::mpl::if_c<boost::is_convertible<nil::crypto3::multiprecision::number<Backend2, ExpressionTemplates2>, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> >::value,
+      typedef typename std::conditional<boost::is_convertible<nil::crypto3::multiprecision::number<Backend2, ExpressionTemplates2>, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> >::value,
          nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, nil::crypto3::multiprecision::number<Backend2, ExpressionTemplates2> >::type ReturnType;
    };
 

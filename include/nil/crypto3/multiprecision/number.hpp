@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock.
 //  Copyright (c) 2019 Mikhail Komarov <nemo@nil.foundation>
-//  Copyright (c) 2019 Alexey Moskvin
+//  Copyright (c) 2019-2021 Aleksei Moskvin <alalmoskvin@gmail.com>
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
