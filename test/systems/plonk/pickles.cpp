@@ -30,11 +30,9 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/crypto3/zk/snark/systems/plonk/pickles.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/pickles/proof.hpp>
 
 using namespace nil::crypto3;
-using namespace nil::crypto3::algebra;
-using namespace nil::marshalling;
 
 BOOST_AUTO_TEST_SUITE(pickles_proof_generation_test_suite)
 
