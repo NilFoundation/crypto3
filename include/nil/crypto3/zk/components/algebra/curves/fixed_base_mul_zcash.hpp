@@ -106,8 +106,8 @@ namespace nil {
                     std::vector<lookup_component> m_windows_y;
 
                     /// Number of segments
-                    std::size_t basepoints_required(std::size_t n_bits) {
-                        return std::ceilf(n_bits / float(lookup_component::chunk_bits * chunks_per_base_point));
+                    static std::size_t basepoints_required(std::size_t n_bits) {
+                        return std::ceil(n_bits / float(lookup_component::chunk_bits * chunks_per_base_point));
                     }
 
                     template<typename BasePoints,
@@ -120,7 +120,7 @@ namespace nil {
                                          const BasePoints &base_points,
                                          const blueprint_variable_vector<field_type> &in_scalar) :
                         component<field_type>(bp) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::RandomAccessRangeConcept<const SinglePassRange>));
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::RandomAccessRangeConcept<const BasePoints>));
                         assert(in_scalar.size() > 0);
                         assert((in_scalar.size() % lookup_component::chunk_bits) == 0);
                         assert(basepoints_required(in_scalar.size()) <= base_points.size());
@@ -131,8 +131,8 @@ namespace nil {
                         typename twisted_edwards_element_component::group_value_type start = base_points[0];
                         // Precompute values for all lookup window tables
                         for (std::size_t i = 0; i < n_windows; ++i) {
-                            std::vector<field_type> lookup_x;
-                            std::vector<field_type> lookup_y;
+                            std::vector<field_value_type> lookup_x;
+                            std::vector<field_value_type> lookup_y;
 
                             lookup_x.reserve(window_size_items);
                             lookup_y.reserve(window_size_items);
@@ -172,7 +172,7 @@ namespace nil {
                             blueprint_linear_combination<field_type> x_lc;
                             x_lc.assign(
                                 this->bp,
-                                snark::linear_term<field_type>(field_value_type::one(), lookup_x[0]) +
+                                snark::linear_term<field_type>(blueprint_variable<field_type>(0), lookup_x[0]) +
                                     snark::linear_term<field_type>(window_bits_x[0], (lookup_x[1] - lookup_x[0])) +
                                     snark::linear_term<field_type>(window_bits_x[1], (lookup_x[2] - lookup_x[0])) +
                                     snark::linear_term<field_type>(
@@ -197,19 +197,19 @@ namespace nil {
                                     // montgomery form, but we have to make sure it will be part of
                                     // the final edwards addition at the end
                                     this->point_converters.emplace_back(
-                                        this->bp, montgomery_element_component(this->m_windows_x[i],
+                                        this->bp, montgomery_element_component(this->bp, this->m_windows_x[i],
                                                                                this->m_windows_y[i].result));
                                 }
                             } else if (i % chunks_per_base_point == 1) {
                                 this->montgomery_adders.emplace_back(
                                     this->bp,
-                                    montgomery_element_component(this->m_windows_x[i - 1],
+                                    montgomery_element_component(this->bp, this->m_windows_x[i - 1],
                                                                  this->m_windows_y[i - 1].result),
-                                    montgomery_element_component(this->m_windows_x[i], this->m_windows_y[i].result));
+                                    montgomery_element_component(this->bp, this->m_windows_x[i], this->m_windows_y[i].result));
                             } else {
                                 this->montgomery_adders.emplace_back(
                                     this->bp, this->montgomery_adders.back().result,
-                                    montgomery_element_component(this->m_windows_x[i], this->m_windows_y[i].result));
+                                    montgomery_element_component(this->bp, this->m_windows_x[i], this->m_windows_y[i].result));
                             }
                         }
 

@@ -126,12 +126,12 @@ namespace nil {
                     // Input point
                     const element_component p_from;
                     // Output point
-                    to_element_component p_to;
+                    to_element_component result;
                     // intermediate variables
                     typename field_type::value_type scale;
 
                     element_g1_to_twisted_edwards(blueprint<field_type> &bp, const element_component &in_p_from) :
-                        component<field_type>(bp), p_from(in_p_from), p_to(bp),
+                        component<field_type>(bp), p_from(in_p_from), result(bp),
                         scale((static_cast<typename field_type::value_type>(4) /
                                (static_cast<typename field_type::value_type>(to_group_type::params_type::a) -
                                 static_cast<typename field_type::value_type>(to_group_type::params_type::d)) /
@@ -141,10 +141,10 @@ namespace nil {
 
                     void generate_r1cs_constraints() {
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
-                            {this->p_from.Y}, {this->p_to.X}, {this->p_from.X * this->scale}));
+                            {this->p_from.Y}, {this->result.X}, {this->p_from.X * this->scale}));
                         this->bp.add_r1cs_constraint(
                             snark::r1cs_constraint<field_type>({this->p_from.X + field_type::value_type::one()},
-                                                               {this->p_to.Y},
+                                                               {this->result.Y},
                                                                {this->p_from.X - field_type::value_type::one()}));
                     }
 
@@ -152,8 +152,8 @@ namespace nil {
                         typename to_group_type::value_type p_to_XY =
                             typename group_type::value_type(this->bp.lc_val(p_from.X), this->bp.lc_val(p_from.Y))
                                 .to_twisted_edwards();
-                        this->bp.lc_val(p_to.X) = p_to_XY.X;
-                        this->bp.lc_val(p_to.Y) = p_to_XY.Y;
+                        this->bp.lc_val(result.X) = p_to_XY.X;
+                        this->bp.lc_val(result.Y) = p_to_XY.Y;
                     }
                 };
             }    // namespace components

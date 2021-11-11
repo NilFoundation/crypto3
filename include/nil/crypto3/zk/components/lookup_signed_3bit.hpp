@@ -78,11 +78,12 @@ namespace nil {
                         /// y_lc = c[0] + b[0] * (c[1]-c0) + b[1] * (c[2]-c[0]) + b[0]&b[1] * (c[3] - c[2] - c[1] +
                         /// c[0])
                         blueprint_linear_combination<field_type> y_lc;
-                        y_lc.assign(this->bp, snark::linear_term<field_type>(field_value_type::one(), this->c[0]) +
-                                                  snark::linear_term<field_type>(this->b[0], this->c[1] - this->c[0]) +
-                                                  snark::linear_term<field_type>(this->b[1], this->c[2] - this->c[0]) +
-                                                  snark::linear_term<field_type>(
-                                                      this->b0b1, this->c[3] - this->c[2] - this->c[1] + this->c[0]));
+                        y_lc.assign(this->bp,
+                                    snark::linear_term<field_type>(blueprint_variable<field_type>(0), this->c[0]) +
+                                        snark::linear_term<field_type>(this->b[0], this->c[1] - this->c[0]) +
+                                        snark::linear_term<field_type>(this->b[1], this->c[2] - this->c[0]) +
+                                        snark::linear_term<field_type>(this->b0b1, this->c[3] - this->c[2] -
+                                                                                       this->c[1] + this->c[0]));
 
                         /// (y_lc + y_lc) * b[2] == y_lc - result
                         this->bp.add_r1cs_constraint(
@@ -90,7 +91,8 @@ namespace nil {
                     }
 
                     void generate_r1cs_witness() {
-                        auto i = this->b.get_field_element_from_bits(this->bp).data;
+                        auto i = static_cast<std::size_t>(static_cast<typename field_type::integral_type>(
+                            this->b.get_field_element_from_bits(this->bp).data));
                         field_value_type result = this->c[i & 3];
                         if (i > 3) {
                             result = result * (-field_value_type::one());

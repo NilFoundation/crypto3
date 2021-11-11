@@ -145,9 +145,9 @@ void check_montgomery_to_twisted_edwards_component(
                       to_tw_edwards_component.generate_r1cs_constraints();
 
                       bp.add_r1cs_constraint(
-                          snark::r1cs_constraint<field_type>(t.template get<1>().X, 1, to_tw_edwards_component.p_to.X));
+                          snark::r1cs_constraint<field_type>(t.template get<1>().X, 1, to_tw_edwards_component.result.X));
                       bp.add_r1cs_constraint(
-                          snark::r1cs_constraint<field_type>(t.template get<1>().Y, 1, to_tw_edwards_component.p_to.Y));
+                          snark::r1cs_constraint<field_type>(t.template get<1>().Y, 1, to_tw_edwards_component.result.Y));
 
                       BOOST_CHECK(bp.is_satisfied());
                   });
