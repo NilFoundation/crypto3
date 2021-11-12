@@ -38,7 +38,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
 macro(define_storage_test test)
     get_filename_component(name ${test} NAME)
-    set(target_name ${name}_test)
+    set(target_name containers_${name}_test)
 
     while(TARGET ${target_name})
         get_filename_component(TEST_DIRECTORY ${test} DIRECTORY)
