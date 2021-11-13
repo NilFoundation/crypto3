@@ -29,6 +29,7 @@
 #include <boost/type_traits.hpp>
 #include <boost/type_traits/is_same.hpp>
 
+#include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/types/integral.hpp>
 #include <nil/marshalling/types/float_value.hpp>
 #include <nil/marshalling/types/array_list.hpp>
