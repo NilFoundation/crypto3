@@ -39,7 +39,7 @@
 
 #include <nil/crypto3/algebra/type_traits.hpp>
 
-#include <nil/crypto3/marshalling/types/integral.hpp>
+#include <nil/crypto3/marshalling/multiprecision/types/integral.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -44,7 +44,7 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
 
-#include <nil/crypto3/marshalling/types/algebra/field_element.hpp>
+#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 template<typename TIter>
 void print_byteblob(TIter iter_begin, TIter iter_end) {
