@@ -88,12 +88,12 @@ namespace nil {
                         }
 
                         static constexpr std::size_t min_length() {
-                            return length();
+                            return 0;
                         }
 
-                        static constexpr std::size_t max_length() {
-                            return length();
-                        }
+                        // static constexpr std::size_t max_length() {
+                        //     return length();
+                        // }
 
                         static constexpr serialized_type to_serialized(value_type val) {
                             return static_cast<serialized_type>(val);
