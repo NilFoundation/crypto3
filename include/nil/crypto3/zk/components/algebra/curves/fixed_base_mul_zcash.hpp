@@ -184,9 +184,8 @@ namespace nil {
                             start = current.doubled().doubled();
                         }
 
-                        // TODO: why doesn't i begin from 0?
                         // Chain adders within one segment together via montgomery adders
-                        for (std::size_t i = 1; i < n_windows; ++i) {
+                        for (std::size_t i = 0; i < n_windows; ++i) {
                             if (i % chunks_per_base_point == 0) {
                                 if (i + 1 < n_windows) {
                                     // 0th lookup will be used in the next iteration to connect
@@ -219,9 +218,10 @@ namespace nil {
                         for (std::size_t i = segment_width; i < this->montgomery_adders.size(); i += segment_width) {
                             this->point_converters.emplace_back(this->bp, this->montgomery_adders[i - 1].result);
                         }
-                        // TODO: Last point seems to be added twice later if n_windows % chunks_per_base_point == 0
                         // The last segment might be incomplete
-                        this->point_converters.emplace_back(this->bp, this->montgomery_adders.back().result);
+                        if (n_windows > 1) {
+                            this->point_converters.emplace_back(this->bp, this->montgomery_adders.back().result);
+                        }
 
                         // Chain adders of converted segment tails together
                         for (std::size_t i = 1; i < this->point_converters.size(); ++i) {
