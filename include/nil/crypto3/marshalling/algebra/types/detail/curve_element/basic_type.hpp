@@ -39,9 +39,7 @@ namespace nil {
                 namespace detail {
                     template<typename TTypeBase, typename CurveGroupType>
                     class basic_curve_element : public TTypeBase {
-
                         using T = typename CurveGroupType::value_type;
-
                         using base_impl_type = TTypeBase;
 
                     public:
@@ -101,36 +99,42 @@ namespace nil {
 
                         template<typename TIter>
                         nil::marshalling::status_type read(TIter &iter, std::size_t size) {
+                            using reader = crypto3::marshalling::processing::curve_element_reader<
+                                bit_length(), typename base_impl_type::endian_type, CurveGroupType>;
                             // if (size < length()) {
                             //     return nil::marshalling::status_type::not_enough_data;
                             // }
 
-                            read_no_status(iter);
+                            auto status = reader::process(value(), iter);
                             iter += max_length();
-                            return nil::marshalling::status_type::success;
+                            return status;
                         }
 
                         template<typename TIter>
                         void read_no_status(TIter &iter) {
-                            value_ = crypto3::marshalling::processing::curve_element_read_data<
-                                bit_length(), typename base_impl_type::endian_type, value_type>(iter);
+                            using reader = crypto3::marshalling::processing::curve_element_reader<
+                                bit_length(), typename base_impl_type::endian_type, CurveGroupType>;
+                            reader::process(value(), iter);
                         }
 
                         template<typename TIter>
                         nil::marshalling::status_type write(TIter &iter, std::size_t size) const {
+                            using writer = crypto3::marshalling::processing::curve_element_writer<
+                                bit_length(), typename base_impl_type::endian_type, CurveGroupType>;
                             // if (size < length()) {
                             //     return nil::marshalling::status_type::buffer_overflow;
                             // }
 
-                            write_no_status(iter);
+                            auto status = writer::process(value(), iter);
                             iter += max_length();
-                            return nil::marshalling::status_type::success;
+                            return status;
                         }
 
                         template<typename TIter>
                         void write_no_status(TIter &iter) const {
-                            crypto3::marshalling::processing::curve_element_write_data<
-                                bit_length(), typename base_impl_type::endian_type>(value_, iter);
+                            using writer = crypto3::marshalling::processing::curve_element_writer<
+                                bit_length(), typename base_impl_type::endian_type, CurveGroupType>;
+                            writer::process(value(), iter);
                         }
 
                     private:
