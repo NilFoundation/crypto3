@@ -43,9 +43,9 @@
 
 #include <nil/crypto3/pubkey/type_traits.hpp>
 
-#include <nil/crypto3/marshalling/types/integral.hpp>
-#include <nil/crypto3/marshalling/types/algebra/field_element.hpp>
-#include <nil/crypto3/marshalling/types/algebra/curve_element.hpp>
+#include <nil/crypto3/marshalling/multiprecision/types/integral.hpp>
+#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
+#include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 
 #include <nil/marshalling/endianness.hpp>
 #include <nil/marshalling/field_type.hpp>
