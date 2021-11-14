@@ -147,6 +147,9 @@ constexpr bool base_operations_test(std::array<Number, test_set_len> test_set) {
     int b_msb = msb(test_set[b_e]);
     int b_lsb = lsb(test_set[b_e]);
 
+    BOOST_ASSERT_MSG(a.mod() == test_set[mod_e], "get modular field error");
+    BOOST_ASSERT_MSG(b.mod() == test_set[mod_e], "get modular field error");
+
     BOOST_ASSERT_MSG(a_add_b.template convert_to<standard_number>() == a_add_b_s, "addition error");
     BOOST_ASSERT_MSG(a_sub_b.template convert_to<standard_number>() == a_sub_b_s, "subtraction error");
     BOOST_ASSERT_MSG(a_mul_b.template convert_to<standard_number>() == a_mul_b_s, "multiplication error");
@@ -229,6 +232,9 @@ bool base_operations_test_mixed(const std::array<Number, test_set_len>& test_set
     modular_number a_xor_b = a ^ b;
     modular_number a_powm_b = powm(a, b);
     modular_number a_pow_b = pow(a, b);
+
+    BOOST_ASSERT_MSG(a.mod() == test_set[mod_e], "get modular field error");
+    BOOST_ASSERT_MSG(b.mod() == test_set[mod_e], "get modular field error");
 
     BOOST_ASSERT_MSG(a_add_b.template convert_to<standard_number>() == a_add_b_s, "addition error");
     BOOST_ASSERT_MSG(a_sub_b.template convert_to<standard_number>() == a_sub_b_s, "subtraction error");
@@ -538,6 +544,7 @@ BOOST_AUTO_TEST_CASE(secp256k1_incorrect_multiplication) {
     constexpr standart_number modulus = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F_cppui256;
     constexpr modular_number x(0xb5d724ce6f44c3c587867bbcb417e9eb6fa05e7e2ef029166568f14eb3161387_cppui256, modulus);
     constexpr modular_number res(0xad6e1fcc680392abfb075838eafa513811112f14c593e0efacb6e9d0d7770b4_cppui256, modulus);
+    constexpr auto mod = x.mod();
     assert(x * x == res);
 }
 
