@@ -1752,6 +1752,15 @@ namespace nil {
             struct complex_result_from_scalar;    // individual backends must specialize this trait.
 
             template<class T>
+            struct scalar_result_from_possible_modular {
+                using type = typename std::conditional<number_category<T>::value == number_kind_modular,
+                    typename component_type<T>::type, T>::type;
+            };
+
+            template<class T>
+            struct scalar_result_from_possible_modular;    // individual backends must specialize this trait.
+
+            template<class T>
             struct is_unsigned_number : public std::integral_constant<bool, false> { };
             template<class Backend, expression_template_option ExpressionTemplates>
             struct is_unsigned_number<number<Backend, ExpressionTemplates>> : public is_unsigned_number<Backend> { };
