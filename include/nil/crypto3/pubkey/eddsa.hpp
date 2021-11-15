@@ -174,12 +174,18 @@ namespace nil {
                                                                    nil::crypto3::multiprecision::uint512_t>
                     marshalling_uint512_t_type;
 
-                static constexpr std::size_t public_key_octets =
-                    base_field_type::modulus_bits / 8 + (base_field_type::modulus_bits % 8 ? 1 : 0);
-                static_assert(32 == public_key_octets, "wrong octet length of public key");
-                typedef std::array<std::uint8_t, public_key_octets> public_key_type;
-                static constexpr std::size_t signature_octets = 64;
-                typedef std::array<std::uint8_t, signature_octets> signature_type;
+                constexpr static const std::size_t public_key_bits = base_field_type::modulus_bits;
+                static_assert(32 * std::numeric_limits<std::uint8_t>::digits - 1 == public_key_bits,
+                              "wrong octet length of public key");
+                typedef std::array<std::uint8_t,
+                                   public_key_bits / std::numeric_limits<std::uint8_t>::digits +
+                                       (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 :
+                                                                                                                    0)>
+                    public_key_type;
+
+                constexpr static const std::size_t signature_bits = 64 * std::numeric_limits<std::uint8_t>::digits;
+                typedef std::array<std::uint8_t, signature_bits / std::numeric_limits<std::uint8_t>::digits>
+                    signature_type;
 
                 public_key() = delete;
                 public_key(const public_key_type &key) : pubkey_point(read_pubkey(key)), pubkey(key) {
@@ -209,7 +215,9 @@ namespace nil {
                     group_value_type R = marshalling_group_value_1.value();
 
                     marshalling_scalar_field_value_type marshalling_scalar_field_value_1;
-                    auto S_iter_1 = std::cbegin(signature) + public_key_octets;
+                    auto S_iter_1 = std::cbegin(signature) +
+                                    public_key_bits / std::numeric_limits<std::uint8_t>::digits +
+                                    (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0);
                     // TODO: process status
                     status = marshalling_scalar_field_value_1.read(S_iter_1,
                                                                    marshalling_scalar_field_value_type::bit_length());
@@ -219,7 +227,11 @@ namespace nil {
                     auto ph_m = padding::accumulators::extract::encode<padding::encoding_policy<padding_policy>>(acc);
                     accumulator_set<hash_type> hash_acc_2;
                     hash<hash_type>(policy_type::get_dom(), hash_acc_2);
-                    hash<hash_type>(std::cbegin(signature), std::cbegin(signature) + public_key_octets, hash_acc_2);
+                    hash<hash_type>(
+                        std::cbegin(signature),
+                        std::cbegin(signature) + public_key_bits / std::numeric_limits<std::uint8_t>::digits +
+                            (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0),
+                        hash_acc_2);
                     hash<hash_type>(this->pubkey, hash_acc_2);
                     hash<hash_type>(ph_m, hash_acc_2);
                     typename hash_type::digest_type h_2 =
@@ -278,13 +290,19 @@ namespace nil {
                 typedef typename scheme_public_key_type::marshalling_base_integral_type marshalling_base_integral_type;
                 typedef typename scheme_public_key_type::marshalling_uint512_t_type marshalling_uint512_t_type;
 
-                static constexpr std::size_t private_key_octets =
-                    base_field_type::modulus_bits / 8 + (base_field_type::modulus_bits % 8 ? 1 : 0);
-                static_assert(32 == private_key_octets, "wrong octet length of private key");
-                typedef std::array<std::uint8_t, private_key_octets> private_key_type;
-                static constexpr std::size_t public_key_octets = scheme_public_key_type::public_key_octets;
+                constexpr static const std::size_t private_key_bits = base_field_type::modulus_bits;
+                static_assert(32 * std::numeric_limits<std::uint8_t>::digits - 1 == private_key_bits,
+                              "wrong octet length of private key");
+                typedef std::array<std::uint8_t,
+                                   private_key_bits / std::numeric_limits<std::uint8_t>::digits +
+                                       (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 :
+                                                                                                                    0)>
+                    private_key_type;
+
+                constexpr static const std::size_t public_key_bits = scheme_public_key_type::public_key_bits;
                 typedef typename scheme_public_key_type::public_key_type public_key_type;
-                static constexpr std::size_t signature_octets = scheme_public_key_type::signature_octets;
+
+                constexpr static const std::size_t signature_bits = scheme_public_key_type::signature_bits;
                 typedef typename scheme_public_key_type::signature_type signature_type;
 
                 private_key() = delete;
@@ -308,8 +326,7 @@ namespace nil {
                     public_key_type public_key;
                     auto write_iter = std::begin(public_key);
                     // TODO: process status
-                    nil::marshalling::status_type status =
-                        marshalling_group_value.write(write_iter, public_key_octets * 8);
+                    nil::marshalling::status_type status = marshalling_group_value.write(write_iter, public_key_bits);
 
                     return public_key;
                 }
@@ -333,7 +350,10 @@ namespace nil {
                     auto ph_m = padding::accumulators::extract::encode<padding::encoding_policy<padding_policy>>(acc);
                     accumulator_set<hash_type> hash_acc_2;
                     hash<hash_type>(policy_type::get_dom(), hash_acc_2);
-                    hash<hash_type>(std::cbegin(h_privkey) + private_key_octets, std::cend(h_privkey), hash_acc_2);
+                    hash<hash_type>(
+                        std::cbegin(h_privkey) + private_key_bits / std::numeric_limits<std::uint8_t>::digits +
+                            (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0),
+                        std::cend(h_privkey), hash_acc_2);
                     hash<hash_type>(ph_m, hash_acc_2);
                     typename hash_type::digest_type h_2 =
                         nil::crypto3::accumulators::extract::hash<hash_type>(hash_acc_2);
@@ -350,12 +370,16 @@ namespace nil {
                     signature_type signature;
                     auto sig_iter_3 = std::begin(signature);
                     // TODO: process status
-                    status = marshalling_group_value.write(sig_iter_3, public_key_octets * 8);
+                    status = marshalling_group_value.write(sig_iter_3, public_key_bits);
 
                     // 4.
                     accumulator_set<hash_type> hash_acc_4;
                     hash<hash_type>(policy_type::get_dom(), hash_acc_4);
-                    hash<hash_type>(std::cbegin(signature), std::cbegin(signature) + public_key_octets, hash_acc_4);
+                    hash<hash_type>(
+                        std::cbegin(signature),
+                        std::cbegin(signature) + public_key_bits / std::numeric_limits<std::uint8_t>::digits +
+                            (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0),
+                        hash_acc_4);
                     hash<hash_type>(this->pubkey, hash_acc_4);
                     hash<hash_type>(ph_m, hash_acc_4);
                     typename hash_type::digest_type h_4 =
@@ -373,9 +397,11 @@ namespace nil {
                     // 6.
                     marshalling_scalar_field_value_type marshalling_scalar_field_value_6 =
                         nil::crypto3::marshalling::types::fill_field_element<scalar_field_type, endianness>(S);
-                    auto sig_iter_6 = std::begin(signature) + public_key_octets;
+                    auto sig_iter_6 =
+                        std::begin(signature) + public_key_bits / std::numeric_limits<std::uint8_t>::digits +
+                        (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0);
                     // TODO: process status
-                    status = marshalling_scalar_field_value_6.write(sig_iter_6, private_key_octets * 8);
+                    status = marshalling_scalar_field_value_6.write(sig_iter_6, private_key_bits);
 
                     return signature;
                 }
@@ -386,7 +412,7 @@ namespace nil {
                     // 3.
                     marshalling_base_integral_type marshalling_base_integral;
                     auto h_it = std::cbegin(h);
-                    marshalling_base_integral.read(h_it, private_key_octets * 8);
+                    marshalling_base_integral.read(h_it, private_key_bits);
                     base_integral_type s = marshalling_base_integral.value();
 
                     // 2.
