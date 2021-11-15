@@ -302,6 +302,7 @@ namespace nil {
              * @param a the input
              * @param p the prime
              * @return y such that (y*y)%p == a, or -1 if no such integer
+             *
              */
             template<typename Backend, expression_template_option ExpressionTemplates>
             constexpr number<Backend, ExpressionTemplates> ressol(const number<Backend, ExpressionTemplates>& a,
@@ -314,7 +315,7 @@ namespace nil {
              * Shanks-Tonnelli algorithm
              *
              * @param modular such modular number with p - prime field, and x - current value
-             * @return y such that (y*y)%p == x, or -1 if no such integer
+             * @return y such that (y*y)%p == x, or p - 1 if no such integer
              */
 
             template<typename Backend, expression_template_option ExpressionTemplates>
