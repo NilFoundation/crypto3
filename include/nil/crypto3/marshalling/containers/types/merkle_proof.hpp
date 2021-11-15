@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2017-2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -103,10 +103,10 @@ namespace nil {
                                 >,
                                 nil::marshalling::option::sequence_size_field_prefix<
                                     nil::marshalling::types::integral<
-                                        TTypeBase, 
+                                        TTypeBase,
                                         std::size_t
                                     >
-                                > 
+                                >
                             >
                         >
                     >;
