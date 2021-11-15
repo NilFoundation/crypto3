@@ -81,7 +81,8 @@ set(HASHES_TESTS_FILES
     "hashes/knapsack"
     "hashes/knapsack_verification"
     "hashes/sha256"
-    "hashes/sha256_verification")
+    "hashes/sha256_verification"
+    "hashes/pedersen")
 
 set(PAIRING_TESTS_FILES
     "algebra/pairing/weierstrass/miller_loop"
