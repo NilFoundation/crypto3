@@ -34,7 +34,7 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename CurveType, typename CommitmentSchemeType>
+                template<typename CurveType, typename Hash, typename CommitmentSchemeType>
                 struct redshift_proof {
 
                     std::vector<typename CommitmentSchemeType::commitment_type> f_commitments;
@@ -44,10 +44,10 @@ namespace nil {
 
                     std::vector<typename CommitmentSchemeType::commitment_type> T_commitments;
 
-                    std::vector<typename CommitmentSchemeType::proof_type> f_CommitmentSchemeType_proofs;
+                    std::vector<typename CommitmentSchemeType::proof_type> f_lpc_proofs;
 
-                    typename CommitmentSchemeType::proof_type P_CommitmentSchemeType_proof;
-                    typename CommitmentSchemeType::proof_type Q_CommitmentSchemeType_proof;
+                    typename CommitmentSchemeType::proof_type P_lpc_proof;
+                    typename CommitmentSchemeType::proof_type Q_lpc_proof;
 
                     std::vector<typename CommitmentSchemeType::proof_type> T_lpc_proofs;
 
