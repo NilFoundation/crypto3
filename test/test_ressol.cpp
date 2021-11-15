@@ -65,9 +65,7 @@ template<typename T>
 void test() {
     using namespace nil::crypto3::multiprecision;
     BOOST_CHECK_EQUAL(ressol(T(0), T(11)), 0);
-    BOOST_CHECK_EQUAL(ressol(T(2), T(11)), -1);
     BOOST_CHECK_EQUAL(ressol(T(5), T(11)), 4);
-    BOOST_CHECK_EQUAL(ressol(T(10), T(11)), -1);
     BOOST_CHECK_EQUAL(ressol(T(5),
                              T("686479766013060971498190079908139321726943530014330540939446345918554318339765605212255"
                                "9640661454554977296311391480858037121987999716643812574028291115057151")),
@@ -86,6 +84,8 @@ void test() {
         T("0x40000000000000000000000000000000000000000000000000000000000c100000000000000d50e"));
 
 #ifndef TEST_TOMMATH
+    BOOST_CHECK_EQUAL(ressol(T(10), T(11)), -1);
+    BOOST_CHECK_EQUAL(ressol(T(2), T(11)), -1);
     BOOST_CHECK_EQUAL(ressol(T(64), T(85)), -1);
     BOOST_CHECK_EQUAL(ressol(T(4),
                              T("686479766013060971498190079908139321726943530014330540939446345918554318339765605212255"
@@ -100,21 +100,6 @@ void test() {
         ressol(T(1025), T("0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff")),
         T("7195614950510915163755738138441999335431224576038191833055420996031360079131617522512565985187"));
 #endif
-}
-
-template<typename T>
-void test_backend_gmp() {
-
-    using namespace nil::crypto3::multiprecision;
-    number<T> res;
-
-    number<backends::modular_adaptor<T>> modular;
-
-    // in modular adaptor: (-1) = p - 1
-
-    modular = number<backends::modular_adaptor<T>>(5, 11);
-//    modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
-//    BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(4));
 }
 
 template<typename T>
