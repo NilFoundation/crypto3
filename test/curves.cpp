@@ -67,17 +67,17 @@
 using namespace nil::crypto3::algebra;
 
 template<typename FieldParams>
-void print_field_element(std::ostream &os, typename fields::detail::element_fp<FieldParams> e) {
+void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {
     std::cout << e.data << std::endl;
 }
 
 template<typename FieldParams>
-void print_field_element(std::ostream &os, typename fields::detail::element_fp2<FieldParams> e) {
+void print_field_element(std::ostream &os, const typename fields::detail::element_fp2<FieldParams> &e) {
     std::cout << e.data[0].data << ", " << e.data[1].data << std::endl;
 }
 
 template<typename FieldParams>
-void print_field_element(std::ostream &os, typename fields::detail::element_fp3<FieldParams> e) {
+void print_field_element(std::ostream &os, const typename fields::detail::element_fp3<FieldParams> &e) {
     std::cout << e.data[0].data << ", " << e.data[1].data << ", " << e.data[2].data << std::endl;
 }
 

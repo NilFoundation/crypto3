@@ -60,6 +60,7 @@ namespace nil {
                                                                                                             ///< y^2 = 1
                                                                                                             ///< +
                                                                                                             ///< dx^2y^2
+                        static constexpr std::size_t cofactor = 8;
                     };
 
                     constexpr typename jubjub_types::integral_type const jubjub_params<forms::twisted_edwards>::a;
@@ -77,6 +78,7 @@ namespace nil {
                         constexpr static const typename jubjub_types::integral_type
                             B =      ///< Montgomery elliptic curve
                             0x01;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
+                        static constexpr std::size_t cofactor = 8;
                     };
 
                     constexpr typename jubjub_types::integral_type const jubjub_params<forms::montgomery>::A;
