@@ -358,19 +358,67 @@ namespace nil {
                     }
                 };
 
-                // /// abst_J(LEOS2BSP_{256}(iter))
-                // /// See https://zips.z.cash/protocol/protocol.pdf#concretegrouphashjubjub
-                // template<std::size_t TSize, typename Endianness, typename G1GroupElement, typename TIter>
-                // typename std::enable_if<
-                //     std::is_same<
-                //         typename algebra::curves::jubjub::g1_type<algebra::curves::coordinates::affine,
-                //                                                   algebra::curves::forms::twisted_edwards>::value_type,
-                //         G1GroupElement>::value &&
-                //         std::is_same<std::uint8_t, typename std::iterator_traits<TIter>::value_type>::value &&
-                //         std::is_same<nil::marshalling::endian::little_endian, Endianness>::value,
-                //     G1GroupElement>::type
-                //     curve_element_read_data(TIter &iter) {
-                // }
+                template<std::size_t TSize>
+                struct curve_element_reader<
+                    TSize,
+                    nil::marshalling::endian::little_endian,
+                    typename algebra::curves::jubjub::template g1_type<algebra::curves::coordinates::affine,
+                                                                       algebra::curves::forms::twisted_edwards>> {
+                    using group_type =
+                        typename algebra::curves::jubjub::template g1_type<algebra::curves::coordinates::affine,
+                                                                           algebra::curves::forms::twisted_edwards>;
+                    using group_value_type = typename group_type::value_type;
+                    using coordinates = typename group_value_type::coordinates;
+                    using form = typename group_value_type::form;
+                    using endianness = nil::marshalling::endian::little_endian;
+
+                    /// abst_J(LEOS2BSP_{256}(iter))
+                    /// See https://zips.z.cash/protocol/protocol.pdf#concretegrouphashjubjub
+                    template<typename TIter>
+                    static typename std::enable_if<
+                        std::is_same<std::uint8_t, typename std::iterator_traits<TIter>::value_type>::value,
+                        nil::marshalling::status_type>::type
+                        process(group_value_type &point, TIter &iter) {
+                        using field_type = typename group_value_type::field_type;
+                        using integral_type = typename field_type::integral_type;
+                        const std::size_t chunk_number = TSize / 8 + (TSize % 8 != 0);
+
+                        integral_type int_v = read_data<TSize, integral_type, endianness>(iter);
+                        if (int_v >= group_value_type::field_type::modulus) {
+                            return nil::marshalling::status_type::invalid_msg_data;
+                        }
+                        field_type::value_type field_v(int_v);
+                        field_type::value_type vv = field_v.squared();
+                        field_type::value_type denominator = (field_type::value_type(group_type::params_type::a) -
+                                                              field_type::value_type(group_type::params_type::d) * vv);
+                        if (denominator.is_zero()) {
+                            return nil::marshalling::status_type::invalid_msg_data;
+                        }
+                        field_type::value_type fraction = (field_type::value_type::one() - vv) / denominator;
+
+                        // TODO: change logic of sqrt error handling
+                        field_type::value_type u;
+                        if (fraction.is_one()) {
+                            u = field_type::modulus - 1;
+                        } else if (fraction.is_zero()) {
+                            u = field_type::value_type::zero();
+                        } else {
+                            u = fraction.sqrt();
+                            if (u == field_type::value_type(field_type::modulus - 1)) {
+                                return nil::marshalling::status_type::invalid_msg_data;
+                            }
+                        }
+                        // TODO: above logic should be handled in sqrt
+
+                        if ((*(iter + chunk_number - 1) >> 7) == (static_cast<integral_type>(u.data) & 1)) {
+                            point = group_value_type(u, field_v);
+                        } else {
+                            point = group_value_type(-u, field_v);
+                        }
+
+                        return nil::marshalling::status_type::success;
+                    }
+                };
             }    // namespace processing
         }        // namespace marshalling
     }            // namespace crypto3
