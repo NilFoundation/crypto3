@@ -46,7 +46,8 @@ namespace nil {
                  * Matter Labs,
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
-                template <typename FieldType, typename Hash>
+                template <typename FieldType, typename Hash, std::size_t lambda, std::size_t k, 
+                    std::size_t r, std::size_t m=2>
                 class list_polynomial_commitment_scheme {
 
                     typedef typename merkletree::MerkleTree<Hash> merkle_tree_type;
@@ -65,7 +66,7 @@ namespace nil {
                     template <std::size_t k, std::size_t lambda, std::size_t r>
                     struct proof_type {
                         std::array<merkle_proof_type, k> z_openings;
-                        std::array<std::array<merkle_proof_type, 2 * r>, lamda> alpha_openings;
+                        std::array<std::array<merkle_proof_type, m * r>, lamda> alpha_openings;
 
                         std::array<std::array<commitment_type, r - 1>, lamda> f_commitments;
 
@@ -90,15 +91,15 @@ namespace nil {
                         return merkle_tree_type(y);
                     }
 
-                    template <std::size_t lambda, std::size_t k>
-                    static ... proof_eval (std::array<..., k> evaluation_points, 
+                    template <...>
+                    static proof_type proof_eval (std::array<..., k> evaluation_points, 
                         const merkle_tree_type &T,
                         const math::polynom<...> &f, 
                         const std::vector<...> &D){
 
                         proof_type proof;
 
-                        fiat_shamir_heuristic<transcript_manifest, transcript_hash_type> transcript;
+                        fiat_shamir_heuristic<transcript_round_manifest, transcript_hash_type> transcript;
 
                         std::array<merkle_proof_type, k> &z_openings = proof.z_openings;
                         std::array<std::pair<..., ...>, k> U_interpolation_points;
@@ -121,25 +122,25 @@ namespace nil {
 
                             math::polynom<...> f_i = Q;
 
-                            ... x_i = transcript.get_challenge<transcript_manifest::challenges_ids::x>();
+                            ... x_i = transcript.get_challenge<transcript_round_manifest::challenges_ids::x>();
 
-                            std::array<merkle_proof_type, 2*r> &alpha_openings = proof.alpha_openings[round_id];
+                            std::array<merkle_proof_type, m*r> &alpha_openings = proof.alpha_openings[round_id];
                             std::array<commitment_type, r - 1> &f_commitments = proof.f_commitments[round_id];
                             std::array<...> &f_ip1_coefficients = proof.f_ip1_coefficients[round_id];
 
                             for (std::size_t i = 0; i <= r-1; i++){
 
-                                ... y_i = transcript.get_challenge<transcript_manifest::challenges_ids::y, i>();
+                                ... y_i = transcript.get_challenge<transcript_round_manifest::challenges_ids::y, i>();
 
                                 math::polynom<...> sqr_polynom = {y_i, 0, -1};
-                                std::array<..., 2> s = math::polynomial::get_roots<2>(sqr_polynom);
+                                std::array<..., m> s = math::polynomial::get_roots<m>(sqr_polynom);
 
-                                std::array<std::pair<..., ...>, 2> p_i_j_interpolation_points;
+                                std::array<std::pair<..., ...>, m> p_i_j_interpolation_points;
 
-                                for (std::size_t j = 0; j < 2; j++){
+                                for (std::size_t j = 0; j < m; j++){
                                     ... alpha_i_j = f_i.evaluate(s[j]);
                                     std::size_t leaf_index = std::find(D.begin(), D.end(), s[j]) - D.begin();
-                                    alpha_openings[2*i + j] = merkle_proof_type(T, leaf_index);
+                                    alpha_openings[m*i + j] = merkle_proof_type(T, leaf_index);
                                     p_i_j_interpolation_points[j] = std::make_pair(s[j], alpha_i_j);
                                 }
 
@@ -158,6 +159,86 @@ namespace nil {
                         }
 
                         return proof;
+                    }
+                };
+
+                template <...>
+                    static bool verify_eval (proof_type proof,
+                        commitment_type T,
+                        std::array<..., k> evaluation_points, 
+                        const std::vector<...> &D){
+
+                        fiat_shamir_heuristic<transcript_round_manifest, transcript_hash_type> transcript;
+
+                        std::array<merkle_proof_type, k> &z_openings = proof.z_openings;
+                        std::array<std::pair<..., ...>, k> U_interpolation_points;
+
+                        for (std::size_t j = 0; j < k; j++){
+                            ... z_j = z_openings[j].leaf;
+                            if (!z_openings[j].validate(T)){
+                                return false;
+                            }
+
+                            U_interpolation_points[j] = std::make_pair(evaluation_points[j], z_j);
+                        }
+
+                        math::polynom<...> U = math::polynomial::Lagrange_interpolation(U_interpolation_points);
+
+                        math::polynom<...> Q = (f - U);
+                        for (std::size_t j = 0; j < k; j++){
+                            Q = Q/(x - U_interpolation_points[j]);
+                        }
+
+                        for (std::size_t round_id = 0; round_id < lambda; round_id++){
+
+                            math::polynom<...> f_i = Q;
+
+                            ... x_i = transcript.get_challenge<transcript_round_manifest::challenges_ids::x>();
+
+                            std::array<merkle_proof_type, m*r> &alpha_openings = proof.alpha_openings[round_id];
+                            std::array<commitment_type, r - 1> &f_commitments = proof.f_commitments[round_id];
+                            std::array<...> &f_ip1_coefficients = proof.f_ip1_coefficients[round_id];
+
+                            for (std::size_t i = 0; i <= r-1; i++){
+
+                                ... y_i = transcript.get_challenge<transcript_round_manifest::challenges_ids::y, i>();
+
+                                math::polynom<...> sqr_polynom = {y_i, 0, -1};
+                                std::array<..., m> s = math::polynomial::get_roots<m>(sqr_polynom);
+
+                                std::array<std::pair<..., ...>, m> p_i_j_interpolation_points;
+
+                                for (std::size_t j = 0; j < m; j++){
+                                    ... alpha_i_j = alpha_openings[m*i + j].leaf;
+                                    if (!alpha_openings[m*i + j].validate(T)){
+                                        return false;
+                                    }
+                                    p_i_j_interpolation_points[j] = std::make_pair(s[j], alpha_i_j);
+                                }
+
+                                math::polynom<...> p_i_j = math::polynomial::Lagrange_interpolation(p_i_j_interpolation_points);
+
+                                x = q.evaluate(x);
+
+                                if (i < r - 1){
+                                    if (f_i != p_i_j){
+                                        return false;
+                                    }
+
+                                    f_commitments[i] = commit(f_i, D_ip1).root();
+                                } else {
+                                    if (f_i != p_i_j){
+                                        return false;
+                                    }
+
+                                    if (math::polynomial::degree(f_i) != ...){
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+
+                        return true;
                     }
                 };
 
