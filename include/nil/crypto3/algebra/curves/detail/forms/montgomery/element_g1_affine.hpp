@@ -24,20 +24,21 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_AFFINE_HPP
-#define CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_AFFINE_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_MONTGOMERY_G1_ELEMENT_AFFINE_HPP
+#define CRYPTO3_ALGEBRA_CURVES_MONTGOMERY_G1_ELEMENT_AFFINE_HPP
 
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
 #include <nil/crypto3/algebra/curves/forms.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/montgomery/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    /** @brief A struct representing a group G1 of elliptic curve.
+                    /**
+                     * @brief A struct representing a group G1 of elliptic curve.
                      *    @tparam CurveParams Parameters of the group
                      *    @tparam Form Form of the curve
                      *    @tparam Coordinates Representation coordinates of the group element
@@ -45,23 +46,24 @@ namespace nil {
                     template<typename CurveParams, typename Form, typename Coordinates>
                     struct curve_element;
 
-                    /** @brief A struct representing an element from the group G1 of twisted Edwards curve of
+                    /**
+                     * @brief A struct representing an element from the group G1 of Montgomery curve of
                      *  affine coordinates representation.
-                     *  Twisted Edwards curves introduced on https://eprint.iacr.org/2008/013.pdf
-                     *  Description: https://hyperelliptic.org/EFD/g1p/auto-twisted.html
+                     *  Description: https://hyperelliptic.org/EFD/g1p/auto-montgom.html
                      *
                      */
                     template<typename CurveParams>
-                    struct curve_element<CurveParams, forms::twisted_edwards, coordinates::affine> {
-
+                    struct curve_element<CurveParams, forms::montgomery, coordinates::affine> {
                         using field_type = typename CurveParams::field_type;
 
                     private:
                         using params_type = CurveParams;
                         using field_value_type = typename field_type::value_type;
 
+                        bool is_inf_point;
+
                     public:
-                        using form = forms::twisted_edwards;
+                        using form = forms::montgomery;
                         using coordinates = coordinates::affine;
 
                         using group_type = typename params_type::template group_type<coordinates>;
@@ -70,30 +72,29 @@ namespace nil {
                         field_value_type Y;
 
                         /*************************  Constructors and zero/one  ***********************************/
-                        /** @brief
+                        /**
+                         * @brief
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr curve_element() :
-                            curve_element(params_type::zero_fill[0], params_type::zero_fill[1]) {};
+                        constexpr curve_element() : is_inf_point(true) {};
 
-                        /** @brief
+                        /**
+                         * @brief
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
-                         *
                          */
-                        constexpr curve_element(field_value_type in_X, field_value_type in_Y) {
-                            this->X = in_X;
-                            this->Y = in_Y;
-                        };
+                        constexpr curve_element(const field_value_type &in_X, const field_value_type &in_Y) :
+                            is_inf_point(false), X(in_X), Y(in_Y) {};
 
-                        /** @brief Get the point at infinity
-                         *
+                        /**
+                         * @brief Get the point at infinity
                          */
                         static curve_element zero() {
                             return curve_element();
                         }
-                        /** @brief Get the generator of group G1
-                         *
+
+                        /**
+                         * @brief Get the generator of group G1
                          */
                         static curve_element one() {
                             return curve_element(params_type::one_fill[0], params_type::one_fill[1]);
@@ -126,30 +127,30 @@ namespace nil {
                         constexpr bool operator!=(const curve_element &other) const {
                             return !(operator==(other));
                         }
-                        /** @brief
+
+                        /**
+                         * @brief
                          *
                          * @return true if element from group G1 is the point at infinity
                          */
                         constexpr bool is_zero() const {
-                            return X == params_type::zero_fill[0] && Y == params_type::zero_fill[0];
+                            return this->is_inf_point;
                         }
 
-                        /** @brief
+                        /**
+                         * @brief Check that point coordinates satisfy curve equitation: b*y^2 = x^3 + a*x^2 + x
                          *
                          * @return true if element from group G1 lies on the elliptic curve
-                         *
-                         * A check, that a*X*X + Y*Y = 1 + d*X*X*Y*Y
                          */
                         constexpr bool is_well_formed() const {
                             if (this->is_zero()) {
                                 return true;
                             } else {
-
                                 field_value_type XX = this->X.squared();
                                 field_value_type YY = this->Y.squared();
 
-                                return (field_value_type(params_type::a) * XX + YY ==
-                                        field_value_type::one() + field_value_type(params_type::d) * XX * YY);
+                                return (field_value_type(params_type::B) * YY) ==
+                                       (XX * this->X + field_value_type(params_type::A) * XX + this->X);
                             }
                         }
 
@@ -157,57 +158,25 @@ namespace nil {
 
                         // /** @brief
                         //  *
+                        //  * See https://eprint.iacr.org/2017/212.pdf, p. 7, par. 3.
+                        //  *
                         //  * @return return the corresponding element from affine coordinates to
-                        //  * projective coordinates
+                        //  xz coordinates
                         //  */
-                        // constexpr curve_element<
-                        //     params_type,
-                        //     form,
-                        //     typename curves::coordinates::projective> to_projective () const {
-
-                        //     using result_type = curve_element<params_type,
-                        //         form, typename curves::coordinates::projective>;
-
-                        //     return result_type(X, Y, result_type::field_type::value_type::one()); // X = x, Y = y, Z
-                        //     = 1
+                        // constexpr curve_element<params_type, form, typename curves::coordinates::xz> to_xz() const {
+                        //     using result_type = curve_element<params_type, form, typename curves::coordinates::xz>;
+                        //
+                        //     return this->is_zero() ? result_type(result_type::field_type::value_type::one(),
+                        //                                          result_type::field_type::value_type::zero()) :
+                        //                              result_type(this->X,
+                        //                              result_type::field_type::value_type::one());
                         // }
 
-                        /** @brief
+                        /**
+                         * @brief
                          *
-                         * @return return the corresponding element from affine coordinates to
-                         * inverted coordinates
-                         */
-                        constexpr curve_element<params_type, form, typename curves::coordinates::inverted>
-                            to_inverted() const {
-
-                            using result_type =
-                                curve_element<params_type, form, typename curves::coordinates::inverted>;
-
-                            return result_type(
-                                X.inversed(), Y.inversed(),
-                                result_type::field_type::value_type::one());    // X = x^(-1), Y = y^(-1), Z = 1
-                        }
-
-                        /** @brief
-                         *
-                         * @return return the corresponding element from affine coordinates to
-                         * extended coordinates with a=-1
-                         */
-                        constexpr curve_element<params_type, form,
-                                                typename curves::coordinates::extended_with_a_minus_1>
-                            to_extended_with_a_minus_1() const {
-
-                            using result_type =
-                                curve_element<params_type, form, typename curves::coordinates::extended_with_a_minus_1>;
-
-                            return result_type(X, Y, X * Y,
-                                               result_type::field_type::value_type::one());    // x=X/Z, y=Y/Z, x*y=T/Z
-                        }
-
-                        /** @brief
-                         *
-                         * @return return the corresponding element from affine coordinates to
-                         * affine coordinates. Just for compatibility.
+                         * @return return the corresponding element from affine coordinates to affine coordinates. Just
+                         * for compatibility.
                          */
                         constexpr curve_element to_affine() const {
                             return *this;
@@ -216,15 +185,17 @@ namespace nil {
                         /*************************  Arithmetic operations  ***********************************/
 
                         constexpr curve_element operator=(const curve_element &other) {
-                            // handle special cases having to do with O
-                            this->X = other.X;
-                            this->Y = other.Y;
+                            this->is_inf_point = other.is_inf_point;
+
+                            if (!other.is_zero()) {
+                                this->X = other.X;
+                                this->Y = other.Y;
+                            }
 
                             return *this;
                         }
 
                         constexpr curve_element operator+(const curve_element &other) const {
-                            // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
                             }
@@ -240,62 +211,91 @@ namespace nil {
                             return this->add(other);
                         }
 
+                        /**
+                         * @brief Affine negation formulas: -(x1,y1)=(x1,-y1).
+                         *
+                         * @return negative element from group G1
+                         */
                         constexpr curve_element operator-() const {
-                            return curve_element(-(this->X), this->Y);
+                            return curve_element(this->X, -(this->Y));
                         }
 
-                        constexpr curve_element operator-(const curve_element &B) const {
-                            return (*this) + (-B);
+                        constexpr curve_element operator-(const curve_element &other) const {
+                            return (*this) + (-other);
                         }
-                        /** @brief
+
+                        /**
+                         * @brief Affine doubling formulas: 2(x1,y1)=(x3,y3) where
+                         *
+                         * x3 = b*(3*x1^2+2*a*x1+1)^2/(2*b*y1)^2-a-x1-x1
+                         * y3 = (2*x1+x1+a)*(3*x1^2+2*a*x1+1)/(2*b*y1)-b*(3*x1^2+2*a*x1+1)^3/(2*b*y1)^3-y1
+                         *
+                         * See https://hyperelliptic.org/EFD/g1p/auto-montgom.html
                          *
                          * @return doubled element from group G1
                          */
                         constexpr curve_element doubled() const {
-
                             if (this->is_zero()) {
                                 return (*this);
                             } else {
+                                const field_value_type two(2);
+                                const field_value_type three(3);
+                                const field_value_type A(params_type::A);
+                                const field_value_type B(params_type::B);
 
-                                return this->add(*this);    // Temporary intil we find something more efficient
+                                const field_value_type temp1 = two * B * this->Y;
+                                const field_value_type temp2 =
+                                    three * this->X.squared() + two * A * this->X + field_value_type::one();
+                                const field_value_type temp1_sqr = temp1.squared();
+                                const field_value_type temp2_sqr = temp2.squared();
+
+                                return curve_element((B * temp2_sqr) / temp1_sqr - A - this->X - this->X,
+                                                     ((three * this->X + A) * temp2) / temp1 -
+                                                         (B * temp2 * temp2_sqr) / (temp1 * temp1_sqr) - this->Y);
                             }
                         }
 
                     private:
-                        /** @brief
-                         * Affine addition formulas: (x1,y1)+(x2,y2)=(x3,y3) where
-                         *   x3 = (x1*y2+y1*x2)/(1+d*x1*x2*y1*y2)
-                         *   y3 = (y1*y2-a*x1*x2)/(1-d*x1*x2*y1*y2)
+                        /**
+                         * @brief Affine addition formulas: (x1,y1)+(x2,y2)=(x3,y3) where
+                         *
+                         * x3 = b*(y2-y1)^2/(x2-x1)^2-a-x1-x2
+                         * y3 = (2*x1+x2+a)*(y2-y1)/(x2-x1)-b*(y2-y1)^3/(x2-x1)^3-y1
+                         *
+                         * See https://hyperelliptic.org/EFD/g1p/auto-montgom.html
+                         *
+                         * @return addition of two elements from group G1
                          */
-                        curve_element add(const curve_element &other) const {
-                            field_value_type XX = (this->X) * (other.X);
-                            field_value_type YY = (this->Y) * (other.Y);
-                            field_value_type XY = (this->X) * (other.Y);
-                            field_value_type YX = (this->Y) * (other.X);
+                        constexpr curve_element add(const curve_element &other) const {
+                            const field_value_type two(2);
+                            const field_value_type A(params_type::A);
+                            const field_value_type B(params_type::B);
 
-                            field_value_type lambda = params_type::d * XX * YY;
-                            field_value_type X3 = (XY + YX) * (field_value_type::one() + lambda).inversed();
-                            field_value_type Y3 =
-                                (YY - params_type::a * XX) * (field_value_type::one() - lambda).inversed();
+                            const field_value_type temp1 = (other.Y) - (this->Y);
+                            const field_value_type temp2 = (other.X) - (this->X);
+                            const field_value_type temp1_sqr = temp1.squared();
+                            const field_value_type temp2_sqr = temp2.squared();
 
-                            return curve_element(X3, Y3);
+                            return curve_element((B * temp1_sqr) / temp2_sqr - A - this->X - other.X,
+                                                 ((two * this->X + other.X + A) * temp1) / temp2 -
+                                                     (B * temp1 * temp1_sqr) / (temp2 * temp2_sqr) - this->Y);
                         }
 
                     public:
                         /*************************  Reducing operations  ***********************************/
 
                         /**
-                         * @brief Convert point coordinates into Montgomery form according to birational equivalence
-                         * map:
+                         * @brief Convert point coordinates into twisted Edwards form according to birational
+                         * equivalence map:
                          *
-                         * - Twisted Edwards(a, d) -–> Montgomery(A', B')
-                         *                  (x, y) --> (u', v')
+                         * - Montgomery(A', B') -–> Twisted Edwards(a, d)
+                         *             (u', v') --> (x, y)
                          *   where
                          *   A' = 2 * (a + d) / (a - d)
                          *   B' = 4 / (a - d)
                          *
-                         *   u' = (1 + y) / (1 - y)
-                         *   v' = (1 + y) / ((1 - y) * x)
+                         *   x = u' / v'
+                         *   y = (u' - 1) / (u' + 1)
                          *
                          * - Montgomery(A', B') -–> Montgomery(A, B)
                          *             (u', v') --> (u, v)
@@ -306,56 +306,54 @@ namespace nil {
                          *   u = u'
                          *   s * v = v'
                          *
-                         * - Twisted Edwards(a, d) -–> Montgomery(A, B)
-                         *                  (x, y) --> (u, v)
+                         * - Montgomery(A, B) -–> Twisted Edwards(a, d)
+                         *             (u, v) --> (x, y)
                          *
-                         *   u = u' = (1 + y) / (1 - y)
-                         *   v = v' / s = (1 + y) / ((1 - y) * x * s)
+                         *   x = u' / v' = u / (s * v)
+                         *   y = (u - 1) / (u + 1)
                          *
                          * See
                          * https://math.stackexchange.com/questions/1391732/birational-equvalence-of-twisted-edwards-and-montgomery-curves
                          * See
                          * https://math.stackexchange.com/questions/1392277/point-conversion-between-twisted-edwards-and-montgomery-curves
                          *
-                         * @return point in affine coordinates of Montgomery form
+                         * @return point in affine coordinates of twisted Edwards form
                          */
-                        constexpr auto to_montgomery() const {
+                        constexpr auto to_twisted_edwards() const {
                             using result_params =
                                 typename group_type::curve_type::template g1_type<curves::coordinates::affine,
-                                                                                  forms::montgomery>::params_type;
+                                                                                  forms::twisted_edwards>::params_type;
                             using result_type =
                                 typename group_type::curve_type::template g1_type<curves::coordinates::affine,
-                                                                                  forms::montgomery>::value_type;
+                                                                                  forms::twisted_edwards>::value_type;
 
                             if (this->is_zero()) {
                                 return result_type();
                             }
 
-                            assert(static_cast<field_value_type>(result_params::A) ==
+                            assert(static_cast<field_value_type>(params_type::A) ==
                                    static_cast<field_value_type>(2) *
-                                       (static_cast<field_value_type>(params_type::a) +
-                                        static_cast<field_value_type>(params_type::d)) /
-                                       (static_cast<field_value_type>(params_type::a) -
-                                        static_cast<field_value_type>(params_type::d)));
+                                       (static_cast<field_value_type>(result_params::a) +
+                                        static_cast<field_value_type>(result_params::d)) /
+                                       (static_cast<field_value_type>(result_params::a) -
+                                        static_cast<field_value_type>(result_params::d)));
 
                             field_value_type s_inv = field_value_type::one();
                             field_value_type B_ =
-                                static_cast<field_value_type>(4) / (static_cast<field_value_type>(params_type::a) -
-                                                                    static_cast<field_value_type>(params_type::d));
-                            if (static_cast<field_value_type>(result_params::B) != B_) {
-                                s_inv = (B_ / static_cast<field_value_type>(result_params::B)).sqrt();
+                                static_cast<field_value_type>(4) / (static_cast<field_value_type>(result_params::a) -
+                                                                    static_cast<field_value_type>(result_params::d));
+                            if (static_cast<field_value_type>(params_type::B) != B_) {
+                                s_inv = (B_ / static_cast<field_value_type>(params_type::B)).sqrt();
                             }
 
-                            return result_type((field_value_type::one() + this->Y) /
-                                                   (field_value_type::one() - this->Y),
-                                               s_inv * ((field_value_type::one() + this->Y) /
-                                                        (this->X * (field_value_type::one() - this->Y))));
+                            return result_type(s_inv * this->X / this->Y,
+                                               (this->X - field_value_type::one()) /
+                                                   (this->X + field_value_type::one()));
                         }
                     };
-
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_AFFINE_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_MONTGOMERY_G1_ELEMENT_AFFINE_HPP

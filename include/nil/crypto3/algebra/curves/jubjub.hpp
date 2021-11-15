@@ -38,7 +38,8 @@ namespace nil {
         namespace algebra {
             namespace curves {
 
-                /** @brief A struct representing a
+                /**
+                 * @brief A struct representing a
                  * [JubJub](https://raw.githubusercontent.com/zcash/zips/master/protocol/protocol.pdf#jubjub) twisted
                  * Edwards elliptic curve defined over Bls12-381 scalar field and described by equation ax^2 + y^2 = 1 +
                  * dx^2y^2.
