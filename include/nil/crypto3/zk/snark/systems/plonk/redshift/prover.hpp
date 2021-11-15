@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PROVER_HPP
 #define CRYPTO3_ZK_PLONK_REDSHIFT_PROVER_HPP
 
-#include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 
 namespace nil {
@@ -34,11 +34,26 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename TCurve>
+                template<typename CurveType>
                 class redshift_prover {
 
                     using types_policy = redshift_types_policy<TCurve>;
                     using transcript_manifest = types_policy::prover_fiat_shamir_heuristic_manifest<6>;
+
+                    typedef hashes::sha2<256> merkle_hash_type;
+                    typedef hashes::sha2<256> transcript_hash_type;
+
+                    typedef typename merkletree::MerkleTree<Hash> merkle_tree_type;
+
+                    constexpr static const std::size_t lambda = ...;
+                    constexpr static const std::size_t k = ...;
+                    constexpr static const std::size_t r = ...;
+                    constexpr static const std::size_t m = 2;
+
+                    constexpr static const typename TCurve::scalar_field_type::value_type omega = 
+                        algebra::get_root_of_unity<typename TCurve::scalar_field_type>()
+                    typedef list_polynomial_commitment_scheme<typename CurveType::scalar_field_type, 
+                        Hash, lambda, k, r, m> lpc;
 
                 public:
                     static inline typename types_policy::proof_type
@@ -51,24 +66,27 @@ namespace nil {
                         std::size_t N_sel = ...;
                         std::size_t N_const = ...;
 
-                        fiat_shamir_heuristic<transcript_manifest, hashes::sha2> transcript;
+                        fiat_shamir_heuristic<transcript_manifest, transcript_hash_type> transcript;
 
                         ... setup_values = ...;
                         transcript(setup_values);
 
                         std::vector<math::polynomial::polynom<...>> f(N_wires);
-                        std::vector<std::fri_commitment_cheme<...>> f_commitments(N_wires);
+
+                        std::vector<merkle_tree_type> f_trees;
+                        std::vector<typename lpc::commitment_type> f_commitments;
 
                         for (std::size_t i = 0; i < N_wires; i++) {
                             f.push_back(proving_key.f[i] + choose_h_i() * proving_key.Z(x));
-                            f_commitments[i].commit(f[i]);
+                            f_trees.push_back(lpc::commit(f[i]));
+                            f_commitments[i].push_back(f_trees[i].root());
                             transcript(f_commitments[i]);
                         }
 
-                        hashes::sha2::digest_type beta_bytes =
+                        typename transcript_hash_type::digest_type beta_bytes =
                             transcript.get_challenge<transcript_manifest::challenges_ids::beta>();
 
-                        hashes::sha2::digest_type gamma_bytes =
+                        typename transcript_hash_type::digest_type gamma_bytes =
                             transcript.get_challenge<transcript_manifest::challenges_ids::gamma>();
 
                         typename TCurve::scalar_field_type::value_type beta =
@@ -117,17 +135,17 @@ namespace nil {
                         math::polynomial::polynom<...> Q =
                             math::polynomial::Lagrange_interpolation(Q_interpolation_points);
 
-                        std::fri_commitment_cheme<...> P_commitment();
-                        std::fri_commitment_cheme<...> Q_commitment();
+                        merkle_tree_type P_tree = lpc::commit(P);
+                        merkle_tree_type Q_tree = lpc::commit(Q);
+                        typename lpc::commitment_type P_commitment = P_tree.root();
+                        typename lpc::commitment_type Q_commitment = Q_tree.root();
 
-                        P_commitment.commit(P);
-                        Q_commitment.commit(Q);
                         transcript(P_commitment);
                         transcript(Q_commitment);
 
                         std::array<typename TCurve::scalar_field_type::value_type, 6> alphas;
                         for (std::size_t i = 0; i < 6; i++) {
-                            hashes::sha2::digest_type alpha_bytes =
+                            typename transcript_hash_type::digest_type alpha_bytes =
                                 transcript.get_challenge<transcript_manifest::challenges_ids::alpha, i>();
                             alphas[i] = (algebra::marshalling<typename TCurve::scalar_field_type>(alpha_bytes));
                         }
@@ -155,19 +173,45 @@ namespace nil {
 
                         math::polynomial::polynom<...> T_consolidated = F_consolidated / Z;
 
-                        std::vector<math::polynomial::polynom<...>> T(N_perm + 2);
+                        std::vector<math::polynomial::polynom<...>> T(N_perm + 1);
                         T = separate_T(T_consolidated);
 
-                        std::vector<std::fri_commitment_cheme<...>> T_commitments(N_perm + 2);
-                        for (std::size_t i = 0; i < N_perm + 2) {
-                            T_commitments[i].commit(T[i]);
+                        std::vector<merkle_tree_type> T_trees;
+                        std::vector<typename lpc::commitment_type> T_commitments;
+
+                        for (std::size_t i = 0; i < N_perm + 1) {
+                            T_trees.push_back(lpc::commit(T[i]));
+                            T_commitments.push_back(T_trees[i].root());
                         }
 
-                        ...
+                        typename transcript_hash_type::digest_type upsilon_bytes =
+                            transcript.get_challenge<transcript_manifest::challenges_ids::upsilon>();
 
-                            typename types_policy::proof_type proof =
-                                typename types_policy::proof_type(std::move(f_commitments), std::move(P_commitment),
-                                                                  std::move(Q_commitment), std::move(T_commitments));
+                        typename TCurve::scalar_field_type::value_type upsilon =
+                            algebra::marshalling<TCurve::scalar_field_type>(upsilon_bytes);
+
+                        std::array<..., k> fT_evaluation_points = {upsilon};
+                        std::vector<lpc::proof> f_lpc_proofs(N_wires);
+
+                        for (std::size_t i = 0; i < N_wires; i++){
+                            f_lpc_proofs.push_back(lpc::proof_eval(fT_evaluation_points, f_trees[i], f[i], ...));
+                        }
+
+                        std::array<..., k> PQ_evaluation_points = {upsilon, upsilon * omega};
+                        lpc::proof P_lpc_proof = lpc::proof_eval(PQ_evaluation_points, P_tree, P, ...);
+                        lpc::proof Q_lpc_proof = lpc::proof_eval(PQ_evaluation_points, Q_tree, Q, ...);
+
+                        std::vector<lpc::proof> T_lpc_proofs(N_perm + 1);
+
+                        for (std::size_t i = 0; i < N_perm + 1; i++){
+                            T_lpc_proofs.push_back(lpc::proof_eval(fT_evaluation_points, T_trees[i], T[i], ...));
+                        }
+
+                        typename types_policy::proof_type proof =
+                            typename types_policy::proof_type(std::move(f_commitments), std::move(P_commitment),
+                                                              std::move(Q_commitment), std::move(T_commitments),
+                                                              std::move(f_lpc_proofs), std::move(P_lpc_proof),
+                                                              std::move(Q_lpc_proof), std::move(T_lpc_proofs));
 
                         return proof;
                     }

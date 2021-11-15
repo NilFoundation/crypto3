@@ -53,7 +53,7 @@ namespace nil {
                     typedef typename merkletree::MerkleTree<Hash> merkle_tree_type;
                     typedef typename merkletree::MerkleProof<Hash> merkle_proof_type;
 
-                    constexpr static const math::polynom<...> q = {0, 0, 1};
+                    constexpr static const math::polynomial::polynom<...> q = {0, 0, 1};
 
                     struct transcript_round_manifest {
                         enum challenges_ids {x, y};
@@ -80,7 +80,7 @@ namespace nil {
                     // result.root();
                     // should be called
                     template <...>
-                    static merkle_tree_type commit (const math::polynom<...> &f, 
+                    static merkle_tree_type commit (const math::polynomial::polynom<...> &f, 
                         const std::vector<...> &D){
 
                         std::vector<...> y;
@@ -94,7 +94,7 @@ namespace nil {
                     template <...>
                     static proof_type proof_eval (std::array<..., k> evaluation_points, 
                         const merkle_tree_type &T,
-                        const math::polynom<...> &f, 
+                        const math::polynomial::polynom<...> &f, 
                         const std::vector<...> &D){
 
                         proof_type proof;
@@ -111,16 +111,16 @@ namespace nil {
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], z_j);
                         }
 
-                        math::polynom<...> U = math::polynomial::Lagrange_interpolation(U_interpolation_points);
+                        math::polynomial::polynom<...> U = math::polynomial::Lagrange_interpolation(U_interpolation_points);
 
-                        math::polynom<...> Q = (f - U);
+                        math::polynomial::polynom<...> Q = (f - U);
                         for (std::size_t j = 0; j < k; j++){
                             Q = Q/(x - U_interpolation_points[j]);
                         }
 
                         for (std::size_t round_id = 0; round_id < lambda; round_id++){
 
-                            math::polynom<...> f_i = Q;
+                            math::polynomial::polynom<...> f_i = Q;
 
                             ... x_i = transcript.get_challenge<transcript_round_manifest::challenges_ids::x>();
 
@@ -132,7 +132,7 @@ namespace nil {
 
                                 ... y_i = transcript.get_challenge<transcript_round_manifest::challenges_ids::y, i>();
 
-                                math::polynom<...> sqr_polynom = {y_i, 0, -1};
+                                math::polynomial::polynom<...> sqr_polynom = {y_i, 0, -1};
                                 std::array<..., m> s = math::polynomial::get_roots<m>(sqr_polynom);
 
                                 std::array<std::pair<..., ...>, m> p_i_j_interpolation_points;
@@ -144,7 +144,7 @@ namespace nil {
                                     p_i_j_interpolation_points[j] = std::make_pair(s[j], alpha_i_j);
                                 }
 
-                                math::polynom<...> p_i_j = math::polynomial::Lagrange_interpolation(p_i_j_interpolation_points);
+                                math::polynomial::polynom<...> p_i_j = math::polynomial::Lagrange_interpolation(p_i_j_interpolation_points);
 
                                 f_i = p_i_j;
 
@@ -152,6 +152,7 @@ namespace nil {
 
                                 if (i < r - 1){
                                     f_commitments[i] = commit(f_i, D_ip1).root();
+                                    transcript(f_commitments[i]);
                                 } else {
                                     f_ip1_coefficients = math::polynomial::get_coefficients(f_i);
                                 }
@@ -163,9 +164,9 @@ namespace nil {
                 };
 
                 template <...>
-                    static bool verify_eval (proof_type proof,
+                    static bool verify_eval (std::array<..., k> evaluation_points, 
                         commitment_type T,
-                        std::array<..., k> evaluation_points, 
+                        proof_type proof,
                         const std::vector<...> &D){
 
                         fiat_shamir_heuristic<transcript_round_manifest, transcript_hash_type> transcript;
@@ -182,16 +183,16 @@ namespace nil {
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], z_j);
                         }
 
-                        math::polynom<...> U = math::polynomial::Lagrange_interpolation(U_interpolation_points);
+                        math::polynomial::polynom<...> U = math::polynomial::Lagrange_interpolation(U_interpolation_points);
 
-                        math::polynom<...> Q = (f - U);
+                        math::polynomial::polynom<...> Q = (f - U);
                         for (std::size_t j = 0; j < k; j++){
                             Q = Q/(x - U_interpolation_points[j]);
                         }
 
                         for (std::size_t round_id = 0; round_id < lambda; round_id++){
 
-                            math::polynom<...> f_i = Q;
+                            math::polynomial::polynom<...> f_i = Q;
 
                             ... x_i = transcript.get_challenge<transcript_round_manifest::challenges_ids::x>();
 
@@ -203,7 +204,7 @@ namespace nil {
 
                                 ... y_i = transcript.get_challenge<transcript_round_manifest::challenges_ids::y, i>();
 
-                                math::polynom<...> sqr_polynom = {y_i, 0, -1};
+                                math::polynomial::polynom<...> sqr_polynom = {y_i, 0, -1};
                                 std::array<..., m> s = math::polynomial::get_roots<m>(sqr_polynom);
 
                                 std::array<std::pair<..., ...>, m> p_i_j_interpolation_points;
@@ -216,7 +217,7 @@ namespace nil {
                                     p_i_j_interpolation_points[j] = std::make_pair(s[j], alpha_i_j);
                                 }
 
-                                math::polynom<...> p_i_j = math::polynomial::Lagrange_interpolation(p_i_j_interpolation_points);
+                                math::polynomial::polynom<...> p_i_j = math::polynomial::Lagrange_interpolation(p_i_j_interpolation_points);
 
                                 x = q.evaluate(x);
 
@@ -226,6 +227,7 @@ namespace nil {
                                     }
 
                                     f_commitments[i] = commit(f_i, D_ip1).root();
+                                    transcript(f_commitments[i]);
                                 } else {
                                     if (f_i != p_i_j){
                                         return false;

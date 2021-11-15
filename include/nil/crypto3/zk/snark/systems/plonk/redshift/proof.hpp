@@ -26,6 +26,7 @@
 #ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PROOF_HPP
 #define CRYPTO3_ZK_PLONK_REDSHIFT_PROOF_HPP
 
+#include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
 #include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
 
 namespace nil {
@@ -33,14 +34,27 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename TCurve>
-                struct redshift_proof {
-                    std::vector<std::fri_commitment_cheme<...>> f_commitments;
+                template<typename CurveType, typename Hash>
+                class redshift_proof {
 
-                    std::fri_commitment_cheme<...> P_commitment;
-                    std::fri_commitment_cheme<...> Q_commitment;
+                    typedef list_polynomial_commitment_scheme<typename CurveType::scalar_field_type, Hash> lpc;
 
-                    std::vector<math::polynomial::polynom<...>> T;
+                public:
+
+                    std::vector<typename lpc::commitment_type> f_commitments;
+
+                    typename lpc::commitment_type P_commitment;
+                    typename lpc::commitment_type Q_commitment;
+
+                    std::vector<typename lpc::commitment_type> T_commitments;
+
+                    std::vector<typename lpc::proof_type> f_lpc_proofs;
+
+                    typename lpc::proof_type P_lpc_proof;
+                    typename lpc::proof_type Q_lpc_proof;
+
+                    std::vector<typename lpc::proof_type> T_lpc_proofs;
+
                 };
             }    // namespace snark
         }        // namespace zk

@@ -41,6 +41,16 @@ namespace nil {
                     using transcript_manifest = types_policy::prover_fiat_shamir_heuristic_manifest<6>;
                     using constraint_system_type = plonk_constraint_system<typename TCurve::scalar_field_type>;
 
+                    constexpr static const std::size_t lambda = ...;
+                    constexpr static const std::size_t k = ...;
+                    constexpr static const std::size_t r = ...;
+                    constexpr static const std::size_t m = 2;
+
+                    constexpr static const typename TCurve::scalar_field_type::value_type omega = 
+                        algebra::get_root_of_unity<typename TCurve::scalar_field_type>()
+                    typedef list_polynomial_commitment_scheme<typename CurveType::scalar_field_type, 
+                        Hash, lambda, k, r, m> lpc;
+
                 public:
                     static inline bool process(const types_policy::verification_key_type &verification_key,
                                                const types_policy::primary_input_type &primary_input,
@@ -60,10 +70,10 @@ namespace nil {
                             transcript(proof.f_commitments[i]);
                         }
 
-                        hashes::sha2::digest_type beta_bytes =
+                        typename transcript_hash_type::digest_type beta_bytes =
                             transcript.get_challenge<transcript_manifest::challenges_ids::beta>();
 
-                        hashes::sha2::digest_type gamma_bytes =
+                        typename transcript_hash_type::digest_type gamma_bytes =
                             transcript.get_challenge<transcript_manifest::challenges_ids::gamma>();
 
                         typename TCurve::scalar_field_type::value_type beta =
@@ -76,7 +86,7 @@ namespace nil {
 
                         std::array<typename TCurve::scalar_field_type::value_type, 6> alphas;
                         for (std::size_t i = 0; i < 6; i++) {
-                            hashes::sha2::digest_type alpha_bytes =
+                            typename transcript_hash_type::digest_type alpha_bytes =
                                 transcript.get_challenge<transcript_manifest::challenges_ids::alpha, i>();
                             alphas[i] = (algebra::marshalling<typename TCurve::scalar_field_type>(alpha_bytes));
                         }
@@ -85,7 +95,7 @@ namespace nil {
                             transcript(proof.T_commitments[i]);
                         }
 
-                        hashes::sha2::digest_type upsilon_bytes =
+                        typename transcript_hash_type::digest_type upsilon_bytes =
                             transcript.get_challenge<transcript_manifest::challenges_ids::upsilon>();
 
                         typename TCurve::scalar_field_type::value_type upsilon =
@@ -116,6 +126,38 @@ namespace nil {
                         math::polynomial::polynom<...> F_consolidated = 0;
                         for (std::size_t i = 0; i < 6; i++) {
                             F_consolidated = a[i] * F[i];
+                        }
+
+                        typename transcript_hash_type::digest_type upsilon_bytes =
+                            transcript.get_challenge<transcript_manifest::challenges_ids::upsilon>();
+
+                        typename TCurve::scalar_field_type::value_type upsilon =
+                            algebra::marshalling<TCurve::scalar_field_type>(upsilon_bytes);
+
+                        std::array<..., k> fT_evaluation_points = {upsilon};
+
+                        for (std::size_t i = 0; i < N_wires; i++){
+                            if (!lpc::verify_eval(fT_evaluation_points, proof.f_commitments[i],
+                                proof.f_lpc_proofs[i], ...)){
+                                return false;
+                            }
+                        }
+
+                        std::array<..., k> PQ_evaluation_points = {upsilon, upsilon * omega};
+                        if (!lpc::verify_eval(PQ_evaluation_points, proof.P_commitment,
+                            proof.P_lpc_proof, ...)){
+                            return false;
+                        }
+                        if (!lpc::verify_eval(PQ_evaluation_points, proof.Q_commitment,
+                            proof.Q_lpc_proof, ...)){
+                            return false;
+                        }
+
+                        for (std::size_t i = 0; i < N_perm + 1; i++){
+                            if (!lpc::verify_eval(fT_evaluation_points, proof.T_commitments[i],
+                                proof.T_lpc_proofs[i], ...)){
+                                return false;
+                            }
                         }
 
                         return (F_consolidated == verification_key.Z * T);
