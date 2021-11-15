@@ -53,7 +53,8 @@ namespace nil {
                     typedef typename merkletree::MerkleTree<Hash> merkle_tree_type;
                     typedef typename merkletree::MerkleProof<Hash> merkle_proof_type;
 
-                    constexpr static const math::polynomial::polynom<...> q = {0, 0, 1};
+                    constexpr static const math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> 
+                        q = {0, 0, 1};
 
                     struct transcript_round_manifest {
                         enum challenges_ids {x, y};
@@ -70,7 +71,8 @@ namespace nil {
 
                         std::array<std::array<commitment_type, r - 1>, lamda> f_commitments;
 
-                        std::array<std::array<...>, lambda> f_ip1_coefficients;
+                        std::array<std::array<typename TCurve::scalar_field_type::value_type>, lambda> 
+                            f_ip1_coefficients;
                     }
 
                     // The result of this function is not commitment_type (as it would expected), 
@@ -80,11 +82,12 @@ namespace nil {
                     // result.root();
                     // should be called
                     template <...>
-                    static merkle_tree_type commit (const math::polynomial::polynom<...> &f, 
+                    static merkle_tree_type commit (const math::polynomial::polynom<
+                            typename TCurve::scalar_field_type::value_type> &f, 
                         const std::vector<...> &D){
 
-                        std::vector<...> y;
-                        for (... H : D){
+                        std::vector<typename TCurve::scalar_field_type::value_type> y;
+                        for (typename TCurve::scalar_field_type::value_type H : D){
                             y.push_back(f.evaluate(H));
                         }
 
@@ -92,9 +95,10 @@ namespace nil {
                     }
 
                     template <...>
-                    static proof_type proof_eval (std::array<..., k> evaluation_points, 
+                    static proof_type proof_eval (
+                        std::array<typename TCurve::scalar_field_type::value_type, k> evaluation_points, 
                         const merkle_tree_type &T,
-                        const math::polynomial::polynom<...> &f, 
+                        const math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> &f, 
                         const std::vector<...> &D){
 
                         proof_type proof;
@@ -102,51 +106,62 @@ namespace nil {
                         fiat_shamir_heuristic<transcript_round_manifest, transcript_hash_type> transcript;
 
                         std::array<merkle_proof_type, k> &z_openings = proof.z_openings;
-                        std::array<std::pair<..., ...>, k> U_interpolation_points;
+                        std::array<std::pair<typename TCurve::scalar_field_type::value_type, 
+                            typename TCurve::scalar_field_type::value_type>, k> U_interpolation_points;
 
                         for (std::size_t j = 0; j < k; j++){
-                            ... z_j = f.evaluate(evaluation_points[j]);
+                            typename TCurve::scalar_field_type::value_type z_j = 
+                                f.evaluate(evaluation_points[j]);
                             std::size_t leaf_index = std::find(D.begin(), D.end(), evaluation_points[j]) - D.begin();
                             z_openings[j] = merkle_proof_type(T, leaf_index);
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], z_j);
                         }
 
-                        math::polynomial::polynom<...> U = math::polynomial::Lagrange_interpolation(U_interpolation_points);
+                        math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> 
+                            U = math::polynomial::Lagrange_interpolation(U_interpolation_points);
 
-                        math::polynomial::polynom<...> Q = (f - U);
+                        math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> 
+                            Q = (f - U);
                         for (std::size_t j = 0; j < k; j++){
                             Q = Q/(x - U_interpolation_points[j]);
                         }
 
                         for (std::size_t round_id = 0; round_id < lambda; round_id++){
 
-                            math::polynomial::polynom<...> f_i = Q;
+                            math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> f_i = Q;
 
-                            ... x_i = transcript.get_challenge<transcript_round_manifest::challenges_ids::x>();
+                            typename TCurve::scalar_field_type::value_type x_i = 
+                                transcript.get_challenge<transcript_round_manifest::challenges_ids::x>();
 
                             std::array<merkle_proof_type, m*r> &alpha_openings = proof.alpha_openings[round_id];
                             std::array<commitment_type, r - 1> &f_commitments = proof.f_commitments[round_id];
-                            std::array<...> &f_ip1_coefficients = proof.f_ip1_coefficients[round_id];
+                            std::array<typename TCurve::scalar_field_type::value_type> &f_ip1_coefficients = 
+                                proof.f_ip1_coefficients[round_id];
 
                             for (std::size_t i = 0; i <= r-1; i++){
 
-                                ... y_i = transcript.get_challenge<transcript_round_manifest::challenges_ids::y, i>();
+                                typename TCurve::scalar_field_type::value_type y_i = 
+                                    transcript.get_challenge<transcript_round_manifest::challenges_ids::y, i>();
 
-                                math::polynomial::polynom<...> sqr_polynom = {y_i, 0, -1};
-                                std::array<..., m> s = math::polynomial::get_roots<m>(sqr_polynom);
+                                math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> 
+                                    sqr_polynom = {y_i, 0, -1};
+                                std::array<typename TCurve::scalar_field_type::value_type, m> s = 
+                                    math::polynomial::get_roots<m>(sqr_polynom);
 
-                                std::array<std::pair<..., ...>, m> p_i_j_interpolation_points;
+                                std::array<std::pair<typename TCurve::scalar_field_type::value_type, 
+                                    typename TCurve::scalar_field_type::value_type>, m> p_y_i_interpolation_points;
+
 
                                 for (std::size_t j = 0; j < m; j++){
-                                    ... alpha_i_j = f_i.evaluate(s[j]);
+                                    typename TCurve::scalar_field_type::value_type alpha_i_j = f_i.evaluate(s[j]);
                                     std::size_t leaf_index = std::find(D.begin(), D.end(), s[j]) - D.begin();
                                     alpha_openings[m*i + j] = merkle_proof_type(T, leaf_index);
-                                    p_i_j_interpolation_points[j] = std::make_pair(s[j], alpha_i_j);
+                                    p_y_i_interpolation_points[j] = std::make_pair(s[j], alpha_i_j);
                                 }
 
-                                math::polynomial::polynom<...> p_i_j = math::polynomial::Lagrange_interpolation(p_i_j_interpolation_points);
+                                math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> p_y_i = math::polynomial::Lagrange_interpolation(p_y_i_interpolation_points);
 
-                                f_i = p_i_j;
+                                f_i = p_y_i;
 
                                 x = q.evaluate(x);
 
@@ -164,7 +179,7 @@ namespace nil {
                 };
 
                 template <...>
-                    static bool verify_eval (std::array<..., k> evaluation_points, 
+                    static bool verify_eval (std::array<typename TCurve::scalar_field_type::value_type, k> evaluation_points, 
                         commitment_type T,
                         proof_type proof,
                         const std::vector<...> &D){
@@ -172,10 +187,12 @@ namespace nil {
                         fiat_shamir_heuristic<transcript_round_manifest, transcript_hash_type> transcript;
 
                         std::array<merkle_proof_type, k> &z_openings = proof.z_openings;
-                        std::array<std::pair<..., ...>, k> U_interpolation_points;
+                        std::array<std::pair<typename TCurve::scalar_field_type::value_type, 
+                            typename TCurve::scalar_field_type::value_type>, k> U_interpolation_points;
 
                         for (std::size_t j = 0; j < k; j++){
-                            ... z_j = z_openings[j].leaf;
+                            typename TCurve::scalar_field_type::value_type z_j = 
+                                algebra::marshalling<TCurve::scalar_field_type>(z_openings[j].leaf);
                             if (!z_openings[j].validate(T)){
                                 return false;
                             }
@@ -183,53 +200,59 @@ namespace nil {
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], z_j);
                         }
 
-                        math::polynomial::polynom<...> U = math::polynomial::Lagrange_interpolation(U_interpolation_points);
+                        math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> U = math::polynomial::Lagrange_interpolation(U_interpolation_points);
 
-                        math::polynomial::polynom<...> Q = (f - U);
+                        math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> Q = (f - U);
                         for (std::size_t j = 0; j < k; j++){
                             Q = Q/(x - U_interpolation_points[j]);
                         }
 
                         for (std::size_t round_id = 0; round_id < lambda; round_id++){
 
-                            math::polynomial::polynom<...> f_i = Q;
+                            math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> f_i = Q;
 
-                            ... x_i = transcript.get_challenge<transcript_round_manifest::challenges_ids::x>();
+                            typename TCurve::scalar_field_type::value_type x_i = 
+                                transcript.get_challenge<transcript_round_manifest::challenges_ids::x>();
 
                             std::array<merkle_proof_type, m*r> &alpha_openings = proof.alpha_openings[round_id];
                             std::array<commitment_type, r - 1> &f_commitments = proof.f_commitments[round_id];
-                            std::array<...> &f_ip1_coefficients = proof.f_ip1_coefficients[round_id];
+                            std::array<typename TCurve::scalar_field_type::value_type> &f_ip1_coefficients = 
+                                proof.f_ip1_coefficients[round_id];
 
                             for (std::size_t i = 0; i <= r-1; i++){
 
-                                ... y_i = transcript.get_challenge<transcript_round_manifest::challenges_ids::y, i>();
+                                typename TCurve::scalar_field_type::value_type y_i = 
+                                    transcript.get_challenge<transcript_round_manifest::challenges_ids::y, i>();
 
-                                math::polynomial::polynom<...> sqr_polynom = {y_i, 0, -1};
-                                std::array<..., m> s = math::polynomial::get_roots<m>(sqr_polynom);
+                                math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> sqr_polynom = {y_i, 0, -1};
+                                std::array<typename TCurve::scalar_field_type::value_type, m> s = 
+                                    math::polynomial::get_roots<m>(sqr_polynom);
 
-                                std::array<std::pair<..., ...>, m> p_i_j_interpolation_points;
+                                std::array<std::pair<typename TCurve::scalar_field_type::value_type, 
+                                    typename TCurve::scalar_field_type::value_type>, m> p_y_i_interpolation_points;
 
                                 for (std::size_t j = 0; j < m; j++){
-                                    ... alpha_i_j = alpha_openings[m*i + j].leaf;
+                                    typename TCurve::scalar_field_type::value_type alpha_i_j = 
+                                        algebra::marshalling<TCurve::scalar_field_type>(alpha_openings[m*i + j].leaf);
                                     if (!alpha_openings[m*i + j].validate(T)){
                                         return false;
                                     }
-                                    p_i_j_interpolation_points[j] = std::make_pair(s[j], alpha_i_j);
+                                    p_y_i_interpolation_points[j] = std::make_pair(s[j], alpha_i_j);
                                 }
 
-                                math::polynomial::polynom<...> p_i_j = math::polynomial::Lagrange_interpolation(p_i_j_interpolation_points);
+                                math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> p_y_i = math::polynomial::Lagrange_interpolation(p_y_i_interpolation_points);
 
                                 x = q.evaluate(x);
 
                                 if (i < r - 1){
-                                    if (f_i != p_i_j){
+                                    if (f_i != p_y_i){
                                         return false;
                                     }
 
                                     f_commitments[i] = commit(f_i, D_ip1).root();
                                     transcript(f_commitments[i]);
                                 } else {
-                                    if (f_i != p_i_j){
+                                    if (f_i != p_y_i){
                                         return false;
                                     }
 

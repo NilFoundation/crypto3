@@ -34,26 +34,22 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename CurveType, typename Hash>
-                class redshift_proof {
+                template<typename CurveType, typename CommitmentSchemeType>
+                struct redshift_proof {
 
-                    typedef list_polynomial_commitment_scheme<typename CurveType::scalar_field_type, Hash> lpc;
+                    std::vector<typename CommitmentSchemeType::commitment_type> f_commitments;
 
-                public:
+                    typename CommitmentSchemeType::commitment_type P_commitment;
+                    typename CommitmentSchemeType::commitment_type Q_commitment;
 
-                    std::vector<typename lpc::commitment_type> f_commitments;
+                    std::vector<typename CommitmentSchemeType::commitment_type> T_commitments;
 
-                    typename lpc::commitment_type P_commitment;
-                    typename lpc::commitment_type Q_commitment;
+                    std::vector<typename CommitmentSchemeType::proof_type> f_CommitmentSchemeType_proofs;
 
-                    std::vector<typename lpc::commitment_type> T_commitments;
+                    typename CommitmentSchemeType::proof_type P_CommitmentSchemeType_proof;
+                    typename CommitmentSchemeType::proof_type Q_CommitmentSchemeType_proof;
 
-                    std::vector<typename lpc::proof_type> f_lpc_proofs;
-
-                    typename lpc::proof_type P_lpc_proof;
-                    typename lpc::proof_type Q_lpc_proof;
-
-                    std::vector<typename lpc::proof_type> T_lpc_proofs;
+                    std::vector<typename CommitmentSchemeType::proof_type> T_lpc_proofs;
 
                 };
             }    // namespace snark

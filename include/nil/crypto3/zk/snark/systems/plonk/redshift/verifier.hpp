@@ -34,17 +34,15 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename TCurve>
+                template<typename TCurve, std::size_t lambda, std::size_t m=2>
                 class redshift_verifier {
 
                     using types_policy = redshift_types_policy<TCurve>;
                     using transcript_manifest = types_policy::prover_fiat_shamir_heuristic_manifest<6>;
                     using constraint_system_type = plonk_constraint_system<typename TCurve::scalar_field_type>;
 
-                    constexpr static const std::size_t lambda = ...;
                     constexpr static const std::size_t k = ...;
                     constexpr static const std::size_t r = ...;
-                    constexpr static const std::size_t m = 2;
 
                     constexpr static const typename TCurve::scalar_field_type::value_type omega = 
                         algebra::get_root_of_unity<typename TCurve::scalar_field_type>()
@@ -54,7 +52,7 @@ namespace nil {
                 public:
                     static inline bool process(const types_policy::verification_key_type &verification_key,
                                                const types_policy::primary_input_type &primary_input,
-                                               const types_policy::proof_type &proof) {
+                                               const types_policy::proof_type<lpc> &proof) {
 
                         std::size_t N_wires = ...;
                         std::size_t N_perm = ...;
@@ -101,9 +99,35 @@ namespace nil {
                         typename TCurve::scalar_field_type::value_type upsilon =
                             algebra::marshalling<TCurve::scalar_field_type>(upsilon_bytes);
 
-                        ...
+                        std::array<typename TCurve::scalar_field_type::value_type, k> 
+                            fT_evaluation_points = {upsilon};
 
-                            std::array<math::polynomial::polynom<...>, 6>
+                        for (std::size_t i = 0; i < N_wires; i++){
+                            if (!lpc::verify_eval(fT_evaluation_points, proof.f_commitments[i],
+                                proof.f_lpc_proofs[i], ...)){
+                                return false;
+                            }
+                        }
+
+                        std::array<typename TCurve::scalar_field_type::value_type, k> 
+                            PQ_evaluation_points = {upsilon, upsilon * omega};
+                        if (!lpc::verify_eval(PQ_evaluation_points, proof.P_commitment,
+                            proof.P_lpc_proof, ...)){
+                            return false;
+                        }
+                        if (!lpc::verify_eval(PQ_evaluation_points, proof.Q_commitment,
+                            proof.Q_lpc_proof, ...)){
+                            return false;
+                        }
+
+                        for (std::size_t i = 0; i < N_perm + 1; i++){
+                            if (!lpc::verify_eval(fT_evaluation_points, proof.T_commitments[i],
+                                proof.T_lpc_proofs[i], ...)){
+                                return false;
+                            }
+                        }
+
+                        std::array<math::polynomial::polynom<typename TCurve::scalar_field_type::value_type>, 6>
                                 F;
                         F[0] = verification_key.L_basis[1] * (P - 1);
                         F[1] = verification_key.L_basis[1] * (Q - 1);
@@ -120,44 +144,12 @@ namespace nil {
                             F[5] += verification_key.f_c[i];
                         }
 
-                        math::polynomial::polynom<...> T_consolidate;
+                        math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> T_consolidate;
                         T_consolidate = consolidate_T(T);
 
-                        math::polynomial::polynom<...> F_consolidated = 0;
+                        math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> F_consolidated = 0;
                         for (std::size_t i = 0; i < 6; i++) {
-                            F_consolidated = a[i] * F[i];
-                        }
-
-                        typename transcript_hash_type::digest_type upsilon_bytes =
-                            transcript.get_challenge<transcript_manifest::challenges_ids::upsilon>();
-
-                        typename TCurve::scalar_field_type::value_type upsilon =
-                            algebra::marshalling<TCurve::scalar_field_type>(upsilon_bytes);
-
-                        std::array<..., k> fT_evaluation_points = {upsilon};
-
-                        for (std::size_t i = 0; i < N_wires; i++){
-                            if (!lpc::verify_eval(fT_evaluation_points, proof.f_commitments[i],
-                                proof.f_lpc_proofs[i], ...)){
-                                return false;
-                            }
-                        }
-
-                        std::array<..., k> PQ_evaluation_points = {upsilon, upsilon * omega};
-                        if (!lpc::verify_eval(PQ_evaluation_points, proof.P_commitment,
-                            proof.P_lpc_proof, ...)){
-                            return false;
-                        }
-                        if (!lpc::verify_eval(PQ_evaluation_points, proof.Q_commitment,
-                            proof.Q_lpc_proof, ...)){
-                            return false;
-                        }
-
-                        for (std::size_t i = 0; i < N_perm + 1; i++){
-                            if (!lpc::verify_eval(fT_evaluation_points, proof.T_commitments[i],
-                                proof.T_lpc_proofs[i], ...)){
-                                return false;
-                            }
+                            F_consolidated += a[i] * F[i];
                         }
 
                         return (F_consolidated == verification_key.Z * T);

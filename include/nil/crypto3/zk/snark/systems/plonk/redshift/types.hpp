@@ -80,7 +80,8 @@ namespace nil {
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        typedef redshift_proof<TCurve> proof_type;
+                        template <typename CommitmentSchemeType>
+                        typedef redshift_proof<CurveType, CommitmentSchemeType> proof_type;
 
                         template<std::size_t AlphasAmount = 6>
                         struct prover_fiat_shamir_heuristic_manifest {
