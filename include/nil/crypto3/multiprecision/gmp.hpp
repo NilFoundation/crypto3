@@ -1785,7 +1785,9 @@ namespace nil {
                 }
 
                 gmp_int eval_ressol(const gmp_int &n, const gmp_int &p) {
-                    gmp_int result = reinterpret_cast<const __mpz_struct *>(-1);
+                    gmp_int result, negone, p_negone;
+                    mpz_set_si(result.data(), -1);
+                    mpz_set_si(negone.data(), -1);
                     mpz_t y, b, t;
                     unsigned int r, m;
 
@@ -1824,8 +1826,13 @@ namespace nil {
                         for(m = 1; mpz_cmp_ui(t, 1); m++) {
                             mpz_mul(t, t, t);
                             mpz_mod(t, t, p.data());
+                            if (m >= r) {
+                                return negone;
+                            }
                         }
-
+                        if (m >= r) {
+                            return negone;
+                        }
                         mpz_set_ui(t, 0);
                         mpz_setbit(t, r - m - 1);
                         mpz_powm(t, y, t, p.data());

@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2018-2020 Pavel Kharitonov <ipavrus@nil.foundation>
+// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -29,12 +30,15 @@
 
 #if defined(TEST_GMP)
 #include <nil/crypto3/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp_modular.hpp>
 #endif
 #if defined(TEST_TOMMATH)
 #include <nil/crypto3/multiprecision/tommath.hpp>
+#include <nil/crypto3/multiprecision/tommath_modular.hpp>
 #endif
 #if defined(TEST_CPP_INT)
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_modular.hpp>
 #endif
 
 #include <nil/crypto3/multiprecision/ressol.hpp>
@@ -60,37 +64,57 @@ using namespace nil::crypto3::multiprecision;
 template<typename T>
 void test() {
     using namespace nil::crypto3::multiprecision;
-
+    BOOST_CHECK_EQUAL(ressol(T(0), T(11)), 0);
+    BOOST_CHECK_EQUAL(ressol(T(2), T(11)), -1);
     BOOST_CHECK_EQUAL(ressol(T(5), T(11)), 4);
+    BOOST_CHECK_EQUAL(ressol(T(10), T(11)), -1);
     BOOST_CHECK_EQUAL(ressol(T(5),
                              T("686479766013060971498190079908139321726943530014330540939446345918554318339765605212255"
                                "9640661454554977296311391480858037121987999716643812574028291115057151")),
                       T("5128001483797946816458955548662741861156429216952843873274631897232136999791540518339021539968"
                         "609345897897688700798659762992302941280478805021587896033442584"));
-    // TODO: check if number prime?
+    BOOST_CHECK_EQUAL(ressol(T("20749193632488214633180774027217139706413443729200940480695355894185"),
+                             T("26959946667150639794667015087019630673557916260026308143510066298881")),
+                      T("1825097171398375765346899906888660610489759292065918530856859649959"));
+    BOOST_CHECK_EQUAL(
+        ressol(T(1024), T("0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff")), 32);
+    BOOST_CHECK_EQUAL(ressol(T(1024), T(174763)), 174731);
+    BOOST_CHECK_EQUAL(
+        ressol(T(16), T("0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff")), 4);
+    BOOST_CHECK_EQUAL(
+        ressol(T(120846049), T("0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff")),
+        T("0x40000000000000000000000000000000000000000000000000000000000c100000000000000d50e"));
+
+#ifndef TEST_TOMMATH
+    BOOST_CHECK_EQUAL(ressol(T(64), T(85)), -1);
     BOOST_CHECK_EQUAL(ressol(T(4),
                              T("686479766013060971498190079908139321726943530014330540939446345918554318339765605212255"
                                "9640661454554977296311391480858037121987999716643812574028291115057149")),
                       -1);
-    BOOST_CHECK_EQUAL(ressol(T("20749193632488214633180774027217139706413443729200940480695355894185"),
-                             T("26959946667150639794667015087019630673557916260026308143510066298881")),
-                      T("1825097171398375765346899906888660610489759292065918530856859649959"));
     BOOST_CHECK_EQUAL(ressol(T(64), T(85)), -1);
     BOOST_CHECK_EQUAL(ressol(T(181), T(217)), -1);
     BOOST_CHECK_EQUAL(ressol(T(4225), T(33153)), -1);
     BOOST_CHECK_EQUAL(ressol(T(2048), T(31417)), -1);
     BOOST_CHECK_EQUAL(ressol(T(2), T(4369)), -1);
     BOOST_CHECK_EQUAL(
-        ressol(T(1024), T("0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff")), 32);
-    BOOST_CHECK_EQUAL(ressol(T(1024), T(174763)), 174731);
-    BOOST_CHECK_EQUAL(
         ressol(T(1025), T("0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff")),
         T("7195614950510915163755738138441999335431224576038191833055420996031360079131617522512565985187"));
-    BOOST_CHECK_EQUAL(
-        ressol(T(16), T("0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff")), 4);
-    BOOST_CHECK_EQUAL(
-        ressol(T(120846049), T("0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff")),
-        T("0x40000000000000000000000000000000000000000000000000000000000c100000000000000d50e"));
+#endif
+}
+
+template<typename T>
+void test_backend_gmp() {
+
+    using namespace nil::crypto3::multiprecision;
+    number<T> res;
+
+    number<backends::modular_adaptor<T>> modular;
+
+    // in modular adaptor: (-1) = p - 1
+
+    modular = number<backends::modular_adaptor<T>>(5, 11);
+//    modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
+//    BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(4));
 }
 
 template<typename T>
@@ -105,15 +129,15 @@ void test_backend() {
 
     modular = number<backends::modular_adaptor<T>>(5, 11);
     modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
-    BOOST_CHECK_EQUAL(cpp_int(res.backend()), cpp_int(4));
+    BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(4));
 
     modular = number<backends::modular_adaptor<T>>(
         5,
         "68647976601306097149819007990813932172694353001433054093944634591855431833976560521225596406614545549772963113"
         "91480858037121987999716643812574028291115057151");
     modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
-    BOOST_CHECK_EQUAL(cpp_int(res.backend()),
-                      cpp_int("5128001483797946816458955548662741861156429216952843873274631897232136999791540518339021"
+    BOOST_CHECK_EQUAL(number<T>(res.backend()),
+                      number<T>("5128001483797946816458955548662741861156429216952843873274631897232136999791540518339021"
                               "539968609345897897688700798659762992302941280478805021587896033442584"));
 
     modular = number<backends::modular_adaptor<T>>(
@@ -121,61 +145,61 @@ void test_backend() {
         "68647976601306097149819007990813932172694353001433054093944634591855431833976560521225596406614545549772963113"
         "91480858037121987999716643812574028291115057149");
     modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
-    BOOST_CHECK_EQUAL(cpp_int(res.backend()), cpp_int(-1) + cpp_int(modular.backend().mod_data().get_mod()));
+    BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(-1) + number<T>(modular.backend().mod_data().get_mod()));
 
     modular =
         number<backends::modular_adaptor<T>>("20749193632488214633180774027217139706413443729200940480695355894185",
                                              "26959946667150639794667015087019630673557916260026308143510066298881");
     modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
-    BOOST_CHECK_EQUAL(cpp_int(res.backend()),
-                      cpp_int("1825097171398375765346899906888660610489759292065918530856859649959"));
+    BOOST_CHECK_EQUAL(number<T>(res.backend()),
+                      number<T>("1825097171398375765346899906888660610489759292065918530856859649959"));
 
     modular = number<backends::modular_adaptor<T>>(64, 85);
     modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
-    BOOST_CHECK_EQUAL(cpp_int(res.backend()), cpp_int(-1) + cpp_int(modular.backend().mod_data().get_mod()));
+    BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(-1) + number<T>(modular.backend().mod_data().get_mod()));
 
     modular = number<backends::modular_adaptor<T>>(181, 217);
     modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
-    BOOST_CHECK_EQUAL(cpp_int(res.backend()), cpp_int(-1) + cpp_int(modular.backend().mod_data().get_mod()));
+    BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(-1) + number<T>(modular.backend().mod_data().get_mod()));
 
     modular = number<backends::modular_adaptor<T>>(4225, 33153);
     modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
-    BOOST_CHECK_EQUAL(cpp_int(res.backend()), cpp_int(-1) + cpp_int(modular.backend().mod_data().get_mod()));
+    BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(-1) + number<T>(modular.backend().mod_data().get_mod()));
 
     modular = number<backends::modular_adaptor<T>>(2048, 31417);
     modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
-    BOOST_CHECK_EQUAL(cpp_int(res.backend()), cpp_int(-1) + cpp_int(modular.backend().mod_data().get_mod()));
+    BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(-1) + number<T>(modular.backend().mod_data().get_mod()));
 
     modular = number<backends::modular_adaptor<T>>(2, 4369);
     modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
-    BOOST_CHECK_EQUAL(cpp_int(res.backend()), cpp_int(-1) + cpp_int(modular.backend().mod_data().get_mod()));
+    BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(-1) + number<T>(modular.backend().mod_data().get_mod()));
 
     modular = number<backends::modular_adaptor<T>>(
         1024, "0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff");
     modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
-    BOOST_CHECK_EQUAL(cpp_int(res.backend()), cpp_int(32));
+    BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(32));
 
     modular = number<backends::modular_adaptor<T>>(1024, 174763);
     modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
-    BOOST_CHECK_EQUAL(cpp_int(res.backend()), cpp_int(174731));
+    BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(174731));
 
     modular = number<backends::modular_adaptor<T>>(
         1025, "0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff");
     modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
     BOOST_CHECK_EQUAL(
-        cpp_int(res.backend()),
-        cpp_int("7195614950510915163755738138441999335431224576038191833055420996031360079131617522512565985187"));
+        number<T>(res.backend()),
+        number<T>("7195614950510915163755738138441999335431224576038191833055420996031360079131617522512565985187"));
 
     modular = number<backends::modular_adaptor<T>>(
         16, "0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff");
     modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
-    BOOST_CHECK_EQUAL(cpp_int(res.backend()), cpp_int(4));
+    BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(4));
 
     modular = number<backends::modular_adaptor<T>>(
         120846049, "0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff");
     modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
-    BOOST_CHECK_EQUAL(cpp_int(res.backend()),
-                      cpp_int("0x40000000000000000000000000000000000000000000000000000000000c100000000000000d50e"));
+    BOOST_CHECK_EQUAL(number<T>(res.backend()),
+                      number<T>("0x40000000000000000000000000000000000000000000000000000000000c100000000000000d50e"));
 }
 
 #if defined(TEST_CPP_INT)
@@ -349,11 +373,12 @@ int main() {
     constexpr bool res1 = test_static();
     constexpr bool res2 = test_backend_static();
 #endif
-#ifdef TEST_GMP
-//    test<nil::crypto3::multiprecision::mpz_int>();
+#if defined(TEST_GMP)
+    test<nil::crypto3::multiprecision::mpz_int>();
+    test_backend<gmp_int>();
 #endif
 #if defined(TEST_TOMMATH)
-//    test<nil::crypto3::multiprecision::tom_int>();
+    test<nil::crypto3::multiprecision::tom_int>();
 #endif
 
     return boost::report_errors();

@@ -537,8 +537,6 @@ namespace nil {
                 template<typename Backend>
                 constexpr modular_adaptor<Backend> eval_ressol(const modular_adaptor<Backend>& input) {
 
-//                    number<Backend, ExpressionTemplates> new_base, res;
-//                    number<modular_adaptor<Backend>, ExpressionTemplates> res_mod;
                     number<Backend> new_base, res;
                     number<modular_adaptor<Backend>> res_mod;
 
