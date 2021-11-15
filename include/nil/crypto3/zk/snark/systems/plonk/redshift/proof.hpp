@@ -34,7 +34,7 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename CurveType, typename Hash, typename CommitmentSchemeType>
+                template<typename CommitmentSchemeType>
                 struct redshift_proof {
 
                     std::vector<typename CommitmentSchemeType::commitment_type> f_commitments;

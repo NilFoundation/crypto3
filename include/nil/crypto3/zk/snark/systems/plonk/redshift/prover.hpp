@@ -34,10 +34,10 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename CurveType, std::size_t lambda, std::size_t m=2>
+                template<typename FieldType, std::size_t lambda, std::size_t m=2>
                 class redshift_prover {
 
-                    using types_policy = redshift_types_policy<TCurve>;
+                    using types_policy = redshift_types_policy<FieldType>;
                     using transcript_manifest = types_policy::prover_fiat_shamir_heuristic_manifest<6>;
 
                     typedef hashes::sha2<256> merkle_hash_type;
@@ -48,9 +48,9 @@ namespace nil {
                     constexpr static const std::size_t k = ...;
                     constexpr static const std::size_t r = ...;
 
-                    constexpr static const typename TCurve::scalar_field_type::value_type omega = 
-                        algebra::get_root_of_unity<typename TCurve::scalar_field_type>()
-                    typedef list_polynomial_commitment_scheme<typename CurveType::scalar_field_type, 
+                    constexpr static const typename FieldType::value_type omega = 
+                        algebra::get_root_of_unity<FieldType>()
+                    typedef list_polynomial_commitment_scheme<FieldType, 
                         Hash, lambda, k, r, m> lpc;
 
                 public:
@@ -69,7 +69,7 @@ namespace nil {
                         ... setup_values = ...;
                         transcript(setup_values);
 
-                        std::vector<math::polynomial::polynom<typename TCurve::scalar_field_type::value_type>> f(N_wires);
+                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> f(N_wires);
 
                         std::vector<merkle_tree_type> f_trees;
                         std::vector<typename lpc::commitment_type> f_commitments;
@@ -87,18 +87,18 @@ namespace nil {
                         typename transcript_hash_type::digest_type gamma_bytes =
                             transcript.get_challenge<transcript_manifest::challenges_ids::gamma>();
 
-                        typename TCurve::scalar_field_type::value_type beta =
-                            algebra::marshalling<TCurve::scalar_field_type>(beta_bytes);
-                        typename TCurve::scalar_field_type::value_type gamma =
-                            algebra::marshalling<TCurve::scalar_field_type>(gamma_bytes);
+                        typename FieldType::value_type beta =
+                            algebra::marshalling<FieldType>(beta_bytes);
+                        typename FieldType::value_type gamma =
+                            algebra::marshalling<FieldType>(gamma_bytes);
 
-                        std::vector<math::polynomial::polynom<typename TCurve::scalar_field_type::value_type>> p(N_perm);
-                        std::vector<math::polynomial::polynom<typename TCurve::scalar_field_type::value_type>> q(N_perm);
+                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> p(N_perm);
+                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> q(N_perm);
 
-                        math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> p1 = 
-                            math::polynomial::polynom<typename TCurve::scalar_field_type::value_type>::one();
-                        math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> q1 = 
-                            math::polynomial::polynom<typename TCurve::scalar_field_type::value_type>::one();
+                        math::polynomial::polynom<typename FieldType::value_type> p1 = 
+                            math::polynomial::polynom<typename FieldType::value_type>::one();
+                        math::polynomial::polynom<typename FieldType::value_type> q1 = 
+                            math::polynomial::polynom<typename FieldType::value_type>::one();
 
                         for (std::size_t j = 0; j < N_perm; j++) {
                             p.push_back(f[j] + beta * S_id[j] + gamma);
@@ -108,19 +108,19 @@ namespace nil {
                             q1 *= q[j];
                         }
 
-                        std::vector<std::pair<typename TCurve::scalar_field_type::value_type,
-                                              typename TCurve::scalar_field_type::value_type>>
+                        std::vector<std::pair<typename FieldType::value_type,
+                                              typename FieldType::value_type>>
                             P_interpolation_points(n + 1);
-                        std::vector<std::pair<typename TCurve::scalar_field_type::value_type,
-                                              typename TCurve::scalar_field_type::value_type>>
+                        std::vector<std::pair<typename FieldType::value_type,
+                                              typename FieldType::value_type>>
                             Q_interpolation_points(n + 1);
 
                         P_interpolation_points.push_back(std::make_pair(proving_key.omega, 1));
                         for (std::size_t i = 2; i <= n + 1; i++) {
-                            typename TCurve::scalar_field_type::value_type P_mul_result =
-                                typename TCurve::scalar_field_type::one();
-                            typename TCurve::scalar_field_type::value_type Q_mul_result =
-                                typename TCurve::scalar_field_type::one();
+                            typename FieldType::value_type P_mul_result =
+                                typename FieldType::one();
+                            typename FieldType::value_type Q_mul_result =
+                                typename FieldType::one();
                             for (std::size_t j = 1; j < i; j++) {
                                 P_mul_result *= p1(proving_key.omega.pow(i));
                                 Q_mul_result *= q1(proving_key.omega.pow(i));
@@ -130,9 +130,9 @@ namespace nil {
                             Q_interpolation_points.push_back(std::make_pair(proving_key.omega.pow(i), Q_mul_result));
                         }
 
-                        math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> P =
+                        math::polynomial::polynom<typename FieldType::value_type> P =
                             math::polynomial::Lagrange_interpolation(P_interpolation_points);
-                        math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> Q =
+                        math::polynomial::polynom<typename FieldType::value_type> Q =
                             math::polynomial::Lagrange_interpolation(Q_interpolation_points);
 
                         merkle_tree_type P_tree = lpc::commit(P);
@@ -143,14 +143,14 @@ namespace nil {
                         transcript(P_commitment);
                         transcript(Q_commitment);
 
-                        std::array<typename TCurve::scalar_field_type::value_type, 6> alphas;
+                        std::array<typename FieldType::value_type, 6> alphas;
                         for (std::size_t i = 0; i < 6; i++) {
                             typename transcript_hash_type::digest_type alpha_bytes =
                                 transcript.get_challenge<transcript_manifest::challenges_ids::alpha, i>();
-                            alphas[i] = (algebra::marshalling<typename TCurve::scalar_field_type>(alpha_bytes));
+                            alphas[i] = (algebra::marshalling<typename FieldType>(alpha_bytes));
                         }
 
-                        std::array<math::polynomial::polynom<typename TCurve::scalar_field_type::value_type>, 6> F;
+                        std::array<math::polynomial::polynom<typename FieldType::value_type>, 6> F;
                         F[0] = proving_key.L_basis[1] * (P - 1);
                         F[1] = proving_key.L_basis[1] * (Q - 1);
                         F[2] = P * p_1 - (P << 1);
@@ -166,15 +166,15 @@ namespace nil {
                             F[5] += proving_key.f_c[i];
                         }
 
-                        math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> F_consolidated = 0;
+                        math::polynomial::polynom<typename FieldType::value_type> F_consolidated = 0;
                         for (std::size_t i = 0; i < 6; i++) {
                             F_consolidated += a[i] * F[i];
                         }
 
-                        math::polynomial::polynom<typename TCurve::scalar_field_type::value_type> T_consolidated = 
+                        math::polynomial::polynom<typename FieldType::value_type> T_consolidated = 
                             F_consolidated / Z;
 
-                        std::vector<math::polynomial::polynom<typename TCurve::scalar_field_type::value_type>> T(N_perm + 1);
+                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> T(N_perm + 1);
                         T = separate_T(T_consolidated);
 
                         std::vector<merkle_tree_type> T_trees;
@@ -188,10 +188,10 @@ namespace nil {
                         typename transcript_hash_type::digest_type upsilon_bytes =
                             transcript.get_challenge<transcript_manifest::challenges_ids::upsilon>();
 
-                        typename TCurve::scalar_field_type::value_type upsilon =
-                            algebra::marshalling<TCurve::scalar_field_type>(upsilon_bytes);
+                        typename FieldType::value_type upsilon =
+                            algebra::marshalling<FieldType>(upsilon_bytes);
 
-                        std::array<typename TCurve::scalar_field_type::value_type, k> 
+                        std::array<typename FieldType::value_type, k> 
                             fT_evaluation_points = {upsilon};
                         std::vector<lpc::proof> f_lpc_proofs(N_wires);
 
@@ -199,7 +199,7 @@ namespace nil {
                             f_lpc_proofs.push_back(lpc::proof_eval(fT_evaluation_points, f_trees[i], f[i], ...));
                         }
 
-                        std::array<typename TCurve::scalar_field_type::value_type, k> 
+                        std::array<typename FieldType::value_type, k> 
                             PQ_evaluation_points = {upsilon, upsilon * omega};
                         lpc::proof P_lpc_proof = lpc::proof_eval(PQ_evaluation_points, P_tree, P, ...);
                         lpc::proof Q_lpc_proof = lpc::proof_eval(PQ_evaluation_points, Q_tree, Q, ...);

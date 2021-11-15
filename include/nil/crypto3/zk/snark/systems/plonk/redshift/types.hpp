@@ -81,7 +81,7 @@ namespace nil {
                          * about the structure for statistics purposes.
                          */
                         template <typename CommitmentSchemeType>
-                        typedef redshift_proof<CurveType, CommitmentSchemeType> proof_type;
+                        typedef redshift_proof<CommitmentSchemeType> proof_type;
 
                         template<std::size_t AlphasAmount = 6>
                         struct prover_fiat_shamir_heuristic_manifest {
