@@ -381,7 +381,9 @@ namespace nil {
                         process(group_value_type &point, TIter &iter) {
                         using field_type = typename group_value_type::field_type;
                         using integral_type = typename field_type::integral_type;
+
                         const std::size_t chunk_number = TSize / 8 + (TSize % 8 != 0);
+                        assert(chunk_number == 32);
 
                         integral_type int_v = read_data<TSize, integral_type, endianness>(iter);
                         if (int_v >= group_value_type::field_type::modulus) {
