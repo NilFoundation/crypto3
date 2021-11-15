@@ -716,6 +716,18 @@ namespace nil {
                     return result;
                 }
 
+                inline int eval_jacobi(const tommath_int &a, const tommath_int &p) {
+                    int result;
+                    detail::check_tommath_result(mp_jacobi(const_cast<::mp_int*>(&a.data()), const_cast<::mp_int*>(&p.data()), &result));
+                     return result;
+                }
+
+                inline tommath_int eval_ressol(const tommath_int &n, const tommath_int &p) {
+                    tommath_int result;
+                    detail::check_tommath_result(mp_sqrtmod_prime(const_cast<::mp_int*>(&n.data()), const_cast<::mp_int*>(&p.data()), const_cast<::mp_int*>(&result.data())));
+                    return result;
+                }
+
             }    // namespace backends
 
             using nil::crypto3::multiprecision::backends::tommath_int;

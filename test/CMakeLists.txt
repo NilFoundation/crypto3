@@ -1,6 +1,6 @@
 #---------------------------------------------------------------------------#
 # Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-# Copyright (c) 2018-2020 Alexey Moskvin
+# Copyright (c) 2018-2021 Aleksei Moskvin <alalmoskvin@gmail.com>
 #
 # Distributed under the Boost Software License, Version 1.0
 # See accompanying file LICENSE_1_0.txt or copy at
@@ -1647,10 +1647,12 @@ set_target_properties(${CURRENT_PROJECT_NAME}_test_cpp_int_snips PROPERTIES CXX_
 cm_test(NAME ${CURRENT_PROJECT_NAME}_test_cpp_int_import_export SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/cpp_int_import_export.cpp)
 target_link_libraries(${CURRENT_PROJECT_NAME}_test_cpp_int_import_export no_eh_support)
 add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_examples ${CURRENT_PROJECT_NAME}_test_cpp_int_import_export)
+set_target_properties(${CURRENT_PROJECT_NAME}_test_cpp_int_import_export PROPERTIES CXX_STANDARD 14)
 
 cm_test(NAME ${CURRENT_PROJECT_NAME}_test_cpp_bin_float_import_export SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/cpp_bin_float_import_export.cpp)
 target_link_libraries(${CURRENT_PROJECT_NAME}_test_cpp_bin_float_import_export no_eh_support)
 add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_examples ${CURRENT_PROJECT_NAME}_test_cpp_bin_float_import_export)
+set_target_properties(${CURRENT_PROJECT_NAME}_test_cpp_bin_float_import_export PROPERTIES CXX_STANDARD 14)
 
 cm_test(NAME ${CURRENT_PROJECT_NAME}_test_cpp_dec_float_snips SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/cpp_dec_float_snips.cpp)
 target_link_libraries(${CURRENT_PROJECT_NAME}_test_cpp_dec_float_snips no_eh_support)
@@ -1665,6 +1667,7 @@ set_target_properties(${CURRENT_PROJECT_NAME}_test_cpp_bin_float_snips PROPERTIE
 cm_test(NAME ${CURRENT_PROJECT_NAME}_test_debug_adaptor_snips SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/debug_adaptor_snips.cpp)
 target_link_libraries(${CURRENT_PROJECT_NAME}_test_debug_adaptor_snips no_eh_support)
 add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_examples ${CURRENT_PROJECT_NAME}_test_debug_adaptor_snips)
+set_target_properties(${CURRENT_PROJECT_NAME}_test_debug_adaptor_snips PROPERTIES CXX_STANDARD 14)
 
 if(FLOAT128_COMPILED)
     #TODO: fix this

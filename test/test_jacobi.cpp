@@ -1,6 +1,7 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright 2020 Mikhail Komarov. Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
+//  Copyright (c) 2020 Mikhail Komarov.
+//  Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifdef _MSC_VER
@@ -31,12 +32,13 @@
 #endif
 #if defined(TEST_CPP_INT)
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
-#endif
-
-#include <nil/crypto3/multiprecision/jacobi.hpp>
 #include <nil/crypto3/multiprecision/cpp_int/literals.hpp>
 
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256);
+
+#endif
+
+#include <nil/crypto3/multiprecision/jacobi.hpp>
 
 template<typename T>
 void test() {

@@ -12,7 +12,7 @@
 #include "test_arithmetic.hpp"
 
 template<>
-struct is_twos_complement_integer<nil::crypto3::multiprecision::tom_int> : public boost::mpl::false_ { };
+struct is_twos_complement_integer<nil::crypto3::multiprecision::tom_int> : public std::integral_constant<bool, false> { };
 
 int main() {
     test<nil::crypto3::multiprecision::number<

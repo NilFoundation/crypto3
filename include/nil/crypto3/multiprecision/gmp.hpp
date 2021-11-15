@@ -1780,6 +1780,80 @@ namespace nil {
                     return result;
                 }
 
+                inline int eval_jacobi(const gmp_int &a, const gmp_int &b) {
+                    return mpz_jacobi(a.data(), b.data());
+                }
+
+                gmp_int eval_ressol(const gmp_int &n, const gmp_int &p) {
+                    gmp_int result, negone, p_negone;
+                    mpz_set_si(result.data(), -1);
+                    mpz_set_si(negone.data(), -1);
+                    mpz_t y, b, t;
+                    unsigned int r, m;
+
+                    if (mpz_divisible_p(n.data(), p.data())) {
+                        mpz_set_ui(result.data(), 0);
+                        return result;
+                    }
+                    if (mpz_legendre(n.data(), p.data()) == -1)
+                        return result;
+
+                    mpz_init(b);
+                    mpz_init(t);
+                    mpz_init_set_ui(y, 2);
+                    while(mpz_legendre(y, p.data()) != -1)
+                        mpz_add_ui(y, y, 1);
+
+                    mpz_sub_ui(result.data(), p.data(), 1);
+                    r = mpz_scan1(result.data(), 0);
+                    mpz_tdiv_q_2exp(result.data(), result.data(), r);
+
+                    mpz_powm(y, y, result.data(), p.data());
+
+                    mpz_tdiv_q_2exp(result.data(), result.data(), 1);
+                    mpz_powm(b, n.data(), result.data(), p.data());
+
+                    mpz_mul(result.data(), n.data(), b);
+                    mpz_mod(result.data(), result.data(), p.data());
+
+                    mpz_mul(b, result.data(), b);
+                    mpz_mod(b, b, p.data());
+
+                    while(mpz_cmp_ui(b, 1)) {
+
+                        mpz_mul(t, b, b);
+                        mpz_mod(t, t, p.data());
+                        for(m = 1; mpz_cmp_ui(t, 1); m++) {
+                            mpz_mul(t, t, t);
+                            mpz_mod(t, t, p.data());
+                            if (m >= r) {
+                                return negone;
+                            }
+                        }
+                        if (m >= r) {
+                            return negone;
+                        }
+                        mpz_set_ui(t, 0);
+                        mpz_setbit(t, r - m - 1);
+                        mpz_powm(t, y, t, p.data());
+
+                        mpz_mul(y, t, t);
+
+                        r = m;
+
+                        mpz_mul(result.data(), result.data(), t);
+                        mpz_mod(result.data(), result.data(), p.data());
+
+                        mpz_mul(b, b, y);
+                        mpz_mod(b, b, p.data());
+                    }
+
+                    mpz_clear(y);
+                    mpz_clear(b);
+                    mpz_clear(t);
+                    return result;
+                }
+
                 struct gmp_rational;
                 void eval_add(gmp_rational& t, const gmp_rational& o);
 

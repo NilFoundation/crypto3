@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock.
 //  Copyright (c) 2019 Mikhail Komarov <nemo@nil.foundation>
-//  Copyright (c) 2019 Alexey Moskvin
+//  Copyright (c) 2019-2021 Aleksei Moskvin <alalmoskvin@gmail.com>
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
@@ -1048,11 +1048,23 @@ namespace nil {
                     return static_cast<Backend const&&>(m_backend);
                 }
                 //
+                // Modular number mod:
+                //
+                BOOST_MP_CXX14_CONSTEXPR
+                typename scalar_result_from_possible_modular<
+                    multiprecision::number<Backend, ExpressionTemplates>>::type
+                mod() const {
+                    return backend().mod_data().get_mod();
+                }
+                //
                 // Complex number real and imag:
                 //
                 BOOST_MP_CXX14_CONSTEXPR
                     typename scalar_result_from_possible_complex<number<Backend, ExpressionTemplates>>::type
                     real() const {
+                    typedef typename scalar_result_from_possible_complex<number<Backend, ExpressionTemplates>>::type cool_type;
+                    cool_type x;
+                    Backend y;
                     using default_ops::eval_real;
                     detail::scoped_default_precision<typename scalar_result_from_possible_complex<
                         multiprecision::number<Backend, ExpressionTemplates>>::type>

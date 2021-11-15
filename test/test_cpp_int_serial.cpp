@@ -59,7 +59,7 @@ T generate_random(unsigned bits_wanted) {
 }
 
 template<class T>
-void test_neg(const T& x, const boost::mpl::true_&) {
+void test_neg(const T& x, const std::integral_constant<bool, true>&) {
     T val = -x;
 #ifndef BOOST_NO_EXCEPTIONS
     try {
@@ -89,7 +89,7 @@ void test_neg(const T& x, const boost::mpl::true_&) {
 #endif
 }
 template<class T>
-void test_neg(const T&, const boost::mpl::false_&) {
+void test_neg(const T&, const std::integral_constant<bool, false>&) {
 }
 
 template<class T>
@@ -142,7 +142,7 @@ void test() {
             std::cout << e.what() << std::endl;
         }
 #endif
-        test_neg(val, boost::mpl::bool_<std::numeric_limits<T>::is_signed>());
+        test_neg(val, std::integral_constant<bool, std::numeric_limits<T>::is_signed>());
         //
         // Check to see if test is taking too long.
         // Tests run on the compiler farm time out after 300 seconds,

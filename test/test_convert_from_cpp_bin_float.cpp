@@ -68,7 +68,7 @@ T generate_random() {
 }
 
 template<class From, class To>
-void test_convert_neg_int(From from, const boost::mpl::true_&) {
+void test_convert_neg_int(From from, const std::integral_constant<bool, true>&) {
     from = -from;
     To t3(from);
     To t4 = from.template convert_to<To>();
@@ -76,12 +76,12 @@ void test_convert_neg_int(From from, const boost::mpl::true_&) {
     BOOST_CHECK_EQUAL(From(trunc(from)), From(t4));
 }
 template<class From, class To>
-void test_convert_neg_int(From const&, const boost::mpl::false_&) {
+void test_convert_neg_int(From const&, const std::integral_constant<bool, false>&) {
 }
 
 template<class From, class To>
-void test_convert_imp(boost::mpl::int_<number_kind_floating_point> const&,
-                      boost::mpl::int_<number_kind_integer> const&) {
+void test_convert_imp(std::integral_constant<int, number_kind_floating_point> const&,
+                      std::integral_constant<int, number_kind_integer> const&) {
     for (unsigned i = 0; i < 100; ++i) {
         From from = generate_random<From>();
         To t1(from);
@@ -94,7 +94,7 @@ void test_convert_imp(boost::mpl::int_<number_kind_floating_point> const&,
 }
 
 template<class From, class To>
-void test_convert_neg_rat(From from, const boost::mpl::true_&) {
+void test_convert_neg_rat(From from, const std::integral_constant<bool, true>&) {
     from = -from;
     To t3(from);
     To t4 = from.template convert_to<To>();
@@ -102,12 +102,12 @@ void test_convert_neg_rat(From from, const boost::mpl::true_&) {
     BOOST_CHECK_EQUAL(From(t4), from);
 }
 template<class From, class To>
-void test_convert_rat_int(From const&, const boost::mpl::false_&) {
+void test_convert_rat_int(From const&, const std::integral_constant<bool, false>&) {
 }
 
 template<class From, class To>
-void test_convert_imp(boost::mpl::int_<number_kind_floating_point> const&,
-                      boost::mpl::int_<number_kind_rational> const&) {
+void test_convert_imp(std::integral_constant<int, number_kind_floating_point> const&,
+                      std::integral_constant<int, number_kind_rational> const&) {
     for (unsigned i = 0; i < 100; ++i) {
         From from = generate_random<From>();
         To t1(from);
@@ -120,7 +120,7 @@ void test_convert_imp(boost::mpl::int_<number_kind_floating_point> const&,
 }
 
 template<class From, class To>
-void test_convert_neg_float(From from, const boost::mpl::true_&) {
+void test_convert_neg_float(From from, const std::integral_constant<bool, true>&) {
     from = -from;
     To t3(from);
     To t4 = from.template convert_to<To>();
@@ -130,12 +130,12 @@ void test_convert_neg_float(From from, const boost::mpl::true_&) {
     BOOST_CHECK_CLOSE_FRACTION(t4, answer, tol);
 }
 template<class From, class To>
-void test_convert_neg_float(From const&, const boost::mpl::false_&) {
+void test_convert_neg_float(From const&, const std::integral_constant<bool, false>&) {
 }
 
 template<class From, class To>
-void test_convert_imp(boost::mpl::int_<number_kind_floating_point> const&,
-                      boost::mpl::int_<number_kind_floating_point> const&) {
+void test_convert_imp(std::integral_constant<int, number_kind_floating_point> const&,
+                      std::integral_constant<int, number_kind_floating_point> const&) {
     for (unsigned i = 0; i < 100; ++i) {
         From from = generate_random<From>();
         To t1(from);

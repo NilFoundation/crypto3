@@ -14,9 +14,6 @@
 
 #include <nil/crypto3/multiprecision/detail/default_ops.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/cpp_int/cpp_int_config.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace multiprecision {
@@ -152,10 +149,10 @@ namespace nil {
 
                 /*
                                 template <typename Backend>
-                                inline void bigint_shr1(typename boost::mpl::front<typename
+                                inline void bigint_shr1(typename std::tuple_element<0, typename
                    Backend::unsigned_types>::type x[], size_t x_size, size_t word_shift, size_t bit_shift)
                                 {
-                                   typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
+                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
 
                                    const size_t top = x_size >= word_shift ? (x_size - word_shift) : 0;
 
@@ -177,11 +174,11 @@ namespace nil {
                                 }
 
                                 template <typename Backend>
-                                inline typename boost::mpl::front<typename Backend::unsigned_types>::type
-                   bigint_add2_nc( typename boost::mpl::front<typename Backend::unsigned_types>::type x[], size_t
-                   x_size, const typename boost::mpl::front<typename Backend::unsigned_types>::type y[], size_t y_size)
+                                inline typename std::tuple_element<0, typename Backend::unsigned_types>::type
+                   bigint_add2_nc( typename std::tuple_element<0, typename Backend::unsigned_types>::type x[], size_t
+                   x_size, const typename std::tuple_element<0, typename Backend::unsigned_types>::type y[], size_t y_size)
                                 {
-                                   typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
+                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
 
                                    ui_type carry = 0;
 
@@ -202,14 +199,14 @@ namespace nil {
                                 }
 
                                 template <typename Backend>
-                                inline typename boost::mpl::front<typename Backend::unsigned_types>::type
-                   bigint_cnd_sub( typename boost::mpl::front<typename Backend::unsigned_types>::type cnd, typename
-                   boost::mpl::front<typename Backend::unsigned_types>::type x[], size_t x_size, const typename
-                   boost::mpl::front<typename Backend::unsigned_types>::type y[], size_t y_size)
+                                inline typename std::tuple_element<0, typename Backend::unsigned_types>::type
+                   bigint_cnd_sub( typename std::tuple_element<0, typename Backend::unsigned_types>::type cnd, typename
+                   std::tuple_element<0, typename Backend::unsigned_types>::type x[], size_t x_size, const typename
+                   std::tuple_element<0, typename Backend::unsigned_types>::type y[], size_t y_size)
                                 {
                                    BOOST_ASSERT_MSG(x_size >= y_size, "Expected sizes");
 
-                                   typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
+                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
 
                                    const auto mask = CT::Mask<ui_type>::expand(cnd);
 
@@ -240,16 +237,16 @@ namespace nil {
                                 }
 
                                 template <typename Backend>
-                                inline typename boost::mpl::front<typename Backend::unsigned_types>::type
-                   bigint_cnd_add( typename boost::mpl::front<typename Backend::unsigned_types>::type       cnd,
-                                    typename boost::mpl::front<typename Backend::unsigned_types>::type       x[],
-                                    typename boost::mpl::front<typename Backend::unsigned_types>::type       x_size,
-                                    const typename boost::mpl::front<typename Backend::unsigned_types>::type y[], size_t
+                                inline typename std::tuple_element<0, typename Backend::unsigned_types>::type
+                   bigint_cnd_add( typename std::tuple_element<0, typename Backend::unsigned_types>::type       cnd,
+                                    typename std::tuple_element<0, typename Backend::unsigned_types>::type       x[],
+                                    typename std::tuple_element<0, typename Backend::unsigned_types>::type       x_size,
+                                    const typename std::tuple_element<0, typename Backend::unsigned_types>::type y[], size_t
                    y_size)
                                 {
                                    BOTAN_ASSERT(x_size >= y_size, "Expected sizes");
 
-                                   typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
+                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
 
                                    const auto mask = CT::Mask<ui_type>::expand(cnd);
 
@@ -280,11 +277,11 @@ namespace nil {
                                 }
 
                                 template <typename Backend>
-                                inline void bigint_cnd_abs(typename boost::mpl::front<typename
-                   Backend::unsigned_types>::type cnd, typename boost::mpl::front<typename
+                                inline void bigint_cnd_abs(typename std::tuple_element<0, typename
+                   Backend::unsigned_types>::type cnd, typename std::tuple_element<0, typename
                    Backend::unsigned_types>::type x[], size_t size)
                                 {
-                                   typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
+                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
                                    const auto                                                          mask =
                                 CT::Mask<ui_type>::expand(cnd);
 
@@ -297,12 +294,12 @@ namespace nil {
                                 }
 
                                 template <typename Backend>
-                                inline void bigint_cnd_swap(typename boost::mpl::front<typename
-                   Backend::unsigned_types>::type cnd, typename boost::mpl::front<typename
-                   Backend::unsigned_types>::type x[], typename boost::mpl::front<typename
+                                inline void bigint_cnd_swap(typename std::tuple_element<0, typename
+                   Backend::unsigned_types>::type cnd, typename std::tuple_element<0, typename
+                   Backend::unsigned_types>::type x[], typename std::tuple_element<0, typename
                    Backend::unsigned_types>::type y[], size_t size)
                                 {
-                                   typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
+                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
                                    const auto                                                          mask =
                                 CT::Mask<ui_type>::expand(cnd);
 
@@ -319,8 +316,8 @@ namespace nil {
                                 template <typename Backend>
                                 void eval_inverse_mod_odd_modulus(Backend& res, const Backend& n, const Backend& mod)
                                 {
-                                   typedef typename boost::mpl::front<typename Backend::signed_types>::type   si_type;
-                                   typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
+                                   typedef typename std::tuple_element<0, typename Backend::signed_types>::type   si_type;
+                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
 
                                    // Caller should assure these preconditions:
                                    BOOST_ASSERT(eval_gt(n, 0));
@@ -538,7 +535,7 @@ namespace nil {
                                 template <typename Backend>
                                 Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
                                 {
-                                   typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;*/
+                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;*/
                 /*
                  * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
                  * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.

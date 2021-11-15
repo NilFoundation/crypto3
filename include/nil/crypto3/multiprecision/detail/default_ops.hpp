@@ -1785,7 +1785,13 @@ namespace nil {
                 inline BOOST_MP_CXX14_CONSTEXPR int eval_signbit(const T& val) {
                     return eval_get_sign(val) < 0 ? 1 : 0;
                 }
-
+                //
+                // Mod in modular number:
+                //
+                template<class To, class From>
+                inline BOOST_MP_CXX14_CONSTEXPR void eval_mod(To& to, const From& from) {
+                    to = from;
+                }
                 //
                 // Real and imaginary parts:
                 //

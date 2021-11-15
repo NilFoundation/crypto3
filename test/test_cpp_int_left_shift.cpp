@@ -65,12 +65,12 @@ void test_value(const T& val) {
     }
 }
 
-void test(const boost::mpl::int_<200>&) {
+void test(const std::integral_constant<int, 200>&) {
 }
 
 template<int N>
-void test(boost::mpl::int_<N> const&) {
-    test(boost::mpl::int_<N + 4>());
+void test(std::integral_constant<int, N> const&) {
+    test(std::integral_constant<int, N + 4>());
 
     typedef nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::cpp_int_backend<N, N, nil::crypto3::multiprecision::unsigned_magnitude>,
@@ -87,6 +87,6 @@ void test(boost::mpl::int_<N> const&) {
 }
 
 int main() {
-    test(boost::mpl::int_<24>());
+    test(std::integral_constant<int, 24>());
     return boost::report_errors();
 }

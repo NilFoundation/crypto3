@@ -73,7 +73,7 @@ T generate_random(unsigned bits_wanted) {
 }
 
 template<class From, class To>
-void test_convert_neg_val(From from, const boost::mpl::true_&) {
+void test_convert_neg_val(From from, const std::integral_constant<bool, true>&) {
     from = -from;
     typename component_type<From>::type answer = numerator(from) / denominator(from);
     To t3(from);
@@ -82,11 +82,11 @@ void test_convert_neg_val(From from, const boost::mpl::true_&) {
     BOOST_CHECK_EQUAL(answer.str(), t4.str());
 }
 template<class From, class To>
-void test_convert_neg_val(From const&, const boost::mpl::false_&) {
+void test_convert_neg_val(From const&, const std::integral_constant<bool, false>&) {
 }
 
 template<class From, class To>
-void test_convert_imp(boost::mpl::int_<number_kind_rational> const&, boost::mpl::int_<number_kind_integer> const&) {
+void test_convert_imp(std::integral_constant<int, number_kind_rational> const&, std::integral_constant<int, number_kind_integer> const&) {
     int bits_wanted = (std::min)((std::min)(std::numeric_limits<From>::digits, std::numeric_limits<To>::digits), 2000);
 
     for (unsigned i = 0; i < 100; ++i) {
@@ -102,7 +102,7 @@ void test_convert_imp(boost::mpl::int_<number_kind_rational> const&, boost::mpl:
 }
 
 template<class From, class To>
-void test_convert_neg_float_val(From from, To const& tol, const boost::mpl::true_&) {
+void test_convert_neg_float_val(From from, To const& tol, const std::integral_constant<bool, true>&) {
     from = -from;
     To answer = To(numerator(from)) / To(denominator(from));
     To t3(from);
@@ -111,12 +111,12 @@ void test_convert_neg_float_val(From from, To const& tol, const boost::mpl::true
     BOOST_CHECK_CLOSE_FRACTION(answer, t4, tol);
 }
 template<class From, class To>
-void test_convert_neg_float_val(From const&, To const&, const boost::mpl::false_&) {
+void test_convert_neg_float_val(From const&, To const&, const std::integral_constant<bool, false>&) {
 }
 
 template<class From, class To>
-void test_convert_imp(boost::mpl::int_<number_kind_rational> const&,
-                      boost::mpl::int_<number_kind_floating_point> const&) {
+void test_convert_imp(std::integral_constant<int, number_kind_rational> const&,
+                      std::integral_constant<int, number_kind_floating_point> const&) {
     int bits_wanted = (std::min)((std::min)(std::numeric_limits<From>::digits, std::numeric_limits<To>::digits), 2000);
 
     for (unsigned i = 0; i < 100; ++i) {
@@ -136,7 +136,7 @@ void test_convert_imp(boost::mpl::int_<number_kind_rational> const&,
 }
 
 template<class From, class To>
-void test_convert_neg_rat_val(From from, const boost::mpl::true_&) {
+void test_convert_neg_rat_val(From from, const std::integral_constant<bool, true>&) {
     from = -from;
     To t3(from);
     To t4 = from.template convert_to<To>();
@@ -144,11 +144,11 @@ void test_convert_neg_rat_val(From from, const boost::mpl::true_&) {
     BOOST_CHECK_EQUAL(from.str(), t4.str());
 }
 template<class From, class To>
-void test_convert_neg_rat_val(From const&, const boost::mpl::false_&) {
+void test_convert_neg_rat_val(From const&, const std::integral_constant<bool, false>&) {
 }
 
 template<class From, class To>
-void test_convert_imp(boost::mpl::int_<number_kind_rational> const&, boost::mpl::int_<number_kind_rational> const&) {
+void test_convert_imp(std::integral_constant<int, number_kind_rational> const&, std::integral_constant<int, number_kind_rational> const&) {
     int bits_wanted = (std::min)((std::min)(std::numeric_limits<From>::digits, std::numeric_limits<To>::digits), 2000);
 
     for (unsigned i = 0; i < 100; ++i) {
