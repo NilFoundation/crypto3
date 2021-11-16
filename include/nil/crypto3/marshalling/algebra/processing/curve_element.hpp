@@ -38,6 +38,7 @@
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/curve25519.hpp>
+#include <nil/crypto3/algebra/curves/jubjub.hpp>
 
 #include <nil/crypto3/marshalling/multiprecision/processing/integral.hpp>
 
@@ -47,257 +48,443 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace processing {
+                // TODO: add marshaling algorithm specification template parameter and specialize parameters depending
+                //  on the algorithm and curve group if needed
+                template<typename Group>
+                struct curve_element_marshalling_params {
+                    using group_type = Group;
 
-                template<std::size_t TSize, typename Endianness, typename G1GroupElement, typename TIter>
-                typename std::enable_if<std::is_same<typename algebra::curves::bls12_381::g1_type<
-                                                         typename G1GroupElement::coordinates,
-                                                         algebra::curves::forms::short_weierstrass>::value_type,
-                                                     G1GroupElement>::value,
-                                        void>::type
-                    curve_element_write_data(const G1GroupElement &point, TIter &iter) {
+                    static constexpr std::size_t length() {
+                        return bit_length() / 8 + ((bit_length() % 8) != 0);
+                    }
 
-                    using chunk_type = typename TIter::value_type;
+                    static constexpr std::size_t min_length() {
+                        return length();
+                    }
 
-                    constexpr static const chunk_type I_bit = 0x40;
+                    static constexpr std::size_t max_length() {
+                        return length();
+                    }
 
-                    typename G1GroupElement::group_type::curve_type::template g1_type<
-                        typename algebra::curves::coordinates::affine,
-                        typename G1GroupElement::form>::value_type point_affine = point.to_affine();
-                    chunk_type m_unit = detail::evaluate_m_unit<chunk_type>(point_affine, true);
-                    // TODO: check possibilities for TA
+                    static constexpr std::size_t bit_length() {
+                        return group_type::field_type::value_bits;
+                    }
 
-                    if (!(I_bit & m_unit)) {
+                    static constexpr std::size_t min_bit_length() {
+                        return bit_length();
+                    }
 
-                        // We assume here, that write_data doesn't change the iter
-                        write_data<TSize, Endianness>(
-                            point_affine.X.data
-                                .template convert_to<typename G1GroupElement::field_type::integral_type>(),
+                    static constexpr std::size_t max_bit_length() {
+                        return bit_length();
+                    }
+                };
+
+                // TODO: do not specify marshaling algorithm by curve group, instead specify marshalling procedure only
+                //  by form, coordinates and specification policy
+                template<typename Endianness, typename Group>
+                struct curve_element_writer;
+
+                // TODO: do not specify marshaling algorithm by curve group, instead specify marshalling procedure only
+                //  by form, coordinates and specification policy
+                template<typename Endianness, typename Group>
+                struct curve_element_reader;
+
+                template<typename Endianness, typename Coordinates>
+                struct curve_element_writer<
+                    Endianness,
+                    typename algebra::curves::bls12_381::template g1_type<Coordinates,
+                                                                          algebra::curves::forms::short_weierstrass>> {
+                    using group_type = typename algebra::curves::bls12_381::
+                        template g1_type<Coordinates, algebra::curves::forms::short_weierstrass>;
+                    using group_value_type = typename group_type::value_type;
+                    using coordinates = typename group_value_type::coordinates;
+                    using form = typename group_value_type::form;
+                    using endianness = Endianness;
+                    using params_type = curve_element_marshalling_params<group_type>;
+
+                    template<typename TIter>
+                    static nil::marshalling::status_type process(const group_value_type &point, TIter &iter) {
+                        using chunk_type = typename TIter::value_type;
+
+                        constexpr static const chunk_type I_bit = 0x40;
+                        typename group_type::curve_type::template g1_type<typename algebra::curves::coordinates::affine,
+                                                                          form>::value_type point_affine =
+                            point.to_affine();
+                        chunk_type m_unit = detail::evaluate_m_unit<chunk_type>(point_affine, true);
+                        if (!(I_bit & m_unit)) {
+                            // We assume here, that write_data doesn't change the iter
+                            write_data<params_type::bit_length(), endianness>(
+                                static_cast<typename group_value_type::field_type::integral_type>(point_affine.X.data),
+                                iter);
+                        }
+                        (*iter) |= m_unit;
+
+                        return nil::marshalling::status_type::success;
+                    }
+                };
+
+                template<typename Endianness, typename Coordinates>
+                struct curve_element_writer<
+
+                    Endianness,
+                    typename algebra::curves::bls12_381::template g2_type<Coordinates,
+                                                                          algebra::curves::forms::short_weierstrass>> {
+                    using group_type = typename algebra::curves::bls12_381::
+                        template g2_type<Coordinates, algebra::curves::forms::short_weierstrass>;
+                    using group_value_type = typename group_type::value_type;
+                    using coordinates = typename group_value_type::coordinates;
+                    using form = typename group_value_type::form;
+                    using endianness = Endianness;
+                    using params_type = curve_element_marshalling_params<group_type>;
+
+                    template<typename TIter>
+                    static nil::marshalling::status_type process(const group_value_type &point, TIter &iter) {
+                        using chunk_type = typename TIter::value_type;
+
+                        constexpr static const std::size_t sizeof_field_element =
+                            params_type::bit_length() / (group_value_type::field_type::arity);
+                        constexpr static const std::size_t units_bits = 8;
+                        constexpr static const std::size_t chunk_bits = sizeof(typename TIter::value_type) * units_bits;
+                        constexpr static const std::size_t sizeof_field_element_chunks_count =
+                            (sizeof_field_element / chunk_bits) + ((sizeof_field_element % chunk_bits) ? 1 : 0);
+
+                        constexpr static const chunk_type I_bit = 0x40;
+                        typename group_type::curve_type::template g2_type<typename algebra::curves::coordinates::affine,
+                                                                          form>::value_type point_affine =
+                            point.to_affine();
+                        chunk_type m_unit = detail::evaluate_m_unit<chunk_type>(point_affine, true);
+                        if (!(I_bit & m_unit)) {
+                            TIter write_iter = iter;
+                            // We assume here, that write_data doesn't change the iter
+                            write_data<sizeof_field_element, endianness>(
+                                static_cast<typename group_value_type::field_type::integral_type>(
+                                    point_affine.X.data[1].data),
+                                write_iter);
+                            write_iter += sizeof_field_element_chunks_count;
+                            // We assume here, that write_data doesn't change the iter
+                            write_data<sizeof_field_element, endianness>(
+                                static_cast<typename group_value_type::field_type::integral_type>(
+                                    point_affine.X.data[0].data),
+                                write_iter);
+                        }
+                        (*iter) |= m_unit;
+
+                        return nil::marshalling::status_type::success;
+                    }
+                };
+
+                template<typename Coordinates>
+                struct curve_element_writer<
+
+                    nil::marshalling::endian::little_endian,
+                    typename algebra::curves::curve25519::template g1_type<Coordinates,
+                                                                           algebra::curves::forms::twisted_edwards>> {
+                    using group_type =
+                        typename algebra::curves::curve25519::template g1_type<Coordinates,
+                                                                               algebra::curves::forms::twisted_edwards>;
+                    using group_value_type = typename group_type::value_type;
+                    using coordinates = typename group_value_type::coordinates;
+                    using form = typename group_value_type::form;
+                    using endianness = nil::marshalling::endian::little_endian;
+                    using params_type = curve_element_marshalling_params<group_type>;
+
+                    template<typename TIter>
+                    static typename std::enable_if<
+                        std::is_same<std::uint8_t, typename std::iterator_traits<TIter>::value_type>::value,
+                        nil::marshalling::status_type>::type
+                        process(const group_value_type &point, TIter &iter) {
+                        using base_field_type = typename group_type::field_type;
+                        using base_integral_type = typename base_field_type::integral_type;
+                        using group_affine_value_type =
+                            typename algebra::curves::curve25519::g1_type<algebra::curves::coordinates::affine,
+                                                                          form>::value_type;
+                        // TODO: somehow add size check of container pointed by iter
+                        constexpr std::size_t encoded_size = 32;
+                        static_assert(encoded_size ==
+                                          (params_type::bit_length() / 8 + (params_type::bit_length() % 8 ? 1 : 0)),
+                                      "wrong size");
+                        using encoded_value_type = std::array<std::uint8_t, encoded_size>;
+
+                        group_affine_value_type point_affine = point.to_affine();
+                        // TODO: remove crating of temporary array encoded_value
+                        encoded_value_type encoded_value;
+                        // TODO: remove lvalue iterator
+                        auto tmp_iter = std::begin(encoded_value);
+                        write_data<encoded_size, endianness>(static_cast<base_integral_type>(point_affine.Y.data),
+                                                             tmp_iter);
+                        // TODO: throw catchable error, for example return status
+                        assert(!(encoded_value[encoded_size - 1] & 0x80));
+                        encoded_value[encoded_size - 1] |=
+                            (static_cast<std::uint8_t>(static_cast<base_integral_type>(point_affine.X.data) & 1) << 7);
+
+                        std::copy(std::cbegin(encoded_value), std::cend(encoded_value), iter);
+
+                        return nil::marshalling::status_type::success;
+                    }
+                };
+
+                template<typename Coordinates>
+                struct curve_element_writer<
+                    nil::marshalling::endian::little_endian,
+                    typename algebra::curves::jubjub::template g1_type<Coordinates,
+                                                                       algebra::curves::forms::twisted_edwards>> {
+                    using group_type =
+                        typename algebra::curves::jubjub::template g1_type<Coordinates,
+                                                                           algebra::curves::forms::twisted_edwards>;
+                    using group_value_type = typename group_type::value_type;
+                    using coordinates = typename group_value_type::coordinates;
+                    using form = typename group_value_type::form;
+                    using endianness = nil::marshalling::endian::little_endian;
+                    using params_type = curve_element_marshalling_params<group_type>;
+
+                    /// https://zips.z.cash/protocol/protocol.pdf#concreteextractorjubjub
+                    template<typename TIter>
+                    static nil::marshalling::status_type process(const group_value_type &point, TIter &iter) {
+                       write_data<params_type::bit_length(), endianness>(
+                            static_cast<typename group_value_type::field_type::integral_type>(point.to_affine().X.data),
                             iter);
+
+                        return nil::marshalling::status_type::success;
                     }
-                    (*iter) |= m_unit;
-                }
+                };
 
-                template<std::size_t TSize, typename Endianness, typename G2GroupElement, typename TIter>
-                typename std::enable_if<std::is_same<typename algebra::curves::bls12_381::g2_type<
-                                                         typename G2GroupElement::coordinates,
-                                                         algebra::curves::forms::short_weierstrass>::value_type,
-                                                     G2GroupElement>::value,
-                                        void>::type
-                    curve_element_write_data(const G2GroupElement &point, TIter &iter) {
+                template<typename Endianness, typename Coordinates>
+                struct curve_element_reader<
+                    Endianness,
+                    typename algebra::curves::bls12_381::template g1_type<Coordinates,
+                                                                          algebra::curves::forms::short_weierstrass>> {
+                    using group_type = typename algebra::curves::bls12_381::
+                        template g1_type<Coordinates, algebra::curves::forms::short_weierstrass>;
+                    using group_value_type = typename group_type::value_type;
+                    using coordinates = typename group_value_type::coordinates;
+                    using form = typename group_value_type::form;
+                    using endianness = Endianness;
+                    using params_type = curve_element_marshalling_params<group_type>;
 
-                    using chunk_type = typename TIter::value_type;
+                    template<typename TIter>
+                    static nil::marshalling::status_type process(group_value_type &point, TIter &iter) {
+                        using chunk_type = typename TIter::value_type;
 
-                    constexpr static const std::size_t sizeof_field_element =
-                        TSize / (G2GroupElement::field_type::arity);
-                    constexpr static const std::size_t units_bits = 8;
-                    constexpr static const std::size_t chunk_bits = sizeof(typename TIter::value_type) * units_bits;
-                    constexpr static const std::size_t sizeof_field_element_chunks_count =
-                        (sizeof_field_element / chunk_bits) + ((sizeof_field_element % chunk_bits) ? 1 : 0);
+                        const chunk_type m_unit = *iter & 0xE0;
+                        BOOST_ASSERT(m_unit != 0x20 && m_unit != 0x60 && m_unit != 0xE0);
 
-                    constexpr static const chunk_type I_bit = 0x40;
+                        constexpr static const std::size_t sizeof_field_element =
+                            params_type::bit_length() / (group_value_type::field_type::arity);
+                        constexpr static const std::size_t units_bits = 8;
+                        constexpr static const std::size_t chunk_bits = sizeof(chunk_type) * units_bits;
+                        constexpr static const std::size_t sizeof_field_element_chunks_count =
+                            (sizeof_field_element / chunk_bits) + ((sizeof_field_element % chunk_bits) ? 1 : 0);
+                        using g1_value_type = group_value_type;
+                        using g1_field_type = typename group_value_type::field_type;
+                        using g1_field_value_type = typename g1_field_type::value_type;
+                        using integral_type = typename g1_value_type::field_type::integral_type;
 
-                    typename G2GroupElement::group_type::curve_type::template g2_type<
-                        typename algebra::curves::coordinates::affine,
-                        typename G2GroupElement::form>::value_type point_affine = point.to_affine();
-                    chunk_type m_unit = detail::evaluate_m_unit<chunk_type>(point_affine, true);
-                    // TODO: check possibilities for TA
+                        constexpr static const chunk_type I_bit = 0x40;
+                        constexpr static const chunk_type S_bit = 0x20;
 
-                    if (!(I_bit & m_unit)) {
+                        if (m_unit & I_bit) {
+                            BOOST_ASSERT(iter + sizeof_field_element_chunks_count ==
+                                         std::find(iter, iter + sizeof_field_element_chunks_count, true));
+                            point = g1_value_type();    // point at infinity
+                        }
 
-                        TIter write_iter = iter;
-                        // We assume here, that write_data doesn't change the iter
-                        write_data<sizeof_field_element, Endianness>(
-                            point_affine.X.data[1]
-                                .data.template convert_to<typename G2GroupElement::field_type::integral_type>(),
-                            write_iter);
+                        integral_type x = read_data<sizeof_field_element, integral_type, Endianness>(iter);
 
-                        write_iter += sizeof_field_element_chunks_count;
-                        // We assume here, that write_data doesn't change the iter
-                        write_data<sizeof_field_element, Endianness>(
-                            point_affine.X.data[0]
-                                .data.template convert_to<typename G2GroupElement::field_type::integral_type>(),
-                            write_iter);
+                        g1_field_value_type x_mod(x);
+                        g1_field_value_type y2_mod = x_mod.pow(3) + g1_field_value_type(4);
+                        BOOST_ASSERT(y2_mod.is_square());
+                        g1_field_value_type y_mod = y2_mod.sqrt();
+                        bool Y_bit = detail::sign_gf_p<g1_field_type>(y_mod);
+                        if (Y_bit == bool(m_unit & S_bit)) {
+                            g1_value_type result(x_mod, y_mod, g1_field_value_type::one());
+                            BOOST_ASSERT(result.is_well_formed());
+                            point = result;
+                        } else {
+                            g1_value_type result(x_mod, -y_mod, g1_field_value_type::one());
+                            BOOST_ASSERT(result.is_well_formed());
+                            point = result;
+                        }
+
+                        return nil::marshalling::status_type::success;
                     }
-                    (*iter) |= m_unit;
-                }
+                };
 
-                template<std::size_t TSize, typename Endianness, typename G1GroupElement, typename TIter>
-                typename std::enable_if<
+                template<typename Endianness, typename Coordinates>
+                struct curve_element_reader<
+                    Endianness,
+                    typename algebra::curves::bls12_381::template g2_type<Coordinates,
+                                                                          algebra::curves::forms::short_weierstrass>> {
+                    using group_type = typename algebra::curves::bls12_381::
+                        template g2_type<Coordinates, algebra::curves::forms::short_weierstrass>;
+                    using group_value_type = typename group_type::value_type;
+                    using coordinates = typename group_value_type::coordinates;
+                    using form = typename group_value_type::form;
+                    using endianness = Endianness;
+                    using params_type = curve_element_marshalling_params<group_type>;
 
-                    std::is_same<typename algebra::curves::curve25519::g1_type<
-                                     typename G1GroupElement::coordinates,
-                                     algebra::curves::forms::twisted_edwards>::value_type,
-                                 G1GroupElement>::value &&
-                        std::is_same<std::uint8_t, typename std::iterator_traits<TIter>::value_type>::value &&
-                        std::is_same<nil::marshalling::endian::little_endian, Endianness>::value,
-                    void>::type
-                    curve_element_write_data(const G1GroupElement &point, TIter &iter) {
-                    using group_value_type = G1GroupElement;
-                    using group_type = typename group_value_type::group_type;
-                    using base_field_type = typename group_type::field_type;
-                    using base_integral_type = typename base_field_type::integral_type;
-                    using group_affine_value_type =
-                        typename algebra::curves::curve25519::g1_type<algebra::curves::coordinates::affine,
-                                                                      typename G1GroupElement::form>::value_type;
-                    // TODO: somehow add size check of container pointed by iter
-                    constexpr std::size_t encoded_size = 32;
-                    static_assert(encoded_size == (TSize / 8 + (TSize % 8 ? 1 : 0)), "wrong size");
-                    using encoded_value_type = std::array<std::uint8_t, encoded_size>;
+                    template<typename TIter>
+                    static nil::marshalling::status_type process(group_value_type &point, TIter &iter) {
+                        using chunk_type = typename TIter::value_type;
 
-                    group_affine_value_type point_affine = point.to_affine();
-                    // TODO: remove crating of temporary array encoded_value
-                    encoded_value_type encoded_value;
-                    // TODO: remove lvalue iterator
-                    auto tmp_iter = std::begin(encoded_value);
-                    write_data<encoded_size, Endianness>(static_cast<base_integral_type>(point_affine.Y.data),
-                                                         tmp_iter);
-                    // TODO: throw catchable error, for example return status
-                    assert(!(encoded_value[encoded_size - 1] & 0x80));
-                    encoded_value[encoded_size - 1] |=
-                        (static_cast<std::uint8_t>(static_cast<base_integral_type>(point_affine.X.data) & 1) << 7);
+                        const chunk_type m_unit = *iter & 0xE0;
+                        BOOST_ASSERT(m_unit != 0x20 && m_unit != 0x60 && m_unit != 0xE0);
 
-                    std::copy(std::cbegin(encoded_value), std::cend(encoded_value), iter);
-                }
+                        constexpr static const std::size_t sizeof_field_element =
+                            params_type::bit_length() / (group_value_type::field_type::arity);
+                        constexpr static const std::size_t units_bits = 8;
+                        constexpr static const std::size_t chunk_bits = sizeof(chunk_type) * units_bits;
+                        constexpr static const std::size_t sizeof_field_element_chunks_count =
+                            (sizeof_field_element / chunk_bits) + ((sizeof_field_element % chunk_bits) ? 1 : 0);
+                        using g2_value_type = group_value_type;
+                        using g2_field_type = typename g2_value_type::field_type;
+                        using g2_field_value_type = typename g2_field_type::value_type;
+                        using integral_type = typename g2_value_type::field_type::integral_type;
 
-                template<std::size_t TSize, typename Endianness, typename G1GroupElement, typename TIter>
-                typename std::enable_if<std::is_same<typename algebra::curves::bls12_381::g1_type<
-                                                         typename G1GroupElement::coordinates,
-                                                         algebra::curves::forms::short_weierstrass>::value_type,
-                                                     G1GroupElement>::value,
-                                        G1GroupElement>::type
-                    curve_element_read_data(TIter &iter) {
+                        constexpr static const chunk_type I_bit = 0x40;
+                        constexpr static const chunk_type S_bit = 0x20;
 
-                    using chunk_type = typename TIter::value_type;
+                        if (m_unit & I_bit) {
+                            BOOST_ASSERT(iter + 2 * sizeof_field_element_chunks_count ==
+                                         std::find(iter, iter + 2 * sizeof_field_element_chunks_count, true));
+                            point = g2_value_type();    // point at infinity
+                        }
 
-                    const chunk_type m_unit = *iter & 0xE0;
-                    BOOST_ASSERT(m_unit != 0x20 && m_unit != 0x60 && m_unit != 0xE0);
+                        TIter read_iter = iter;
 
-                    constexpr static const std::size_t sizeof_field_element =
-                        TSize / (G1GroupElement::field_type::arity);
-                    constexpr static const std::size_t units_bits = 8;
-                    constexpr static const std::size_t chunk_bits = sizeof(chunk_type) * units_bits;
-                    constexpr static const std::size_t sizeof_field_element_chunks_count =
-                        (sizeof_field_element / chunk_bits) + ((sizeof_field_element % chunk_bits) ? 1 : 0);
-                    using g1_value_type = G1GroupElement;
-                    using g1_field_type = typename g1_value_type::field_type;
-                    using g1_field_value_type = typename g1_field_type::value_type;
+                        integral_type x_1 = read_data<sizeof_field_element, integral_type, endianness>(read_iter);
+                        read_iter += sizeof_field_element_chunks_count;
 
-                    constexpr static const chunk_type I_bit = 0x40;
-                    constexpr static const chunk_type S_bit = 0x20;
+                        integral_type x_0 = read_data<sizeof_field_element, integral_type, endianness>(read_iter);
 
-                    if (m_unit & I_bit) {
-                        BOOST_ASSERT(iter + sizeof_field_element_chunks_count ==
-                                     std::find(iter, iter + sizeof_field_element_chunks_count, true));
-                        return g1_value_type();    // point at infinity
+                        g2_field_value_type x_mod(x_0, x_1);
+                        g2_field_value_type y2_mod = x_mod.pow(3) + g2_field_value_type(4, 4);
+                        BOOST_ASSERT(y2_mod.is_square());
+                        g2_field_value_type y_mod = y2_mod.sqrt();
+                        bool Y_bit = detail::sign_gf_p<g2_field_type>(y_mod);
+                        if (Y_bit == bool(m_unit & S_bit)) {
+                            g2_value_type result(x_mod, y_mod, g2_field_value_type::one());
+                            BOOST_ASSERT(result.is_well_formed());
+                            point = result;
+                        } else {
+                            g2_value_type result(x_mod, -y_mod, g2_field_value_type::one());
+                            BOOST_ASSERT(result.is_well_formed());
+                            point = result;
+                        }
+
+                        return nil::marshalling::status_type::success;
                     }
+                };
 
-                    typename G1GroupElement::field_type::integral_type x =
-                        read_data<sizeof_field_element, typename G1GroupElement::field_type::integral_type, Endianness>(
-                            iter);
+                template<typename Coordinates>
+                struct curve_element_reader<
+                    nil::marshalling::endian::little_endian,
+                    typename algebra::curves::curve25519::template g1_type<Coordinates,
+                                                                           algebra::curves::forms::twisted_edwards>> {
+                    using group_type =
+                        typename algebra::curves::curve25519::template g1_type<Coordinates,
+                                                                               algebra::curves::forms::twisted_edwards>;
+                    using group_value_type = typename group_type::value_type;
+                    using coordinates = typename group_value_type::coordinates;
+                    using form = typename group_value_type::form;
+                    using endianness = nil::marshalling::endian::little_endian;
+                    using params_type = curve_element_marshalling_params<group_type>;
 
-                    g1_field_value_type x_mod(x);
-                    g1_field_value_type y2_mod = x_mod.pow(3) + g1_field_value_type(4);
-                    BOOST_ASSERT(y2_mod.is_square());
-                    g1_field_value_type y_mod = y2_mod.sqrt();
-                    bool Y_bit = detail::sign_gf_p<g1_field_type>(y_mod);
-                    if (Y_bit == bool(m_unit & S_bit)) {
-                        g1_value_type result(x_mod, y_mod, g1_field_value_type::one());
-                        BOOST_ASSERT(result.is_well_formed());
-                        return result;
+                    template<typename TIter>
+                    static typename std::enable_if<
+                        std::is_same<std::uint8_t, typename std::iterator_traits<TIter>::value_type>::value,
+                        nil::marshalling::status_type>::type
+                        process(group_value_type &point, TIter &iter) {
+                        // somehow add size check of container pointed by iter
+                        // assert(TSize == std::distance(first, last));
+                        using base_field_type = typename group_type::field_type;
+                        using base_integral_type = typename base_field_type::integral_type;
+                        using group_affine_value_type =
+                            typename algebra::curves::curve25519::g1_type<algebra::curves::coordinates::affine,
+                                                                          form>::value_type;
+                        constexpr std::size_t encoded_size = 32;
+                        static_assert(encoded_size ==
+                                          (params_type::bit_length() / 8 + (params_type::bit_length() % 8 ? 1 : 0)),
+                                      "wrong size");
+
+                        base_integral_type y =
+                            read_data<params_type::bit_length(), base_integral_type, endianness>(iter);
+                        bool sign = *(iter + encoded_size - 1) & (1 << 7);
+                        group_affine_value_type decoded_point_affine =
+                            detail::recover_x<group_affine_value_type>(y, sign);
+
+                        // TODO: remove hard-coded call for type conversion, implement type conversion between
+                        // coordinates
+                        //  through operator
+                        point = decoded_point_affine.to_extended_with_a_minus_1();
+
+                        return nil::marshalling::status_type::success;
                     }
-                    g1_value_type result(x_mod, -y_mod, g1_field_value_type::one());
-                    BOOST_ASSERT(result.is_well_formed());
-                    return result;
-                }
+                };
 
-                template<std::size_t TSize, typename Endianness, typename G2GroupElement, typename TIter>
-                typename std::enable_if<std::is_same<typename algebra::curves::bls12_381::g2_type<
-                                                         typename G2GroupElement::coordinates,
-                                                         algebra::curves::forms::short_weierstrass>::value_type,
-                                                     G2GroupElement>::value,
-                                        G2GroupElement>::type
-                    curve_element_read_data(TIter &iter) {
+                template<>
+                struct curve_element_reader<
+                    nil::marshalling::endian::little_endian,
+                    typename algebra::curves::jubjub::template g1_type<algebra::curves::coordinates::affine,
+                                                                       algebra::curves::forms::twisted_edwards>> {
+                    using group_type =
+                        typename algebra::curves::jubjub::template g1_type<algebra::curves::coordinates::affine,
+                                                                           algebra::curves::forms::twisted_edwards>;
+                    using group_value_type = typename group_type::value_type;
+                    using coordinates = typename group_value_type::coordinates;
+                    using form = typename group_value_type::form;
+                    using endianness = nil::marshalling::endian::little_endian;
+                    using params_type = curve_element_marshalling_params<group_type>;
 
-                    using chunk_type = typename TIter::value_type;
+                    /// abst_J(LEOS2BSP_{256}(iter))
+                    /// See https://zips.z.cash/protocol/protocol.pdf#concretegrouphashjubjub
+                    template<typename TIter>
+                    static typename std::enable_if<
+                        std::is_same<std::uint8_t, typename std::iterator_traits<TIter>::value_type>::value,
+                        nil::marshalling::status_type>::type
+                        process(group_value_type &point, TIter &iter) {
+                        using field_type = typename group_value_type::field_type;
+                        using integral_type = typename field_type::integral_type;
 
-                    const chunk_type m_unit = *iter & 0xE0;
-                    BOOST_ASSERT(m_unit != 0x20 && m_unit != 0x60 && m_unit != 0xE0);
+                        const std::size_t chunk_number =
+                            params_type::bit_length() / 8 + (params_type::bit_length() % 8 != 0);
+                        assert(chunk_number == 32);
 
-                    constexpr static const std::size_t sizeof_field_element =
-                        TSize / (G2GroupElement::field_type::arity);
-                    constexpr static const std::size_t units_bits = 8;
-                    constexpr static const std::size_t chunk_bits = sizeof(chunk_type) * units_bits;
-                    constexpr static const std::size_t sizeof_field_element_chunks_count =
-                        (sizeof_field_element / chunk_bits) + ((sizeof_field_element % chunk_bits) ? 1 : 0);
-                    using g2_value_type = G2GroupElement;
-                    using g2_field_type = typename g2_value_type::field_type;
-                    using g2_field_value_type = typename g2_field_type::value_type;
+                        integral_type int_v = read_data<params_type::bit_length(), integral_type, endianness>(iter);
+                        if (int_v >= group_value_type::field_type::modulus) {
+                            return nil::marshalling::status_type::invalid_msg_data;
+                        }
+                        field_type::value_type field_v(int_v);
+                        field_type::value_type vv = field_v.squared();
+                        field_type::value_type denominator = (field_type::value_type(group_type::params_type::a) -
+                                                              field_type::value_type(group_type::params_type::d) * vv);
+                        if (denominator.is_zero()) {
+                            return nil::marshalling::status_type::invalid_msg_data;
+                        }
+                        field_type::value_type fraction = (field_type::value_type::one() - vv) / denominator;
 
-                    constexpr static const chunk_type I_bit = 0x40;
-                    constexpr static const chunk_type S_bit = 0x20;
+                        // TODO: change logic of sqrt error handling
+                        field_type::value_type u;
+                        if (fraction.is_one()) {
+                            u = field_type::modulus - 1;
+                        } else if (fraction.is_zero()) {
+                            u = field_type::value_type::zero();
+                        } else {
+                            u = fraction.sqrt();
+                            if (u == field_type::value_type(field_type::modulus - 1)) {
+                                return nil::marshalling::status_type::invalid_msg_data;
+                            }
+                        }
+                        // TODO: above logic should be handled in sqrt
 
-                    if (m_unit & I_bit) {
-                        BOOST_ASSERT(iter + 2 * sizeof_field_element_chunks_count ==
-                                     std::find(iter, iter + 2 * sizeof_field_element_chunks_count, true));
-                        return g2_value_type();    // point at infinity
+                        if ((*(iter + chunk_number - 1) >> 7) == (static_cast<integral_type>(u.data) & 1)) {
+                            point = group_value_type(u, field_v);
+                        } else {
+                            point = group_value_type(-u, field_v);
+                        }
+
+                        return nil::marshalling::status_type::success;
                     }
-
-                    TIter read_iter = iter;
-
-                    typename G2GroupElement::field_type::integral_type x_1 =
-                        read_data<sizeof_field_element, typename G2GroupElement::field_type::integral_type, Endianness>(
-                            read_iter);
-                    read_iter += sizeof_field_element_chunks_count;
-
-                    typename G2GroupElement::field_type::integral_type x_0 =
-                        read_data<sizeof_field_element, typename G2GroupElement::field_type::integral_type, Endianness>(
-                            read_iter);
-
-                    g2_field_value_type x_mod(x_0, x_1);
-                    g2_field_value_type y2_mod = x_mod.pow(3) + g2_field_value_type(4, 4);
-                    BOOST_ASSERT(y2_mod.is_square());
-                    g2_field_value_type y_mod = y2_mod.sqrt();
-                    bool Y_bit = detail::sign_gf_p<g2_field_type>(y_mod);
-                    if (Y_bit == bool(m_unit & S_bit)) {
-                        g2_value_type result(x_mod, y_mod, g2_field_value_type::one());
-                        BOOST_ASSERT(result.is_well_formed());
-                        return result;
-                    }
-                    g2_value_type result(x_mod, -y_mod, g2_field_value_type::one());
-                    BOOST_ASSERT(result.is_well_formed());
-                    return result;
-                }
-
-                template<std::size_t TSize, typename Endianness, typename G1GroupElement, typename TIter>
-                typename std::enable_if<
-                    std::is_same<typename algebra::curves::curve25519::g1_type<
-                                     typename G1GroupElement::coordinates,
-                                     algebra::curves::forms::twisted_edwards>::value_type,
-                                 G1GroupElement>::value &&
-                        std::is_same<std::uint8_t, typename std::iterator_traits<TIter>::value_type>::value &&
-                        std::is_same<nil::marshalling::endian::little_endian, Endianness>::value,
-                    G1GroupElement>::type
-                    curve_element_read_data(TIter &iter) {
-                    // somehow add size check of container pointed by iter
-                    // assert(TSize == std::distance(first, last));
-                    using group_value_type = G1GroupElement;
-                    using group_type = typename group_value_type::group_type;
-                    using base_field_type = typename group_type::field_type;
-                    using base_integral_type = typename base_field_type::integral_type;
-                    using group_affine_value_type =
-                        typename algebra::curves::curve25519::g1_type<algebra::curves::coordinates::affine,
-                                                                      typename G1GroupElement::form>::value_type;
-                    constexpr std::size_t encoded_size = 32;
-                    static_assert(encoded_size == (TSize / 8 + (TSize % 8 ? 1 : 0)), "wrong size");
-
-                    base_integral_type y = read_data<TSize, base_integral_type, Endianness>(iter);
-                    bool sign = *(iter + encoded_size - 1) & (1 << 7);
-                    group_affine_value_type decoded_point_affine = detail::recover_x<group_affine_value_type>(y, sign);
-
-                    // TODO: remove hard-coded call for type conversion, implement type conversion between coordinates
-                    //  through operator
-                    return decoded_point_affine.to_extended_with_a_minus_1();
-                }
+                };
             }    // namespace processing
         }        // namespace marshalling
     }            // namespace crypto3

@@ -37,12 +37,19 @@ namespace nil {
         namespace marshalling {
             namespace types {
                 namespace detail {
-                    template<typename TTypeBase, typename CurveGroupType>
+                    template<typename TTypeBase, typename CurveGroup>
                     class basic_curve_element : public TTypeBase {
-
-                        using T = typename CurveGroupType::value_type;
-
+                        using T = typename CurveGroup::value_type;
                         using base_impl_type = TTypeBase;
+
+                        using params_type =
+                            crypto3::marshalling::processing::curve_element_marshalling_params<CurveGroup>;
+                        using reader_type =
+                            crypto3::marshalling::processing::curve_element_reader<typename base_impl_type::endian_type,
+                                                                                   CurveGroup>;
+                        using writer_type =
+                            crypto3::marshalling::processing::curve_element_writer<typename base_impl_type::endian_type,
+                                                                                   CurveGroup>;
 
                     public:
                         using value_type = T;
@@ -72,23 +79,23 @@ namespace nil {
                         }
 
                         static constexpr std::size_t length() {
-                            return max_length();
+                            return params_type::length();
                         }
 
                         static constexpr std::size_t min_length() {
-                            return max_length();
+                            return params_type::min_length();
                         }
 
                         static constexpr std::size_t max_length() {
-                            return max_bit_length() / 8 + ((max_bit_length() % 8) ? 1 : 0);
+                            return params_type::max_length();
                         }
 
                         static constexpr std::size_t bit_length() {
-                            return max_bit_length();
+                            return params_type::bit_length();
                         }
 
                         static constexpr std::size_t max_bit_length() {
-                            return CurveGroupType::field_type::value_bits;
+                            return params_type::max_bit_length();
                         }
 
                         static constexpr serialized_type to_serialized(value_type val) {
@@ -101,36 +108,26 @@ namespace nil {
 
                         template<typename TIter>
                         nil::marshalling::status_type read(TIter &iter, std::size_t size) {
-                            // if (size < length()) {
-                            //     return nil::marshalling::status_type::not_enough_data;
-                            // }
-
-                            read_no_status(iter);
+                            nil::marshalling::status_type status = reader_type::process(value(), iter);
                             iter += max_length();
-                            return nil::marshalling::status_type::success;
+                            return status;
                         }
 
                         template<typename TIter>
                         void read_no_status(TIter &iter) {
-                            value_ = crypto3::marshalling::processing::curve_element_read_data<
-                                bit_length(), typename base_impl_type::endian_type, value_type>(iter);
+                            reader_type::process(value(), iter);
                         }
 
                         template<typename TIter>
                         nil::marshalling::status_type write(TIter &iter, std::size_t size) const {
-                            // if (size < length()) {
-                            //     return nil::marshalling::status_type::buffer_overflow;
-                            // }
-
-                            write_no_status(iter);
+                            nil::marshalling::status_type status = writer_type::process(value(), iter);
                             iter += max_length();
-                            return nil::marshalling::status_type::success;
+                            return status;
                         }
 
                         template<typename TIter>
                         void write_no_status(TIter &iter) const {
-                            crypto3::marshalling::processing::curve_element_write_data<
-                                bit_length(), typename base_impl_type::endian_type>(value_, iter);
+                            writer_type::process(value(), iter);
                         }
 
                     private:
