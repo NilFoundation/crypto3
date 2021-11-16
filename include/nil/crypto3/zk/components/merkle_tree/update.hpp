@@ -45,7 +45,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename FieldType, typename Hash>
+                template<typename FieldType, typename Hash, std::size_t Arity = 2>
                 class merkle_proof_update : public component<FieldType> {
 
                     std::vector<Hash> prev_hashers;
@@ -68,10 +68,10 @@ namespace nil {
                     blueprint_variable_vector<FieldType> address_bits;
                     digest_variable<FieldType> prev_leaf_digest;
                     digest_variable<FieldType> prev_root_digest;
-                    merkle_authentication_path_variable<FieldType, Hash> prev_path;
+                    merkle_proof<FieldType, Hash, Arity> prev_path;
                     digest_variable<FieldType> next_leaf_digest;
                     digest_variable<FieldType> next_root_digest;
-                    merkle_authentication_path_variable<FieldType, Hash> next_path;
+                    merkle_proof<FieldType, Hash, Arity> next_path;
                     blueprint_linear_combination<FieldType> update_successful;
 
                     /* Note that while it is necessary to generate R1CS constraints
@@ -84,10 +84,10 @@ namespace nil {
                         const blueprint_variable_vector<FieldType> &address_bits,
                         const digest_variable<FieldType> &prev_leaf_digest,
                         const digest_variable<FieldType> &prev_root_digest,
-                        const merkle_authentication_path_variable<FieldType, Hash> &prev_path,
+                        const merkle_proof<FieldType, Hash, Arity> &prev_path,
                         const digest_variable<FieldType> &next_leaf_digest,
                         const digest_variable<FieldType> &next_root_digest,
-                        const merkle_authentication_path_variable<FieldType, Hash> &next_path,
+                        const merkle_proof<FieldType, Hash, Arity> &next_path,
                         const blueprint_linear_combination<FieldType> &update_successful) :
                         component<FieldType>(bp),
                         digest_size(Hash::get_digest_len()), tree_depth(tree_depth), address_bits(address_bits),

@@ -44,7 +44,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename FieldType, typename Hash>
+                template<typename FieldType, typename Hash, std::size_t Arity = 2>
                 class merkle_proof_validate : public component<FieldType> {
                 private:
                     std::vector<Hash> hashers;
@@ -61,18 +61,18 @@ namespace nil {
                     blueprint_linear_combination_vector<FieldType> address_bits;
                     digest_variable<FieldType> leaf;
                     digest_variable<FieldType> root;
-                    merkle_authentication_path_variable<FieldType, Hash> path;
+                    merkle_proof<FieldType, Hash, Arity> path;
                     blueprint_linear_combination<FieldType> read_successful;
 
                     merkle_proof_validate(blueprint<FieldType> &bp,
                                                      const std::size_t tree_depth,
                                                      const blueprint_linear_combination_vector<FieldType> &address_bits,
-                                                     const digest_variable<FieldType> &leaf_digest,
-                                                     const digest_variable<FieldType> &root_digest,
-                                                     const merkle_authentication_path_variable<FieldType, Hash> &path,
+                                                     const digest_variable<FieldType> &leaf,
+                                                     const digest_variable<FieldType> &root,
+                                                     const merkle_proof<FieldType, Hash, Arity> &path,
                                                      const blueprint_linear_combination<FieldType> &read_successful):
                         component<FieldType>(bp),
-                        digest_size(Hash::get_digest_len()), tree_depth(tree_depth), address_bits(address_bits), leaf(leaf),
+                        digest_size(Hash::digest_bits), tree_depth(tree_depth), address_bits(address_bits), leaf(leaf),
                         root(root), path(path), read_successful(read_successful) {
                         /*
                            The tricky part here is ordering. For Merkle tree
