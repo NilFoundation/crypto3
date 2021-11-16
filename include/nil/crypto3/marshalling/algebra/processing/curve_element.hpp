@@ -48,19 +48,49 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace processing {
-                // TODO: remove Group parameter, specify marshalling procedure only by form, coordinates and
-                // specification policy
-                template<std::size_t TSize, typename Endianness, typename Group>
+                // TODO: add marshaling algorithm specification template parameter and specialize parameters depending
+                //  on the algorithm and curve group if needed
+                template<typename Group>
+                struct curve_element_marshalling_params {
+                    using group_type = Group;
+
+                    static constexpr std::size_t length() {
+                        return bit_length() / 8 + ((bit_length() % 8) != 0);
+                    }
+
+                    static constexpr std::size_t min_length() {
+                        return length();
+                    }
+
+                    static constexpr std::size_t max_length() {
+                        return length();
+                    }
+
+                    static constexpr std::size_t bit_length() {
+                        return group_type::field_type::value_bits;
+                    }
+
+                    static constexpr std::size_t min_bit_length() {
+                        return bit_length();
+                    }
+
+                    static constexpr std::size_t max_bit_length() {
+                        return bit_length();
+                    }
+                };
+
+                // TODO: do not specify marshaling algorithm by curve group, instead specify marshalling procedure only
+                //  by form, coordinates and specification policy
+                template<typename Endianness, typename Group>
                 struct curve_element_writer;
 
-                // TODO: remove Group parameter, specify marshalling procedure only by form, coordinates and
-                // specification policy
-                template<std::size_t TSize, typename Endianness, typename Group>
+                // TODO: do not specify marshaling algorithm by curve group, instead specify marshalling procedure only
+                //  by form, coordinates and specification policy
+                template<typename Endianness, typename Group>
                 struct curve_element_reader;
 
-                template<std::size_t TSize, typename Endianness, typename Coordinates>
+                template<typename Endianness, typename Coordinates>
                 struct curve_element_writer<
-                    TSize,
                     Endianness,
                     typename algebra::curves::bls12_381::template g1_type<Coordinates,
                                                                           algebra::curves::forms::short_weierstrass>> {
@@ -70,6 +100,7 @@ namespace nil {
                     using coordinates = typename group_value_type::coordinates;
                     using form = typename group_value_type::form;
                     using endianness = Endianness;
+                    using params_type = curve_element_marshalling_params<group_type>;
 
                     template<typename TIter>
                     static nil::marshalling::status_type process(const group_value_type &point, TIter &iter) {
@@ -82,7 +113,7 @@ namespace nil {
                         chunk_type m_unit = detail::evaluate_m_unit<chunk_type>(point_affine, true);
                         if (!(I_bit & m_unit)) {
                             // We assume here, that write_data doesn't change the iter
-                            write_data<TSize, endianness>(
+                            write_data<params_type::bit_length(), endianness>(
                                 static_cast<typename group_value_type::field_type::integral_type>(point_affine.X.data),
                                 iter);
                         }
@@ -92,9 +123,9 @@ namespace nil {
                     }
                 };
 
-                template<std::size_t TSize, typename Endianness, typename Coordinates>
+                template<typename Endianness, typename Coordinates>
                 struct curve_element_writer<
-                    TSize,
+
                     Endianness,
                     typename algebra::curves::bls12_381::template g2_type<Coordinates,
                                                                           algebra::curves::forms::short_weierstrass>> {
@@ -104,13 +135,14 @@ namespace nil {
                     using coordinates = typename group_value_type::coordinates;
                     using form = typename group_value_type::form;
                     using endianness = Endianness;
+                    using params_type = curve_element_marshalling_params<group_type>;
 
                     template<typename TIter>
                     static nil::marshalling::status_type process(const group_value_type &point, TIter &iter) {
                         using chunk_type = typename TIter::value_type;
 
                         constexpr static const std::size_t sizeof_field_element =
-                            TSize / (group_value_type::field_type::arity);
+                            params_type::bit_length() / (group_value_type::field_type::arity);
                         constexpr static const std::size_t units_bits = 8;
                         constexpr static const std::size_t chunk_bits = sizeof(typename TIter::value_type) * units_bits;
                         constexpr static const std::size_t sizeof_field_element_chunks_count =
@@ -141,9 +173,9 @@ namespace nil {
                     }
                 };
 
-                template<std::size_t TSize, typename Coordinates>
+                template<typename Coordinates>
                 struct curve_element_writer<
-                    TSize,
+
                     nil::marshalling::endian::little_endian,
                     typename algebra::curves::curve25519::template g1_type<Coordinates,
                                                                            algebra::curves::forms::twisted_edwards>> {
@@ -154,6 +186,7 @@ namespace nil {
                     using coordinates = typename group_value_type::coordinates;
                     using form = typename group_value_type::form;
                     using endianness = nil::marshalling::endian::little_endian;
+                    using params_type = curve_element_marshalling_params<group_type>;
 
                     template<typename TIter>
                     static typename std::enable_if<
@@ -167,7 +200,9 @@ namespace nil {
                                                                           form>::value_type;
                         // TODO: somehow add size check of container pointed by iter
                         constexpr std::size_t encoded_size = 32;
-                        static_assert(encoded_size == (TSize / 8 + (TSize % 8 ? 1 : 0)), "wrong size");
+                        static_assert(encoded_size ==
+                                          (params_type::bit_length() / 8 + (params_type::bit_length() % 8 ? 1 : 0)),
+                                      "wrong size");
                         using encoded_value_type = std::array<std::uint8_t, encoded_size>;
 
                         group_affine_value_type point_affine = point.to_affine();
@@ -188,9 +223,33 @@ namespace nil {
                     }
                 };
 
-                template<std::size_t TSize, typename Endianness, typename Coordinates>
+                template<typename Coordinates>
+                struct curve_element_writer<
+                    nil::marshalling::endian::little_endian,
+                    typename algebra::curves::jubjub::template g1_type<Coordinates,
+                                                                       algebra::curves::forms::twisted_edwards>> {
+                    using group_type =
+                        typename algebra::curves::jubjub::template g1_type<Coordinates,
+                                                                           algebra::curves::forms::twisted_edwards>;
+                    using group_value_type = typename group_type::value_type;
+                    using coordinates = typename group_value_type::coordinates;
+                    using form = typename group_value_type::form;
+                    using endianness = nil::marshalling::endian::little_endian;
+                    using params_type = curve_element_marshalling_params<group_type>;
+
+                    /// https://zips.z.cash/protocol/protocol.pdf#concreteextractorjubjub
+                    template<typename TIter>
+                    static nil::marshalling::status_type process(const group_value_type &point, TIter &iter) {
+                       write_data<params_type::bit_length(), endianness>(
+                            static_cast<typename group_value_type::field_type::integral_type>(point.to_affine().X.data),
+                            iter);
+
+                        return nil::marshalling::status_type::success;
+                    }
+                };
+
+                template<typename Endianness, typename Coordinates>
                 struct curve_element_reader<
-                    TSize,
                     Endianness,
                     typename algebra::curves::bls12_381::template g1_type<Coordinates,
                                                                           algebra::curves::forms::short_weierstrass>> {
@@ -200,6 +259,7 @@ namespace nil {
                     using coordinates = typename group_value_type::coordinates;
                     using form = typename group_value_type::form;
                     using endianness = Endianness;
+                    using params_type = curve_element_marshalling_params<group_type>;
 
                     template<typename TIter>
                     static nil::marshalling::status_type process(group_value_type &point, TIter &iter) {
@@ -209,7 +269,7 @@ namespace nil {
                         BOOST_ASSERT(m_unit != 0x20 && m_unit != 0x60 && m_unit != 0xE0);
 
                         constexpr static const std::size_t sizeof_field_element =
-                            TSize / (group_value_type::field_type::arity);
+                            params_type::bit_length() / (group_value_type::field_type::arity);
                         constexpr static const std::size_t units_bits = 8;
                         constexpr static const std::size_t chunk_bits = sizeof(chunk_type) * units_bits;
                         constexpr static const std::size_t sizeof_field_element_chunks_count =
@@ -249,9 +309,8 @@ namespace nil {
                     }
                 };
 
-                template<std::size_t TSize, typename Endianness, typename Coordinates>
+                template<typename Endianness, typename Coordinates>
                 struct curve_element_reader<
-                    TSize,
                     Endianness,
                     typename algebra::curves::bls12_381::template g2_type<Coordinates,
                                                                           algebra::curves::forms::short_weierstrass>> {
@@ -261,6 +320,7 @@ namespace nil {
                     using coordinates = typename group_value_type::coordinates;
                     using form = typename group_value_type::form;
                     using endianness = Endianness;
+                    using params_type = curve_element_marshalling_params<group_type>;
 
                     template<typename TIter>
                     static nil::marshalling::status_type process(group_value_type &point, TIter &iter) {
@@ -270,7 +330,7 @@ namespace nil {
                         BOOST_ASSERT(m_unit != 0x20 && m_unit != 0x60 && m_unit != 0xE0);
 
                         constexpr static const std::size_t sizeof_field_element =
-                            TSize / (group_value_type::field_type::arity);
+                            params_type::bit_length() / (group_value_type::field_type::arity);
                         constexpr static const std::size_t units_bits = 8;
                         constexpr static const std::size_t chunk_bits = sizeof(chunk_type) * units_bits;
                         constexpr static const std::size_t sizeof_field_element_chunks_count =
@@ -315,9 +375,8 @@ namespace nil {
                     }
                 };
 
-                template<std::size_t TSize, typename Coordinates>
+                template<typename Coordinates>
                 struct curve_element_reader<
-                    TSize,
                     nil::marshalling::endian::little_endian,
                     typename algebra::curves::curve25519::template g1_type<Coordinates,
                                                                            algebra::curves::forms::twisted_edwards>> {
@@ -328,6 +387,7 @@ namespace nil {
                     using coordinates = typename group_value_type::coordinates;
                     using form = typename group_value_type::form;
                     using endianness = nil::marshalling::endian::little_endian;
+                    using params_type = curve_element_marshalling_params<group_type>;
 
                     template<typename TIter>
                     static typename std::enable_if<
@@ -342,9 +402,12 @@ namespace nil {
                             typename algebra::curves::curve25519::g1_type<algebra::curves::coordinates::affine,
                                                                           form>::value_type;
                         constexpr std::size_t encoded_size = 32;
-                        static_assert(encoded_size == (TSize / 8 + (TSize % 8 ? 1 : 0)), "wrong size");
+                        static_assert(encoded_size ==
+                                          (params_type::bit_length() / 8 + (params_type::bit_length() % 8 ? 1 : 0)),
+                                      "wrong size");
 
-                        base_integral_type y = read_data<TSize, base_integral_type, endianness>(iter);
+                        base_integral_type y =
+                            read_data<params_type::bit_length(), base_integral_type, endianness>(iter);
                         bool sign = *(iter + encoded_size - 1) & (1 << 7);
                         group_affine_value_type decoded_point_affine =
                             detail::recover_x<group_affine_value_type>(y, sign);
@@ -358,9 +421,8 @@ namespace nil {
                     }
                 };
 
-                template<std::size_t TSize>
+                template<>
                 struct curve_element_reader<
-                    TSize,
                     nil::marshalling::endian::little_endian,
                     typename algebra::curves::jubjub::template g1_type<algebra::curves::coordinates::affine,
                                                                        algebra::curves::forms::twisted_edwards>> {
@@ -371,6 +433,7 @@ namespace nil {
                     using coordinates = typename group_value_type::coordinates;
                     using form = typename group_value_type::form;
                     using endianness = nil::marshalling::endian::little_endian;
+                    using params_type = curve_element_marshalling_params<group_type>;
 
                     /// abst_J(LEOS2BSP_{256}(iter))
                     /// See https://zips.z.cash/protocol/protocol.pdf#concretegrouphashjubjub
@@ -382,10 +445,11 @@ namespace nil {
                         using field_type = typename group_value_type::field_type;
                         using integral_type = typename field_type::integral_type;
 
-                        const std::size_t chunk_number = TSize / 8 + (TSize % 8 != 0);
+                        const std::size_t chunk_number =
+                            params_type::bit_length() / 8 + (params_type::bit_length() % 8 != 0);
                         assert(chunk_number == 32);
 
-                        integral_type int_v = read_data<TSize, integral_type, endianness>(iter);
+                        integral_type int_v = read_data<params_type::bit_length(), integral_type, endianness>(iter);
                         if (int_v >= group_value_type::field_type::modulus) {
                             return nil::marshalling::status_type::invalid_msg_data;
                         }
