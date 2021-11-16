@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
@@ -46,7 +46,7 @@ namespace nil {
             namespace components {
 
                 template<typename FieldType, typename Hash>
-                class merkle_tree_check_update_components : public component<FieldType> {
+                class merkle_proof_update : public component<FieldType> {
 
                     std::vector<Hash> prev_hashers;
                     std::vector<block_variable<FieldType>> prev_hasher_inputs;
@@ -78,7 +78,7 @@ namespace nil {
                        for prev_path, it is not necessary to do so for next_path. See
                        comment in the implementation of generate_r1cs_constraints() */
 
-                    merkle_tree_check_update_components(
+                    merkle_proof_update(
                         blueprint<FieldType> &bp,
                         const std::size_t tree_depth,
                         const blueprint_variable_vector<FieldType> &address_bits,
@@ -202,27 +202,6 @@ namespace nil {
                         }
 
                         check_next_root->generate_r1cs_witness();
-                    }
-
-                    static std::size_t root_size_in_bits() {
-                        return Hash::get_digest_len();
-                    }
-                    /* for debugging purposes */
-                    static std::size_t expected_constraints(const std::size_t tree_depth) {
-                        /* NB: this includes path constraints */
-                        const std::size_t prev_hasher_constraints = tree_depth * Hash::expected_constraints(false);
-                        const std::size_t next_hasher_constraints = tree_depth * Hash::expected_constraints(true);
-                        const std::size_t prev_authentication_path_constraints =
-                            2 * tree_depth * Hash::get_digest_len();
-                        const std::size_t prev_propagator_constraints = tree_depth * Hash::get_digest_len();
-                        const std::size_t next_propagator_constraints = tree_depth * Hash::get_digest_len();
-                        const std::size_t check_next_root_constraints =
-                            3 * (Hash::get_digest_len() + (FieldType::capacity()) - 1) / FieldType::capacity();
-                        const std::size_t aux_equality_constraints = tree_depth * Hash::get_digest_len();
-
-                        return (prev_hasher_constraints + next_hasher_constraints +
-                                prev_authentication_path_constraints + prev_propagator_constraints +
-                                next_propagator_constraints + check_next_root_constraints + aux_equality_constraints);
                     }
                 };
 
