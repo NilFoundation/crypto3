@@ -23,18 +23,24 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PROPERTY_HPP
-#define CRYPTO3_PROPERTY_HPP
+#ifndef CRYPTO3_MERKLE_TREE_NODE_HPP
+#define CRYPTO3_MERKLE_TREE_NODE_HPP
 
-#include <boost/config.hpp>
+namespace nil {
+    namespace crypto3 {
+        namespace detail {
+            template<typename Hash>
+            struct merkle_tree_node {
+                typedef Hash hash_type;
 
-enum vertex_hash_t
-{
-    vertex_hash
-};
+                constexpr static const std::size_t digest_bits = hash_type::digest_bits;
+                typedef typename hash_type::digest_type digest_type;
 
-namespace boost {
-    BOOST_INSTALL_PROPERTY(vertex, hash);
-}
+                typedef typename Hash::digest_type value_type;
+                constexpr static const std::size_t value_bits = digest_bits;
+            };
+        }    // namespace detail
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif    // CRYPTO3_PROPERTY_HPP
+#endif    // CRYPTO3_NODE_HPP

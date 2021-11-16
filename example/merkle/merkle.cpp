@@ -27,7 +27,7 @@
 #include <nil/crypto3/hash/md5.hpp>
 #include <nil/crypto3/hash/blake2b.hpp>
 
-#include <nil/merkle/merkle.hpp>
+#include <nil/merkle/tree.hpp>
 #include <nil/merkle/proof.hpp>
 
 using namespace nil::crypto3::merkletree;
@@ -36,9 +36,9 @@ using namespace nil::crypto3;
 int main() {
     std::vector<std::array<char, 1> > data_on_leafs = {{'0'}, {'1'}, {'2'}, {'3'}, {'4'}, {'5'}, {'6'}, {'7'}, {'8'}};
     std::array<char, 1> element_not_in_tree = {'9'};
-    MerkleTree<hashes::blake2b<224>, 3> tree(data_on_leafs);
-    MerkleProof<hashes::blake2b<224>, 3> proof_leaf_3(tree, 3);
-    MerkleProof<hashes::blake2b<224>, 3> proof_leaf_0(tree, 0);
+    merkle_tree<hashes::blake2b<224>, 3> tree(data_on_leafs);
+    merkle_proof<hashes::blake2b<224>, 3> proof_leaf_3(tree, 3);
+    merkle_proof<hashes::blake2b<224>, 3> proof_leaf_0(tree, 0);
     std::cout << "Tree structure:" << std::endl;
     std::cout << tree << std::endl;
     std::vector<std::array<char, 1>> data_to_check = {{data_on_leafs[2]}, {data_on_leafs[0]}, element_not_in_tree};
@@ -53,8 +53,8 @@ int main() {
     std::array<char, 7> left = {'\x6d', '\x65', '\x73', '\x73', '\x61', '\x67', '\x65'};
     std::array<char, 7> right = {'\x20', '\x64', '\x69', '\x67', '\x65', '\x73', '\x74'};
     std::vector<std::array<char, 7> > simple_binary_tree_data = {left, right};
-    MerkleTree<hashes::blake2b<224>, 2> simple_binary_tree(simple_binary_tree_data);
-    MerkleProof<hashes::blake2b<224>, 2> simple_binary_proof_leaf_1(simple_binary_tree, 1);
+    merkle_tree<hashes::blake2b<224>, 2> simple_binary_tree(simple_binary_tree_data);
+    merkle_proof<hashes::blake2b<224>, 2> simple_binary_proof_leaf_1(simple_binary_tree, 1);
     std::cout << "Tree simple binary structure:" << std::endl;
     std::cout << simple_binary_tree << std::endl;
     std::cout << "Is leaf " << data_on_leafs[1][0] << " was in tree in position 1: ";
