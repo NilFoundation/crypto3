@@ -48,12 +48,14 @@ namespace nil {
                 template<typename FieldType, typename Hash, std::size_t Arity = 2>
                 class merkle_proof_update : public component<FieldType> {
 
-                    std::vector<Hash> prev_hashers;
+                    using hash_component = nil::crypto3::zk::components::hash<Hash>;
+
+                    std::vector<hash_component> prev_hashers;
                     std::vector<block_variable<FieldType>> prev_hasher_inputs;
                     std::vector<digest_selector_component<FieldType>> prev_propagators;
                     std::vector<digest_variable<FieldType>> prev_internal_output;
 
-                    std::vector<Hash> next_hashers;
+                    std::vector<hash_component> next_hashers;
                     std::vector<block_variable<FieldType>> next_hasher_inputs;
                     std::vector<digest_selector_component<FieldType>> next_propagators;
                     std::vector<digest_variable<FieldType>> next_internal_output;
@@ -90,7 +92,7 @@ namespace nil {
                         const merkle_proof<FieldType, Hash, Arity> &next_path,
                         const blueprint_linear_combination<FieldType> &update_successful) :
                         component<FieldType>(bp),
-                        digest_size(Hash::get_digest_len()), tree_depth(tree_depth), address_bits(address_bits),
+                        digest_size(Hash::digest_bits), tree_depth(tree_depth), address_bits(address_bits),
                         prev_leaf_digest(prev_leaf_digest), prev_root_digest(prev_root_digest), prev_path(prev_path),
                         next_leaf_digest(next_leaf_digest), next_root_digest(next_root_digest), next_path(next_path),
                         update_successful(update_successful) {
@@ -108,14 +110,14 @@ namespace nil {
                             block_variable<FieldType> prev_inp(bp, prev_path.left_digests[i],
                                                                prev_path.right_digests[i]);
                             prev_hasher_inputs.emplace_back(prev_inp);
-                            prev_hashers.emplace_back(Hash(bp, 2 * digest_size, prev_inp,
+                            prev_hashers.emplace_back(hash_component(bp, 2 * digest_size, prev_inp,
                                                            (i == 0 ? prev_root_digest : prev_internal_output[i - 1])));
 
                             block_variable<FieldType> next_inp(bp, next_path.left_digests[i],
                                                                next_path.right_digests[i]);
                             next_hasher_inputs.emplace_back(next_inp);
                             next_hashers.emplace_back(
-                                Hash(bp, 2 * digest_size, next_inp,
+                                hash_component(bp, 2 * digest_size, next_inp,
                                      (i == 0 ? *computed_next_root : next_internal_output[i - 1])));
                         }
 

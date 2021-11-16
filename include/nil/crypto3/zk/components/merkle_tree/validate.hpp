@@ -46,8 +46,10 @@ namespace nil {
 
                 template<typename FieldType, typename Hash, std::size_t Arity = 2>
                 class merkle_proof_validate : public component<FieldType> {
-                private:
-                    std::vector<Hash> hashers;
+                
+                    using hash_component = nil::crypto3::zk::components::hash<Hash>;
+
+                    std::vector<hash_component> hashers;
                     std::vector<block_variable<FieldType>> hasher_inputs;
                     std::vector<digest_selector_component<FieldType>> propagators;
                     std::vector<digest_variable<FieldType>> internal_output;
@@ -96,7 +98,7 @@ namespace nil {
                             block_variable<FieldType> inp(bp, path.left_digests[i], path.right_digests[i]);
                             hasher_inputs.emplace_back(inp);
                             hashers.emplace_back(
-                                Hash(bp, 2 * digest_size, inp, (i == 0 ? *computed_root : internal_output[i - 1])));
+                                hash_component(bp, 2 * digest_size, inp, (i == 0 ? *computed_root : internal_output[i - 1])));
                         }
 
                         for (std::size_t i = 0; i < tree_depth; ++i) {
