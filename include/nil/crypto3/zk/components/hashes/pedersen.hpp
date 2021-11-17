@@ -44,16 +44,17 @@ namespace nil {
                  */
                 template<typename Curve, typename Hash = hashes::sha2<256>,
                          typename HashParams = hashes::find_group_hash_default_params>
-                struct pedersen : public component<typename Curve::base_field_type> {
+                struct pedersen_to_point : public component<typename Curve::base_field_type> {
                     using curve_type = Curve;
                     using hash_type = Hash;
                     using hash_params = HashParams;
                     using commitment_component = fixed_base_mul_zcash<curve_type>;
                     using field_type = typename commitment_component::field_type;
                     using element_component = typename commitment_component::twisted_edwards_element_component;
+                    using result_type = element_component;
 
-                    element_component result;
                     commitment_component m_commitment;
+                    result_type &result;
 
                     static std::vector<typename element_component::group_value_type> get_base_points(std::size_t n) {
                         using group_hash_type =
@@ -70,65 +71,71 @@ namespace nil {
                     }
 
                     /// Auto allocation of the result
-                    pedersen(blueprint<field_type> &bp, const blueprint_variable_vector<field_type> &in_bits) :
-                        component<field_type>(bp), result(bp),
+                    pedersen_to_point(blueprint<field_type> &bp, const blueprint_variable_vector<field_type> &in_bits) :
+                        component<field_type>(bp),
                         m_commitment(bp, get_base_points(commitment_component::basepoints_required(in_bits.size())),
-                                     in_bits, result) {
+                                     in_bits),
+                        result(m_commitment.result) {
+                    }
+
+                    /// Manual allocation of the result
+                    pedersen_to_point(blueprint<field_type> &bp, const blueprint_variable_vector<field_type> &in_bits,
+                                      const result_type &in_result) :
+                        component<field_type>(bp),
+                        m_commitment(bp, get_base_points(commitment_component::basepoints_required(in_bits.size())),
+                                     in_bits, in_result),
+                        result(m_commitment.result) {
+                    }
+
+                    void generate_r1cs_constraints() {
+                        this->m_commitment.generate_r1cs_constraints();
+                    }
+
+                    void generate_r1cs_witness() {
+                        this->m_commitment.generate_r1cs_witness();
+                    }
+                };
+
+                template<typename Curve, typename Hash = hashes::sha2<256>,
+                         typename HashParams = hashes::find_group_hash_default_params>
+                struct pedersen : public component<typename Curve::base_field_type> {
+                    using curve_type = Curve;
+                    using hash_type = Hash;
+                    using hash_params = HashParams;
+                    using hash_component = pedersen_to_point<curve_type, hash_type, hash_params>;
+                    using field_type = typename hash_component::field_type;
+                    using element_component = typename hash_component::element_component;
+                    using to_bits_component = typename element_component::to_bits_component;
+                    using result_type = typename to_bits_component::result_type;
+
+                    hash_component hash_creator;
+                    to_bits_component to_bits_converter;
+                    result_type &result;
+
+                    /// Auto allocation of the result
+                    pedersen(blueprint<field_type> &bp, const blueprint_variable_vector<field_type> &in_bits) :
+                        component<field_type>(bp), hash_creator(bp, in_bits),
+                        to_bits_converter(bp, hash_creator.result), result(to_bits_converter.result) {
                     }
 
                     /// Manual allocation of the result
                     pedersen(blueprint<field_type> &bp, const blueprint_variable_vector<field_type> &in_bits,
-                             const element_component &in_result) :
+                             const result_type &in_result) :
                         component<field_type>(bp),
-                        result(in_result),
-                        m_commitment(bp, get_base_points(commitment_component::basepoints_required(in_bits.size())),
-                                     in_bits, in_result) {
+                        hash_creator(bp, in_bits), to_bits_converter(bp, hash_creator.result, in_result),
+                        result(to_bits_converter.result) {
                     }
 
                     void generate_r1cs_constraints() {
-                        m_commitment.generate_r1cs_constraints();
+                        this->hash_creator.generate_r1cs_constraints();
+                        this->to_bits_converter.generate_r1cs_constraints();
                     }
 
                     void generate_r1cs_witness() {
-                        m_commitment.generate_r1cs_witness();
+                        this->hash_creator.generate_r1cs_witness();
+                        this->to_bits_converter.generate_r1cs_witness();
                     }
                 };
-
-                // /**
-                //  * The X coordinate is distinct
-                //  */
-                // template<typename CurveType>
-                // struct PedersenHashToBits : public component<typename CurveType::base_field_type> {
-                //
-                //     using curve_type = CurveType;
-                //     using field_type = typename curve_type::base_field_type;
-                //     constexpr static const algebra::curves::representations representation_type =
-                //         algebra::curves::representations::edwards;
-                //     using element_component = element_g1<curve_type, representation_type>;
-                //
-                //     PedersenHash<curve_type> pedersen_hash;
-                //     element_component pedersen_hash_result;
-                //     field_to_bits_strict<field_type> tobits;
-                //
-                //     PedersenHashToBits(blueprint<field_type> &bp,
-                //                        const blueprint_variable_vector<field_type> &bits,
-                //                        blueprint_variable_vector<field_type> &result) :
-                //         component<field_type>(bp),
-                //         pedersen_hash_result(bp), pedersen_hash(bp, bits, pedersen_hash_result),
-                //         tobits(bp, pedersen_hash_result.X, result) {
-                //     }
-                //
-                //     void generate_r1cs_constraints() {
-                //         pedersen_hash.generate_r1cs_constraints();
-                //         tobits.generate_r1cs_constraints();
-                //     }
-                //
-                //     void generate_r1cs_witness() {
-                //         pedersen_hash.generate_r1cs_witness();
-                //         tobits.generate_r1cs_witness();
-                //     }
-                // };
-
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3

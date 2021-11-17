@@ -44,6 +44,9 @@ namespace nil {
 
                 template<typename Curve, typename Form, typename Coordinates>
                 struct element_g1_to_twisted_edwards { };
+
+                template<typename Curve, typename Form, typename Coordinates>
+                struct element_g1_to_bits { };
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3

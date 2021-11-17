@@ -33,6 +33,7 @@
 #define CRYPTO3_ZK_BLUEPRINT_TWISTED_EDWARDS_G1_COMPONENT_HPP
 
 #include <nil/crypto3/zk/components/algebra/curves/element_g1_affine.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/field_to_bits.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -254,6 +255,55 @@ namespace nil {
                             this->bp.lc_val(this->XX);
                         this->bp.lc_val(this->dXXYY) = this->bp.lc_val(this->dXX) * this->bp.lc_val(this->YY);
                         this->bp.lc_val(this->rhs) = this->bp.lc_val(this->dXXYY) + field_type::value_type::one();
+                    }
+                };
+
+                /**
+                 * @brief Component that creates constraints for the point serialization into the bit sequence
+                 * according to https://zips.z.cash/protocol/protocol.pdf#concreteextractorjubjub
+                 */
+                template<typename Curve>
+                struct element_g1_to_bits<Curve,
+                                          algebra::curves::forms::twisted_edwards,
+                                          algebra::curves::coordinates::affine>
+                    : public component<typename element_g1<Curve,
+                                                           algebra::curves::forms::twisted_edwards,
+                                                           algebra::curves::coordinates::affine>::field_type> {
+                    using curve_type = Curve;
+                    using form = algebra::curves::forms::twisted_edwards;
+                    using coordinates = algebra::curves::coordinates::affine;
+
+                    using element_component = element_g1<curve_type, form, coordinates>;
+
+                    using field_type = typename element_component::field_type;
+                    using group_type = typename element_component::group_type;
+
+                    using field_to_bits_component = field_to_bits_strict<field_type>;
+                    using result_type = typename field_to_bits_component::result_type;
+
+                    field_to_bits_component field_to_bits_converter;
+                    result_type &result;
+
+                    /// Auto allocation of the result
+                    element_g1_to_bits(blueprint<field_type> &bp, const element_component &in_p) :
+                        component<field_type>(bp), field_to_bits_converter(bp, in_p.X),
+                        result(field_to_bits_converter.result) {
+                    }
+
+                    /// Manual allocation of the result
+                    element_g1_to_bits(blueprint<field_type> &bp,
+                                       const element_component &in_p,
+                                       const result_type &in_result) :
+                        component<field_type>(bp),
+                        field_to_bits_converter(bp, in_p.X, in_result), result(field_to_bits_converter.result) {
+                    }
+
+                    void generate_r1cs_constraints() {
+                        this->field_to_bits_converter.generate_r1cs_constraints();
+                    }
+
+                    void generate_r1cs_witness() {
+                        this->field_to_bits_converter.generate_r1cs_witness();
                     }
                 };
 

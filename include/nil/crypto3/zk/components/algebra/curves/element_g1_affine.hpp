@@ -63,6 +63,7 @@ namespace nil {
                     using addition_component = element_g1_addition<curve_type, form, coordinates>;
                     using is_well_formed_component = element_g1_is_well_formed<curve_type, form, coordinates>;
                     using to_twisted_edwards_component = element_g1_to_twisted_edwards<curve_type, form, coordinates>;
+                    using to_bits_component = element_g1_to_bits<curve_type, form, coordinates>;
 
                     underlying_element_type X;
                     underlying_element_type Y;
