@@ -58,9 +58,11 @@ namespace nil {
                     using field_type = typename element_component::field_type;
                     using group_type = typename element_component::group_type;
 
+                    using result_type = element_component;
+
                     const element_component p1;
                     const element_component p2;
-                    element_component result;
+                    result_type result;
 
                     // Intermediate variables
                     element_fp<field_type> X1X2;
@@ -107,7 +109,7 @@ namespace nil {
                     element_g1_addition(blueprint<field_type> &bp,
                                         const element_component &in_p1,
                                         const element_component &in_p2,
-                                        const element_component &in_result) :
+                                        const result_type &in_result) :
                         component<field_type>(bp),
                         p1(in_p1), p2(in_p2), result(in_result) {
                         init();
@@ -188,7 +190,7 @@ namespace nil {
 
                     const element_component p;
 
-                    // intermediate variables:
+                    // Intermediate variables
                     element_fp<field_type> XX;
                     element_fp<field_type> aXX;
                     element_fp<field_type> dXX;

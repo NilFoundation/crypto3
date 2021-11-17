@@ -56,6 +56,8 @@ namespace nil {
                     using field_type = typename element_component::field_type;
                     using group_type = typename element_component::group_type;
 
+                    using result_type = element_component;
+
                     const element_component p1;
                     const element_component p2;
                     element_component result;
@@ -76,7 +78,7 @@ namespace nil {
                     element_g1_addition(blueprint<field_type> &bp,
                                         const element_component &in_p1,
                                         const element_component &in_p2,
-                                        const element_component &in_result) :
+                                        const result_type &in_result) :
                         component<field_type>(bp),
                         p1(in_p1), p2(in_p2), result(in_result) {
                         blueprint_variable<field_type> lambda_var;
@@ -132,10 +134,12 @@ namespace nil {
                     using group_type = typename element_component::group_type;
                     using to_group_type = typename to_element_component::group_type;
 
+                    using result_type = to_element_component;
+
                     // Input point
                     const element_component p;
                     // Output point
-                    to_element_component result;
+                    result_type result;
                     // Intermediate variables
                     typename field_type::value_type scale;
 
@@ -151,7 +155,7 @@ namespace nil {
 
                     /// Manual allocation of the result
                     element_g1_to_twisted_edwards(blueprint<field_type> &bp, const element_component &in_p,
-                                                  const to_element_component &in_result) :
+                                                  const result_type &in_result) :
                         component<field_type>(bp),
                         p(in_p), result(in_result),
                         scale((static_cast<typename field_type::value_type>(4) /

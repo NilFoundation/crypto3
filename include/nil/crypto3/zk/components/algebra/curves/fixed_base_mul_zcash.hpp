@@ -71,6 +71,7 @@ namespace nil {
                         std::is_same<field_type, typename twisted_edwards_element_component::field_type>::value);
 
                     using lookup_component = lookup_signed_3bit<field_type>;
+                    using result_type = twisted_edwards_element_component;
 
                     /// See definition of \p c in https://zips.z.cash/protocol/protocol.pdf#concretepedersenhash
                     static constexpr std::size_t chunks_per_base_point = []() {
@@ -104,7 +105,7 @@ namespace nil {
                     std::vector<typename twisted_edwards_element_component::addition_component> edward_adders;
                     std::vector<element_fp<field_type>> m_windows_x;
                     std::vector<lookup_component> m_windows_y;
-                    twisted_edwards_element_component result;
+                    result_type result;
 
                 private:
                     template<typename BasePoints,
@@ -252,7 +253,7 @@ namespace nil {
                     fixed_base_mul_zcash(blueprint<field_type> &bp,
                                          const BasePoints &base_points,
                                          const blueprint_variable_vector<field_type> &in_scalar,
-                                         const twisted_edwards_element_component &in_result) :
+                                         const result_type &in_result) :
                         component<field_type>(bp),
                         result(in_result) {
                         init(base_points, in_scalar);
