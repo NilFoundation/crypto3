@@ -104,24 +104,18 @@ namespace nil {
                     std::vector<typename twisted_edwards_element_component::addition_component> edward_adders;
                     std::vector<element_fp<field_type>> m_windows_x;
                     std::vector<lookup_component> m_windows_y;
+                    twisted_edwards_element_component result;
 
-                    /// Number of segments
-                    static std::size_t basepoints_required(std::size_t n_bits) {
-                        return std::ceil(n_bits / float(lookup_component::chunk_bits * chunks_per_base_point));
-                    }
-
+                private:
                     template<typename BasePoints,
                              typename std::enable_if<
                                  std::is_same<
                                      typename twisted_edwards_element_component::group_value_type,
                                      typename std::iterator_traits<typename BasePoints::iterator>::value_type>::value,
                                  bool>::type = true>
-                    fixed_base_mul_zcash(blueprint<field_type> &bp,
-                                         const BasePoints &base_points,
-                                         const blueprint_variable_vector<field_type> &in_scalar) :
-                        component<field_type>(bp) {
+                    void init(const BasePoints &base_points, const blueprint_variable_vector<field_type> &in_scalar) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::RandomAccessRangeConcept<const BasePoints>));
-                        assert(in_scalar.size() > 0);
+                        assert(!in_scalar.empty());
                         assert((in_scalar.size() % lookup_component::chunk_bits) == 0);
                         assert(basepoints_required(in_scalar.size()) <= base_points.size());
 
@@ -204,11 +198,13 @@ namespace nil {
                                     this->bp,
                                     montgomery_element_component(this->bp, this->m_windows_x[i - 1],
                                                                  this->m_windows_y[i - 1].result),
-                                    montgomery_element_component(this->bp, this->m_windows_x[i], this->m_windows_y[i].result));
+                                    montgomery_element_component(this->bp, this->m_windows_x[i],
+                                                                 this->m_windows_y[i].result));
                             } else {
                                 this->montgomery_adders.emplace_back(
                                     this->bp, this->montgomery_adders.back().result,
-                                    montgomery_element_component(this->bp, this->m_windows_x[i], this->m_windows_y[i].result));
+                                    montgomery_element_component(this->bp, this->m_windows_x[i],
+                                                                 this->m_windows_y[i].result));
                             }
                         }
 
@@ -235,6 +231,33 @@ namespace nil {
                         }
                     }
 
+                public:
+                    /// Number of segments
+                    static std::size_t basepoints_required(std::size_t n_bits) {
+                        return std::ceil(n_bits / float(lookup_component::chunk_bits * chunks_per_base_point));
+                    }
+
+                    /// Auto allocation of the result
+                    template<typename BasePoints>
+                    fixed_base_mul_zcash(blueprint<field_type> &bp,
+                                         const BasePoints &base_points,
+                                         const blueprint_variable_vector<field_type> &in_scalar) :
+                        component<field_type>(bp),
+                        result(bp) {
+                        init(base_points, in_scalar);
+                    }
+
+                    /// Manual allocation of the result
+                    template<typename BasePoints>
+                    fixed_base_mul_zcash(blueprint<field_type> &bp,
+                                         const BasePoints &base_points,
+                                         const blueprint_variable_vector<field_type> &in_scalar,
+                                         const twisted_edwards_element_component &in_result) :
+                        component<field_type>(bp),
+                        result(in_result) {
+                        init(base_points, in_scalar);
+                    }
+
                     void generate_r1cs_constraints() {
                         for (auto &lut_y : this->m_windows_y) {
                             lut_y.generate_r1cs_constraints();
@@ -250,6 +273,23 @@ namespace nil {
 
                         for (auto &adder : this->edward_adders) {
                             adder.generate_r1cs_constraints();
+                        }
+
+                        // formal check
+                        if (!this->edward_adders.empty()) {
+                            this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
+                                {blueprint_variable<field_type>(0)}, {this->result.X},
+                                {this->edward_adders.back().result.X}));
+                            this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
+                                {blueprint_variable<field_type>(0)}, {this->result.Y},
+                                {this->edward_adders.back().result.Y}));
+                        } else {
+                            this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
+                                {blueprint_variable<field_type>(0)}, {this->result.X},
+                                {this->point_converters.back().result.X}));
+                            this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
+                                {blueprint_variable<field_type>(0)}, {this->result.Y},
+                                {this->point_converters.back().result.Y}));
                         }
                     }
 
@@ -275,11 +315,14 @@ namespace nil {
                         for (auto &adder : this->edward_adders) {
                             adder.generate_r1cs_witness();
                         }
-                    }
 
-                    const twisted_edwards_element_component &result() const {
-                        return this->edward_adders.size() ? this->edward_adders.back().result :
-                                                            this->point_converters.back().result;
+                        if (!this->edward_adders.empty()) {
+                            this->bp.lc_val(this->result.X) = this->bp.lc_val(this->edward_adders.back().result.X);
+                            this->bp.lc_val(this->result.Y) = this->bp.lc_val(this->edward_adders.back().result.Y);
+                        } else {
+                            this->bp.lc_val(this->result.X) = this->bp.lc_val(this->point_converters.back().result.X);
+                            this->bp.lc_val(this->result.Y) = this->bp.lc_val(this->point_converters.back().result.Y);
+                        }
                     }
                 };
             }    // namespace components

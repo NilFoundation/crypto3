@@ -42,8 +42,7 @@ namespace nil {
                  *
                  * For a given input of scalars, create an equivalent set of base points within a namespace.
                  */
-                template<typename Curve,
-                         typename Hash = hashes::sha2<256>,
+                template<typename Curve, typename Hash = hashes::sha2<256>,
                          typename HashParams = hashes::find_group_hash_default_params>
                 struct pedersen : public component<typename Curve::base_field_type> {
                     using curve_type = Curve;
@@ -53,6 +52,7 @@ namespace nil {
                     using field_type = typename commitment_component::field_type;
                     using element_component = typename commitment_component::twisted_edwards_element_component;
 
+                    element_component result;
                     commitment_component m_commitment;
 
                     static std::vector<typename element_component::group_value_type> get_base_points(std::size_t n) {
@@ -69,11 +69,20 @@ namespace nil {
                         return basepoints;
                     }
 
+                    /// Auto allocation of the result
                     pedersen(blueprint<field_type> &bp, const blueprint_variable_vector<field_type> &in_bits) :
+                        component<field_type>(bp), result(bp),
+                        m_commitment(bp, get_base_points(commitment_component::basepoints_required(in_bits.size())),
+                                     in_bits, result) {
+                    }
+
+                    /// Manual allocation of the result
+                    pedersen(blueprint<field_type> &bp, const blueprint_variable_vector<field_type> &in_bits,
+                             const element_component &in_result) :
                         component<field_type>(bp),
-                        m_commitment(bp,
-                                     get_base_points(commitment_component::basepoints_required(in_bits.size())),
-                                     in_bits) {
+                        result(in_result),
+                        m_commitment(bp, get_base_points(commitment_component::basepoints_required(in_bits.size())),
+                                     in_bits, in_result) {
                     }
 
                     void generate_r1cs_constraints() {

@@ -43,11 +43,9 @@ namespace nil {
                  * group G1 lies on the elliptic curve)
                  */
                 template<typename Curve>
-                struct element_g1_addition<Curve,
-                                           algebra::curves::forms::montgomery,
+                struct element_g1_addition<Curve, algebra::curves::forms::montgomery,
                                            algebra::curves::coordinates::affine>
-                    : public component<typename element_g1<Curve,
-                                                           algebra::curves::forms::montgomery,
+                    : public component<typename element_g1<Curve, algebra::curves::forms::montgomery,
                                                            algebra::curves::coordinates::affine>::field_type> {
                     using curve_type = Curve;
                     using form = algebra::curves::forms::montgomery;
@@ -63,11 +61,24 @@ namespace nil {
                     element_component result;
                     element_fp<field_type> lambda;
 
+                    /// Auto allocation of the result
                     element_g1_addition(blueprint<field_type> &bp,
                                         const element_component &in_p1,
                                         const element_component &in_p2) :
                         component<field_type>(bp),
                         p1(in_p1), p2(in_p2), result(bp) {
+                        blueprint_variable<field_type> lambda_var;
+                        lambda_var.allocate(this->bp);
+                        this->lambda = lambda_var;
+                    }
+
+                    /// Manual allocation of the result
+                    element_g1_addition(blueprint<field_type> &bp,
+                                        const element_component &in_p1,
+                                        const element_component &in_p2,
+                                        const element_component &in_result) :
+                        component<field_type>(bp),
+                        p1(in_p1), p2(in_p2), result(in_result) {
                         blueprint_variable<field_type> lambda_var;
                         lambda_var.allocate(this->bp);
                         this->lambda = lambda_var;
@@ -105,11 +116,9 @@ namespace nil {
                  * Gadget to convert affine Montgomery coordinates into affine twisted Edwards coordinates.
                  */
                 template<typename Curve>
-                struct element_g1_to_twisted_edwards<Curve,
-                                                     algebra::curves::forms::montgomery,
+                struct element_g1_to_twisted_edwards<Curve, algebra::curves::forms::montgomery,
                                                      algebra::curves::coordinates::affine>
-                    : public component<typename element_g1<Curve,
-                                                           algebra::curves::forms::montgomery,
+                    : public component<typename element_g1<Curve, algebra::curves::forms::montgomery,
                                                            algebra::curves::coordinates::affine>::field_type> {
                     using curve_type = Curve;
                     using form = algebra::curves::forms::montgomery;
@@ -124,14 +133,27 @@ namespace nil {
                     using to_group_type = typename to_element_component::group_type;
 
                     // Input point
-                    const element_component p_from;
+                    const element_component p;
                     // Output point
                     to_element_component result;
-                    // intermediate variables
+                    // Intermediate variables
                     typename field_type::value_type scale;
 
-                    element_g1_to_twisted_edwards(blueprint<field_type> &bp, const element_component &in_p_from) :
-                        component<field_type>(bp), p_from(in_p_from), result(bp),
+                    /// Auto allocation of the result
+                    element_g1_to_twisted_edwards(blueprint<field_type> &bp, const element_component &in_p) :
+                        component<field_type>(bp), p(in_p), result(bp),
+                        scale((static_cast<typename field_type::value_type>(4) /
+                               (static_cast<typename field_type::value_type>(to_group_type::params_type::a) -
+                                static_cast<typename field_type::value_type>(to_group_type::params_type::d)) /
+                               static_cast<typename field_type::value_type>(group_type::params_type::B))
+                                  .sqrt()) {
+                    }
+
+                    /// Manual allocation of the result
+                    element_g1_to_twisted_edwards(blueprint<field_type> &bp, const element_component &in_p,
+                                                  const to_element_component &in_result) :
+                        component<field_type>(bp),
+                        p(in_p), result(in_result),
                         scale((static_cast<typename field_type::value_type>(4) /
                                (static_cast<typename field_type::value_type>(to_group_type::params_type::a) -
                                 static_cast<typename field_type::value_type>(to_group_type::params_type::d)) /
@@ -140,17 +162,17 @@ namespace nil {
                     }
 
                     void generate_r1cs_constraints() {
-                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
-                            {this->p_from.Y}, {this->result.X}, {this->p_from.X * this->scale}));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>({this->p.Y}, {this->result.X},
+                                                                                        {this->p.X * this->scale}));
                         this->bp.add_r1cs_constraint(
-                            snark::r1cs_constraint<field_type>({this->p_from.X + field_type::value_type::one()},
+                            snark::r1cs_constraint<field_type>({this->p.X + field_type::value_type::one()},
                                                                {this->result.Y},
-                                                               {this->p_from.X - field_type::value_type::one()}));
+                                                               {this->p.X - field_type::value_type::one()}));
                     }
 
                     void generate_r1cs_witness() {
                         typename to_group_type::value_type p_to_XY =
-                            typename group_type::value_type(this->bp.lc_val(p_from.X), this->bp.lc_val(p_from.Y))
+                            typename group_type::value_type(this->bp.lc_val(p.X), this->bp.lc_val(p.Y))
                                 .to_twisted_edwards();
                         this->bp.lc_val(result.X) = p_to_XY.X;
                         this->bp.lc_val(result.Y) = p_to_XY.Y;

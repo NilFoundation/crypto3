@@ -61,7 +61,7 @@ namespace nil {
                     const element_component p2;
                     element_component result;
 
-                    // intermediate variables
+                    // Intermediate variables
                     element_fp<field_type> X1X2;
                     element_fp<field_type> X1Y2;
                     element_fp<field_type> Y1Y2;
@@ -70,11 +70,8 @@ namespace nil {
                     element_fp<field_type> dX1X2Y1Y2;
                     element_fp<field_type> aX1X2;
 
-                    element_g1_addition(blueprint<field_type> &bp,
-                                        const element_component &in_p1,
-                                        const element_component &in_p2) :
-                        component<field_type>(bp),
-                        p1(in_p1), p2(in_p2), result(bp) {
+                private:
+                    void init() {
                         blueprint_variable<field_type> X1X2_var, X1Y2_var, Y1Y2_var, Y1X2_var, X1X2Y1Y2_var,
                             dX1X2Y1Y2_var, aX1X2_var;
 
@@ -93,6 +90,26 @@ namespace nil {
                         this->X1X2Y1Y2 = X1X2Y1Y2_var;
                         this->dX1X2Y1Y2 = dX1X2Y1Y2_var;
                         this->aX1X2 = aX1X2_var;
+                    }
+
+                public:
+                    /// Auto allocation of the result
+                    element_g1_addition(blueprint<field_type> &bp,
+                                        const element_component &in_p1,
+                                        const element_component &in_p2) :
+                        component<field_type>(bp),
+                        p1(in_p1), p2(in_p2), result(bp) {
+                        init();
+                    }
+
+                    /// Manual allocation of the result
+                    element_g1_addition(blueprint<field_type> &bp,
+                                        const element_component &in_p1,
+                                        const element_component &in_p2,
+                                        const element_component &in_result) :
+                        component<field_type>(bp),
+                        p1(in_p1), p2(in_p2), result(in_result) {
+                        init();
                     }
 
                     void generate_r1cs_constraints() {
@@ -243,6 +260,7 @@ namespace nil {
                 /**
                  * @brief Component that creates constraints for the addition of two elements from G1.
                  */
+                // TODO: fixme
                 template<typename Curve>
                 struct element_g1_conditional_addition<Curve,
                                                        algebra::curves::forms::twisted_edwards,
@@ -277,9 +295,10 @@ namespace nil {
                     element_g1_conditional_addition(blueprint<field_type> &bp,
                                                     const element_component &in_p1,
                                                     const element_component &in_p2,
-                                                    const blueprint_variable<field_type> &in_can_add) :
+                                                    const blueprint_variable<field_type> &in_can_add,
+                                                    const element_component &in_result) :
                         component<field_type>(bp),
-                        p1(in_p1), p2(in_p2), can_add(in_can_add), p_to_add(bp) {
+                        p1(in_p1), p2(in_p2), can_add(in_can_add), p_to_add(bp), result(in_result) {
                         blueprint_variable<field_type> Y_intermediate_to_add1_var, Y_intermediate_to_add2_var;
 
                         Y_intermediate_to_add1_var.allocate(this->bp);

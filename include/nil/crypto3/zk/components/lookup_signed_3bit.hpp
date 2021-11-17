@@ -50,11 +50,15 @@ namespace nil {
                     static constexpr std::size_t chunk_bits = 3;
                     static constexpr std::size_t lookup_bits = 2;
 
+                    // Input variables
                     std::vector<field_value_type> c;
                     const blueprint_variable_vector<field_type> b;
+                    // Intermediate variable
                     blueprint_variable<field_type> b0b1;
+                    // Output variable
                     blueprint_variable<field_type> result;
 
+                    /// Auto allocation of the result
                     template<typename Constants,
                              typename std::enable_if<
                                  std::is_same<field_value_type, typename std::iterator_traits<
@@ -67,6 +71,22 @@ namespace nil {
                         b(in_bits) {
                         this->b0b1.allocate(this->bp);
                         this->result.allocate(this->bp);
+                        std::copy(std::cbegin(in_constants), std::cend(in_constants), std::back_inserter(this->c));
+                    }
+
+                    /// Manual allocation of the result
+                    template<typename Constants,
+                             typename std::enable_if<
+                                 std::is_same<field_value_type, typename std::iterator_traits<
+                                                                    typename Constants::iterator>::value_type>::value,
+                                 bool>::type = true>
+                    lookup_signed_3bit(blueprint<field_type> &bp,
+                                       const Constants &in_constants,
+                                       const blueprint_variable_vector<field_type> &in_bits,
+                                       const blueprint_variable<field_type> &in_result) :
+                        component<field_type>(bp),
+                        b(in_bits), result(in_result) {
+                        this->b0b1.allocate(this->bp);
                         std::copy(std::cbegin(in_constants), std::cend(in_constants), std::back_inserter(this->c));
                     }
 

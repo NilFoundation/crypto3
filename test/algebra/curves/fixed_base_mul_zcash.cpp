@@ -74,14 +74,14 @@ void test_curves_g1_fixed_base_mul_zcash_component(
 
     // components::element_g1<curve_type,
     //     representation_type> result(bp);
-
-    fixed_base_mul_zcash_component fixed_base_mul_instance(bp, basepoints, in_bits);
+    typename fixed_base_mul_zcash_component::twisted_edwards_element_component result(bp);
+    fixed_base_mul_zcash_component fixed_base_mul_instance(bp, basepoints, in_bits, result);
 
     fixed_base_mul_instance.generate_r1cs_witness();
     fixed_base_mul_instance.generate_r1cs_constraints();
 
-    BOOST_CHECK(expected.X == bp.lc_val(fixed_base_mul_instance.result().X));
-    BOOST_CHECK(expected.Y == bp.lc_val(fixed_base_mul_instance.result().Y));
+    BOOST_CHECK(expected.X == bp.lc_val(result.X));
+    BOOST_CHECK(expected.Y == bp.lc_val(result.Y));
     BOOST_CHECK(bp.is_satisfied());
 }
 

@@ -40,6 +40,7 @@ using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
+// TODO: extend tests
 BOOST_AUTO_TEST_SUITE(blueprint_twisted_edwards_operations_manual_test_suite)
 
 BOOST_AUTO_TEST_CASE(babyjubjub_test) {
