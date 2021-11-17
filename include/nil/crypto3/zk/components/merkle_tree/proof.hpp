@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
@@ -38,52 +38,45 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename FieldType, typename Hash>
-                struct merkle_authentication_path_variable : public component<FieldType> {
+                template<typename FieldType, typename Hash, std::size_t Arity = 2>
+                struct merkle_proof : public component<FieldType> {
 
                     const std::size_t tree_depth;
-                    std::vector<digest_variable<FieldType>> left_digests;
-                    std::vector<digest_variable<FieldType>> right_digests;
 
-                    merkle_authentication_path_variable(blueprint<FieldType> &bp, const std::size_t tree_depth) :
+                    std::vector<std::array<digest_variable<FieldType>, Arity>> path;
+
+                    merkle_proof (blueprint<FieldType> &bp, const std::size_t tree_depth):
                         component<FieldType>(bp), tree_depth(tree_depth) {
-                        for (std::size_t i = 0; i < tree_depth; ++i) {
-                            left_digests.emplace_back(digest_variable<FieldType>(bp, Hash::get_digest_len()));
-                            right_digests.emplace_back(digest_variable<FieldType>(bp, Hash::get_digest_len()));
+
+                        for (std::size_t i = 0; i < tree_depth; ++i) {                        
+                            std::array<digest_variable<FieldType>, Arity> layer;
+
+                            for (std::size_t j = 0; j < Arity; ++j) {
+                                layer_neighbours[j] = digest_variable<FieldType>(bp, Hash::digest_bits);
+                            }
+
+                            path.emplace_back(layer_neighbours);
                         }
+
                     }
 
                     void generate_r1cs_constraints() {
                         for (std::size_t i = 0; i < tree_depth; ++i) {
-                            left_digests[i].generate_r1cs_constraints();
-                            right_digests[i].generate_r1cs_constraints();
-                        }
-                    }
-
-                    void generate_r1cs_witness(const std::size_t address,
-                                               const snark::merkle_authentication_path &path) {
-                        assert(path.size() == tree_depth);
-
-                        for (std::size_t i = 0; i < tree_depth; ++i) {
-                            if (address & (1ul << (tree_depth - 1 - i))) {
-                                left_digests[i].generate_r1cs_witness(path[i]);
-                            } else {
-                                right_digests[i].generate_r1cs_witness(path[i]);
+                            for (std::size_t j = 0; j < Arity - 1; ++j) {
+                                path[i][j].generate_r1cs_constraints();
                             }
                         }
                     }
 
-                    snark::merkle_authentication_path get_authentication_path(const std::size_t address) const {
-                        snark::merkle_authentication_path result;
+                    void generate_r1cs_witness(nil::crypto3::merkletree::MerkleProof<Hash, Arity> proof) {
+                        assert(proof.path.size() == tree_depth);
+
                         for (std::size_t i = 0; i < tree_depth; ++i) {
-                            if (address & (1ul << (tree_depth - 1 - i))) {
-                                result.emplace_back(left_digests[i].get_digest());
-                            } else {
-                                result.emplace_back(right_digests[i].get_digest());
+                            for (std::size_t j =0; j < Arity - 1; j++){
+                                std::size_t neighbour_index = proof.path[i][j].position;
+                                path[i][neighbour_index].generate_r1cs_constraints(proof.path[i][j].hash);
                             }
                         }
-
-                        return result;
                     }
                 };
             }    // namespace components
