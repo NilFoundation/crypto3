@@ -50,6 +50,11 @@ namespace nil {
                         find_const_variables(p);
                     }
 
+                    /*
+                    * Compute -input^-1 mod 2^limb_bits. Throws an exception if input
+                    * is even. If input is odd, then input and 2^n are relatively prime
+                    * and an inverse exists.
+                    */
                     limb_type monty_inverse(limb_type a) {
                         if (a % 2 == 0) {
                             throw std::invalid_argument("Monty_inverse only valid for odd integers");

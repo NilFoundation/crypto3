@@ -18,27 +18,39 @@ namespace nil {
     namespace crypto3 {
         namespace multiprecision {
             namespace backends {
-
                 template<typename Backend>
-                constexpr Backend eval_extended_euclidean_algorithm(Backend& a, Backend& b, Backend& x, Backend& y) {
-                    if (eval_is_zero(a)) {
-                        using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
-                        x = ui_type(0u);
-                        y = ui_type(1u);
-                        return b;
+                constexpr Backend eval_extended_euclidean_algorithm(Backend &num1, Backend& num2, Backend &bezout_x, Backend &bezout_y) {
+                    Backend x, y, tmp_num1 = num1, tmp_num2 = num2;
+                    using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
+                    y = ui_type(1u);
+                    bezout_x = ui_type(1u);
+
+                    // Extended Euclidean Algorithm
+                    while (!eval_is_zero(tmp_num2)) {
+                        Backend quotient, remainder, placeholder;
+
+                        eval_divide(quotient, tmp_num1, tmp_num2);
+                        eval_modulus(remainder, tmp_num1, tmp_num2);
+
+                        tmp_num1 = tmp_num2;
+                        tmp_num2 = remainder;
+
+                        Backend temp_x = x, temp_y = y;
+                        eval_multiply(placeholder, quotient, x);
+                        eval_subtract(placeholder, bezout_x, placeholder);
+                        x = placeholder;
+                        bezout_x = temp_x;
+
+                        eval_multiply(placeholder, quotient, y);
+                        eval_subtract(placeholder, bezout_y, placeholder);
+                        y = placeholder;
+                        bezout_y = temp_y;
+
                     }
-                    Backend x1, y1, tmp = b;
-                    eval_modulus(tmp, a);
-                    Backend d = eval_extended_euclidean_algorithm(tmp, a, x1, y1);
-                    tmp = b;
-                    eval_divide(tmp, a);
-                    eval_multiply(tmp, x1);
-                    x = y1;
-                    eval_subtract(x, tmp);
-                    y = x1;
-                    return d;
+                    return tmp_num1;
                 }
 
+                // a^(-1) mod p
                 template<typename Backend>
                 constexpr Backend eval_inverse_extended_euclidean_algorithm(const Backend& a, const Backend& m) {
                     using Backend_doubled = typename default_ops::double_precision_type<Backend>::type;
@@ -58,34 +70,32 @@ namespace nil {
                     }
                 }
 
-                template<typename Backend>
-                constexpr typename std::tuple_element<0, typename Backend::signed_types>::type
-                    eval_monty_inverse(typename std::tuple_element<0, typename Backend::signed_types>::type a) {
-                    using si_type = typename std::tuple_element<0, typename Backend::signed_types>::type;
+                template<typename Backend, typename Number>
+                Backend eval_inverse_mod_pow2(Backend a, size_t k) {
+                    using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
+                    Backend tmp;
+                    Backend zero = ui_type(0u);
+                    Backend one = ui_type(1u);
+                    Backend two = ui_type(2u);
 
-                    if (a % 2 == 0) {
-                        throw std::invalid_argument("monty_inverse only valid for odd integers");
-                    }
-
+                    eval_modulus(tmp, a, two);
+                    if (eval_is_zero(tmp) || k == 0)
+                        return zero;
+                    if (k == 1)
+                        return one;
                     /*
                      * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
                      * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
                      */
-
-                    si_type b = 1;
-                    si_type r = 0;
-
-                    for (size_t i = 0; i != sizeof(si_type) * CHAR_BIT; ++i) {
-                        const si_type bi = b % 2;
-                        r >>= 1;
-                        r += bi << (sizeof(si_type) * CHAR_BIT - 1);
-
-                        b -= a * bi;
-                        b >>= 1;
+                    Backend b = one;
+                    Backend r;
+                    for (size_t i = 0; i < k; ++i) {
+                        if (eval_bit_test(b, 0)) {
+                            eval_subtract(b, a);
+                            eval_bit_set(r, i);
+                        }
+                        eval_right_shift(b, one);
                     }
-
-                    // Now invert in addition space
-                    r = (~static_cast<si_type>(0) - r) + 1;
 
                     return r;
                 }
@@ -148,169 +158,6 @@ namespace nil {
                 }
 
                 /*
-                                template <typename Backend>
-                                inline void bigint_shr1(typename std::tuple_element<0, typename
-                   Backend::unsigned_types>::type x[], size_t x_size, size_t word_shift, size_t bit_shift)
-                                {
-                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
-
-                                   const size_t top = x_size >= word_shift ? (x_size - word_shift) : 0;
-
-                                   if (top > 0)
-                                      copy_mem(x, x + word_shift, top);
-                                   clear_mem(x + top, std::min(word_shift, x_size));
-
-                                   const auto   carry_mask  = CT::Mask<ui_type>::expand(bit_shift);
-                                   const size_t carry_shift = carry_mask.if_set_return(BOTAN_MP_WORD_BITS - bit_shift);
-
-                                   ui_type carry = 0;
-
-                                   for (size_t i = 0; i != top; ++i)
-                                   {
-                                      const ui_type w = x[top - i - 1];
-                                      x[top - i - 1]  = (w >> bit_shift) | carry;
-                                      carry           = carry_mask.if_set_return(w << carry_shift);
-                                   }
-                                }
-
-                                template <typename Backend>
-                                inline typename std::tuple_element<0, typename Backend::unsigned_types>::type
-                   bigint_add2_nc( typename std::tuple_element<0, typename Backend::unsigned_types>::type x[], size_t
-                   x_size, const typename std::tuple_element<0, typename Backend::unsigned_types>::type y[], size_t y_size)
-                                {
-                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
-
-                                   ui_type carry = 0;
-
-                                   BOOST_ASSERT_MSG(x_size >= y_size, "Expected sizes");
-
-                                   const size_t blocks = y_size - (y_size % 8);
-
-                                   for (size_t i = 0; i != blocks; i += 8)
-                                      carry = word8_add2(x + i, y + i, carry);
-
-                                   for (size_t i = blocks; i != y_size; ++i)
-                                      x[i] = word_add(x[i], y[i], &carry);
-
-                                   for (size_t i = y_size; i != x_size; ++i)
-                                      x[i] = word_add(x[i], 0, &carry);
-
-                                   return carry;
-                                }
-
-                                template <typename Backend>
-                                inline typename std::tuple_element<0, typename Backend::unsigned_types>::type
-                   bigint_cnd_sub( typename std::tuple_element<0, typename Backend::unsigned_types>::type cnd, typename
-                   std::tuple_element<0, typename Backend::unsigned_types>::type x[], size_t x_size, const typename
-                   std::tuple_element<0, typename Backend::unsigned_types>::type y[], size_t y_size)
-                                {
-                                   BOOST_ASSERT_MSG(x_size >= y_size, "Expected sizes");
-
-                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
-
-                                   const auto mask = CT::Mask<ui_type>::expand(cnd);
-
-                                   ui_type carry = 0;
-
-                                   const size_t blocks = y_size - (y_size % 8);
-                                   ui_type      z[8]   = {0};
-
-                                   for (size_t i = 0; i != blocks; i += 8)
-                                   {
-                                      carry = word8_sub3(z, x + i, y + i, carry);
-                                      mask.select_n(x + i, z, x + i, 8);
-                                   }
-
-                                   for (size_t i = blocks; i != y_size; ++i)
-                                   {
-                                      z[0] = word_sub(x[i], y[i], &carry);
-                                      x[i] = mask.select(z[0], x[i]);
-                                   }
-
-                                   for (size_t i = y_size; i != x_size; ++i)
-                                   {
-                                      z[0] = word_sub(x[i], 0, &carry);
-                                      x[i] = mask.select(z[0], x[i]);
-                                   }
-
-                                   return mask.if_set_return(carry);
-                                }
-
-                                template <typename Backend>
-                                inline typename std::tuple_element<0, typename Backend::unsigned_types>::type
-                   bigint_cnd_add( typename std::tuple_element<0, typename Backend::unsigned_types>::type       cnd,
-                                    typename std::tuple_element<0, typename Backend::unsigned_types>::type       x[],
-                                    typename std::tuple_element<0, typename Backend::unsigned_types>::type       x_size,
-                                    const typename std::tuple_element<0, typename Backend::unsigned_types>::type y[], size_t
-                   y_size)
-                                {
-                                   BOTAN_ASSERT(x_size >= y_size, "Expected sizes");
-
-                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
-
-                                   const auto mask = CT::Mask<ui_type>::expand(cnd);
-
-                                   ui_type carry = 0;
-
-                                   const size_t blocks = y_size - (y_size % 8);
-                                   ui_type      z[8]   = {0};
-
-                                   for (size_t i = 0; i != blocks; i += 8)
-                                   {
-                                      carry = word8_add3(z, x + i, y + i, carry);
-                                      mask.select_n(x + i, z, x + i, 8);
-                                   }
-
-                                   for (size_t i = blocks; i != y_size; ++i)
-                                   {
-                                      z[0] = word_add(x[i], y[i], &carry);
-                                      x[i] = mask.select(z[0], x[i]);
-                                   }
-
-                                   for (size_t i = y_size; i != x_size; ++i)
-                                   {
-                                      z[0] = word_add(x[i], 0, &carry);
-                                      x[i] = mask.select(z[0], x[i]);
-                                   }
-
-                                   return mask.if_set_return(carry);
-                                }
-
-                                template <typename Backend>
-                                inline void bigint_cnd_abs(typename std::tuple_element<0, typename
-                   Backend::unsigned_types>::type cnd, typename std::tuple_element<0, typename
-                   Backend::unsigned_types>::type x[], size_t size)
-                                {
-                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
-                                   const auto                                                          mask =
-                                CT::Mask<ui_type>::expand(cnd);
-
-                                   ui_type carry = mask.if_set_return(1);
-                                   for (size_t i = 0; i != size; ++i)
-                                   {
-                                      const ui_type z = word_add(~x[i], 0, &carry);
-                                      x[i]            = mask.select(z, x[i]);
-                                   }
-                                }
-
-                                template <typename Backend>
-                                inline void bigint_cnd_swap(typename std::tuple_element<0, typename
-                   Backend::unsigned_types>::type cnd, typename std::tuple_element<0, typename
-                   Backend::unsigned_types>::type x[], typename std::tuple_element<0, typename
-                   Backend::unsigned_types>::type y[], size_t size)
-                                {
-                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
-                                   const auto                                                          mask =
-                                CT::Mask<ui_type>::expand(cnd);
-
-                                   for (size_t i = 0; i != size; ++i)
-                                   {
-                                      const ui_type a = x[i];
-                                      const ui_type b = y[i];
-                                      x[i]            = mask.select(b, a);
-                                      y[i]            = mask.select(a, b);
-                                   }
-                                }
 
 
                                 template <typename Backend>
@@ -520,16 +367,6 @@ namespace nil {
                                 }
                                 */
 
-                /*
-                                template <typename Backend, expression_template_option ExpressionTemplates>
-                                number<Backend, ExpressionTemplates> normalized_montgomery_inverse(
-                                    const number<Backend, ExpressionTemplates>& a,
-                                    const number<Backend, ExpressionTemplates>& p)
-                                {
-                                   return number<Backend, ExpressionTemplates>(
-                                       evaL_normalized_montgomery_inverse(a.backned(), p.backend()));
-                                }
-                                 */
 
                 /*
                                 template <typename Backend>
@@ -578,15 +415,6 @@ namespace nil {
                                 }
                                 */
 
-                /*
-                                template <typename Backend, expression_template_option ExpressionTemplates>
-                                number<Backend, ExpressionTemplates> inverse_mod_pow2(
-                                    const number<Backend, ExpressionTemplates>& a1, size_t k)
-                                {
-                                   return number<Backend, ExpressionTemplates>(
-                                       eval_inverse_mod_pow2(a1.backend(), k.backend()));
-                                }
-                                */
 
                 /*
                                 template <typename Backend>

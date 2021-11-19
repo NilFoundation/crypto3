@@ -225,6 +225,11 @@ namespace nil {
                         }
                     }
 
+                    /*
+                    * Compute -input^-1 mod 2^limb_bits. Throws an exception if input
+                    * is even. If input is odd, then input and 2^n are relatively prime
+                    * and an inverse exists.
+                    */
                     constexpr internal_limb_type monty_inverse(internal_limb_type a) {
                         BOOST_ASSERT(check_montgomery_constraints(get_mod().backend()));
 
