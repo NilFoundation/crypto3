@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Noam Yemini <@NoamDev at GitHub>
 //
 // MIT License
 //
@@ -38,9 +39,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                using lc_index_t = std::size_t;
-
-                template<typename FieldType>
+                template<typename TArithmetization, typename FieldType>
                 class blueprint;
 
                 template<typename FieldType>
@@ -49,8 +48,10 @@ namespace nil {
                     typedef typename field_type::value_type field_value_type;
 
                 public:
+
+                    using index_type = std::size_t;
                     bool is_variable;
-                    lc_index_t index;
+                    index_type index;
 
                     blueprint_linear_combination() {
                         this->is_variable = false;
@@ -62,13 +63,15 @@ namespace nil {
                         this->terms.emplace_back(snark::linear_term<field_type>(var));
                     }
 
-                    void assign(blueprint<field_type> &bp, const snark::linear_combination<field_type> &lc) {
+                    template<typename TArithmetization>
+                    void assign(blueprint<TArithmetization, field_type> &bp, const snark::linear_combination<field_type> &lc) {
                         assert(this->is_variable == false);
                         this->index = bp.allocate_lc_index();
                         this->terms = lc.terms;
                     }
 
-                    void evaluate(blueprint<field_type> &bp) const {
+                    template<typename TArithmetization>
+                    void evaluate(blueprint<TArithmetization, field_type> &bp) const {
                         if (this->is_variable) {
                             return;    // do nothing
                         }
@@ -152,13 +155,15 @@ namespace nil {
                                                         typename contents::const_reverse_iterator last) :
                         contents(first, last) {};
 
-                    void evaluate(blueprint<field_type> &bp) const {
+                    template<typename TArithmetization>
+                    void evaluate(blueprint<TArithmetization, field_type> &bp) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             (*this)[i].evaluate(bp);
                         }
                     }
 
-                    void fill_with_field_elements(blueprint<field_type> &bp,
+                    template<typename TArithmetization>
+                    void fill_with_field_elements(blueprint<TArithmetization, field_type> &bp,
                                                   const std::vector<field_value_type> &vals) const {
                         assert(this->size() == vals.size());
                         for (std::size_t i = 0; i < vals.size(); ++i) {
@@ -166,25 +171,29 @@ namespace nil {
                         }
                     }
 
-                    void fill_with_bits(blueprint<field_type> &bp, const std::vector<bool> &bits) const {
+                    template<typename TArithmetization>
+                    void fill_with_bits(blueprint<TArithmetization, field_type> &bp, const std::vector<bool> &bits) const {
                         assert(this->size() == bits.size());
                         for (std::size_t i = 0; i < bits.size(); ++i) {
                             bp.lc_val((*this)[i]) = (bits[i] ? field_value_type::one() : field_value_type::zero());
                         }
                     }
 
-                    void fill_with_bits_of_ulong(blueprint<field_type> &bp, const unsigned long i) const {
+                    template<typename TArithmetization>
+                    void fill_with_bits_of_ulong(blueprint<TArithmetization, field_type> &bp, const unsigned long i) const {
                         this->fill_with_bits_of_field_element(bp, field_value_type(i));
                     }
 
-                    void fill_with_bits_of_field_element(blueprint<field_type> &bp, const field_value_type &r) const {
+                    template<typename TArithmetization>
+                    void fill_with_bits_of_field_element(blueprint<TArithmetization, field_type> &bp, const field_value_type &r) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             bp.lc_val((*this)[i]) = multiprecision::bit_test(r.data, i) ? field_value_type::one() :
                                                                                           field_value_type::zero();
                         }
                     }
 
-                    std::vector<field_value_type> get_vals(const blueprint<field_type> &bp) const {
+                    template<typename TArithmetization>
+                    std::vector<field_value_type> get_vals(const blueprint<TArithmetization, field_type> &bp) const {
                         std::vector<field_value_type> result(this->size());
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             result[i] = bp.lc_val((*this)[i]);
@@ -192,7 +201,8 @@ namespace nil {
                         return result;
                     }
 
-                    std::vector<bool> get_bits(const blueprint<field_type> &bp) const {
+                    template<typename TArithmetization>
+                    std::vector<bool> get_bits(const blueprint<TArithmetization, field_type> &bp) const {
                         std::vector<bool> result;
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             const field_value_type v = bp.lc_val((*this)[i]);
@@ -202,7 +212,8 @@ namespace nil {
                         return result;
                     }
 
-                    field_value_type get_field_element_from_bits(const blueprint<field_type> &bp) const {
+                    template<typename TArithmetization>
+                    field_value_type get_field_element_from_bits(const blueprint<TArithmetization, field_type> &bp) const {
                         field_value_type result = field_value_type::zero();
 
                         for (std::size_t i = 0; i < this->size(); ++i) {

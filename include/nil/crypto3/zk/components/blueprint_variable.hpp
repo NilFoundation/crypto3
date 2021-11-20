@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2021 Noam Yemini <@NoamDev at GitHub>
 //
@@ -39,25 +39,29 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename FieldType>
+                template<typename TArithmetization, typename TBlueprintField>
                 class blueprint;
 
-                template<typename FieldType>
-                class blueprint_variable : public snark::variable<FieldType> {
+                template<typename TBlueprintField>
+                class blueprint_variable : public snark::variable<TBlueprintField> {
                 public:
-                    blueprint_variable(const typename snark::variable<FieldType>::index_type index = 0) :
-                        snark::variable<FieldType>(index) {};
+                    blueprint_variable(const typename snark::variable<TBlueprintField>::index_type index = 0) :
+                        snark::variable<TBlueprintField>(index) {};
 
-                    void allocate(blueprint<FieldType> &bp) {
+                    template<typename TArithmetization>
+                    void allocate(blueprint<TArithmetization, TBlueprintField> &bp) {
                         this->index = bp.allocate_var_index();
+                    }
+
+                    static blueprint_variable<TBlueprintField> constant() {
+                        return blueprint_variable<TBlueprintField>(0);
                     }
                 };
 
-                template<typename FieldType>
-                class blueprint_variable_vector : private std::vector<blueprint_variable<FieldType>> {
-                    typedef FieldType field_type;
-                    typedef typename field_type::value_type field_value_type;
-                    typedef std::vector<blueprint_variable<field_type>> contents;
+                template<typename TBlueprintField>
+                class blueprint_variable_vector : private std::vector<blueprint_variable<TBlueprintField>> {
+                    typedef typename TBlueprintField::value_type field_value_type;
+                    typedef std::vector<blueprint_variable<TBlueprintField>> contents;
 
                 public:
                     using typename contents::const_iterator;
@@ -67,6 +71,7 @@ namespace nil {
 
                     using contents::begin;
                     using contents::emplace_back;
+                    using contents::erase;
                     using contents::empty;
                     using contents::end;
                     using contents::insert;
@@ -78,7 +83,7 @@ namespace nil {
                     using contents::resize;
 
                     blueprint_variable_vector() : contents() {};
-                    blueprint_variable_vector(std::size_t count, const blueprint_variable<field_type> &value) :
+                    blueprint_variable_vector(std::size_t count, const blueprint_variable<TBlueprintField> &value) :
                         contents(count, value) {};
                     blueprint_variable_vector(typename contents::const_iterator first,
                                               typename contents::const_iterator last) :
@@ -87,8 +92,9 @@ namespace nil {
                                               typename contents::const_reverse_iterator last) :
                         contents(first, last) {};
 
-                    /* allocates blueprint_variable<field_type> array in MSB->LSB order */
-                    void allocate(blueprint<field_type> &bp, const std::size_t n) {
+                    /* allocates blueprint_variable<TBlueprintField> vector in MSB->LSB order */
+                    template<typename TArithmetization>
+                    void allocate(blueprint<TArithmetization, TBlueprintField> &bp, const std::size_t n) {
                         (*this).resize(n);
 
                         for (std::size_t i = 0; i < n; ++i) {
@@ -96,7 +102,8 @@ namespace nil {
                         }
                     }
 
-                    void fill_with_field_elements(blueprint<field_type> &bp,
+                    template<typename TArithmetization>
+                    void fill_with_field_elements(blueprint<TArithmetization, TBlueprintField> &bp,
                                                   const std::vector<field_value_type> &vals) const {
                         assert(this->size() == vals.size());
                         for (std::size_t i = 0; i < vals.size(); ++i) {
@@ -104,18 +111,21 @@ namespace nil {
                         }
                     }
 
-                    void fill_with_bits(blueprint<field_type> &bp, const std::vector<bool> &bits) const {
+                    template<typename TArithmetization>
+                    void fill_with_bits(blueprint<TArithmetization, TBlueprintField> &bp, const std::vector<bool> &bits) const {
                         assert(this->size() == bits.size());
                         for (std::size_t i = 0; i < bits.size(); ++i) {
                             bp.val((*this)[i]) = (bits[i] ? field_value_type::one() : field_value_type::zero());
                         }
                     }
 
-                    void fill_with_bits_of_ulong(blueprint<field_type> &bp, const unsigned long i) const {
+                    template<typename TArithmetization>
+                    void fill_with_bits_of_ulong(blueprint<TArithmetization, TBlueprintField> &bp, const unsigned long i) const {
                         this->fill_with_bits_of_field_element(bp, field_value_type(i));
                     }
 
-                    void fill_with_bits_of_field_element(blueprint<field_type> &bp, const field_value_type &r) const {
+                    template<typename TArithmetization>
+                    void fill_with_bits_of_field_element(blueprint<TArithmetization, TBlueprintField> &bp, const field_value_type &r) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             bp.val((*this)[i]) = nil::crypto3::multiprecision::bit_test(r.data, i) ?
                                                      field_value_type::one() :
@@ -123,7 +133,8 @@ namespace nil {
                         }
                     }
 
-                    std::vector<field_value_type> get_vals(const blueprint<field_type> &bp) const {
+                    template<typename TArithmetization>
+                    std::vector<field_value_type> get_vals(const blueprint<TArithmetization, TBlueprintField> &bp) const {
                         std::vector<field_value_type> result(this->size());
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             result[i] = bp.val((*this)[i]);
@@ -131,7 +142,8 @@ namespace nil {
                         return result;
                     }
 
-                    std::vector<bool> get_bits(const blueprint<field_type> &bp) const {
+                    template<typename TArithmetization>
+                    std::vector<bool> get_bits(const blueprint<TArithmetization, TBlueprintField> &bp) const {
                         std::vector<bool> result;
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             const field_value_type v = bp.val((*this)[i]);
@@ -141,7 +153,8 @@ namespace nil {
                         return result;
                     }
 
-                    field_value_type get_field_element_from_bits(const blueprint<field_type> &bp) const {
+                    template<typename TArithmetization>
+                    field_value_type get_field_element_from_bits(const blueprint<TArithmetization, TBlueprintField> &bp) const {
                         field_value_type result = field_value_type::zero();
 
                         for (std::size_t i = 0; i < this->size(); ++i) {
