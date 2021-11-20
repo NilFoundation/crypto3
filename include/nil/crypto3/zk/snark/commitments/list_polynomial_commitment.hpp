@@ -64,7 +64,6 @@ namespace nil {
                     using openning_type = merkle_proof_type;
                     using commitment_type = typename merkle_tree_type::root_type;
 
-                    template <std::size_t k, std::size_t lambda, std::size_t r>
                     struct proof_type {
                         std::array<merkle_proof_type, k> z_openings;
                         std::array<std::array<merkle_proof_type, m * r>, lamda> alpha_openings;

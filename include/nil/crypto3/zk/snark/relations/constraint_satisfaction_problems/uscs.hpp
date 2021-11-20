@@ -37,6 +37,7 @@
 #include <vector>
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
+#include <nil/crypto3/zk/snark/relations/linear_combination.hpp>
 
 namespace nil {
     namespace crypto3 {
