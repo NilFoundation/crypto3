@@ -53,7 +53,8 @@ namespace nil {
                     element_g1_variable_base_endo_scalar_mul_plonk(blueprint_type &bp) :
                         component<FieldType>(bp){
 
-                        j = bp.allocate_rows(64);
+                        // the last row is only for the n
+                        j = bp.allocate_rows(64 + 1);
                     }
 
                     void generate_gates() {
@@ -89,29 +90,32 @@ namespace nil {
                         constexpr static const typename blueprint_type::variable_type b_4(W14, 
                             blueprint_type::variable_type::rotation_type::current);
 
-                        constexpr static const typename blueprint_type::variable_type s_5(W0, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type b_3(W1, 
-                            blueprint_type::variable_type::rotation_type::current);
-
                         constexpr static const typename blueprint_type::variable_type next_n(W6, 
                             blueprint_type::variable_type::rotation_type::next);
 
-                        bp.add_gate(j, b_1 * (b_1 - 1));
-                        bp.add_gate(j, b_2 * (b_2 - 1));
-                        bp.add_gate(j, b_3 * (b_3 - 1));
-                        bp.add_gate(j, b_4 * (b_4 - 1));
+                        for (typename blueprint_type::row_index_type z = 0; z <= 63; z++){
+                            bp.add_gate(j + z, b_1 * (b_1 - 1));
+                            bp.add_gate(j + z, b_2 * (b_2 - 1));
+                            bp.add_gate(j + z, b_3 * (b_3 - 1));
+                            bp.add_gate(j + z, b_4 * (b_4 - 1));
 
-                        bp.add_gate(j, ((1 + (endo - 1) * b_2) * x_T - x_P) * s_1 - (2 * b_1 - 1) * y_T + y_P);
-                        bp.add_gate(j, (2 * x_P - s_1^2 + (1 + (endo - 1) * b_2) * x_T) * ((x_P - x_R) * s_1 + y_R + y_P) - (x_P - x_R) * 2 * y_P);
-                        bp.add_gate(j, (y_R + yP)^2 - ((xP - x_R)^2 * (s_1^2 - (1 + (endo - 1) * b_2) * x_T + x_R)));
-                        bp.add_gate(j, ((1 + (endo - 1) * b_2) * x_T - x_R) * s_3 - (2 * b_3-1) * y_T + y_R);
-                        bp.add_gate(j, (2 * x_R - s_3^2 + (1 + (endo - 1) * b_4) * x_T) * ((x_R - x_S) * s_3 + y_S + y_R) - (x_R - x_S) * 2 * y_R);
-                        bp.add_gate(j, (y_S + y_R)^2 - ((x_R - x_S)^2 * (s_3^2 - (1 + (endo - 1) * b_4) * x_T + x_S)));
-                        bp.add_gate(j, n - (16 * next_n + 8 * b_1 + 4 * b_2 + 2 * b_3 + b_4));
-
+                            bp.add_gate(j + z, ((1 + (endo - 1) * b_2) * x_T - x_P) * s_1 - (2 * b_1 - 1) * y_T + y_P);
+                            bp.add_gate(j + z, (2 * x_P - s_1^2 + (1 + (endo - 1) * b_2) * x_T) * ((x_P - x_R) * s_1 + y_R + y_P) - (x_P - x_R) * 2 * y_P);
+                            bp.add_gate(j + z, (y_R + yP)^2 - ((xP - x_R)^2 * (s_1^2 - (1 + (endo - 1) * b_2) * x_T + x_R)));
+                            bp.add_gate(j + z, ((1 + (endo - 1) * b_2) * x_T - x_R) * s_3 - (2 * b_3-1) * y_T + y_R);
+                            bp.add_gate(j + z, (2 * x_R - s_3^2 + (1 + (endo - 1) * b_4) * x_T) * ((x_R - x_S) * s_3 + y_S + y_R) - (x_R - x_S) * 2 * y_R);
+                            bp.add_gate(j + z, (y_S + y_R)^2 - ((x_R - x_S)^2 * (s_3^2 - (1 + (endo - 1) * b_4) * x_T + x_S)));
+                            bp.add_gate(j + z, n - (16 * next_n + 8 * b_1 + 4 * b_2 + 2 * b_3 + b_4));
+                        }
                     }
 
+                private:
+                    static typename CurveType::scalar_field_type::value_type lambda(
+                        typename CurveType::g1_type<>::value_type P1,
+                        typename CurveType::g1_type<>::value_type P2){
+                        return (P1.Y - P2.Y)*(P1.X - P2.X);
+                    }
+                public:
                     void generate_assignments(typename CurveType::scalar_field_type::value_type &r, 
                                               typename CurveType::g1_type<>::value_type &T) {
 
@@ -121,38 +125,25 @@ namespace nil {
                         
                         std::array<bool, 4> b = marshalling::unpack(r);
 
-                        bp.val(W0, j) = T.X;
-                        bp.val(W1, j) = T.Y;
-                        bp.val(W2, j) = S.X;
-                        bp.val(W3, j) = S.Y;
-                        bp.val(W4, j) = ...;
-                        bp.val(W5, j) = ...;
-                        bp.val(W6, j) = ...;
-                        bp.val(W7, j) = R.X;
-                        bp.val(W8, j) = R.Y;
-                        bp.val(W9, j) = ...;
-                        bp.val(W10, j) = ...;
-                        bp.val(W11, j) = b[0];
-                        bp.val(W12, j) = b[1];
-                        bp.val(W13, j) = b[2];
-                        bp.val(W14, j) = b[3];
+                        for (typename blueprint_type::row_index_type z = 0; z <= 63; z++){
+                            bp.val(W0, j + z) = T.X;
+                            bp.val(W1, j + z) = T.Y;
+                            bp.val(W2, j) = S.X;
+                            bp.val(W3, j) = S.Y;
+                            bp.val(W4, j) = Q.X;
+                            bp.val(W5, j) = Q.Y;
+                            bp.val(W6, j) = r;
+                            bp.val(W7, j) = R.X;
+                            bp.val(W8, j) = R.Y;
+                            bp.val(W9, j) = lambda(S, Q);
+                            bp.val(W10, j) = lambda(R, S);
+                            bp.val(W11, j + z) = b[0];
+                            bp.val(W12, j + z) = b[1];
+                            bp.val(W13, j + z) = b[2];
+                            bp.val(W14, j + z) = b[3];
+                        }
 
-                        bp.val(W0, j+1) = ...;
-                        bp.val(W1, j+1) = b[3];
-                        bp.val(W2, j+1) = S.X;
-                        bp.val(W3, j+1) = S.Y;
-                        bp.val(W4, j+1) = ...;
-                        bp.val(W5, j+1) = ...;
-                        bp.val(W6, j+1) = ...;
-                        bp.val(W7, j+1) = R.X;
-                        bp.val(W8, j+1) = R.Y;
-                        bp.val(W9, j+1) = ...;
-                        bp.val(W10, j+1) = ...;
-                        bp.val(W11, j+1) = b[0];
-                        bp.val(W12, j+1) = b[1];
-                        bp.val(W13, j+1) = b[2];
-                        bp.val(W14, j+1) = b[3];
-
+                        bp.val(W6, j+64) = 0;
                     }
                 };
 
