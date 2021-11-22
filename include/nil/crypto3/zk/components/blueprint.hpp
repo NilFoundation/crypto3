@@ -157,78 +157,54 @@ namespace nil {
                     }
                 };
 
-                template<typename TBlueprintField>
-                class blueprint <snark::plonk_constraint_system<TBlueprintField>, TBlueprintField>{
-                    std::vector<snark::plonk_variable_assignment<TBlueprintField>> values;
+                template<typename TBlueprintField, std::size_t WiresAmount>
+                class blueprint <snark::plonk_constraint_system<TBlueprintField, WiresAmount>, TBlueprintField>{
+                    snark::plonk_variable_assignment<TBlueprintField, WiresAmount> assignments;
 
-                    typename TBlueprintField::value_type constant_term;
-                    std::vector<typename snark::variable<TBlueprintField>::index_type> next_free_vars;
-
-                    snark::plonk_constraint_system<TBlueprintField> constraint_system;
+                    snark::plonk_constraint_system<TBlueprintField, WiresAmount> constraint_system;
 
                 public:
-                    // typedef TBlueprintField field_type;
 
                     blueprint(): next_free_vars(){
-                        constant_term = TBlueprintField::value_type::one();
 
-                        next_free_vars.push_back(1); /* to account for constant 1 term */
                     }
                     
-                    void clear_values() {
-                        for (auto iter = values.begin(); iter != values.end(); iter++){
+                    void clear_assignments() {
+                        for (auto iter = assignments.begin(); iter != assignments.end(); iter++){
                             std::fill(iter->begin(), iter->end(), TBlueprintField::value_type::zero());
                         }
                     }
 
-                    typename TBlueprintField::value_type &val(const blueprint_variable<TBlueprintField> &var, std::size_t row_index) {
-                        assert(row_index < values.size());
-                        assert(var.index <= values[row_index].size());
-                        return (var.index == 0 ? constant_term : values[row_index][var.index - 1]);
+                    typename TBlueprintField::value_type &assignment(const blueprint_variable<TBlueprintField> &var, std::size_t row_index) {
+                        assert(row_index < assignments.size());
+                        assert(var.index <= assignments[row_index].size());
+                        return (assignments[row_index][var.index]);
                     }
 
-                    typename TBlueprintField::value_type val(const blueprint_variable<TBlueprintField> &var, std::size_t row_index) const {
-                        assert(row_index < values.size());
-                        assert(var.index <= values[row_index].size());
-                        return (var.index == 0 ? constant_term : values[row_index][var.index - 1]);
+                    typename TBlueprintField::value_type assignment(const blueprint_variable<TBlueprintField> &var, std::size_t row_index) const {
+                        assert(row_index < assignments.size());
+                        assert(var.index <= assignments[row_index].size());
+                        return (assignments[row_index][var.index - 1]);
                     
 
-                    void add_constraint(const snark::plonk_constraint<TBlueprintField> &constr) {
+                    void add_gate(const snark::plonk_constraint<TBlueprintField> &constr) {
                         constraint_system.constraints.emplace_back(constr);
                     }
 
                     bool is_satisfied() const {
-                        return constraint_system.is_satisfied(primary_input(), auxiliary_input());
+                        return constraint_system.is_satisfied(assignments);
                     }
 
                     std::size_t num_constraints() const {
                         return constraint_system.num_constraints();
                     }
 
-                    std::size_t num_inputs() const {
-                        return constraint_system.num_inputs();
-                    }
-
-                    std::size_t num_variables(std::size_t row_index) const {
-                        return next_free_vars[row_index] - 1;
-                    }
-
-                    void set_input_sizes(const std::size_t primary_input_size) {
-                        assert(primary_input_size <= num_variables());
-                        constraint_system.primary_input_size = primary_input_size;
-                        constraint_system.auxiliary_input_size = num_variables() - primary_input_size;
+                    constexpr std::size_t num_wires() {
+                        return WiresAmount;
                     }
 
                     snark::plonk_variable_assignment<TBlueprintField> full_variable_assignment() const {
-                        return values;
-                    }
-
-                    snark::plonk_primary_input<TBlueprintField> primary_input() const {
-                        return snark::plonk_primary_input<TBlueprintField>(values.begin(), values.begin() + num_inputs());
-                    }
-
-                    snark::plonk_auxiliary_input<TBlueprintField> auxiliary_input() const {
-                        return snark::plonk_auxiliary_input<TBlueprintField>(values.begin() + num_inputs(), values.end());
+                        return assignments;
                     }
 
                     snark::plonk_constraint_system<TBlueprintField> get_constraint_system() const {
@@ -236,13 +212,6 @@ namespace nil {
                     }
 
                     friend class blueprint_variable<TBlueprintField>;
-
-                private:
-                    typename snark::variable<TBlueprintField>::index_type allocate_var_index(std::size_t row_index) {
-                        ++constraint_system.auxiliary_input_size;
-                        values.emplace_back(TBlueprintField::value_type::zero());
-                        return next_free_vars[row_index]++;
-                    }
                 };
             }    // namespace components
         }        // namespace zk

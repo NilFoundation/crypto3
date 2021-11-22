@@ -42,8 +42,12 @@ namespace nil {
                 template<typename TArithmetization, typename TBlueprintField>
                 class blueprint;
 
+                template<typename TArithmetization, typename TBlueprintField>
+                class blueprint_variable;
+
                 template<typename TBlueprintField>
-                class blueprint_variable : public snark::variable<TBlueprintField> {
+                class blueprint_variable<snark::r1cs_constraint_system<TBlueprintField>, TBlueprintField> : 
+                    public snark::variable<TBlueprintField, false> {
                 public:
                     blueprint_variable(const typename snark::variable<TBlueprintField>::index_type index = 0) :
                         snark::variable<TBlueprintField>(index) {};
@@ -56,6 +60,14 @@ namespace nil {
                     static blueprint_variable<TBlueprintField> constant() {
                         return blueprint_variable<TBlueprintField>(0);
                     }
+                };
+
+                template<typename TBlueprintField>
+                class blueprint_variable<snark::plonk_constraint_system<TBlueprintField>, TBlueprintField> : 
+                    public snark::variable<TBlueprintField, true> {
+                public:
+                    blueprint_variable(const wire_index_type wire_index, rotation_type rotation = rotation_type::current) :
+                        snark::variable<TBlueprintField>(index) {};
                 };
 
                 template<typename TBlueprintField>

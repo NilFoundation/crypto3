@@ -53,13 +53,20 @@ namespace nil {
                     }
 
                     void generate_r1cs_constraints() {
-                        typename blueprint_type::variable_type x_1(W0, i);
-                        typename blueprint_type::variable_type y_1(W1, i);
-                        typename blueprint_type::variable_type x_2(W2, i);
-                        typename blueprint_type::variable_type y_2(W3, i);
-                        typename blueprint_type::variable_type x_3(W4, i);
-                        typename blueprint_type::variable_type y_3(W5, i);
-                        typename blueprint_type::variable_type r(W6, i);
+                        typename blueprint_type::variable_type x_1(W0, 
+                            blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type y_1(W1, 
+                            blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type x_2(W2, 
+                            blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type y_2(W3, 
+                            blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type x_3(W4, 
+                            blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type y_3(W5, 
+                            blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type r(W6, 
+                            blueprint_type::variable_type::rotation_type::current);
 
                         bp.add_gate(i, (x_2 - x_1)*(y_1 + y_3) - (y_1 - y_2)*(x_1 - x_3));
                         bp.add_gate(i, (x_1 + x_2 + x_3)*(x_1 - x_3)^2 - (y_1 + y_3)^2 );
