@@ -25,12 +25,10 @@
 // @file Declaration of interfaces for auxiliary components for the SHA256 component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_SCALAR_MUL_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_SCALAR_MUL_COMPONENT_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_SCALAR_MUL_COMPONENT_5_WIRES_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_SCALAR_MUL_COMPONENT_5_WIRES_HPP
 
 #include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/plonk/doubling.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/plonk/addition.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -51,7 +49,7 @@ namespace nil {
                     element_g1_scalar_mul_plonk(blueprint_type &bp) :
                         component<FieldType>(bp){
 
-                        j = bp.allocate_row(85);
+                        j = bp.allocate_rows(85);
                     }
                 private:
                     typename CurveType::g1_type<>::value_type omega(
@@ -177,6 +175,19 @@ namespace nil {
                         constexpr static const typename blueprint_type::variable_type w_4_jp2(W4, 
                             blueprint_type::variable_type::rotation_type::after_next);
 
+                        bp.add_gate(j, w_1_j * (w_1_j - 1));
+                        bp.add_gate(j, w_2_j * (w_2_j - 1));
+                        bp.add_gate(j, w_3_j * (w_3_j - 1));
+
+                        bp.add_gate(j+1, w_3_j * (w_3_j - 1));
+
+                        bp.add_gate(j+2, w_1_j * (w_1_j - 1));
+                        bp.add_gate(j+2, w_2_j * (w_2_j - 1));
+                        bp.add_gate(j+2, w_4_j * (w_4_j - 1));
+
+                        bp.add_gate(j+3, w_3_j * (w_3_j - 1));
+                        bp.add_gate(j+3, w_4_j * (w_4_j - 1));
+
                         // j=0
                         bp.add_gate(j, w_o_j - (w_1_j*4 + w_2_j*2 + w_3_j));
 
@@ -273,4 +284,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_SCALAR_MUL_COMPONENT_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_SCALAR_MUL_COMPONENT_5_WIRES_HPP
