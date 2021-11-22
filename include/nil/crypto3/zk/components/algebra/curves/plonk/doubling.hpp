@@ -25,8 +25,8 @@
 // @file Declaration of interfaces for auxiliary components for the SHA256 component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_ADDITION_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_ADDITION_COMPONENT_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_DOUBLING_COMPONENT_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_DOUBLING_COMPONENT_HPP
 
 #include <nil/crypto3/zk/components/blueprint.hpp>
 
@@ -37,8 +37,8 @@ namespace nil {
 
                 template<typename TBlueprintField, typename CurveType, 
                     std::size_t W0 = 0, std::size_t W1 = 1, std::size_t W2 = 2, std::size_t W3 = 3, 
-                    std::size_t W4 = 4, std::size_t W5 = 5, std::size_t W6 = 6>
-                class element_g1_addition_plonk : public component<TBlueprintField> {
+                    std::size_t W6 = 6>
+                class element_g1_doubling_plonk : public component<TBlueprintField> {
                     typedef snark::plonk_constraint_system<TBlueprintField> arithmetization_type;
 
                     typedef blueprint<arithmetization_type, TBlueprintField> blueprint_type;
@@ -46,7 +46,7 @@ namespace nil {
                     typename blueprint_type::row_index_type i;
                 public:
 
-                    element_g1_addition_plonk(blueprint_type &bp) :
+                    element_g1_doubling_plonk(blueprint_type &bp) :
                         component<FieldType>(bp) {
                         i = bp.allocate_row();
                     }
@@ -60,32 +60,24 @@ namespace nil {
                             blueprint_type::variable_type::rotation_type::current);
                         typename blueprint_type::variable_type y_2(W3, 
                             blueprint_type::variable_type::rotation_type::current);
-                        typename blueprint_type::variable_type x_3(W4, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        typename blueprint_type::variable_type y_3(W5, 
-                            blueprint_type::variable_type::rotation_type::current);
                         typename blueprint_type::variable_type r(W6, 
                             blueprint_type::variable_type::rotation_type::current);
 
-                        bp.add_gate(i, (x_2 - x_1)*(y_1 + y_3) - (y_1 - y_2)*(x_1 - x_3));
-                        bp.add_gate(i, (x_1 + x_2 + x_3)*(x_1 - x_3)^2 - (y_1 + y_3)^2 );
-                        bp.add_gate(i, (x_2 - x_1) * r - 1 );
+                        bp.add_gate(i, 4*y_1^2 * (x_2 + 2*x_1) - 9 * x_1^4);
+                        bp.add_gate(i, 2*y_1 * (y_2 + y_1) - 3*x_1^2 * (x_1 - x_2));
+                        bp.add_gate(i, y_1*r_1 - 1);
+                    }
+
+                    void generate_r1cs_witness(typename CurveType::value_type &P1) {
+                        generate_r1cs_witness(P1, P1.doubled());
                     }
 
                     void generate_r1cs_witness(typename CurveType::value_type &P1, 
                                                typename CurveType::value_type &P2) {
-                        generate_r1cs_witness(P1, P2, P1+P2);
-                    }
-
-                    void generate_r1cs_witness(typename CurveType::value_type &P1, 
-                                               typename CurveType::value_type &P2,
-                                               typename CurveType::value_type &P3) {
                         bp.val(W0, i) = P1.X;
                         bp.val(W1, i) = P1.Y;
                         bp.val(W2, i) = P2.X;
                         bp.val(W3, i) = P2.Y;
-                        bp.val(W4, i) = P3.X;
-                        bp.val(W5, i) = P3.Y;
                         bp.val(W6, i) = ?;
                     }
                 };
@@ -95,4 +87,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_ADDITION_COMPONENT_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_DOUBLING_COMPONENT_HPP
