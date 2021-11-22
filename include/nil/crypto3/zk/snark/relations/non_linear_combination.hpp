@@ -98,7 +98,18 @@ namespace nil {
                     }
 
                     bool operator==(const non_linear_term &other) const {
+                        std::sort(vars.begin(), vars.end());
                         return (this->vars == other.vars && this->coeff == other.coeff);
+                    }
+
+                    void sort(){
+                        
+                    }
+
+                    bool operator<(const non_linear_term &other) {
+                        this->sort();
+                        other.sort();
+                        return (this->vars < other.vars || ((this->vars == other.vars) && (this->coeff < other.coeff)));
                     }
                 };
 
@@ -109,19 +120,19 @@ namespace nil {
                     return nlt * field_coeff;
                 }
 
-                template<typename FieldType, bool RotationSupport>
-                non_linear_combination<FieldType, RotationSupport> operator+(
-                    const typename FieldType::value_type &field_coeff,
-                    const non_linear_term<FieldType, RotationSupport> &nlt) {
-                    return non_linear_combination<FieldType, RotationSupport>(field_coeff) + nlt;
-                }
+                // template<typename FieldType, bool RotationSupport>
+                // non_linear_combination<FieldType, RotationSupport> operator+(
+                //     const typename FieldType::value_type &field_coeff,
+                //     const non_linear_term<FieldType, RotationSupport> &nlt) {
+                //     return non_linear_combination<FieldType, RotationSupport>(field_coeff) + nlt;
+                // }
 
-                template<typename FieldType, bool RotationSupport>
-                non_linear_combination<FieldType, RotationSupport> operator-(
-                    const typename FieldType::value_type &field_coeff,
-                    const non_linear_term<FieldType, RotationSupport> &nlt) {
-                    return non_linear_combination<FieldType, RotationSupport>(field_coeff) - nlt;
-                }
+                // template<typename FieldType, bool RotationSupport>
+                // non_linear_combination<FieldType, RotationSupport> operator-(
+                //     const typename FieldType::value_type &field_coeff,
+                //     const non_linear_term<FieldType, RotationSupport> &nlt) {
+                //     return non_linear_combination<FieldType, RotationSupport>(field_coeff) - nlt;
+                // }
 
                 /***************************** Linear combination ****************************/
 
@@ -148,26 +159,9 @@ namespace nil {
                     non_linear_combination(const non_linear_term<FieldType, RotationSupport> &nlt) {
                         this->add_term(nlt);
                     }
-                    // non_linear_combination(const std::vector<non_linear_term<FieldType, RotationSupport>> &all_terms) {
-                    //     if (all_terms.empty()) {
-                    //         return;
-                    //     }
-
-                    //     terms = all_terms;
-                    //     std::sort(terms.begin(), terms.end(),
-                    //               [](non_linear_term<FieldType, RotationSupport> a, 
-                    //                 non_linear_term<FieldType, RotationSupport> b) { return a.index < b.index; });
-
-                    //     auto result_it = terms.begin();
-                    //     for (auto it = ++terms.begin(); it != terms.end(); ++it) {
-                    //         if (it->index == result_it->index) {
-                    //             result_it->coeff += it->coeff;
-                    //         } else {
-                    //             *(++result_it) = *it;
-                    //         }
-                    //     }
-                    //     terms.resize((result_it - terms.begin()) + 1);
-                    // }
+                    non_linear_combination(const std::vector<non_linear_term<FieldType, RotationSupport>> &terms):
+                        terms(terms) {
+                    }
 
                     /* for supporting range-based for loops over non_linear_combination */
                     typename std::vector<non_linear_term<FieldType, RotationSupport>>::const_iterator begin() const {
@@ -188,10 +182,11 @@ namespace nil {
                         this->terms.emplace_back(nlt);
                     }
 
+                    template <typename WiresAmount>
                     field_value_type evaluate(std::size_t row_index, 
-                        const std::vector<std::vector<field_value_type>> &assignment) const {
+                        const std::array<std::vector<field_value_type>, WiresAmount> &assignment) const {
                         field_value_type acc = field_value_type::zero();
-                        for (auto &nlt : terms) {
+                        for (non_linear_combination &nlt : terms) {
                             field_value_type term_value = nlt.coeff;
 
                             for (variable<FieldType, RotationSupport> &var: nlt.vars){
@@ -211,37 +206,13 @@ namespace nil {
                         }
                         return result;
                     }
+
                     non_linear_combination operator+(const non_linear_combination &other) const {
                         non_linear_combination result;
 
-                        auto it1 = this->terms.begin();
-                        auto it2 = other.terms.begin();
-
-                        /* invariant: it1 and it2 always point to unprocessed items in the corresponding linear
-                         * combinations
-                         */
-                        while (it1 != this->terms.end() && it2 != other.terms.end()) {
-                            if (it1->wire_index < it2->wire_index) {
-                                result.terms.emplace_back(*it1);
-                                ++it1;
-                            } else if (it1->wire_index > it2->wire_index) {
-                                result.terms.emplace_back(*it2);
-                                ++it2;
-                            } else {
-                                /* it1->wire_index == it2->wire_index */
-                                result.terms.emplace_back(
-                                    non_linear_term<FieldType, RotationSupport>(variable<FieldType, RotationSupport>(it1->wire_index)) * (it1->coeff + it2->coeff));
-                                ++it1;
-                                ++it2;
-                            }
-                        }
-
-                        if (it1 != this->terms.end()) {
-                            result.terms.insert(result.terms.end(), it1, this->terms.end());
-                        } else {
-                            result.terms.insert(result.terms.end(), it2, other.terms.end());
-                        }
-
+                        result.terms.insert(result.terms.end(), this->terms.begin(), this->terms.end());
+                        result.terms.insert(result.terms.end(), other.terms.begin(), other.terms.end());
+                        
                         return result;
                     }
                     non_linear_combination operator-(const non_linear_combination &other) const {
@@ -251,34 +222,30 @@ namespace nil {
                         return (*this) * (-field_value_type::one());
                     }
 
-                    bool operator==(const non_linear_combination &other) const {
+                    bool sort(){
+                        std::sort(terms.begin(), terms.end());
+                        std::vector<non_linear_term> new_terms;
 
-                        std::vector<non_linear_term<FieldType, RotationSupport>> thisterms = this->terms;
-                        std::sort(thisterms.begin(), thisterms.end(),
-                                  [](non_linear_term<FieldType, RotationSupport> a, non_linear_term<FieldType, RotationSupport> b) { return a.wire_index < b.wire_index; });
+                        if (terms.size()){
+                            new_terms.push_back(term[0]);
 
-                        std::vector<non_linear_term<FieldType, RotationSupport>> otherterms = other.terms;
-                        std::sort(otherterms.begin(), otherterms.end(),
-                                  [](non_linear_term<FieldType, RotationSupport> a, non_linear_term<FieldType, RotationSupport> b) { return a.wire_index < b.wire_index; });
-
-                        return (thisterms == otherterms);
-                    }
-
-                    bool is_valid(size_t num_variables) const {
-                        /* check that all terms in linear combination are sorted */
-                        for (std::size_t i = 1; i < terms.size(); ++i) {
-                            if (terms[i - 1].wire_index >= terms[i].wire_index) {
-                                return false;
+                            for (std::size_t i = 1; i < terms.size(); i++){
+                                if (terms[i].vars == terms[i-1].vars){
+                                    (new_terms.end() - 1)->coeff+=terms[i].coeff;
+                                } else {
+                                    new_terms.push_back(term[i])
+                                }
                             }
                         }
 
-                        /* check that the variables are in proper range. as the variables
-                           are sorted, it suffices to check the last term */
-                        if ((--terms.end())->wire_index >= num_variables) {
-                            return false;
-                        }
+                    }
 
-                        return true;
+                    bool operator==(const non_linear_combination &other) {
+
+                        this->sort();
+                        other.sort();
+
+                        return (thisterms == otherterms);
                     }
                 };
 

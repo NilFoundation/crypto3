@@ -74,15 +74,15 @@ namespace nil {
                         return result;
                     }
 
-                    linear_combination<field_type, RotationSupport> operator+(
-                        const linear_combination<field_type, RotationSupport> &other) const {
-                        return linear_combination<field_type, RotationSupport>(*this) + other;
-                    }
+                    // linear_combination<field_type, RotationSupport> operator+(
+                    //     const linear_combination<field_type, RotationSupport> &other) const {
+                    //     return linear_combination<field_type, RotationSupport>(*this) + other;
+                    // }
 
-                    linear_combination<field_type, RotationSupport> operator-(
-                        const linear_combination<field_type, RotationSupport> &other) const {
-                        return (*this) + (-other);
-                    }
+                    // linear_combination<field_type, RotationSupport> operator-(
+                    //     const linear_combination<field_type, RotationSupport> &other) const {
+                    //     return (*this) + (-other);
+                    // }
 
                     linear_term operator-() const {
                         return linear_term(this->index) *(-this->coeff);
@@ -99,17 +99,17 @@ namespace nil {
                     return lt * field_coeff;
                 }
 
-                template<typename FieldType, bool RotationSupport>
-                linear_combination<FieldType, RotationSupport> operator+(const typename FieldType::value_type &field_coeff,
-                                                        const linear_term<FieldType, RotationSupport> &lt) {
-                    return linear_combination<FieldType, RotationSupport>(field_coeff) + lt;
-                }
+                // template<typename FieldType, bool RotationSupport>
+                // linear_combination<FieldType, RotationSupport> operator+(const typename FieldType::value_type &field_coeff,
+                //                                         const linear_term<FieldType, RotationSupport> &lt) {
+                //     return linear_combination<FieldType, RotationSupport>(field_coeff) + lt;
+                // }
 
-                template<typename FieldType, bool RotationSupport>
-                linear_combination<FieldType, RotationSupport> operator-(const typename FieldType::value_type &field_coeff,
-                                                        const linear_term<FieldType, RotationSupport> &lt) {
-                    return linear_combination<FieldType, RotationSupport>(field_coeff) - lt;
-                }
+                // template<typename FieldType, bool RotationSupport>
+                // linear_combination<FieldType, RotationSupport> operator-(const typename FieldType::value_type &field_coeff,
+                //                                         const linear_term<FieldType, RotationSupport> &lt) {
+                //     return linear_combination<FieldType, RotationSupport>(field_coeff) - lt;
+                // }
 
                 /***************************** Linear combination ****************************/
 

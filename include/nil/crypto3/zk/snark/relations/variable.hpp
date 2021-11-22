@@ -186,6 +186,11 @@ namespace nil {
                     bool operator==(const variable &other) const {
                         return ((this->wire_index == other.wire_index) && (this->rotation == other.rotation));
                     }
+
+                    bool operator<(const variable &other) const {
+                        return ((this->wire_index < other.wire_index) || 
+                            ((this->wire_index == other.wire_index) && (this->rotation < other.rotation)));
+                    }
                 };
 
                 template<typename FieldType>
