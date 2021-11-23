@@ -128,15 +128,15 @@ namespace nil {
                         for (typename blueprint_type::row_index_type z = 0; z <= 63; z++){
                             bp.val(W0, j + z) = T.X;
                             bp.val(W1, j + z) = T.Y;
-                            bp.val(W2, j) = S.X;
-                            bp.val(W3, j) = S.Y;
-                            bp.val(W4, j) = Q.X;
-                            bp.val(W5, j) = Q.Y;
-                            bp.val(W6, j) = r;
-                            bp.val(W7, j) = R.X;
-                            bp.val(W8, j) = R.Y;
-                            bp.val(W9, j) = lambda(S, Q);
-                            bp.val(W10, j) = lambda(R, S);
+                            bp.val(W2, j + z) = S.X;
+                            bp.val(W3, j + z) = S.Y;
+                            bp.val(W4, j + z) = Q.X;
+                            bp.val(W5, j + z) = Q.Y;
+                            bp.val(W6, j + z) = r;
+                            bp.val(W7, j + z) = R.X;
+                            bp.val(W8, j + z) = R.Y;
+                            bp.val(W9, j + z) = lambda(S, Q);
+                            bp.val(W10, j + z) = lambda(R, S);
                             bp.val(W11, j + z) = b[0];
                             bp.val(W12, j + z) = b[1];
                             bp.val(W13, j + z) = b[2];
