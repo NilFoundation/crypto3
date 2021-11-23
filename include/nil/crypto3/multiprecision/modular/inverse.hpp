@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -51,6 +52,7 @@ namespace nil {
                 }
 
                 // a^(-1) mod p
+                // http://www-math.ucdenver.edu/~wcherowi/courses/m5410/exeucalg.html
                 template<typename Backend>
                 constexpr Backend eval_inverse_extended_euclidean_algorithm(const Backend& a, const Backend& m) {
                     using Backend_doubled = typename default_ops::double_precision_type<Backend>::type;
@@ -70,8 +72,8 @@ namespace nil {
                     }
                 }
 
-                template<typename Backend, typename Number>
-                Backend eval_inverse_mod_pow2(Backend a, size_t k) {
+                template<typename Backend>
+                Backend eval_monty_inverse_pow2(Backend a, Backend k) {
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
                     Backend tmp;
                     Backend zero = ui_type(0u);
@@ -79,9 +81,9 @@ namespace nil {
                     Backend two = ui_type(2u);
 
                     eval_modulus(tmp, a, two);
-                    if (eval_is_zero(tmp) || k == 0)
+                    if (eval_is_zero(tmp) || eval_is_zero(k))
                         return zero;
-                    if (k == 1)
+                    if (eval_eq(k, one))
                         return one;
                     /*
                      * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
@@ -89,17 +91,240 @@ namespace nil {
                      */
                     Backend b = one;
                     Backend r;
-                    for (size_t i = 0; i < k; ++i) {
+                    Backend cur_add = one;
+                    for (Backend i = zero; !eval_eq(i, k); eval_increment(i)) {
                         if (eval_bit_test(b, 0)) {
                             eval_subtract(b, a);
-                            eval_bit_set(r, i);
+                            eval_add(r, cur_add);
                         }
-                        eval_right_shift(b, one);
+                        eval_left_shift(cur_add, 1);
+                        eval_right_shift(b, 1);
                     }
 
                     return r;
                 }
 
+                template<typename Backend>
+                Backend inverse_mod_odd_modulus(const Backend& n, const Backend& mod)
+                {
+                    using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
+                    Backend zero = ui_type(0u);
+                    Backend one = ui_type(1u);
+                    Backend two = ui_type(2u);
+                    // Caller should assure these preconditions:
+//                    BOOST_ASSERT(n >= 0);
+//                    BOOST_ASSERT(mod >= 0);
+//                    BOOST_ASSERT(n < mod);
+//                    BOOST_ASSERT(mod >= 3 && mod % 2 != 0);
+
+                    /*
+                    This uses a modular inversion algorithm designed by Niels Möller
+                    and implemented in Nettle. The same algorithm was later also
+                    adapted to GMP in mpn_sec_invert.
+
+                   There is also a description of the algorithm in Appendix 5 of "Fast
+                    Software Polynomial Multiplication on ARM Processors using the NEON Engine"
+                    by Danilo Câmara, Conrado P. L. Gouvêa, Julio López, and Ricardo
+                    Dahab in LNCS 8182
+                       https://conradoplg.cryptoland.net/files/2010/12/mocrysen13.pdf
+
+                    */
+
+                    Backend a = n;
+                    Backend b = mod;
+                    Backend u = one;
+                    Backend v = zero;
+
+                    size_t ell = eval_msb(mod);
+                    for (size_t i = 0; i < 2 * ell; ++i) {
+
+                        size_t odd = eval_bit_test(a, 0);
+                        //Backend gteq = (a >= b);
+                        size_t gteq = default_ops::eval_gt(a, b) || eval_eq(a, b);
+                        if (odd && gteq) {
+                            eval_subtract(a, b);
+//                            a -= b;
+                        } else if (odd && !gteq) {
+                            swap(u, v);
+                            Backend tmp = a;
+                            eval_subtract(a, b, a);
+//                            a = b - a;
+                            b = tmp;
+                        }
+                        eval_right_shift(a, 1);
+//                        a >>= 1;
+//                        Backend gteq2 = (u >= v);
+                        size_t gteq2 = default_ops::eval_gt(u, v) || eval_eq(u, v);
+                        if (odd && gteq2) {
+                            eval_subtract(u, v);
+//                            u -= v;
+                        } else if (odd && !gteq2) {
+                            eval_add(u, mod);
+                            eval_subtract(u, v);
+//                            u = u + mod - v;
+                        }
+
+                        auto tmp = u; //to_length<N + 1>(u);
+//                        if (u & 1) {
+                        if (eval_bit_test(u, 0)) {
+//                            tmp += mod; //add(u, n);
+                            eval_add(tmp, u, mod);
+                        }
+                        u = tmp;
+                        eval_right_shift(u, 1);
+                    }
+                    if (!eval_eq(b, one)) { // if b != 1 then gcd(n,mod) > 1 and inverse does not exist
+                        return zero;
+                    }
+                    return v;
+                }
+
+                template<typename Backend>
+                Backend eval_inverse_mod(const Backend& n, const Backend& mod)
+                {
+                    using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
+                    Backend zero = ui_type(0u);
+                    Backend one = ui_type(1u);
+                    Backend two = ui_type(2u);
+//                    BOOST_ASSERT(mod > 0 && n >= 0);
+                    if (eval_is_zero(n) || (!eval_bit_test(n, 0) && !eval_bit_test(mod, 0))) {
+                        return zero;
+                    }
+//                    if(n == 0 || (n % 2 == 0 && mod % 2 == 0))
+//                        return zero;
+
+//                    if(mod % 2 != 0) {
+                    if(eval_bit_test(mod, 0)) {
+                        /*
+                        Fastpath for common case. This leaks if n is greater than mod or
+                        not, but we don't guarantee const time behavior in that case.
+                        */
+                        Backend tmp1;
+                        eval_modulus(tmp1, n, mod);
+//                        Backend tmp1 = n % mod;
+//                        if(n < mod)
+                        if (default_ops::eval_lt(n, mod))
+                            return inverse_mod_odd_modulus(n, mod);
+                        else
+                            return inverse_mod_odd_modulus(tmp1, mod);
+                    }
+
+                    // If n is even and mod is even we already returned 0
+                    // If n is even and mod is odd we jumped directly to odd-modulus algo
+//                    BOOST_ASSERT(n % 2 == 1);
+                    const size_t mod_lz = eval_lsb(mod);
+//                    if (mod == 1 << mod_lz) {
+                    Backend tmp4 = one;
+                    eval_left_shift(tmp4, mod_lz);
+                    if (eval_eq(mod, tmp4)) {
+                        // In this case we are performing an inversion modulo 2^k
+                        Backend tmp5 = ui_type(mod_lz);
+                        return eval_monty_inverse_pow2(n, tmp5);
+                    }
+
+                    if(mod_lz == 1) {
+                        /*
+                        Inversion modulo 2*o is an easier special case of CRT
+
+                        This is exactly the main CRT flow below but taking advantage of
+                        the fact that any odd number ^-1 modulo 2 is 1. As a result both
+                        inv_2k and c can be taken to be 1, m2k is 2, and h is always
+                        either 0 or 1, and its value depends only on the low bit of inv_o.
+
+                        This is worth special casing because we generate RSA primes such
+                        that phi(n) is of this form. However this only works for keys
+                        that we generated in this way; pre-existing keys will typically
+                        fall back to the general algorithm below.
+                        */
+
+//                        const Backend o = mod >> 1;
+                        Backend o = mod;
+                        eval_right_shift(o, 1);
+//                        const Backend n_redc = n % o;
+                        Backend n_redc;
+                        eval_modulus(n_redc, n, o);
+                        const Backend inv_o = inverse_mod_odd_modulus(n_redc, o);
+
+                        // No modular inverse in this case:
+//                        if(inv_o == 0)
+                        if (eval_is_zero(inv_o))
+                            return zero;
+
+                        Backend h = inv_o;
+//                        if (inv_o % 2 == 0) {
+                        if (!eval_bit_test(inv_o, 0)) {
+                            eval_add(h, o);
+                        }
+//                        h.ct_cond_add(!inv_o.get_bit(0), o);
+                        return h;
+                    }
+
+                    /*
+                    * In this case we are performing an inversion modulo 2^k*o for
+                    * some k >= 2 and some odd (not necessarily prime) integer.
+                    * Compute the inversions modulo 2^k and modulo o, then combine them
+                    * using CRT, which is possible because 2^k and o are relatively prime.
+                    */
+
+//                    const Backend o = mod >> mod_lz;
+//                    const Backend n_redc = n % o; // ct_modulo(n, o);
+                    Backend o = mod;
+                    eval_right_shift(o, mod_lz);
+                    Backend n_redc = n;
+                    eval_modulus(n_redc, o);
+                    const Backend inv_o = inverse_mod_odd_modulus(n_redc, o);
+                    Backend tmp5 = ui_type(mod_lz);
+                    const Backend inv_2k = eval_monty_inverse_pow2(n, tmp5);
+
+                    // No modular inverse in this case:
+//                    if(inv_o == 0 || inv_2k == 0)
+                    if(eval_is_zero(inv_o) || eval_is_zero(inv_2k))
+                        return zero;
+
+//                    const Backend m2k = 1 << mod_lz; //BigInt::power_of_2(mod_lz);
+                    Backend m2k = one;
+                    eval_left_shift(m2k, mod_lz);
+                    // Compute the CRT parameter
+                    Backend tmp6 = ui_type(mod_lz);
+                    const Backend c = eval_monty_inverse_pow2(o, tmp6);
+
+                    // Compute h = c*(inv_2k-inv_o) mod 2^k
+//                    Backend h = c * (inv_2k - inv_o);
+                    Backend h;
+                    eval_subtract(h, inv_2k, inv_o);
+                    eval_multiply(h, c);
+//                    const bool h_neg = h <= 0;
+
+//                    h.set_sign(BigInt::Positive);
+//                    h.mask_bits(mod_lz);
+                    Backend tmp3 = one;
+                    eval_left_shift(tmp3, mod_lz);
+                    eval_subtract(tmp3, one);
+                    eval_bitwise_and(h, tmp3);
+//                    h &= (1 << mod_lz) - 1;
+//                    h <<= mod_lz;
+//                    const bool h_nonzero = h.is_nonzero();
+//                    h.ct_cond_assign(h_nonzero && h_neg, m2k - h);
+//                    if (h_neg) {
+//                        h = m2k - h;
+//                    }
+                    // Return result inv_o + h * o
+                    eval_multiply(h, o);
+                    eval_add(h, inv_o);
+//                    h = inv_o + h * o;
+                    return h;
+                }
+
+                /*
+                * Compute the inversion number mod p^k.
+                * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç.
+                * @see https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
+                *
+                * @param a is a non-negative integer
+                * @param p is a prime number, where gcd(a,p) = 1
+                * @param k is a non-negative integer, where a < p^k
+                * @return x = a^(−1) mod p^k
+               */
                 template<typename Backend>
                 constexpr void eval_monty_inverse(Backend& res, const Backend& a, const Backend& p, const Backend& k) {
 
@@ -121,12 +346,10 @@ namespace nil {
 
                     // a^(-1) mod p:
                     c = eval_inverse_extended_euclidean_algorithm(a, p);
+//                    с = inverse_mod(a, p);
 
-                    Backend bi = one, bt, i = zero, k_negone = k, xi, nextp = one;
-                    eval_subtract(k_negone, one);
+                    Backend bi = one, bt, i = zero, xi, nextp = one;
                     res = zero;
-
-                    // ui_type kn = cpp_int(k_negone);
 
                     while (!eval_eq(i, k)) {
                         // xi:
@@ -156,356 +379,6 @@ namespace nil {
                         eval_add(i, one);
                     }
                 }
-
-                /*
-
-
-                                template <typename Backend>
-                                void eval_inverse_mod_odd_modulus(Backend& res, const Backend& n, const Backend& mod)
-                                {
-                                   typedef typename std::tuple_element<0, typename Backend::signed_types>::type   si_type;
-                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;
-
-                                   // Caller should assure these preconditions:
-                                   BOOST_ASSERT(eval_gt(n, 0));
-                                   BOOST_ASSERT(eval_gt(mod, 0));
-                                   BOOST_ASSERT(eval_lt(n, mod));
-                                   BOOST_ASSERT(eval_ge(mod, 3) && eval_modulus(mod, 2) == 1);*/
-
-                /*
-                                This uses a modular inversion algorithm designed by Niels Möller
-                                and implemented in Nettle. The same algorithm was later also
-                                adapted to GMP in mpn_sec_invert.
-                                It can be easily implemented in a way that does not depend on
-                                secret branches or memory lookups, providing resistance against
-                                some forms of side channel attack.
-                                There is also a description of the algorithm in Appendix 5 of "Fast
-                                Software Polynomial Multiplication on ARM Processors using the NEON Engine"
-                                by Danilo Câmara, Conrado P. L. Gouvêa, Julio López, and Ricardo
-                                Dahab in LNCS 8182
-                                   https://conradoplg.cryptoland.net/files/2010/12/mocrysen13.pdf
-                                Thanks to Niels for creating the algorithm, explaining some things
-                                about it, and the reference to the paper.
-                                */
-                /*
-                                   const size_t mod_words = mod.size();
-                                   BOOST_ASSERT_MSG(mod_words > 0, "Not empty");
-
-                                   std::vector<ui_type> tmp_mem(5 * mod_words);
-
-                                   ui_type* v_w   = &tmp_mem[0];
-                                   ui_type* u_w   = &tmp_mem[1 * mod_words];
-                                   ui_type* b_w   = &tmp_mem[2 * mod_words];
-                                   ui_type* a_w   = &tmp_mem[3 * mod_words];
-                                   ui_type* mp1o2 = &tmp_mem[4 * mod_words];
-
-                                   //   ct::poison(tmp_mem.data(), tmp_mem.size());
-
-                                   copy_mem(a_w, n.data(), std::min(n.size(), mod_words));
-                                   copy_mem(b_w, mod.data(), std::min(mod.size(), mod_words));
-                                   u_w[0] = 1;
-                                   // v_w = 0
-
-                                   // compute (mod + 1) / 2 which [because mod is odd] is equal to
-                                   // (mod / 2) + 1
-                                   copy_mem(mp1o2, mod.data(), std::min(mod.size(), mod_words));
-                                   bigint_shr1(mp1o2, mod_words, 0, 1);
-                                   ui_type carry = bigint_add2_nc(mp1o2, mod_words, u_w, 1);
-                                   BOOST_ASSERT(carry == 0);
-
-                                   // Only n.bits() + mod.bits() iterations are required, but avoid leaking the size of
-                   n const size_t execs = 2 * eval_msb(mod);
-
-                                   for (size_t i = 0; i != execs; ++i)
-                                   {
-                                      const ui_type odd_a = a_w[0] & 1;
-
-                                      //if(odd_a) a -= b
-                                      ui_type underflow = bigint_cnd_sub(odd_a, a_w, b_w, mod_words);
-
-                                      //if(underflow) { b -= a; a = abs(a); swap(u, v); }
-                                      bigint_cnd_add(underflow, b_w, a_w, mod_words);
-                                      bigint_cnd_abs(underflow, a_w, mod_words);
-                                      bigint_cnd_swap(underflow, u_w, v_w, mod_words);
-
-                                      // a >>= 1
-                                      bigint_shr1(a_w, mod_words, 0, 1);
-
-                                      //if(odd_a) u -= v;
-                                      ui_type borrow = bigint_cnd_sub(odd_a, u_w, v_w, mod_words);
-
-                                      // if(borrow) u += p
-                                      bigint_cnd_add(borrow, u_w, mod.data(), mod_words);
-
-                                      const ui_type odd_u = u_w[0] & 1;
-
-                                      // u >>= 1
-                                      bigint_shr1(u_w, mod_words, 0, 1);
-
-                                      //if(odd_u) u += mp1o2;
-                                      bigint_cnd_add(odd_u, u_w, mp1o2, mod_words);
-                                   }
-
-                                   auto a_is_0 = CT::Mask<ui_type>::set();
-                                   for (size_t i = 0; i != mod_words; ++i)
-                                      a_is_0 &= CT::Mask<ui_type>::is_zero(a_w[i]);
-
-                                   auto b_is_1 = CT::Mask<ui_type>::is_equal(b_w[0], 1);
-                                   for (size_t i = 1; i != mod_words; ++i)
-                                      b_is_1 &= CT::Mask<ui_type>::is_zero(b_w[i]);
-
-                                   BOOST_ASSERT_MSG(a_is_0.is_set(), "A is zero");
-
-                                   // if b != 1 then gcd(n,mod) > 1 and inverse does not exist
-                                   // in which case zero out the result to indicate this
-                                   (~b_is_1).if_set_zero_out(v_w, mod_words);*/
-
-                /*
-                 * We've placed the result in the lowest words of the temp buffer.
-                 * So just clear out the other values and then give that buffer to a
-                 * BigInt.
-                 */
-                /*
-                                   clear_mem(&tmp_mem[mod_words], 4 * mod_words);
-
-                                   CT::unpoison(tmp_mem.data(), tmp_mem.size());
-
-                                   Backend r;
-                                   r.swap_reg(tmp_mem);
-                                   return r;
-                                }*/
-
-                /*
-                                template <typename Backend, expression_template_option ExpressionTemplates>
-                                void inverse_mod_odd_modulus(number<Backend, ExpressionTemplates>&       res,
-                                                             const number<Backend, ExpressionTemplates>& n,
-                                                             const number<Backend, ExpressionTemplates>& mod)
-                                {
-                                   eval_inverse_mod_odd_modulus(res.backend(), n.backend(), mod.backend());
-                                }
-                                 */
-
-                /*
-                                template <typename Backend>
-                                std::size_t eval_almost_montgomery_inverse(Backend& result, const Backend& a,
-                                                                           const Backend& p)
-                                {
-                                   size_t k = 0;
-
-                                   Backend u = p, v = a, r = 0, s = 1;
-
-                                   while (eval_gt(v, 0))
-                                   {
-                                      if (eval_integer_modulus(u, 2) == 0)
-                                      {
-                                         eval_right_shift(u, 1);
-                                         eval_left_shift(s, 1);
-                                      }
-                                      else if (eval_integer_modulus(v, 2) == 0)
-                                      {
-                                         eval_right_shift(v, 1);
-                                         eval_left_shift(r, 1);
-                                      }
-                                      else if (eval_gt(u, v))
-                                      {
-                                         eval_subtract(u, v);
-                                         eval_right_shift(u, 1);
-                                         eval_add(r, s);
-                                         eval_left_shift(s, 1);
-                                      }
-                                      else
-                                      {
-                                         eval_subtract(v, u);
-                                         eval_right_shift(v, 1);
-                                         eval_add(s, r);
-                                         eval_left_shift(r, 1);
-                                      }
-
-                                      k++;
-                                   }
-
-                                   if (!eval_gt(p, r))
-                                   {
-                                      eval_subtract(r, p);
-                                   }
-
-                                   result = p;
-
-                                   eval_subtract(result, r);
-
-                                   return k;
-                                }
-                                */
-
-                /*
-                                template <typename Backend, expression_template_option ExpressionTemplates>
-                                std::size_t almost_montgomery_inverse(number<Backend, ExpressionTemplates>& result,
-                                                                      const number<Backend, ExpressionTemplates>& a,
-                                                                      const number<Backend, ExpressionTemplates>& p)
-                                {
-                                   return eval_almost_montgomery_inverse(result.backend(), a.backend(), p.backend());
-                                }
-                                */
-
-                /*
-                                template <typename Backend>
-                                Backend eval_normalized_montgomery_inverse(const Backend& a, const Backend& p)
-                                {
-                                   Backend     r;
-                                   std::size_t k = eval_almost_montgomery_inverse(r, a, p);
-
-                                   for (std::size_t i = 0; i != k; ++i)
-                                   {
-                                      if (eval_integer_modulus(p, 2) == 1)
-                                      {
-                                         eval_add(r, p);
-                                      }
-                                      eval_right_shift(r, 1);
-                                   }
-
-                                   return r;
-                                }
-                                */
-
-
-                /*
-                                template <typename Backend>
-                                Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
-                                {
-                                   typedef typename std::tuple_element<0, typename Backend::unsigned_types>::type ui_type;*/
-                /*
-                 * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
-                 * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
-                 */
-                /*
-                                   if (eval_integer_modulus(a1, 2) == 0)
-                                      return 0;
-
-                                   Backend a = a1;
-                                   eval_bit_set(a, k);
-
-                                   Backend b = 1, X = 0, newb;
-
-                                   const std::size_t a_words = a.sig_words();
-
-                                   X.grow_to(round_up(k, sizeof(ui_type) * CHAR_BIT) / sizeof(ui_type) * CHAR_BIT);
-                                   b.grow_to(a_words);
-                                   */
-                /*
-                                Hide the exact value of k. k is anyway known to word length
-                                granularity because of the length of a, so no point in doing more
-                                than this.
-                                */
-                /*
-
-                                   const std::size_t iter = round_up(k, sizeof(ui_type) * CHAR_BIT);
-
-                                   for (std::size_t i = 0; i != iter; ++i)
-                                   {
-                                      const bool b0 = eval_bit_test(b, 0);
-                                      X.conditionally_set_bit(i, b0);
-                                      newb = b;
-                                      eval_subtract(newb, a);
-                                      b.ct_cond_assign(b0, newb);
-                                      eval_right_shift(b, 1);
-                                   }
-                                   eval_bit_set(X, k);
-                                   X.const_time_unpoison();
-                                   return X;
-                                }
-                                */
-
-
-                /*
-                                template <typename Backend>
-                                Backend eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
-                                {
-                                   if (eval_is_zero(mod))
-                                   {
-                                      BOOST_THROW_EXCEPTION(
-                                          std::invalid_argument("eval_inverse_mod: mod must be non zero"));
-                                   }
-                                   if ((eval_get_sign(mod) < 0) || (eval_get_sign(n) < 0))
-                                   {
-                                      BOOST_THROW_EXCEPTION(
-                                          std::invalid_argument("eval_inverse_mod: arguments must be non-negative"));
-                                   }
-                                   if (eval_is_zero(n) || (eval_integer_modulus(n, 2) == 0 && eval_integer_modulus(mod,
-                   2) == 0))
-                                   {
-                                      return 0;
-                                   }
-                                   if (eval_integer_modulus(n, 2) == 1)
-                                   {*/
-                /*
-                                Fastpath for common case. This leaks information if n > mod
-                                but we don't guarantee const time behavior in that case.
-                                */
-                /*
-                                      if (eval_gt(mod, n))
-                                         return eval_inverse_mod_odd_modulus(n, mod);
-                                      else
-                                         return eval_inverse_mod_odd_modulus(ct_modulo(n, mod), mod);
-                                   }
-
-                                   const std::size_t mod_lz = eval_lsb(mod);
-                                   BOOST_ASSERT(mod_lz > 0);
-                                   const std::size_t mod_bits = eval_msb(mod);
-                                   BOOST_ASSERT(mod_bits > mod_lz);
-
-                                   if (mod_lz == mod_bits - 1)
-                                   {
-                                      // In this case we are performing an inversion modulo 2^k
-                                      return eval_inverse_mod_pow2(n, mod_lz);
-                                   }*/
-
-                /*
-                 * In this case we are performing an inversion modulo 2^k*o for
-                 * some k > 1 and some odd (not necessarily prime) integer.
-                 * Compute the inversions modulo 2^k and modulo o, then combine them
-                 * using CRT, which is possible because 2^k and o are relatively prime.
-                 */
-                /*
-                                   Backend o = mod;
-
-                                   eval_right_shift(mod, mod_lz);
-
-                                   Backend n_redc = ct_modulo(n, o);
-                                   Backend inv_o  = eval_inverse_mod_odd_modulus(n_redc, o);
-                                   Backend inv_2k = eval_inverse_mod_pow2(n, mod_lz);
-
-                                   // No modular inverse in this case:
-                                   if (eval_is_zero(o) || eval_is_zero(inv_2k))
-                                      return 0;
-
-                                   Backend m2k = mod_lz;
-                                   eval_multiply(m2k, m2k);
-                                   // Compute the CRT parameter
-                                   Backend c = inverse_mod_pow2(o, mod_lz);
-
-                                   // Compute h = c*(inv_2k-inv_o) mod 2^k
-                                   Backend h = inv_2k;
-
-                                   eval_subtract(h, inv_o);
-                                   eval_multiply(h, c);
-
-                                   const bool h_neg = (eval_get_sign(h) < 0);
-
-                                   eval_abs(h); // h.set_sign(BigInt::Positive);
-                                   eval_bit_set(h, mod_lz);
-
-                                   const bool h_nonzero = !eval_is_zero(h);
-
-                                   eval_subtracr(m2k, h);
-                                   h.ct_cond_assign(h_nonzero && h_neg, m2k);
-
-                                   // Return result inv_o + h * o
-                                   eval_multiply(h, o);
-                                   eval_add(h, inv_o);
-
-                                   return h;
-                                }
-                                */
             }    // namespace backends
         }        // namespace multiprecision
     }            // namespace crypto3
