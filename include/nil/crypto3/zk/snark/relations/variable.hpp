@@ -152,7 +152,7 @@ namespace nil {
                     wire_index_type wire_index;
                     rotation_type rotation;
 
-                    variable(const wire_index_type wire_index, rotation_type rotation = rotation_type::current) : 
+                    constexpr variable(const wire_index_type wire_index, rotation_type rotation = rotation_type::current) : 
                         wire_index(wire_index), rotation(rotation) {};
 
                     non_linear_term<FieldType, RotationSupport> operator^(const std::size_t power) const {

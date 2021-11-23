@@ -31,8 +31,8 @@
 // Above, R1CS stands for "Rank-1 Constraint System".
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_R1CS_HPP
-#define CRYPTO3_ZK_R1CS_HPP
+#ifndef CRYPTO3_ZK_R1CS_CONSTRAINT_SYSTEM_HPP
+#define CRYPTO3_ZK_R1CS_CONSTRAINT_SYSTEM_HPP
 
 #include <cstdlib>
 #include <vector>
@@ -226,4 +226,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_R1CS_HPP
+#endif    // CRYPTO3_ZK_R1CS_CONSTRAINT_SYSTEM_HPP
