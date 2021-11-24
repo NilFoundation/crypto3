@@ -1871,4 +1871,11 @@ target_link_libraries(${CURRENT_PROJECT_NAME}_test_inverse_cpp_int no_eh_support
 add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_modular_cpp_int_tests ${CURRENT_PROJECT_NAME}_test_inverse_cpp_int)
 set_target_properties(${CURRENT_PROJECT_NAME}_test_inverse_cpp_int PROPERTIES CXX_STANDARD 17)
 
+cm_test(NAME ${CURRENT_PROJECT_NAME}_test_inverse_gmp SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_inverse.cpp)
+target_compile_definitions(${CURRENT_PROJECT_NAME}_test_inverse_gmp PUBLIC -DTEST_GMP)
+target_link_libraries(${CURRENT_PROJECT_NAME}_test_inverse_gmp ${GMP_LIBRARIES} no_eh_support)
+target_include_directories(${CURRENT_PROJECT_NAME}_test_inverse_gmp PRIVATE ${GMP_INCLUDE_DIRS})
+#add_dependencies(${CURRENT_PROJECT_NAME}_test_inverse_gmp ${CURRENT_PROJECT_NAME}_test_inverse_cpp_int)
+set_target_properties(${CURRENT_PROJECT_NAME}_test_inverse_gmp PROPERTIES CXX_STANDARD 17)
+
 include_directories(${CMAKE_WORKSPACE_SOURCES_DIR})
