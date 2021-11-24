@@ -238,6 +238,8 @@ void test_jubjub_pedersen_merkle_tree_check_validate_component() {
     std::vector<bool> prev_hash(digest_len);
     std::generate(prev_hash.begin(), prev_hash.end(), [&]() { return std::rand() % 2; });
     std::vector<bool> leaf = prev_hash;
+    auto leaf_wrong = leaf;
+    leaf_wrong[0] = !leaf_wrong[0];
 
     std::vector<bool> address_bits;
 
@@ -258,6 +260,12 @@ void test_jubjub_pedersen_merkle_tree_check_validate_component() {
         prev_hash = h;
     }
     std::vector<bool> root = prev_hash;
+    auto root_wrong = root;
+    root_wrong[0] = !root_wrong[0];
+    auto path_wrong = path;
+    path_wrong[0][0] = !path_wrong[0][0];
+    auto address_bits_wrong = address_bits;
+    address_bits_wrong[0] = !address_bits_wrong[0];
 
     /* execute test */
     components::blueprint<field_type> bp;
@@ -283,6 +291,31 @@ void test_jubjub_pedersen_merkle_tree_check_validate_component() {
     leaf_digest.generate_r1cs_witness(leaf);
     root_digest.generate_r1cs_witness(root);
     BOOST_REQUIRE(bp.is_satisfied());
+
+    // false negative test with wrong root
+    root_digest.generate_r1cs_witness(root_wrong);
+    BOOST_REQUIRE(!bp.is_satisfied());
+
+    // reset blueprint in the correct state
+    root_digest.generate_r1cs_witness(root);
+    BOOST_REQUIRE(bp.is_satisfied());
+    // false negative test with wrong leaf
+    leaf_digest.generate_r1cs_witness(leaf_wrong);
+    BOOST_REQUIRE(!bp.is_satisfied());
+
+    // reset blueprint in the correct state
+    leaf_digest.generate_r1cs_witness(leaf);
+    BOOST_REQUIRE(bp.is_satisfied());
+    // false negative test with wrong path
+    path_var.generate_r1cs_witness(address, path_wrong);
+    BOOST_REQUIRE(!bp.is_satisfied());
+
+    // reset blueprint in the correct state
+    path_var.generate_r1cs_witness(address, path);
+    BOOST_REQUIRE(bp.is_satisfied());
+    // false negative test with wrong address
+    address_bits_va.fill_with_bits(bp, address_bits_wrong);
+    BOOST_REQUIRE(!bp.is_satisfied());
 
     // const std::size_t num_constraints = bp.num_constraints();
     // const std::size_t expected_constraints =
