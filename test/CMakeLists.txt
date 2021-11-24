@@ -100,6 +100,9 @@ set(SCHEMES_TESTS_FILES
 set(MERKLE_TREE_TESTS_FILES
     "merkle_tree_components")
 
+set(VOTING_TESTS_FILES
+    "voting/saver")
+
 set(BASIC_COMPONENTS_TESTS_FILES
     "basic_components"
     "basic_components_r1cs_gg_ppzksnark")
@@ -115,6 +118,7 @@ SET(ALL_TESTS_FILES
     ${ROUTING_TESTS_FILES}
     ${SCHEMES_TESTS_FILES}
     ${MERKLE_TREE_TESTS_FILES}
+    ${VOTING_TESTS_FILES}
     ${BASIC_COMPONENTS_TESTS_FILES})
 
 foreach(TEST_FILE ${ALL_TESTS_FILES})
