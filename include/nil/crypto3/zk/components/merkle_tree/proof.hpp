@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -29,52 +30,70 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
 #define CRYPTO3_ZK_BLUEPRINT_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
 
-#include <nil/crypto3/zk/snark/merkle_tree.hpp>
+#include <nil/crypto3/merkle/proof.hpp>
+
 #include <nil/crypto3/zk/components/component.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
+#include <nil/crypto3/zk/components/hashes/pedersen.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-
-                template<typename FieldType, typename Hash, std::size_t Arity = 2>
+                template<typename HashComponent = nil::crypto3::zk::components::pedersen<>,
+                         typename FieldType = typename HashComponent::field_type, std::size_t Arity = 2>
                 struct merkle_proof : public component<FieldType> {
+                    using merkle_proof_container = nil::crypto3::merkle_proof<typename HashComponent::hash_type, Arity>;
+                    using path_type = std::vector<std::vector<digest_variable<FieldType>>>;
 
                     const std::size_t tree_depth;
+                    path_type path;
 
-                    std::vector<std::array<digest_variable<FieldType>, Arity>> path;
-
-                    merkle_proof (blueprint<FieldType> &bp, const std::size_t tree_depth):
+                    merkle_proof(blueprint<FieldType> &bp, const std::size_t tree_depth) :
                         component<FieldType>(bp), tree_depth(tree_depth) {
 
-                        for (std::size_t i = 0; i < tree_depth; ++i) {                        
-                            std::array<digest_variable<FieldType>, Arity> layer;
+                        for (std::size_t i = 0; i < tree_depth; ++i) {
+                            std::vector<digest_variable<FieldType>> layer;
 
                             for (std::size_t j = 0; j < Arity; ++j) {
-                                layer_neighbours[j] = digest_variable<FieldType>(bp, Hash::digest_bits);
+                                layer.template emplace_back(
+                                    digest_variable<FieldType>(this->bp, HashComponent::digest_bits));
                             }
 
-                            path.emplace_back(layer_neighbours);
+                            path.emplace_back(layer);
                         }
-
                     }
 
                     void generate_r1cs_constraints() {
                         for (std::size_t i = 0; i < tree_depth; ++i) {
-                            for (std::size_t j = 0; j < Arity - 1; ++j) {
+                            for (std::size_t j = 0; j < Arity; ++j) {
                                 path[i][j].generate_r1cs_constraints();
                             }
                         }
                     }
 
-                    void generate_r1cs_witness(nil::crypto3::merkletree::MerkleProof<Hash, Arity> proof) {
+                    void generate_r1cs_witness(const merkle_proof_container &proof) {
                         assert(proof.path.size() == tree_depth);
 
                         for (std::size_t i = 0; i < tree_depth; ++i) {
-                            for (std::size_t j =0; j < Arity - 1; j++){
+                            for (std::size_t j = 0; j < Arity - 1; ++j) {
                                 std::size_t neighbour_index = proof.path[i][j].position;
-                                path[i][neighbour_index].generate_r1cs_constraints(proof.path[i][j].hash);
+                                // TODO: treat case if proof.path[i][j].hash is not vector<bool>
+                                path[i][neighbour_index].generate_r1cs_witness(proof.path[i][j].hash);
+                            }
+                        }
+                    }
+
+                    void generate_r1cs_witness(std::size_t address, const std::vector<std::vector<bool>> &proof) {
+                        // TODO: generalize for Arity > 2
+                        assert(Arity == 2);
+                        assert(proof.size() == tree_depth);
+
+                        for (std::size_t i = 0; i < tree_depth; ++i) {
+                            if (address & (1ul << (tree_depth - 1 - i))) {
+                                path[i][0].generate_r1cs_witness(proof[i]);
+                            } else {
+                                path[i][1].generate_r1cs_witness(proof[i]);
                             }
                         }
                     }

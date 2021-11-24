@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -34,22 +35,23 @@
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/components/component.hpp>
-#include <nil/crypto3/zk/components/hashes/knapsack/knapsack_component.hpp>
 #include <nil/crypto3/zk/components/hashes/digest_selector_component.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
-#include <nil/crypto3/zk/components/merkle_tree/authentication_path.hpp>
+#include <nil/crypto3/zk/components/merkle_tree/proof.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
 
-                template<typename FieldType, typename Hash, std::size_t Arity = 2>
+                template<typename HashComponent = pedersen<>, typename FieldType = typename HashComponent::field_type,
+                         std::size_t Arity = 2>
                 class merkle_proof_validate : public component<FieldType> {
-                
-                    using hash_component = nil::crypto3::zk::components::hash<Hash>;
+                    static_assert(std::is_same<digest_variable<FieldType>, typename HashComponent::result_type>::value);
+                    // TODO: add support of the trees with arity more than 2
+                    static_assert(Arity == 2);
 
-                    std::vector<hash_component> hashers;
+                    std::vector<HashComponent> hashers;
                     std::vector<block_variable<FieldType>> hasher_inputs;
                     std::vector<digest_selector_component<FieldType>> propagators;
                     std::vector<digest_variable<FieldType>> internal_output;
@@ -63,19 +65,19 @@ namespace nil {
                     blueprint_linear_combination_vector<FieldType> address_bits;
                     digest_variable<FieldType> leaf;
                     digest_variable<FieldType> root;
-                    merkle_proof<FieldType, Hash, Arity> path;
+                    merkle_proof<HashComponent, FieldType, Arity> path;
                     blueprint_linear_combination<FieldType> read_successful;
 
                     merkle_proof_validate(blueprint<FieldType> &bp,
-                                                     const std::size_t tree_depth,
-                                                     const blueprint_linear_combination_vector<FieldType> &address_bits,
-                                                     const digest_variable<FieldType> &leaf,
-                                                     const digest_variable<FieldType> &root,
-                                                     const merkle_proof<FieldType, Hash, Arity> &path,
-                                                     const blueprint_linear_combination<FieldType> &read_successful):
+                                          const std::size_t tree_depth,
+                                          const blueprint_linear_combination_vector<FieldType> &address_bits,
+                                          const digest_variable<FieldType> &leaf,
+                                          const digest_variable<FieldType> &root,
+                                          const merkle_proof<HashComponent, FieldType, Arity> &path,
+                                          const blueprint_linear_combination<FieldType> &read_successful) :
                         component<FieldType>(bp),
-                        digest_size(Hash::digest_bits), tree_depth(tree_depth), address_bits(address_bits), leaf(leaf),
-                        root(root), path(path), read_successful(read_successful) {
+                        digest_size(HashComponent::digest_bits), tree_depth(tree_depth), address_bits(address_bits),
+                        leaf(leaf), root(root), path(path), read_successful(read_successful) {
                         /*
                            The tricky part here is ordering. For Merkle tree
                            authentication paths, path[0] corresponds to one layer below
@@ -95,10 +97,11 @@ namespace nil {
                         computed_root.reset(new digest_variable<FieldType>(bp, digest_size));
 
                         for (std::size_t i = 0; i < tree_depth; ++i) {
-                            block_variable<FieldType> inp(bp, path.left_digests[i], path.right_digests[i]);
+                            // TODO: generalize for Arity > 2
+                            block_variable<FieldType> inp(bp, path.path[i][0], path.path[i][1]);
                             hasher_inputs.emplace_back(inp);
                             hashers.emplace_back(
-                                hash_component(bp, 2 * digest_size, inp, (i == 0 ? *computed_root : internal_output[i - 1])));
+                                HashComponent(bp, inp, (i == 0 ? *computed_root : internal_output[i - 1])));
                         }
 
                         for (std::size_t i = 0; i < tree_depth; ++i) {
@@ -107,16 +110,17 @@ namespace nil {
                               base case) and propagate it one layer up, either in the left
                               or the right slot of authentication_path_variable.
                             */
+                            // TODO: generalize for Arity > 2
                             propagators.emplace_back(digest_selector_component<FieldType>(
                                 bp, digest_size, i < tree_depth - 1 ? internal_output[i] : leaf,
-                                address_bits[tree_depth - 1 - i], path.left_digests[i], path.right_digests[i]));
+                                address_bits[tree_depth - 1 - i], path.path[i][0], path.path[i][1]));
                         }
 
-                        check_root.reset(new bit_vector_copy_component<FieldType>(bp, computed_root->bits, root.bits,
-                                                                                  read_successful, FieldType::number_bits));
+                        check_root.reset(new bit_vector_copy_component<FieldType>(
+                            bp, computed_root->bits, root.bits, read_successful, FieldType::number_bits));
                     }
 
-                    void generate_r1cs_constraints(){
+                    void generate_r1cs_constraints() {
                         /* ensure correct hash computations */
                         for (std::size_t i = 0; i < tree_depth; ++i) {
                             // Note that we check root outside and have enforced booleanity of
@@ -132,7 +136,7 @@ namespace nil {
                         check_root->generate_r1cs_constraints(false, false);
                     }
 
-                    void generate_r1cs_witness(){
+                    void generate_r1cs_witness() {
                         /* do the hash computations bottom-up */
                         for (int i = tree_depth - 1; i >= 0; --i) {
                             /* propagate previous input */

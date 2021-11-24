@@ -71,30 +71,29 @@ namespace nil {
                     /* adds constraint result = \sum  bits[i] * 2^i */
                     void generate_r1cs_constraints(bool enforce_bitness) {
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
-                            field_type::value_type::one(), blueprint_packing_sum<field_type>(this->bits),
-                            this->packed));
+                            field_type::value_type::one(), blueprint_packing_sum<field_type>(bits), packed));
 
                         if (enforce_bitness) {
-                            for (std::size_t i = 0; i < this->bits.size(); ++i) {
-                                generate_boolean_r1cs_constraint<field_type>(this->bp, this->bits[i]);
+                            for (std::size_t i = 0; i < bits.size(); ++i) {
+                                generate_boolean_r1cs_constraint<field_type>(this->bp, bits[i]);
                             }
                         }
                     }
 
                     void generate_r1cs_witness_from_packed() {
-                        this->packed.evaluate(this->bp);
+                        packed.evaluate(this->bp);
 
                         // `bits` is large enough to represent this packed value
-                        assert(multiprecision::msb(static_cast<typename field_type::integral_type>(
-                                   this->bp.lc_val(this->packed).data)) +
+                        assert(multiprecision::msb(
+                                   static_cast<typename field_type::integral_type>(this->bp.lc_val(packed).data)) +
                                    1 <=
-                               this->bits.size());
-                        this->bits.fill_with_bits_of_field_element(this->bp, this->bp.lc_val(this->packed));
+                               bits.size());
+                        bits.fill_with_bits_of_field_element(this->bp, this->bp.lc_val(packed));
                     }
 
                     void generate_r1cs_witness_from_bits() {
-                        this->bits.evaluate(this->bp);
-                        this->bp.lc_val(this->packed) = this->bits.get_field_element_from_bits(this->bp);
+                        bits.evaluate(this->bp);
+                        this->bp.lc_val(packed) = bits.get_field_element_from_bits(this->bp);
                     }
                 };
 
@@ -131,7 +130,7 @@ namespace nil {
                         }
                     }
 
-                    void generate_r1cs_constraints(bool enforce_bitness) {
+                    void generate_r1cs_constraints(const bool enforce_bitness) {
                         for (std::size_t i = 0; i < num_chunks; ++i) {
                             packers[i].generate_r1cs_constraints(enforce_bitness);
                         }
