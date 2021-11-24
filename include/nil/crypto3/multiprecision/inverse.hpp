@@ -54,6 +54,16 @@ namespace nil {
                 return res;
             }
 
+            template<typename Backend, expression_template_option ExpressionTemplates>
+            constexpr number<Backend, ExpressionTemplates>
+            inverse_mod(const number<Backend, ExpressionTemplates>& a,
+                          const number<Backend, ExpressionTemplates>& p) {
+                number<Backend, ExpressionTemplates> res;
+                res = backends::eval_inverse_mod(a.backend(), p.backend());
+                return res;
+            }
+
+
             /*
                         template <typename IntegerType, typename = typename boost::enable_if<typename
                         is_trivial_cpp_int<IntegerType>::value>::type> IntegerType monty_inverse(const IntegerType& a)

@@ -51,18 +51,20 @@ namespace nil {
                     return tmp_num1;
                 }
 
-                // a^(-1) mod p
+                    // a^(-1) mod p
                 // http://www-math.ucdenver.edu/~wcherowi/courses/m5410/exeucalg.html
                 template<typename Backend>
                 constexpr Backend eval_inverse_extended_euclidean_algorithm(const Backend& a, const Backend& m) {
                     using Backend_doubled = typename default_ops::double_precision_type<Backend>::type;
+                    using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
 
                     Backend aa = a, mm = m, x, y, g;
-                    using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
+                    Backend zero;
+                    zero = ui_type(0u);
                     g = eval_extended_euclidean_algorithm(aa, mm, x, y);
                     if (!eval_eq(g, ui_type(1u))) {
                         // BOOST_THROW_EXCEPTION(std::invalid_argument("eval_inverse_with_gcd: no inverse element"));
-                        return ui_type(0u);
+                        return zero;
                     } else {
                         eval_modulus(x, m);
                         Backend_doubled tmp(x);
@@ -73,17 +75,17 @@ namespace nil {
                 }
 
                 template<typename Backend>
-                Backend eval_monty_inverse_pow2(Backend a, Backend k) {
+                constexpr Backend eval_inverse_mod_pow2(Backend a, size_t k) {
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
-                    Backend tmp;
-                    Backend zero = ui_type(0u);
-                    Backend one = ui_type(1u);
-                    Backend two = ui_type(2u);
+                    Backend tmp, zero, one, two;
+                    zero = ui_type(0u);
+                    one = ui_type(1u);
+                    two = ui_type(2u);
 
                     eval_modulus(tmp, a, two);
-                    if (eval_is_zero(tmp) || eval_is_zero(k))
+                    if (eval_is_zero(tmp) || k == 0)
                         return zero;
-                    if (eval_eq(k, one))
+                    if (k == 1)
                         return one;
                     /*
                      * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
@@ -91,13 +93,11 @@ namespace nil {
                      */
                     Backend b = one;
                     Backend r;
-                    Backend cur_add = one;
-                    for (Backend i = zero; !eval_eq(i, k); eval_increment(i)) {
+                    for (size_t i = 0; i < k; ++i) {
                         if (eval_bit_test(b, 0)) {
                             eval_subtract(b, a);
-                            eval_add(r, cur_add);
+                            eval_bit_set(r, i);
                         }
-                        eval_left_shift(cur_add, 1);
                         eval_right_shift(b, 1);
                     }
 
@@ -105,14 +105,14 @@ namespace nil {
                 }
 
                 template<typename Backend>
-                Backend inverse_mod_odd_modulus(const Backend& n, const Backend& mod)
+                constexpr Backend eval_inverse_mod_odd(const Backend& n, const Backend& mod)
                 {
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
-                    Backend zero = ui_type(0u);
-                    Backend one = ui_type(1u);
-                    Backend two = ui_type(2u);
+                    Backend zero, one, two;
+                    zero = ui_type(0u);
+                    one = ui_type(1u);
                     // Caller should assure these preconditions:
-//                    BOOST_ASSERT(n >= 0);
+//                    BOOST_ASSERT(eval_gt(n, 0) >= 0);
 //                    BOOST_ASSERT(mod >= 0);
 //                    BOOST_ASSERT(n < mod);
 //                    BOOST_ASSERT(mod >= 3 && mod % 2 != 0);
@@ -139,87 +139,70 @@ namespace nil {
                     for (size_t i = 0; i < 2 * ell; ++i) {
 
                         size_t odd = eval_bit_test(a, 0);
-                        //Backend gteq = (a >= b);
-                        size_t gteq = default_ops::eval_gt(a, b) || eval_eq(a, b);
+                        size_t gteq = default_ops::eval_gt(a, b) || default_ops::eval_eq(a, b);
                         if (odd && gteq) {
                             eval_subtract(a, b);
-//                            a -= b;
                         } else if (odd && !gteq) {
-                            swap(u, v);
+                            Backend u_tmp = u;
+                            u = v;
+                            v = u_tmp;
                             Backend tmp = a;
                             eval_subtract(a, b, a);
-//                            a = b - a;
                             b = tmp;
                         }
                         eval_right_shift(a, 1);
-//                        a >>= 1;
-//                        Backend gteq2 = (u >= v);
-                        size_t gteq2 = default_ops::eval_gt(u, v) || eval_eq(u, v);
+                        size_t gteq2 = default_ops::eval_gt(u, v) || default_ops::eval_eq(u, v);
                         if (odd && gteq2) {
                             eval_subtract(u, v);
-//                            u -= v;
                         } else if (odd && !gteq2) {
                             eval_add(u, mod);
                             eval_subtract(u, v);
-//                            u = u + mod - v;
                         }
 
-                        auto tmp = u; //to_length<N + 1>(u);
-//                        if (u & 1) {
                         if (eval_bit_test(u, 0)) {
-//                            tmp += mod; //add(u, n);
-                            eval_add(tmp, u, mod);
+                            eval_add(u, u, mod);
                         }
-                        u = tmp;
                         eval_right_shift(u, 1);
                     }
-                    if (!eval_eq(b, one)) { // if b != 1 then gcd(n,mod) > 1 and inverse does not exist
+                    if (!default_ops::eval_eq(b, one)) { // if b != 1 then gcd(n,mod) > 1 and inverse does not exist
                         return zero;
                     }
                     return v;
                 }
 
                 template<typename Backend>
-                Backend eval_inverse_mod(const Backend& n, const Backend& mod)
+                constexpr Backend eval_inverse_mod(const Backend& n, const Backend& mod)
                 {
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
-                    Backend zero = ui_type(0u);
-                    Backend one = ui_type(1u);
-                    Backend two = ui_type(2u);
+                    Backend zero, one, tmp;
+                    zero = ui_type(0u);
+                    one =  ui_type(1u);
 //                    BOOST_ASSERT(mod > 0 && n >= 0);
                     if (eval_is_zero(n) || (!eval_bit_test(n, 0) && !eval_bit_test(mod, 0))) {
                         return zero;
                     }
-//                    if(n == 0 || (n % 2 == 0 && mod % 2 == 0))
-//                        return zero;
 
-//                    if(mod % 2 != 0) {
                     if(eval_bit_test(mod, 0)) {
                         /*
                         Fastpath for common case. This leaks if n is greater than mod or
                         not, but we don't guarantee const time behavior in that case.
                         */
-                        Backend tmp1;
-                        eval_modulus(tmp1, n, mod);
-//                        Backend tmp1 = n % mod;
-//                        if(n < mod)
+                        eval_modulus(tmp, n, mod);
+
                         if (default_ops::eval_lt(n, mod))
-                            return inverse_mod_odd_modulus(n, mod);
+                            return eval_inverse_mod_odd(n, mod);
                         else
-                            return inverse_mod_odd_modulus(tmp1, mod);
+                            return eval_inverse_mod_odd(tmp, mod);
                     }
 
                     // If n is even and mod is even we already returned 0
                     // If n is even and mod is odd we jumped directly to odd-modulus algo
-//                    BOOST_ASSERT(n % 2 == 1);
                     const size_t mod_lz = eval_lsb(mod);
-//                    if (mod == 1 << mod_lz) {
-                    Backend tmp4 = one;
-                    eval_left_shift(tmp4, mod_lz);
-                    if (eval_eq(mod, tmp4)) {
+                    const size_t mod_mz = eval_msb(mod);
+
+                    if (mod_lz == mod_mz) {
                         // In this case we are performing an inversion modulo 2^k
-                        Backend tmp5 = ui_type(mod_lz);
-                        return eval_monty_inverse_pow2(n, tmp5);
+                        return eval_inverse_mod_pow2(n, mod_lz);
                     }
 
                     if(mod_lz == 1) {
@@ -237,25 +220,22 @@ namespace nil {
                         fall back to the general algorithm below.
                         */
 
-//                        const Backend o = mod >> 1;
                         Backend o = mod;
                         eval_right_shift(o, 1);
-//                        const Backend n_redc = n % o;
                         Backend n_redc;
                         eval_modulus(n_redc, n, o);
-                        const Backend inv_o = inverse_mod_odd_modulus(n_redc, o);
+                        const Backend inv_o = eval_inverse_mod_odd(n_redc, o);
 
                         // No modular inverse in this case:
-//                        if(inv_o == 0)
                         if (eval_is_zero(inv_o))
                             return zero;
 
                         Backend h = inv_o;
-//                        if (inv_o % 2 == 0) {
+
                         if (!eval_bit_test(inv_o, 0)) {
                             eval_add(h, o);
                         }
-//                        h.ct_cond_add(!inv_o.get_bit(0), o);
+
                         return h;
                     }
 
@@ -266,52 +246,34 @@ namespace nil {
                     * using CRT, which is possible because 2^k and o are relatively prime.
                     */
 
-//                    const Backend o = mod >> mod_lz;
-//                    const Backend n_redc = n % o; // ct_modulo(n, o);
                     Backend o = mod;
                     eval_right_shift(o, mod_lz);
                     Backend n_redc = n;
                     eval_modulus(n_redc, o);
-                    const Backend inv_o = inverse_mod_odd_modulus(n_redc, o);
-                    Backend tmp5 = ui_type(mod_lz);
-                    const Backend inv_2k = eval_monty_inverse_pow2(n, tmp5);
+                    const Backend inv_o = eval_inverse_mod_odd(n_redc, o);
+                    const Backend inv_2k = eval_inverse_mod_pow2(n, mod_lz);
 
                     // No modular inverse in this case:
-//                    if(inv_o == 0 || inv_2k == 0)
                     if(eval_is_zero(inv_o) || eval_is_zero(inv_2k))
                         return zero;
 
-//                    const Backend m2k = 1 << mod_lz; //BigInt::power_of_2(mod_lz);
                     Backend m2k = one;
                     eval_left_shift(m2k, mod_lz);
                     // Compute the CRT parameter
-                    Backend tmp6 = ui_type(mod_lz);
-                    const Backend c = eval_monty_inverse_pow2(o, tmp6);
+                    const Backend c = eval_inverse_mod_pow2(o, mod_lz);
 
                     // Compute h = c*(inv_2k-inv_o) mod 2^k
-//                    Backend h = c * (inv_2k - inv_o);
                     Backend h;
                     eval_subtract(h, inv_2k, inv_o);
                     eval_multiply(h, c);
-//                    const bool h_neg = h <= 0;
-
-//                    h.set_sign(BigInt::Positive);
-//                    h.mask_bits(mod_lz);
                     Backend tmp3 = one;
                     eval_left_shift(tmp3, mod_lz);
                     eval_subtract(tmp3, one);
                     eval_bitwise_and(h, tmp3);
-//                    h &= (1 << mod_lz) - 1;
-//                    h <<= mod_lz;
-//                    const bool h_nonzero = h.is_nonzero();
-//                    h.ct_cond_assign(h_nonzero && h_neg, m2k - h);
-//                    if (h_neg) {
-//                        h = m2k - h;
-//                    }
+
                     // Return result inv_o + h * o
                     eval_multiply(h, o);
                     eval_add(h, inv_o);
-//                    h = inv_o + h * o;
                     return h;
                 }
 
@@ -334,9 +296,10 @@ namespace nil {
                     using default_ops::eval_subtract;
 
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
-                    Backend zero = ui_type(0u);
-                    Backend one = ui_type(1u);
-                    Backend two = ui_type(2u);
+                    Backend zero, one, two;
+                    zero = ui_type(0u);
+                    one = ui_type(1u);
+                    two = ui_type(2u);
 
                     /*
                      * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
@@ -345,13 +308,12 @@ namespace nil {
                     Backend c, tmp;
 
                     // a^(-1) mod p:
-                    c = eval_inverse_extended_euclidean_algorithm(a, p);
-//                    с = inverse_mod(a, p);
+                    c = eval_inverse_mod(a, p);
 
                     Backend bi = one, bt, i = zero, xi, nextp = one;
                     res = zero;
 
-                    while (!eval_eq(i, k)) {
+                    while (!default_ops::eval_eq(i, k)) {
                         // xi:
                         xi = bi;
                         eval_multiply(xi, c);
