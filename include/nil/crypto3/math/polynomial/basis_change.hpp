@@ -77,7 +77,7 @@ namespace nil {
                         b = T[i - 1][index];
                         index++;
 
-                        _polynomial_multiplication<FieldType>(T[i][j], a, b);
+                        polynomial::multiplication<FieldType>(T[i][j], a, b);
                     }
                     index = 0;
                 }
@@ -112,7 +112,7 @@ namespace nil {
 
                 I.resize(n);
 
-                std::vector<value_type> Q(_polynomial_multiplication_transpose<FieldType>(n - 1, I, a));
+                std::vector<value_type> Q(polynomial::multiplication_transpose<FieldType>(n - 1, I, a));
                 _reverse(Q, n);
 
                 /* TNewtonToMonomial */
@@ -129,7 +129,7 @@ namespace nil {
 
                     /* NB: unsigned reverse iteration */
                     for (std::size_t j = (1u << (m - i - 1)) - 1; j < (1u << (m - i - 1)); j--) {
-                        c[2 * j + 1] = _polynomial_multiplication_transpose<FieldType>(
+                        c[2 * j + 1] = polynomial::multiplication_transpose<FieldType>(
                             (1u << i) - 1, T[i][row_length - 2 * j], c[j]);
                         c[2 * j] = c[j];
                         c[2 * j].resize(c_vec);
@@ -171,8 +171,8 @@ namespace nil {
                 std::vector<value_type> temp(1, value_type::zero());
                 for (std::size_t i = 0; i < m; i++) {
                     for (std::size_t j = 0; j < (1u << (m - i - 1)); j++) {
-                        _polynomial_multiplication<FieldType>(temp, T[i][2 * j], f[2 * j + 1]);
-                        _polynomial_addition(f[j], f[2 * j], temp);
+                        polynomial::multiplication<FieldType>(temp, T[i][2 * j], f[2 * j + 1]);
+                        polynomial::addition(f[j], f[2 * j], temp);
                     }
                 }
 
@@ -213,7 +213,7 @@ namespace nil {
                     }
                 }
 
-                w = _polynomial_multiplication_transpose<FieldType>(n - 1, z, f);
+                w = polynomial::multiplication_transpose<FieldType>(n - 1, z, f);
 
 #ifdef MULTICORE
 #pragma omp parallel for
@@ -258,7 +258,7 @@ namespace nil {
                         z[i] = -z[i];
                 }
 
-                w = _polynomial_multiplication_transpose<FieldType>(n - 1, u, w);
+                w = polynomial::multiplication_transpose<FieldType>(n - 1, u, w);
 
 #ifdef MULTICORE
 #pragma omp parallel for

@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_equal) {
     std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7, 1, 5, 8};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_addition(c, a, b);
+    polynomial::addition(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 8, 12, 10};
 
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_long_a) {
     std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_addition(c, a, b);
+    polynomial::addition(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 7, 7, 2};
 
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_long_b) {
     std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7, 1, 5, 8};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_addition(c, a, b);
+    polynomial::addition(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 1, 5, 8};
 
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_zero_a) {
     std::vector<typename FieldType::value_type> b = {1, 3, 4, 25, 6, 7, 7, 2};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_addition(c, a, b);
+    polynomial::addition(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
 
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_zero_b) {
     std::vector<typename FieldType::value_type> b = {0, 0, 0};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_addition(c, a, b);
+    polynomial::addition(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
 
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_equal) {
     std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7, 1, 5, 8};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_subtraction(c, a, b);
+    polynomial::subtraction(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {-8, 0, -7, 11, -1, 6, 2, -6};
 
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_a) {
     std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_subtraction(c, a, b);
+    polynomial::subtraction(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {-8, 0, -7, 11, -1, 7, 7, 2};
 
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_b) {
     std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7, 1, 5, 8};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_subtraction(c, a, b);
+    polynomial::subtraction(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {-8, 0, -7, 11, -1, -1, -5, -8};
 
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_a) {
     std::vector<typename FieldType::value_type> b = {1, 3, 4, 25, 6, 7, 7, 2};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_subtraction(c, a, b);
+    polynomial::subtraction(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {-1, -3, -4, -25, -6, -7, -7, -2};
 
@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_b) {
     std::vector<typename FieldType::value_type> b = {0, 0, 0};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_subtraction(c, a, b);
+    polynomial::subtraction(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
 
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_long_a) {
     std::vector<typename FieldType::value_type> b = {13, 0, 1};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_multiplication<FieldType>(c, a, b);
+    polynomial::multiplication(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {65, 0, 5, 169, 0, 26, 0, 1};
 
@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_long_b) {
     std::vector<typename FieldType::value_type> b = {5, 0, 0, 13, 0, 1};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_multiplication<FieldType>(c, a, b);
+    polynomial::multiplication(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {65, 0, 5, 169, 0, 26, 0, 1};
 
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_a) {
     std::vector<typename FieldType::value_type> b = {5, 0, 0, 13, 0, 1};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_multiplication<FieldType>(c, a, b);
+    polynomial::multiplication(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {0};
 
@@ -252,7 +252,7 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_b) {
     std::vector<typename FieldType::value_type> b = {0};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_multiplication<FieldType>(c, a, b);
+    polynomial::multiplication(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {0};
 
@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE(polynomial_division) {
     std::vector<typename FieldType::value_type> Q(1, FieldType::value_type::zero());
     std::vector<typename FieldType::value_type> R(1, FieldType::value_type::zero());
 
-    _polynomial_division<FieldType>(Q, R, a, b);
+    polynomial::division(Q, R, a, b);
 
     std::vector<typename FieldType::value_type> Q_ans = {0, 0, 0, 1};
     std::vector<typename FieldType::value_type> R_ans = {5};
@@ -293,7 +293,7 @@ BOOST_AUTO_TEST_CASE(extended_gcd) {
     std::vector<typename FieldType::value_type> pu(1, FieldType::value_type::zero());
     std::vector<typename FieldType::value_type> pv(1, FieldType::value_type::zero());
 
-    extended_euclidean<FieldType>(a, b, pg, pu, pv);
+    extended_euclidean(a, b, pg, pu, pv);
 
     std::vector<typename FieldType::value_type> pv_ans = {1, 6, 25, 90};
 

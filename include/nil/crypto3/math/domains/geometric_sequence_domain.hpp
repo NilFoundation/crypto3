@@ -108,7 +108,7 @@ namespace nil {
                         g[i] = geometric_triangular_sequence[i] * a[i];
                     }
 
-                    _polynomial_multiplication<FieldType>(a, g, T);
+                    polynomial::multiplication<FieldType>(a, g, T);
                     a.resize(this->m);
 
 #ifdef MULTICORE
@@ -142,7 +142,7 @@ namespace nil {
                             T[i] = -T[i];
                     }
 
-                    _polynomial_multiplication<FieldType>(a, W, T);
+                    polynomial::multiplication<FieldType>(a, W, T);
                     a.resize(this->m);
 
 #ifdef MULTICORE
@@ -249,7 +249,7 @@ namespace nil {
                         t[0] = -geometric_sequence[i];
                         t[1] = value_type::one();
 
-                        _polynomial_multiplication<FieldType>(x, x, t);
+                        polynomial::multiplication<FieldType>(x, x, t);
                     }
 
 #ifdef MULTICORE
