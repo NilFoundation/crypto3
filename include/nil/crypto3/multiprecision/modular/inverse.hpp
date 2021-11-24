@@ -54,7 +54,7 @@ namespace nil {
                     // a^(-1) mod p
                 // http://www-math.ucdenver.edu/~wcherowi/courses/m5410/exeucalg.html
                 template<typename Backend>
-                constexpr Backend eval_inverse_extended_euclidean_algorithm(const Backend& a, const Backend& m) {
+                constexpr void eval_inverse_extended_euclidean_algorithm(Backend &result, const Backend& a, const Backend& m) {
                     using Backend_doubled = typename default_ops::double_precision_type<Backend>::type;
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
 
@@ -64,18 +64,18 @@ namespace nil {
                     g = eval_extended_euclidean_algorithm(aa, mm, x, y);
                     if (!eval_eq(g, ui_type(1u))) {
                         // BOOST_THROW_EXCEPTION(std::invalid_argument("eval_inverse_with_gcd: no inverse element"));
-                        return zero;
+                        result = zero;
                     } else {
                         eval_modulus(x, m);
                         Backend_doubled tmp(x);
                         eval_add(tmp, m);
                         eval_modulus(tmp, m);
-                        return static_cast<Backend>(tmp);
+                        result = static_cast<Backend>(tmp);
                     }
                 }
 
                 template<typename Backend>
-                constexpr Backend eval_inverse_mod_pow2(Backend a, size_t k) {
+                constexpr void eval_inverse_mod_pow2(Backend &result, const Backend &a, const size_t &k) {
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
                     Backend tmp, zero, one, two;
                     zero = ui_type(0u);
@@ -83,10 +83,16 @@ namespace nil {
                     two = ui_type(2u);
 
                     eval_modulus(tmp, a, two);
-                    if (eval_is_zero(tmp) || k == 0)
-                        return zero;
-                    if (k == 1)
-                        return one;
+                    if (eval_is_zero(tmp) || k == 0) {
+                        result = zero;
+                        return;
+                    }
+
+                    if (k == 1) {
+                        result = one;
+                        return;
+                    }
+
                     /*
                      * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
                      * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
@@ -100,8 +106,8 @@ namespace nil {
                         }
                         eval_right_shift(b, 1);
                     }
-
-                    return r;
+                    result = r;
+                    return;
                 }
 
                 template<typename Backend>
@@ -171,7 +177,7 @@ namespace nil {
                 }
 
                 template<typename Backend>
-                constexpr Backend eval_inverse_mod(const Backend& n, const Backend& mod)
+                constexpr void eval_inverse_mod(Backend& result, const Backend& n, const Backend& mod)
                 {
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
                     Backend zero, one, tmp;
@@ -179,7 +185,8 @@ namespace nil {
                     one =  ui_type(1u);
 //                    BOOST_ASSERT(mod > 0 && n >= 0);
                     if (eval_is_zero(n) || (!eval_bit_test(n, 0) && !eval_bit_test(mod, 0))) {
-                        return zero;
+                        result = zero;
+                        return;
                     }
 
                     if(eval_bit_test(mod, 0)) {
@@ -188,11 +195,8 @@ namespace nil {
                         not, but we don't guarantee const time behavior in that case.
                         */
                         eval_modulus(tmp, n, mod);
-
-                        if (default_ops::eval_lt(n, mod))
-                            return eval_inverse_mod_odd(n, mod);
-                        else
-                            return eval_inverse_mod_odd(tmp, mod);
+                        result = eval_inverse_mod_odd(tmp, mod);
+                        return;
                     }
 
                     // If n is even and mod is even we already returned 0
@@ -202,7 +206,8 @@ namespace nil {
 
                     if (mod_lz == mod_mz) {
                         // In this case we are performing an inversion modulo 2^k
-                        return eval_inverse_mod_pow2(n, mod_lz);
+                        eval_inverse_mod_pow2(result, n, mod_lz);
+                        return;
                     }
 
                     if(mod_lz == 1) {
@@ -227,16 +232,18 @@ namespace nil {
                         const Backend inv_o = eval_inverse_mod_odd(n_redc, o);
 
                         // No modular inverse in this case:
-                        if (eval_is_zero(inv_o))
-                            return zero;
+                        if (eval_is_zero(inv_o)) {
+                            result = zero;
+                            return;
+                        }
 
                         Backend h = inv_o;
 
                         if (!eval_bit_test(inv_o, 0)) {
                             eval_add(h, o);
                         }
-
-                        return h;
+                        result = h;
+                        return;
                     }
 
                     /*
@@ -251,16 +258,20 @@ namespace nil {
                     Backend n_redc = n;
                     eval_modulus(n_redc, o);
                     const Backend inv_o = eval_inverse_mod_odd(n_redc, o);
-                    const Backend inv_2k = eval_inverse_mod_pow2(n, mod_lz);
+                    Backend inv_2k;
+                    eval_inverse_mod_pow2(inv_2k, n, mod_lz);
 
                     // No modular inverse in this case:
-                    if(eval_is_zero(inv_o) || eval_is_zero(inv_2k))
-                        return zero;
+                    if(eval_is_zero(inv_o) || eval_is_zero(inv_2k)) {
+                        result = zero;
+                        return;
+                    }
 
                     Backend m2k = one;
                     eval_left_shift(m2k, mod_lz);
                     // Compute the CRT parameter
-                    const Backend c = eval_inverse_mod_pow2(o, mod_lz);
+                    Backend c;
+                    eval_inverse_mod_pow2(c, o, mod_lz);
 
                     // Compute h = c*(inv_2k-inv_o) mod 2^k
                     Backend h;
@@ -274,7 +285,8 @@ namespace nil {
                     // Return result inv_o + h * o
                     eval_multiply(h, o);
                     eval_add(h, inv_o);
-                    return h;
+                    result = h;
+                    return;
                 }
 
                 /*
@@ -294,6 +306,7 @@ namespace nil {
                     using default_ops::eval_gt;
                     using default_ops::eval_modulus;
                     using default_ops::eval_subtract;
+                    using default_ops::eval_eq;
 
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
                     Backend zero, one, two;
@@ -308,12 +321,12 @@ namespace nil {
                     Backend c, tmp;
 
                     // a^(-1) mod p:
-                    c = eval_inverse_mod(a, p);
+                    eval_inverse_mod(c, a, p);
 
                     Backend bi = one, bt, i = zero, xi, nextp = one;
                     res = zero;
 
-                    while (!default_ops::eval_eq(i, k)) {
+                    while (!eval_eq(i, k)) {
                         // xi:
                         xi = bi;
                         eval_multiply(xi, c);
