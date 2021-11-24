@@ -71,22 +71,31 @@ namespace nil {
                     element_g1(blueprint<field_type> &bp) : component<field_type>(bp) {
                         blueprint_variable<field_type> X_var, Y_var;
 
-                        X_var.allocate(this->bp);
-                        Y_var.allocate(this->bp);
+                        X_var.allocate(bp);
+                        Y_var.allocate(bp);
 
-                        this->X = X_var;
-                        this->Y = Y_var;
+                        X = X_var;
+                        Y = Y_var;
                     }
 
                     element_g1(blueprint<field_type> &bp, const group_value_type &p) : element_g1(bp) {
-                        this->bp.lc_val(this->X) = p.X.data;
-                        this->bp.lc_val(this->Y) = p.Y.data;
+                        bp.lc_val(X) = p.X.data;
+                        bp.lc_val(Y) = p.Y.data;
                     }
 
                     element_g1(blueprint<field_type> &bp, const underlying_element_type &in_X,
                                const underlying_element_type &in_Y) :
                         component<field_type>(bp),
                         X(in_X), Y(in_Y) {
+                    }
+
+                    // TODO: maybe add is_well_formed constraints
+                    void generate_r1cs_constraints() {
+                    }
+
+                    void generate_r1cs_witness(const group_value_type &p) {
+                        this->bp.lc_val(X) = p.X.data;
+                        this->bp.lc_val(Y) = p.Y.data;
                     }
 
                     // (See a comment in r1cs_ppzksnark_verifier_component.hpp about why

@@ -43,39 +43,46 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-
-                template<typename HashComponent = pedersen<>, typename FieldType = typename HashComponent::field_type,
+                template<typename HashComponent = pedersen<>, typename Field = typename HashComponent::field_type,
                          std::size_t Arity = 2>
-                class merkle_proof_validate : public component<FieldType> {
-                    static_assert(std::is_same<digest_variable<FieldType>, typename HashComponent::result_type>::value);
+                struct merkle_proof_validate : public component<Field> {
+                    static constexpr std::size_t arity = Arity;
+
+                    using field_type = Field;
+                    using hash_component = HashComponent;
+                    using merkle_proof_component = merkle_proof<hash_component, field_type, arity>;
+
                     // TODO: add support of the trees with arity more than 2
-                    static_assert(Arity == 2);
+                    static_assert(arity == 2);
+                    static_assert(
+                        std::is_same<digest_variable<field_type>, typename HashComponent::result_type>::value);
 
+                private:
                     std::vector<HashComponent> hashers;
-                    std::vector<block_variable<FieldType>> hasher_inputs;
-                    std::vector<digest_selector_component<FieldType>> propagators;
-                    std::vector<digest_variable<FieldType>> internal_output;
+                    std::vector<block_variable<field_type>> hasher_inputs;
+                    std::vector<digest_selector_component<field_type>> propagators;
+                    std::vector<digest_variable<field_type>> internal_output;
 
-                    std::shared_ptr<digest_variable<FieldType>> computed_root;
-                    std::shared_ptr<bit_vector_copy_component<FieldType>> check_root;
+                    std::shared_ptr<digest_variable<field_type>> computed_root;
+                    std::shared_ptr<bit_vector_copy_component<field_type>> check_root;
 
                 public:
                     const std::size_t digest_size;
                     const std::size_t tree_depth;
-                    blueprint_linear_combination_vector<FieldType> address_bits;
-                    digest_variable<FieldType> leaf;
-                    digest_variable<FieldType> root;
-                    merkle_proof<HashComponent, FieldType, Arity> path;
-                    blueprint_linear_combination<FieldType> read_successful;
+                    blueprint_linear_combination_vector<field_type> address_bits;
+                    digest_variable<field_type> leaf;
+                    digest_variable<field_type> root;
+                    merkle_proof_component path;
+                    blueprint_linear_combination<field_type> read_successful;
 
-                    merkle_proof_validate(blueprint<FieldType> &bp,
+                    merkle_proof_validate(blueprint<field_type> &bp,
                                           const std::size_t tree_depth,
-                                          const blueprint_linear_combination_vector<FieldType> &address_bits,
-                                          const digest_variable<FieldType> &leaf,
-                                          const digest_variable<FieldType> &root,
-                                          const merkle_proof<HashComponent, FieldType, Arity> &path,
-                                          const blueprint_linear_combination<FieldType> &read_successful) :
-                        component<FieldType>(bp),
+                                          const blueprint_linear_combination_vector<field_type> &address_bits,
+                                          const digest_variable<field_type> &leaf,
+                                          const digest_variable<field_type> &root,
+                                          const merkle_proof_component &path,
+                                          const blueprint_linear_combination<field_type> &read_successful) :
+                        component<field_type>(bp),
                         digest_size(HashComponent::digest_bits), tree_depth(tree_depth), address_bits(address_bits),
                         leaf(leaf), root(root), path(path), read_successful(read_successful) {
                         /*
@@ -91,14 +98,14 @@ namespace nil {
                         assert(tree_depth == address_bits.size());
 
                         for (std::size_t i = 0; i < tree_depth - 1; ++i) {
-                            internal_output.emplace_back(digest_variable<FieldType>(bp, digest_size));
+                            internal_output.emplace_back(digest_variable<field_type>(bp, digest_size));
                         }
 
-                        computed_root.reset(new digest_variable<FieldType>(bp, digest_size));
+                        computed_root.reset(new digest_variable<field_type>(bp, digest_size));
 
                         for (std::size_t i = 0; i < tree_depth; ++i) {
-                            // TODO: generalize for Arity > 2
-                            block_variable<FieldType> inp(bp, path.path[i][0], path.path[i][1]);
+                            // TODO: generalize for arity > 2
+                            block_variable<field_type> inp(bp, path.path[i][0], path.path[i][1]);
                             hasher_inputs.emplace_back(inp);
                             hashers.emplace_back(
                                 HashComponent(bp, inp, (i == 0 ? *computed_root : internal_output[i - 1])));
@@ -110,14 +117,14 @@ namespace nil {
                               base case) and propagate it one layer up, either in the left
                               or the right slot of authentication_path_variable.
                             */
-                            // TODO: generalize for Arity > 2
-                            propagators.emplace_back(digest_selector_component<FieldType>(
+                            // TODO: generalize for arity > 2
+                            propagators.emplace_back(digest_selector_component<field_type>(
                                 bp, digest_size, i < tree_depth - 1 ? internal_output[i] : leaf,
                                 address_bits[tree_depth - 1 - i], path.path[i][0], path.path[i][1]));
                         }
 
-                        check_root.reset(new bit_vector_copy_component<FieldType>(
-                            bp, computed_root->bits, root.bits, read_successful, FieldType::number_bits));
+                        check_root.reset(new bit_vector_copy_component<field_type>(
+                            bp, computed_root->bits, root.bits, read_successful, field_type::number_bits));
                     }
 
                     void generate_r1cs_constraints() {
@@ -149,7 +156,6 @@ namespace nil {
                         check_root->generate_r1cs_witness();
                     }
                 };
-
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3

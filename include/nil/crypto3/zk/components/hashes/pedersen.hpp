@@ -32,9 +32,6 @@
 #include <nil/crypto3/hash/pedersen.hpp>
 #include <nil/crypto3/hash/algorithm/to_curve.hpp>
 
-#include <nil/crypto3/zk/components/algebra/curves/montgomery/element_g1.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/twisted_edwards/element_g1.hpp>
-
 #include <nil/crypto3/zk/components/algebra/curves/fixed_base_mul_zcash.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
 
@@ -63,7 +60,7 @@ namespace nil {
                     using hash_type = void;
 
                     commitment_component m_commitment;
-                    result_type &result;
+                    result_type result;
 
                     static std::vector<typename element_component::group_value_type> get_base_points(std::size_t n) {
                         using group_hash_type = hashes::find_group_hash<HashParams, BasePointsGeneratorHash,
@@ -364,7 +361,7 @@ namespace nil {
 
                     // TODO: ignored for now, enforce bitness checking constrains
                     void generate_r1cs_constraints(bool ensure_output_bitness = false) {
-                        this->hasher.generate_r1cs_constraints();
+                        this->hasher.generate_r1cs_constraints(ensure_output_bitness);
                         this->to_bits_converter.generate_r1cs_constraints();
                         this->result.generate_r1cs_constraints();
                     }
@@ -377,6 +374,121 @@ namespace nil {
 
                     static std::size_t get_digest_len() {
                         return digest_bits;
+                    }
+                };
+
+                /// @brief See https://zips.z.cash/protocol/protocol.pdf#concretewindowedcommit
+                template<typename Curve = nil::crypto3::algebra::curves::jubjub,
+                         typename BasePointsGeneratorHash = hashes::sha2<256>,
+                         typename HashParams = hashes::find_group_hash_default_params>
+                struct pedersen_commitment_to_point : public component<typename Curve::base_field_type> {
+                    using hash_component = pedersen_to_point<Curve, BasePointsGeneratorHash, HashParams>;
+                    using element_component = typename hash_component::element_component;
+                    using addition_component = typename element_component::addition_component;
+
+                    using field_type = typename hash_component::field_type;
+                    using result_type = typename hash_component::result_type;
+
+                public:
+                    result_type result;
+
+                private:
+                    hash_component hasher;
+                    element_component random_point;
+                    addition_component adder;
+
+                    /// Auto allocation of the result
+                    /// Take in_bits as blueprint_variable_vector.
+                    pedersen_commitment_to_point(blueprint<field_type> &bp,
+                                                 const blueprint_variable_vector<field_type> &in_bits) :
+                        component<field_type>(bp),
+                        // public field
+                        result(bp),
+                        // private fields
+                        hasher(bp, in_bits), random_point(bp), adder(bp, hasher.result, random_point, result) {
+                    }
+
+                    /// Manual allocation of the result
+                    /// Take in_bits as blueprint_variable_vector.
+                    pedersen_commitment_to_point(blueprint<field_type> &bp,
+                                                 const blueprint_variable_vector<field_type> &in_bits,
+                                                 const result_type &result) :
+                        component<field_type>(bp),
+                        // public field
+                        result(result),
+                        // private fields
+                        hasher(bp, in_bits), random_point(bp), adder(bp, hasher.result, random_point, result) {
+                    }
+
+                    void generate_r1cs_constraints(bool ensure_output_bitness = false) {
+                        hasher.generate_r1cs_constraints(ensure_output_bitness);
+                        adder.generate_r1cs_constraints();
+                    }
+
+                    void generate_r1cs_witness(const typename field_type::value_type &r) {
+                        using group_hash_type = hashes::find_group_hash<HashParams, BasePointsGeneratorHash,
+                                                                        typename element_component::group_type>;
+
+                        hasher.generate_r1cs_witness();
+                        random_point.generate_r1cs_witness(r * to_curve<group_hash_type>(std::vector<std::uint8_t> {
+                                                                   'r',
+                                                               }));
+                        adder.generate_r1cs_witness();
+                    }
+                };
+
+                template<typename Curve = nil::crypto3::algebra::curves::jubjub,
+                         typename BasePointsGeneratorHash = hashes::sha2<256>,
+                         typename HashParams = hashes::find_group_hash_default_params>
+                struct pedersen_commitment : public component<typename Curve::base_field_type> {
+                    using commitment_component =
+                        pedersen_commitment_to_point<Curve, BasePointsGeneratorHash, HashParams>;
+                    using element_component = typename commitment_component::element_component;
+                    using to_bits_component = typename element_component::to_bits_component;
+
+                    using field_type = typename commitment_component::field_type;
+                    using result_type = digest_variable<field_type>;
+
+                private:
+                    commitment_component commiter;
+                    to_bits_component to_bits_converter;
+
+                public:
+                    result_type result;
+
+                    /// Auto allocation of the result
+                    /// Take in_bits as blueprint_variable_vector.
+                    pedersen_commitment(blueprint<field_type> &bp,
+                                        const blueprint_variable_vector<field_type> &in_bits) :
+                        component<field_type>(bp),
+                        // private fields
+                        commiter(bp, in_bits), to_bits_converter(bp, commiter.result),
+                        // public field
+                        result(bp, field_type::value_bits, to_bits_converter.result, 0) {
+                    }
+
+                    /// Manual allocation of the result
+                    /// Take in_bits as blueprint_variable_vector.
+                    pedersen_commitment(blueprint<field_type> &bp,
+                                        const blueprint_variable_vector<field_type> &in_bits,
+                                        const result_type &result) :
+                        component<field_type>(bp),
+                        // private fields
+                        commiter(bp, in_bits), to_bits_converter(bp, commiter.result, result.bits),
+                        // public field
+                        result(result) {
+                    }
+
+                    void generate_r1cs_constraints(bool ensure_output_bitness = false) {
+                        commiter.generate_r1cs_constraints(ensure_output_bitness);
+                        to_bits_converter.generate_r1cs_constraints();
+                    }
+
+                    void generate_r1cs_witness(const typename field_type::value_type &r) {
+                        commiter.generate_r1cs_witness(r);
+                        // to_bits_converter generate witness also for result
+                        to_bits_converter.generate_r1cs_witness();
+                        result.generate_r1cs_constraints();
                     }
                 };
             }    // namespace components

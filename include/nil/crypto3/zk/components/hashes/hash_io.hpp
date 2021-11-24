@@ -112,7 +112,12 @@ namespace nil {
                         bits.insert(bits.end(), right.bits.begin(), right.bits.end());
                     }
 
-                    void generate_r1cs_constraints();
+                    void generate_r1cs_constraints() {
+                        for (std::size_t i = 0; i < block_size; ++i) {
+                            generate_boolean_r1cs_constraint<FieldType>(this->bp, bits[i]);
+                        }
+                    }
+
                     void generate_r1cs_witness(const std::vector<bool> &contents) {
                         bits.fill_with_bits(this->bp, contents);
                     }

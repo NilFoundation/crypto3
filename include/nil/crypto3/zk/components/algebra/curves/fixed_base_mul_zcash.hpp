@@ -48,8 +48,8 @@
 
 #include <nil/crypto3/zk/components/algebra/fields/element_fp.hpp>
 
-#include <nil/crypto3/zk/components/algebra/curves/element_ops.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/element_g1_affine.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/montgomery/element_g1.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/twisted_edwards/element_g1.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -232,6 +232,23 @@ namespace nil {
                         }
                     }
 
+                    static blueprint_variable_vector<field_type>
+                        pad_input(blueprint<field_type> &bp, const blueprint_variable_vector<field_type> &input) {
+                        blueprint_variable_vector<field_type> padded_input = input;
+                        for (std::size_t i = 0;
+                             // TODO: simplify calculation of the padding length
+                             i < (input.size() % lookup_component::chunk_bits ?
+                                      (lookup_component::chunk_bits - input.size() % lookup_component::chunk_bits) :
+                                      0);
+                             ++i) {
+                            blueprint_variable<field_type> pad_i;
+                            pad_i.allocate(bp);
+                            bp.val(pad_i) = field_value_type::zero();
+                            padded_input.template emplace_back(pad_i);
+                        }
+                        return padded_input;
+                    }
+
                 public:
                     /// Number of segments
                     static std::size_t basepoints_required(std::size_t n_bits) {
@@ -242,10 +259,11 @@ namespace nil {
                     template<typename BasePoints>
                     fixed_base_mul_zcash(blueprint<field_type> &bp,
                                          const BasePoints &base_points,
-                                         const blueprint_variable_vector<field_type> &in_scalar) :
+                                         const blueprint_variable_vector<field_type> &in_scalar,
+                                         const bool do_pad_input = true) :
                         component<field_type>(bp),
                         result(bp) {
-                        init(base_points, in_scalar);
+                        init(base_points, do_pad_input ? pad_input(bp, in_scalar) : in_scalar);
                     }
 
                     /// Manual allocation of the result
@@ -253,10 +271,11 @@ namespace nil {
                     fixed_base_mul_zcash(blueprint<field_type> &bp,
                                          const BasePoints &base_points,
                                          const blueprint_variable_vector<field_type> &in_scalar,
-                                         const result_type &in_result) :
+                                         const result_type &in_result,
+                                         const bool do_pad_input = true) :
                         component<field_type>(bp),
                         result(in_result) {
-                        init(base_points, in_scalar);
+                        init(base_points, do_pad_input ? pad_input(bp, in_scalar) : in_scalar);
                     }
 
                     void generate_r1cs_constraints() {

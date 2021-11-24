@@ -307,6 +307,26 @@ BOOST_AUTO_TEST_CASE(pedersen_jubjub_sha256_default_params_test) {
         1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0};
     test_pedersen_default_params_component<curve_type>(bits_to_hash, expected, expected_bits);
 
+    // check work of internal padding
+    bits_to_hash = {
+        0, 0, 0, 1, 1,
+    };
+    expected =
+        typename curve_type::template g1_type<curves::coordinates::affine, curves::forms::twisted_edwards>::value_type(
+            field_value_type(
+                integral_type("36263379031273262448220672699212876513597479199804632409115456999776988098218")),
+            field_value_type(
+                integral_type("31510484483269042758896724536623472863781228578271767290815193389100113348921")));
+    expected_bits = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1,
+                     0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
+                     0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1,
+                     1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1,
+                     1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1,
+                     1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0,
+                     0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0,
+                     1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1};
+    test_pedersen_default_params_component<curve_type>(bits_to_hash, expected, expected_bits);
+
     bits_to_hash = std::vector<bool> {0, 0, 1};
     expected =
         typename curve_type::template g1_type<curves::coordinates::affine, curves::forms::twisted_edwards>::value_type(

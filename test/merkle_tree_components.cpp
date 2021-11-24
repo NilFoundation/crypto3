@@ -289,6 +289,9 @@ void test_jubjub_pedersen_merkle_tree_check_validate_component() {
     /* make sure that read checker didn't accidentally overwrite anything */
     address_bits_va.fill_with_bits(bp, address_bits);
     leaf_digest.generate_r1cs_witness(leaf);
+    /// Very important step, hidden error could appear without it. merkle_validate_component use
+    /// bit_vector_copy_component to copy computed root into root_digest, so without this step internal check of the
+    /// computed step will always be positive
     root_digest.generate_r1cs_witness(root);
     BOOST_REQUIRE(bp.is_satisfied());
 
