@@ -150,42 +150,42 @@ void test_jubjub_pedersen_saver_component() {
     vote_var.generate_r1cs_witness(root, sn);
     BOOST_CHECK(bp.is_satisfied());
 
-    // false negative test with wrong root
+    // false positive test with wrong root
     root_digest.generate_r1cs_witness(root_wrong);
     BOOST_CHECK(!bp.is_satisfied());
 
     // reset blueprint in the correct state
     root_digest.generate_r1cs_witness(root);
     BOOST_CHECK(bp.is_satisfied());
-    // false negative test with wrong sk
+    // false positive test with wrong sk
     sk_block.generate_r1cs_witness(sk_wrong);
     BOOST_CHECK(!bp.is_satisfied());
 
     // reset blueprint in the correct state
     sk_block.generate_r1cs_witness(sk);
     BOOST_CHECK(bp.is_satisfied());
-    // false negative test with wrong path
+    // false positive test with wrong path
     path_var.generate_r1cs_witness(address, path_wrong);
     BOOST_CHECK(!bp.is_satisfied());
 
     // reset blueprint in the correct state
     path_var.generate_r1cs_witness(address, path);
     BOOST_CHECK(bp.is_satisfied());
-    // false negative test with wrong address
+    // false positive test with wrong address
     address_bits_va.fill_with_bits(bp, address_bits_wrong);
     BOOST_CHECK(!bp.is_satisfied());
 
     // reset blueprint in the correct state
     address_bits_va.fill_with_bits(bp, address_bits);
     BOOST_CHECK(bp.is_satisfied());
-    // false negative test with wrong sn
+    // false positive test with wrong sn
     sn_digest.generate_r1cs_witness(sn_wrong);
     BOOST_CHECK(!bp.is_satisfied());
 
     // reset blueprint in the correct state
     sn_digest.generate_r1cs_witness(sn);
     BOOST_CHECK(bp.is_satisfied());
-    // false negative test with wrong m
+    // false positive test with wrong m
     m_block.generate_r1cs_witness(m_wrong);
     BOOST_CHECK(!bp.is_satisfied());
 
