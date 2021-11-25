@@ -136,6 +136,10 @@ BOOST_AUTO_TEST_CASE(jubjub_sha256_default_params_manual_test) {
             "19724757542882122580209648860907766139392382704367414563715710526666657068129"));
     point = to_curve<hash_type>(input);
     BOOST_CHECK(expected == point);
+
+    std::uint32_t input_uint32 = 3;
+    point = to_curve<hash_type>({input_uint32,});
+    BOOST_CHECK(expected == point);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

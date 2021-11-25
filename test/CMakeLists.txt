@@ -65,7 +65,8 @@ set(TESTS_NAMES
     "static_digest"
     "tiger"
     "h2c"
-    "find_group_hash")
+    "find_group_hash"
+    "pedersen")
 
 if(CRYPTO3_HASH_POSEIDON)
     list(APPEND TESTS_NAMES poseidon)

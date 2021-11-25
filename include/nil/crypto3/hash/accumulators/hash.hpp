@@ -49,6 +49,10 @@
 
 namespace nil {
     namespace crypto3 {
+        namespace hashes {
+            template<typename Params, typename BasePointGeneratorHash, typename Group>
+            struct pedersen;
+        }
         namespace accumulators {
             namespace impl {
                 template<typename Hash>
@@ -219,6 +223,45 @@ namespace nil {
                     std::size_t total_seen;
                     block_type cache;
                     construction_type construction;
+                };
+
+                template<typename Params, typename BasePointGeneratorHash, typename Group>
+                struct hash_impl<nil::crypto3::hashes::pedersen<Params, BasePointGeneratorHash, Group>>
+                    : boost::accumulators::accumulator_base {
+                protected:
+                    typedef nil::crypto3::hashes::pedersen<Params, BasePointGeneratorHash, Group> hash_type;
+                    typedef typename hash_type::internal_accumulator_type internal_accumulator_type;
+
+                public:
+                    typedef typename hash_type::result_type result_type;
+
+                    template<typename Args>
+                    hash_impl(const Args &args) {
+                        hash_type::init_accumulator(acc);
+                    }
+
+                    template<typename Args>
+                    inline void operator()(const Args &args) {
+                        resolve_type(args[boost::accumulators::sample],
+                                     args[::nil::crypto3::accumulators::iterator_last | nullptr]);
+                    }
+
+                    inline result_type result(boost::accumulators::dont_care) const {
+                        return hash_type::process(acc);
+                    }
+
+                protected:
+                    template<typename InputRange, typename InputIterator>
+                    inline void resolve_type(const InputRange &range, InputIterator) {
+                        hash_type::update(acc, range);
+                    }
+
+                    template<typename InputIterator>
+                    inline void resolve_type(InputIterator first, InputIterator last) {
+                        hash_type::update(acc, first, last);
+                    }
+
+                    mutable internal_accumulator_type acc;
                 };
             }    // namespace impl
 

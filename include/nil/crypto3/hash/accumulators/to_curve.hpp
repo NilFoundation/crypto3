@@ -43,22 +43,22 @@ namespace nil {
         namespace hashes {
             namespace accumulators {
                 namespace impl {
-                    template<typename HashingPolicy, typename = void>
+                    template<typename HashType, typename = void>
                     struct to_curve_impl;
 
                     // TODO: maybe add dependant hash accumulator instead manually work with it inside
-                    template<typename HashingPolicy>
-                    struct to_curve_impl<HashingPolicy> : boost::accumulators::accumulator_base {
+                    template<typename HashType>
+                    struct to_curve_impl<HashType> : boost::accumulators::accumulator_base {
                     protected:
-                        typedef HashingPolicy hashing_policy;
-                        typedef typename hashing_policy::internal_accumulator_type internal_accumulator_type;
+                        typedef HashType hash_type;
+                        typedef typename hash_type::internal_accumulator_type internal_accumulator_type;
 
                     public:
-                        typedef typename hashing_policy::result_type result_type;
+                        typedef typename hash_type::result_type result_type;
 
                         template<typename Args>
                         to_curve_impl(const Args &args) {
-                            hashing_policy::init_accumulator(acc);
+                            hash_type::init_accumulator(acc);
                         }
 
                         template<typename Args>
@@ -68,18 +68,18 @@ namespace nil {
                         }
 
                         inline result_type result(boost::accumulators::dont_care) const {
-                            return hashing_policy::process(acc);
+                            return hash_type::process(acc);
                         }
 
                     protected:
                         template<typename InputRange, typename InputIterator>
                         inline void resolve_type(const InputRange &range, InputIterator) {
-                            hashing_policy::update(acc, range);
+                            hash_type::update(acc, range);
                         }
 
                         template<typename InputIterator>
                         inline void resolve_type(InputIterator first, InputIterator last) {
-                            hashing_policy::update(acc, first, last);
+                            hash_type::update(acc, first, last);
                         }
 
                         mutable internal_accumulator_type acc;
@@ -87,22 +87,22 @@ namespace nil {
                 }    // namespace impl
 
                 namespace tag {
-                    template<typename HashingPolicy>
+                    template<typename HashType>
                     struct to_curve : boost::accumulators::depends_on<> {
-                        typedef HashingPolicy hashing_policy;
+                        typedef HashType hash_type;
 
                         /// INTERNAL ONLY
                         ///
 
-                        typedef boost::mpl::always<accumulators::impl::to_curve_impl<hashing_policy>> impl;
+                        typedef boost::mpl::always<accumulators::impl::to_curve_impl<hash_type>> impl;
                     };
                 }    // namespace tag
 
                 namespace extract {
-                    template<typename HashingPolicy, typename AccumulatorSet>
-                    typename boost::mpl::apply<AccumulatorSet, tag::to_curve<HashingPolicy>>::type::result_type
+                    template<typename HashType, typename AccumulatorSet>
+                    typename boost::mpl::apply<AccumulatorSet, tag::to_curve<HashType>>::type::result_type
                         to_curve(const AccumulatorSet &acc) {
-                        return boost::accumulators::extract_result<tag::to_curve<HashingPolicy>>(acc);
+                        return boost::accumulators::extract_result<tag::to_curve<HashType>>(acc);
                     }
                 }    // namespace extract
             }        // namespace accumulators

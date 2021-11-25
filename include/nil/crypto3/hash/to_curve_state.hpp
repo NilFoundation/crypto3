@@ -39,12 +39,11 @@ namespace nil {
          *
          * @ingroup hashes
          *
-         * @tparam HashingPolicy
+         * @tparam Hash
          */
-        template<typename HashingPolicy>
+        template<typename Hash>
         using hashing_to_curve_accumulator_set = boost::accumulators::accumulator_set<
-            typename HashingPolicy::result_type,
-            boost::accumulators::features<hashes::accumulators::tag::to_curve<HashingPolicy>>>;
+            typename Hash::result_type, boost::accumulators::features<hashes::accumulators::tag::to_curve<Hash>>>;
     }    // namespace crypto3
 }    // namespace nil
 
