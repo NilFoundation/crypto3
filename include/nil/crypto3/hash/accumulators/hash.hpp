@@ -44,6 +44,7 @@
 #include <nil/crypto3/hash/accumulators/bits_count.hpp>
 
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
+#include <nil/crypto3/hash/accumulators/parameters/iterator_last.hpp>
 
 #include <boost/accumulators/statistics/count.hpp>
 
