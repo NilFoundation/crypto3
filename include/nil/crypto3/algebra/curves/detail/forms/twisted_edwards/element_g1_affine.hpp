@@ -131,7 +131,7 @@ namespace nil {
                          * @return true if element from group G1 is the point at infinity
                          */
                         constexpr bool is_zero() const {
-                            return X == params_type::zero_fill[0] && Y == params_type::zero_fill[0];
+                            return X == params_type::zero_fill[0] && Y == params_type::zero_fill[1];
                         }
 
                         /** @brief
