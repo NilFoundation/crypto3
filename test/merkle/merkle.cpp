@@ -28,6 +28,7 @@
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/md5.hpp>
 #include <nil/crypto3/hash/blake2b.hpp>
+#include <nil/crypto3/hash/pedersen.hpp>
 
 #include <nil/crypto3/merkle/tree.hpp>
 #include <nil/crypto3/merkle/proof.hpp>
@@ -57,6 +58,19 @@ void testing_validate_template(std::vector<Element> data) {
 }
 
 template<typename Hash, size_t Arity, typename Element>
+void testing_validate_template_pedersen(std::vector<Element> data) {
+    std::array<bool, Hash::digest_bits> data_not_in_tree = {0};
+    merkle_tree<Hash, Arity> tree(data);
+    merkle_proof<Hash, Arity> proof(tree, 0);
+    bool good_validate = proof.validate(data[0]);
+    bool wrong_leaf_validate = proof.validate(data[1]);
+    bool wrong_data_validate = proof.validate(data_not_in_tree);
+    BOOST_CHECK(true == good_validate);
+    BOOST_CHECK(false == wrong_leaf_validate);
+    BOOST_CHECK(false == wrong_data_validate);
+}
+
+template<typename Hash, size_t Arity, typename Element>
 void testing_hash_template(std::vector<Element> data, std::string result) {
     merkle_tree<Hash, Arity> tree(data);
     std::cout << tree.root() << std::endl;
@@ -75,6 +89,18 @@ BOOST_AUTO_TEST_CASE(merkletree_validate_test_2) {
     testing_validate_template<hashes::sha2<256>, 3>(v);
     testing_validate_template<hashes::md5, 3>(v);
     testing_validate_template<hashes::blake2b<224>, 3>(v);
+}
+
+BOOST_AUTO_TEST_CASE(merkletree_validate_test_3) {
+    using hash_type = hashes::pedersen<>;
+    std::size_t leaf_number = 8;
+    std::vector<std::array<bool, hash_type::digest_bits>> v;
+    for (std::size_t i = 0; i < leaf_number; ++i) {
+        std::array<bool, hash_type::digest_bits> leaf;
+        std::generate(leaf.begin(), leaf.end(), [&]() { return std::rand() % 2; });
+        v.emplace_back(leaf);
+    }
+    testing_validate_template_pedersen<hashes::pedersen<>, 2>(v);
 }
 
 BOOST_AUTO_TEST_CASE(merkletree_hash_test_1) {

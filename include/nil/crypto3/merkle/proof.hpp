@@ -4,6 +4,7 @@
 //  Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 //  Copyright (c) 2020-2021 Nikita Kaskov <nemo@nil.foundation>
 //  Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
+//  Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -77,28 +78,25 @@ namespace nil {
 
                     for (size_t cur_row = 0; cur_row < path.size(); ++cur_row) {
 
-                        std::array<uint8_t, (value_bits / std::numeric_limits<std::uint8_t>::digits +
-                                             (value_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0)) *
-                                                arity>
-                            new_input;
+                        nil::crypto3::accumulator_set<hash_type> acc;
                         size_t missing_idx = arity - 1;    // If every previous index was fine - missing the last one.
+                        std::array<std::size_t, arity> position_map;
 
                         for (size_t i = 0; i < arity - 1; ++i) {
-                            std::copy(path[cur_row][i].hash.begin(), path[cur_row][i].hash.end(),
-                                      new_input.begin() +
-                                          path[cur_row][i].position *
-                                              (value_bits / std::numeric_limits<std::uint8_t>::digits +
-                                               (value_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0)));
+                            position_map[path[cur_row][i].position] = i;
                             if (path[cur_row][i].position != i && missing_idx == arity - 1) {
                                 missing_idx = i;
                             }
                         }
-
-                        std::copy(d.begin(), d.end(),
-                                  new_input.begin() +
-                                      missing_idx * (value_bits / std::numeric_limits<std::uint8_t>::digits +
-                                                     (value_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0)));
-                        d = crypto3::hash<hash_type>(new_input);
+                        for (size_t i = 0; i < arity; ++i) {
+                            if (missing_idx == i) {
+                                crypto3::hash<hash_type>(d.begin(), d.end(), acc);
+                            } else {
+                                crypto3::hash<hash_type>(path[cur_row][position_map[i]].hash.begin(),
+                                                         path[cur_row][position_map[i]].hash.end(), acc);
+                            }
+                        }
+                        d = nil::crypto3::accumulators::extract::hash<hash_type>(acc);
                     }
                     return (d == root);
                 }
