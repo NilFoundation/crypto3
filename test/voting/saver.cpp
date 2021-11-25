@@ -115,10 +115,10 @@ void test_jubjub_pedersen_saver_component() {
     std::vector<bool> eid(eid_size);
     std::generate(eid.begin(), eid.end(), [&]() { return std::rand() % 2; });
 
-    std::vector<bool> eid_pk;
-    std::copy(std::cbegin(eid), std::cend(eid), std::back_inserter(eid_pk));
-    std::copy(std::cbegin(pk), std::cend(pk), std::back_inserter(eid_pk));
-    std::vector<bool> sn = calculate_hash_via_component<hash_component>(eid_pk);
+    std::vector<bool> eid_sk;
+    std::copy(std::cbegin(eid), std::cend(eid), std::back_inserter(eid_sk));
+    std::copy(std::cbegin(sk), std::cend(sk), std::back_inserter(eid_sk));
+    std::vector<bool> sn = calculate_hash_via_component<hash_component>(eid_sk);
     auto sn_wrong = sn;
     sn_wrong[0] = !sn_wrong[0];
 
@@ -147,9 +147,7 @@ void test_jubjub_pedersen_saver_component() {
 
     /* make sure that read checker didn't accidentally overwrite anything */
     address_bits_va.fill_with_bits(bp, address_bits);
-    root_digest.generate_r1cs_witness(root);
-    sn_digest.generate_r1cs_witness(sn);
-    vote_var.generate_r1cs_witness();
+    vote_var.generate_r1cs_witness(root, sn);
     BOOST_CHECK(bp.is_satisfied());
 
     // false negative test with wrong root
@@ -186,8 +184,6 @@ void test_jubjub_pedersen_saver_component() {
 
     // reset blueprint in the correct state
     sn_digest.generate_r1cs_witness(sn);
-    // TODO: vote_var.generate_r1cs_witness should not be called for satisfying
-    vote_var.generate_r1cs_witness();
     BOOST_CHECK(bp.is_satisfied());
     // false negative test with wrong m
     m_block.generate_r1cs_witness(m_wrong);

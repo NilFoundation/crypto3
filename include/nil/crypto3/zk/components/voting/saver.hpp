@@ -67,8 +67,10 @@ namespace nil {
                      * expected values before call \p is_satisfied for \p bp. This is due to using of the
                      * bit_vector_copy_component which is responsible for both logics: copying of the computed fields
                      * (\p rt and \p sn) and comparison of the computed and passed values. So, if you don't call \p
-                     * generate_r1cs_witness for \p rt and \p sn satisfiability check will always be positive. Also be
-                     * sure to
+                     * generate_r1cs_witness for \p rt and \p sn satisfiability check will always be positive, i.e.
+                     * false positive error happens. Another solution - instead of manual calling to the \p
+                     * generate_r1cs_witness for \p rt and \p sn just use saver's \p generate_r1cs_witness accepting
+                     * additional parameters \p root and \p sn.
                      */
                     saver(blueprint<field_type> &bp,
                           const block_variable<field_type> &m,
@@ -121,6 +123,12 @@ namespace nil {
                         root_validator.generate_r1cs_witness();
                         sn_hasher.generate_r1cs_witness();
                         check_sn.generate_r1cs_witness();
+                    }
+
+                    void generate_r1cs_witness(const std::vector<bool> &root, const std::vector<bool> &sn) {
+                        generate_r1cs_witness();
+                        root_validator.root.generate_r1cs_witness(root);
+                        this->sn.generate_r1cs_witness(sn);
                     }
                 };
             }    // namespace components
