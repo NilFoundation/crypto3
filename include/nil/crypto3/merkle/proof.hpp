@@ -37,6 +37,13 @@
 
 namespace nil {
     namespace crypto3 {
+        namespace zk {
+            namespace components {
+                template<typename, typename, std::size_t>
+                struct merkle_proof;
+            }    // namespace components
+        }        // namespace zk
+
         namespace detail {
             template<typename NodeType, std::size_t Arity = 2>
             struct merkle_proof_impl {
@@ -120,6 +127,9 @@ namespace nil {
                 };
 
                 std::vector<std::array<path_element_type, Arity - 1>> path;
+
+                template<typename, typename, std::size_t>
+                friend class nil::crypto3::zk::components::merkle_proof;
             };
         }    // namespace detail
 
