@@ -45,7 +45,7 @@ namespace nil {
                  * For a given input of scalars, create an equivalent set of base points within a namespace.
                  */
                 template<typename Curve = nil::crypto3::algebra::curves::jubjub,
-                         typename BasePointsGeneratorHash = hashes::sha2<256>,
+                         typename BasePointGeneratorHash = hashes::sha2<256>,
                          typename HashParams = hashes::find_group_hash_default_params>
                 struct pedersen_to_point : public component<typename Curve::base_field_type> {
                     using curve_type = Curve;
@@ -63,7 +63,7 @@ namespace nil {
                     result_type result;
 
                     static std::vector<typename element_component::group_value_type> get_base_points(std::size_t n) {
-                        using group_hash_type = hashes::find_group_hash<HashParams, BasePointsGeneratorHash,
+                        using group_hash_type = hashes::find_group_hash<HashParams, BasePointGeneratorHash,
                                                                         typename element_component::group_type>;
                         assert(n > 0);
                         std::vector<typename element_component::group_value_type> basepoints;
@@ -214,11 +214,11 @@ namespace nil {
                 };
 
                 template<typename Curve = nil::crypto3::algebra::curves::jubjub,
-                         typename BasePointsGeneratorHash = hashes::sha2<256>,
+                         typename BasePointGeneratorHash = hashes::sha2<256>,
                          typename HashParams = hashes::find_group_hash_default_params>
                 struct pedersen : public component<typename Curve::base_field_type> {
                     using curve_type = Curve;
-                    using hash_component = pedersen_to_point<curve_type, BasePointsGeneratorHash, HashParams>;
+                    using hash_component = pedersen_to_point<curve_type, BasePointGeneratorHash, HashParams>;
                     using field_type = typename hash_component::field_type;
                     using element_component = typename hash_component::element_component;
                     using to_bits_component = typename element_component::to_bits_component;
@@ -226,7 +226,7 @@ namespace nil {
                     using result_type = digest_variable<field_type>;
 
                     // hash_type is corresponding to the component hash policy
-                    using hash_type = nil::crypto3::hashes::pedersen<HashParams, BasePointsGeneratorHash,
+                    using hash_type = nil::crypto3::hashes::pedersen<HashParams, BasePointGeneratorHash,
                                                                      typename element_component::group_type>;
                     // TODO: retrieve digest_bits from hash_type
                     static constexpr std::size_t digest_bits = field_type::value_bits;
@@ -379,10 +379,10 @@ namespace nil {
 
                 /// @brief See https://zips.z.cash/protocol/protocol.pdf#concretewindowedcommit
                 template<typename Curve = nil::crypto3::algebra::curves::jubjub,
-                         typename BasePointsGeneratorHash = hashes::sha2<256>,
+                         typename BasePointGeneratorHash = hashes::sha2<256>,
                          typename HashParams = hashes::find_group_hash_default_params>
                 struct pedersen_commitment_to_point : public component<typename Curve::base_field_type> {
-                    using hash_component = pedersen_to_point<Curve, BasePointsGeneratorHash, HashParams>;
+                    using hash_component = pedersen_to_point<Curve, BasePointGeneratorHash, HashParams>;
                     using element_component = typename hash_component::element_component;
                     using addition_component = typename element_component::addition_component;
 
@@ -426,7 +426,7 @@ namespace nil {
                     }
 
                     void generate_r1cs_witness(const typename field_type::value_type &r) {
-                        using group_hash_type = hashes::find_group_hash<HashParams, BasePointsGeneratorHash,
+                        using group_hash_type = hashes::find_group_hash<HashParams, BasePointGeneratorHash,
                                                                         typename element_component::group_type>;
 
                         hasher.generate_r1cs_witness();
@@ -438,11 +438,11 @@ namespace nil {
                 };
 
                 template<typename Curve = nil::crypto3::algebra::curves::jubjub,
-                         typename BasePointsGeneratorHash = hashes::sha2<256>,
+                         typename BasePointGeneratorHash = hashes::sha2<256>,
                          typename HashParams = hashes::find_group_hash_default_params>
                 struct pedersen_commitment : public component<typename Curve::base_field_type> {
                     using commitment_component =
-                        pedersen_commitment_to_point<Curve, BasePointsGeneratorHash, HashParams>;
+                        pedersen_commitment_to_point<Curve, BasePointGeneratorHash, HashParams>;
                     using element_component = typename commitment_component::element_component;
                     using to_bits_component = typename element_component::to_bits_component;
 

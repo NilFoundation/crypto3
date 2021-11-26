@@ -220,6 +220,93 @@ std::vector<bool> calculate_pedersen_via_component(const std::vector<bool> &in_b
     return hash_comp_bits.result.get_digest();
 }
 
+void test_jubjub_pedersen_merkle_tree_container_check_validate_component() {
+    using curve_type = curves::jubjub;
+    using bp_generator_hash_type = hashes::sha2<256>;
+    using hash_params = hashes::find_group_hash_default_params;
+    using hash_component = components::pedersen<curve_type, bp_generator_hash_type, hash_params>;
+    using field_type = typename hash_component::field_type;
+    constexpr std::size_t arity = 2;
+    using merkle_proof_component = components::merkle_proof<hash_component, field_type, arity>;
+    using merkle_validate_component = components::merkle_proof_validate<hash_component, field_type, arity>;
+
+    /* prepare test */
+    const std::size_t digest_len = hash_component::get_digest_len();
+    const std::size_t tree_depth = 2;
+    const std::size_t leafs_number = nil::crypto3::detail::pow(arity, tree_depth);
+
+    // TODO: remove copy from array to vector
+    std::vector<std::array<bool, hash_component::digest_bits>> leafs;
+    std::vector<std::vector<bool>> leafs_v;
+    for (std::size_t i = 0; i < leafs_number; ++i) {
+        std::array<bool, hash_component::digest_bits> leaf;
+        std::generate(leaf.begin(), leaf.end(), [&]() { return std::rand() % 2; });
+        leafs.emplace_back(leaf);
+    }
+
+    std::size_t leaf_idx = 0;
+    typename merkle_proof_component::merkle_tree_container tree(leafs);
+    typename merkle_proof_component::merkle_proof_container proof(tree, leaf_idx);
+    BOOST_CHECK(proof.validate(leafs[leaf_idx]));
+    BOOST_CHECK(!proof.validate(leafs[(leaf_idx + 1) % leafs_number]));
+    for (std::size_t i = 0; i < leafs_number; ++i) {
+        leafs_v.emplace_back(
+            static_cast<std::vector<bool>>(nil::crypto3::hash<typename hash_component::hash_type>(leafs[i])));
+    }
+
+    /* execute test */
+    components::blueprint<field_type> bp;
+    components::blueprint_variable_vector<field_type> address_bits_va;
+    address_bits_va.allocate(bp, tree_depth);
+    components::digest_variable<field_type> leaf_digest(bp, digest_len);
+    components::digest_variable<field_type> root_digest(bp, digest_len);
+    merkle_proof_component path_var(bp, tree_depth);
+    merkle_validate_component ml(bp, tree_depth, address_bits_va, leaf_digest, root_digest, path_var,
+                                 components::blueprint_variable<field_type>(0));
+
+    path_var.generate_r1cs_constraints();
+    ml.generate_r1cs_constraints();
+
+    leaf_digest.generate_r1cs_witness(leafs_v[leaf_idx]);
+    path_var.generate_r1cs_witness(proof);
+    address_bits_va.fill_with_bits_of_ulong(bp, path_var.address);
+    BOOST_REQUIRE(address_bits_va.get_field_element_from_bits(bp) == path_var.address);
+    ml.generate_r1cs_witness();
+
+    /* make sure that read checker didn't accidentally overwrite anything */
+    address_bits_va.fill_with_bits_of_ulong(bp, path_var.address);
+    leaf_digest.generate_r1cs_witness(leafs_v[leaf_idx]);
+    /// Very important step, hidden error could appear without it. merkle_validate_component use
+    /// bit_vector_copy_component to copy computed root into root_digest, so without this step internal check of the
+    /// computed step will always be positive
+    root_digest.generate_r1cs_witness(merkle_proof_component::get_root(proof));
+    BOOST_REQUIRE(bp.is_satisfied());
+
+    auto root_wrong = merkle_proof_component::get_root(proof);
+    root_wrong[0] = !root_wrong[0];
+    // false negative test with wrong root
+    root_digest.generate_r1cs_witness(root_wrong);
+    BOOST_REQUIRE(!bp.is_satisfied());
+
+    // reset blueprint in the correct state
+    root_digest.generate_r1cs_witness(merkle_proof_component::get_root(proof));
+    BOOST_REQUIRE(bp.is_satisfied());
+    // false negative test with wrong leaf
+    auto leaf_digest_wrong = leafs_v[leaf_idx];
+    leaf_digest_wrong[0] = !leaf_digest_wrong[0];
+    leaf_digest.generate_r1cs_witness(leaf_digest_wrong);
+    BOOST_REQUIRE(!bp.is_satisfied());
+
+    // reset blueprint in the correct state
+    leaf_digest.generate_r1cs_witness(leafs_v[leaf_idx]);
+    BOOST_REQUIRE(bp.is_satisfied());
+    // false negative test with wrong path
+    typename merkle_proof_component::merkle_proof_container proof_wrong(tree, (leaf_idx + 1) % leafs_number);
+    path_var.generate_r1cs_witness(proof_wrong);
+    address_bits_va.fill_with_bits_of_ulong(bp, path_var.address);
+    BOOST_REQUIRE(!bp.is_satisfied());
+}
+
 void test_jubjub_pedersen_merkle_tree_check_validate_component() {
     using curve_type = curves::jubjub;
     using bp_generator_hash_type = hashes::sha2<256>;
@@ -345,7 +432,8 @@ BOOST_AUTO_TEST_SUITE(merkle_tree_components_test_suite)
 
 BOOST_AUTO_TEST_CASE(merkle_tree_components_jubjub_pedersen_test) {
 
-    test_jubjub_pedersen_merkle_tree_check_validate_component();
+    test_jubjub_pedersen_merkle_tree_container_check_validate_component();
+    // test_jubjub_pedersen_merkle_tree_check_validate_component();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

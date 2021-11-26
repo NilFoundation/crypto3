@@ -47,7 +47,6 @@ namespace nil {
 
                     digest_variable<field_type> sn_computed;
                     digest_variable<field_type> pk;
-                    // TODO: clarify how to compute pk_leaf from pk
                     digest_variable<field_type> pk_leaf;
                     hash_component pk_hasher;
                     hash_component pk_leaf_hasher;
@@ -114,8 +113,13 @@ namespace nil {
                             sum_m_i = sum_m_i + m_i;
                         }
                         // sum_m_i == 1
-                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<Field>(
-                            Field::value_type::one(), Field::value_type::one() - sum_m_i, Field::value_type::zero()));
+                        // this->bp.add_r1cs_constraint(snark::r1cs_constraint<Field>(
+                        //     Field::value_type::one(), Field::value_type::one() - sum_m_i,
+                        //     Field::value_type::zero()));
+                        generate_r1cs_equals_const_constraint(
+                            this->bp,
+                            static_cast<blueprint_linear_combination<field_type>>(this->bp, sum_m_i),
+                            Field::value_type::one());
                     }
                     void generate_r1cs_witness() {
                         pk_hasher.generate_r1cs_witness();

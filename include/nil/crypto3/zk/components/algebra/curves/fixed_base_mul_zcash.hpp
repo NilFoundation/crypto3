@@ -74,31 +74,9 @@ namespace nil {
                     using result_type = twisted_edwards_element_component;
 
                     /// See definition of \p c in https://zips.z.cash/protocol/protocol.pdf#concretepedersenhash
-                    static constexpr std::size_t chunks_per_base_point = []() {
-                        using scalar_field_type = typename curve_type::scalar_field_type;
-
-                        typename scalar_field_type::extended_integral_type two(2);
-                        std::size_t c = 1;
-                        std::size_t prev_c = 0;
-                        /// (Fr - 1) / 2
-                        typename scalar_field_type::extended_integral_type upper_bound =
-                            (scalar_field_type::modulus - 1) / 2;
-                        // TODO: first multiplier should be verified
-                        /// (chunk_bits + 1) * ((2^(c * (chunk_bits + 1)) - 1) / (2^(chunk_bits + 1) - 1))
-                        auto get_test_value = [&](auto i) {
-                            return (lookup_component::chunk_bits + 1) *
-                                   ((::nil::crypto3::detail::pow(two, i * (lookup_component::chunk_bits + 1)) - 1) /
-                                    (::nil::crypto3::detail::pow(two, lookup_component::chunk_bits + 1) - 1));
-                        };
-                        auto test_value = get_test_value(c);
-
-                        while (test_value <= upper_bound) {
-                            prev_c = c++;
-                            test_value = get_test_value(c);
-                        }
-
-                        return prev_c;
-                    }();
+                    static constexpr std::size_t chunks_per_base_point =
+                        nil::crypto3::hashes::detail::get_chunks_per_base_point<typename curve_type::scalar_field_type>(
+                            lookup_component::chunk_bits);
 
                     std::vector<typename montgomery_element_component::addition_component> montgomery_adders;
                     std::vector<typename montgomery_element_component::to_twisted_edwards_component> point_converters;

@@ -43,9 +43,11 @@ namespace nil {
                 template<typename HashComponent = nil::crypto3::zk::components::pedersen<>,
                          typename FieldType = typename HashComponent::field_type, std::size_t Arity = 2>
                 struct merkle_proof : public component<FieldType> {
+                    using merkle_tree_container = nil::crypto3::merkle_tree<typename HashComponent::hash_type, Arity>;
                     using merkle_proof_container = nil::crypto3::merkle_proof<typename HashComponent::hash_type, Arity>;
                     using path_type = std::vector<std::vector<digest_variable<FieldType>>>;
 
+                    std::size_t address;
                     const std::size_t tree_depth;
                     path_type path;
 
@@ -73,13 +75,17 @@ namespace nil {
                     }
 
                     void generate_r1cs_witness(const merkle_proof_container &proof) {
+                        // TODO: generalize for Arity > 2
+                        assert(Arity == 2);
                         assert(proof.path.size() == tree_depth);
 
+                        this->address = 0;
                         for (std::size_t i = 0; i < tree_depth; ++i) {
                             for (std::size_t j = 0; j < Arity - 1; ++j) {
-                                std::size_t neighbour_index = proof.path[i][j].position;
-                                // TODO: treat case if proof.path[i][j].hash is not vector<bool>
-                                path[i][neighbour_index].generate_r1cs_witness(proof.path[i][j].hash);
+                                path[i][proof.path[tree_depth - 1 - i][j].position].generate_r1cs_witness(
+                                    proof.path[tree_depth - 1 - i][j].hash);
+                                this->address |=
+                                    (proof.path[tree_depth - 1 - i][j].position ? 0 : 1ul << (tree_depth - 1 - i));
                             }
                         }
                     }
@@ -96,6 +102,13 @@ namespace nil {
                                 path[i][1].generate_r1cs_witness(proof[i]);
                             }
                         }
+
+                        this->address = address;
+                    }
+
+                    /// For test only
+                    static auto get_root(const merkle_proof_container &proof) {
+                        return proof.root;
                     }
                 };
             }    // namespace components

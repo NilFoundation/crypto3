@@ -29,15 +29,20 @@ namespace nil {
     namespace crypto3 {
         namespace detail {
             template<typename T, typename U>
-            constexpr T pow(const T &x, const U &n) {
-                if (n == 0)
-                    return 1;
-                else if (n == 1)
-                    return x;
-                else if ((n & 1) == 0)
-                    return pow(x * x, n / 2);
-                else
-                    return pow(x * x, n / 2) * x;
+            constexpr T pow(T x, U n) {
+                T result = 1;
+                while (n > 0) {
+                    if (n % 2 == 0) {
+                        // n is even
+                        x = x * x;
+                        n = n / 2;
+                    } else {
+                        // n isn't even
+                        result = result * x;
+                        n = n - 1;
+                    }
+                }
+                return result;
             }
         }    // namespace detail
     }        // namespace crypto3
