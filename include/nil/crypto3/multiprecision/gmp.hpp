@@ -1784,6 +1784,10 @@ namespace nil {
                     return mpz_jacobi(a.data(), b.data());
                 }
 
+                inline void eval_inverse_mod(gmp_int& result, const gmp_int& x, const gmp_int& mod) {
+                    mpz_invert(result.data(), x.data(), mod.data());
+                }
+
                 gmp_int eval_ressol(const gmp_int &n, const gmp_int &p) {
                     gmp_int result, negone, p_negone;
                     mpz_set_si(result.data(), -1);

@@ -26,8 +26,9 @@ namespace nil {
             constexpr number<Backend, ExpressionTemplates>
                 inverse_extended_euclidean_algorithm(const number<Backend, ExpressionTemplates>& n,
                                                      const number<Backend, ExpressionTemplates>& mod) {
-                return number<Backend, ExpressionTemplates>(
-                    backends::eval_inverse_extended_euclidean_algorithm(n.backend(), mod.backend()));
+                number<Backend, ExpressionTemplates> result;
+                backends::eval_inverse_extended_euclidean_algorithm(result.backend(), n.backend(), mod.backend());
+                return result;
             }
 
             template<typename Backend, expression_template_option ExpressionTemplates>
@@ -37,8 +38,7 @@ namespace nil {
                 number<modular_adaptor<Backend>, ExpressionTemplates> res_mod;
 
                 modular.backend().mod_data().adjust_regular(new_base.backend(), modular.backend().base_data());
-                res = backends::eval_inverse_extended_euclidean_algorithm(
-                    new_base.backend(), modular.backend().mod_data().get_mod().backend());
+                backends::eval_inverse_extended_euclidean_algorithm(res.backend(), new_base.backend(), modular.backend().mod_data().get_mod().backend());
                 assign_components(res_mod.backend(), res.backend(), modular.backend().mod_data().get_mod().backend());
 
                 return res_mod;
@@ -54,23 +54,22 @@ namespace nil {
                 return res;
             }
 
-            /*
-                        template <typename IntegerType, typename = typename boost::enable_if<typename
-                        is_trivial_cpp_int<IntegerType>::value>::type> IntegerType monty_inverse(const IntegerType& a)
-                        {
-                           return eval_monty_inverse(a);
-                        }
-                         */
+            template<typename Backend, expression_template_option ExpressionTemplates>
+            constexpr number<Backend, ExpressionTemplates>
+            inverse_mod(const number<Backend, ExpressionTemplates>& a,
+                          const number<Backend, ExpressionTemplates>& p) {
+                number<Backend, ExpressionTemplates> res;
+                backends::eval_inverse_mod(res.backend(), a.backend(), p.backend());
+                return res;
+            }
 
-            /*
-                        template <typename IntegerType, typename = typename boost::enable_if<!typename
-                        is_trivial_cpp_int<IntegerType>::value>::type> IntegerType monty_inverse(const IntegerType& a)
-                        {
-                           IntegerType res;
-                           eval_monty_inverse(res.backend(), a.backend());
-                           return res;
-                        }
-                         */
+            template<typename Backend, expression_template_option ExpressionTemplates>
+            constexpr number<modular_adaptor<Backend>, ExpressionTemplates>
+            inverse_mod(const number<modular_adaptor<Backend>, ExpressionTemplates>& modular) {
+                number<modular_adaptor<Backend>> res;
+                backends::eval_inverse_mod(res.backend(), modular.backend());
+                return res;
+            }
 
         }    // namespace multiprecision
     }        // namespace crypto3
