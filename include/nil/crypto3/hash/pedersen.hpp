@@ -112,25 +112,32 @@ namespace nil {
 
                 private:
                     void encode_chunk() {
-                        assert(cached_bits.size() == 3);
-                        if ((chunks_supplied - 1) % chunks_per_base_point == 0) {
+                        assert(cached_bits.size() == chunk_bits);
+                        if ((chunks_supplied - 1) % chunks_per_base_point ==
+                            0) {    ///< we moved to a new segment, pow_two and encoded_segment should be reset
                             pow_two = 1;
                             encoded_segment = curve_type::scalar_field_type::value_type::zero();
                         }
+                        // TODO: generalize calculation of the lookup table value for chunk_bits != 3
                         typename curve_type::scalar_field_type::value_type encoded_chunk =
                             static_cast<typename curve_type::scalar_field_type::value_type>(
                                 (1 - 2 * cached_bits[2]) * (1 + cached_bits[0] + 2 * cached_bits[1])) *
                             pow_two;
                         encoded_segment = encoded_segment + encoded_chunk;
-                        pow_two = pow_two << 4;
-                        cached_bits.clear();
+                        pow_two = pow_two << (chunk_bits + 1);
+                        cached_bits.clear();    ///< current chunk was processed, we could clear cache and be ready to
+                                                ///< accepts bits of the next chunk
                     }
 
                     void update_base_point() {
                         chunks_supplied = bits_supplied / chunk_bits;
                         std::uint32_t new_segment_n = (chunks_supplied - 1) / chunks_per_base_point;
-                        if (new_segment_n != segment_n) {
-                            result = result + encoded_segment * current_base_point;
+                        if (new_segment_n ==
+                            segment_n + 1) {    ///< current base point already used chunks_per_base_point times, it's
+                                                ///< time to update base point
+                            result =
+                                result + encoded_segment * current_base_point;    ///< encoded_segment is ready, it's
+                                                                                  ///< time to add it to the result
                             segment_n = new_segment_n;
                             current_base_point = to_curve<base_point_generator>({
                                 segment_n,
@@ -142,17 +149,22 @@ namespace nil {
                     void update(bool b) {
                         cached_bits.template emplace_back(b);
                         ++bits_supplied;
-                        if (cached_bits.size() == 3) {
+                        if (cached_bits.size() == chunk_bits) {    ///< we could proceed if whole chunk was supplied
                             update_base_point();
                             encode_chunk();
                         }
                     }
 
                     void pad_update() {
-                        while (!cached_bits.empty() || !bits_supplied) {
+                        while (!cached_bits
+                                    .empty() ||     ///< length of the input bit string is not a multiple of chunk_bits
+                               !bits_supplied) {    ///< empty bit string is being hashed, then hash only padding
                             update(false);
                         }
-                        if ((chunks_supplied - 1) % chunks_per_base_point != 0 || chunks_supplied == 1) {
+                        if ((chunks_supplied - 1) % chunks_per_base_point !=
+                                0 ||    ///< last encoded_segment wasn't added to the result in encode_chunk() yet
+                            chunks_supplied == 1) {    ///< only one chunk was supplied, so it was not added neither in
+                                                       ///< encode_chunk() nor in previous previous condition
                             result = result + encoded_segment * current_base_point;
                         }
                     }
