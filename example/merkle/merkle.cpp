@@ -27,8 +27,8 @@
 #include <nil/crypto3/hash/md5.hpp>
 #include <nil/crypto3/hash/blake2b.hpp>
 
-#include <nil/merkle/tree.hpp>
-#include <nil/merkle/proof.hpp>
+#include <nil/crypto3/merkle/tree.hpp>
+#include <nil/crypto3/merkle/proof.hpp>
 
 using namespace nil::crypto3::merkletree;
 using namespace nil::crypto3;
