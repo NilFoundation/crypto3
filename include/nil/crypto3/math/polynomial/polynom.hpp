@@ -62,7 +62,7 @@ namespace nil {
                     using std::vector<FieldValueType>::resize;
 
                     polynom():
-                        std::vector<FieldValueType>(){};
+                        std::vector<FieldValueType>({0}){};
 
                     polynom(std::size_t count, FieldValueType value = FieldValueType()):
                         std::vector<FieldValueType>(count, value){};
@@ -74,6 +74,19 @@ namespace nil {
                         std::vector<FieldValueType>(power+1, FieldValueType(0)){
                             (*this)[power] = value;
                         };
+
+                    template <typename Range>
+                    FieldValueType evaluate(Range &values){
+
+                        assert(values.size() + 1 == this->size());
+
+                        FieldValueType result = (*this)[0];
+                        for (std::size_t i = 0; i < values.size(); i++){
+                            result += (*this)[i + 1]*values[i];
+                        }
+
+                        return result;
+                    }
 
                     /**
                      * Returns true if polynom is a zero polynom.
@@ -189,7 +202,7 @@ namespace nil {
                      * Perform the multiplication of two polynomials, polynomial A * polynomial B, and stores result in
                      * polynomial C.
                      */
-                    polynom operator*(const polynom &other) {
+                    polynom operator*(const polynom &other) const {
                         polynom result;
                         multiplication_on_fft(result, *this, other);
                         return result;
@@ -200,7 +213,7 @@ namespace nil {
                      * Input: Polynomial A, Polynomial B, where A / B
                      * Output: Polynomial Q, such that A = (Q * B) + R.
                      */
-                    polynom operator/(const polynom &other) {
+                    polynom operator/(const polynom &other) const {
 
                         std::size_t d = other.size() - 1;       /* Degree of B */
                         FieldValueType c = other.back().inversed(); /* Inverse of Leading Coefficient of B */
@@ -239,7 +252,7 @@ namespace nil {
                      * Input: Polynomial A, Polynomial B, where A / B
                      * Output: Polynomial R, such that A = (Q * B) + R.
                      */
-                    polynom operator%(const polynom &other) {
+                    polynom operator%(const polynom &other) const {
 
                         std::size_t d = other.size() - 1;       /* Degree of B */
                         FieldValueType c = other.back().inversed(); /* Inverse of Leading Coefficient of B */
