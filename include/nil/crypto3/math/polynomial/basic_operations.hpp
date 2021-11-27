@@ -37,7 +37,7 @@ namespace nil {
     namespace crypto3 {
         namespace math {
             namespace polynomial {
-
+                
                 /**
                  * Returns true if polynomial A is a zero polynomial.
                  */
@@ -199,7 +199,7 @@ namespace nil {
                  */
                 template<typename Range>
                 void multiplication(Range &c, const Range &a, const Range &b) {
-                    multiplication_on_fft<Range>(c, a, b);
+                    multiplication_on_fft(c, a, b);
                 }
 
                 /**
@@ -270,7 +270,7 @@ namespace nil {
                     condense(q);
                 }
             }    // namespace polynomial
-        }    // namespace fft
+        }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
 
