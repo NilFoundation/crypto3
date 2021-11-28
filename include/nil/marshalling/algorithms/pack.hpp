@@ -94,11 +94,11 @@ namespace nil {
          * @return
          */
         template<typename TEndian, typename TOutput, typename InputContainer>
-        typename std::enable_if<boost::spirit::traits::is_container<InputContainer>::value
-                                    && is_compatible<TOutput>::value
-                                    && (!nil::marshalling::is_container<typename is_compatible<TOutput>::template type<>>::value)
-                                    && std::is_integral<typename InputContainer::value_type>::value,
-                                TOutput>::type
+        typename std::enable_if<
+            boost::spirit::traits::is_container<InputContainer>::value && is_compatible<TOutput>::value
+                && (!nil::marshalling::is_container<typename is_compatible<TOutput>::template type<>>::value)
+                && std::is_integral<typename InputContainer::value_type>::value,
+            TOutput>::type
             pack(InputContainer val, status_type &status) {
 
             using marshalling_type = typename is_compatible<TOutput>::template type<TEndian>;
@@ -125,13 +125,14 @@ namespace nil {
          * @return
          */
         template<typename TEndian, typename TContainer, typename InputContainer>
-        typename std::enable_if<boost::spirit::traits::is_container<InputContainer>::value
-                                    && is_compatible<TContainer>::value
-                                    && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
-                                    && (!nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>::element_type>::value)
-                                    && (!is_compatible<TContainer>::fixed_size)
-                                    && std::is_integral<typename InputContainer::value_type>::value,
-                                TContainer>::type
+        typename std::enable_if<
+            boost::spirit::traits::is_container<InputContainer>::value && is_compatible<TContainer>::value
+                && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
+                && (!nil::marshalling::is_container<
+                    typename is_compatible<TContainer>::template type<>::element_type>::value)
+                && (!is_compatible<TContainer>::fixed_size)
+                && std::is_integral<typename InputContainer::value_type>::value,
+            TContainer>::type
             pack(InputContainer val, status_type &status) {
 
             using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
@@ -164,12 +165,12 @@ namespace nil {
          * @return
          */
         template<typename TEndian, typename TContainer, typename InputContainer>
-        typename std::enable_if<boost::spirit::traits::is_container<InputContainer>::value
-                                    && is_compatible<TContainer>::value
-                                    && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
-                                    && is_compatible<TContainer>::fixed_size
-                                    && std::is_integral<typename InputContainer::value_type>::value,
-                                TContainer>::type
+        typename std::enable_if<
+                boost::spirit::traits::is_container<InputContainer>::value && is_compatible<TContainer>::value
+                && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
+                && is_compatible<TContainer>::fixed_size
+                && std::is_integral<typename InputContainer::value_type>::value,
+            TContainer>::type
             pack(InputContainer val, status_type &status) {
 
             using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;

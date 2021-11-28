@@ -63,14 +63,14 @@ namespace nil {
          *
          * @return
          */
-        template<typename OutputWordType, typename TMarshallingInput>
+        template<typename OutputContainer = std::vector<uint8_t>, typename TMarshallingInput>
         typename std::enable_if<marshalling::is_marshalling_type<TMarshallingInput>::value
-                                    && std::is_integral<OutputWordType>::value,
-                                std::vector<OutputWordType>>::type
+                                    && std::is_integral<typename OutputContainer::value_type>::value,
+            OutputContainer>::type
             unpack(TMarshallingInput val, status_type &status) {
 
-            std::vector<OutputWordType> result(val.length());
-            typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
+            OutputContainer result(val.length());
+            typename OutputContainer::iterator buffer_begin = result.begin();
             status = val.write(buffer_begin, result.size());
 
             return result;
@@ -90,36 +90,36 @@ namespace nil {
          *
          * @return
          */
-        template<typename TEndian, typename OutputWordType = std::uint8_t, typename TInput>
+        template<typename TEndian, typename OutputContainer = std::vector<uint8_t>, typename TInput>
         typename std::enable_if<
             is_compatible<TInput>::value
                 && (!nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value)
-                && std::is_integral<OutputWordType>::value && !std::is_same<bool, OutputWordType>::value,
-            std::vector<OutputWordType>>::type
+                && std::is_integral<typename OutputContainer::value_type>::value && !std::is_same<bool, typename OutputContainer::value_type>::value,
+            OutputContainer>::type
             unpack(TInput val, status_type &status) {
 
             using marshalling_type = typename is_compatible<TInput>::template type<TEndian>;
 
             marshalling_type m_val = marshalling_type(val);
-            std::vector<OutputWordType> result(m_val.length());
-            typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
+            OutputContainer result(m_val.length());
+            typename OutputContainer::iterator buffer_begin = result.begin();
             status = m_val.write(buffer_begin, result.size());
 
             return result;
         }
 
-        template<typename TEndian, typename OutputWordType, typename TInput>
+        template<typename TEndian, typename OutputContainer = std::vector<bool>, typename TInput>
         typename std::enable_if<
             is_compatible<TInput>::value
                 && (!nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value)
-                && std::is_same<bool, OutputWordType>::value,
-            std::vector<OutputWordType>>::type
+                && std::is_same<bool, typename OutputContainer::value_type>::value,
+            OutputContainer>::type
             unpack(TInput val, status_type &status) {
 
             using marshalling_type = typename is_compatible<TInput>::template type<TEndian>;
 
             marshalling_type m_val = marshalling_type(val);
-            std::vector<bool> result(m_val.bit_length());
+            OutputContainer result(m_val.bit_length());
             auto buffer_begin = result.begin();
             status = m_val.write(buffer_begin, result.size());
 
@@ -140,14 +140,14 @@ namespace nil {
          *
          * @return
          */
-        template<typename TEndian, typename OutputWordType = std::uint8_t, typename TContainer>
+        template<typename TEndian, typename OutputContainer = std::vector<uint8_t>, typename TContainer>
         typename std::enable_if<
             is_compatible<TContainer>::value
                 && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
                 && (!nil::marshalling::is_container<
                     typename is_compatible<TContainer>::template type<>::element_type>::value)
-                && (!is_compatible<TContainer>::fixed_size) && std::is_integral<OutputWordType>::value,
-            std::vector<OutputWordType>>::type
+                && (!is_compatible<TContainer>::fixed_size) && std::is_integral<typename OutputContainer::value_type>::value,
+            OutputContainer>::type
             unpack(TContainer val, status_type &status) {
 
             using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
@@ -159,8 +159,8 @@ namespace nil {
             }
 
             marshalling_type m_val = marshalling_type(values);
-            std::vector<OutputWordType> result(m_val.length());
-            typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
+            OutputContainer result(m_val.length());
+            typename OutputContainer::iterator buffer_begin = result.begin();
             status = m_val.write(buffer_begin, result.size());
 
             return result;
@@ -180,12 +180,12 @@ namespace nil {
          *
          * @return
          */
-        template<typename TEndian, typename OutputWordType = std::uint8_t, typename TContainer>
+        template<typename TEndian, typename OutputContainer = std::vector<uint8_t>, typename TContainer>
         typename std::enable_if<
             is_compatible<TContainer>::value
                 && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
-                && is_compatible<TContainer>::fixed_size && std::is_integral<OutputWordType>::value,
-            std::vector<OutputWordType>>::type
+                && is_compatible<TContainer>::fixed_size && std::is_integral<typename OutputContainer::value_type>::value,
+            OutputContainer>::type
             unpack(TContainer val, status_type &status) {
 
             using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
@@ -198,8 +198,8 @@ namespace nil {
             }
 
             marshalling_type m_val = marshalling_type(values);
-            std::vector<OutputWordType> result(m_val.length());
-            typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
+            OutputContainer result(m_val.length());
+            typename OutputContainer::iterator buffer_begin = result.begin();
             status = m_val.write(buffer_begin, result.size());
 
             return result;

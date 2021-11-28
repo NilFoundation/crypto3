@@ -65,8 +65,8 @@ namespace nil {
         TOutput repack(TInput val, status_type &status) {
             status_type result_status;
 
-            std::vector<std::uint8_t> buffer = unpack<TInputEndian, 
-                std::uint8_t>(val, result_status);
+            std::vector<std::uint8_t> buffer = unpack<TInputEndian,
+            std::vector<std::uint8_t>>(val, result_status);
 
             TOutput result = pack<TOutputEndian, TOutput>(buffer, status);
 
