@@ -187,6 +187,15 @@ BOOST_AUTO_TEST_CASE(curve_element_jubjub_g1) {
     for (auto i = 0; i < expected_bits.size(); ++i) {
         BOOST_CHECK(expected_bits[i] == ((cv[i / 8] >> (i % 8)) & 1));
     }
+
+    /// serialization into bits
+    std::vector<bool> cv_bits = nil::marshalling::unpack<nil::marshalling::option::little_endian, bool>(point, status);
+    auto it1 = expected_bits.begin();
+    auto it2 = cv_bits.begin();
+    while (it1 != expected_bits.end() && it2 != cv_bits.end()) {
+        BOOST_CHECK(*it1++ == *it2++);
+    }
+    BOOST_CHECK(cv_bits.size() == field_type::value_bits);
 }
 
 BOOST_AUTO_TEST_CASE(curve_element_curve25519_g1) {
