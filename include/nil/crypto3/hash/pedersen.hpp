@@ -261,8 +261,8 @@ namespace nil {
                     nil::marshalling::status_type status;
                     // TODO: check status
                     result_type result =
-                        nil::marshalling::unpack_bits<typename construction::params_type::digest_endian>(result_point,
-                                                                                                         status);
+                        nil::marshalling::unpack<typename construction::params_type::digest_endian, bool>(result_point,
+                                                                                                          status);
                     return result;
                 }
             };
