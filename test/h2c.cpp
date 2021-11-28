@@ -38,6 +38,7 @@
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
+#include <nil/crypto3/hash/h2c.hpp>
 #include <nil/crypto3/hash/algorithm/to_curve.hpp>
 
 using namespace nil::crypto3;
@@ -46,23 +47,25 @@ using namespace nil::crypto3::algebra;
 
 template<typename FieldParams>
 void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {
-    os << e.data << std::endl;
+    std::cout << e.data << std::endl;
 }
 
 template<typename FieldParams>
 void print_field_element(std::ostream &os, const typename fields::detail::element_fp2<FieldParams> &e) {
-    os << e.data[0].data << " " << e.data[1].data << std::endl;
+    std::cout << e.data[0].data << ", " << e.data[1].data << std::endl;
 }
 
-template<typename FpCurveGroupElement>
-void print_fp_curve_group_element(std::ostream &os, const FpCurveGroupElement &e) {
-    os << "( " << e.X.data << " : " << e.Y.data << " : " << e.Z.data << " )";
-}
-
-template<typename Fp2CurveGroupElement>
-void print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroupElement &e) {
-    os << "(" << e.X.data[0].data << " , " << e.X.data[1].data << ") : (" << e.Y.data[0].data << " , "
-       << e.Y.data[1].data << ") : (" << e.Z.data[0].data << " , " << e.Z.data[1].data << ")" << std::endl;
+template<typename CurveParams, typename Form, typename Coordinates>
+typename std::enable_if<std::is_same<Coordinates, curves::coordinates::projective>::value ||
+                        std::is_same<Coordinates, curves::coordinates::jacobian_with_a4_0>::value>::type
+    print_curve_point(std::ostream &os, const curves::detail::curve_element<CurveParams, Form, Coordinates> &p) {
+    os << "( X: [";
+    print_field_element(os, p.X);
+    os << "], Y: [";
+    print_field_element(os, p.Y);
+    os << "], Z:[";
+    print_field_element(os, p.Z);
+    os << "] )" << std::endl;
 }
 
 namespace boost {
@@ -82,17 +85,11 @@ namespace boost {
                 }
             };
 
-            template<>
-            struct print_log_value<typename curves::bls12<381>::g1_type<>::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<381>::g1_type<>::value_type const &e) {
-                    print_fp_curve_group_element(os, e);
-                }
-            };
-
-            template<>
-            struct print_log_value<typename curves::bls12<381>::g2_type<>::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<381>::g2_type<>::value_type const &e) {
-                    print_fp2_curve_group_element(os, e);
+            template<typename CurveParams, typename Form, typename Coordinates>
+            struct print_log_value<curves::detail::curve_element<CurveParams, Form, Coordinates>> {
+                void operator()(std::ostream &os,
+                                curves::detail::curve_element<CurveParams, Form, Coordinates> const &p) {
+                    print_curve_point(os, p);
                 }
             };
 
@@ -108,8 +105,9 @@ namespace boost {
 
 template<typename Group>
 void check_hash_to_curve(const std::string &msg_str, const typename Group::value_type &expected) {
+    using hash_type = hashes::h2c<Group>;
     std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
-    typename Group::value_type result = to_curve<Group, hashes::h2c_default_params<Group>>(msg);
+    typename Group::value_type result = to_curve<hash_type>(msg);
     BOOST_CHECK_EQUAL(result, expected);
 }
 
