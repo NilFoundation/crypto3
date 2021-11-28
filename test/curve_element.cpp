@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE(curve_element_jubjub_g1) {
     }
 
     /// serialization into bits
-    std::vector<bool> cv_bits = nil::marshalling::unpack_bits<nil::marshalling::option::little_endian>(point, status);
+    std::vector<bool> cv_bits = nil::marshalling::unpack<nil::marshalling::option::little_endian, bool>(point, status);
     auto it1 = expected_bits.begin();
     auto it2 = cv_bits.begin();
     while (it1 != expected_bits.end() && it2 != cv_bits.end()) {
