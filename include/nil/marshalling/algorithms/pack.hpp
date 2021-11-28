@@ -28,6 +28,8 @@
 
 #include <type_traits>
 
+#include <boost/spirit/home/support/container.hpp>
+
 #include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/inference.hpp>
 #include <nil/detail/type_traits.hpp>
@@ -63,14 +65,15 @@ namespace nil {
          *
          * @return
          */
-        template<typename TMarshallingOutnput, typename InputWordType>
-        typename std::enable_if<marshalling::is_marshalling_type<TMarshallingOutnput>::value
-                                    && std::is_integral<InputWordType>::value,
+        template<typename TMarshallingOutnput, typename InputContainer>
+        typename std::enable_if<boost::spirit::traits::is_container<InputContainer>::value
+                                    && marshalling::is_marshalling_type<TMarshallingOutnput>::value
+                                    && std::is_integral<typename InputContainer::value_type>::value,
                                 TMarshallingOutnput>::type
-            pack(std::vector<InputWordType> val, status_type &status) {
+            pack(InputContainer val, status_type &status) {
 
             TMarshallingOutnput result;
-            typename std::vector<InputWordType>::iterator buffer_begin = val.begin();
+            typename InputContainer::iterator buffer_begin = val.begin();
             status = result.read(buffer_begin, val.size());
 
             return result;
@@ -90,17 +93,18 @@ namespace nil {
          *
          * @return
          */
-        template<typename TEndian, typename TOutput, typename InputWordType>
-        typename std::enable_if<is_compatible<TOutput>::value
+        template<typename TEndian, typename TOutput, typename InputContainer>
+        typename std::enable_if<boost::spirit::traits::is_container<InputContainer>::value
+                                    && is_compatible<TOutput>::value
                                     && (!nil::marshalling::is_container<typename is_compatible<TOutput>::template type<>>::value)
-                                    && std::is_integral<InputWordType>::value,
+                                    && std::is_integral<typename InputContainer::value_type>::value,
                                 TOutput>::type
-            pack(std::vector<InputWordType> val, status_type &status) {
+            pack(InputContainer val, status_type &status) {
 
             using marshalling_type = typename is_compatible<TOutput>::template type<TEndian>;
 
             marshalling_type m_val;
-            typename std::vector<InputWordType>::iterator buffer_begin = val.begin();
+            typename InputContainer::iterator buffer_begin = val.begin();
             status = m_val.read(buffer_begin, val.size());
 
             return m_val.value();
@@ -113,26 +117,27 @@ namespace nil {
          *
          * @tparam TEndian
          * @tparam InputWordType A compatible with std::is_integral type
-         * @tparam TContainer std::vector
+         * @tparam TContainer A compatible with boost::is_container container.
          *
          * @param val
          * @param status
          *
          * @return
          */
-        template<typename TEndian, typename TContainer, typename InputWordType>
-        typename std::enable_if<is_compatible<TContainer>::value
+        template<typename TEndian, typename TContainer, typename InputContainer>
+        typename std::enable_if<boost::spirit::traits::is_container<InputContainer>::value
+                                    && is_compatible<TContainer>::value
                                     && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
                                     && (!nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>::element_type>::value)
                                     && (!is_compatible<TContainer>::fixed_size)
-                                    && std::is_integral<InputWordType>::value,
+                                    && std::is_integral<typename InputContainer::value_type>::value,
                                 TContainer>::type
-            pack(std::vector<InputWordType> val, status_type &status) {
+            pack(InputContainer val, status_type &status) {
 
             using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
 
             marshalling_type m_val;
-            typename std::vector<InputWordType>::iterator buffer_begin = val.begin();
+            typename InputContainer::iterator buffer_begin = val.begin();
 
             status = m_val.read(buffer_begin, val.size());
 
@@ -158,18 +163,19 @@ namespace nil {
          *
          * @return
          */
-        template<typename TEndian, typename TContainer, typename InputWordType>
-        typename std::enable_if<is_compatible<TContainer>::value
+        template<typename TEndian, typename TContainer, typename InputContainer>
+        typename std::enable_if<boost::spirit::traits::is_container<InputContainer>::value
+                                    && is_compatible<TContainer>::value
                                     && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
                                     && is_compatible<TContainer>::fixed_size
-                                    && std::is_integral<InputWordType>::value,
+                                    && std::is_integral<typename InputContainer::value_type>::value,
                                 TContainer>::type
-            pack(std::vector<InputWordType> val, status_type &status) {
+            pack(InputContainer val, status_type &status) {
 
             using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
 
             marshalling_type m_val;
-            typename std::vector<InputWordType>::iterator buffer_begin = val.begin();
+            typename InputContainer::iterator buffer_begin = val.begin();
 
             status = m_val.read(buffer_begin, val.size());
             auto values = m_val.value();
