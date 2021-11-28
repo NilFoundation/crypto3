@@ -94,7 +94,7 @@ namespace nil {
         typename std::enable_if<
             is_compatible<TInput>::value
                 && (!nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value)
-                && std::is_integral<OutputWordType>::value,
+                && std::is_integral<OutputWordType>::value && !std::is_same<bool, OutputWordType>::value,
             std::vector<OutputWordType>>::type
             unpack(TInput val, status_type &status) {
 
@@ -108,12 +108,13 @@ namespace nil {
             return result;
         }
 
-        template<typename TEndian, typename TInput>
+        template<typename TEndian, typename OutputWordType, typename TInput>
         typename std::enable_if<
             is_compatible<TInput>::value
-                && (!nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value),
-            std::vector<bool>>::type
-            unpack_bits(TInput val, status_type &status) {
+                && (!nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value)
+                && std::is_same<bool, OutputWordType>::value,
+            std::vector<OutputWordType>>::type
+            unpack(TInput val, status_type &status) {
 
             using marshalling_type = typename is_compatible<TInput>::template type<TEndian>;
 
