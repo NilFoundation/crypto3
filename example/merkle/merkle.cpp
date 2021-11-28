@@ -30,7 +30,6 @@
 #include <nil/crypto3/merkle/tree.hpp>
 #include <nil/crypto3/merkle/proof.hpp>
 
-using namespace nil::crypto3::merkletree;
 using namespace nil::crypto3;
 
 int main() {

@@ -66,12 +66,16 @@ namespace nil {
                     while (cur_leaf != tree.size() - 1) {    // while it's not root
                         std::size_t parent = tree.parent(cur_leaf);
                         std::array<std::size_t, arity> children = tree.children(parent);
-                        std::size_t save_i = 0;
+                        std::size_t cur_leaf_pos = cur_leaf % arity;
                         for (size_t i = 0; i < arity; ++i) {
                             std::size_t current_child = children[i];
                             if (cur_leaf != current_child) {
-                                path[cur_row][save_i] = path_element_type(tree[current_child], current_child % arity);
-                                ++save_i;
+                                std::size_t save_position = current_child % arity;
+                                if (save_position > cur_leaf_pos) {
+                                    --save_position;
+                                }
+                                path[cur_row][save_position] =
+                                    path_element_type(tree[current_child], current_child % arity);
                             }
                         }
                         cur_row++;
@@ -86,22 +90,17 @@ namespace nil {
                     for (size_t cur_row = 0; cur_row < path.size(); ++cur_row) {
 
                         nil::crypto3::accumulator_set<hash_type> acc;
-                        size_t missing_idx = arity - 1;    // If every previous index was fine - missing the last one.
-                        std::array<std::size_t, arity> position_map;
+                        bool was_missing = false;    // If every previous index was fine - missing the last one.
 
                         for (size_t i = 0; i < arity - 1; ++i) {
-                            position_map[path[cur_row][i].position] = i;
-                            if (path[cur_row][i].position != i && missing_idx == arity - 1) {
-                                missing_idx = i;
-                            }
-                        }
-                        for (size_t i = 0; i < arity; ++i) {
-                            if (missing_idx == i) {
+                            if (path[cur_row][i].position != i && !was_missing) {
                                 crypto3::hash<hash_type>(d.begin(), d.end(), acc);
-                            } else {
-                                crypto3::hash<hash_type>(path[cur_row][position_map[i]].hash.begin(),
-                                                         path[cur_row][position_map[i]].hash.end(), acc);
+                                was_missing = true;
                             }
+                            crypto3::hash<hash_type>(path[cur_row][i].hash.begin(), path[cur_row][i].hash.end(), acc);
+                        }
+                        if (!was_missing) {
+                            crypto3::hash<hash_type>(d.begin(), d.end(), acc);
                         }
                         d = nil::crypto3::accumulators::extract::hash<hash_type>(acc);
                     }

@@ -37,7 +37,7 @@ macro(define_containers_example example)
             ${CMAKE_WORKSPACE_NAME}::algebra
             ${CMAKE_WORKSPACE_NAME}::hash
             ${Boost_LIBRARIES})
-    set_target_properties(${target_name} PROPERTIES CXX_STANDARD 14)
+    set_target_properties(${target_name} PROPERTIES CXX_STANDARD 17)
 endmacro()
 
 set(EXAMPLES_NAMES
