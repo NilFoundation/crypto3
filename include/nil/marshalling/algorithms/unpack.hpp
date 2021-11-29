@@ -91,10 +91,11 @@ namespace nil {
          * @return
          */
         template<typename TEndian, typename OutputWordType = std::uint8_t, typename TInput>
-        typename std::enable_if<is_compatible<TInput>::value
-                                    && (!nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value)
-                                    && std::is_integral<OutputWordType>::value,
-                                std::vector<OutputWordType>>::type
+        typename std::enable_if<
+            is_compatible<TInput>::value
+                && (!nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value)
+                && std::is_integral<OutputWordType>::value && !std::is_same<bool, OutputWordType>::value,
+            std::vector<OutputWordType>>::type
             unpack(TInput val, status_type &status) {
 
             using marshalling_type = typename is_compatible<TInput>::template type<TEndian>;
@@ -102,6 +103,24 @@ namespace nil {
             marshalling_type m_val = marshalling_type(val);
             std::vector<OutputWordType> result(m_val.length());
             typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
+            status = m_val.write(buffer_begin, result.size());
+
+            return result;
+        }
+
+        template<typename TEndian, typename OutputWordType, typename TInput>
+        typename std::enable_if<
+            is_compatible<TInput>::value
+                && (!nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value)
+                && std::is_same<bool, OutputWordType>::value,
+            std::vector<OutputWordType>>::type
+            unpack(TInput val, status_type &status) {
+
+            using marshalling_type = typename is_compatible<TInput>::template type<TEndian>;
+
+            marshalling_type m_val = marshalling_type(val);
+            std::vector<bool> result(m_val.bit_length());
+            auto buffer_begin = result.begin();
             status = m_val.write(buffer_begin, result.size());
 
             return result;
@@ -122,12 +141,13 @@ namespace nil {
          * @return
          */
         template<typename TEndian, typename OutputWordType = std::uint8_t, typename TContainer>
-        typename std::enable_if<is_compatible<TContainer>::value
-                                    && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
-                                    && (!nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>::element_type>::value)
-                                    && (!is_compatible<TContainer>::fixed_size)
-                                    && std::is_integral<OutputWordType>::value,
-                                std::vector<OutputWordType>>::type
+        typename std::enable_if<
+            is_compatible<TContainer>::value
+                && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
+                && (!nil::marshalling::is_container<
+                    typename is_compatible<TContainer>::template type<>::element_type>::value)
+                && (!is_compatible<TContainer>::fixed_size) && std::is_integral<OutputWordType>::value,
+            std::vector<OutputWordType>>::type
             unpack(TContainer val, status_type &status) {
 
             using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
@@ -161,17 +181,18 @@ namespace nil {
          * @return
          */
         template<typename TEndian, typename OutputWordType = std::uint8_t, typename TContainer>
-        typename std::enable_if<is_compatible<TContainer>::value
-                                    && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
-                                    && is_compatible<TContainer>::fixed_size
-                                    && std::is_integral<OutputWordType>::value,
-                                std::vector<OutputWordType>>::type
+        typename std::enable_if<
+            is_compatible<TContainer>::value
+                && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
+                && is_compatible<TContainer>::fixed_size && std::is_integral<OutputWordType>::value,
+            std::vector<OutputWordType>>::type
             unpack(TContainer val, status_type &status) {
 
             using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
             using marshalling_internal_type = typename marshalling_type::element_type;
 
-            nil::marshalling::container::static_vector<marshalling_internal_type, marshalling_type::max_length()> values;
+            nil::marshalling::container::static_vector<marshalling_internal_type, marshalling_type::max_length()>
+                values;
             for (const auto &val_i : val) {
                 values.emplace_back(val_i);
             }
