@@ -165,9 +165,10 @@ namespace nil {
 
                 public:
 
-                    blueprint(): next_free_vars(){
+                    using value_type = blueprint_variable<TBlueprintField, 
+                        snark::plonk_constraint_system<TBlueprintField, WiresAmount>>;
 
-                    }
+                    blueprint(){}
                     
                     void clear_assignments() {
                         for (auto iter = assignments.begin(); iter != assignments.end(); iter++){
@@ -175,16 +176,16 @@ namespace nil {
                         }
                     }
 
-                    typename TBlueprintField::value_type &assignment(const blueprint_variable<TBlueprintField> &var, std::size_t row_index) {
+                    typename TBlueprintField::value_type &assignment(const value_type &var, std::size_t row_index) {
                         assert(row_index < assignments.size());
                         assert(var.index <= assignments[row_index].size());
                         return (assignments[row_index][var.index]);
                     }
 
-                    typename TBlueprintField::value_type assignment(const blueprint_variable<TBlueprintField> &var, std::size_t row_index) const {
-                        assert(row_index < assignments.size());
-                        assert(var.index <= assignments[row_index].size());
-                        return (assignments[row_index][var.index - 1]);
+                    typename TBlueprintField::value_type assignment(const value_type &var, std::size_t row_index) const {
+                        assert(var.index <= assignments.size());
+                        assert(row_index < assignments[var.index].size());
+                        return (assignments[var.index][row_index]);
                     
 
                     void add_gate(const snark::plonk_constraint<TBlueprintField> &constr) {
