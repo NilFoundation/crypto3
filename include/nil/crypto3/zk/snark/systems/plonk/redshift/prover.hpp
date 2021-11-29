@@ -95,10 +95,8 @@ namespace nil {
                         std::vector<math::polynomial::polynom<typename FieldType::value_type>> p(N_perm);
                         std::vector<math::polynomial::polynom<typename FieldType::value_type>> q(N_perm);
 
-                        math::polynomial::polynom<typename FieldType::value_type> p1 = 
-                            math::polynomial::polynom<typename FieldType::value_type>::one();
-                        math::polynomial::polynom<typename FieldType::value_type> q1 = 
-                            math::polynomial::polynom<typename FieldType::value_type>::one();
+                        math::polynomial::polynom<typename FieldType::value_type> p1 = {1};
+                        math::polynomial::polynom<typename FieldType::value_type> q1 = {1};
 
                         for (std::size_t j = 0; j < N_perm; j++) {
                             p.push_back(f[j] + beta * S_id[j] + gamma);

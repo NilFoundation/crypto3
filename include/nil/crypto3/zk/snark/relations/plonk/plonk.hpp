@@ -83,6 +83,36 @@ namespace nil {
                         return true;
                     }
 
+                    std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_polynoms(
+                        plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment){
+
+                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> result(constraints.size());
+
+                        std::array<math::polynomial::polynom<typename FieldType::value_type>, WiresAmount> wire_polynomials;
+                        for (std::size_t wire_index = 0; wire_index < WiresAmount; wire_index++){
+                            wire_polynomials[wire_index] = math::polynomial::Lagrange_interpolation(full_variable_assignment[wire_index]);
+                        }
+
+                        for (std::size_t constraint_index = 0; i < constraints.size(); constraint_index++){
+
+                            for (auto &term: constraints[constraint_index].terms){
+                                
+                                math::polynomial::polynom<typename FieldType::value_type> 
+                                    term_polynom = {term.coeff};
+
+                                // TODO: Rotation isn't taken into consideration
+                                for (auto &var: term.vars){
+                                    term_polynom *= wire_polynomials[var.index];
+                                }
+
+                                result[constraint_index] += term_polynom;
+                            }
+                        }
+
+                        return result;
+
+                    }
+
                     void add_constraint(const plonk_constraint<FieldType> &c) {
                         constraints.emplace_back(c);
                     }
