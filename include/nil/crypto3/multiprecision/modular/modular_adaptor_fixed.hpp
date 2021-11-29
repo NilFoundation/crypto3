@@ -170,11 +170,6 @@ namespace nil {
                         eval_add(base_data(), mod_data().get_mod().backend());
                     }
 
-                    template<typename BackendT, expression_template_option ExpressionTemplates>
-                    constexpr operator number<BackendT, ExpressionTemplates>() {
-                        return static_cast<BackendT>(base_data());
-                    };
-
                 protected:
                     Backend m_base;
                     modulus_type m_mod;

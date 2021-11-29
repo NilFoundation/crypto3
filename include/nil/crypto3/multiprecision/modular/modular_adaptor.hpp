@@ -185,11 +185,6 @@ namespace nil {
                         base_data().negate();
                         eval_add(base_data(), mod_data().get_mod().backend());
                     }
-
-                    template<typename BackendT, expression_template_option ExpressionTemplates>
-                    operator number<BackendT, ExpressionTemplates>() {
-                        return base_data();
-                    };
                 };
 
                 template<class Result, class Backend>
