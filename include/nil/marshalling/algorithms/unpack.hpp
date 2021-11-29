@@ -28,6 +28,8 @@
 
 #include <type_traits>
 
+#include <boost/spirit/home/support/container.hpp>
+
 #include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/inference.hpp>
 #include <nil/detail/type_traits.hpp>
@@ -63,10 +65,12 @@ namespace nil {
          *
          * @return
          */
-        template<typename OutputContainer = std::vector<uint8_t>, typename TMarshallingInput>
+        template<typename TMarshallingOutput = uint8_t, typename OutputContainer = std::vector<TMarshallingOutput>,
+                 typename TMarshallingInput>
         typename std::enable_if<marshalling::is_marshalling_type<TMarshallingInput>::value
+                                    && boost::spirit::traits::is_container<OutputContainer>::value
                                     && std::is_integral<typename OutputContainer::value_type>::value,
-            OutputContainer>::type
+                                OutputContainer>::type
             unpack(TMarshallingInput val, status_type &status) {
 
             OutputContainer result(val.length());
@@ -94,7 +98,9 @@ namespace nil {
         typename std::enable_if<
             is_compatible<TInput>::value
                 && (!nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value)
-                && std::is_integral<typename OutputContainer::value_type>::value && !std::is_same<bool, typename OutputContainer::value_type>::value,
+                && boost::spirit::traits::is_container<OutputContainer>::value
+                && std::is_integral<typename OutputContainer::value_type>::value
+                && !std::is_same<bool, typename OutputContainer::value_type>::value,
             OutputContainer>::type
             unpack(TInput val, status_type &status) {
 
@@ -112,6 +118,7 @@ namespace nil {
         typename std::enable_if<
             is_compatible<TInput>::value
                 && (!nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value)
+                && boost::spirit::traits::is_container<OutputContainer>::value
                 && std::is_same<bool, typename OutputContainer::value_type>::value,
             OutputContainer>::type
             unpack(TInput val, status_type &status) {
@@ -120,7 +127,7 @@ namespace nil {
 
             marshalling_type m_val = marshalling_type(val);
             OutputContainer result(m_val.bit_length());
-            auto buffer_begin = result.begin();
+            typename OutputContainer::iterator buffer_begin = result.begin();
             status = m_val.write(buffer_begin, result.size());
 
             return result;
@@ -146,7 +153,9 @@ namespace nil {
                 && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
                 && (!nil::marshalling::is_container<
                     typename is_compatible<TContainer>::template type<>::element_type>::value)
-                && (!is_compatible<TContainer>::fixed_size) && std::is_integral<typename OutputContainer::value_type>::value,
+                && (!is_compatible<TContainer>::fixed_size)
+                && boost::spirit::traits::is_container<OutputContainer>::value
+                && std::is_integral<typename OutputContainer::value_type>::value,
             OutputContainer>::type
             unpack(TContainer val, status_type &status) {
 
@@ -184,7 +193,8 @@ namespace nil {
         typename std::enable_if<
             is_compatible<TContainer>::value
                 && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
-                && is_compatible<TContainer>::fixed_size && std::is_integral<typename OutputContainer::value_type>::value,
+                && is_compatible<TContainer>::fixed_size && boost::spirit::traits::is_container<OutputContainer>::value
+                && std::is_integral<typename OutputContainer::value_type>::value,
             OutputContainer>::type
             unpack(TContainer val, status_type &status) {
 
