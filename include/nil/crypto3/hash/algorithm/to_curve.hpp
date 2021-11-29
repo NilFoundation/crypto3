@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -25,8 +26,6 @@
 #ifndef CRYPTO3_HASH_TO_CURVE_HPP
 #define CRYPTO3_HASH_TO_CURVE_HPP
 
-#include <nil/crypto3/hash/h2c.hpp>
-
 #include <nil/crypto3/hash/to_curve_state.hpp>
 #include <nil/crypto3/hash/to_curve_value.hpp>
 
@@ -35,10 +34,6 @@
 namespace nil {
     namespace crypto3 {
         /*!
-         * @defgroup hashes CurveGroup Functions & Checksums
-         *
-         * @brief
-         *
          * @defgroup hash_algorithms Algorithms
          * @ingroup hashes
          * @brief Algorithms are meant to provide hashing to curve interface similar to STL algorithms' one.
@@ -49,7 +44,7 @@ namespace nil {
          *
          * @ingroup hash_algorithms
          *
-         * @tparam CurveGroup
+         * @tparam Hash
          * @tparam InputIterator
          * @tparam OutputIterator
          *
@@ -59,11 +54,11 @@ namespace nil {
          *
          * @return
          */
-        template<typename CurveGroup, typename Params, typename InputIterator, typename OutputIterator>
+        template<typename Hash, typename InputIterator, typename OutputIterator>
         typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
                                 OutputIterator>::type
             to_curve(InputIterator first, InputIterator last, OutputIterator out) {
-            typedef hashing_to_curve_accumulator_set<hashes::h2c<CurveGroup, Params>> HashingAccumulator;
+            typedef hashing_to_curve_accumulator_set<Hash> HashingAccumulator;
 
             typedef hashes::detail::value_to_curve_impl<HashingAccumulator> StreamHashImpl;
             typedef hashes::detail::itr_to_curve_impl<StreamHashImpl, OutputIterator> HashImpl;
@@ -76,7 +71,7 @@ namespace nil {
          *
          * @ingroup hash_algorithms
          *
-         * @tparam CurveGroup
+         * @tparam Hash
          * @tparam InputIterator
          * @tparam HashingAccumulator
          *
@@ -86,8 +81,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename CurveGroup, typename Params, typename InputIterator,
-                 typename HashingAccumulator = hashing_to_curve_accumulator_set<hashes::h2c<CurveGroup, Params>>>
+        template<typename Hash, typename InputIterator,
+                 typename HashingAccumulator = hashing_to_curve_accumulator_set<Hash>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<HashingAccumulator>::value,
                                 HashingAccumulator>::type &
             to_curve(InputIterator first, InputIterator last, HashingAccumulator &sh) {
@@ -102,7 +97,7 @@ namespace nil {
          *
          * @ingroup hash_algorithms
          *
-         * @tparam CurveGroup
+         * @tparam Hash
          * @tparam InputIterator
          * @tparam HashingAccumulator
          *
@@ -111,8 +106,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename CurveGroup, typename Params, typename InputIterator,
-                 typename HashingAccumulator = hashing_to_curve_accumulator_set<hashes::h2c<CurveGroup, Params>>>
+        template<typename Hash, typename InputIterator,
+                 typename HashingAccumulator = hashing_to_curve_accumulator_set<Hash>>
         hashes::detail::range_to_curve_impl<hashes::detail::value_to_curve_impl<typename std::enable_if<
             boost::accumulators::detail::is_accumulator_set<HashingAccumulator>::value, HashingAccumulator>::type>>
             to_curve(InputIterator first, InputIterator last) {
@@ -127,7 +122,7 @@ namespace nil {
          *
          * @ingroup hash_algorithms
          *
-         * @tparam CurveGroup
+         * @tparam Hash
          * @tparam SinglePassRange
          * @tparam OutputIterator
          *
@@ -136,10 +131,10 @@ namespace nil {
          *
          * @return
          */
-        template<typename CurveGroup, typename Params, typename SinglePassRange, typename OutputIterator>
+        template<typename Hash, typename SinglePassRange, typename OutputIterator>
         typename std::enable_if<::nil::crypto3::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             to_curve(const SinglePassRange &rng, OutputIterator out) {
-            typedef hashing_to_curve_accumulator_set<hashes::h2c<CurveGroup, Params>> HashingAccumulator;
+            typedef hashing_to_curve_accumulator_set<Hash> HashingAccumulator;
 
             typedef hashes::detail::value_to_curve_impl<HashingAccumulator> StreamHashImpl;
             typedef hashes::detail::itr_to_curve_impl<StreamHashImpl, OutputIterator> HashImpl;
@@ -152,7 +147,7 @@ namespace nil {
          *
          * @ingroup hash_algorithms
          *
-         * @tparam CurveGroup
+         * @tparam Hash
          * @tparam SinglePassRange
          * @tparam HashingAccumulator
          *
@@ -161,8 +156,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename CurveGroup, typename Params, typename SinglePassRange,
-                 typename HashingAccumulator = hashing_to_curve_accumulator_set<hashes::h2c<CurveGroup, Params>>>
+        template<typename Hash, typename SinglePassRange,
+                 typename HashingAccumulator = hashing_to_curve_accumulator_set<Hash>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<HashingAccumulator>::value,
                                 HashingAccumulator>::type &
             to_curve(const SinglePassRange &rng, HashingAccumulator &sh) {
@@ -177,7 +172,7 @@ namespace nil {
          *
          * @ingroup hash_algorithms
          *
-         * @tparam CurveGroup
+         * @tparam Hash
          * @tparam SinglePassRange
          * @tparam HashingAccumulator
          *
@@ -185,8 +180,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename CurveGroup, typename Params, typename SinglePassRange,
-                 typename HashingAccumulator = hashing_to_curve_accumulator_set<hashes::h2c<CurveGroup, Params>>>
+        template<typename Hash, typename SinglePassRange,
+                 typename HashingAccumulator = hashing_to_curve_accumulator_set<Hash>>
         hashes::detail::range_to_curve_impl<hashes::detail::value_to_curve_impl<HashingAccumulator>>
             to_curve(const SinglePassRange &r) {
 
@@ -201,7 +196,7 @@ namespace nil {
          *
          * @ingroup hash_algorithms
          *
-         * @tparam CurveGroup
+         * @tparam Hash
          * @tparam T
          * @tparam OutputIterator
          *
@@ -210,10 +205,10 @@ namespace nil {
          *
          * @return
          */
-        template<typename CurveGroup, typename Params, typename T, typename OutputIterator>
+        template<typename Hash, typename T, typename OutputIterator>
         typename std::enable_if<::nil::crypto3::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             to_curve(std::initializer_list<T> list, OutputIterator out) {
-            typedef hashing_to_curve_accumulator_set<hashes::h2c<CurveGroup, Params>> HashingAccumulator;
+            typedef hashing_to_curve_accumulator_set<Hash> HashingAccumulator;
 
             typedef hashes::detail::value_to_curve_impl<HashingAccumulator> StreamHashImpl;
             typedef hashes::detail::itr_to_curve_impl<StreamHashImpl, OutputIterator> HashImpl;
@@ -226,7 +221,7 @@ namespace nil {
          *
          * @ingroup hash_algorithms
          *
-         * @tparam CurveGroup
+         * @tparam Hash
          * @tparam T
          * @tparam HashingAccumulator
          *
@@ -235,8 +230,7 @@ namespace nil {
          *
          * @return
          */
-        template<typename CurveGroup, typename Params, typename T,
-                 typename HashingAccumulator = hashing_to_curve_accumulator_set<hashes::h2c<CurveGroup, Params>>>
+        template<typename Hash, typename T, typename HashingAccumulator = hashing_to_curve_accumulator_set<Hash>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<HashingAccumulator>::value,
                                 HashingAccumulator>::type &
             to_curve(std::initializer_list<T> rng, HashingAccumulator &sh) {
@@ -251,7 +245,7 @@ namespace nil {
          *
          * @ingroup hash_algorithms
          *
-         * @tparam CurveGroup
+         * @tparam Hash
          * @tparam T
          * @tparam HashingAccumulator
          *
@@ -259,8 +253,7 @@ namespace nil {
          *
          * @return
          */
-        template<typename CurveGroup, typename Params, typename T,
-                 typename HashingAccumulator = hashing_to_curve_accumulator_set<hashes::h2c<CurveGroup, Params>>>
+        template<typename Hash, typename T, typename HashingAccumulator = hashing_to_curve_accumulator_set<Hash>>
         hashes::detail::range_to_curve_impl<hashes::detail::value_to_curve_impl<HashingAccumulator>>
             to_curve(std::initializer_list<T> r) {
 

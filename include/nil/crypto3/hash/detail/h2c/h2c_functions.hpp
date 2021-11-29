@@ -36,8 +36,10 @@
 #include <boost/static_assert.hpp>
 #include <boost/concept/assert.hpp>
 
-#include <nil/crypto3/algebra/marshalling.hpp>
-#include <nil/crypto3/marshalling/types/integral.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/marshalling/endianness.hpp>
+#include <nil/marshalling/algorithms/pack.hpp>
+#include <nil/crypto3/marshalling/multiprecision/types/integral.hpp>
 
 #include <nil/crypto3/algebra/type_traits.hpp>
 
@@ -440,13 +442,13 @@ namespace nil {
                          typename PublicParams,
                          UniformityCount uniformity_count,
                          ExpandMsgVariant expand_msg_variant>
-                struct ep_map<
-                    Group,
-                    PublicParams,
-                    uniformity_count,
-                    expand_msg_variant,
-                    typename std::enable_if<//algebra::is_group_element<typename Group::value_type>::value &&
-                                            (ExpandMsgVariant::rfc_xmd == expand_msg_variant)>::type> {
+                struct ep_map<Group,
+                              PublicParams,
+                              uniformity_count,
+                              expand_msg_variant,
+                              typename std::enable_if<    // algebra::is_group_element<typename
+                                                          // Group::value_type>::value &&
+                                  (ExpandMsgVariant::rfc_xmd == expand_msg_variant)>::type> {
                     typedef h2c_suite<Group> suite_type;
 
                     typedef typename suite_type::group_value_type group_value_type;
@@ -471,12 +473,6 @@ namespace nil {
                     typedef expand_message_xmd<k, len_in_bytes, hash_type, PublicParams> expand_message_type;
                     typedef group_value_type result_type;
                     typedef typename expand_message_type::internal_accumulator_type internal_accumulator_type;
-
-                    typedef ::nil::crypto3::marshalling::types::integral<
-                        ::nil::marshalling::field_type<::nil::marshalling::option::big_endian>,
-                        multiprecision::cpp_int>
-                        marshalling_cpp_int_be_type;
-                    typedef std::array<std::uint8_t, L> imported_octets_container_type;
 
                     static inline void init_accumulator(internal_accumulator_type &acc) {
                         expand_message_type::init_accumulator(acc);
@@ -503,25 +499,18 @@ namespace nil {
                             for (std::size_t j = 0; j < m; j++) {
                                 auto elm_offset = L * (j + i * m);
 
-                                if constexpr (digest_bits >= modulus_bits) {
-                                    marshalling_cpp_int_be_type marshalling_cpp_int_be;
-                                    auto it = std::cbegin(uniform_bytes) + elm_offset;
-                                    marshalling_cpp_int_be.template read(it, L * 8);
-                                    coordinates[j] = modular_type(marshalling_cpp_int_be.value(), suite_type::p);
-                                } else {
-                                    // TODO: creating copy of range is a bottleneck:
-                                    //  extend marshaling interface by function supporting initialization from
-                                    //  container which length is less than modulus_octets
-                                    imported_octets_container_type imported_octets;
-                                    imported_octets.fill(0);
-                                    std::copy(std::cbegin(uniform_bytes) + elm_offset,
-                                              std::cbegin(uniform_bytes) + elm_offset + L,
-                                              std::begin(imported_octets));
-                                    marshalling_cpp_int_be_type marshalling_cpp_int_be;
-                                    auto it = std::cbegin(imported_octets);
-                                    marshalling_cpp_int_be.template read(it, L * 8);
-                                    coordinates[j] = modular_type(marshalling_cpp_int_be.value(), suite_type::p);
-                                }
+                                // TODO: creating copy of range is a bottleneck:
+                                //  extend marshaling interface by function supporting initialization from
+                                //  container which length is less than modulus_octets
+                                std::vector<std::uint8_t> imported_octets;
+                                std::copy(std::cbegin(uniform_bytes) + elm_offset,
+                                          std::cbegin(uniform_bytes) + elm_offset + L,
+                                          std::back_inserter(imported_octets));
+                                nil::marshalling::status_type status;
+                                coordinates[j] = modular_type(
+                                    nil::marshalling::pack<nil::marshalling::option::big_endian,
+                                                           multiprecision::cpp_int>(imported_octets, status),
+                                    suite_type::p);
                             }
                             result[i] = coordinates[0];
                         }
@@ -540,25 +529,18 @@ namespace nil {
                             for (std::size_t j = 0; j < m; j++) {
                                 auto elm_offset = L * (j + i * m);
 
-                                if constexpr (digest_bits >= modulus_bits) {
-                                    marshalling_cpp_int_be_type marshalling_cpp_int_be;
-                                    auto it = std::cbegin(uniform_bytes) + elm_offset;
-                                    marshalling_cpp_int_be.template read(it, L * 8);
-                                    coordinates[j] = modular_type(marshalling_cpp_int_be.value(), suite_type::p);
-                                } else {
-                                    // TODO: creating copy of range is a bottleneck:
-                                    //  extend marshaling interface by function supporting initialization from
-                                    //  container which length is less than modulus_octets
-                                    imported_octets_container_type imported_octets;
-                                    imported_octets.fill(0);
-                                    std::copy(std::cbegin(uniform_bytes) + elm_offset,
-                                              std::cbegin(uniform_bytes) + elm_offset + L,
-                                              std::begin(imported_octets));
-                                    marshalling_cpp_int_be_type marshalling_cpp_int_be;
-                                    auto it = std::cbegin(imported_octets);
-                                    marshalling_cpp_int_be.template read(it, L * 8);
-                                    coordinates[j] = modular_type(marshalling_cpp_int_be.value(), suite_type::p);
-                                }
+                                // TODO: creating copy of range is a bottleneck:
+                                //  extend marshaling interface by function supporting initialization from
+                                //  container which length is less than modulus_octets
+                                std::vector<std::uint8_t> imported_octets;
+                                std::copy(std::cbegin(uniform_bytes) + elm_offset,
+                                          std::cbegin(uniform_bytes) + elm_offset + L,
+                                          std::back_inserter(imported_octets));
+                                nil::marshalling::status_type status;
+                                coordinates[j] = modular_type(
+                                    nil::marshalling::pack<nil::marshalling::option::big_endian,
+                                                           multiprecision::cpp_int>(imported_octets, status),
+                                    suite_type::p);
                             }
                             result[i] = field_value_type(coordinates[0], coordinates[1]);
                         }

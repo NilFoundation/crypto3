@@ -42,9 +42,10 @@ namespace nil {
                 constexpr static ExpandMsgVariant expand_msg_variant = _expand_msg_variant;
 
                 typedef h2c_suite<Group> suite_type;
-                static inline std::vector<std::uint8_t> dst = []() {
+                typedef std::vector<std::uint8_t> dst_type;
+                static inline dst_type dst = []() {
                     std::string default_tag_str = "QUUX-V01-CS02-with-";
-                    std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());
+                    dst_type dst(default_tag_str.begin(), default_tag_str.end());
                     dst.insert(dst.end(), suite_type::suite_id.begin(), suite_type::suite_id.end());
                     return dst;
                 }();
