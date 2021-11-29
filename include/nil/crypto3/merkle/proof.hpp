@@ -4,6 +4,7 @@
 //  Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 //  Copyright (c) 2020-2021 Nikita Kaskov <nemo@nil.foundation>
 //  Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
+//  Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +37,13 @@
 
 namespace nil {
     namespace crypto3 {
+        namespace zk {
+            namespace components {
+                template<typename, typename, std::size_t>
+                struct merkle_proof;
+            }    // namespace components
+        }        // namespace zk
+
         namespace detail {
             template<typename NodeType, std::size_t Arity = 2>
             struct merkle_proof_impl {
@@ -58,12 +66,16 @@ namespace nil {
                     while (cur_leaf != tree.size() - 1) {    // while it's not root
                         std::size_t parent = tree.parent(cur_leaf);
                         std::array<std::size_t, arity> children = tree.children(parent);
-                        std::size_t save_i = 0;
+                        std::size_t cur_leaf_pos = cur_leaf % arity;
                         for (size_t i = 0; i < arity; ++i) {
                             std::size_t current_child = children[i];
                             if (cur_leaf != current_child) {
-                                path[cur_row][save_i] = path_element_type(tree[current_child], current_child % arity);
-                                ++save_i;
+                                std::size_t save_position = current_child % arity;
+                                if (save_position > cur_leaf_pos) {
+                                    --save_position;
+                                }
+                                path[cur_row][save_position] =
+                                    path_element_type(tree[current_child], current_child % arity);
                             }
                         }
                         cur_row++;
@@ -77,28 +89,20 @@ namespace nil {
 
                     for (size_t cur_row = 0; cur_row < path.size(); ++cur_row) {
 
-                        std::array<uint8_t, (value_bits / std::numeric_limits<std::uint8_t>::digits +
-                                             (value_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0)) *
-                                                arity>
-                            new_input;
-                        size_t missing_idx = arity - 1;    // If every previous index was fine - missing the last one.
+                        nil::crypto3::accumulator_set<hash_type> acc;
+                        bool was_missing = false;    // If every previous index was fine - missing the last one.
 
                         for (size_t i = 0; i < arity - 1; ++i) {
-                            std::copy(path[cur_row][i].hash.begin(), path[cur_row][i].hash.end(),
-                                      new_input.begin() +
-                                          path[cur_row][i].position *
-                                              (value_bits / std::numeric_limits<std::uint8_t>::digits +
-                                               (value_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0)));
-                            if (path[cur_row][i].position != i && missing_idx == arity - 1) {
-                                missing_idx = i;
+                            if (path[cur_row][i].position != i && !was_missing) {
+                                crypto3::hash<hash_type>(d.begin(), d.end(), acc);
+                                was_missing = true;
                             }
+                            crypto3::hash<hash_type>(path[cur_row][i].hash.begin(), path[cur_row][i].hash.end(), acc);
                         }
-
-                        std::copy(d.begin(), d.end(),
-                                  new_input.begin() +
-                                      missing_idx * (value_bits / std::numeric_limits<std::uint8_t>::digits +
-                                                     (value_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0)));
-                        d = crypto3::hash<hash_type>(new_input);
+                        if (!was_missing) {
+                            crypto3::hash<hash_type>(d.begin(), d.end(), acc);
+                        }
+                        d = nil::crypto3::accumulators::extract::hash<hash_type>(acc);
                     }
                     return (d == root);
                 }
@@ -122,6 +126,9 @@ namespace nil {
                 };
 
                 std::vector<std::array<path_element_type, Arity - 1>> path;
+
+                template<typename, typename, std::size_t>
+                friend class nil::crypto3::zk::components::merkle_proof;
             };
         }    // namespace detail
 
