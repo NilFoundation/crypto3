@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -183,7 +184,9 @@ namespace nil {
                 constexpr static const std::size_t value_bits = node_type::value_bits;
 
             protected:
-                typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS,
+                typedef boost::adjacency_list<boost::vecS,
+                                              boost::vecS,
+                                              boost::bidirectionalS,
                                               boost::property<vertex_hash_t, value_type>>
                     graph_type;
                 typedef typename boost::property_map<graph_type, vertex_hash_t>::type vertex_name_map_type;
@@ -204,23 +207,18 @@ namespace nil {
                              current_element < start_layer_element + layer_elements;
                              ++current_element) {
                             if (row_number == 0) {
-                                hash_map[current_element] = crypto3::hash<hash_type>(data[current_element]);
+                                hash_map[current_element] = static_cast<typename hash_type::digest_type>(
+                                    crypto3::hash<hash_type>(data[current_element]));
                             } else {
-                                std::array<uint8_t, (value_bits / std::numeric_limits<std::uint8_t>::digits +
-                                                     (value_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0)) *
-                                                        Arity>
-                                    new_input;
+                                nil::crypto3::accumulator_set<hash_type> acc;
                                 for (size_t i = 0; i < Arity; ++i) {
                                     size_t children_index =
                                         (current_element - start_layer_element) * Arity + prev_layer_element + i;
-                                    std::copy(
-                                        hash_map[children_index].begin(), hash_map[children_index].end(),
-                                        new_input.begin() +
-                                            i * (value_bits / std::numeric_limits<std::uint8_t>::digits +
-                                                 (value_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0)));
+                                    crypto3::hash<hash_type>(
+                                        hash_map[children_index].begin(), hash_map[children_index].end(), acc);
                                     add_edge(children_index, current_element, _t);
                                 }
-                                hash_map[current_element] = crypto3::hash<hash_type>(new_input);
+                                hash_map[current_element] = nil::crypto3::accumulators::extract::hash<hash_type>(acc);
                             }
                         }
                         prev_layer_element = start_layer_element;

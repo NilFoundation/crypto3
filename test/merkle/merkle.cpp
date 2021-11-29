@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -28,6 +29,7 @@
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/md5.hpp>
 #include <nil/crypto3/hash/blake2b.hpp>
+#include <nil/crypto3/hash/pedersen.hpp>
 
 #include <nil/crypto3/merkle/tree.hpp>
 #include <nil/crypto3/merkle/proof.hpp>
@@ -37,11 +39,39 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include <cstdio>
+#include <limits>
+#include <type_traits>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::detail;
 
-BOOST_AUTO_TEST_SUITE(containers_merkltree_test)
+template<typename ValueType, std::size_t N>
+typename std::enable_if<std::is_unsigned<ValueType>::value, std::vector<std::array<ValueType, N>>>::type
+    generate_random_data(std::size_t leaf_number) {
+    std::vector<std::array<ValueType, N>> v;
+    for (std::size_t i = 0; i < leaf_number; ++i) {
+        std::array<ValueType, N> leaf;
+        std::generate(std::begin(leaf), std::end(leaf),
+                      [&]() { return std::rand() % (std::numeric_limits<ValueType>::max() + 1); });
+        v.emplace_back(leaf);
+    }
+    return v;
+}
+
+template<typename Hash, size_t Arity, typename ValueType, std::size_t N>
+void testing_validate_template_random_data(std::size_t leaf_number) {
+    std::array<ValueType, N> data_not_in_tree = {0};
+    auto data = generate_random_data<ValueType, N>(leaf_number);
+    merkle_tree<Hash, Arity> tree(data);
+    std::size_t proof_idx = std::rand() % leaf_number;
+    merkle_proof<Hash, Arity> proof(tree, proof_idx);
+    bool good_validate = proof.validate(data[proof_idx]);
+    bool wrong_leaf_validate = proof.validate(data[(proof_idx + 1) % leaf_number]);
+    bool wrong_data_validate = proof.validate(data_not_in_tree);
+    BOOST_CHECK(good_validate);
+    BOOST_CHECK(!wrong_leaf_validate);
+    BOOST_CHECK(!wrong_data_validate);
+}
 
 template<typename Hash, size_t Arity, typename Element>
 void testing_validate_template(std::vector<Element> data) {
@@ -63,11 +93,18 @@ void testing_hash_template(std::vector<Element> data, std::string result) {
     BOOST_CHECK(result == std::to_string(tree.root()).data());
 }
 
+BOOST_AUTO_TEST_SUITE(containers_merkltree_test)
+
 BOOST_AUTO_TEST_CASE(merkletree_validate_test_1) {
     std::vector<std::array<char, 1>> v = {{'0'}, {'1'}, {'2'}, {'3'}, {'4'}, {'5'}, {'6'}, {'7'}};
     testing_validate_template<hashes::sha2<256>, 2>(v);
     testing_validate_template<hashes::md5, 2>(v);
     testing_validate_template<hashes::blake2b<224>, 2>(v);
+
+    std::size_t leaf_number = 8;
+    testing_validate_template_random_data<hashes::sha2<256>, 2, std::uint8_t, 1>(leaf_number);
+    testing_validate_template_random_data<hashes::md5, 2, std::uint8_t, 1>(leaf_number);
+    testing_validate_template_random_data<hashes::blake2b<224>, 2, std::uint8_t, 1>(leaf_number);
 }
 
 BOOST_AUTO_TEST_CASE(merkletree_validate_test_2) {
@@ -75,6 +112,20 @@ BOOST_AUTO_TEST_CASE(merkletree_validate_test_2) {
     testing_validate_template<hashes::sha2<256>, 3>(v);
     testing_validate_template<hashes::md5, 3>(v);
     testing_validate_template<hashes::blake2b<224>, 3>(v);
+
+    std::size_t leaf_number = 9;
+    testing_validate_template_random_data<hashes::sha2<256>, 3, std::uint8_t, 1>(leaf_number);
+    testing_validate_template_random_data<hashes::md5, 3, std::uint8_t, 1>(leaf_number);
+    testing_validate_template_random_data<hashes::blake2b<224>, 3, std::uint8_t, 1>(leaf_number);
+}
+
+BOOST_AUTO_TEST_CASE(merkletree_validate_test_3) {
+    using hash_type = hashes::pedersen<
+        hashes::find_group_hash_default_params, hashes::sha2<256>,
+        algebra::curves::jubjub::template g1_type<nil::crypto3::algebra::curves::coordinates::affine,
+                                                  nil::crypto3::algebra::curves::forms::twisted_edwards>>;
+    std::size_t leaf_number = 8;
+    testing_validate_template_random_data<hash_type, 2, bool, hash_type::digest_bits>(leaf_number);
 }
 
 BOOST_AUTO_TEST_CASE(merkletree_hash_test_1) {

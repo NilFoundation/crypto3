@@ -54,7 +54,7 @@ macro(define_storage_test test)
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(${target_name} PROPERTIES CXX_STANDARD 14)
+    set_target_properties(${target_name} PROPERTIES CXX_STANDARD 17)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
