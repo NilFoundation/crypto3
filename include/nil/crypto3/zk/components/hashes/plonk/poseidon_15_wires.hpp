@@ -25,8 +25,8 @@
 // @file Declaration of interfaces for auxiliary components for the SHA256 component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_POSEIDON_5_WIRES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_POSEIDON_5_WIRES_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_POSEIDON_15_WIRES_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_POSEIDON_15_WIRES_HPP
 
 #include <nil/crypto3/zk/components/blueprint.hpp>
 #include <nil/crypto3/zk/components/blueprint_variable.hpp>
@@ -101,7 +101,7 @@ namespace nil {
                             blueprint_type::variable_type::rotation_type::next);
 
                         //TODO: The gates are similar for each z, it can be optimized using selectors
-                        for (std::size_t z=0; z < 11; z++){
+                        for (std::size_t z=0; z <= 11; z++){
 
                             bp.add_gate(j + z, T_1_0 - (T_0_0^5 * M[0][0] + T_0_1^5 * M[0][1] + T_0_2^5 * M[0][2] + RC[0]));
                             bp.add_gate(j + z, T_1_1 - (T_0_0^5 * M[1][0] + T_0_1^5 * M[1][1] + T_0_2^5 * M[1][2] + RC[1]));
@@ -135,4 +135,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_POSEIDON_5_WIRES_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_POSEIDON_15_WIRES_HPP
