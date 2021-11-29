@@ -52,7 +52,7 @@ namespace nil {
 
                     }
 
-                    void generate_r1cs_constraints(bool ensure_output_bitness = true) {    // TODO: ignored for now
+                    void generate_r1cs_constraints() {    // TODO: ignored for now
                         padding->generate_r1cs_constraints();
                         for (auto f : blocks_components) {
                             f->generate_r1cs_constraints();

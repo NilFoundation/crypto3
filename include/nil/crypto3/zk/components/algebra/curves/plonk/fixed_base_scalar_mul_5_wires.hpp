@@ -25,8 +25,8 @@
 // @file Declaration of interfaces for auxiliary components for the SHA256 component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_SCALAR_MUL_COMPONENT_5_WIRES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_SCALAR_MUL_COMPONENT_5_WIRES_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_FIXED_BASE_SCALAR_MUL_COMPONENT_5_WIRES_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_FIXED_BASE_SCALAR_MUL_COMPONENT_5_WIRES_HPP
 
 #include <nil/crypto3/zk/components/blueprint.hpp>
 
@@ -38,7 +38,7 @@ namespace nil {
                 template<typename TBlueprintField, typename CurveType, 
                     std::size_t W0 = 4, std::size_t W1 = 0, std::size_t W2 = 1, std::size_t W3 = 2, 
                     std::size_t W4 = 3, CurveType::g1_type<>::value_type B>
-                class element_g1_scalar_mul_plonk : public component<TBlueprintField> {
+                class element_g1_fixed_base_scalar_mul_plonk : public component<TBlueprintField> {
                     typedef snark::plonk_constraint_system<TBlueprintField> arithmetization_type;
 
                     typedef blueprint<arithmetization_type, TBlueprintField> blueprint_type;
@@ -46,7 +46,7 @@ namespace nil {
                     typename blueprint_type::row_index_type j;
                 public:
 
-                    element_g1_scalar_mul_plonk(blueprint_type &bp) :
+                    element_g1_fixed_base_scalar_mul_plonk(blueprint_type &bp) :
                         component<FieldType>(bp){
 
                         j = bp.allocate_rows(85);
@@ -276,4 +276,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_SCALAR_MUL_COMPONENT_5_WIRES_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_FIXED_BASE_SCALAR_MUL_COMPONENT_5_WIRES_HPP
