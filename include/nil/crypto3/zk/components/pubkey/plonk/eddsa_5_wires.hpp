@@ -36,7 +36,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TBlueprintField, typename FieldType, 
+                template<typename TBlueprintField, typename CurveType, 
                     std::size_t W0 = 4, std::size_t W1 = 0, std::size_t W2 = 1, std::size_t W3 = 2, 
                     std::size_t W4 = 3>
                 class eddsa_verifier_plonk : public component<TBlueprintField> {
@@ -57,7 +57,7 @@ namespace nil {
                 public:
 
                     eddsa_verifier_plonk(blueprint_type &bp) :
-                        component<FieldType>(bp), range_proof(bp), sha512(bp), 
+                        component<BlueprintFieldType>(bp), range_proof(bp), sha512(bp), 
                         fixed_scalar_mul(bp), variable_base_mul(bp) {
 
                         j = bp.allocate_rows(6);
@@ -123,6 +123,11 @@ namespace nil {
                         range_proof.generate_gates();
                         sha512_plonk.generate_gates();
                         fixed_scalar_mul.generate_gates();
+
+                        bp.add_gate(j, x_t*(1 + CurveType::d*x_s * (-x_r)*y_s*y_r) - (x_s*y_r - x_r*y_s));
+                        bp.add_gate(j, y_t*(1 + CurveType::d*x_s * (-x_r)*y_s*y_r) - (x_s*(-x_r) + y_r*y_s));
+                        bp.add_gate(j, -x_r^2 +y_r^2 - (1 - CurveType::d*x_r^2*y_r^2));
+
                         variable_base_mul.generate_gates();
                     }
 
