@@ -20,18 +20,27 @@ Hashes library architecture consists of several parts listed below:
 5. Accumulators
 6. Value Processors
 
-@dot digraph hash_arch { color="#222222"; rankdir="TB"
+@dot digraph hash_arch { 
+bgcolor="#151515"
+rankdir="TB"
 node [shape="box"]
 
-a [label="Algorithms" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hashes_algorithms"];
-b [label="Stream Processors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hashes_stream"];
-c [label="Data Type Conversion" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hashes_data"];
-d [label="Hash Policies" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hashes_policies"];
-e [label="Constructions and Compressors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hashes_constructions_compressors"]
-; f [label="Accumulators" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hashes_accumulators"];
-g [label="Value Processors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hashes_value"];
+a [label="Algorithms" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica" URL="@ref hashes_algorithms"]; 
+b [label="Stream Processors" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica" URL="@ref hashes_stream"];
+c [label="Data Type Conversion" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica" URL="@ref hashes_data"]; 
+d [label="Hash Policies" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica" URL="@ref hashes_policies"];
+e [label="Constructions and Compressors" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica" URL="@ref hashes_constructions_compressors"]; 
+f [label="Accumulators" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica" URL="@ref hashes_accumulators"]; 
+g [label="Value Processors" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica" URL="@ref hashes_value"];
 
-a -> b; b -> c; c -> d; d -> e; e -> f; f -> g; } @enddot
+a -> b; 
+b -> c; 
+c -> d; 
+d -> e; 
+e -> f; 
+f -> g;
+
+} @enddot
 
 ## Algorithms {#hashes_algorithms}
 
@@ -101,7 +110,9 @@ to appropriate size integers (words in the cryptography meaning, not machine wor
 
 Example. Lets assume input data stream consists of 16 bytes as follows.
 
-@dot digraph bytes { bgcolor="#222222"; node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+@dot digraph bytes { 
+bgcolor="#151515"
+node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
 struct1 [label="0x00 | 0x01 | 0x02 | 0x03 | 0x04 | 0x05 | 0x06 | 0x07 | 0x08 | 0x09 | 0x10 | 0x11 | 0x12 | 0x13 | 0x14 | 0x15"]
 ;
@@ -111,7 +122,9 @@ struct1 [label="0x00 | 0x01 | 0x02 | 0x03 | 0x04 | 0x05 | 0x06 | 0x07 | 0x08 | 0
 Lets assume the selected hash to be used is SHA2 with 32 bit word size and 512 bit block size. This means input data
 stream needs to be converted to 32 bit words and merged to 512 bit blocks as follows:
 
-@dot digraph bytes_to_words { bgcolor="#222222"; node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+@dot digraph bytes_to_words { 
+bgcolor="#151515"
+node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
 struct1 [label="<b0> 0x00 |<b1> 0x01 |<b2> 0x02 |<b3> 0x03 |<b4> 0x04 |<b5> 0x05 |<b6> 0x06 |<b7> 0x07 |<b8> 0x08 |<b9> 0x09 |<b10> 0x10 |<b11> 0x11 |<b12> 0x12 |<b13> 0x13 |<b14> 0x14 |<b15> 0x15"]
 ;

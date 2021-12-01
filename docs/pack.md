@@ -70,7 +70,9 @@ std::array<uint32_t, 1> output = {0x34127856};
 
 input:
 
-@dot digraph bytes { bgcolor="#222222"; node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+@dot digraph bytes {
+bgcolor="#151515"
+node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
 struct1 [label="0x12 | 0x34 "];
 
@@ -80,7 +82,9 @@ struct2 [label="0x56 | 0x78 "];
 
 output:
 
-@dot digraph bytes { bgcolor="#222222"; node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+@dot digraph bytes {
+bgcolor="#151515"
+node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
 struct1 [label="0x34 | 0x12 | 0x78 | 0x56 "];
 
@@ -99,7 +103,9 @@ std::array<uint32_t, 2> output {0x78563412};
 
 input:
 
-@dot digraph bytes { bgcolor="#222222"; node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+@dot digraph bytes { 
+bgcolor="#151515"
+node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
 struct1 [label="0x12 | 0x34 "];
 
@@ -109,7 +115,9 @@ struct2 [label="0x56 | 0x78 "];
 
 output:
 
-@dot digraph bytes { bgcolor="#222222"; node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+@dot digraph bytes { 
+bgcolor="#151515"
+node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
 struct1 [label="0x78 | 0x56 | 0x34 | 0x12 "];
 
@@ -131,7 +139,9 @@ std::array<uint64_t, 1> output = {0x1234567890abcdef};
 
 input:
 
-@dot digraph bytes { bgcolor="#222222"; node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+@dot digraph bytes { 
+bgcolor="#151515"
+node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
 struct1 [label="0x12 | 0x34 "];
 
@@ -143,7 +153,9 @@ struct4 [label="0xcd | 0xef "]; } @enddot
 
 output:
 
-@dot digraph bytes { bgcolor="#222222"; node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+@dot digraph bytes { 
+bgcolor="#151515"
+node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
 struct1 [label="0x12 | 0x34 | 0x56 | 0x78 | 0x90 | 0xab | 0xcd | 0xef"];
 
@@ -163,7 +175,9 @@ std::array<uint16_t, 2> output = {0x482c, 0x6a1e};
 
 input:
 
-@dot digraph bytes { bgcolor="#222222"; node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+@dot digraph bytes { 
+bgcolor="#151515"
+node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
 struct1 [label="0x12"];
 
@@ -175,7 +189,9 @@ struct4 [label="0x78"]; } @enddot
 
 output:
 
-@dot digraph bytes { bgcolor="#222222"; node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+@dot digraph bytes { 
+bgcolor="#151515"
+node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
 struct1 [label="0x48 | 0x2c"];
 
