@@ -3,9 +3,9 @@
 @tableofcontents
 
 The key idea of `algebra` is to provide usefull interfaces for basic cryptography math. It's based on NilFoundation fork of 
-nil::crypto3::multiprecision and boost::integer modules as backend so that it can be used with boost cpp_int, gmp or other backends.
+Boost.Multiprecision so that it can be used with boost cpp_int, gmp or other backends.
 
-We expanded nil::crypto3::multiprecision with `modular_adaptor`, which is actually a multi-precision number by some modular. It contains 
+We expanded Boost.Multiprecision with `modular_adaptor`, which is actually a multi-precision number by some modular. It contains 
 modular number-specific algorithms using Montgomery representation. It also supports compile-time computations, because it gives 
 us opportunity to implement algebra constructions as constexpr.
 
@@ -36,14 +36,14 @@ of several parts listed below:
 
 @dot
 digraph fields_arch {
-bgcolor="#222222"
+bgcolor="#151515"
 rankdir="TB"
 node [shape="box"]
 
-  a [label="Field Policies" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref field_policies"];
-  b [label="Field Extensions" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref field_extensions"];
-  c [label="Field Parameters" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref field_parameters"];
-  d [label="Field Element Algorithms" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref field_element_algorithms"];
+  a [label="Field Policies" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica" URL="@ref field_policies"];
+  b [label="Field Extensions" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica" URL="@ref field_extensions"];
+  c [label="Field Parameters" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica" URL="@ref field_parameters"];
+  d [label="Field Element Algorithms" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica" URL="@ref field_element_algorithms"];
   
   a -> b;
   b -> c;
@@ -65,14 +65,14 @@ Fp -> Fp2 -> Fp6 -> Fp12;
 
 @dot
 digraph fp12_2over3over2_arch {
-bgcolor="#222222"
+bgcolor="#151515"
 rankdir="TB"
 node [shape="box"]
 
-  a [label="Fp12" color="#F5F2F1" fontcolor="#F5F2F1"];
-  b [label="Fp6" color="#F5F2F1" fontcolor="#F5F2F1"];
-  c [label="Fp2" color="#F5F2F1" fontcolor="#F5F2F1"];
-  d [label="Fp" color="#F5F2F1" fontcolor="#F5F2F1"];
+  a [label="Fp12" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
+  b [label="Fp6" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
+  c [label="Fp2" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
+  d [label="Fp" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
   
   a -> b;
   b -> c;
@@ -86,14 +86,14 @@ Fp -> Fp3 -> Fp6 -> Fp12;
 
 @dot
 digraph fp12_2over2over3_arch {
-bgcolor="#222222"
+bgcolor="#151515"
 rankdir="TB"
 node [shape="box"]
 
-  a [label="Fp12" color="#F5F2F1" fontcolor="#F5F2F1"];
-  b [label="Fp6" color="#F5F2F1" fontcolor="#F5F2F1"];
-  c [label="Fp3" color="#F5F2F1" fontcolor="#F5F2F1"];
-  d [label="Fp" color="#F5F2F1" fontcolor="#F5F2F1"];
+  a [label="Fp12" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
+  b [label="Fp6" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
+  c [label="Fp3" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
+  d [label="Fp"color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
   
   a -> b;
   b -> c;
@@ -105,14 +105,14 @@ Fp -> Fp2 -> Fp4 -> Fp12;
 
 @dot
 digraph fp12_3over2over2_arch {
-bgcolor="#222222"
+bgcolor="#151515"
 rankdir="TB"
 node [shape="box"]
 
-  a [label="Fp12" color="#F5F2F1" fontcolor="#F5F2F1"];
-  b [label="Fp4" color="#F5F2F1" fontcolor="#F5F2F1"];
-  c [label="Fp2" color="#F5F2F1" fontcolor="#F5F2F1"];
-  d [label="Fp" color="#F5F2F1" fontcolor="#F5F2F1"];
+  a [label="Fp12" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
+  b [label="Fp4" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
+  c [label="Fp2" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
+  d [label="Fp" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
   
   a -> b;
   b -> c;
@@ -142,13 +142,13 @@ Curves were build upon the `fields`. So it basically consist of several parts li
 
 @dot
 digraph curves_arch {
-bgcolor="#222222"
+bgcolor="#151515"
 rankdir="TB"
 node [shape="box"]
 
-  a [label="Curve Policies" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref curve_policies"];
-  b [label="Curve Element Algorithms" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref curve_element_algorithms"];
-  c [label="Basic curve policies" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref basic_curve_policies"];
+  a [label="Curve Policies" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica" URL="@ref curve_policies"];
+  b [label="Curve Element Algorithms" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica" URL="@ref curve_element_algorithms"];
+  c [label="Basic curve policies" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica" URL="@ref basic_curve_policies"];
   
   a -> b;
   b -> c;
