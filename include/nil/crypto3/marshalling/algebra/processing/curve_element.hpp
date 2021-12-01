@@ -205,7 +205,7 @@ namespace nil {
 
                         group_affine_value_type point_affine = point.to_affine();
                         // TODO: remove crating of temporary array encoded_value
-                        encoded_value_type encoded_value;
+                        encoded_value_type encoded_value {0};
                         // TODO: remove lvalue iterator
                         auto tmp_iter = std::begin(encoded_value);
                         write_data<encoded_size, endianness>(static_cast<base_integral_type>(point_affine.Y.data),
