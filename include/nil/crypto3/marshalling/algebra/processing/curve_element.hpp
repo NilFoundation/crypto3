@@ -237,7 +237,10 @@ namespace nil {
 
                     /// https://zips.z.cash/protocol/protocol.pdf#concreteextractorjubjub
                     template<typename TIter>
-                    static nil::marshalling::status_type process(const group_value_type &point, TIter &iter) {
+                    static typename std::enable_if<
+                        !std::is_same<bool, typename std::iterator_traits<TIter>::value_type>::value,
+                        nil::marshalling::status_type>::type
+                        process(const group_value_type &point, TIter &iter) {
                         write_data<params_type::bit_length(), endianness>(
                             static_cast<typename group_value_type::field_type::integral_type>(point.to_affine().X.data),
                             iter);
@@ -246,11 +249,13 @@ namespace nil {
                     }
 
                     // TODO: refactor
-                    template<>
-                    static nil::marshalling::status_type
-                        process<typename std::vector<bool>::iterator>(const group_value_type &point,
-                                                                      typename std::vector<bool>::iterator &iter) {
-                        auto X_affine = static_cast<typename group_value_type::field_type::integral_type>(point.to_affine().X.data);
+                    template<typename TIter>
+                    static typename std::enable_if<
+                        std::is_same<bool, typename std::iterator_traits<TIter>::value_type>::value,
+                        nil::marshalling::status_type>::type
+                        process(const group_value_type &point, TIter &iter) {
+                        auto X_affine =
+                            static_cast<typename group_value_type::field_type::integral_type>(point.to_affine().X.data);
                         for (std::size_t i = 0; i < params_type::bit_length(); ++i) {
                             *iter++ = bit_test(X_affine, 0);
                             X_affine >>= 1;
