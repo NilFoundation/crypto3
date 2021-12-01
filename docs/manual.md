@@ -4,7 +4,7 @@
 
 ## Basic Example
 
-```
+```cpp
 #include <string>
 
 #include <nil/crypto3/codec/base.hpp>
@@ -19,5 +19,4 @@ int main(int argc, char *argv[]) {
     
     return !(result == "V2VpcmQgR2VybWFuIDIgYnl0ZSB0aGluZzogw58u");
 }
-
 ```
