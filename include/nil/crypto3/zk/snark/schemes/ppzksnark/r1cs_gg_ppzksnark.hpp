@@ -44,25 +44,27 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
-                using is_basic_mode = typename std::integral_constant<
-                    bool,
-                    std::is_same<r1cs_gg_ppzksnark_generator<CurveType>, Generator>::value &&
-                        std::is_same<r1cs_gg_ppzksnark_prover<CurveType>, Prover>::value &&
-                        (std::is_same<r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType>, Verifier>::value ||
-                         std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>,
-                                      Verifier>::value 
-                        // || std::is_same<r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>,
-                        //               Verifier>::value
-                                      )>;
+                using is_basic_mode = typename std::bool_constant<
+                    ProvingMode::Basic == Generator::mode && ProvingMode::Basic == Prover::mode &&
+                    ProvingMode::Basic == Verifier::mode &&
+                    std::is_same<r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Basic>, Generator>::value &&
+                    std::is_same<r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Basic>, Prover>::value &&
+                    (std::is_same<r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType, ProvingMode::Basic>,
+                                  Verifier>::value ||
+                     std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Basic>,
+                                  Verifier>::value
+                     // || std::is_same<r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>,
+                     //               Verifier>::value
+                     )>;
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
-                using is_aggregate_mode = typename std::integral_constant<
-                    bool,
-                    std::is_same<r1cs_gg_ppzksnark_aggregate_generator<CurveType>, Generator>::value &&
-                        std::is_same<r1cs_gg_ppzksnark_aggregate_prover<CurveType, typename Prover::basic_prover>,
-                                     Prover>::value &&
-                        std::is_same<r1cs_gg_ppzksnark_aggregate_verifier<CurveType, typename Verifier::basic_verifier>,
-                                     Verifier>::value>;
+                using is_aggregate_mode = typename std::bool_constant<
+                    ProvingMode::Aggregate == Generator::mode && ProvingMode::Aggregate == Prover::mode &&
+                    ProvingMode::Aggregate == Verifier::mode &&
+                    std::is_same<r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Aggregate>, Generator>::value &&
+                    std::is_same<r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Aggregate>, Prover>::value &&
+                    std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Aggregate>,
+                                 Verifier>::value>;
                 /*!
                  * @brief ppzkSNARK for R1CS with a security proof in the generic group (GG) model
                  * @tparam CurveType
@@ -94,7 +96,7 @@ namespace nil {
                 template<typename CurveType, typename Generator = r1cs_gg_ppzksnark_generator<CurveType>,
                          typename Prover = r1cs_gg_ppzksnark_prover<CurveType>,
                          typename Verifier = r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>,
-                         ProvingMode mode = ProvingMode::Basic, typename = void>
+                         ProvingMode Mode = ProvingMode::Basic, typename = void>
                 class r1cs_gg_ppzksnark;
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
@@ -138,7 +140,7 @@ namespace nil {
                 class r1cs_gg_ppzksnark<
                     CurveType, Generator, Prover, Verifier, ProvingMode::Aggregate,
                     typename std::enable_if<is_aggregate_mode<CurveType, Generator, Prover, Verifier>::value>::type> {
-                        
+
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
 
                 public:

@@ -52,9 +52,9 @@ namespace nil {
                 // template<typename CurveType>
                 // typename std::enable_if<CurveType::has_affine_pairing, void>::type
                 //     test_affine_verifier(const typename r1cs_gg_ppzksnark<CurveType>::verification_key_type &vk,
-                //                          const typename r1cs_gg_ppzksnark<CurveType>::primary_input_type &primary_input,
-                //                          const typename r1cs_gg_ppzksnark<CurveType>::proof_type &proof,
-                //                          const bool expected_answer) {
+                //                          const typename r1cs_gg_ppzksnark<CurveType>::primary_input_type
+                //                          &primary_input, const typename r1cs_gg_ppzksnark<CurveType>::proof_type
+                //                          &proof, const bool expected_answer) {
                 //     const bool answer = verify<r1cs_gg_ppzksnark<
                 //         CurveType,
                 //         r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>>>(vk,
@@ -79,11 +79,10 @@ namespace nil {
                 bool run_r1cs_gg_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
 
                     using basic_proof_system = r1cs_gg_ppzksnark<CurveType>;
-                    using weak_proof_system = r1cs_gg_ppzksnark<
-                        CurveType,
-                        r1cs_gg_ppzksnark_generator<CurveType>,
-                        r1cs_gg_ppzksnark_prover<CurveType>,
-                        r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType>>;
+                    using weak_proof_system =
+                        r1cs_gg_ppzksnark<CurveType, r1cs_gg_ppzksnark_generator<CurveType>,
+                                          r1cs_gg_ppzksnark_prover<CurveType>,
+                                          r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType>>;
 
                     std::cout << "Starting generator" << std::endl;
                     typename basic_proof_system::keypair_type keypair =
@@ -120,9 +119,7 @@ namespace nil {
 
                     std::cout << "Starting weak verifier" << std::endl;
 
-                    const bool ans3 = verify<weak_proof_system>(keypair.second,
-                                                                example.primary_input,
-                                                                proof);
+                    const bool ans3 = verify<weak_proof_system>(keypair.second, example.primary_input, proof);
 
                     std::cout << "Weak verifier finished, result: " << ans3 << std::endl;
 

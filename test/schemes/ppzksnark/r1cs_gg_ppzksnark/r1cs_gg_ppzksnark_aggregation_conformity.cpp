@@ -157,11 +157,11 @@ namespace boost {
 }    // namespace boost
 
 using curve_type = curves::bls12_381;
-using scheme_type = r1cs_gg_ppzksnark<
-    curve_type, r1cs_gg_ppzksnark_aggregate_generator<curve_type>,
-    r1cs_gg_ppzksnark_aggregate_prover<curve_type, r1cs_gg_ppzksnark_prover<curve_type>>,
-    r1cs_gg_ppzksnark_aggregate_verifier<curve_type, r1cs_gg_ppzksnark_verifier_strong_input_consistency<curve_type>>,
-    ProvingMode::Aggregate>;
+using scheme_type =
+    r1cs_gg_ppzksnark<curve_type, r1cs_gg_ppzksnark_generator<curve_type, ProvingMode::Aggregate>,
+                      r1cs_gg_ppzksnark_prover<curve_type, ProvingMode::Aggregate>,
+                      r1cs_gg_ppzksnark_verifier_strong_input_consistency<curve_type, ProvingMode::Aggregate>,
+                      ProvingMode::Aggregate>;
 
 using g1_type = typename curve_type::template g1_type<>;
 using g2_type = typename curve_type::template g2_type<>;
@@ -183,8 +183,8 @@ using fq12_value_type = typename fq12_type::value_type;
 
 using fq6_value_type = typename fq12_value_type::underlying_type;
 
-using scalar_modular_type = typename scalar_field_type::number_type;
-using base_modular_type = typename curve_type::base_field_type::number_type;
+using scalar_modular_type = typename scalar_field_type::modular_type;
+using base_modular_type = typename curve_type::base_field_type::modular_type;
 
 using hash_type = hashes::sha2<256>;
 

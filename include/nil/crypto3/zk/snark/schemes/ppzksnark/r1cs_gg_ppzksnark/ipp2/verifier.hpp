@@ -30,6 +30,8 @@
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/verifier.hpp>
+
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verification_key.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prover.hpp>
@@ -350,7 +352,8 @@ namespace nil {
                                                const std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
                                                                r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>> &,
                                                const std::pair<typename CurveType::template g1_type<>::value_type,
-                                                               typename CurveType::template g1_type<>::value_type> &> &t) {
+                                                               typename CurveType::template g1_type<>::value_type> &>
+                                &t) {
                             // .write(&zab_l)
                             tr.template write<typename CurveType::gt_type>(t.template get<1>().first);
                             // .write(&zab_r)
@@ -660,11 +663,14 @@ namespace nil {
                     return pc.verify();
                 }
 
-                template<typename CurveType, typename BasicVerifier>
-                class r1cs_gg_ppzksnark_aggregate_verifier {
+                template<typename CurveType>
+                class r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Aggregate> {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
+                    typedef r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Basic>
+                        basic_verifier;
+
                 public:
-                    typedef BasicVerifier basic_verifier;
+                    static constexpr ProvingMode mode = ProvingMode::Aggregate;
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::verification_srs_type verification_srs_type;
@@ -695,7 +701,7 @@ namespace nil {
                     static inline bool process(const VerificationKey &vk,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        return BasicVerifier::process(vk, primary_input, proof);
+                        return basic_verifier::process(vk, primary_input, proof);
                     }
                 };
             }    // namespace snark

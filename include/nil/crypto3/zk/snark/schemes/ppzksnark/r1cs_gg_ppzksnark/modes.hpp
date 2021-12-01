@@ -33,6 +33,7 @@ namespace nil {
                 enum class ProvingMode {
                     Basic,
                     Aggregate,
+                    EncryptedInput,
                 };
             }    // namespace snark
         }        // namespace zk

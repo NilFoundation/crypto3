@@ -65,6 +65,10 @@
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/proof.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verification_key.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
+// #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/proving_key.hpp>
+// #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/verification_key.hpp>
+// #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/secret_key.hpp>
+// #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/proof.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -235,6 +239,66 @@ namespace nil {
                          */
                         typedef r1cs_gg_ppzksnark_aggregate_proof<CurveType> aggregate_proof_type;
                     };
+
+                    // template<typename CurveType>
+                    // struct r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::EncryptedInput> {
+                    //     typedef CurveType curve_type;
+                    //
+                    //     /******************************** Params ********************************/
+                    //
+                    //     /**
+                    //      * Below are various template aliases (used for convenience).
+                    //      */
+                    //
+                    //     typedef r1cs_constraint_system<typename curve_type::scalar_field_type> constraint_system_type;
+                    //
+                    //     typedef r1cs_primary_input<typename curve_type::scalar_field_type> primary_input_type;
+                    //
+                    //     typedef r1cs_auxiliary_input<typename curve_type::scalar_field_type> auxiliary_input_type;
+                    //
+                    //     /******************************** Proving key ********************************/
+                    //
+                    //     /**
+                    //      * A proving key for the R1CS GG-ppzkSNARK with encrypted input.
+                    //      */
+                    //     typedef r1cs_gg_ppzksnark_enc_input_proving_key<curve_type, constraint_system_type>
+                    //         proving_key_type;
+                    //
+                    //     /******************************* Verification key ****************************/
+                    //
+                    //     /**
+                    //      * A verification key for the R1CS GG-ppzkSNARK with encrypted input.
+                    //      */
+                    //     typedef r1cs_gg_ppzksnark_enc_input_verification_key<curve_type> verification_key_type;
+                    //
+                    //     /************************ Processed verification key *************************/
+                    //
+                    //     /**
+                    //      * A secret key for the R1CS GG-ppzkSNARK with encrypted input.
+                    //      */
+                    //     typedef r1cs_gg_ppzksnark_enc_input_secret_key<curve_type> secret_key_type;
+                    //
+                    //     /********************************** Key pair *********************************/
+                    //
+                    //     /**
+                    //      * A key pair for the R1CS GG-ppzkSNARK with encrypted input, which consists of proving, secret
+                    //      * and verification keys.
+                    //      */
+                    //     typedef r1cs_gg_ppzksnark_keypair<
+                    //         r1cs_gg_ppzksnark_keypair<proving_key_type, verification_key_type>, secret_key_type>
+                    //         keypair_type;
+                    //
+                    //     /*********************************** Proof ***********************************/
+                    //
+                    //     /**
+                    //      * A proof for the R1CS GG-ppzkSNARK.
+                    //      *
+                    //      * While the proof has a structure, externally one merely opaquely produces,
+                    //      * serializes/deserializes, and verifies proofs. We only expose some information
+                    //      * about the structure for statistics purposes.
+                    //      */
+                    //     typedef r1cs_gg_ppzksnark_proof<CurveType> proof_type;
+                    // };
                 }    // namespace detail
             }        // namespace snark
         }            // namespace zk
