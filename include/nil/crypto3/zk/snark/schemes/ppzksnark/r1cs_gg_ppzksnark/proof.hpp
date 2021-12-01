@@ -29,14 +29,19 @@
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
+                struct r1cs_gg_ppzksnark_proof;
+
                 template<typename CurveType>
-                struct r1cs_gg_ppzksnark_proof {
+                struct r1cs_gg_ppzksnark_proof<CurveType, ProvingMode::Basic> {
                     typedef CurveType curve_type;
+                    static constexpr ProvingMode mode = ProvingMode::Basic;
 
                     typename CurveType::template g1_type<>::value_type g_A;
                     typename CurveType::template g2_type<>::value_type g_B;

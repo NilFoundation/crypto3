@@ -510,7 +510,7 @@ namespace nil {
                                  typename std::iterator_traits<InputTranscriptIncludeIterator>::value_type>::value &&
                         std::is_same<typename std::iterator_traits<InputProofIterator>::value_type,
                                      r1cs_gg_ppzksnark_proof<CurveType>>::value,
-                    r1cs_gg_ppzksnark_aggregate_proof<CurveType>>::type
+                    r1cs_gg_ppzksnark_proof<CurveType, ProvingMode::Aggregate>>::type
                     aggregate_proofs(const r1cs_gg_ppzksnark_aggregate_proving_srs<CurveType> &srs,
                                      InputTranscriptIncludeIterator tr_include_first,
                                      InputTranscriptIncludeIterator tr_include_last, InputProofIterator proofs_first,

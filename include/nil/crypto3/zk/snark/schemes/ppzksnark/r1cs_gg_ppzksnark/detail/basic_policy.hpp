@@ -81,6 +81,7 @@ namespace nil {
                     template<typename CurveType>
                     struct r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> {
                         typedef CurveType curve_type;
+                        static constexpr ProvingMode mode = ProvingMode::Basic;
 
                         /******************************** Params ********************************/
 
@@ -99,14 +100,15 @@ namespace nil {
                         /**
                          * A proving key for the R1CS GG-ppzkSNARK.
                          */
-                        typedef r1cs_gg_ppzksnark_proving_key<curve_type, constraint_system_type> proving_key_type;
+                        typedef r1cs_gg_ppzksnark_proving_key<curve_type, mode, constraint_system_type>
+                            proving_key_type;
 
                         /******************************* Verification key ****************************/
 
                         /**
                          * A verification key for the R1CS GG-ppzkSNARK.
                          */
-                        typedef r1cs_gg_ppzksnark_verification_key<curve_type> verification_key_type;
+                        typedef r1cs_gg_ppzksnark_verification_key<curve_type, mode> verification_key_type;
 
                         /************************ Processed verification key *************************/
 
@@ -117,7 +119,7 @@ namespace nil {
                          * contains a small constant amount of additional pre-computed information that
                          * enables a faster verification time.
                          */
-                        typedef r1cs_gg_ppzksnark_processed_verification_key<curve_type>
+                        typedef r1cs_gg_ppzksnark_processed_verification_key<curve_type, mode>
                             processed_verification_key_type;
 
                         /********************************** Key pair *********************************/
@@ -142,6 +144,7 @@ namespace nil {
                     template<typename CurveType>
                     struct r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> {
                         typedef CurveType curve_type;
+                        static constexpr ProvingMode mode = ProvingMode::Aggregate;
 
                         /******************************** Params ********************************/
 
@@ -160,14 +163,15 @@ namespace nil {
                         /**
                          * A proving key for the R1CS GG-ppzkSNARK.
                          */
-                        typedef r1cs_gg_ppzksnark_proving_key<curve_type, constraint_system_type> proving_key_type;
+                        typedef r1cs_gg_ppzksnark_proving_key<curve_type, ProvingMode::Basic, constraint_system_type>
+                            proving_key_type;
 
                         /******************************* Verification key ****************************/
 
                         /**
                          * A verification key for the R1CS GG-ppzkSNARK.
                          */
-                        typedef r1cs_gg_ppzksnark_aggregate_verification_key<curve_type> verification_key_type;
+                        typedef r1cs_gg_ppzksnark_verification_key<curve_type, mode> verification_key_type;
 
                         /************************ Processed verification key *************************/
 
@@ -193,7 +197,7 @@ namespace nil {
                         /**
                          * A SRS (Structured Reference String) for the R1CS GG-ppzkSNARK aggregation scheme.
                          */
-                        typedef r1cs_gg_pp_zksnark_aggregate_srs<CurveType> srs_type;
+                        typedef r1cs_gg_ppzksnark_srs<CurveType, mode> srs_type;
 
                         /******************************** Proving SRS for aggregation ********************************/
 
@@ -226,7 +230,7 @@ namespace nil {
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        typedef r1cs_gg_ppzksnark_proof<CurveType> proof_type;
+                        typedef r1cs_gg_ppzksnark_proof<CurveType, ProvingMode::Basic> proof_type;
 
                         /*********************************** Aggregated proof ***********************************/
 
@@ -237,7 +241,7 @@ namespace nil {
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        typedef r1cs_gg_ppzksnark_aggregate_proof<CurveType> aggregate_proof_type;
+                        typedef r1cs_gg_ppzksnark_proof<CurveType, ProvingMode::Aggregate> aggregate_proof_type;
                     };
 
                     // template<typename CurveType>
@@ -250,7 +254,8 @@ namespace nil {
                     //      * Below are various template aliases (used for convenience).
                     //      */
                     //
-                    //     typedef r1cs_constraint_system<typename curve_type::scalar_field_type> constraint_system_type;
+                    //     typedef r1cs_constraint_system<typename curve_type::scalar_field_type>
+                    //     constraint_system_type;
                     //
                     //     typedef r1cs_primary_input<typename curve_type::scalar_field_type> primary_input_type;
                     //
@@ -281,7 +286,8 @@ namespace nil {
                     //     /********************************** Key pair *********************************/
                     //
                     //     /**
-                    //      * A key pair for the R1CS GG-ppzkSNARK with encrypted input, which consists of proving, secret
+                    //      * A key pair for the R1CS GG-ppzkSNARK with encrypted input, which consists of proving,
+                    //      secret
                     //      * and verification keys.
                     //      */
                     //     typedef r1cs_gg_ppzksnark_keypair<

@@ -32,6 +32,7 @@
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/keypair.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -109,6 +110,9 @@ namespace nil {
                     typename CurveType::template g2_type<>::value_type h_beta;
                 };
 
+                template<typename CurveType, ProvingMode Mode>
+                struct r1cs_gg_ppzksnark_srs;
+
                 /// It contains the maximum number of raw elements of the SRS needed to aggregate and verify
                 /// Groth16 proofs. One can derive specialized prover and verifier key for _specific_ size of
                 /// aggregations by calling `srs.specialize(n)`. The specialized prover key also contains
@@ -117,8 +121,9 @@ namespace nil {
                 /// ,in other words from two distinct Groth16 CRS.
                 /// See [there](https://github.com/nikkolasg/taupipp) a way on how to generate this GenesisSRS.
                 template<typename CurveType>
-                struct r1cs_gg_pp_zksnark_aggregate_srs {
+                struct r1cs_gg_ppzksnark_srs<CurveType, ProvingMode::Aggregate> {
                     typedef CurveType curve_type;
+                    static constexpr ProvingMode mode = ProvingMode::Aggregate;
                     typedef typename curve_type::scalar_field_type scalar_field_type;
                     typedef typename curve_type::template g1_type<> g1_type;
                     typedef typename curve_type::template g2_type<> g2_type;
@@ -139,9 +144,9 @@ namespace nil {
                     /// $\{h^b^i\}_{i=0}^{N}$ where N is the smallest size of the two Groth16 CRS.
                     std::vector<g2_value_type> h_beta_powers;
 
-                    r1cs_gg_pp_zksnark_aggregate_srs() = default;
-                    r1cs_gg_pp_zksnark_aggregate_srs(std::size_t num_proofs, const scalar_field_value_type &alpha,
-                                                     const scalar_field_value_type &beta) :
+                    r1cs_gg_ppzksnark_srs() = default;
+                    r1cs_gg_ppzksnark_srs(std::size_t num_proofs, const scalar_field_value_type &alpha,
+                                          const scalar_field_value_type &beta) :
                         g_alpha_powers(structured_generators_scalar_power<g1_type>(2 * num_proofs, alpha)),
                         h_alpha_powers(structured_generators_scalar_power<g2_type>(2 * num_proofs, alpha)),
                         g_beta_powers(structured_generators_scalar_power<g1_type>(2 * num_proofs, beta)),

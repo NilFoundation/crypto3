@@ -899,7 +899,7 @@ BOOST_AUTO_TEST_CASE(bls381_prove_commitment_test) {
             fq_value_type::one()));
 
     // setup_fake_srs
-    r1cs_gg_pp_zksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
+    r1cs_gg_ppzksnark_srs<curve_type, ProvingMode::Aggregate> srs(n, alpha, beta);
     auto [pk, vk] = srs.specialize(n);
 
     kzg_opening<g2_type> comm_v = prove_commitment_v<curve_type>(pk.h_alpha_powers.begin(),
@@ -2029,7 +2029,7 @@ BOOST_AUTO_TEST_CASE(bls381_prove_tipp_mipp_test) {
         0x66d3bcd37b8ce4dbc7efc5bcbb6111f5593c2a173f60a2935bf958efcc099c88_cppui255;
     constexpr scalar_field_value_type beta =
         0x01f39625fe789118b73750642f16a60224a2a86a4d0487a0df75795c3269e3fd_cppui255;
-    r1cs_gg_pp_zksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
+    r1cs_gg_ppzksnark_srs<curve_type, ProvingMode::Aggregate> srs(n, alpha, beta);
     auto [pk, vk] = srs.specialize(n);
 
     tipp_mipp_proof<curve_type> tmp =
@@ -2671,7 +2671,7 @@ BOOST_AUTO_TEST_CASE(bls381_aggregate_proofs) {
         0x57aa5df37b9bd97a5e5f84f4797eac33e5ebe0c6e2ca2fbca1b3b3d7052ce35d_cppui255;
     constexpr scalar_field_value_type beta =
         0x43131d0617d95a6fbd46c1f9055f60e8028acaae2e6e7e500a471ed47553ecfe_cppui255;
-    r1cs_gg_pp_zksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
+    r1cs_gg_ppzksnark_srs<curve_type, ProvingMode::Aggregate> srs(n, alpha, beta);
     auto [pk, vk] = srs.specialize(n);
 
     r1cs_gg_ppzksnark_proof<curve_type> proof0 {
@@ -2815,7 +2815,7 @@ BOOST_AUTO_TEST_CASE(bls381_aggregate_proofs) {
 
     std::array<std::uint8_t, 3> tr_inc {1, 2, 3};
 
-    // r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof =
+    // r1cs_gg_ppzksnark_proof<curve_type, ProvingMode::Aggregate> agg_proof =
     //     aggregate_proofs<curve_type>(pk, tr_inc.begin(), tr_inc.end(), proofs_vec.begin(), proofs_vec.end());
     auto agg_proof =
         prove<scheme_type, hashes::sha2<256>>(pk, tr_inc.begin(), tr_inc.end(), proofs_vec.begin(), proofs_vec.end());
@@ -3580,7 +3580,7 @@ BOOST_AUTO_TEST_CASE(bls381_verification) {
         0x43131d0617d95a6fbd46c1f9055f60e8028acaae2e6e7e500a471ed47553ecfe_cppui255;
 
     // setup_fake_srs
-    r1cs_gg_pp_zksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
+    r1cs_gg_ppzksnark_srs<curve_type, ProvingMode::Aggregate> srs(n, alpha, beta);
     auto [pk, vk] = srs.specialize(n);
 
     std::vector<G2_value_type> pk_vkey_a = {
@@ -3890,8 +3890,8 @@ BOOST_AUTO_TEST_CASE(bls381_verification) {
     };
     accumulation_vector<g1_type> vk_acc_ic(std::forward<G1_value_type>(vk_ic[0]),
                                            std::vector<G1_value_type>(vk_ic.begin() + 1, vk_ic.end()));
-    r1cs_gg_ppzksnark_aggregate_verification_key<curve_type> pvk(vk_alpha_g1, vk_beta_g2, vk_gamma_g2, vk_delta_g2,
-                                                                 vk_acc_ic);
+    r1cs_gg_ppzksnark_verification_key<curve_type, ProvingMode::Aggregate> pvk(vk_alpha_g1, vk_beta_g2, vk_gamma_g2,
+                                                                               vk_delta_g2, vk_acc_ic);
 
     r1cs_gg_ppzksnark_proof<curve_type> proof0(
         G1_value_type(
@@ -4141,7 +4141,7 @@ BOOST_AUTO_TEST_CASE(bls381_verification) {
     };
     std::vector<std::uint8_t> tr_include {1, 2, 3};
 
-    // r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof =
+    // r1cs_gg_ppzksnark_proof<curve_type, ProvingMode::Aggregate> agg_proof =
     //     aggregate_proofs<curve_type>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());
     auto agg_proof =
         prove<scheme_type, hashes::sha2<256>>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());
@@ -4916,7 +4916,7 @@ BOOST_AUTO_TEST_CASE(bls381_verification) {
 
     // 3. aggregate invalid proof content (random A, B, and C)
     proofs[0].g_A = random_element<g1_type>();
-    r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof_rand_a =
+    r1cs_gg_ppzksnark_proof<curve_type, ProvingMode::Aggregate> agg_proof_rand_a =
         aggregate_proofs<curve_type>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());
     // BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof_rand_a, tr_include.begin(),
     // tr_include.end()));
@@ -4926,7 +4926,7 @@ BOOST_AUTO_TEST_CASE(bls381_verification) {
     proofs[0].g_A = proof0.g_A;
 
     proofs[0].g_B = random_element<g2_type>();
-    r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof_rand_b =
+    r1cs_gg_ppzksnark_proof<curve_type, ProvingMode::Aggregate> agg_proof_rand_b =
         aggregate_proofs<curve_type>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());
     // BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof_rand_b, tr_include.begin(),
     // tr_include.end()));
@@ -4936,7 +4936,7 @@ BOOST_AUTO_TEST_CASE(bls381_verification) {
     proofs[0].g_B = proof0.g_B;
 
     proofs[0].g_C = random_element<g1_type>();
-    r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof_rand_c =
+    r1cs_gg_ppzksnark_proof<curve_type, ProvingMode::Aggregate> agg_proof_rand_c =
         aggregate_proofs<curve_type>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());
     // BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof_rand_c, tr_include.begin(),
     // tr_include.end()));
@@ -4973,7 +4973,7 @@ BOOST_AUTO_TEST_CASE(bls381_verification_mimc) {
         0x252c17e40f6978eddcfcf95e3134923554ff29176eba269cfa22d647230b12a8_cppui255;
 
     // setup_fake_srs
-    r1cs_gg_pp_zksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
+    r1cs_gg_ppzksnark_srs<curve_type, ProvingMode::Aggregate> srs(n, alpha, beta);
     auto [pk, vk] = srs.specialize(n);
 
     r1cs_gg_ppzksnark_proof<curve_type> proof0(
@@ -5197,8 +5197,8 @@ BOOST_AUTO_TEST_CASE(bls381_verification_mimc) {
     };
     accumulation_vector<g1_type> vk_acc_ic(std::forward<G1_value_type>(vk_ic[0]),
                                            std::vector<G1_value_type>(vk_ic.begin() + 1, vk_ic.end()));
-    r1cs_gg_ppzksnark_aggregate_verification_key<curve_type> pvk(vk_alpha_g1, vk_beta_g2, vk_gamma_g2, vk_delta_g2,
-                                                                 vk_acc_ic);
+    r1cs_gg_ppzksnark_verification_key<curve_type, ProvingMode::Aggregate> pvk(vk_alpha_g1, vk_beta_g2, vk_gamma_g2,
+                                                                               vk_delta_g2, vk_acc_ic);
 
     auto agg_proof =
         prove<scheme_type, hashes::sha2<256>>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());

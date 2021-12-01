@@ -28,16 +28,24 @@
 
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
                 template<typename CurveType,
+                         ProvingMode Mode = ProvingMode::Basic,
                          typename ConstraintSystem = r1cs_constraint_system<typename CurveType::scalar_field_type>>
-                struct r1cs_gg_ppzksnark_proving_key {
+                struct r1cs_gg_ppzksnark_proving_key;
+
+                template<typename CurveType>
+                struct r1cs_gg_ppzksnark_proving_key<CurveType,
+                                                     ProvingMode::Basic,
+                                                     r1cs_constraint_system<typename CurveType::scalar_field_type>> {
                     typedef CurveType curve_type;
-                    typedef ConstraintSystem constraint_system_type;
+                    static constexpr ProvingMode mode = ProvingMode::Basic;
+                    typedef r1cs_constraint_system<typename CurveType::scalar_field_type> constraint_system_type;
 
                     typename CurveType::template g1_type<>::value_type alpha_g1;
                     typename CurveType::template g1_type<>::value_type beta_g1;

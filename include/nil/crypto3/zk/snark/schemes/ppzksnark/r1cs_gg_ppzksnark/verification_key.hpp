@@ -32,14 +32,22 @@
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
+                struct r1cs_gg_ppzksnark_verification_key;
+
+                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
+                struct r1cs_gg_ppzksnark_processed_verification_key;
+
                 template<typename CurveType>
-                struct r1cs_gg_ppzksnark_verification_key {
+                struct r1cs_gg_ppzksnark_verification_key<CurveType, ProvingMode::Basic> {
                     typedef CurveType curve_type;
+                    static constexpr ProvingMode mode = ProvingMode::Basic;
 
                     typename CurveType::gt_type::value_type alpha_g1_beta_g2;
                     typename CurveType::template g2_type<>::value_type gamma_g2;
@@ -83,8 +91,9 @@ namespace nil {
                 };
 
                 template<typename CurveType>
-                struct r1cs_gg_ppzksnark_processed_verification_key {
+                struct r1cs_gg_ppzksnark_processed_verification_key<CurveType, ProvingMode::Basic> {
                     typedef CurveType curve_type;
+                    static constexpr ProvingMode mode = ProvingMode::Basic;
                     typedef typename algebra::pairing::pairing_policy<CurveType> pairing_policy;
 
                     typename CurveType::gt_type::value_type vk_alpha_g1_beta_g2;

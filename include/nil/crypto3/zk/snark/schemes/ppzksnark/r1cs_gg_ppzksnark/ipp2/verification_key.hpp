@@ -35,8 +35,9 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename CurveType>
-                struct r1cs_gg_ppzksnark_aggregate_verification_key {
+                struct r1cs_gg_ppzksnark_verification_key<CurveType, ProvingMode::Aggregate> {
                     typedef CurveType curve_type;
+                    static constexpr ProvingMode mode = ProvingMode::Aggregate;
 
                     typename curve_type::template g1_type<>::value_type alpha_g1;
                     typename curve_type::template g2_type<>::value_type beta_g2;
@@ -45,8 +46,8 @@ namespace nil {
 
                     accumulation_vector<typename CurveType::template g1_type<>> gamma_ABC_g1;
 
-                    r1cs_gg_ppzksnark_aggregate_verification_key() = default;
-                    r1cs_gg_ppzksnark_aggregate_verification_key(
+                    r1cs_gg_ppzksnark_verification_key() = default;
+                    r1cs_gg_ppzksnark_verification_key(
                         const typename curve_type::template g1_type<>::value_type &alpha_g1,
                         const typename curve_type::template g2_type<>::value_type &beta_g2,
                         const typename curve_type::template g2_type<>::value_type &gamma_g2,
@@ -56,14 +57,14 @@ namespace nil {
                         beta_g2(beta_g2), gamma_g2(gamma_g2), delta_g2(delta_g2), gamma_ABC_g1(gamma_ABC_g1) {
                     }
 
-                    bool operator==(const r1cs_gg_ppzksnark_aggregate_verification_key &other) const {
+                    bool operator==(const r1cs_gg_ppzksnark_verification_key &other) const {
                         return (this->alpha_g1 == other.alpha_g1 && this->beta_g2 == other.beta_g2 &&
                                 this->gamma_g2 == other.gamma_g2 && this->delta_g2 == other.delta_g2 &&
                                 this->gamma_ABC_g1 == other.gamma_ABC_g1);
                     }
 
-                    operator r1cs_gg_ppzksnark_verification_key<curve_type>() const {
-                        return r1cs_gg_ppzksnark_verification_key<curve_type>(
+                    explicit operator r1cs_gg_ppzksnark_verification_key<curve_type, ProvingMode::Basic>() const {
+                        return r1cs_gg_ppzksnark_verification_key<curve_type, ProvingMode::Basic>(
                             algebra::pair_reduced<curve_type>(alpha_g1, beta_g2, gamma_g2, delta_g2, gamma_ABC_g1));
                     }
                 };
