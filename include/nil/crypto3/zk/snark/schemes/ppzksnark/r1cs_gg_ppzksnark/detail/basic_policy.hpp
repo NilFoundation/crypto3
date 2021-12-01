@@ -67,7 +67,6 @@
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 // #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/proving_key.hpp>
 // #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/verification_key.hpp>
-// #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/secret_key.hpp>
 // #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/proof.hpp>
 
 namespace nil {
@@ -122,12 +121,41 @@ namespace nil {
                         typedef r1cs_gg_ppzksnark_processed_verification_key<curve_type, mode>
                             processed_verification_key_type;
 
+                        /************************ Extended verification key *************************/
+
+                        /**
+                         * An extended verification key for the R1CS GG-ppzkSNARK.
+                         *
+                         * Compared to a (non-extended) verification key, an extended verification key
+                         * contains additional field.
+                         */
+                        typedef r1cs_gg_ppzksnark_extended_verification_key<curve_type, mode>
+                            extended_verification_key_type;
+
                         /********************************** Key pair *********************************/
 
                         /**
                          * A key pair for the R1CS GG-ppzkSNARK, which consists of a proving key and a verification key.
                          */
                         typedef r1cs_gg_ppzksnark_keypair<proving_key_type, verification_key_type> keypair_type;
+
+                        /********************************** Key pair *********************************/
+
+                        /**
+                         * A key pair for the R1CS GG-ppzkSNARK, which consists of a proving key and a processed
+                         * verification key.
+                         */
+                        typedef r1cs_gg_ppzksnark_keypair<proving_key_type, processed_verification_key_type>
+                            processed_keypair_type;
+
+                        /********************************** Extended key pair *********************************/
+
+                        /**
+                         * A key pair for the R1CS GG-ppzkSNARK, which consists of a proving key and an extended
+                         * verification key.
+                         */
+                        typedef r1cs_gg_ppzksnark_keypair<proving_key_type, extended_verification_key_type>
+                            extended_keypair_type;
 
                         /*********************************** Proof ***********************************/
 
@@ -247,6 +275,7 @@ namespace nil {
                     // template<typename CurveType>
                     // struct r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::EncryptedInput> {
                     //     typedef CurveType curve_type;
+                    //     static constexpr ProvingMode mode = ProvingMode::EncryptedInput;
                     //
                     //     /******************************** Params ********************************/
                     //
@@ -254,8 +283,7 @@ namespace nil {
                     //      * Below are various template aliases (used for convenience).
                     //      */
                     //
-                    //     typedef r1cs_constraint_system<typename curve_type::scalar_field_type>
-                    //     constraint_system_type;
+                    //     typedef r1cs_constraint_system<typename curve_type::scalar_field_type> constraint_system_type;
                     //
                     //     typedef r1cs_primary_input<typename curve_type::scalar_field_type> primary_input_type;
                     //
@@ -266,7 +294,7 @@ namespace nil {
                     //     /**
                     //      * A proving key for the R1CS GG-ppzkSNARK with encrypted input.
                     //      */
-                    //     typedef r1cs_gg_ppzksnark_enc_input_proving_key<curve_type, constraint_system_type>
+                    //     typedef r1cs_gg_ppzksnark_proving_key<curve_type, mode, constraint_system_type>
                     //         proving_key_type;
                     //
                     //     /******************************* Verification key ****************************/
@@ -274,14 +302,7 @@ namespace nil {
                     //     /**
                     //      * A verification key for the R1CS GG-ppzkSNARK with encrypted input.
                     //      */
-                    //     typedef r1cs_gg_ppzksnark_enc_input_verification_key<curve_type> verification_key_type;
-                    //
-                    //     /************************ Processed verification key *************************/
-                    //
-                    //     /**
-                    //      * A secret key for the R1CS GG-ppzkSNARK with encrypted input.
-                    //      */
-                    //     typedef r1cs_gg_ppzksnark_enc_input_secret_key<curve_type> secret_key_type;
+                    //     typedef r1cs_gg_ppzksnark_verification_key<curve_type, mode> verification_key_type;
                     //
                     //     /********************************** Key pair *********************************/
                     //
@@ -290,9 +311,7 @@ namespace nil {
                     //      secret
                     //      * and verification keys.
                     //      */
-                    //     typedef r1cs_gg_ppzksnark_keypair<
-                    //         r1cs_gg_ppzksnark_keypair<proving_key_type, verification_key_type>, secret_key_type>
-                    //         keypair_type;
+                    //     typedef r1cs_gg_ppzksnark_keypair<proving_key_type, verification_key_type> keypair_type;
                     //
                     //     /*********************************** Proof ***********************************/
                     //
@@ -303,7 +322,7 @@ namespace nil {
                     //      * serializes/deserializes, and verifies proofs. We only expose some information
                     //      * about the structure for statistics purposes.
                     //      */
-                    //     typedef r1cs_gg_ppzksnark_proof<CurveType> proof_type;
+                    //     typedef r1cs_gg_ppzksnark_proof<CurveType, mode> proof_type;
                     // };
                 }    // namespace detail
             }        // namespace snark

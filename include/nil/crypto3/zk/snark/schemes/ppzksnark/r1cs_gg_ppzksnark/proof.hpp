@@ -35,13 +35,16 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
+                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic, typename = void>
                 struct r1cs_gg_ppzksnark_proof;
 
-                template<typename CurveType>
-                struct r1cs_gg_ppzksnark_proof<CurveType, ProvingMode::Basic> {
+                template<typename CurveType, ProvingMode Mode>
+                struct r1cs_gg_ppzksnark_proof<
+                    CurveType,
+                    Mode,
+                    typename std::enable_if<ProvingMode::Basic == Mode || ProvingMode::EncryptedInput == Mode>::type> {
                     typedef CurveType curve_type;
-                    static constexpr ProvingMode mode = ProvingMode::Basic;
+                    static constexpr ProvingMode mode = Mode;
 
                     typename CurveType::template g1_type<>::value_type g_A;
                     typename CurveType::template g2_type<>::value_type g_B;

@@ -117,8 +117,9 @@ namespace nil {
                     typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
-                    static inline keypair_type generate(const constraint_system_type &constraint_system) {
-                        return Generator::process(constraint_system);
+                    template<typename KeyPairType>
+                    static inline KeyPairType generate(const constraint_system_type &constraint_system) {
+                        return Generator::template process<KeyPairType>(constraint_system);
                     }
 
                     static inline proof_type prove(const proving_key_type &pk,
