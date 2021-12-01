@@ -23,12 +23,21 @@ Pubkey library architecture consists of several parts listed below:
 
 The execution of any asymmetric operation (signing, verification, aggregation etc.) go through the following steps:
 
-@dot digraph hash_arch { color="#222222"; rankdir="TB"
+@dot digraph hash_arch {
+bgcolor="#151515"
+rankdir="TB"
+
 node [shape="box"]
 
-a [label="Algorithm"]; b [label="Accumulator"]; c [label="Processing Mode"]; d [label="Scheme Policies"];
+a [label="Algorithm" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"]; 
+b [label="Accumulator" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"]; 
+c [label="Processing Mode" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"]; 
+d [label="Scheme Policies" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
-a -> b; b -> c; c -> d; } @enddot
+a -> b; b -> c; c -> d;
+
+} 
+@enddot
 
 Detailed descriptions of each step and architecture parts are presented below.
 

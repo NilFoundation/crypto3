@@ -91,14 +91,18 @@ using namespace nil::crypto3::multiprecision;
     using signing_acc = typename boost::mpl::front<typename signing_acc_set::features_type>::type;  
 
 int main() {
-    sstd::string msg_str = "hello world";
+    std::string msg_str = "hello world";
     std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
+    
     privkey_type sk = privkey_type(random_element<typename _privkey_type::field_type>());
     pubkey_type &pubkey = sk;
     signing_acc_set sign_acc(sk);
-    ::nil::crypto3::sign<scheme_type>(msg, sign_acc);
+    
+    nil::crypto3::sign<scheme_type>(msg, sign_acc);
+    
     signature_type sig = boost::accumulators::extract_result<signing_acc>(sign_acc);
     verification_acc_set verify_acc(pubkey, nil::crypto3::accumulators::signature = sig);
+    
     return !(nil::crypto3::verify<scheme_type>(msg, verify_acc));
 }
 ```
