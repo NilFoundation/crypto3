@@ -34,7 +34,7 @@ namespace nil {
         template<typename TInputEndian, typename TOutputEndian, typename SinglePassRange>
         range_repack_impl<TInputEndian, TOutputEndian, typename SinglePassRange::const_iterator> repack(const SinglePassRange &val, status_type &status) {
 
-            return range_repack_impl<TOutputEndian, TOutputEndian, typename SinglePassRange::const_iterator>(val, status);
+            return range_repack_impl<TInputEndian, TOutputEndian, typename SinglePassRange::const_iterator>(val, status);
         }
     }    // namespace marshalling
 }    // namespace nil

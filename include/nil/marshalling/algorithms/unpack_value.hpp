@@ -46,11 +46,10 @@
 namespace nil {
     namespace marshalling {
 
-        template <typename TEndian, typename TInput>
+        template <typename TInput>
         struct value_unpack_impl {
             status_type *status;
             TInput input;
-            size_t count_elements;
 
             value_unpack_impl(const TInput &input, status_type &status) {
                 this->input = input;
@@ -58,12 +57,17 @@ namespace nil {
             }
 
             inline operator std::vector<std::uint8_t>() {
-                using marshalling_type = typename is_compatible<TInput>::template type<TEndian>;
-
-                marshalling_type m_val = marshalling_type(input);
-                std::vector<std::uint8_t> result(m_val.length());
+                std::vector<std::uint8_t> result(input.length());
                 typename std::vector<std::uint8_t>::iterator buffer_begin = result.begin();
-                status = m_val.write(buffer_begin, result.size());
+                *status = input.write(buffer_begin, result.size());
+
+                return result;
+            }
+
+            inline operator std::vector<char>() {
+                std::vector<char> result(input.length());
+                typename std::vector<char>::iterator buffer_begin = result.begin();
+                *status = input.write(buffer_begin, result.size());
 
                 return result;
             }

@@ -2,6 +2,7 @@
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
 //
 // MIT License
 //
@@ -236,8 +237,7 @@ BOOST_AUTO_TEST_CASE(lubb_to_bubb_1) {
     std::uint64_t res = 0x34127856ab90efcd;
 
     status_type status;
-    std::uint64_t out = repack<option::little_endian, option::big_endian, 
-        std::vector<std::uint16_t>, std::uint64_t>(in, status);
+    std::uint64_t out = repack<option::little_endian, option::big_endian>(in, status);
 
     BOOST_CHECK(status == status_type::success);
 

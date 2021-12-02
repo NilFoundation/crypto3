@@ -38,11 +38,11 @@
 
 namespace nil {
     namespace marshalling {
-//        template<typename TEndian, typename TInput, typename = typename std::enable_if<is_compatible<TInput>::value>::type>
-//        value_unpack_impl<TEndian, TInput> unpack(const TInput &input, status_type &status) {
-//
-//            return value_unpack_impl<TEndian, TInput>(input, status);
-//        }
+        template<typename TInput, typename = typename std::enable_if<marshalling::is_marshalling_type<TInput>::value>::type>
+        value_unpack_impl<TInput> unpack(const TInput &input, status_type &status) {
+
+            return value_unpack_impl<TInput>(input, status);
+        }
 
         template<typename TEndian, typename SinglePassRange>
         range_unpack_impl<TEndian, typename SinglePassRange::const_iterator> unpack(const SinglePassRange &r, status_type &status) {

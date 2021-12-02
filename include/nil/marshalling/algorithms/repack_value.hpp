@@ -67,11 +67,11 @@ namespace nil {
             }
 
             template<typename T>
-            inline operator std::vector<T>() {
+            inline operator T() {
                 status_type result_status_unpack, result_status_pack;
 
                 std::vector<std::uint8_t> buffer = unpack<TInputEndian>(iterator, count_elements, result_status_unpack);
-                std::vector<T> result = pack<TOutputEndian>(buffer, result_status_pack);
+                T result = pack<TOutputEndian>(buffer, result_status_pack);
                 *status = result_status_pack | result_status_unpack;
 
                 return result;
