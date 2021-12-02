@@ -27,18 +27,14 @@
 #ifndef MARSHALLING_REPACK_NEW_HPP
 #define MARSHALLING_REPACK_NEW_HPP
 
-#include <nil/marshalling/algorithms/unpack_new.hpp>
-#include <nil/marshalling/algorithms/pack_new.hpp>
+#include <nil/marshalling/algorithms/repack_value.hpp>
 
 namespace nil {
     namespace marshalling {
         template<typename TInputEndian, typename TOutputEndian, typename SinglePassRange>
-            range_pack_impl<TOutputEndian, std::vector<std::uint8_t>::const_iterator> repack(const SinglePassRange &val, status_type &status) {
+        range_repack_impl<TInputEndian, TOutputEndian, typename SinglePassRange::const_iterator> repack(const SinglePassRange &val, status_type &status) {
 
-            status_type result_status;
-            std::vector<std::uint8_t> buffer = unpack<TInputEndian>(val, result_status);
-
-            return range_pack_impl<TOutputEndian, std::vector<std::uint8_t>::const_iterator>(buffer, status);
+            return range_repack_impl<TOutputEndian, TOutputEndian, typename SinglePassRange::const_iterator>(val, status);
         }
     }    // namespace marshalling
 }    // namespace nil

@@ -45,9 +45,9 @@
 #include <nil/marshalling/types/no_value.hpp>
 #include <nil/marshalling/types/variant.hpp>
 
-#include <nil/marshalling/algorithms/unpack.hpp>
-#include <nil/marshalling/algorithms/pack.hpp>
-#include <nil/marshalling/algorithms/repack.hpp>
+#include <nil/marshalling/algorithms/unpack_new.hpp>
+#include <nil/marshalling/algorithms/pack_new.hpp>
+#include <nil/marshalling/algorithms/repack_new.hpp>
 
 #include <cstdio>
 
@@ -61,12 +61,12 @@ BOOST_AUTO_TEST_CASE(be_to_be_1) {
     std::vector<std::uint16_t> res = {{0x1234, 0x5678}};
 
     status_type status;
-    std::vector<std::uint16_t> out = pack<option::big_endian, std::vector<std::uint16_t>>(in, status);
+    std::vector<std::uint16_t> out = pack<option::big_endian>(in, status);
 
     BOOST_CHECK(status == status_type::success);
     BOOST_CHECK(out.size() == res.size());
 
-    for (auto it = out.begin(), res_it = res.begin(); it != out.end(), res_it != res.end(); 
+    for (auto it = out.begin(), res_it = res.begin(); it != out.end() && res_it != res.end(); 
             ++it, ++res_it){
         BOOST_CHECK((*it) == (*res_it));
     }
@@ -78,13 +78,12 @@ BOOST_AUTO_TEST_CASE(be_to_be_2) {
     std::vector<std::uint32_t> res = {{0x12345678, 0x90abcdef}};
 
     status_type status;
-    std::vector<std::uint32_t> out = repack<option::big_endian, option::big_endian, 
-        std::vector<std::uint16_t>, std::vector<std::uint32_t>>(in, status);
+    std::vector<std::uint32_t> out = repack<option::big_endian, option::big_endian>(in, status);
 
     BOOST_CHECK(status == status_type::success);
     BOOST_CHECK(out.size() == res.size());
 
-    for (auto it = out.begin(), res_it = res.begin(); it != out.end(), res_it != res.end(); 
+    for (auto it = out.begin(), res_it = res.begin(); it != out.end() && res_it != res.end(); 
             ++it, ++res_it){
         BOOST_CHECK((*it) == (*res_it));
     }
@@ -96,7 +95,7 @@ BOOST_AUTO_TEST_CASE(be_to_le_1) {
     std::uint32_t res = 0x78563412;
 
     status_type status;
-    std::uint32_t out = pack<option::little_endian, std::uint32_t>(in, status);
+    std::uint32_t out = pack<option::little_endian>(in, status);
 
     BOOST_CHECK(status == status_type::success);
 
@@ -153,7 +152,7 @@ BOOST_AUTO_TEST_CASE(be_to_le_2) {
     std::uint64_t res = 0xefcdab9078563412;
 
     status_type status;
-    std::uint64_t out = pack<option::little_endian, std::uint64_t>(in, status);
+    std::uint64_t out = pack<option::little_endian>(in, status);
 
     BOOST_CHECK(status == status_type::success);
 
@@ -166,13 +165,12 @@ BOOST_AUTO_TEST_CASE(be_to_le_3) {
     std::vector<std::uint32_t> res = {{0x78563412, 0xefcdab90}};
 
     status_type status;
-    std::vector<std::uint32_t> out = repack<option::big_endian, option::little_endian, 
-        std::vector<std::uint16_t>, std::vector<std::uint32_t>>(in, status);
+    std::vector<std::uint32_t> out = repack<option::big_endian, option::little_endian>(in, status);
 
     BOOST_CHECK(status == status_type::success);
     BOOST_CHECK(out.size() == res.size());
 
-    for (auto it = out.begin(), res_it = res.begin(); it != out.end(), res_it != res.end(); 
+    for (auto it = out.begin(), res_it = res.begin(); it != out.end() && res_it != res.end(); 
             ++it, ++res_it){
         BOOST_CHECK((*it) == (*res_it));
     }
@@ -184,8 +182,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_lulb_4) {
     uint32_t res = 0x78563412;
 
     status_type status;
-    std::uint32_t out = repack<option::big_endian, option::little_endian, 
-        std::vector<std::uint16_t>, std::uint32_t>(in, status);
+    std::uint32_t out = repack<option::big_endian, option::little_endian>(in, status);
 
     BOOST_CHECK(status == status_type::success);
 
@@ -273,7 +270,7 @@ BOOST_AUTO_TEST_CASE(lubb_to_lubb_1) {
     std::uint16_t res = 0x7856;
 
     status_type status;
-    std::uint16_t out = pack<option::little_endian, std::uint16_t>(in, status);
+    std::uint16_t out = pack<option::little_endian>(in, status);
 
     BOOST_CHECK(status == status_type::success);
 
@@ -286,13 +283,12 @@ BOOST_AUTO_TEST_CASE(lubb_to_lubb_2) {
     std::vector<std::uint32_t> res = {{0x56781234, 0xcdef90ab}};
 
     status_type status;
-    std::vector<std::uint32_t> out = repack<option::little_endian, option::little_endian, 
-        std::vector<uint16_t>, std::vector<std::uint32_t>>(in, status);
+    std::vector<std::uint32_t> out = repack<option::little_endian, option::little_endian>(in, status);
 
     BOOST_CHECK(status == status_type::success);
     BOOST_CHECK(out.size() == res.size());
 
-    for (auto it = out.begin(), res_it = res.begin(); it != out.end(), res_it != res.end(); 
+    for (auto it = out.begin(), res_it = res.begin(); it != out.end() && res_it != res.end(); 
             ++it, ++res_it){
         BOOST_CHECK((*it) == (*res_it));
     }
