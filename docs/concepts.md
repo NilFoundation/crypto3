@@ -2,35 +2,35 @@
 
 @tableofcontents
 
-## Public key scheme concept ## {#pubkey_concept}
+## Public key scheme concept ## {#pubkey_scheme_concept}
 
 A `PublicKeyScheme` is a stateless asymmetric crypto-scheme policy.
 
-### Requirements ### {#pubkey_concepts_requirements}
+### Requirements ### {#pubkey_scheme_concept_requirements}
 
 The type `X` satisfies `PublicKeyScheme` if at least there exist partial specializations of the templates `public_key<X>` and `private_key<X>` satisfying to the concepts `PublicKey` and `PrivateKey` accordingly.
 
-## Signature public key scheme concept ## {#pubkey_concept}
+## Signature public key scheme concept ## {#signature_pubkey_concept}
 
 A `SignaturePublicKeyScheme` is a stateless asymmetric crypto-scheme policy supporting algorithms of signature creation and verification.
 
-### Requirements ### {#pubkey_concepts_requirements}
+### Requirements ### {#signature_pubkey_concepts_requirements}
 
 The type `X` satisfies `SignaturePublicKeyScheme` if it satisfies to the concept `PublicKeyScheme` and at least there exist partial specializations of the templates `public_key<X>` and `private_key<X>` satisfying to the concepts `VerificationPublicKey` and `SigningPrivateKey` accordingly.
 
-## Encryption public key scheme concept ## {#pubkey_concept}
+## Encryption public key scheme concept ## {#encryption_pubkey_concept}
 
 An `EncryptionPublicKeyScheme` is a stateless asymmetric crypto-scheme policy supporting asymmetric encryption and decryption algorithms.
 
-### Requirements ### {#pubkey_concepts_requirements}
+### Requirements ### {#encryption_pubkey_concepts_requirements}
 
 The type `X` satisfies `EncryptionPublicKeyScheme` if it satisfies to the concept `PublicKeyScheme` and at least there exist partial specializations of the templates `public_key<X>` and `private_key<X>` satisfying to the concepts `EncryptionPublicKey` and `DecryptionPrivateKey` accordingly.
 
-## Secret sharing scheme concept ## {#pubkey_concept}
+## Secret sharing scheme concept ## {#secret_sharing_pubkey_concept}
 
 An `SecretSharingScheme` is a stateless secret sharing crypto-scheme policy.
 
-### Requirements ### {#pubkey_concepts_requirements}
+### Requirements ### {#secret_sharing_pubkey_concepts_requirements}
 
 The type `X` satisfies `SecretSharingScheme` if at least there exist partial specializations of the templates `deal_shares_op<X>` satisfying to the concepts `PublicKeyOperation`, `share_sss<Scheme>` satisfying to the concepts `Share`, `public_share_sss<Scheme>` satisfying to the concepts `PublicShare`, `secret_sss<Scheme>` satisfying to the concepts `Secret` and following expressions must be valid and have their specified effects.
 
@@ -41,11 +41,11 @@ The type `X` satisfies `SecretSharingScheme` if at least there exist partial spe
 |`X::coeff_type`|type of polynomial coefficients|
 |`X::public_coeff_type`|type of public representatives of polynomial coefficients|
 
-## Weighted secret sharing scheme concept ## {#pubkey_concept}
+## Weighted secret sharing scheme concept ## {#wsss_pubkey_concept}
 
 An `WeightedSecretSharingScheme` is a stateless secret sharing crypto-scheme policy.
 
-### Requirements ### {#pubkey_concepts_requirements}
+### Requirements ### {#wsss_pubkey_concepts_requirements}
 
 The type `X` satisfies `WeightedSecretSharingScheme` if at least there exist partial specializations of the templates `deal_shares_op<X>` satisfying to the concepts `PublicKeyOperation`, `share_sss<Scheme>` satisfying to the concepts `WeightedShare`, `public_share_sss<Scheme>` satisfying to the concepts `WeightedPublicShare`, `secret_sss<Scheme>` satisfying to the concepts `Secret`.
 
@@ -93,13 +93,13 @@ Given
 |`x.update(acc, r)`| |Accumulate input message in `acc` to process it later by executing algorithms supported by `Scheme`|
 |`x.update(acc, i, j)`| |Accumulate input message in `acc` to process it later by executing algorithms supported by `Scheme`|
 
-## Signature verification public key concept ## {#pubkey_concept}
+## Signature verification public key concept ## {#signature_verification_pubkey_concept}
 
 A `VerificationPublicKey` is a concept of a stateful object containing cryptographic material of public key and defining methods to execute cryptographic algorithms of particular asymmetric signature crypto-scheme.
 
 Implementation of concept `VerificationPublicKey` for some asymmetric signature crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `public_key<Scheme>`.
 
-### Requirements ### {#pubkey_concepts_requirements}
+### Requirements ### {#signature_verification_pubkey_concepts_requirements}
 
 If the type `X` satisfies `VerificationPublicKey` concept then it satisfies to `PublicKey` and following expressions must be valid and have their specified effects.
 
@@ -122,13 +122,13 @@ Given
 |---|---|---|
 |`x.verify(acc, s)`|`bool`|Extract accumulator `acc` and process verification using extracted data, input signature `s` and public key material stored in `x`|
 
-## Encryption public key concept ## {#pubkey_concept}
+## Encryption public key concept ## {#encryption_pubkey_concept}
 
 A `EncryptionPublicKey` is a concept of a stateful object containing cryptographic material of public key and defining methods to execute cryptographic algorithms, of particular asymmetric encryption crypto-scheme, assuming the use of the private key.
 
 Implementation of concept `EncryptionPublicKey` for some asymmetric encryption crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `public_key<Scheme>`.
 
-### Requirements ### {#pubkey_concepts_requirements}
+### Requirements ### {#encryption_pubkey_concepts_requirements}
 
 If the type `X` satisfies `EncryptionPublicKey` concept then it satisfies to `PublicKey` and following expressions must be valid and have their specified effects.
 
