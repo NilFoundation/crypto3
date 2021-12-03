@@ -143,6 +143,8 @@ namespace nil {
                     typename std::enable_if<is_aggregate_mode<CurveType, Generator, Prover, Verifier>::value>::type> {
 
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> basic_policy_type;
+                    typedef typename basic_policy_type::proof_type basic_proof_type;
 
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;
@@ -160,7 +162,6 @@ namespace nil {
                     typedef typename policy_type::srs_pair_type srs_pair_type;
 
                     typedef typename policy_type::proof_type proof_type;
-                    typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
 
                     // Generate key pair
                     template<typename DistributionType = boost::random::uniform_int_distribution<
@@ -178,31 +179,33 @@ namespace nil {
                         return Generator::template process<DistributionType, GeneratorType>(num_proofs);
                     }
 
+                    // TODO: remove
                     // Basic proove
-                    static inline proof_type prove(const proving_key_type &pk,
-                                                   const primary_input_type &primary_input,
-                                                   const auxiliary_input_type &auxiliary_input) {
+                    static inline basic_proof_type prove(const proving_key_type &pk,
+                                                         const primary_input_type &primary_input,
+                                                         const auxiliary_input_type &auxiliary_input) {
 
                         return Prover::process(pk, primary_input, auxiliary_input);
                     }
 
                     // Aggregate prove
                     template<typename Hash, typename InputTranscriptIncludeIterator, typename InputProofIterator>
-                    static inline aggregate_proof_type prove(const proving_srs_type &srs,
-                                                             InputTranscriptIncludeIterator transcript_include_first,
-                                                             InputTranscriptIncludeIterator transcript_include_last,
-                                                             InputProofIterator proofs_first,
-                                                             InputProofIterator proofs_last) {
+                    static inline proof_type prove(const proving_srs_type &srs,
+                                                   InputTranscriptIncludeIterator transcript_include_first,
+                                                   InputTranscriptIncludeIterator transcript_include_last,
+                                                   InputProofIterator proofs_first,
+                                                   InputProofIterator proofs_last) {
 
                         return Prover::template process<Hash>(srs, transcript_include_first, transcript_include_last,
                                                               proofs_first, proofs_last);
                     }
 
+                    // TODO: remove
                     // Basic verify
                     template<typename VerificationKey>
                     static inline bool verify(const VerificationKey &vk,
                                               const primary_input_type &primary_input,
-                                              const proof_type &proof) {
+                                              const basic_proof_type &proof) {
                         return Verifier::process(vk, primary_input, proof);
                     }
 
@@ -214,7 +217,7 @@ namespace nil {
                     static inline bool verify(const verification_srs_type &ip_verifier_srs,
                                               const verification_key_type &pvk,
                                               const InputPrimaryInputRange &public_inputs,
-                                              const aggregate_proof_type &proof,
+                                              const proof_type &proof,
                                               InputIterator transcript_include_first,
                                               InputIterator transcript_include_last) {
                         return Verifier::template process<DistributionType, GeneratorType, Hash>(

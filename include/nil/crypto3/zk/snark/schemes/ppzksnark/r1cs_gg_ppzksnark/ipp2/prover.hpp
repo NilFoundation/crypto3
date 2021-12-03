@@ -612,6 +612,7 @@ namespace nil {
                 class r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Aggregate> {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
                     typedef r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Basic> basic_prover;
+                    typedef typename basic_prover::proof_type basic_proof_type;
 
                 public:
                     static constexpr ProvingMode mode = ProvingMode::Aggregate;
@@ -620,23 +621,22 @@ namespace nil {
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::proving_srs_type proving_srs_type;
                     typedef typename policy_type::proof_type proof_type;
-                    typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
 
                     // Aggregate prove
                     template<typename Hash, typename InputTranscriptIncludeIterator, typename InputProofIterator>
-                    static inline aggregate_proof_type process(const proving_srs_type &srs,
-                                                               InputTranscriptIncludeIterator transcript_include_first,
-                                                               InputTranscriptIncludeIterator transcript_include_last,
-                                                               InputProofIterator proofs_first,
-                                                               InputProofIterator proofs_last) {
+                    static inline proof_type process(const proving_srs_type &srs,
+                                                     InputTranscriptIncludeIterator transcript_include_first,
+                                                     InputTranscriptIncludeIterator transcript_include_last,
+                                                     InputProofIterator proofs_first,
+                                                     InputProofIterator proofs_last) {
                         return aggregate_proofs<CurveType, Hash>(srs, transcript_include_first, transcript_include_last,
                                                                  proofs_first, proofs_last);
                     }
 
                     // Basic prove
-                    static inline proof_type process(const proving_key_type &pk,
-                                                     const primary_input_type &primary_input,
-                                                     const auxiliary_input_type &auxiliary_input) {
+                    static inline basic_proof_type process(const proving_key_type &pk,
+                                                           const primary_input_type &primary_input,
+                                                           const auxiliary_input_type &auxiliary_input) {
 
                         return basic_prover::process(pk, primary_input, auxiliary_input);
                     }

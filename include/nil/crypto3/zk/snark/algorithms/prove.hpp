@@ -44,12 +44,11 @@ namespace nil {
                          typename Hash,
                          typename InputTranscriptIncludeIterator,
                          typename InputProofIterator>
-                typename ProofSystemType::aggregate_proof_type
-                    prove(const typename ProofSystemType::proving_srs_type &srs,
-                          InputTranscriptIncludeIterator transcript_include_first,
-                          InputTranscriptIncludeIterator transcript_include_last,
-                          InputProofIterator proofs_first,
-                          InputProofIterator proofs_last) {
+                typename ProofSystemType::proof_type prove(const typename ProofSystemType::proving_srs_type &srs,
+                                                           InputTranscriptIncludeIterator transcript_include_first,
+                                                           InputTranscriptIncludeIterator transcript_include_last,
+                                                           InputProofIterator proofs_first,
+                                                           InputProofIterator proofs_last) {
 
                     return ProofSystemType::template prove<Hash>(
                         srs, transcript_include_first, transcript_include_last, proofs_first, proofs_last);

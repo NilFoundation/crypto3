@@ -56,7 +56,7 @@ namespace nil {
                 bool verify(const typename ProofSystemType::verification_srs_type &ip_verifier_srs,
                             const typename ProofSystemType::verification_key_type &pvk,
                             const InputPrimaryInputRange &public_inputs,
-                            const typename ProofSystemType::aggregate_proof_type &proof,
+                            const typename ProofSystemType::proof_type &proof,
                             InputIterator transcript_include_first,
                             InputIterator transcript_include_last) {
 

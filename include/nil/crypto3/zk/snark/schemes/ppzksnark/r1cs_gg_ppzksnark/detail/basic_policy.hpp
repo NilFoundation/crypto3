@@ -188,6 +188,7 @@ namespace nil {
 
                         /******************************** Proving key ********************************/
 
+                        // TODO: remove
                         /**
                          * A proving key for the R1CS GG-ppzkSNARK.
                          */
@@ -252,24 +253,13 @@ namespace nil {
                         /*********************************** Proof ***********************************/
 
                         /**
-                         * A proof for the R1CS GG-ppzkSNARK.
-                         *
-                         * While the proof has a structure, externally one merely opaquely produces,
-                         * serializes/deserializes, and verifies proofs. We only expose some information
-                         * about the structure for statistics purposes.
-                         */
-                        typedef r1cs_gg_ppzksnark_proof<CurveType, ProvingMode::Basic> proof_type;
-
-                        /*********************************** Aggregated proof ***********************************/
-
-                        /**
                          * A proof for the R1CS GG-ppzkSNARK aggregation scheme.
                          *
                          * While the proof has a structure, externally one merely opaquely produces,
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        typedef r1cs_gg_ppzksnark_proof<CurveType, ProvingMode::Aggregate> aggregate_proof_type;
+                        typedef r1cs_gg_ppzksnark_proof<CurveType, ProvingMode::Aggregate> proof_type;
                     };
 
                     // template<typename CurveType>
@@ -283,7 +273,8 @@ namespace nil {
                     //      * Below are various template aliases (used for convenience).
                     //      */
                     //
-                    //     typedef r1cs_constraint_system<typename curve_type::scalar_field_type> constraint_system_type;
+                    //     typedef r1cs_constraint_system<typename curve_type::scalar_field_type>
+                    //     constraint_system_type;
                     //
                     //     typedef r1cs_primary_input<typename curve_type::scalar_field_type> primary_input_type;
                     //
