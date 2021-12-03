@@ -62,11 +62,9 @@ namespace nil {
              */
             template<typename Range>
             void _condense(Range &a) {
-                for (auto first = std::begin(a);
-                     first != std::end(a) &&
-                     a.back() ==
-                         typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type();
-                     ++first) {
+                while (std::distance(std::cbegin(a), std::cend(a)) > 1 &&
+                       a.back() ==
+                           typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type()) {
                     a.pop_back();
                 }
             }
@@ -278,7 +276,7 @@ namespace nil {
                 _condense(q);
             }
 
-        }    // namespace fft
+        }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
 
