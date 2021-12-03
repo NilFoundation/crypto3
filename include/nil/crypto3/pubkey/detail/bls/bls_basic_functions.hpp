@@ -96,17 +96,18 @@ namespace nil {
                     static inline void update(internal_accumulator_type &acc, const InputRange &range) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<InputRange>));
 
-                        to_curve<typename h2c_policy::group_type, typename h2c_policy::params_type>(range, acc);
+                        to_curve<h2c_policy>(range, acc);
                     }
 
                     template<typename InputIterator>
                     static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
-                        to_curve<typename h2c_policy::group_type, typename h2c_policy::params_type>(first, last, acc);
+                        to_curve<h2c_policy>(first, last, acc);
                     }
 
-                    static inline signature_type sign(const internal_accumulator_type &acc, const private_key_type &sk) {
+                    static inline signature_type sign(const internal_accumulator_type &acc,
+                                                      const private_key_type &sk) {
                         BOOST_ASSERT(validate_private_key(sk));
 
                         signature_type Q = hashes::accumulators::extract::to_curve<h2c_policy>(acc);
@@ -195,8 +196,7 @@ namespace nil {
                         assert(validate_private_key(sk));
 
                         public_key_type pk = privkey_to_pubkey(sk);
-                        signature_type Q = to_curve<typename h2c_policy::group_type, typename h2c_policy::params_type>(
-                            point_to_pubkey(pk));
+                        signature_type Q = to_curve<h2c_policy>(point_to_pubkey(pk));
                         return sk * Q;
                     }
 
@@ -207,8 +207,7 @@ namespace nil {
                         if (!validate_public_key(pk)) {
                             return false;
                         }
-                        signature_type Q = to_curve<typename h2c_policy::group_type, typename h2c_policy::params_type>(
-                            point_to_pubkey(pk));
+                        signature_type Q = to_curve<h2c_policy>(point_to_pubkey(pk));
                         auto C1 = policy_type::pairing(Q, pk);
                         auto C2 = policy_type::pairing(pop, public_key_type::one());
                         return C1 == C2;

@@ -29,6 +29,7 @@
 #include <cstddef>
 
 #include <nil/crypto3/hash/algorithm/to_curve.hpp>
+#include <nil/crypto3/hash/h2c.hpp>
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 #include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
