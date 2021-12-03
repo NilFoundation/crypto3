@@ -38,8 +38,8 @@
 
 #include <nil/crypto3/algebra/marshalling.hpp>
 #include <nil/marshalling/field_type.hpp>
-#include <nil/crypto3/marshalling/types/integral.hpp>
-#include <nil/crypto3/marshalling/types/algebra/field_element.hpp>
+#include <nil/marshalling/types/integral.hpp>
+#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 #include <nil/crypto3/detail/type_traits.hpp>
 #include <nil/crypto3/algebra/type_traits.hpp>
