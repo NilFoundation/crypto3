@@ -31,6 +31,33 @@
 
 namespace nil {
     namespace marshalling {
+        /*!
+         * @defgroup marshalling Marshalling
+         *
+         * @brief Marshalling between one type, different endianness
+         *
+         * @defgroup marshalling_algorithms Algorithms
+         * @ingroup marshalling
+         * @brief Algorithms are meant to provide marshalling interface similar to STL algorithms' one.
+         */
+
+        /*!
+         * @brief Repack converting between arbitrary types, arbitrary endiannesses.
+         * In case, if one type (inpur nor output) is byte container and there is no
+         * need to change the endianness, it's better to use pack or unpack algorithm
+         * respectively. The repack algorithm would work less effective in that case.
+         *
+         * @ingroup marshalling_algorithms
+         *
+         * @tparam TInputEndian
+         * @tparam TOutputEndian
+         * @tparam SinglePassRange
+         *
+         * @param val
+         * @param status
+         *
+         * @return TOutput
+         */
         template<typename TInputEndian, typename TOutputEndian, typename SinglePassRange>
         range_repack_impl<TInputEndian, TOutputEndian, typename SinglePassRange::const_iterator>
             repack(const SinglePassRange &val, status_type &status) {
@@ -39,6 +66,21 @@ namespace nil {
                                                                                                             status);
         }
 
+        /*!
+        * @brief
+        *
+        * @ingroup marshalling_algorithms
+        *
+        * @tparam TInputEndian
+        * @tparam TOutputEndian
+        * @tparam InputIterator
+        *
+        * @param first
+        * @param last
+        * @param status
+        *
+        * @return
+        */
         template<typename TInputEndian, typename TOutputEndian, typename InputIterator,
                  typename = typename std::enable_if<std::is_integral<typename InputIterator::value_type>::value>::type>
         range_repack_impl<TInputEndian, TOutputEndian, InputIterator> pack(InputIterator first, InputIterator last,

@@ -38,6 +38,33 @@
 
 namespace nil {
     namespace marshalling {
+        /*!
+         * @defgroup marshalling Marshalling
+         *
+         * @brief Marshalling between two or more defined types
+         *
+         * @defgroup marshalling_algorithms Algorithms
+         * @ingroup marshalling
+         * @brief Algorithms are meant to provide marshalling interface similar to STL algorithms' one.
+         */
+
+        /*
+         * Marshalling with both input and output types, which are marshalling types, not a std
+         * iterator of elements with a marshalling type
+         */
+
+        /*!
+         * @brief
+         *
+         * @ingroup marshalling_algorithms
+         *
+         * @tparam TInput
+         *
+         * @param input
+         * @param status
+         *
+         * @return
+         */
         template<typename TInput,
                  typename = typename std::enable_if<marshalling::is_marshalling_type<TInput>::value>::type>
         value_unpack_impl<TInput> unpack(const TInput &input, status_type &status) {
@@ -45,6 +72,19 @@ namespace nil {
             return value_unpack_impl<TInput>(input, status);
         }
 
+        /*!
+         * @brief
+         *
+         * @ingroup marshalling_algorithms
+         *
+         * @tparam TEndian
+         * @tparam TInput
+         *
+         * @param input
+         * @param status
+         *
+         * @return
+         */
         template<typename TEndian, typename TInput,
                  typename = typename std::enable_if<is_compatible<TInput>::value>::type,
                  typename = typename std::enable_if<
@@ -54,6 +94,19 @@ namespace nil {
             return value_unpack_impl<TInput>(typename is_compatible<TInput>::template type<TEndian>(input), status);
         }
 
+        /*!
+         * @brief
+         *
+         * @ingroup marshalling_algorithms
+         *
+         * @tparam TEndian
+         * @tparam SinglePassRange
+         *
+         * @param r
+         * @param status
+         *
+         * @return
+         */
         template<typename TEndian, typename SinglePassRange>
         range_unpack_impl<TEndian, typename SinglePassRange::const_iterator> unpack(const SinglePassRange &r,
                                                                                     status_type &status) {
@@ -61,6 +114,20 @@ namespace nil {
             return range_unpack_impl<TEndian, typename SinglePassRange::const_iterator>(r, status);
         }
 
+        /*!
+         * @brief
+         *
+         * @ingroup marshalling_algorithms
+         *
+         * @tparam TEndian
+         * @tparam SinglePassIterator
+         *
+         * @param r
+         * @param len
+         * @param status
+         *
+         * @return
+         */
         template<typename TEndian, typename SinglePassIterator>
         range_unpack_impl<TEndian, SinglePassIterator> unpack(const SinglePassIterator &r, size_t len,
                                                               status_type &status) {
@@ -68,6 +135,20 @@ namespace nil {
             return range_unpack_impl<TEndian, SinglePassIterator>(r, len, status);
         }
 
+        /*!
+         * @brief
+         *
+         * @ingroup marshalling_algorithms
+         *
+         * @tparam TEndian
+         * @tparam InputIterator
+         *
+         * @param first
+         * @param last
+         * @param status
+         *
+         * @return
+         */
         template<typename TEndian, typename InputIterator>
         range_unpack_impl<TEndian, InputIterator> unpack(InputIterator first, InputIterator last, status_type &status) {
 

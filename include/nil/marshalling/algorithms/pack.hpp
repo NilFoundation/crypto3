@@ -29,8 +29,6 @@
 
 #include <type_traits>
 
-#include <boost/spirit/home/support/container.hpp>
-
 #include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/inference.hpp>
 #include <nil/marshalling/algorithms/pack_value.hpp>
@@ -38,6 +36,29 @@
 
 namespace nil {
     namespace marshalling {
+        /*!
+         * @defgroup marshalling Marshalling
+         *
+         * @brief Marshalling between two or more defined types
+         *
+         * @defgroup marshalling_algorithms Algorithms
+         * @ingroup marshalling
+         * @brief Algorithms are meant to provide marshalling interface similar to STL algorithms' one.
+         */
+
+        /*!
+        * @brief
+        *
+        * @ingroup marshalling_algorithms
+        *
+        * @tparam TEndian
+        * @tparam SinglePassRange
+        *
+        * @param r
+        * @param status
+        *
+        * @return
+        */
         template<typename TEndian, typename SinglePassRange,
                  typename
                  = typename std::enable_if<std::is_integral<typename SinglePassRange::value_type>::value>::type>
@@ -47,6 +68,21 @@ namespace nil {
             return range_pack_impl<TEndian, typename SinglePassRange::const_iterator>(r, status);
         }
 
+        /*!
+        * @brief
+        *
+        * @ingroup marshalling_algorithms
+        *
+        * @tparam TEndian
+        * @tparam InputIterator
+        *
+        * @param first
+        * @param last
+        * @param status
+        *
+        * @return
+        */
+
         template<typename TEndian, typename InputIterator,
                  typename = typename std::enable_if<std::is_integral<typename InputIterator::value_type>::value>::type>
         range_pack_impl<TEndian, InputIterator> pack(InputIterator first, InputIterator last, status_type &status) {
@@ -54,6 +90,21 @@ namespace nil {
             return range_pack_impl<TEndian, InputIterator>(first, last, status);
         }
 
+        /*!
+        * @brief
+        *
+        * @ingroup marshalling_algorithms
+        *
+        * @tparam TEndian
+        * @tparam SinglePassRange
+        * @tparam OutputIterator
+        *
+        * @param r
+        * @param out
+        * @param status
+        *
+        * @return
+        */
         template<typename TEndian, typename SinglePassRange, typename OutputIterator,
                  typename
                  = typename std::enable_if<std::is_integral<typename SinglePassRange::value_type>::value>::type>
@@ -63,6 +114,22 @@ namespace nil {
             return itr_pack_impl<TEndian, typename SinglePassRange::iterator, OutputIterator>(r, out, status);
         }
 
+        /*!
+        * @brief
+        *
+        * @ingroup marshalling_algorithms
+        *
+        * @tparam TEndian
+        * @tparam InputIterator
+        * @tparam OutputIterator
+        *
+        * @param first
+        * @param last
+        * @param out
+        * @param status
+        *
+        * @return
+        */
         template<typename TEndian, typename InputIterator, typename OutputIterator,
                  typename = typename std::enable_if<std::is_integral<typename InputIterator::value_type>::value>::type>
         itr_pack_impl<TEndian, typename InputIterator::iterator, OutputIterator>
