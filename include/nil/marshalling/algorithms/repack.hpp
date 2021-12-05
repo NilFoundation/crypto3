@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
 //
 // MIT License
 //
@@ -23,58 +24,25 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_REPACK_HPP
-#define MARSHALLING_REPACK_HPP
+#ifndef MARSHALLING_REPACK_NEW_HPP
+#define MARSHALLING_REPACK_NEW_HPP
 
-#include <nil/marshalling/algorithms/unpack.hpp>
-#include <nil/marshalling/algorithms/pack.hpp>
+#include <nil/marshalling/algorithms/repack_value.hpp>
 
 namespace nil {
     namespace marshalling {
-
-        /*!
-         * @defgroup marshalling Marshalling
-         *
-         * @brief Marshalling between one type, different endianness
-         *
-         * @defgroup marshalling_algorithms Algorithms
-         * @ingroup marshalling
-         * @brief Algorithms are meant to provide marshalling interface similar to STL algorithms' one.
-         */
-
-        /*!
-         * @brief Repack converting between arbitrary types, arbitrary endiannesses. 
-         * In case, if one type (inpur nor output) is byte container and there is no 
-         * need to change the endianness, it's better to use pack or unpack algorithm 
-         * respectively. The repack algorithm would work less effective in that case.
-         *
-         * @ingroup marshalling_algorithms
-         *
-         * @tparam TInputEndian
-         * @tparam TOutputEndian
-         * @tparam TInput
-         * @tparam TOutput
-         *
-         * @param val
-         * @param status
-         *
-         * @return TOutput
-         */
-        template<typename TInputEndian, typename TOutputEndian, typename TInput, 
-                typename TOutput>
-        TOutput repack(TInput val, status_type &status) {
-            status_type result_status;
-
-            std::vector<std::uint8_t> buffer = unpack<TInputEndian,
-            std::vector<std::uint8_t>>(val, result_status);
-
-            TOutput result = pack<TOutputEndian, TOutput>(buffer, status);
-
-            status = status|result_status;
-            return result;
+        template<typename TInputEndian, typename TOutputEndian, typename SinglePassRange>
+        range_repack_impl<TInputEndian, TOutputEndian, typename SinglePassRange::const_iterator> repack(const SinglePassRange &val, status_type &status) {
+            BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+            return range_repack_impl<TInputEndian, TOutputEndian, typename SinglePassRange::const_iterator>(val, status);
         }
 
+        template<typename TInputEndian, typename TOutputEndian, typename InputIterator, typename = typename std::enable_if<std::is_integral<typename InputIterator::value_type>::value>::type>
+        range_repack_impl<TInputEndian, TOutputEndian, InputIterator> pack(InputIterator first, InputIterator last, status_type &status) {
+            BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
+            return range_repack_impl<TInputEndian, TOutputEndian, InputIterator>(first, last, status);
+        }
     }    // namespace marshalling
 }    // namespace nil
 
-#endif    // MARSHALLING_REPACK_HPP
+#endif    // MARSHALLING_REPACK_NEW_HPP
