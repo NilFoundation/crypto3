@@ -46,9 +46,9 @@
 #include <nil/marshalling/types/no_value.hpp>
 #include <nil/marshalling/types/variant.hpp>
 
-#include <nil/marshalling/algorithms/unpack_new.hpp>
-#include <nil/marshalling/algorithms/pack_new.hpp>
-#include <nil/marshalling/algorithms/repack_new.hpp>
+#include <nil/marshalling/algorithms/unpack.hpp>
+#include <nil/marshalling/algorithms/pack.hpp>
+#include <nil/marshalling/algorithms/repack.hpp>
 
 #include <cstdio>
 
@@ -91,9 +91,11 @@ BOOST_AUTO_TEST_CASE(be_to_be_2) {
 }
 
 BOOST_AUTO_TEST_CASE(be_to_le_1) {
-    
     std::vector<std::uint8_t> in = {{0x12, 0x34, 0x56, 0x78}};
     std::uint32_t res = 0x78563412;
+    std::vector<int> x;
+        std::vector<int> a = {0, 1, 2, 3};
+        x = std::vector<int>(a.begin(), a.end());
 
     status_type status;
     std::uint32_t out = pack<option::little_endian>(in, status);

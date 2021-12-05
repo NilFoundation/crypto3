@@ -52,9 +52,9 @@
 #include <nil/marshalling/version.hpp>
 #include <nil/marshalling/inference.hpp>
 
-#include <nil/marshalling/algorithms/pack_new.hpp>
-#include <nil/marshalling/algorithms/unpack_new.hpp>
-#include <nil/marshalling/algorithms/repack_new.hpp>
+#include <nil/marshalling/algorithms/pack.hpp>
+#include <nil/marshalling/algorithms/unpack.hpp>
+#include <nil/marshalling/algorithms/repack.hpp>
 
 #include <nil/marshalling/container/array_view.hpp>
 #include <nil/marshalling/container/static_vector.hpp>
