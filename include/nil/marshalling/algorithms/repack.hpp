@@ -32,13 +32,17 @@
 namespace nil {
     namespace marshalling {
         template<typename TInputEndian, typename TOutputEndian, typename SinglePassRange>
-        range_repack_impl<TInputEndian, TOutputEndian, typename SinglePassRange::const_iterator> repack(const SinglePassRange &val, status_type &status) {
+        range_repack_impl<TInputEndian, TOutputEndian, typename SinglePassRange::const_iterator>
+            repack(const SinglePassRange &val, status_type &status) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
-            return range_repack_impl<TInputEndian, TOutputEndian, typename SinglePassRange::const_iterator>(val, status);
+            return range_repack_impl<TInputEndian, TOutputEndian, typename SinglePassRange::const_iterator>(val,
+                                                                                                            status);
         }
 
-        template<typename TInputEndian, typename TOutputEndian, typename InputIterator, typename = typename std::enable_if<std::is_integral<typename InputIterator::value_type>::value>::type>
-        range_repack_impl<TInputEndian, TOutputEndian, InputIterator> pack(InputIterator first, InputIterator last, status_type &status) {
+        template<typename TInputEndian, typename TOutputEndian, typename InputIterator,
+                 typename = typename std::enable_if<std::is_integral<typename InputIterator::value_type>::value>::type>
+        range_repack_impl<TInputEndian, TOutputEndian, InputIterator> pack(InputIterator first, InputIterator last,
+                                                                           status_type &status) {
             BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
             return range_repack_impl<TInputEndian, TOutputEndian, InputIterator>(first, last, status);
         }

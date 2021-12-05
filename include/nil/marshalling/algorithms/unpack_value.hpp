@@ -46,7 +46,7 @@
 namespace nil {
     namespace marshalling {
 
-        template <typename TInput>
+        template<typename TInput>
         struct value_unpack_impl {
             status_type *status;
             TInput input;
@@ -56,7 +56,8 @@ namespace nil {
                 this->status = &status;
             }
 
-            template <typename T, typename = typename std::enable_if<std::is_same<T, bool>::value || std::is_same<T, std::uint8_t>::value>::type>
+            template<typename T, typename = typename std::enable_if<std::is_same<T, bool>::value
+                                                                    || std::is_same<T, std::uint8_t>::value>::type>
             inline operator std::vector<T>() {
                 std::vector<T> result(input.length());
                 typename std::vector<T>::iterator buffer_begin = result.begin();
@@ -65,7 +66,9 @@ namespace nil {
                 return result;
             }
 
-            template <typename T, size_t ArraySize, typename = typename std::enable_if<std::is_same<T, bool>::value || std::is_same<T, std::uint8_t>::value>::type>
+            template<typename T, size_t ArraySize,
+                     typename = typename std::enable_if<std::is_same<T, bool>::value
+                                                        || std::is_same<T, std::uint8_t>::value>::type>
             inline operator std::array<T, ArraySize>() {
                 BOOST_STATIC_ASSERT(ArraySize == input.length());
                 std::array<T, ArraySize> result;
@@ -85,13 +88,13 @@ namespace nil {
             }
         };
 
-        template <typename TEndian, typename Iter>
+        template<typename TEndian, typename Iter>
         struct range_unpack_impl {
             status_type *status;
             mutable Iter iterator;
             size_t count_elements;
 
-            template <typename SinglePassRange>
+            template<typename SinglePassRange>
             range_unpack_impl(const SinglePassRange &range, status_type &status) {
                 iterator = range.begin();
                 count_elements = std::distance(range.begin(), range.end());
@@ -105,16 +108,18 @@ namespace nil {
                 this->status = &status;
             }
 
-            template <typename SinglePassIterator>
+            template<typename SinglePassIterator>
             range_unpack_impl(const SinglePassIterator &iter, size_t len, status_type &status) {
                 iterator = iter;
                 count_elements = len;
                 this->status = &status;
             }
 
-            template <typename T, typename = typename std::enable_if<std::is_same<T, bool>::value || std::is_same<T, std::uint8_t>::value>::type>
+            template<typename T, typename = typename std::enable_if<std::is_same<T, bool>::value
+                                                                    || std::is_same<T, std::uint8_t>::value>::type>
             inline operator std::vector<T>() {
-                using marshalling_type = typename is_compatible<std::vector<typename Iter::value_type>>::template type<TEndian>;
+                using marshalling_type =
+                    typename is_compatible<std::vector<typename Iter::value_type>>::template type<TEndian>;
                 using marshalling_internal_type = typename marshalling_type::element_type;
 
                 std::vector<marshalling_internal_type> values;
@@ -132,7 +137,9 @@ namespace nil {
                 return result;
             }
 
-            template <typename T, size_t ArraySize, typename = typename std::enable_if<std::is_same<T, bool>::value || std::is_same<T, std::uint8_t>::value>::type>
+            template<typename T, size_t ArraySize,
+                     typename = typename std::enable_if<std::is_same<T, bool>::value
+                                                        || std::is_same<T, std::uint8_t>::value>::type>
             inline operator std::array<T, ArraySize>() {
                 using marshalling_type = typename is_compatible<std::array<T, ArraySize>>::template type<TEndian>;
                 using marshalling_internal_type = typename marshalling_type::element_type;

@@ -46,13 +46,13 @@
 namespace nil {
     namespace marshalling {
 
-        template <typename TInputEndian, typename TOutputEndian, typename Iter>
+        template<typename TInputEndian, typename TOutputEndian, typename Iter>
         struct range_repack_impl {
             status_type *status;
             mutable Iter iterator;
             size_t count_elements;
 
-            template <typename SinglePassRange>
+            template<typename SinglePassRange>
             range_repack_impl(const SinglePassRange &range, status_type &status) {
                 iterator = range.begin();
                 count_elements = std::distance(range.begin(), range.end());
