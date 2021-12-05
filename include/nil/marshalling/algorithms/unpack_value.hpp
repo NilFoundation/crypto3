@@ -56,20 +56,32 @@ namespace nil {
                 this->status = &status;
             }
 
-            inline operator std::vector<std::uint8_t>() {
-                std::vector<std::uint8_t> result(input.length());
-                typename std::vector<std::uint8_t>::iterator buffer_begin = result.begin();
+            template <typename T, typename = typename std::enable_if<std::is_same<T, bool>::value || std::is_same<T, std::uint8_t>::value>::type>
+            inline operator std::vector<T>() {
+                std::vector<T> result(input.length());
+                typename std::vector<T>::iterator buffer_begin = result.begin();
                 *status = input.write(buffer_begin, result.size());
 
                 return result;
             }
 
-            inline operator std::vector<char>() {
-                std::vector<char> result(input.length());
-                typename std::vector<char>::iterator buffer_begin = result.begin();
+            template <typename T, size_t ArraySize, typename = typename std::enable_if<std::is_same<T, bool>::value || std::is_same<T, std::uint8_t>::value>::type>
+            inline operator std::array<T, ArraySize>() {
+                BOOST_STATIC_ASSERT(ArraySize == input.length());
+                std::array<T, ArraySize> result;
+                typename std::array<T, ArraySize>::iterator buffer_begin = result.begin();
                 *status = input.write(buffer_begin, result.size());
 
                 return result;
+            }
+
+            template<typename OutputRange>
+            inline operator OutputRange() const {
+                std::vector<typename OutputRange::value_type> result(input.length());
+                typename std::vector<std::uint8_t>::iterator buffer_begin = result.begin();
+                *status = input.write(buffer_begin, result.size());
+
+                return OutputRange(result.begin(), result.end());
             }
         };
 
@@ -100,8 +112,9 @@ namespace nil {
                 this->status = &status;
             }
 
-            inline operator std::vector<std::uint8_t>() {
-                using marshalling_type = typename is_compatible<std::vector<std::uint16_t>>::template type<TEndian>;
+            template <typename T, typename = typename std::enable_if<std::is_same<T, bool>::value || std::is_same<T, std::uint8_t>::value>::type>
+            inline operator std::vector<T>() {
+                using marshalling_type = typename is_compatible<std::vector<typename Iter::value_type>>::template type<TEndian>;
                 using marshalling_internal_type = typename marshalling_type::element_type;
 
                 std::vector<marshalling_internal_type> values;
@@ -112,47 +125,32 @@ namespace nil {
                 }
 
                 marshalling_type m_val = marshalling_type(values);
-                std::vector<std::uint8_t> result(m_val.length());
-                typename std::vector<std::uint8_t>::iterator buffer_begin = result.begin();
+                std::vector<T> result(m_val.length());
+                typename std::vector<T>::iterator buffer_begin = result.begin();
+                *status = m_val.write(buffer_begin, result.size());
+
+                return result;
+            }
+
+            template <typename T, size_t ArraySize, typename = typename std::enable_if<std::is_same<T, bool>::value || std::is_same<T, std::uint8_t>::value>::type>
+            inline operator std::array<T, ArraySize>() {
+                using marshalling_type = typename is_compatible<std::array<T, ArraySize>>::template type<TEndian>;
+                using marshalling_internal_type = typename marshalling_type::element_type;
+
+                nil::marshalling::container::static_vector<marshalling_internal_type, marshalling_type::max_length()>
+                    values;
+                auto k = iterator;
+                for (int i = 0; i < count_elements; ++i, ++k) {
+                    values.emplace_back(*k);
+                }
+                marshalling_type m_val = marshalling_type(values);
+                std::array<T, ArraySize> result(m_val.length());
+                typename std::array<T, ArraySize>::iterator buffer_begin = result.begin();
                 *status = m_val.write(buffer_begin, result.size());
 
                 return result;
             }
         };
-
-//        template <typename TEndian, typename Iter, typename OutputIterator>
-//        struct itr_unpack_impl {
-//            mutable Iter iterator;
-//            size_t count_elements;
-//            OutputIterator out_iterator;
-//            using value_type = typename std::iterator_traits<Iter>::value_type;
-//
-//            template<typename SinglePassRange>
-//            itr_unpack_impl(const SinglePassRange &range, OutputIterator out, status_type &status) {
-//                out_iterator = out;
-//                iterator = range.begin();
-//                count_elements = std::distance(range.begin(), range.end());
-//            }
-//
-//            template<typename InputIterator>
-//            itr_unpack_impl(InputIterator first, InputIterator last, OutputIterator out, status_type &status) {
-//                InputIterator first_save = first;
-//                iterator = first_save;
-//                count_elements = std::distance(first, last);
-//            }
-//
-//            inline operator OutputIterator() const {
-//                using marshalling_type = typename is_compatible<OutputIterator>::template type<TEndian>;
-//
-//                marshalling_type m_val;
-//
-//                m_val.read(iterator, count_elements);
-//                auto values = m_val.value();
-//
-//                return std::move(values.cbegin(), values.cend(), out_iterator);
-//            }
-//        };
-
     }    // namespace marshalling
 }    // namespace nil
 

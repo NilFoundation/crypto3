@@ -66,7 +66,7 @@ namespace nil {
                 this->status = &status;
             }
 
-            template<typename T>
+            template<typename T, typename = typename std::enable_if<!nil::marshalling::is_container<typename is_compatible<T>::template type<>>::value>::type>
             inline operator std::vector<T>() {
                 using marshalling_type = typename is_compatible<std::vector<T>>::template type<TEndian>;
 
@@ -81,7 +81,7 @@ namespace nil {
                 return result;
             }
 
-            template<typename T, size_t SizeArray>
+            template<typename T, size_t SizeArray, typename = typename std::enable_if<!nil::marshalling::is_container<typename is_compatible<T>::template type<>>::value>::type>
             inline operator std::array<T, SizeArray>() {
 
                 using marshalling_type = typename is_compatible<std::array<T, SizeArray>>::template type<TEndian>;
@@ -107,17 +107,6 @@ namespace nil {
                 return result;
             }
 
-//            template<typename OutputRange, typename = typename is_compatible<OutputRange>::value, typename = typename std::enable_if<nil::detail::is_range<OutputRange>::value>::type>
-//            inline operator OutputRange() const {
-//                using marshalling_type = typename is_compatible<OutputRange>::template type<TEndian>;
-//
-//                marshalling_type m_val;
-//
-//                *status = m_val.read(iterator, count_elements);
-//
-//                return OutputRange(m_val.value().begin(),  m_val.value().end());
-//            }
-
             template <typename TOutput, typename = typename std::enable_if<is_compatible<TOutput>::value>::type,
                 typename = typename  std::enable_if<!nil::marshalling::is_container<typename is_compatible<TOutput>::template type<>>::value>::type>
             inline operator TOutput() const {
@@ -130,6 +119,20 @@ namespace nil {
                 *status = m_val.read(iterator, count_elements);
 
                 return TOutput(m_val.value());
+            }
+
+            template<typename OutputRange,
+                typename = typename std::enable_if<is_compatible<OutputRange>::value>::value,
+                typename = typename std::enable_if<is_compatible<OutputRange>::value>::type,
+                typename = typename std::enable_if<!nil::marshalling::is_container<typename is_compatible<OutputRange>::template type<>>::value>::type>
+            inline operator OutputRange() const {
+                using marshalling_type = typename is_compatible<OutputRange>::template type<TEndian>;
+
+                marshalling_type m_val;
+
+                *status = m_val.read(iterator, count_elements);
+
+                return OutputRange(m_val.value().begin(),  m_val.value().end());
             }
 
         };
