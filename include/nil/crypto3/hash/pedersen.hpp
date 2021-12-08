@@ -96,6 +96,7 @@ namespace nil {
                 static constexpr std::size_t chunks_per_base_point =
                     detail::get_chunks_per_base_point<typename curve_type::scalar_field_type>(chunk_bits);
 
+                // TODO: simplify, refactor
                 class internal_accumulator_type {
                     std::size_t bits_supplied = 0;
                     std::size_t chunks_supplied = 0;
@@ -163,6 +164,7 @@ namespace nil {
                         }
                         if ((chunks_supplied - 1) % chunks_per_base_point !=
                                 0 ||    ///< last encoded_segment wasn't added to the result in encode_chunk() yet
+                            chunks_supplied % chunks_per_base_point != 0 ||
                             chunks_supplied == 1) {    ///< only one chunk was supplied, so it was not added neither in
                                                        ///< encode_chunk() nor in previous previous condition
                             result = result + encoded_segment * current_base_point;
