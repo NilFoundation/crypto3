@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
 //
 // MIT License
 //
@@ -33,164 +34,15 @@
 
 #include <boost/tti/tti.hpp>
 
-#define GENERATE_HAS_MEMBER_TYPE(Type)                                                \
-                                                                                      \
-    template<class T>                                                                 \
-    class HasMemberType_##Type {                                                      \
-    private:                                                                          \
-        using Yes = char[2];                                                          \
-        using No = char[1];                                                           \
-                                                                                      \
-        struct Fallback {                                                             \
-            struct Type { };                                                          \
-        };                                                                            \
-        struct Derived : T, Fallback { };                                             \
-                                                                                      \
-        template<class U>                                                             \
-        static No &test(typename U::Type *);                                          \
-        template<typename U>                                                          \
-        static Yes &test(U *);                                                        \
-                                                                                      \
-    public:                                                                           \
-        static constexpr bool RESULT = sizeof(test<Derived>(nullptr)) == sizeof(Yes); \
-    };                                                                                \
-                                                                                      \
-    template<class T>                                                                 \
-    struct has_##Type : public std::integral_constant<bool, HasMemberType_##Type<T>::RESULT> { };
-
-#define GENERATE_HAS_MEMBER(member)                                                   \
-                                                                                      \
-    template<class T>                                                                 \
-    class HasMember_##member {                                                        \
-    private:                                                                          \
-        using Yes = char[2];                                                          \
-        using No = char[1];                                                           \
-                                                                                      \
-        struct Fallback {                                                             \
-            int member;                                                               \
-        };                                                                            \
-        struct Derived : T, Fallback { };                                             \
-                                                                                      \
-        template<class U>                                                             \
-        static No &test(decltype(U::member) *);                                       \
-        template<typename U>                                                          \
-        static Yes &test(U *);                                                        \
-                                                                                      \
-    public:                                                                           \
-        static constexpr bool RESULT = sizeof(test<Derived>(nullptr)) == sizeof(Yes); \
-    };                                                                                \
-                                                                                      \
-    template<class T>                                                                 \
-    struct has_##member : public std::integral_constant<bool, HasMember_##member<T>::RESULT> { };
-
-#define GENERATE_HAS_MEMBER_FUNCTION(Function, ...)                                  \
-                                                                                     \
-    template<typename T>                                                             \
-    struct has_##Function {                                                          \
-        struct Fallback {                                                            \
-            void Function(##__VA_ARGS__);                                            \
-        };                                                                           \
-                                                                                     \
-        struct Derived : Fallback { };                                               \
-                                                                                     \
-        template<typename C, C>                                                      \
-        struct ChT;                                                                  \
-                                                                                     \
-        template<typename C>                                                         \
-        static char (&f(ChT<void (Fallback::*)(##__VA_ARGS__), &C::Function> *))[1]; \
-                                                                                     \
-        template<typename C>                                                         \
-        static char (&f(...))[2];                                                    \
-                                                                                     \
-        static bool const value = sizeof(f<Derived>(0)) == 2;                        \
-    };
-
-#define GENERATE_HAS_MEMBER_CONST_FUNCTION(Function, ...)                                  \
-                                                                                           \
-    template<typename T>                                                                   \
-    struct has_##Function {                                                                \
-        struct Fallback {                                                                  \
-            void Function(##__VA_ARGS__) const;                                            \
-        };                                                                                 \
-                                                                                           \
-        struct Derived : Fallback { };                                                     \
-                                                                                           \
-        template<typename C, C>                                                            \
-        struct ChT;                                                                        \
-                                                                                           \
-        template<typename C>                                                               \
-        static char (&f(ChT<void (Fallback::*)(##__VA_ARGS__) const, &C::Function> *))[1]; \
-                                                                                           \
-        template<typename C>                                                               \
-        static char (&f(...))[2];                                                          \
-                                                                                           \
-        static bool const value = sizeof(f<Derived>(0)) == 2;                              \
-    };
-
-#define GENERATE_HAS_MEMBER_RETURN_FUNCTION(Function, ReturnType, ...)                       \
-                                                                                             \
-    template<typename T>                                                                     \
-    struct has_##Function {                                                                  \
-        struct Dummy {                                                                       \
-            typedef void ReturnType;                                                         \
-        };                                                                                   \
-        typedef typename std::conditional<has_##ReturnType<T>::value, T, Dummy>::type TType; \
-        typedef typename TType::ReturnType type;                                             \
-                                                                                             \
-        struct Fallback {                                                                    \
-            type Function(##__VA_ARGS__);                                                    \
-        };                                                                                   \
-                                                                                             \
-        struct Derived : TType, Fallback { };                                                \
-                                                                                             \
-        template<typename C, C>                                                              \
-        struct ChT;                                                                          \
-                                                                                             \
-        template<typename C>                                                                 \
-        static char (&f(ChT<type (Fallback::*)(##__VA_ARGS__), &C::Function> *))[1];         \
-                                                                                             \
-        template<typename C>                                                                 \
-        static char (&f(...))[2];                                                            \
-                                                                                             \
-        static bool const value = sizeof(f<Derived>(0)) == 2;                                \
-    };
-
-#define GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(Function, ReturnType, ...)                 \
-                                                                                             \
-    template<typename T>                                                                     \
-    struct has_##Function {                                                                  \
-        struct Dummy {                                                                       \
-            typedef void ReturnType;                                                         \
-        };                                                                                   \
-        typedef typename std::conditional<has_##ReturnType<T>::value, T, Dummy>::type TType; \
-        typedef typename TType::ReturnType type;                                             \
-                                                                                             \
-        struct Fallback {                                                                    \
-            type Function(##__VA_ARGS__) const;                                              \
-        };                                                                                   \
-                                                                                             \
-        struct Derived : TType, Fallback { };                                                \
-                                                                                             \
-        template<typename C, C>                                                              \
-        struct ChT;                                                                          \
-                                                                                             \
-        template<typename C>                                                                 \
-        static char (&f(ChT<type (Fallback::*)(##__VA_ARGS__) const, &C::Function> *))[1];   \
-                                                                                             \
-        template<typename C>                                                                 \
-        static char (&f(...))[2];                                                            \
-                                                                                             \
-        static bool const value = sizeof(f<Derived>(0)) == 2;                                \
-    };
-
 namespace nil {
     namespace detail {
 
-        GENERATE_HAS_MEMBER_TYPE(iterator)
-        GENERATE_HAS_MEMBER_TYPE(const_iterator)
+        BOOST_TTI_HAS_TYPE(iterator)
+        BOOST_TTI_HAS_TYPE(const_iterator)
 
-        GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(begin, const_iterator)
-        GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(end, const_iterator)
+        BOOST_TTI_HAS_FUNCTION(begin);
+        BOOST_TTI_HAS_MEMBER_FUNCTION(begin);
+        BOOST_TTI_HAS_MEMBER_FUNCTION(end);
         
         template<typename T>
         struct is_iterator {
@@ -206,15 +58,50 @@ namespace nil {
             constexpr static bool value = std::is_same<decltype(test(std::declval<T>())), long>::value;
         };
 
-        template<typename Range>
+        template <typename T>
+        class HasBegin
+        {
+        private:
+            typedef char YesType[1];
+            typedef char NoType[2];
+
+            template <typename C> static YesType& test( decltype(&C::begin) ) ;
+            template <typename C> static NoType& test(...);
+
+
+        public:
+            enum { value = sizeof(test<T>(0)) == sizeof(YesType) };
+        };
+
+        template<typename Range, typename Enabled = void>
         struct is_range {
-            static const bool value = has_begin<Range>::value && has_end<Range>::value;
+            static const bool value = false;
+        };
+
+        template<typename Range>
+        struct is_range<Range, typename std::enable_if<has_type_iterator<Range>::value>::type> {
+            static const bool value = has_member_function_begin<Range, typename Range::iterator>::value &&
+                                      has_member_function_end<Range, typename Range::iterator>::value;
+        };
+
+        template<typename Container, typename Enabled = void>
+        struct is_container {
+            static const bool value = false;
         };
 
         template<typename Container>
-        struct is_container {
-            static const bool value
-                = has_const_iterator<Container>::value && has_begin<Container>::value && has_end<Container>::value;
+        struct is_container<Container, typename std::enable_if<has_type_const_iterator<Container>::value>::type> {
+            static const bool value = has_member_function_begin<Container>::value && has_member_function_end<Container>::value;
+        };
+
+        template<typename Value>
+        struct is_std_array {
+            static const bool value = false;
+        };
+
+        template<typename T, size_t ArraySize>
+        struct is_std_array<std::array<T, ArraySize>>{
+            static const bool value = true;
         };
 
         /// @brief Check whether provided type is a variant of

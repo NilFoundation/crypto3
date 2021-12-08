@@ -33,7 +33,7 @@
 
 #include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/inference.hpp>
-#include <nil/marshalling/algorithms/unpack_value.hpp>
+#include <nil/detail/unpack_value.hpp>
 #include <nil/detail/type_traits.hpp>
 
 namespace nil {
@@ -65,11 +65,11 @@ namespace nil {
          *
          * @return
          */
-        template<typename TInput,
-                 typename = typename std::enable_if<marshalling::is_marshalling_type<TInput>::value>::type>
-        value_unpack_impl<TInput> unpack(const TInput &input, status_type &status) {
+        template<typename TInput>
+        typename std::enable_if<is_marshalling_type<TInput>::value, nil::detail::value_unpack_impl<TInput>>::type
+            unpack(const TInput &input, status_type &status) {
 
-            return value_unpack_impl<TInput>(input, status);
+            return nil::detail::value_unpack_impl<TInput>(input, status);
         }
 
         /*!
@@ -85,13 +85,14 @@ namespace nil {
          *
          * @return
          */
-        template<typename TEndian, typename TInput,
-                 typename = typename std::enable_if<is_compatible<TInput>::value>::type,
-                 typename = typename std::enable_if<
-                     !nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value>::type>
-        value_unpack_impl<TInput> unpack(const TInput &input, status_type &status) {
+        template<typename TEndian, typename TInput>
+            typename std::enable_if<
+                is_compatible<TInput>::value
+                && !nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value,
+            nil::detail::value_unpack_impl<TInput>>::type unpack(const TInput &input, status_type &status) {
 
-            return value_unpack_impl<TInput>(typename is_compatible<TInput>::template type<TEndian>(input), status);
+            return nil::detail::value_unpack_impl<TInput>(typename is_compatible<TInput>::template type<TEndian>(input),
+                                                          status);
         }
 
         /*!
@@ -108,31 +109,10 @@ namespace nil {
          * @return
          */
         template<typename TEndian, typename SinglePassRange>
-        range_unpack_impl<TEndian, typename SinglePassRange::const_iterator> unpack(const SinglePassRange &r,
-                                                                                    status_type &status) {
+        nil::detail::range_unpack_impl<TEndian, typename SinglePassRange::const_iterator>
+            unpack(const SinglePassRange &r, status_type &status) {
 
-            return range_unpack_impl<TEndian, typename SinglePassRange::const_iterator>(r, status);
-        }
-
-        /*!
-         * @brief
-         *
-         * @ingroup marshalling_algorithms
-         *
-         * @tparam TEndian
-         * @tparam SinglePassIterator
-         *
-         * @param r
-         * @param len
-         * @param status
-         *
-         * @return
-         */
-        template<typename TEndian, typename SinglePassIterator>
-        range_unpack_impl<TEndian, SinglePassIterator> unpack(const SinglePassIterator &r, size_t len,
-                                                              status_type &status) {
-
-            return range_unpack_impl<TEndian, SinglePassIterator>(r, len, status);
+            return nil::detail::range_unpack_impl<TEndian, typename SinglePassRange::const_iterator>(r, status);
         }
 
         /*!
@@ -150,11 +130,50 @@ namespace nil {
          * @return
          */
         template<typename TEndian, typename InputIterator>
-        range_unpack_impl<TEndian, InputIterator> unpack(InputIterator first, InputIterator last, status_type &status) {
+        nil::detail::range_unpack_impl<TEndian, InputIterator>
+            unpack(InputIterator first, InputIterator last, status_type &status) {
 
-            return range_unpack_impl<TEndian, InputIterator>(first, last, status);
+            return nil::detail::range_unpack_impl<TEndian, InputIterator>(first, last, status);
         }
 
+        template<typename TInput, typename TOutput>
+        status_type unpack(const TInput &input, TOutput &result) {
+            status_type status;
+            result = unpack(input, status);
+            return status;
+        }
+
+        template<typename TEndian, typename TInput, typename TOutput>
+        status_type unpack(const TInput &input, TOutput &result) {
+            status_type status;
+            result = unpack<TEndian>(input, status);
+            return status;
+        }
+
+        template<typename TEndian, typename TInput, typename SinglePassRange>
+        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value, status_type>::type
+            unpack(const TInput &input, SinglePassRange &result) {
+            status_type status;
+            std::vector<typename SinglePassRange::value_type> v = unpack<TEndian>(input, status);
+            result = SinglePassRange(v.begin(), v.end());
+            return status;
+        }
+
+        template<typename TEndian, typename InputIterator, typename TOutput>
+        status_type unpack(InputIterator first, InputIterator last, TOutput &result) {
+            status_type status;
+            result = nil::detail::range_unpack_impl<TEndian, InputIterator>(first, last, status);
+            return result;
+        }
+
+        template<typename TEndian, typename InputIterator, typename SinglePassRange>
+        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value, status_type>::type
+            unpack(InputIterator first, InputIterator last, SinglePassRange &result) {
+            status_type status;
+            std::vector<typename SinglePassRange::value_type> v = unpack<TEndian>(first, last, status);
+            result = SinglePassRange(v.begin(), v.end());
+            return status;
+        }
     }    // namespace marshalling
 }    // namespace nil
 

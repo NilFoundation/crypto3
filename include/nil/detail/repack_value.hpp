@@ -39,28 +39,31 @@
 
 #include <boost/spirit/home/support/container.hpp>
 
+#include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/inference.hpp>
 #include <nil/detail/type_traits.hpp>
+#include <nil/detail/unpack_value.hpp>
+#include <nil/detail/pack_value.hpp>
 
 namespace nil {
-    namespace marshalling {
+    namespace detail {
 
         template<typename TInputEndian, typename TOutputEndian, typename Iter>
         struct range_repack_impl {
-            status_type *status;
+            marshalling::status_type *status;
             mutable Iter iterator;
             size_t count_elements;
 
             template<typename SinglePassRange>
-            range_repack_impl(const SinglePassRange &range, status_type &status) {
+            range_repack_impl(const SinglePassRange &range, marshalling::status_type &status) {
                 iterator = range.begin();
                 count_elements = std::distance(range.begin(), range.end());
                 this->status = &status;
             }
 
             template<typename InputIterator>
-            range_repack_impl(InputIterator first, InputIterator last, status_type &status) {
+            range_repack_impl(InputIterator first, InputIterator last, marshalling::status_type &status) {
                 iterator = first;
                 count_elements = std::distance(first, last);
                 this->status = &status;
@@ -68,10 +71,10 @@ namespace nil {
 
             template<typename T>
             inline operator T() {
-                status_type result_status_unpack, result_status_pack;
+                marshalling::status_type result_status_unpack, result_status_pack;
 
-                std::vector<std::uint8_t> buffer = unpack<TInputEndian>(iterator, count_elements, result_status_unpack);
-                T result = pack<TOutputEndian>(buffer, result_status_pack);
+                std::vector<std::uint8_t> buffer = range_unpack_impl<TInputEndian, Iter>(iterator, count_elements, result_status_unpack);
+                T result = range_pack_impl<TOutputEndian, std::vector<std::uint8_t>::const_iterator>(buffer, result_status_pack);
                 *status = result_status_pack | result_status_unpack;
 
                 return result;
