@@ -93,9 +93,8 @@ namespace nil {
                 /// using inner pairing product arguments. This proof can be created by any
                 /// party in possession of valid Groth16 proofs.
                 template<typename CurveType>
-                struct r1cs_gg_ppzksnark_proof<CurveType, ProvingMode::Aggregate> {
+                struct r1cs_gg_ppzksnark_aggregate_proof {
                     typedef CurveType curve_type;
-                    static constexpr ProvingMode mode = ProvingMode::Aggregate;
                     /// commitment to A and B using the pair commitment scheme needed to verify
                     /// TIPP relation.
                     r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type> com_ab;
@@ -113,7 +112,7 @@ namespace nil {
                         // 1. Check length of the proofs
                         if (tmipp.gipa.nproofs < 2 ||
                             tmipp.gipa.nproofs >
-                                r1cs_gg_ppzksnark_srs<curve_type, ProvingMode::Aggregate>::MAX_SRS_SIZE) {
+                                r1cs_gg_ppzksnark_aggregate_srs<curve_type>::MAX_SRS_SIZE) {
                             return false;
                         }
                         // 2. Check if it's a power of two

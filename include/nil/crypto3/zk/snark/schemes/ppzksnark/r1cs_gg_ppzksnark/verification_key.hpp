@@ -38,19 +38,12 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
-                struct r1cs_gg_ppzksnark_verification_key;
-
-                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
+                template<typename CurveType>
                 struct r1cs_gg_ppzksnark_processed_verification_key;
 
-                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
-                struct r1cs_gg_ppzksnark_extended_verification_key;
-
                 template<typename CurveType>
-                struct r1cs_gg_ppzksnark_verification_key<CurveType, ProvingMode::Basic> {
+                struct r1cs_gg_ppzksnark_verification_key {
                     typedef CurveType curve_type;
-                    static constexpr ProvingMode mode = ProvingMode::Basic;
 
                     typename CurveType::gt_type::value_type alpha_g1_beta_g2;
                     typename CurveType::template g2_type<>::value_type gamma_g2;
@@ -92,8 +85,8 @@ namespace nil {
                                 this->delta_g2 == other.delta_g2 && this->gamma_ABC_g1 == other.gamma_ABC_g1);
                     }
 
-                    explicit operator r1cs_gg_ppzksnark_processed_verification_key<CurveType, mode>() const {
-                        r1cs_gg_ppzksnark_processed_verification_key<CurveType, mode> processed_verification_key;
+                    explicit operator r1cs_gg_ppzksnark_processed_verification_key<CurveType>() const {
+                        r1cs_gg_ppzksnark_processed_verification_key<CurveType> processed_verification_key;
                         processed_verification_key.vk_alpha_g1_beta_g2 = alpha_g1_beta_g2;
                         processed_verification_key.vk_gamma_g2_precomp = precompute_g2<CurveType>(gamma_g2);
                         processed_verification_key.vk_delta_g2_precomp = precompute_g2<CurveType>(delta_g2);
@@ -104,9 +97,8 @@ namespace nil {
                 };
 
                 template<typename CurveType>
-                struct r1cs_gg_ppzksnark_processed_verification_key<CurveType, ProvingMode::Basic> {
+                struct r1cs_gg_ppzksnark_processed_verification_key {
                     typedef CurveType curve_type;
-                    static constexpr ProvingMode mode = ProvingMode::Basic;
                     typedef typename algebra::pairing::pairing_policy<CurveType> pairing_policy;
 
                     typename CurveType::gt_type::value_type vk_alpha_g1_beta_g2;
@@ -124,9 +116,8 @@ namespace nil {
                 };
 
                 template<typename CurveType>
-                struct r1cs_gg_ppzksnark_extended_verification_key<CurveType, ProvingMode::Basic> {
+                struct r1cs_gg_ppzksnark_extended_verification_key {
                     typedef CurveType curve_type;
-                    static constexpr ProvingMode mode = ProvingMode::Basic;
 
                     typedef typename CurveType::template g1_type<> g1_type;
                     typedef typename CurveType::template g2_type<> g2_type;

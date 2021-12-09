@@ -510,7 +510,7 @@ namespace nil {
                                  typename std::iterator_traits<InputTranscriptIncludeIterator>::value_type>::value &&
                         std::is_same<typename std::iterator_traits<InputProofIterator>::value_type,
                                      r1cs_gg_ppzksnark_proof<CurveType>>::value,
-                    r1cs_gg_ppzksnark_proof<CurveType, ProvingMode::Aggregate>>::type
+                    r1cs_gg_ppzksnark_aggregate_proof<CurveType>>::type
                     aggregate_proofs(const r1cs_gg_ppzksnark_aggregate_proving_srs<CurveType> &srs,
                                      InputTranscriptIncludeIterator tr_include_first,
                                      InputTranscriptIncludeIterator tr_include_last, InputProofIterator proofs_first,
@@ -615,7 +615,6 @@ namespace nil {
                     typedef typename basic_prover::proof_type basic_proof_type;
 
                 public:
-                    static constexpr ProvingMode mode = ProvingMode::Aggregate;
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
                     typedef typename policy_type::proving_key_type proving_key_type;

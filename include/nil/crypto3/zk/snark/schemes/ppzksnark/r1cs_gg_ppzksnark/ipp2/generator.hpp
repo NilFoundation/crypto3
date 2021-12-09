@@ -43,7 +43,6 @@ namespace nil {
                     typedef typename CurveType::template g2_type<> g2_type;
 
                 public:
-                    static constexpr ProvingMode mode = ProvingMode::Aggregate;
                     typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;

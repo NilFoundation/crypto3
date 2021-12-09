@@ -54,7 +54,6 @@ namespace nil {
                     typedef typename CurveType::gt_type gt_type;
 
                 public:
-                    static constexpr ProvingMode mode = ProvingMode::EncryptedInput;
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
                     typedef typename policy_type::proving_key_type proving_key_type;

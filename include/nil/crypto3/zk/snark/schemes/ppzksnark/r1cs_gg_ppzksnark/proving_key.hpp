@@ -35,16 +35,9 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename CurveType,
-                         ProvingMode Mode = ProvingMode::Basic,
                          typename ConstraintSystem = r1cs_constraint_system<typename CurveType::scalar_field_type>>
-                struct r1cs_gg_ppzksnark_proving_key;
-
-                template<typename CurveType>
-                struct r1cs_gg_ppzksnark_proving_key<CurveType,
-                                                     ProvingMode::Basic,
-                                                     r1cs_constraint_system<typename CurveType::scalar_field_type>> {
+                struct r1cs_gg_ppzksnark_proving_key {
                     typedef CurveType curve_type;
-                    static constexpr ProvingMode mode = ProvingMode::Basic;
                     typedef r1cs_constraint_system<typename CurveType::scalar_field_type> constraint_system_type;
 
                     typename CurveType::template g1_type<>::value_type alpha_g1;

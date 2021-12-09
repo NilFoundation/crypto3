@@ -82,7 +82,6 @@ namespace nil {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                 public:
-                    static constexpr ProvingMode mode = ProvingMode::Basic;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
@@ -126,7 +125,6 @@ namespace nil {
                     typedef typename pairing::pairing_policy<CurveType>::g2_precomputed_type g2_precomputed_type;
 
                 public:
-                    static constexpr ProvingMode mode = ProvingMode::Basic;
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
@@ -193,7 +191,6 @@ namespace nil {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                 public:
-                    static constexpr ProvingMode mode = ProvingMode::Basic;
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;

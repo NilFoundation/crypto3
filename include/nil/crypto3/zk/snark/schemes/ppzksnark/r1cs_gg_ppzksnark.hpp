@@ -45,8 +45,6 @@ namespace nil {
             namespace snark {
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
                 using is_basic_mode = typename std::bool_constant<
-                    ProvingMode::Basic == Generator::mode && ProvingMode::Basic == Prover::mode &&
-                    ProvingMode::Basic == Verifier::mode &&
                     std::is_same<r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Basic>, Generator>::value &&
                     std::is_same<r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Basic>, Prover>::value &&
                     (std::is_same<r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType, ProvingMode::Basic>,
@@ -59,8 +57,6 @@ namespace nil {
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
                 using is_aggregate_mode = typename std::bool_constant<
-                    ProvingMode::Aggregate == Generator::mode && ProvingMode::Aggregate == Prover::mode &&
-                    ProvingMode::Aggregate == Verifier::mode &&
                     std::is_same<r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Aggregate>, Generator>::value &&
                     std::is_same<r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Aggregate>, Prover>::value &&
                     std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Aggregate>,

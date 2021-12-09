@@ -327,7 +327,7 @@ namespace nil {
                                   std::vector<typename CurveType::scalar_field_type::value_type>,
                                   std::vector<typename CurveType::scalar_field_type::value_type>>
                     gipa_verify_tipp_mipp(transcript<CurveType, Hash> &tr,
-                                          const r1cs_gg_ppzksnark_proof<CurveType, ProvingMode::Aggregate> &proof,
+                                          const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
                                           const typename CurveType::scalar_field_type::value_type &r_shift) {
                     std::vector<typename CurveType::scalar_field_type::value_type> challenges;
                     std::vector<typename CurveType::scalar_field_type::value_type> challenges_inv;
@@ -464,7 +464,7 @@ namespace nil {
                          typename Hash = hashes::sha2<256>>
                 inline void verify_tipp_mipp(transcript<CurveType, Hash> &tr,
                                              const r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> &v_srs,
-                                             const r1cs_gg_ppzksnark_proof<CurveType, ProvingMode::Aggregate> &proof,
+                                             const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
                                              const typename CurveType::scalar_field_type::value_type &r_shift,
                                              pairing_check<CurveType, DistributionType, GeneratorType> &pc) {
                     // (T,U), Z for TIPP and MIPP  and all challenges
@@ -568,9 +568,9 @@ namespace nil {
                     bool>::type
                     verify_aggregate_proof(
                         const r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> &ip_verifier_srs,
-                        const r1cs_gg_ppzksnark_verification_key<CurveType, ProvingMode::Aggregate> &pvk,
+                        const r1cs_gg_ppzksnark_aggregate_verification_key<CurveType> &pvk,
                         const InputRangesRange &public_inputs,
-                        const r1cs_gg_ppzksnark_proof<CurveType, ProvingMode::Aggregate> &proof,
+                        const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
                         InputIterator transcript_include_first,
                         InputIterator transcript_include_last) {
                     for (const auto &public_input : public_inputs) {
@@ -671,7 +671,6 @@ namespace nil {
                     typedef typename basic_verifier::proof_type basic_proof_type;
 
                 public:
-                    static constexpr ProvingMode mode = ProvingMode::Aggregate;
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::verification_srs_type verification_srs_type;
