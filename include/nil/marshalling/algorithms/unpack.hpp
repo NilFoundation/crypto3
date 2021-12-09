@@ -144,14 +144,14 @@ namespace nil {
         }
 
         template<typename TEndian, typename TInput, typename TOutput>
-        status_type unpack(const TInput &input, TOutput &result) {
+        typename std::enable_if<!nil::detail::is_range<TOutput>::value || nil::detail::is_similar_std_array<TOutput>::value, status_type>::type unpack(const TInput &input, TOutput &result) {
             status_type status;
             result = unpack<TEndian>(input, status);
             return status;
         }
 
         template<typename TEndian, typename TInput, typename SinglePassRange>
-        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value, status_type>::type
+        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value && !nil::detail::is_similar_std_array<SinglePassRange>::value, status_type>::type
             unpack(const TInput &input, SinglePassRange &result) {
             status_type status;
             std::vector<typename SinglePassRange::value_type> v = unpack<TEndian>(input, status);
@@ -160,14 +160,14 @@ namespace nil {
         }
 
         template<typename TEndian, typename InputIterator, typename TOutput>
-        status_type unpack(InputIterator first, InputIterator last, TOutput &result) {
+        typename std::enable_if<!nil::detail::is_range<TOutput>::value || nil::detail::is_similar_std_array<TOutput>::value, status_type>::type unpack(InputIterator first, InputIterator last, TOutput &result) {
             status_type status;
             result = nil::detail::range_unpack_impl<TEndian, InputIterator>(first, last, status);
-            return result;
+            return status;
         }
 
         template<typename TEndian, typename InputIterator, typename SinglePassRange>
-        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value, status_type>::type
+        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value && !nil::detail::is_similar_std_array<SinglePassRange>::value, status_type>::type
             unpack(InputIterator first, InputIterator last, SinglePassRange &result) {
             status_type status;
             std::vector<typename SinglePassRange::value_type> v = unpack<TEndian>(first, last, status);

@@ -84,6 +84,23 @@ namespace nil {
                 }
                 return result;
             }
+//            template<typename Array,
+//                     typename = typename std::enable_if<nil::detail::is_similar_std_array<Array>::value>::type>
+//            inline operator Array() {
+//
+//                using marshalling_type = typename marshalling::is_compatible<Array>::template type<TEndian>;
+//
+//                marshalling_type m_val;
+//
+//                *status = m_val.read(iterator, count_elements);
+//                auto values = m_val.value();
+//
+//                Array result;
+//                for (std::size_t i = 0; i < values.size(); i++) {
+//                    result[i] = values[i].value();
+//                }
+//                return result;
+//            }
 
             template<typename TMarshallingOutnput,
                      typename = typename std::enable_if<marshalling::is_marshalling_type<TMarshallingOutnput>::value>::type>
@@ -110,7 +127,7 @@ namespace nil {
                 return TOutput(m_val.value());
             }
 
-            template<typename OutputRange, typename = typename std::enable_if<!nil::marshalling::is_container<
+            template<typename OutputRange, typename = typename std::enable_if<!marshalling::is_marshalling_type<OutputRange>::value && !nil::marshalling::is_container<
                 typename marshalling::is_compatible<typename OutputRange::value_type>::template type<>>::value>::type>
             inline operator OutputRange() {
                 using T = typename OutputRange::value_type;
@@ -130,6 +147,7 @@ namespace nil {
 
         template<typename TEndian, typename Iter, typename OutputIterator>
         struct itr_pack_impl {
+            marshalling::status_type *status;
             mutable Iter iterator;
             size_t count_elements;
             OutputIterator out_iterator;
@@ -140,24 +158,29 @@ namespace nil {
                 out_iterator = out;
                 iterator = range.begin();
                 count_elements = std::distance(range.begin(), range.end());
+                this->status = &status;
             }
 
             template<typename InputIterator>
             itr_pack_impl(InputIterator first, InputIterator last, OutputIterator out, marshalling::status_type &status) {
-                InputIterator first_save = first;
-                iterator = first_save;
+                iterator = first;
+                out_iterator = out;
                 count_elements = std::distance(first, last);
+                this->status = &status;
             }
 
             inline operator OutputIterator() const {
-                using marshalling_type = typename marshalling::is_compatible<OutputIterator>::template type<TEndian>;
-
+                using T = typename std::iterator_traits<OutputIterator>::value_type;
+                using marshalling_type = typename marshalling::is_compatible<std::vector<T>>::template type<TEndian>;
                 marshalling_type m_val;
 
-                m_val.read(iterator, count_elements);
-                auto values = m_val.value();
+                *status = m_val.read(iterator, count_elements);
+                std::vector<T> result;
+                for (const auto &val_i : m_val.value()) {
+                    result.push_back(val_i.value());
+                }
 
-                return std::move(values.cbegin(), values.cend(), out_iterator);
+                return std::move(result.cbegin(), result.cend(), out_iterator);
             }
         };
 
