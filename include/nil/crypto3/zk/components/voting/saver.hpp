@@ -49,7 +49,7 @@ namespace nil {
                     digest_variable<field_type> pk;
                     digest_variable<field_type> pk_leaf;
                     hash_component pk_hasher;
-                    hash_component pk_leaf_hasher;
+                    MerkleTreeHashComponent pk_leaf_hasher;
                     merkle_proof_validating_component root_validator;
                     hash_component sn_hasher;
                     bit_vector_copy_component<field_type> check_sn;
@@ -113,14 +113,11 @@ namespace nil {
                             sum_m_i = sum_m_i + m_i;
                         }
                         // sum_m_i == 1
-                        // this->bp.add_r1cs_constraint(snark::r1cs_constraint<Field>(
-                        //     Field::value_type::one(), Field::value_type::one() - sum_m_i,
-                        //     Field::value_type::zero()));
-                        generate_r1cs_equals_const_constraint(
-                            this->bp,
-                            static_cast<blueprint_linear_combination<field_type>>(this->bp, sum_m_i),
-                            Field::value_type::one());
+                        this->bp.add_r1cs_constraint(
+                            snark::r1cs_constraint<Field>(Field::value_type::one(), sum_m_i, Field::value_type::one()));
                     }
+
+                private:
                     void generate_r1cs_witness() {
                         pk_hasher.generate_r1cs_witness();
                         pk_leaf_hasher.generate_r1cs_witness();
@@ -129,6 +126,10 @@ namespace nil {
                         check_sn.generate_r1cs_witness();
                     }
 
+                public:
+                    /**
+                     * @brief Witness generation should be called every time we update
+                     */
                     void generate_r1cs_witness(const std::vector<bool> &root, const std::vector<bool> &sn) {
                         generate_r1cs_witness();
                         root_validator.root.generate_r1cs_witness(root);

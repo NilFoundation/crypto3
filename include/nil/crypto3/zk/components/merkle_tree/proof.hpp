@@ -74,7 +74,7 @@ namespace nil {
                         }
                     }
 
-                    void generate_r1cs_witness(const merkle_proof_container &proof) {
+                    void generate_r1cs_witness(const merkle_proof_container &proof, bool do_clear = false) {
                         // TODO: generalize for Arity > 2
                         assert(Arity == 2);
                         assert(proof.path.size() == tree_depth);
@@ -82,10 +82,13 @@ namespace nil {
                         this->address = 0;
                         for (std::size_t i = 0; i < tree_depth; ++i) {
                             for (std::size_t j = 0; j < Arity - 1; ++j) {
-                                path[i][proof.path[tree_depth - 1 - i][j].position].generate_r1cs_witness(
-                                    proof.path[tree_depth - 1 - i][j].hash);
-                                this->address |=
-                                    (proof.path[tree_depth - 1 - i][j].position ? 0 : 1ul << (tree_depth - 1 - i));
+                                auto position = proof.path[tree_depth - 1 - i][j].position;
+                                path[i][position].generate_r1cs_witness(proof.path[tree_depth - 1 - i][j].hash);
+                                this->address |= (position ? 0 : 1ul << (tree_depth - 1 - i));
+                                if (do_clear) {
+                                    path[i][position ? 0 : 1].generate_r1cs_witness(
+                                        std::vector<bool>(HashComponent::digest_bits, false));
+                                }
                             }
                         }
                     }

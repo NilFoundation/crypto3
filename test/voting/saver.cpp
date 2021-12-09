@@ -33,6 +33,8 @@
 
 #include <nil/crypto3/zk/components/voting/saver.hpp>
 
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
@@ -56,7 +58,9 @@ void test_jubjub_pedersen_saver_component() {
     using bp_generator_hash_type = hashes::sha2<256>;
     using hash_params = hashes::find_group_hash_default_params;
     using hash_component = components::pedersen<curve_type, bp_generator_hash_type, hash_params>;
+    using hash_type = typename hash_component::hash_type;
     using merkle_hash_component = hash_component;
+    using merkle_hash_type = typename merkle_hash_component::hash_type;
     using field_type = typename hash_component::field_type;
     constexpr std::size_t arity = 2;
     using voting_component = components::saver<arity, hash_component, merkle_hash_component, field_type>;
@@ -74,8 +78,8 @@ void test_jubjub_pedersen_saver_component() {
     auto sk_wrong = sk;
     sk_wrong[0] = !sk_wrong[0];
 
-    std::vector<bool> pk = calculate_hash_via_component<hash_component>(sk);
-    std::vector<bool> pk_leaf = calculate_hash_via_component<merkle_hash_component>(pk);
+    std::vector<bool> pk = hash<hash_type>(sk);
+    std::vector<bool> pk_leaf = hash<merkle_hash_type>(pk);
     BOOST_CHECK(pk_leaf.size() == merkle_hash_component::digest_bits);
 
     std::vector<bool> prev_hash = pk_leaf;
@@ -93,7 +97,7 @@ void test_jubjub_pedersen_saver_component() {
 
         std::vector<bool> block = prev_hash;
         block.insert(computed_is_right ? block.begin() : block.end(), other.begin(), other.end());
-        std::vector<bool> h = calculate_hash_via_component<merkle_hash_component>(block);
+        std::vector<bool> h = hash<merkle_hash_type>(block);
 
         path[level] = other;
 
@@ -118,7 +122,7 @@ void test_jubjub_pedersen_saver_component() {
     std::vector<bool> eid_sk;
     std::copy(std::cbegin(eid), std::cend(eid), std::back_inserter(eid_sk));
     std::copy(std::cbegin(sk), std::cend(sk), std::back_inserter(eid_sk));
-    std::vector<bool> sn = calculate_hash_via_component<hash_component>(eid_sk);
+    std::vector<bool> sn = hash<hash_type>(eid_sk);
     auto sn_wrong = sn;
     sn_wrong[0] = !sn_wrong[0];
 
@@ -199,10 +203,152 @@ void test_jubjub_pedersen_saver_component() {
     // BOOST_CHECK(num_constraints == expected_constraints);
 }
 
+template<typename ValueType, std::size_t N>
+typename std::enable_if<std::is_unsigned<ValueType>::value, std::vector<std::array<ValueType, N>>>::type
+    generate_random_data(std::size_t leaf_number) {
+    std::vector<std::array<ValueType, N>> v;
+    for (std::size_t i = 0; i < leaf_number; ++i) {
+        std::array<ValueType, N> leaf;
+        std::generate(std::begin(leaf), std::end(leaf),
+                      [&]() { return std::rand() % (std::numeric_limits<ValueType>::max() + 1); });
+        v.emplace_back(leaf);
+    }
+    return v;
+}
+
+void test_jubjub_merkle_container_pedersen_saver_component() {
+    using curve_type = curves::jubjub;
+    using bp_generator_hash_type = hashes::sha2<256>;
+    using hash_params = hashes::find_group_hash_default_params;
+    using hash_component = components::pedersen<curve_type, bp_generator_hash_type, hash_params>;
+    using hash_type = typename hash_component::hash_type;
+    using merkle_hash_component = hash_component;
+    using merkle_hash_type = typename merkle_hash_component::hash_type;
+    using field_type = typename hash_component::field_type;
+    constexpr std::size_t arity = 2;
+    using voting_component = components::saver<arity, hash_component, merkle_hash_component, field_type>;
+    using merkle_proof_component = typename voting_component::merkle_proof_component;
+    using merkle_validate_component = typename voting_component::merkle_proof_validating_component;
+
+    /* prepare test */
+    constexpr std::size_t tree_depth = 4;
+    constexpr std::size_t leafs_number = 1 << tree_depth;
+    auto secret_keys = generate_random_data<bool, hash_type::digest_bits>(leafs_number);
+    std::vector<std::array<bool, hash_type::digest_bits>> public_keys;
+    for (const auto &sk : secret_keys) {
+        std::array<bool, hash_type::digest_bits> pk;
+        hash<merkle_hash_type>(sk, std::begin(pk));
+        public_keys.emplace_back(pk);
+    }
+    merkle_tree<merkle_hash_type, arity> tree(public_keys);
+    std::size_t proof_idx = std::rand() % leafs_number;
+    merkle_proof<merkle_hash_type, arity> proof(tree, proof_idx);
+    merkle_proof<merkle_hash_type, arity> proof_wrong(tree, (proof_idx + 1) % leafs_number);
+
+    auto tree_pk_leaf = tree[proof_idx];
+    std::vector<bool> pk_leaf = hash<merkle_hash_type>(public_keys[proof_idx]);
+
+    BOOST_ASSERT(tree_pk_leaf.size() == pk_leaf.size());
+    for (auto i = 0; i < pk_leaf.size(); ++i) {
+        BOOST_ASSERT(tree_pk_leaf[i] == pk_leaf[i]);
+    }
+
+    auto sk_wrong = secret_keys[proof_idx];
+    sk_wrong[0] = !sk_wrong[0];
+
+    auto root = tree.root();
+    auto root_wrong = root;
+    root_wrong[0] = !root_wrong[0];
+
+    std::vector<bool> m = {0, 1, 0, 0, 0, 0, 0};
+    auto m_wrong = m;
+    m_wrong[0] = !m_wrong[0];
+
+    const std::size_t eid_size = 64;
+    std::vector<bool> eid(eid_size);
+    std::generate(eid.begin(), eid.end(), [&]() { return std::rand() % 2; });
+
+    std::vector<bool> eid_sk;
+    std::copy(std::cbegin(eid), std::cend(eid), std::back_inserter(eid_sk));
+    std::copy(std::cbegin(secret_keys[proof_idx]), std::cend(secret_keys[proof_idx]), std::back_inserter(eid_sk));
+    std::vector<bool> sn = hash<hash_type>(eid_sk);
+    auto sn_wrong = sn;
+    sn_wrong[0] = !sn_wrong[0];
+
+    /* execute test */
+    components::blueprint<field_type> bp;
+    components::blueprint_variable_vector<field_type> address_bits_va;
+    address_bits_va.allocate(bp, tree_depth);
+    components::block_variable<field_type> m_block(bp, m.size());
+    components::block_variable<field_type> eid_block(bp, eid.size());
+    components::block_variable<field_type> sk_block(bp, secret_keys[proof_idx].size());
+    components::digest_variable<field_type> sn_digest(bp, hash_component::digest_bits);
+    components::digest_variable<field_type> root_digest(bp, merkle_hash_component::digest_bits);
+    merkle_proof_component path_var(bp, tree_depth);
+    voting_component vote_var(bp, m_block, eid_block, sn_digest, root_digest, address_bits_va, path_var, sk_block,
+                              components::blueprint_variable<field_type>(0));
+
+    path_var.generate_r1cs_constraints();
+    vote_var.generate_r1cs_constraints();
+
+    path_var.generate_r1cs_witness(proof);
+    address_bits_va.fill_with_bits_of_ulong(bp, path_var.address);
+    auto address = path_var.address;
+    BOOST_CHECK(address_bits_va.get_field_element_from_bits(bp) == path_var.address);
+    m_block.generate_r1cs_witness(m);
+    eid_block.generate_r1cs_witness(eid);
+    sk_block.generate_r1cs_witness(secret_keys[proof_idx]);
+    vote_var.generate_r1cs_witness(root, sn);
+    BOOST_CHECK(bp.is_satisfied());
+
+    // false positive test with wrong root
+    root_digest.generate_r1cs_witness(root_wrong);
+    BOOST_CHECK(!bp.is_satisfied());
+
+    // reset blueprint in the correct state
+    root_digest.generate_r1cs_witness(root);
+    BOOST_CHECK(bp.is_satisfied());
+    // false positive test with wrong sk
+    sk_block.generate_r1cs_witness(sk_wrong);
+    BOOST_CHECK(!bp.is_satisfied());
+
+    // reset blueprint in the correct state
+    sk_block.generate_r1cs_witness(secret_keys[proof_idx]);
+    BOOST_CHECK(bp.is_satisfied());
+    // false positive test with wrong address
+    address_bits_va.fill_with_bits_of_ulong(bp, path_var.address - 1);
+    BOOST_CHECK(!bp.is_satisfied());
+
+    // reset blueprint in the correct state
+    address_bits_va.fill_with_bits_of_ulong(bp, path_var.address);
+    BOOST_CHECK(bp.is_satisfied());
+    // false positive test with wrong sn
+    sn_digest.generate_r1cs_witness(sn_wrong);
+    BOOST_CHECK(!bp.is_satisfied());
+
+    // reset blueprint in the correct state
+    sn_digest.generate_r1cs_witness(sn);
+    BOOST_CHECK(bp.is_satisfied());
+    // false positive test with wrong m
+    m_block.generate_r1cs_witness(m_wrong);
+    BOOST_CHECK(!bp.is_satisfied());
+
+    // reset blueprint in the correct state
+    m_block.generate_r1cs_witness(m);
+    BOOST_CHECK(bp.is_satisfied());
+    // false positive test with wrong path
+    path_var.generate_r1cs_witness(proof_wrong, true);
+    BOOST_CHECK(!bp.is_satisfied());
+}
+
 BOOST_AUTO_TEST_SUITE(voting_component_test_suite)
 
 BOOST_AUTO_TEST_CASE(voting_component_jubjub_pedersen_test) {
     test_jubjub_pedersen_saver_component();
+}
+
+BOOST_AUTO_TEST_CASE(voting_component_jubjub_merkle_container_pedersen_test) {
+    test_jubjub_merkle_container_pedersen_saver_component();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -118,7 +118,8 @@ namespace nil {
                         }
                     }
 
-                    void generate_r1cs_witness(const std::vector<bool> &contents) {
+                    template<typename InputRange>
+                    void generate_r1cs_witness(const InputRange &contents) {
                         bits.fill_with_bits(this->bp, contents);
                     }
 

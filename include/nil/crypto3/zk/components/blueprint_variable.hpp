@@ -27,6 +27,11 @@
 #define CRYPTO3_ZK_BLUEPRINT_VARIABLE_HPP
 
 #include <vector>
+#include <type_traits>
+#include <iterator>
+
+#include <boost/concept_check.hpp>
+#include <boost/range/concepts.hpp>
 
 #include <nil/crypto3/multiprecision/integer.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
@@ -103,7 +108,12 @@ namespace nil {
                         }
                     }
 
-                    void fill_with_bits(blueprint<field_type> &bp, const std::vector<bool> &bits) const {
+                    template<typename InputRange>
+                    typename std::enable_if<std::is_same<
+                        bool,
+                        typename std::iterator_traits<typename InputRange::iterator>::value_type>::value>::type
+                        fill_with_bits(blueprint<field_type> &bp, const InputRange &bits) const {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::RandomAccessRangeConcept<const InputRange>));
                         assert(this->size() == bits.size());
                         for (std::size_t i = 0; i < bits.size(); ++i) {
                             bp.val((*this)[i]) = (bits[i] ? field_value_type::one() : field_value_type::zero());
