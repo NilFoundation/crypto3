@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE voting_saver_component_test
+#define BOOST_TEST_MODULE voting_encrypted_input_component_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -31,7 +31,7 @@
 
 #include <nil/crypto3/zk/components/hashes/pedersen.hpp>
 
-#include <nil/crypto3/zk/components/voting/saver.hpp>
+#include <nil/crypto3/zk/components/voting/encrypted_input_voting.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
@@ -53,7 +53,7 @@ std::vector<bool> calculate_hash_via_component(const std::vector<bool> &in_bits)
     return hash_comp_bits.result.get_digest();
 }
 
-void test_jubjub_pedersen_saver_component() {
+void test_jubjub_pedersen_encrypted_input_voting_component() {
     using curve_type = curves::jubjub;
     using bp_generator_hash_type = hashes::sha2<256>;
     using hash_params = hashes::find_group_hash_default_params;
@@ -63,7 +63,7 @@ void test_jubjub_pedersen_saver_component() {
     using merkle_hash_type = typename merkle_hash_component::hash_type;
     using field_type = typename hash_component::field_type;
     constexpr std::size_t arity = 2;
-    using voting_component = components::saver<arity, hash_component, merkle_hash_component, field_type>;
+    using voting_component = components::encrypted_input_voting<arity, hash_component, merkle_hash_component, field_type>;
     using merkle_proof_component = typename voting_component::merkle_proof_component;
     using merkle_validate_component = typename voting_component::merkle_proof_validating_component;
 
@@ -216,7 +216,7 @@ typename std::enable_if<std::is_unsigned<ValueType>::value, std::vector<std::arr
     return v;
 }
 
-void test_jubjub_merkle_container_pedersen_saver_component() {
+void test_jubjub_merkle_container_pedersen_encrypted_input_voting_component() {
     using curve_type = curves::jubjub;
     using bp_generator_hash_type = hashes::sha2<256>;
     using hash_params = hashes::find_group_hash_default_params;
@@ -226,7 +226,7 @@ void test_jubjub_merkle_container_pedersen_saver_component() {
     using merkle_hash_type = typename merkle_hash_component::hash_type;
     using field_type = typename hash_component::field_type;
     constexpr std::size_t arity = 2;
-    using voting_component = components::saver<arity, hash_component, merkle_hash_component, field_type>;
+    using voting_component = components::encrypted_input_voting<arity, hash_component, merkle_hash_component, field_type>;
     using merkle_proof_component = typename voting_component::merkle_proof_component;
     using merkle_validate_component = typename voting_component::merkle_proof_validating_component;
 
@@ -291,6 +291,8 @@ void test_jubjub_merkle_container_pedersen_saver_component() {
     path_var.generate_r1cs_constraints();
     vote_var.generate_r1cs_constraints();
 
+    std::cout << "Constraints number: " << bp.num_constraints() << std::endl;
+
     path_var.generate_r1cs_witness(proof);
     address_bits_va.fill_with_bits_of_ulong(bp, path_var.address);
     auto address = path_var.address;
@@ -344,11 +346,11 @@ void test_jubjub_merkle_container_pedersen_saver_component() {
 BOOST_AUTO_TEST_SUITE(voting_component_test_suite)
 
 BOOST_AUTO_TEST_CASE(voting_component_jubjub_pedersen_test) {
-    test_jubjub_pedersen_saver_component();
+    test_jubjub_pedersen_encrypted_input_voting_component();
 }
 
 BOOST_AUTO_TEST_CASE(voting_component_jubjub_merkle_container_pedersen_test) {
-    test_jubjub_merkle_container_pedersen_saver_component();
+    test_jubjub_merkle_container_pedersen_encrypted_input_voting_component();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

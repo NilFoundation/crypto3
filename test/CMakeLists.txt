@@ -101,7 +101,7 @@ set(MERKLE_TREE_TESTS_FILES
     "merkle_tree_components")
 
 set(VOTING_TESTS_FILES
-    "voting/saver")
+    "voting/encrypted_input_voting")
 
 set(BASIC_COMPONENTS_TESTS_FILES
     "basic_components"

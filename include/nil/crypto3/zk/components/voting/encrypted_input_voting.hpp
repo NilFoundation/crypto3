@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_VOTING_SAVER_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_VOTING_SAVER_COMPONENT_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_VOTING_ENCRYPTED_INPUT_VOTING_COMPONENT_HPP
+#define CRYPTO3_ZK_BLUEPRINT_VOTING_ENCRYPTED_INPUT_VOTING_COMPONENT_HPP
 
 #include <nil/crypto3/zk/components/merkle_tree/validate.hpp>
 #include <nil/crypto3/zk/components/hashes/pedersen.hpp>
@@ -38,7 +38,7 @@ namespace nil {
                          typename HashComponent = pedersen<>,
                          typename MerkleTreeHashComponent = HashComponent,
                          typename Field = typename HashComponent::field_type>
-                struct saver : public component<Field> {
+                struct encrypted_input_voting : public component<Field> {
                     using field_type = Field;
                     using hash_component = HashComponent;
                     using merkle_proof_validating_component =
@@ -61,17 +61,17 @@ namespace nil {
 
                     /**
                      * @warning If you just want to compute intermediate fields (\p rt and \p sn) it is sufficient to
-                     * instantiate saver component and call \p generate_r1cs_witness, but if you want to check
+                     * instantiate encrypted_input_voting component and call \p generate_r1cs_witness, but if you want to check
                      * satisfiability of the CS you have to call \p generate_r1cs_witness for \p rt and \p sn with
                      * expected values before call \p is_satisfied for \p bp. This is due to using of the
                      * bit_vector_copy_component which is responsible for both logics: copying of the computed fields
                      * (\p rt and \p sn) and comparison of the computed and passed values. So, if you don't call \p
                      * generate_r1cs_witness for \p rt and \p sn satisfiability check will always be positive, i.e.
                      * false positive error happens. Another solution - instead of manual calling to the \p
-                     * generate_r1cs_witness for \p rt and \p sn just use saver's \p generate_r1cs_witness accepting
+                     * generate_r1cs_witness for \p rt and \p sn just use encrypted_input_voting's \p generate_r1cs_witness accepting
                      * additional parameters \p root and \p sn.
                      */
-                    saver(blueprint<field_type> &bp,
+                    encrypted_input_voting(blueprint<field_type> &bp,
                           const block_variable<field_type> &m,
                           const block_variable<field_type> &eid,
                           const digest_variable<field_type> &sn,
@@ -135,10 +135,14 @@ namespace nil {
                         root_validator.root.generate_r1cs_witness(root);
                         this->sn.generate_r1cs_witness(sn);
                     }
+
+                    inline std::size_t get_input_size() const {
+                        return m.block_size + eid.block_size + sn.digest_size + root_validator.root.digest_size;
+                    }
                 };
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_VOTING_SAVER_COMPONENT_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_VOTING_ENCRYPTED_INPUT_VOTING_COMPONENT_HPP
