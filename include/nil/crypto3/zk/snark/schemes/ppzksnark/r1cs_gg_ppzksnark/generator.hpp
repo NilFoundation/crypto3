@@ -54,12 +54,10 @@ namespace nil {
                  * Given a R1CS constraint system CS, this algorithm produces proving and verification keys for
                  * CS.
                  */
-                template<typename CurveType, ProvingMode Mode>
-                class r1cs_gg_ppzksnark_generator<
-                    CurveType, Mode,
-                    typename std::enable_if<ProvingMode::Basic == Mode || ProvingMode::EncryptedInput == Mode>::type> {
+                template<typename CurveType>
+                class r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Basic> {
 
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, Mode> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::template g1_type<> g1_type;

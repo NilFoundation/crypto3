@@ -38,6 +38,7 @@
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/generator.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prover.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verifier.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/generator.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -61,6 +62,16 @@ namespace nil {
                     std::is_same<r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Aggregate>, Prover>::value &&
                     std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Aggregate>,
                                  Verifier>::value>;
+
+                template<typename CurveType, typename Generator, typename Prover, typename Verifier>
+                using is_encrypted_input_mode = typename std::bool_constant<
+                    std::is_same<r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::EncryptedInput>,
+                                 Generator>::value &&
+                    std::is_same<r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::EncryptedInput>, Prover>::value &&
+                    std::is_same<
+                        r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::EncryptedInput>,
+                        Verifier>::value>;
+
                 /*!
                  * @brief ppzkSNARK for R1CS with a security proof in the generic group (GG) model
                  * @tparam CurveType
@@ -219,6 +230,38 @@ namespace nil {
                         return Verifier::template process<DistributionType, GeneratorType, Hash>(
                             ip_verifier_srs, pvk, public_inputs, proof, transcript_include_first,
                             transcript_include_last);
+                    }
+                };
+
+                template<typename CurveType, typename Generator, typename Prover, typename Verifier>
+                class r1cs_gg_ppzksnark<CurveType, Generator, Prover, Verifier, ProvingMode::EncryptedInput,
+                                        typename std::enable_if<is_encrypted_input_mode<CurveType, Generator, Prover,
+                                                                                        Verifier>::value>::type> {
+
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::EncryptedInput> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> basic_policy_type;
+                    typedef typename basic_policy_type::proof_type basic_proof_type;
+
+                public:
+                    typedef typename policy_type::constraint_system_type constraint_system_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
+
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+
+                    typedef typename policy_type::keypair_type keypair_type;
+
+                    typedef typename policy_type::proof_type proof_type;
+
+                    // Generate key pair
+                    template<typename KeyPairType,
+                             typename DistributionType = boost::random::uniform_int_distribution<
+                                 typename CurveType::scalar_field_type::integral_type>,
+                             typename GeneratorType = boost::random::mt19937>
+                    static inline KeyPairType generate(const constraint_system_type &constraint_system) {
+                        return Generator::template process<KeyPairType, DistributionType, GeneratorType>(
+                            constraint_system);
                     }
                 };
             }    // namespace snark
