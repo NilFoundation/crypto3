@@ -31,7 +31,8 @@ set(TESTS_NAMES
         "ecdsa"
         "bls"
         "secret_sharing"
-        "eddsa")
+        "eddsa"
+        "elgamal_verifiable")
 
 foreach (TEST_NAME ${TESTS_NAMES})
     define_pubkey_test(${TEST_NAME})
