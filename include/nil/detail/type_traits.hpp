@@ -216,13 +216,8 @@ namespace nil {
             constexpr static bool value = std::is_same<decltype(test(std::declval<T>())), long>::value;
         };
 
-        template<typename Range, typename Enable = void>
-        struct is_range {
-            static const bool value = false;
-        };
-
         template<typename Range>
-        struct is_range<Range, typename std::enable_if<std::is_class<Range>::value>::type> {
+        struct is_range {
             static const bool value = has_begin<Range>::value && has_end<Range>::value;
         };
 
