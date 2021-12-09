@@ -26,27 +26,28 @@
 #ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PROVER_HPP
 #define CRYPTO3_ZK_PLONK_REDSHIFT_PROVER_HPP
 
+#include <nil/crypto3/math/polynomial/polynom.hpp>
+
 #include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/types.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, std::size_t lambda, std::size_t m=2>
+                template<typename FieldType, std::size_t WiresAmount, 
+                    std::size_t lambda, std::size_t k, std::size_t r, std::size_t m=2>
                 class redshift_prover {
 
-                    using types_policy = redshift_types_policy<FieldType>;
+                    using types_policy = redshift_types_policy<FieldType, WiresAmount>;
                     using transcript_manifest = types_policy::prover_fiat_shamir_heuristic_manifest<6>;
 
                     typedef hashes::sha2<256> merkle_hash_type;
                     typedef hashes::sha2<256> transcript_hash_type;
 
                     typedef typename merkletree::MerkleTree<Hash> merkle_tree_type;
-
-                    constexpr static const std::size_t k = ...;
-                    constexpr static const std::size_t r = ...;
 
                     constexpr static const typename FieldType::value_type omega = 
                         algebra::get_root_of_unity<FieldType>()
@@ -55,13 +56,13 @@ namespace nil {
 
                 public:
                     static inline typename types_policy::proof_type<lpc>
-                        process(const types_policy::proving_key_type &proving_key,
-                                const types_policy::primary_input_type &primary_input,
-                                const types_policy::auxiliary_input_type &auxiliary_input) {
+                        process(const types_policy::preprocessed_data_type data,
+                                const typename types_policy::constraint_system_type &constraint_system,
+                                const typename types_policy::variable_assignment_type &assignments) {
 
-                        std::size_t N_wires = primary_input.size() + auxiliary_input.size();
-                        std::size_t N_perm = ...;
-                        std::size_t N_sel = ...;
+                        std::size_t N_wires = WiresAmount;
+                        std::size_t N_perm = data.permutations.size();
+                        std::size_t N_sel = data.selectors.size();
                         std::size_t N_const = ...;
 
                         fiat_shamir_heuristic<transcript_manifest, transcript_hash_type> transcript;
@@ -69,34 +70,61 @@ namespace nil {
                         ... setup_values = ...;
                         transcript(setup_values);
 
-                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> f(N_wires);
+                        // 2 - Define new witness polynomials
+                        // and 3 - Add commitments to fi to transcript
+                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> f = 
+                            constraint_system.get_polynoms(assignments);
 
                         std::vector<merkle_tree_type> f_trees;
                         std::vector<typename lpc::commitment_type> f_commitments;
 
                         for (std::size_t i = 0; i < N_wires; i++) {
-                            f.push_back(proving_key.f[i] + choose_h_i() * proving_key.Z(x));
+                            f[i] = f[i] + choose_h_i() * proving_key.Z(x);
                             f_trees.push_back(lpc::commit(f[i]));
                             f_commitments[i].push_back(f_trees[i].root());
                             transcript(f_commitments[i]);
                         }
 
-                        typename transcript_hash_type::digest_type beta_bytes =
-                            transcript.get_challenge<transcript_manifest::challenges_ids::beta>();
+                        // 4
+                        typename FieldType::value_type teta =
+                            transcript.get_challenge<transcript_manifest::challenges_ids::teta, FieldType>();
 
-                        typename transcript_hash_type::digest_type gamma_bytes =
-                            transcript.get_challenge<transcript_manifest::challenges_ids::gamma>();
+                        // 5
+                        // A(teta)
+                        std::vector<typename FieldType::value_type> A;
+                        // S(teta)
+                        std::vector<typename FieldType::value_type> S;
 
+                        // 6
+                        math::polynomial::polynom<typename FieldType::value_type> A1;
+                        math::polynomial::polynom<typename FieldType::value_type> S1;
+
+                        // 7
+                        merkle_tree_type A1_tree = lpc::commit(A1);
+                        merkle_tree_type P1_tree = lpc::commit(P1);
+                        typename lpc::commitment_type A1_commitment = A1_tree.root();
+                        typename lpc::commitment_type P1_commitment = P1_tree.root();
+
+                        transcript(A1_commitment);
+                        transcript(P1_commitment);
+
+                        // 8
                         typename FieldType::value_type beta =
-                            algebra::marshalling<FieldType>(beta_bytes);
-                        typename FieldType::value_type gamma =
-                            algebra::marshalling<FieldType>(gamma_bytes);
+                            transcript.get_challenge<transcript_manifest::challenges_ids::beta, FieldType>();
 
+                        typename FieldType::value_type gamma =
+                            transcript.get_challenge<transcript_manifest::challenges_ids::gamma, FieldType>();
+
+                        // 9
+                        // and 10
                         std::vector<math::polynomial::polynom<typename FieldType::value_type>> p(N_perm);
                         std::vector<math::polynomial::polynom<typename FieldType::value_type>> q(N_perm);
 
                         math::polynomial::polynom<typename FieldType::value_type> p1 = {1};
                         math::polynomial::polynom<typename FieldType::value_type> q1 = {1};
+
+                        std::vector<math::polynomial::polynom> &S_sigma = data.permutations;
+                        std::vector<math::polynomial::polynom> &S_id = data.identity_permutations;
 
                         for (std::size_t j = 0; j < N_perm; j++) {
                             p.push_back(f[j] + beta * S_id[j] + gamma);
@@ -106,6 +134,7 @@ namespace nil {
                             q1 *= q[j];
                         }
 
+                        // 11
                         std::vector<std::pair<typename FieldType::value_type,
                                               typename FieldType::value_type>>
                             P_interpolation_points(n + 1);
@@ -113,19 +142,20 @@ namespace nil {
                                               typename FieldType::value_type>>
                             Q_interpolation_points(n + 1);
 
-                        P_interpolation_points.push_back(std::make_pair(proving_key.omega, 1));
+                        P_interpolation_points.push_back(std::make_pair(data.omega, 1));
                         for (std::size_t i = 2; i <= n + 1; i++) {
+
                             typename FieldType::value_type P_mul_result =
                                 typename FieldType::one();
                             typename FieldType::value_type Q_mul_result =
                                 typename FieldType::one();
                             for (std::size_t j = 1; j < i; j++) {
-                                P_mul_result *= p1(proving_key.omega.pow(i));
-                                Q_mul_result *= q1(proving_key.omega.pow(i));
+                                P_mul_result *= p1(data.omega.pow(i));
+                                Q_mul_result *= q1(data.omega.pow(i));
                             }
 
-                            P_interpolation_points.push_back(std::make_pair(proving_key.omega.pow(i), P_mul_result));
-                            Q_interpolation_points.push_back(std::make_pair(proving_key.omega.pow(i), Q_mul_result));
+                            P_interpolation_points.push_back(std::make_pair(data.omega.pow(i), P_mul_result));
+                            Q_interpolation_points.push_back(std::make_pair(data.omega.pow(i), Q_mul_result));
                         }
 
                         math::polynomial::polynom<typename FieldType::value_type> P =
@@ -133,6 +163,7 @@ namespace nil {
                         math::polynomial::polynom<typename FieldType::value_type> Q =
                             math::polynomial::Lagrange_interpolation(Q_interpolation_points);
 
+                        // 12
                         merkle_tree_type P_tree = lpc::commit(P);
                         merkle_tree_type Q_tree = lpc::commit(Q);
                         typename lpc::commitment_type P_commitment = P_tree.root();
@@ -141,40 +172,68 @@ namespace nil {
                         transcript(P_commitment);
                         transcript(Q_commitment);
 
+                        // 13
+                        ... V = ...;
+
+                        // 14
+                        transcript(lpc::commit(V).root());
+
+                        // 15
                         std::array<typename FieldType::value_type, 6> alphas;
                         for (std::size_t i = 0; i < 6; i++) {
-                            typename transcript_hash_type::digest_type alpha_bytes =
-                                transcript.get_challenge<transcript_manifest::challenges_ids::alpha, i>();
-                            alphas[i] = (algebra::marshalling<typename FieldType>(alpha_bytes));
+                            alphas[i] =
+                                transcript.get_challenge<transcript_manifest::challenges_ids::alpha, i, FieldType>();
                         }
 
-                        std::array<math::polynomial::polynom<typename FieldType::value_type>, 6> F;
-                        F[0] = proving_key.L_basis[1] * (P - 1);
-                        F[1] = proving_key.L_basis[1] * (Q - 1);
+                        // 16
+                        typename FieldType::value_type tau =
+                            transcript.get_challenge<transcript_manifest::challenges_ids::tau, FieldType>();
+
+                        // 17
+                        // and 21
+                        std::size_t N_T = N_perm;
+                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> gates(N_sel);
+                        for (std::size_t i = 0; i < N_sel; i++) {
+                            gates[i] = [0];
+                            for (std::size_t j = 0; j < ...; j++){
+                                gates[i] += data.constraints[j][i] * tau.pow(...);
+                            }
+
+                            gates[i] *= data.selectors[i];
+
+                            N_T = std::max(N_T, gates[i].degree() - 1);
+                        }                        
+
+                        // 18
+                        std::array<math::polynomial::polynom<typename FieldType::value_type>, 11> F;
+                        F[0] = proving_key.Lagrange_basis[1] * (P - 1);
+                        F[1] = proving_key.Lagrange_basis[1] * (Q - 1);
                         F[2] = P * p_1 - (P << 1);
                         F[3] = Q * q_1 - (Q << 1);
-                        F[4] = proving_key.L_basis[n] * ((P << 1) - (Q << 1));
-                        F[5] = proving_key.PI;
+                        F[4] = proving_key.Lagrange_basis[n] * ((P << 1) - (Q << 1));
+                        F[5] = data.PI;
 
                         for (std::size_t i = 0; i < N_sel; i++) {
-                            F[5] += q[i] * ....gate[i];
+                            F[5] += gates[i];
                         }
 
-                        for (std::size_t i = 0; i < N_const; i++) {
-                            F[5] += proving_key.f_c[i];
-                        }
+                        // 19
+                        ...
 
+                        // 20
                         math::polynomial::polynom<typename FieldType::value_type> F_consolidated = 0;
-                        for (std::size_t i = 0; i < 6; i++) {
+                        for (std::size_t i = 0; i < 11; i++) {
                             F_consolidated += a[i] * F[i];
                         }
 
                         math::polynomial::polynom<typename FieldType::value_type> T_consolidated = 
                             F_consolidated / Z;
 
-                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> T(N_perm + 1);
+                        // 22
+                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> T(N_T);
                         T = separate_T(T_consolidated);
 
+                        // 23
                         std::vector<merkle_tree_type> T_trees;
                         std::vector<typename lpc::commitment_type> T_commitments;
 
@@ -183,11 +242,8 @@ namespace nil {
                             T_commitments.push_back(T_trees[i].root());
                         }
 
-                        typename transcript_hash_type::digest_type upsilon_bytes =
-                            transcript.get_challenge<transcript_manifest::challenges_ids::upsilon>();
-
                         typename FieldType::value_type upsilon =
-                            algebra::marshalling<FieldType>(upsilon_bytes);
+                            transcript.get_challenge<transcript_manifest::challenges_ids::upsilon, FieldType>();
 
                         std::array<typename FieldType::value_type, k> 
                             fT_evaluation_points = {upsilon};
@@ -215,6 +271,7 @@ namespace nil {
                                                               std::move(Q_lpc_proof), std::move(T_lpc_proofs));
 
                         return proof;
+                            }
                     }
                 };
             }    // namespace snark

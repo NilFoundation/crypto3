@@ -83,6 +83,18 @@ namespace nil {
                         return true;
                     }
 
+                    std::vector<...> get_copy_constraints(){
+
+                    }
+
+                    std::vector<...> get_selectors(){
+                        
+                    }
+
+                    std::vector<...> get_lookups(){
+                        
+                    }
+
                     std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_polynoms(
                         plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment){
 

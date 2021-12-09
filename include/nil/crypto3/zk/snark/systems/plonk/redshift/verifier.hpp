@@ -26,8 +26,11 @@
 #ifndef CRYPTO3_ZK_PLONK_REDSHIFT_VERIFIER_HPP
 #define CRYPTO3_ZK_PLONK_REDSHIFT_VERIFIER_HPP
 
+#include <nil/crypto3/math/polynomial/polynom.hpp>
+
 #include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/types.hpp>
 
 namespace nil {
     namespace crypto3 {
