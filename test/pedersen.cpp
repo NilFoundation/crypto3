@@ -64,13 +64,6 @@ void print_curve_point(std::ostream &os,
 namespace boost {
     namespace test_tools {
         namespace tt_detail {
-            // template<typename FieldParams>
-            // struct print_log_value<typename fields::detail::element_fp<FieldParams>> {
-            //     void operator()(std::ostream &os, typename fields::detail::element_fp<FieldParams> const &e) {
-            //         print_field_element(os, e);
-            //     }
-            // };
-
             template<typename CurveParams, typename Form, typename Coordinates>
             struct print_log_value<curves::detail::curve_element<CurveParams, Form, Coordinates>> {
                 void operator()(std::ostream &os,
@@ -88,14 +81,6 @@ namespace boost {
         }    // namespace tt_detail
     }        // namespace test_tools
 }    // namespace boost
-
-// template<typename Group>
-// void check_hash_to_curve(const std::string &msg_str, const typename Group::value_type &expected) {
-//     using hash_to_curve_type = hashes::h2c<Group>;
-//     std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
-//     typename Group::value_type result = to_curve<hash_to_curve_type>(msg);
-//     BOOST_CHECK_EQUAL(result, expected);
-// }
 
 BOOST_AUTO_TEST_SUITE(hash_pedersen_manual_test_suite)
 

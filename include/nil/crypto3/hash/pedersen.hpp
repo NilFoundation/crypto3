@@ -28,43 +28,17 @@
 
 #include <tuple>
 
-#include <nil/crypto3/detail/static_pow.hpp>
-
 #include <nil/crypto3/hash/algorithm/to_curve.hpp>
 #include <nil/crypto3/hash/to_curve_state.hpp>
 #include <nil/crypto3/hash/find_group_hash.hpp>
 
 #include <nil/crypto3/hash/detail/raw_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/pedersen/basic_functions.hpp>
+#include <nil/crypto3/hash/detail/pedersen/lookup.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hashes {
-            namespace detail {
-                /// See definition of \p c in https://zips.z.cash/protocol/protocol.pdf#concretepedersenhash
-                template<typename Field>
-                constexpr std::size_t get_chunks_per_base_point(std::size_t chunk_bits) {
-                    typename Field::extended_integral_type two(2);
-                    std::size_t c = 1;
-                    std::size_t prev_c = 0;
-                    /// (Fr - 1) / 2
-                    typename Field::extended_integral_type upper_bound = (Field::modulus - 1) / 2;
-                    // TODO: first multiplier should be verified
-                    /// (chunk_bits + 1) * ((2^(c * (chunk_bits + 1)) - 1) / (2^(chunk_bits + 1) - 1))
-                    auto get_test_value = [&](auto i) {
-                        return (chunk_bits + 1) * ((::nil::crypto3::detail::pow(two, i * (chunk_bits + 1)) - 1) /
-                                                   (::nil::crypto3::detail::pow(two, chunk_bits + 1) - 1));
-                    };
-                    auto test_value = get_test_value(c);
-
-                    while (test_value <= upper_bound) {
-                        prev_c = c++;
-                        test_value = get_test_value(c);
-                    }
-
-                    return prev_c;
-                }
-            }    // namespace detail
-
             /*!
              * @brief Pedersen hash
              *
@@ -121,8 +95,8 @@ namespace nil {
                         }
                         // TODO: generalize calculation of the lookup table value for chunk_bits != 3
                         typename curve_type::scalar_field_type::value_type encoded_chunk =
-                            static_cast<typename curve_type::scalar_field_type::value_type>(
-                                (1 - 2 * cached_bits[2]) * (1 + cached_bits[0] + 2 * cached_bits[1])) *
+                            detail::lookup<typename curve_type::scalar_field_type::value_type, chunk_bits>::process(
+                                cached_bits) *
                             pow_two;
                         encoded_segment = encoded_segment + encoded_chunk;
                         pow_two = pow_two << (chunk_bits + 1);
