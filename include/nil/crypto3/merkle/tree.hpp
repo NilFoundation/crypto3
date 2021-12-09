@@ -194,10 +194,10 @@ namespace nil {
             public:
                 template<typename Hashable, size_t Size>
                 merkle_tree_impl(std::vector<std::array<Hashable, Size>> data) :
-                    _leafs(data.size()), _size(detail::get_merkle_tree_len(_leafs, Arity)) {
+                    _leafs(data.size()), _size(nil::crypto3::detail::get_merkle_tree_len(_leafs, Arity)) {
                     BOOST_ASSERT_MSG(data.size() % Arity == 0, "Wrong leafs number");
 
-                    rc = detail::get_merkle_tree_row_count(_leafs, Arity);
+                    rc = nil::crypto3::detail::get_merkle_tree_row_count(_leafs, Arity);
                     for (size_t i = 0; i < _size; ++i) {
                         boost::add_vertex(_t);
                     }
