@@ -91,8 +91,8 @@ namespace nil {
                 && !nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value,
             nil::detail::value_unpack_impl<TInput>>::type unpack(const TInput &input, status_type &status) {
 
-            return nil::detail::value_unpack_impl<TInput>(typename is_compatible<TInput>::template type<TEndian>(input),
-                                                          status);
+            using marshalling_type = typename is_compatible<TInput>::template type<TEndian>;
+            return nil::detail::value_unpack_impl<TInput>(marshalling_type(input), status);
         }
 
         /*!
@@ -174,6 +174,15 @@ namespace nil {
             result = SinglePassRange(v.begin(), v.end());
             return status;
         }
+
+//        template<typename TEndian, typename InputIterator, typename OutputIterator>
+//        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value && !nil::detail::is_similar_std_array<SinglePassRange>::value, status_type>::type
+//        unpack(InputIterator first, InputIterator last, SinglePassRange &result) {
+//            status_type status;
+//            std::vector<typename SinglePassRange::value_type> v = unpack<TEndian>(first, last, status);
+//            result = SinglePassRange(v.begin(), v.end());
+//            return status;
+//        }
     }    // namespace marshalling
 }    // namespace nil
 

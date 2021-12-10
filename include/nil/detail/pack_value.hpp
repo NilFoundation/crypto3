@@ -84,23 +84,6 @@ namespace nil {
                 }
                 return result;
             }
-//            template<typename Array,
-//                     typename = typename std::enable_if<nil::detail::is_similar_std_array<Array>::value>::type>
-//            inline operator Array() {
-//
-//                using marshalling_type = typename marshalling::is_compatible<Array>::template type<TEndian>;
-//
-//                marshalling_type m_val;
-//
-//                *status = m_val.read(iterator, count_elements);
-//                auto values = m_val.value();
-//
-//                Array result;
-//                for (std::size_t i = 0; i < values.size(); i++) {
-//                    result[i] = values[i].value();
-//                }
-//                return result;
-//            }
 
             template<typename TMarshallingOutnput,
                      typename = typename std::enable_if<marshalling::is_marshalling_type<TMarshallingOutnput>::value>::type>

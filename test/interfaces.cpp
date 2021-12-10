@@ -115,23 +115,63 @@ void test_pack(Input in) {
 
 template <typename T, typename Tinput>
 void test_unpack(Tinput in) {
+    std::cout << is_compatible<Tinput>::value << std::endl;
+    std::cout <<  !nil::marshalling::is_container<typename is_compatible<Tinput>::template type<>>::value  << std::endl;
+
     status_type status;
 
-    T res_1_1 = unpack<option::big_endian>(in, status);
-    T res_1_2 = unpack<option::big_endian>(in.begin(), in.end(), status);
-    T res_1_3, res_1_4;
-    status = unpack<option::big_endian>(in, res_1_3);
-    status = unpack<option::big_endian>(in.begin(), in.end(), res_1_4);
+    T result1 = unpack<option::big_endian>(in, status);
+    BOOST_CHECK(status == status_type::success);
+
+#ifdef INPUT_HAS_BEGIN
+    T result2 = unpack<option::big_endian>(in.begin(), in.end(), status);
+    BOOST_CHECK(status == status_type::success);
+#endif
+
+    T result3;
+    status = unpack<option::big_endian>(in, result3);
+    BOOST_CHECK(status == status_type::success);
+
+#ifdef INPUT_HAS_BEGIN
+    T result4;
+    status = unpack<option::big_endian>(in.begin(), in.end(), result4);
+    BOOST_CHECK(status == status_type::success);
+#endif
+
+//    T result5;
+//    resize(result5, 2);
+//    unpack<option::big_endian>(in, result5.begin(), status);
+//    BOOST_CHECK(status == status_type::success);
+
+#ifdef INPUT_HAS_BEGIN
+    T result6;
+    resize(result6, 2);
+    unpack<option::big_endian>(in.begin(), in.end(), result6.begin(), status);
+    BOOST_CHECK(status == status_type::success);
+#endif
+
+//    T result7;
+//    resize(result7, 2);
+//    status = unpack<option::big_endian>(in, result7.begin());
+//    BOOST_CHECK(status == status_type::success);
+
+#ifdef INPUT_HAS_BEGIN
+    T result8;
+    resize(result8, 2);
+    status = unpack<option::big_endian>(in.begin(), in.end(), result8.begin());
+    BOOST_CHECK(status == status_type::success);
+#endif
 
 }
 
-BOOST_AUTO_TEST_CASE(vector_test) {
+BOOST_AUTO_TEST_CASE(pack_test) {
 #define INPUT_HAS_BEGIN 1
     std::vector<uint8_t> in1 = {0x12, 0x34, 0x56, 0x78};
     test_pack<std::vector<uint16_t>>(in1);
     test_pack<std::array<uint16_t, 2>>(in1);
 //    test_pack<boost::array<uint16_t, 2>>(in1);
     test_pack<boost::container::static_vector<uint16_t, 2>>(in1);
+    test_pack<std::uint32_t>(in1);
 #define INPUT_HAS_BEGIN 0
     test_pack<types::integral<field_type<option::big_endian>, std::uint16_t>>(in1);
 
@@ -141,13 +181,35 @@ BOOST_AUTO_TEST_CASE(vector_test) {
     test_pack<std::array<uint16_t, 2>>(in2);
 //    test_pack<boost::array<uint16_t, 2>>(in2);
     test_pack<boost::container::static_vector<uint16_t, 2>>(in2);
+    test_pack<std::uint32_t>(in2);
 #define INPUT_HAS_BEGIN 0
     test_pack<types::integral<field_type<option::big_endian>, std::uint16_t>>(in2);
 
-    std::vector<uint16_t> in = {0x1234, 0x5678};
-    test_unpack<std::vector<uint8_t>>(in);
-    test_unpack<std::array<uint8_t, 4>>(in);
-    test_unpack<boost::container::static_vector<uint8_t, 4>>(in);
+}
+
+BOOST_AUTO_TEST_CASE(unpack_test) {
+#define INPUT_HAS_BEGIN 1
+    std::vector<uint16_t> in1 = {0x1234, 0x5678};
+    test_unpack<std::vector<uint8_t>>(in1);
+    test_unpack<std::array<uint8_t, 4>>(in1);
+    test_unpack<boost::container::static_vector<uint8_t, 4>>(in1);
+////    test_unpack<boost::array<uint16_t, 2>>(in1);
+////    test_unpack<types::integral<field_type<option::big_endian>, std::uint16_t>>(in1);
+//
+    std::array<uint16_t, 2> in2 = {0x1234, 0x5678};
+    test_unpack<std::vector<uint8_t>>(in2);
+    test_unpack<std::array<uint8_t, 4>>(in2);
+    test_unpack<boost::container::static_vector<uint8_t, 4>>(in2);
+////    test_unpack<boost::array<uint8_t, 2>>(in2);
+////    test_unpack<types::integral<field_type<option::big_endian>, std::uint8_t>>(in2);
+
+#define INPUT_HAS_BEGIN 0
+//    uint32_t in3 = 0x12345678;
+//    test_unpack<std::vector<uint8_t>>(in3);
+//    test_unpack<std::array<uint8_t, 4>>(in3);
+//    test_unpack<boost::container::static_vector<uint8_t, 4>>(in3);
+////    test_unpack<boost::array<uint16_t, 2>>(in2);
+//    test_pack<types::integral<field_type<option::big_endian>, std::uint8_t>>(in3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
