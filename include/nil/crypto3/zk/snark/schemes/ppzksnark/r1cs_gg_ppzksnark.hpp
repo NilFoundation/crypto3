@@ -39,6 +39,7 @@
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prover.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verifier.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/generator.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/prover.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -249,9 +250,7 @@ namespace nil {
 
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
-
                     typedef typename policy_type::keypair_type keypair_type;
-
                     typedef typename policy_type::proof_type proof_type;
 
                     // Generate key pair
@@ -262,6 +261,16 @@ namespace nil {
                     static inline KeyPairType generate(const constraint_system_type &constraint_system) {
                         return Generator::template process<KeyPairType, DistributionType, GeneratorType>(
                             constraint_system);
+                    }
+
+                    // Proving
+                    template<typename PublicKey>
+                    static inline proof_type prove(const proving_key_type &pk,
+                                                   const PublicKey &pubkey,
+                                                   const primary_input_type &primary_input,
+                                                   const auxiliary_input_type &auxiliary_input,
+                                                   const typename CurveType::scalar_field_type::value_type &r) {
+                        return Prover::process(pk, pubkey, primary_input, auxiliary_input, r);
                     }
                 };
             }    // namespace snark

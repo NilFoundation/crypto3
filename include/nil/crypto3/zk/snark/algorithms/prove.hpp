@@ -53,6 +53,17 @@ namespace nil {
                     return ProofSystemType::template prove<Hash>(
                         srs, transcript_include_first, transcript_include_last, proofs_first, proofs_last);
                 }
+
+                template<typename ProofSystemType, typename PublicKey, typename ScalarValue>
+                typename ProofSystemType::proof_type
+                    prove(const typename ProofSystemType::proving_key_type &pk,
+                          const PublicKey &pubkey,
+                          const typename ProofSystemType::primary_input_type &primary_input,
+                          const typename ProofSystemType::auxiliary_input_type &auxiliary_input,
+                          const ScalarValue &r) {
+
+                    return ProofSystemType::prove(pk, pubkey, primary_input, auxiliary_input, r);
+                }
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

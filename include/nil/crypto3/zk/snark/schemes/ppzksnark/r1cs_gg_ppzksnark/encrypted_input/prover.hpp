@@ -45,8 +45,6 @@ namespace nil {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::EncryptedInput> policy_type;
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> basic_policy_type;
                     typedef r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Basic> basic_prover_type;
-                    typedef typename basic_policy_type::proof_type basic_proof_type;
-                    typedef typename basic_policy_type::extended_verification_key_type basic_extended_keypair_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::template g1_type<> g1_type;
@@ -57,19 +55,21 @@ namespace nil {
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
                     typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
-                    static inline proof_type process(const basic_extended_keypair_type &gg_keypair,
-                                                     const proving_key_type &proving_key,
+                    // TODO: add type constraints on PublicKey
+                    template<typename PublicKey>
+                    static inline proof_type process(const proving_key_type &gg_proving_key,
+                                                     const PublicKey &pubkey,
                                                      const primary_input_type &primary_input,
                                                      const auxiliary_input_type &auxiliary_input,
                                                      const typename scalar_field_type::value_type &r) {
-                        basic_proof_type proof =
-                            basic_prover_type::process(gg_keypair.first, primary_input, auxiliary_input);
+                        proof_type proof = basic_prover_type::process(gg_proving_key, primary_input, auxiliary_input);
 
                         return proof_type(std::move(proof.g_A),
                                           std::move(proof.g_B),
-                                          std::move(r * proving_key.gamma_inverse_sum_s_g1 + proof.g_C));
+                                          std::move(r * pubkey.gamma_inverse_sum_s_g1 + proof.g_C));
                     }
                 };
             }    // namespace snark
