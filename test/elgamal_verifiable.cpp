@@ -31,8 +31,11 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include <nil/crypto3/pubkey/algorithm/generate_keypair.hpp>
 #include <nil/crypto3/pubkey/algorithm/encrypt.hpp>
 #include <nil/crypto3/pubkey/algorithm/decrypt.hpp>
+
+#include <nil/crypto3/pubkey/modes/verifiable_encryption.hpp>
 
 #include <nil/crypto3/pubkey/elgamal_verifiable.hpp>
 
@@ -49,11 +52,12 @@
 #include <nil/crypto3/zk/snark/algorithms/generate.hpp>
 
 #include <nil/crypto3/zk/components/voting/encrypted_input_voting.hpp>
-// #include <nil/c>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::zk;
+using namespace nil::crypto3::pubkey;
+using namespace nil::crypto3::random;
 
 template<typename FieldParams>
 void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {
@@ -163,24 +167,27 @@ BOOST_AUTO_TEST_SUITE(pubkey_elgamal_verifiable_auto_test_suite)
 BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     using pairing_curve_type = curves::bls12_381;
     using curve_type = curves::jubjub;
-    using bp_generator_hash_type = hashes::sha2<256>;
+    using base_points_generator_hash_type = hashes::sha2<256>;
     using hash_params = hashes::find_group_hash_default_params;
-    using hash_component = components::pedersen<curve_type, bp_generator_hash_type, hash_params>;
+    using hash_component = components::pedersen<curve_type, base_points_generator_hash_type, hash_params>;
     using hash_type = typename hash_component::hash_type;
     using merkle_hash_component = hash_component;
     using merkle_hash_type = typename merkle_hash_component::hash_type;
     using field_type = typename hash_component::field_type;
     constexpr std::size_t arity = 2;
-    using voting_component = components::encrypted_input_voting<arity, hash_component, merkle_hash_component, field_type>;
+    using voting_component =
+        components::encrypted_input_voting<arity, hash_component, merkle_hash_component, field_type>;
     using merkle_proof_component = typename voting_component::merkle_proof_component;
     using proof_system = snark::r1cs_gg_ppzksnark<
         pairing_curve_type, snark::r1cs_gg_ppzksnark_generator<pairing_curve_type, snark::ProvingMode::EncryptedInput>,
         snark::r1cs_gg_ppzksnark_prover<pairing_curve_type, snark::ProvingMode::EncryptedInput>,
-        snark::r1cs_gg_ppzksnark_verifier_strong_input_consistency<pairing_curve_type, snark::ProvingMode::EncryptedInput>,
+        snark::r1cs_gg_ppzksnark_verifier_strong_input_consistency<pairing_curve_type,
+                                                                   snark::ProvingMode::EncryptedInput>,
         snark::ProvingMode::EncryptedInput>;
+    using encryption_scheme = elgamal_verifiable<pairing_curve_type>;
 
     /* prepare test */
-    constexpr std::size_t tree_depth = 2;
+    constexpr std::size_t tree_depth = 1;
     constexpr std::size_t participants_number = 1 << tree_depth;
     auto secret_keys = generate_random_data<bool, hash_type::digest_bits>(participants_number);
     std::vector<std::array<bool, hash_type::digest_bits>> public_keys;
@@ -195,6 +202,10 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     auto tree_pk_leaf = tree[proof_idx];
 
     std::vector<bool> m = {0, 1, 0, 0, 0, 0, 0};
+    std::vector<typename pairing_curve_type::scalar_field_type::value_type> m_field;
+    for(const auto m_i : m) {
+        m_field.emplace_back(std::size_t(m_i));
+    }
 
     const std::size_t eid_size = 64;
     std::vector<bool> eid(eid_size);
@@ -218,10 +229,22 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
 
     bp.set_input_sizes(vote_var.get_input_size());
 
-    typename proof_system::keypair_type keypair =
-        snark::generate<proof_system>(bp.get_constraint_system());
+    typename proof_system::keypair_type gg_keypair = snark::generate<proof_system>(bp.get_constraint_system());
 
+    algebraic_random_device<typename pairing_curve_type::scalar_field_type> d;
+    std::vector<typename pairing_curve_type::scalar_field_type::value_type> rnd;
+    for (std::size_t i = 0; i < m.size() * 3 + 2; ++i) {
+        rnd.emplace_back(d());
+    }
+    typename encryption_scheme::keypair_type keypair =
+        generate_keypair<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(rnd,
+                                                                                             {gg_keypair, m.size()});
 
+    typename encryption_scheme::cipher_type cipher_text = encrypt<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(m_field, {d(), std::get<0>(keypair)});
+    typename encryption_scheme::decipher_type decipher_text = decrypt<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(cipher_text, {std::get<1>(keypair), std::get<2>(keypair)});
+    for (const auto &dm_i: decipher_text.first) {
+        std::cout << dm_i.data << std::endl;
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
