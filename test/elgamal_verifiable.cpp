@@ -178,13 +178,8 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     using voting_component =
         components::encrypted_input_voting<arity, hash_component, merkle_hash_component, field_type>;
     using merkle_proof_component = typename voting_component::merkle_proof_component;
-    using proof_system = snark::r1cs_gg_ppzksnark<
-        pairing_curve_type, snark::r1cs_gg_ppzksnark_generator<pairing_curve_type, snark::ProvingMode::EncryptedInput>,
-        snark::r1cs_gg_ppzksnark_prover<pairing_curve_type, snark::ProvingMode::EncryptedInput>,
-        snark::r1cs_gg_ppzksnark_verifier_strong_input_consistency<pairing_curve_type,
-                                                                   snark::ProvingMode::EncryptedInput>,
-        snark::ProvingMode::EncryptedInput>;
     using encryption_scheme = elgamal_verifiable<pairing_curve_type>;
+    using proof_system = typename encryption_scheme::proof_system_type;
 
     /* prepare test */
     constexpr std::size_t tree_depth = 1;
@@ -203,13 +198,18 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
 
     std::vector<bool> m = {0, 1, 0, 0, 0, 0, 0};
     std::vector<typename pairing_curve_type::scalar_field_type::value_type> m_field;
-    for(const auto m_i : m) {
+    for (const auto m_i : m) {
         m_field.emplace_back(std::size_t(m_i));
     }
 
     const std::size_t eid_size = 64;
     std::vector<bool> eid(eid_size);
     std::generate(eid.begin(), eid.end(), [&]() { return std::rand() % 2; });
+
+    std::vector<bool> eid_sk;
+    std::copy(std::cbegin(eid), std::cend(eid), std::back_inserter(eid_sk));
+    std::copy(std::cbegin(secret_keys[proof_idx]), std::cend(secret_keys[proof_idx]), std::back_inserter(eid_sk));
+    std::vector<bool> sn = hash<hash_type>(eid_sk);
 
     components::blueprint<field_type> bp;
     components::block_variable<field_type> m_block(bp, m.size());
@@ -225,6 +225,17 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
 
     path_var.generate_r1cs_constraints();
     vote_var.generate_r1cs_constraints();
+
+    path_var.generate_r1cs_witness(proof);
+    address_bits_va.fill_with_bits_of_ulong(bp, path_var.address);
+    auto address = path_var.address;
+    BOOST_REQUIRE(address_bits_va.get_field_element_from_bits(bp) == path_var.address);
+    m_block.generate_r1cs_witness(m);
+    eid_block.generate_r1cs_witness(eid);
+    sk_block.generate_r1cs_witness(secret_keys[proof_idx]);
+    vote_var.generate_r1cs_witness(tree.root(), sn);
+    BOOST_REQUIRE(bp.is_satisfied());
+
     std::cout << "Constraints number: " << bp.num_constraints() << std::endl;
 
     bp.set_input_sizes(vote_var.get_input_size());
@@ -240,10 +251,15 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
         generate_keypair<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(rnd,
                                                                                              {gg_keypair, m.size()});
 
-    typename encryption_scheme::cipher_type cipher_text = encrypt<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(m_field, {d(), std::get<0>(keypair)});
-    typename encryption_scheme::decipher_type decipher_text = decrypt<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(cipher_text, {std::get<1>(keypair), std::get<2>(keypair)});
-    for (const auto &dm_i: decipher_text.first) {
-        std::cout << dm_i.data << std::endl;
+    typename encryption_scheme::cipher_type cipher_text =
+        encrypt<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(
+            m_field, {d(), std::get<0>(keypair), gg_keypair, bp.primary_input(), bp.auxiliary_input()});
+    typename encryption_scheme::decipher_type decipher_text =
+        decrypt<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(
+            cipher_text.first, {std::get<1>(keypair), std::get<2>(keypair), gg_keypair});
+    BOOST_REQUIRE(decipher_text.first.size() == m_field.size());
+    for (std::size_t i = 0; i < m_field.size(); ++i) {
+        BOOST_REQUIRE(decipher_text.first[i] == m_field[i]);
     }
 }
 
