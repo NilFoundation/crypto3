@@ -34,6 +34,7 @@
 #include <nil/crypto3/pubkey/algorithm/generate_keypair.hpp>
 #include <nil/crypto3/pubkey/algorithm/encrypt.hpp>
 #include <nil/crypto3/pubkey/algorithm/decrypt.hpp>
+#include <nil/crypto3/pubkey/algorithm/verify_encryption.hpp>
 
 #include <nil/crypto3/pubkey/modes/verifiable_encryption.hpp>
 
@@ -226,13 +227,19 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     path_var.generate_r1cs_constraints();
     vote_var.generate_r1cs_constraints();
 
+    BOOST_REQUIRE(!bp.is_satisfied());
     path_var.generate_r1cs_witness(proof);
+    BOOST_REQUIRE(!bp.is_satisfied());
     address_bits_va.fill_with_bits_of_ulong(bp, path_var.address);
+    BOOST_REQUIRE(!bp.is_satisfied());
     auto address = path_var.address;
     BOOST_REQUIRE(address_bits_va.get_field_element_from_bits(bp) == path_var.address);
     m_block.generate_r1cs_witness(m);
+    BOOST_REQUIRE(!bp.is_satisfied());
     eid_block.generate_r1cs_witness(eid);
+    BOOST_REQUIRE(!bp.is_satisfied());
     sk_block.generate_r1cs_witness(secret_keys[proof_idx]);
+    BOOST_REQUIRE(!bp.is_satisfied());
     vote_var.generate_r1cs_witness(tree.root(), sn);
     BOOST_REQUIRE(bp.is_satisfied());
 
@@ -261,6 +268,13 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     for (std::size_t i = 0; i < m_field.size(); ++i) {
         BOOST_REQUIRE(decipher_text.first[i] == m_field[i]);
     }
+
+    typename proof_system::primary_input_type pinput = bp.primary_input();
+    bool enc_verification_ans = verify_encryption<encryption_scheme>(
+        cipher_text.first,
+        {std::get<0>(keypair), gg_keypair, cipher_text.second,
+         typename proof_system::primary_input_type {std::cbegin(pinput) + m.size(), std::cend(pinput)}});
+    BOOST_REQUIRE(enc_verification_ans);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

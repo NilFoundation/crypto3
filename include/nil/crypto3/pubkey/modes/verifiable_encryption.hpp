@@ -46,7 +46,6 @@ namespace nil {
                     typedef Scheme scheme_type;
 
                     typedef Operation<scheme_type> op_type;
-                    typedef typename op_type::init_params_type init_params_type;
                     typedef typename op_type::internal_accumulator_type internal_accumulator_type;
                     typedef typename op_type::result_type result_type;
 

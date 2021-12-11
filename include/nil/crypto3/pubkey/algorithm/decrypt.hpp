@@ -41,26 +41,6 @@ namespace nil {
             template<typename Scheme>
             using decryption_init_params_type = typename decrypt_op<Scheme>::init_params_type;
         }
-        /*!
-         * @brief Signing of the input message on the \p key
-         *
-         * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme public key signature scheme
-         * @tparam InputIterator iterator representing input message
-         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
-         * executing a signing operation as in specification, another example is threshold mode
-         * @tparam PubkeyAccumulator accumulator set initialized with signing accumulator (internal parameter)
-         * @tparam StreamSchemeImpl (internal parameter)
-         * @tparam SchemeImpl return type implicitly convertible to \p PubkeyAccumulator or \p
-         * ProcessingMode::result_type (internal parameter)
-         *
-         * @param first the beginning of the message range to decrypt
-         * @param last the end of the message range to decrypt
-         * @param key private key to be used for signing
-         *
-         * @return \p SchemeImpl
-         */
         template<typename Scheme, typename Mode = pubkey::modes::isomorphic<Scheme>,
                  typename ProcessingMode = typename Mode::decryption_policy, typename InputIterator,
                  typename PubkeyAccumulator = pubkey::pubkey_accumulator_set<ProcessingMode>,
@@ -71,25 +51,6 @@ namespace nil {
             return SchemeImpl(first, last, PubkeyAccumulator(init_params));
         }
 
-        /*!
-         * @brief Signing of the input message on the \p key
-         *
-         * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme public key signature scheme
-         * @tparam SinglePassRange range representing input message
-         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
-         * executing a signing operation as in specification, another example is threshold mode
-         * @tparam PubkeyAccumulator accumulator set initialized with signing accumulator (internal parameter)
-         * @tparam StreamSchemeImpl (internal parameter)
-         * @tparam SchemeImpl return type implicitly convertible to \p PubkeyAccumulator or \p
-         * ProcessingMode::result_type (internal parameter)
-         *
-         * @param range the message range to decrypt
-         * @param key private key to be used for signing
-         *
-         * @return \p SchemeImpl
-         */
         template<typename Scheme, typename Mode = pubkey::modes::isomorphic<Scheme>,
                  typename ProcessingMode = typename Mode::decryption_policy, typename SinglePassRange,
                  typename PubkeyAccumulator = pubkey::pubkey_accumulator_set<ProcessingMode>,
@@ -100,24 +61,6 @@ namespace nil {
             return SchemeImpl(range, PubkeyAccumulator(init_params));
         }
 
-        /*!
-         * @brief Updating of accumulator set \p acc containing signing accumulator with input message
-         *
-         * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme public key signature scheme
-         * @tparam InputIterator iterator representing input message
-         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
-         * executing a signing operation as in specification, another example is threshold mode
-         * @tparam OutputAccumulator accumulator set initialized with signing accumulator (internal parameter)
-         *
-         * @param first the beginning of the message range to decrypt
-         * @param last the end of the message range to decrypt
-         * @param acc accumulator set containing signing accumulator initialized with private key and possibly
-         * pre-initialized with the beginning of message to be signed
-         *
-         * @return \p OutputAccumulator
-         */
         template<typename Scheme, typename Mode = pubkey::modes::isomorphic<Scheme>,
                  typename ProcessingMode = typename Mode::decryption_policy, typename InputIterator,
                  typename OutputAccumulator = pubkey::pubkey_accumulator_set<ProcessingMode>>
@@ -130,23 +73,6 @@ namespace nil {
             return SchemeImpl(first, last, std::forward<OutputAccumulator>(acc));
         }
 
-        /*!
-         * @brief Updating of accumulator set \p acc containing signing accumulator with input message
-         *
-         * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme public key signature scheme
-         * @tparam SinglePassRange range representing input message
-         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
-         * executing a signing operation as in specification, another example is threshold mode
-         * @tparam OutputAccumulator accumulator set initialized with signing accumulator (internal parameter)
-         *
-         * @param range the message range to decrypt
-         * @param acc accumulator set containing signing accumulator initialized with private key and possibly
-         * pre-initialized with the beginning of message to be signed
-         *
-         * @return \p OutputAccumulator
-         */
         template<typename Scheme, typename Mode = pubkey::modes::isomorphic<Scheme>,
                  typename ProcessingMode = typename Mode::decryption_policy, typename SinglePassRange,
                  typename OutputAccumulator = pubkey::pubkey_accumulator_set<ProcessingMode>>
@@ -159,24 +85,6 @@ namespace nil {
             return SchemeImpl(range, std::forward<OutputAccumulator>(acc));
         }
 
-        /*!
-         * @brief Signing of the input message on the \p key and writing result in \p out
-         *
-         * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme public key signature scheme
-         * @tparam InputIterator iterator representing input message
-         * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
-         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
-         * executing a signing operation as in specification, another example is threshold mode
-         *
-         * @param first the beginning of the message range to decrypt
-         * @param last the end of the message range to decrypt
-         * @param key private key to be used for signing
-         * @param out the beginning of the destination range
-         *
-         * @return \p OutputIterator
-         */
         template<typename Scheme, typename Mode = pubkey::modes::isomorphic<Scheme>,
                  typename ProcessingMode = typename Mode::decryption_policy, typename InputIterator,
                  typename OutputIterator>
@@ -190,23 +98,6 @@ namespace nil {
             return SchemeImpl(first, last, std::move(out), PubkeyAccumulator(init_params));
         }
 
-        /*!
-         * @brief Signing of the input message on the \p key and writing result in \p out
-         *
-         * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme public key signature scheme
-         * @tparam SinglePassRange range representing input message
-         * @tparam OutputIterator iterator representing output range with value type of \p ProcessingMode::result_type
-         * @tparam ProcessingMode a policy representing a work mode of the scheme, by default isomorphic, which means
-         * executing a signing operation as in specification, another example is threshold mode
-         *
-         * @param range the message range to decrypt
-         * @param key private key to be used for signing
-         * @param out the beginning of the destination range
-         *
-         * @return \p OutputIterator
-         */
         template<typename Scheme, typename Mode = pubkey::modes::isomorphic<Scheme>,
                  typename ProcessingMode = typename Mode::decryption_policy, typename SinglePassRange,
                  typename OutputIterator>
