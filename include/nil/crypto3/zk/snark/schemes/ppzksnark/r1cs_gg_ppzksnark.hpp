@@ -40,6 +40,7 @@
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verifier.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/generator.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/prover.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/verifier.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -271,6 +272,15 @@ namespace nil {
                                                    const auxiliary_input_type &auxiliary_input,
                                                    const typename CurveType::scalar_field_type::value_type &r) {
                         return Prover::process(pk, pubkey, primary_input, auxiliary_input, r);
+                    }
+
+                    // Verification
+                    template<typename CipherTextIterator, typename PublicKey>
+                    static inline bool verify(CipherTextIterator first, CipherTextIterator last,
+                                              const keypair_type &keypair, const PublicKey &pubkey,
+                                              const primary_input_type &unencrypted_primary_input,
+                                              const proof_type &proof) {
+                        return Verifier::process(first, last, keypair, pubkey, unencrypted_primary_input, proof);
                     }
                 };
             }    // namespace snark
