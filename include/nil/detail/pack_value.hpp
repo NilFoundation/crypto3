@@ -66,23 +66,36 @@ namespace nil {
                 this->status = &status;
             }
 
-            template<typename T, size_t SizeArray,
-                     typename = typename std::enable_if<
-                         !nil::marshalling::is_container<typename marshalling::is_compatible<T>::template type<>>::value>::type>
-            inline operator std::array<T, SizeArray>() {
-
-                using marshalling_type = typename marshalling::is_compatible<std::array<T, SizeArray>>::template type<TEndian>;
+            template <typename SimilarStdArray>
+            SimilarStdArray similar_std_array_marshalling() {
+                using marshalling_type = typename marshalling::is_compatible<SimilarStdArray>::template type<TEndian>;
 
                 marshalling_type m_val;
 
                 *status = m_val.read(iterator, count_elements);
                 auto values = m_val.value();
 
-                std::array<T, SizeArray> result;
+                SimilarStdArray result;
                 for (std::size_t i = 0; i < values.size(); i++) {
                     result[i] = values[i].value();
                 }
                 return result;
+            }
+
+            template<typename T, size_t SizeArray,
+                     typename = typename std::enable_if<
+                         !nil::detail::is_container<typename marshalling::is_compatible<T>::template type<>>::value>::type>
+            inline operator std::array<T, SizeArray>() {
+
+                return similar_std_array_marshalling<std::array<T, SizeArray>>();
+            }
+
+            template<typename T, size_t SizeArray,
+                typename = typename std::enable_if<
+                    !nil::detail::is_container<typename marshalling::is_compatible<T>::template type<>>::value>::type>
+            inline operator boost::array<T, SizeArray>() {
+
+                return similar_std_array_marshalling<boost::array<T, SizeArray>>();
             }
 
             template<typename TMarshallingOutnput,

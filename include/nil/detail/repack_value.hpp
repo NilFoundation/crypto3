@@ -81,6 +81,41 @@ namespace nil {
             }
         };
 
+        template<typename TInputEndian, typename TOutputEndian, typename Iter, typename OutputIterator>
+        struct itr_repack_impl {
+            marshalling::status_type *status;
+            mutable Iter iterator;
+            size_t count_elements;
+            OutputIterator out_iterator;
+
+            template<typename SinglePassRange>
+            itr_repack_impl(const SinglePassRange &range, OutputIterator out, marshalling::status_type &status) {
+                iterator = range.begin();
+                out_iterator = out;
+                count_elements = std::distance(range.begin(), range.end());
+                this->status = &status;
+            }
+
+            template<typename InputIterator>
+            itr_repack_impl(InputIterator first, InputIterator last, OutputIterator out, marshalling::status_type &status) {
+                iterator = first;
+                out_iterator = out;
+                count_elements = std::distance(first, last);
+                this->status = &status;
+            }
+
+            template<typename T>
+            inline operator T() {
+                marshalling::status_type result_status_unpack, result_status_pack;
+
+                std::vector<std::uint8_t> buffer = range_unpack_impl<TInputEndian, Iter>(iterator, count_elements, result_status_unpack);
+                out_iterator = range_pack_impl<TOutputEndian, std::vector<std::uint8_t>::const_iterator>(buffer, out_iterator, result_status_pack);
+                *status = result_status_pack | result_status_unpack;
+
+                return out_iterator;
+            }
+        };
+
     }    // namespace marshalling
 }    // namespace nil
 

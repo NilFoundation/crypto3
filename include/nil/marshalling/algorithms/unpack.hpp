@@ -36,6 +36,9 @@
 #include <nil/detail/unpack_value.hpp>
 #include <nil/detail/type_traits.hpp>
 
+#include <boost/concept/requires.hpp>
+#include <boost/range/concepts.hpp>
+
 namespace nil {
     namespace marshalling {
         /*!
@@ -65,11 +68,11 @@ namespace nil {
          *
          * @return
          */
-        template<typename TInput>
-        typename std::enable_if<is_marshalling_type<TInput>::value, nil::detail::value_unpack_impl<TInput>>::type
-            unpack(const TInput &input, status_type &status) {
+        template<typename TMarshallingInput>
+        typename std::enable_if<is_marshalling_type<TMarshallingInput>::value, nil::detail::value_unpack_impl<TMarshallingInput>>::type
+            unpack(const TMarshallingInput &input, status_type &status) {
 
-            return nil::detail::value_unpack_impl<TInput>(input, status);
+            return nil::detail::value_unpack_impl<TMarshallingInput>(input, status);
         }
 
         /*!
@@ -85,14 +88,15 @@ namespace nil {
          *
          * @return
          */
+
         template<typename TEndian, typename TInput>
-            typename std::enable_if<
-                is_compatible<TInput>::value
+        typename std::enable_if< is_compatible<TInput>::value
                 && !nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value,
-            nil::detail::value_unpack_impl<TInput>>::type unpack(const TInput &input, status_type &status) {
+            nil::detail::value_unpack_impl<typename is_compatible<TInput>::template type<TEndian>>>::type
+            unpack(const TInput &input, status_type &status) {
 
             using marshalling_type = typename is_compatible<TInput>::template type<TEndian>;
-            return nil::detail::value_unpack_impl<TInput>(marshalling_type(input), status);
+            return unpack(marshalling_type(input), status);
         }
 
         /*!
@@ -115,43 +119,110 @@ namespace nil {
             return nil::detail::range_unpack_impl<TEndian, typename SinglePassRange::const_iterator>(r, status);
         }
 
-        /*!
-         * @brief
-         *
-         * @ingroup marshalling_algorithms
-         *
-         * @tparam TEndian
-         * @tparam InputIterator
-         *
-         * @param first
-         * @param last
-         * @param status
-         *
-         * @return
-         */
         template<typename TEndian, typename InputIterator>
         nil::detail::range_unpack_impl<TEndian, InputIterator>
             unpack(InputIterator first, InputIterator last, status_type &status) {
 
             return nil::detail::range_unpack_impl<TEndian, InputIterator>(first, last, status);
         }
+// all with outputiterator begin
+        template<typename TInput, typename OutputIterator>
+        OutputIterator unpack(const TInput &r, OutputIterator out, status_type &status) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            std::vector<T> result = unpack(r, status);
+            return std::move(result.cbegin(), result.cend(), out);
+        }
+
+        template<typename InputIterator, typename OutputIterator>
+        OutputIterator unpack(InputIterator first, InputIterator last, OutputIterator out, status_type &status) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            std::vector<T> result = unpack(first, last, status);
+            return std::move(result.cbegin(), result.cend(), out);
+        }
+
+        template<typename TInput, typename OutputIterator>
+        typename std::enable_if<!nil::detail::is_range<OutputIterator>::value,
+                                status_type>::type
+        unpack(const TInput &r, OutputIterator out) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            status_type status;
+            std::vector<T> result = unpack(r, status);
+            std::move(result.cbegin(), result.cend(), out);
+            return status;
+        }
+
+        template<typename InputIterator, typename OutputIterator>
+        status_type unpack(InputIterator first, InputIterator last, OutputIterator out) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            status_type status;
+            std::vector<T> result = unpack(first, last, status);
+            std::move(result.cbegin(), result.cend(), out);
+            return status;
+        }
+
+
+
+        template<typename TEndian, typename TInput, typename OutputIterator>
+        OutputIterator unpack(const TInput &r, OutputIterator out, status_type &status) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            std::vector<T> result = unpack<TEndian>(r, status);
+            return std::move(result.cbegin(), result.cend(), out);
+        }
+
+        template<typename TEndian, typename TInput, typename OutputIterator>
+        typename std::enable_if<!nil::detail::is_range<OutputIterator>::value && !nil::detail::is_similar_std_array<OutputIterator>::value,
+                                status_type>::type
+        unpack(const TInput &r, OutputIterator out) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            status_type status;
+            std::vector<T> result = unpack<TEndian>(r, status);
+            std::move(result.cbegin(), result.cend(), out);
+            return status;
+        }
+
+        template<typename TEndian, typename InputIterator, typename OutputIterator>
+        OutputIterator unpack(InputIterator first, InputIterator last, OutputIterator out, status_type &status) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            std::vector<T> result = unpack<TEndian>(first, last, status);
+            return std::move(result.cbegin(), result.cend(), out);
+        }
+
+        template<typename TEndian, typename InputIterator, typename OutputIterator>
+        typename std::enable_if<!nil::detail::is_range<OutputIterator>::value && !nil::detail::is_similar_std_array<OutputIterator>::value,
+                                status_type>::type
+        unpack(InputIterator first, InputIterator last, OutputIterator out) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            status_type status;
+            std::vector<T> result = unpack<TEndian>(first, last, status);
+            std::move(result.cbegin(), result.cend(), out);
+            return status;
+        }
+//all with outputiterator end
+
+        template<typename TInput, typename SinglePassRange>
+        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value
+                                    && !(nil::detail::is_similar_std_array<SinglePassRange>::value),
+                                status_type>::type
+        unpack(const TInput &input, SinglePassRange &result) {
+            status_type status;
+            std::vector<typename SinglePassRange::value_type> v = unpack(input, status);
+            result = SinglePassRange(v.begin(), v.end());
+            return status;
+        }
 
         template<typename TInput, typename TOutput>
-        status_type unpack(const TInput &input, TOutput &result) {
+        typename std::enable_if<!nil::detail::is_range<TOutput>::value || nil::detail::is_similar_std_array<TOutput>::value,
+                                status_type>::type
+            unpack(const TInput &input, TOutput &result) {
             status_type status;
             result = unpack(input, status);
             return status;
         }
 
-        template<typename TEndian, typename TInput, typename TOutput>
-        typename std::enable_if<!nil::detail::is_range<TOutput>::value || nil::detail::is_similar_std_array<TOutput>::value, status_type>::type unpack(const TInput &input, TOutput &result) {
-            status_type status;
-            result = unpack<TEndian>(input, status);
-            return status;
-        }
-
         template<typename TEndian, typename TInput, typename SinglePassRange>
-        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value && !nil::detail::is_similar_std_array<SinglePassRange>::value, status_type>::type
+        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value
+                                    && !(nil::detail::is_similar_std_array<SinglePassRange>::value),
+                                status_type>::type
             unpack(const TInput &input, SinglePassRange &result) {
             status_type status;
             std::vector<typename SinglePassRange::value_type> v = unpack<TEndian>(input, status);
@@ -159,30 +230,34 @@ namespace nil {
             return status;
         }
 
-        template<typename TEndian, typename InputIterator, typename TOutput>
-        typename std::enable_if<!nil::detail::is_range<TOutput>::value || nil::detail::is_similar_std_array<TOutput>::value, status_type>::type unpack(InputIterator first, InputIterator last, TOutput &result) {
+        template<typename TEndian, typename TInput, typename TOutput>
+        typename std::enable_if<!nil::detail::is_range<TOutput>::value || nil::detail::is_similar_std_array<TOutput>::value,
+                                status_type>::type
+        unpack(const TInput &input, TOutput &result) {
             status_type status;
-            result = nil::detail::range_unpack_impl<TEndian, InputIterator>(first, last, status);
+            result = unpack<TEndian>(input, status);
             return status;
         }
 
         template<typename TEndian, typename InputIterator, typename SinglePassRange>
-        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value && !nil::detail::is_similar_std_array<SinglePassRange>::value, status_type>::type
-            unpack(InputIterator first, InputIterator last, SinglePassRange &result) {
+        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value
+                                    && !(nil::detail::is_similar_std_array<SinglePassRange>::value),
+                                status_type>::type
+         unpack(InputIterator first, InputIterator last, SinglePassRange &result) {
             status_type status;
             std::vector<typename SinglePassRange::value_type> v = unpack<TEndian>(first, last, status);
             result = SinglePassRange(v.begin(), v.end());
             return status;
         }
 
-//        template<typename TEndian, typename InputIterator, typename OutputIterator>
-//        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value && !nil::detail::is_similar_std_array<SinglePassRange>::value, status_type>::type
-//        unpack(InputIterator first, InputIterator last, SinglePassRange &result) {
-//            status_type status;
-//            std::vector<typename SinglePassRange::value_type> v = unpack<TEndian>(first, last, status);
-//            result = SinglePassRange(v.begin(), v.end());
-//            return status;
-//        }
+        template<typename TEndian, typename InputIterator, typename TOutput>
+        typename std::enable_if<!nil::detail::is_range<TOutput>::value || nil::detail::is_similar_std_array<TOutput>::value,
+                                status_type>::type
+            unpack(InputIterator first, InputIterator last, TOutput &result) {
+            status_type status;
+            result = unpack<TEndian>(first, last, status);
+            return status;
+        }
     }    // namespace marshalling
 }    // namespace nil
 
