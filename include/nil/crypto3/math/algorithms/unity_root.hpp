@@ -27,7 +27,7 @@
 #define CRYPTO3_MATH_UNITY_ROOT_HPP
 
 #include <type_traits>
-// #include <complex>
+#include <complex>
 
 #include <boost/math/constants/constants.hpp>
 #include <nil/crypto3/algebra/fields/params.hpp>
