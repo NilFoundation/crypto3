@@ -41,7 +41,8 @@ endmacro()
 set(TESTS_NAMES
     "evaluation_domain"
     "kronecker_substitution"
-    "polynomial_arithmetic")
+    "polynomial_arithmetic"
+    "polynom")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_math_test(${TEST_NAME})

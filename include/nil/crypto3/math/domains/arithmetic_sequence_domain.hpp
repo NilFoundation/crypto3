@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -104,7 +104,7 @@ namespace nil {
                         S[i] = (factorial * arithmetic_generator).inversed();
                     }
 
-                    _polynomial_multiplication<FieldType>(a, a, S);
+                    polynomial::multiplication(a, a, S);
                     a.resize(this->m);
 
 #ifdef MULTICORE
@@ -138,7 +138,7 @@ namespace nil {
                             S[i] = -S[i];
                     }
 
-                    _polynomial_multiplication<FieldType>(a, W, S);
+                    polynomial::multiplication(a, W, S);
                     a.resize(this->m);
 
                     /* Newton to Monomial */
@@ -228,7 +228,7 @@ namespace nil {
                         t[0] = -this->arithmetic_sequence[i];
                         t[1] = value_type::one();
 
-                        _polynomial_multiplication<FieldType>(x, x, t);
+                        polynomial::multiplication(x, x, t);
                     }
 
 #ifdef MULTICORE
