@@ -43,99 +43,100 @@ namespace nil {
                 struct merkle_proof;
             }    // namespace components
         }        // namespace zk
+        namespace containers {
+            namespace detail {
+                template<typename NodeType, std::size_t Arity = 2>
+                struct merkle_proof_impl {
+                    typedef NodeType node_type;
+                    typedef typename node_type::hash_type hash_type;
 
-        namespace detail {
-            template<typename NodeType, std::size_t Arity = 2>
-            struct merkle_proof_impl {
-                typedef NodeType node_type;
-                typedef typename node_type::hash_type hash_type;
+                    constexpr static const std::size_t arity = Arity;
 
-                constexpr static const std::size_t arity = Arity;
+                    constexpr static const std::size_t value_bits = node_type::value_bits;
+                    typedef typename node_type::value_type value_type;
 
-                constexpr static const std::size_t value_bits = node_type::value_bits;
-                typedef typename node_type::value_type value_type;
+                    merkle_proof_impl(merkle_tree<hash_type, arity> tree, std::size_t leaf_idx) {
+                        root = tree.root();
+                        path.resize(tree.row_count() - 1);
 
-                merkle_proof_impl(merkle_tree<hash_type, arity> tree, std::size_t leaf_idx) {
-                    root = tree.root();
-                    path.resize(tree.row_count() - 1);
+                        li = leaf_idx;
 
-                    li = leaf_idx;
+                        std::size_t cur_leaf = leaf_idx, cur_row = 0;
 
-                    std::size_t cur_leaf = leaf_idx, cur_row = 0;
-
-                    while (cur_leaf != tree.size() - 1) {    // while it's not root
-                        std::size_t parent = tree.parent(cur_leaf);
-                        std::array<std::size_t, arity> children = tree.children(parent);
-                        std::size_t cur_leaf_pos = cur_leaf % arity;
-                        for (size_t i = 0; i < arity; ++i) {
-                            std::size_t current_child = children[i];
-                            if (cur_leaf != current_child) {
-                                std::size_t save_position = current_child % arity;
-                                if (save_position > cur_leaf_pos) {
-                                    --save_position;
+                        while (cur_leaf != tree.size() - 1) {    // while it's not root
+                            std::size_t parent = tree.parent(cur_leaf);
+                            std::array<std::size_t, arity> children = tree.children(parent);
+                            std::size_t cur_leaf_pos = cur_leaf % arity;
+                            for (size_t i = 0; i < arity; ++i) {
+                                std::size_t current_child = children[i];
+                                if (cur_leaf != current_child) {
+                                    std::size_t save_position = current_child % arity;
+                                    if (save_position > cur_leaf_pos) {
+                                        --save_position;
+                                    }
+                                    path[cur_row][save_position] =
+                                        path_element_type(tree[current_child], current_child % arity);
                                 }
-                                path[cur_row][save_position] =
-                                    path_element_type(tree[current_child], current_child % arity);
                             }
+                            cur_row++;
+                            cur_leaf = parent;
                         }
-                        cur_row++;
-                        cur_leaf = parent;
                     }
-                }
 
-                template<typename Hashable>
-                bool validate(Hashable a) {
-                    value_type d = crypto3::hash<hash_type>(a);
+                    template<typename Hashable>
+                    bool validate(Hashable a) {
+                        value_type d = crypto3::hash<hash_type>(a);
 
-                    for (size_t cur_row = 0; cur_row < path.size(); ++cur_row) {
+                        for (size_t cur_row = 0; cur_row < path.size(); ++cur_row) {
 
-                        nil::crypto3::accumulator_set<hash_type> acc;
-                        bool was_missing = false;    // If every previous index was fine - missing the last one.
+                            accumulator_set<hash_type> acc;
+                            bool was_missing = false;    // If every previous index was fine - missing the last one.
 
-                        for (size_t i = 0; i < arity - 1; ++i) {
-                            if (path[cur_row][i].position != i && !was_missing) {
+                            for (size_t i = 0; i < arity - 1; ++i) {
+                                if (path[cur_row][i].position != i && !was_missing) {
+                                    crypto3::hash<hash_type>(d.begin(), d.end(), acc);
+                                    was_missing = true;
+                                }
+                                crypto3::hash<hash_type>(path[cur_row][i].hash.begin(), path[cur_row][i].hash.end(), acc);
+                            }
+                            if (!was_missing) {
                                 crypto3::hash<hash_type>(d.begin(), d.end(), acc);
-                                was_missing = true;
                             }
-                            crypto3::hash<hash_type>(path[cur_row][i].hash.begin(), path[cur_row][i].hash.end(), acc);
+                            d = accumulators::extract::hash<hash_type>(acc);
                         }
-                        if (!was_missing) {
-                            crypto3::hash<hash_type>(d.begin(), d.end(), acc);
+                        return (d == root);
+                    }
+
+                    std::size_t leaf_index() {
+                        return li;
+                    }
+
+                private:
+                    std::size_t li;
+
+                    value_type root;
+
+                    struct path_element_type {
+                        path_element_type(value_type x, size_t pos) : hash(x), position(pos) {
                         }
-                        d = nil::crypto3::accumulators::extract::hash<hash_type>(acc);
-                    }
-                    return (d == root);
-                }
+                        path_element_type() {
+                        }
+                        value_type hash;
+                        std::size_t position;
+                    };
 
-                std::size_t leaf_index() {
-                    return li;
-                }
+                    std::vector<std::array<path_element_type, Arity - 1>> path;
 
-            private:
-                std::size_t li;
-
-                value_type root;
-
-                struct path_element_type {
-                    path_element_type(value_type x, size_t pos) : hash(x), position(pos) {
-                    }
-                    path_element_type() {
-                    }
-                    value_type hash;
-                    std::size_t position;
+                    template<typename, typename, std::size_t>
+                    friend class nil::crypto3::zk::components::merkle_proof;
                 };
+            }    // namespace detail
 
-                std::vector<std::array<path_element_type, Arity - 1>> path;
-
-                template<typename, typename, std::size_t>
-                friend class nil::crypto3::zk::components::merkle_proof;
-            };
-        }    // namespace detail
-
-        template<typename T, std::size_t Arity>
-        using merkle_proof = typename std::conditional<detail::is_hash<T>::value,
-                                                       detail::merkle_proof_impl<detail::merkle_tree_node<T>, Arity>,
-                                                       detail::merkle_proof_impl<T, Arity>>::type;
+            template<typename T, std::size_t Arity>
+            using merkle_proof = typename std::conditional<nil::crypto3::detail::is_hash<T>::value,
+                                                           detail::merkle_proof_impl<detail::merkle_tree_node<T>, Arity>,
+                                                           detail::merkle_proof_impl<T, Arity>>::type;
+        }    // namespace containers
     }    // namespace crypto3
 }    // namespace nil
 

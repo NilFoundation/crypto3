@@ -43,7 +43,8 @@
 #include <type_traits>
 
 using namespace nil::crypto3;
-using namespace nil::crypto3::detail;
+using namespace nil::crypto3::containers;
+using namespace nil::crypto3::containers::detail;
 
 template<typename ValueType, std::size_t N>
 typename std::enable_if<std::is_unsigned<ValueType>::value, std::vector<std::array<ValueType, N>>>::type

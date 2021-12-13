@@ -28,18 +28,20 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace detail {
-            template<typename Hash>
-            struct merkle_tree_node {
-                typedef Hash hash_type;
+        namespace containers {
+            namespace detail {
+                template<typename Hash>
+                struct merkle_tree_node {
+                    typedef Hash hash_type;
 
-                constexpr static const std::size_t digest_bits = hash_type::digest_bits;
-                typedef typename hash_type::digest_type digest_type;
+                    constexpr static const std::size_t digest_bits = hash_type::digest_bits;
+                    typedef typename hash_type::digest_type digest_type;
 
-                typedef typename Hash::digest_type value_type;
-                constexpr static const std::size_t value_bits = digest_bits;
-            };
-        }    // namespace detail
+                    typedef typename Hash::digest_type value_type;
+                    constexpr static const std::size_t value_bits = digest_bits;
+                };
+            }    // namespace detail
+        }        // namespace containers
     }        // namespace crypto3
 }    // namespace nil
 
