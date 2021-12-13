@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
 //
 // MIT License
 //
@@ -23,18 +24,22 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_MARSHALL_HPP
-#define MARSHALLING_MARSHALL_HPP
+#ifndef MARSHALLING_MARSHALL_NEW_HPP
+#define MARSHALLING_MARSHALL_NEW_HPP
 
 #include <type_traits>
 
 #include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/inference.hpp>
+#include <nil/detail/pack_value.hpp>
 #include <nil/detail/type_traits.hpp>
+
+#include <boost/container/static_vector.hpp>
+#include <boost/concept/requires.hpp>
+#include <boost/range/concepts.hpp>
 
 namespace nil {
     namespace marshalling {
-
         /*!
          * @defgroup marshalling Marshalling
          *
@@ -45,35 +50,25 @@ namespace nil {
          * @brief Algorithms are meant to provide marshalling interface similar to STL algorithms' one.
          */
 
-        /*
-         * Marshalling with both input and output types, which are marshalling types, not a std
-         * iterator of elements with a marshalling type
-         */
-
         /*!
          * @brief
          *
          * @ingroup marshalling_algorithms
          *
-         * @tparam InputWordType
-         * @tparam TMarshallingOutnput
+         * @tparam TEndian
+         * @tparam SinglePassRange
          *
-         * @param val
+         * @param r
          * @param status
          *
          * @return
          */
-        template<typename TMarshallingOutnput, typename InputWordType>
-        typename std::enable_if<marshalling::is_marshalling_type<TMarshallingOutnput>::value
-                                    && std::is_integral<InputWordType>::value,
-                                TMarshallingOutnput>::type
-            pack(std::vector<InputWordType> val, status_type &status) {
-
-            TMarshallingOutnput result;
-            typename std::vector<InputWordType>::iterator buffer_begin = val.begin();
-            status = result.read(buffer_begin, val.size());
-
-            return result;
+        template<typename TEndian, typename SinglePassRange>
+        typename std::enable_if<std::is_integral<typename SinglePassRange::value_type>::value,
+                                nil::detail::range_pack_impl<TEndian, typename SinglePassRange::const_iterator>>::type
+            pack(const SinglePassRange &r, status_type &status) {
+            BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+            return nil::detail::range_pack_impl<TEndian, typename SinglePassRange::const_iterator>(r, status);
         }
 
         /*!
@@ -82,28 +77,21 @@ namespace nil {
          * @ingroup marshalling_algorithms
          *
          * @tparam TEndian
-         * @tparam InputWordType A compatible with std::is_integral type
-         * @tparam TOutput std::is_arithmetic type, not a marshalling type. For example, `int`, `uint8_t` or `double`
+         * @tparam InputIterator
          *
-         * @param val
+         * @param first
+         * @param last
          * @param status
          *
          * @return
          */
-        template<typename TEndian, typename TOutput, typename InputWordType>
-        typename std::enable_if<is_compatible<TOutput>::value
-                                    && (!nil::marshalling::is_container<typename is_compatible<TOutput>::template type<>>::value)
-                                    && std::is_integral<InputWordType>::value,
-                                TOutput>::type
-            pack(std::vector<InputWordType> val, status_type &status) {
 
-            using marshalling_type = typename is_compatible<TOutput>::template type<TEndian>;
-
-            marshalling_type m_val;
-            typename std::vector<InputWordType>::iterator buffer_begin = val.begin();
-            status = m_val.read(buffer_begin, val.size());
-
-            return m_val.value();
+        template<typename TEndian, typename InputIterator>
+        typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIterator>::value_type>::value,
+                                nil::detail::range_pack_impl<TEndian, InputIterator>>::type
+            pack(InputIterator first, InputIterator last, status_type &status) {
+            BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
+            return nil::detail::range_pack_impl<TEndian, InputIterator>(first, last, status);
         }
 
         /*!
@@ -112,77 +100,109 @@ namespace nil {
          * @ingroup marshalling_algorithms
          *
          * @tparam TEndian
-         * @tparam InputWordType A compatible with std::is_integral type
-         * @tparam TContainer std::vector
+         * @tparam SinglePassRange
+         * @tparam OutputIterator
          *
-         * @param val
+         * @param r
+         * @param out
          * @param status
          *
          * @return
          */
-        template<typename TEndian, typename TContainer, typename InputWordType>
-        typename std::enable_if<is_compatible<TContainer>::value
-                                    && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
-                                    && (!nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>::element_type>::value)
-                                    && (!is_compatible<TContainer>::fixed_size)
-                                    && std::is_integral<InputWordType>::value,
-                                TContainer>::type
-            pack(std::vector<InputWordType> val, status_type &status) {
-
-            using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
-
-            marshalling_type m_val;
-            typename std::vector<InputWordType>::iterator buffer_begin = val.begin();
-
-            status = m_val.read(buffer_begin, val.size());
-
-            TContainer result;
-            for (const auto &val_i : m_val.value()) {
-                result.push_back(val_i.value());
-            }
-
-            return result;
+        template<typename TEndian, typename SinglePassRange, typename OutputIterator>
+        typename std::enable_if<
+            std::is_integral<typename SinglePassRange::value_type>::value,
+            nil::detail::itr_pack_impl<TEndian, typename SinglePassRange::const_iterator, OutputIterator>>::type
+            pack(const SinglePassRange &r, OutputIterator out, status_type &status) {
+            BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+            return nil::detail::itr_pack_impl<TEndian, typename SinglePassRange::const_iterator, OutputIterator>(
+                r, out, status);
         }
 
-        /*!
-         * @brief
-         *
-         * @ingroup marshalling_algorithms
-         *
-         * @tparam TEndian
-         * @tparam InputWordType A compatible with std::is_integral type
-         * @tparam TContainer std::array
-         *
-         * @param val
-         * @param status
-         *
-         * @return
-         */
-        template<typename TEndian, typename TContainer, typename InputWordType>
-        typename std::enable_if<is_compatible<TContainer>::value
-                                    && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
-                                    && is_compatible<TContainer>::fixed_size
-                                    && std::is_integral<InputWordType>::value,
-                                TContainer>::type
-            pack(std::vector<InputWordType> val, status_type &status) {
+        template<typename TEndian, typename SinglePassRange, typename OutputIterator>
+        typename std::enable_if<std::is_integral<typename SinglePassRange::value_type>::value
+                                    && nil::detail::is_iterator<OutputIterator>::value,
+                                status_type>::type
+            pack(const SinglePassRange &r, OutputIterator out) {
+            BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+            BOOST_CONCEPT_ASSERT(
+                (boost::OutputIteratorConcept<OutputIterator,
+                                              typename std::iterator_traits<OutputIterator>::value_type>));
+            status_type status;
+            out = nil::detail::itr_pack_impl<TEndian, typename SinglePassRange::const_iterator, OutputIterator>(r, out,
+                                                                                                                status);
+            return status;
+        }
 
-            using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
+        template<typename TEndian, typename InputIterator, typename OutputIterator>
+        typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIterator>::value_type>::value,
+                                nil::detail::itr_pack_impl<TEndian, InputIterator, OutputIterator>>::type
+            pack(InputIterator first, InputIterator last, OutputIterator out, status_type &status) {
+            return nil::detail::itr_pack_impl<TEndian, InputIterator, OutputIterator>(first, last, out, status);
+        }
 
-            marshalling_type m_val;
-            typename std::vector<InputWordType>::iterator buffer_begin = val.begin();
+        template<typename TEndian, typename InputIterator, typename OutputIterator>
+        typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIterator>::value_type>::value
+                                    && nil::detail::is_iterator<OutputIterator>::value,
+                                status_type>::type
+            pack(InputIterator first, InputIterator last, OutputIterator out) {
+            BOOST_CONCEPT_ASSERT(
+                (boost::OutputIteratorConcept<OutputIterator,
+                                              typename std::iterator_traits<OutputIterator>::value_type>));
+            status_type status;
+            out = nil::detail::itr_pack_impl<TEndian, InputIterator, OutputIterator>(first, last, out, status);
+            return status;
+        }
 
-            status = m_val.read(buffer_begin, val.size());
-            auto values = m_val.value();
+        template<typename TEndian, typename SinglePassRange1, typename SinglePassRange2>
+        typename std::enable_if<nil::detail::is_range<SinglePassRange2>::value
+                                    && !nil::detail::is_similar_std_array<SinglePassRange2>::value,
+                                status_type>::type
+            pack(const SinglePassRange1 &rng_input, SinglePassRange2 &rng_output) {
+            BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange1>));
+            BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange2>));
+            status_type status;
+            std::vector<typename SinglePassRange2::value_type> v = pack<TEndian>(rng_input, status);
+            rng_output = SinglePassRange2(v.begin(), v.end());
+            return status;
+        }
 
-            TContainer result;
-            for (std::size_t i = 0; i < values.size(); i++) {
-                result[i] = values[i].value();
-            }
+        template<typename TEndian, typename SinglePassRange, typename TOutput>
+        typename std::enable_if<!(nil::detail::is_range<TOutput>::value)
+                                    || nil::detail::is_similar_std_array<TOutput>::value,
+                                status_type>::type
+            pack(const SinglePassRange &rng_input, TOutput &rng_output) {
+            BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+            status_type status;
+            rng_output = pack<TEndian>(rng_input, status);
+            return status;
+        }
 
-            return result;
+        template<typename TEndian, typename InputIterator, typename SinglePassRange>
+        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value
+                                    && !(nil::detail::is_similar_std_array<SinglePassRange>::value),
+                                status_type>::type
+            pack(InputIterator first, InputIterator last, SinglePassRange &rng_output) {
+            BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
+            BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+            status_type status;
+            std::vector<typename SinglePassRange::value_type> v = pack<TEndian>(first, last, status);
+            rng_output = SinglePassRange(v.begin(), v.end());
+            return status;
+        }
+
+        template<typename TEndian, typename InputIterator, typename TOutput>
+        typename std::enable_if<!nil::detail::is_range<TOutput>::value
+                                    || nil::detail::is_similar_std_array<TOutput>::value,
+                                status_type>::type
+            pack(InputIterator first, InputIterator last, TOutput &rng_output) {
+            BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
+            status_type status;
+            rng_output = pack<TEndian>(first, last, status);
+            return status;
         }
 
     }    // namespace marshalling
 }    // namespace nil
 
-#endif    // MARSHALLING_MARSHALL_HPP
+#endif    // MARSHALLING_MARSHALL_NEW_HPP

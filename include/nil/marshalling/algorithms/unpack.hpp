@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
 //
 // MIT License
 //
@@ -23,18 +24,23 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_DEMARSHALL_HPP
-#define MARSHALLING_DEMARSHALL_HPP
+#ifndef MARSHALLING_MARSHALL_UNPACK_NEW_HPP
+#define MARSHALLING_MARSHALL_UNPACK_NEW_HPP
 
 #include <type_traits>
 
+#include <boost/spirit/home/support/container.hpp>
+
 #include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/inference.hpp>
+#include <nil/detail/unpack_value.hpp>
 #include <nil/detail/type_traits.hpp>
+
+#include <boost/concept/requires.hpp>
+#include <boost/range/concepts.hpp>
 
 namespace nil {
     namespace marshalling {
-
         /*!
          * @defgroup marshalling Marshalling
          *
@@ -55,25 +61,19 @@ namespace nil {
          *
          * @ingroup marshalling_algorithms
          *
-         * @tparam OutputWordType
-         * @tparam TMarshallingInput
+         * @tparam TInput
          *
-         * @param val
+         * @param input
          * @param status
          *
          * @return
          */
-        template<typename OutputWordType, typename TMarshallingInput>
-        typename std::enable_if<marshalling::is_marshalling_type<TMarshallingInput>::value
-                                    && std::is_integral<OutputWordType>::value,
-                                std::vector<OutputWordType>>::type
-            unpack(TMarshallingInput val, status_type &status) {
+        template<typename TMarshallingInput>
+        typename std::enable_if<is_marshalling_type<TMarshallingInput>::value,
+                                nil::detail::value_unpack_impl<TMarshallingInput>>::type
+            unpack(const TMarshallingInput &input, status_type &status) {
 
-            std::vector<OutputWordType> result(val.length());
-            typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
-            status = val.write(buffer_begin, result.size());
-
-            return result;
+            return nil::detail::value_unpack_impl<TMarshallingInput>(input, status);
         }
 
         /*!
@@ -82,48 +82,23 @@ namespace nil {
          * @ingroup marshalling_algorithms
          *
          * @tparam TEndian
-         * @tparam OutputWordType A compatible with std::is_integral type
-         * @tparam TInput std::is_arithmetic type, not a marshalling type. For example, `int`, `uint8_t` or `double`
+         * @tparam TInput
          *
-         * @param val
+         * @param input
          * @param status
          *
          * @return
          */
-        template<typename TEndian, typename OutputWordType = std::uint8_t, typename TInput>
+
+        template<typename TEndian, typename TInput>
         typename std::enable_if<
             is_compatible<TInput>::value
-                && (!nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value)
-                && std::is_integral<OutputWordType>::value && !std::is_same<bool, OutputWordType>::value,
-            std::vector<OutputWordType>>::type
-            unpack(TInput val, status_type &status) {
+                && !nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value,
+            nil::detail::value_unpack_impl<typename is_compatible<TInput>::template type<TEndian>>>::type
+            unpack(const TInput &input, status_type &status) {
 
             using marshalling_type = typename is_compatible<TInput>::template type<TEndian>;
-
-            marshalling_type m_val = marshalling_type(val);
-            std::vector<OutputWordType> result(m_val.length());
-            typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
-            status = m_val.write(buffer_begin, result.size());
-
-            return result;
-        }
-
-        template<typename TEndian, typename OutputWordType, typename TInput>
-        typename std::enable_if<
-            is_compatible<TInput>::value
-                && (!nil::marshalling::is_container<typename is_compatible<TInput>::template type<>>::value)
-                && std::is_same<bool, OutputWordType>::value,
-            std::vector<OutputWordType>>::type
-            unpack(TInput val, status_type &status) {
-
-            using marshalling_type = typename is_compatible<TInput>::template type<TEndian>;
-
-            marshalling_type m_val = marshalling_type(val);
-            std::vector<bool> result(m_val.bit_length());
-            auto buffer_begin = result.begin();
-            status = m_val.write(buffer_begin, result.size());
-
-            return result;
+            return unpack(marshalling_type(input), status);
         }
 
         /*!
@@ -132,80 +107,162 @@ namespace nil {
          * @ingroup marshalling_algorithms
          *
          * @tparam TEndian
-         * @tparam OutputWordType A compatible with std::is_integral type
-         * @tparam TContainer std::vector.
+         * @tparam SinglePassRange
          *
-         * @param val
+         * @param r
          * @param status
          *
          * @return
          */
-        template<typename TEndian, typename OutputWordType = std::uint8_t, typename TContainer>
-        typename std::enable_if<
-            is_compatible<TContainer>::value
-                && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
-                && (!nil::marshalling::is_container<
-                    typename is_compatible<TContainer>::template type<>::element_type>::value)
-                && (!is_compatible<TContainer>::fixed_size) && std::is_integral<OutputWordType>::value,
-            std::vector<OutputWordType>>::type
-            unpack(TContainer val, status_type &status) {
+        template<typename TEndian, typename SinglePassRange>
+        nil::detail::range_unpack_impl<TEndian, typename SinglePassRange::const_iterator>
+            unpack(const SinglePassRange &r, status_type &status) {
 
-            using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
-            using marshalling_internal_type = typename marshalling_type::element_type;
-
-            std::vector<marshalling_internal_type> values;
-            for (const auto &val_i : val) {
-                values.emplace_back(val_i);
-            }
-
-            marshalling_type m_val = marshalling_type(values);
-            std::vector<OutputWordType> result(m_val.length());
-            typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
-            status = m_val.write(buffer_begin, result.size());
-
-            return result;
+            return nil::detail::range_unpack_impl<TEndian, typename SinglePassRange::const_iterator>(r, status);
         }
 
-        /*!
-         * @brief
-         *
-         * @ingroup marshalling_algorithms
-         *
-         * @tparam TEndian
-         * @tparam OutputWordType A compatible with std::is_integral type
-         * @tparam TContainer std::array.
-         *
-         * @param val
-         * @param status
-         *
-         * @return
-         */
-        template<typename TEndian, typename OutputWordType = std::uint8_t, typename TContainer>
-        typename std::enable_if<
-            is_compatible<TContainer>::value
-                && nil::marshalling::is_container<typename is_compatible<TContainer>::template type<>>::value
-                && is_compatible<TContainer>::fixed_size && std::is_integral<OutputWordType>::value,
-            std::vector<OutputWordType>>::type
-            unpack(TContainer val, status_type &status) {
+        template<typename TEndian, typename InputIterator>
+        nil::detail::range_unpack_impl<TEndian, InputIterator> unpack(InputIterator first, InputIterator last,
+                                                                      status_type &status) {
 
-            using marshalling_type = typename is_compatible<TContainer>::template type<TEndian>;
-            using marshalling_internal_type = typename marshalling_type::element_type;
-
-            nil::marshalling::container::static_vector<marshalling_internal_type, marshalling_type::max_length()>
-                values;
-            for (const auto &val_i : val) {
-                values.emplace_back(val_i);
-            }
-
-            marshalling_type m_val = marshalling_type(values);
-            std::vector<OutputWordType> result(m_val.length());
-            typename std::vector<OutputWordType>::iterator buffer_begin = result.begin();
-            status = m_val.write(buffer_begin, result.size());
-
-            return result;
+            return nil::detail::range_unpack_impl<TEndian, InputIterator>(first, last, status);
+        }
+        // all with outputiterator begin
+        template<typename TInput, typename OutputIterator>
+        OutputIterator unpack(const TInput &r, OutputIterator out, status_type &status) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            std::vector<T> result = unpack(r, status);
+            return std::move(result.cbegin(), result.cend(), out);
         }
 
+        template<typename InputIterator, typename OutputIterator>
+        OutputIterator unpack(InputIterator first, InputIterator last, OutputIterator out, status_type &status) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            std::vector<T> result = unpack(first, last, status);
+            return std::move(result.cbegin(), result.cend(), out);
+        }
+
+        template<typename TInput, typename OutputIterator>
+        typename std::enable_if<!nil::detail::is_range<OutputIterator>::value, status_type>::type
+            unpack(const TInput &r, OutputIterator out) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            status_type status;
+            std::vector<T> result = unpack(r, status);
+            std::move(result.cbegin(), result.cend(), out);
+            return status;
+        }
+
+        template<typename InputIterator, typename OutputIterator>
+        status_type unpack(InputIterator first, InputIterator last, OutputIterator out) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            status_type status;
+            std::vector<T> result = unpack(first, last, status);
+            std::move(result.cbegin(), result.cend(), out);
+            return status;
+        }
+
+        template<typename TEndian, typename TInput, typename OutputIterator>
+        OutputIterator unpack(const TInput &r, OutputIterator out, status_type &status) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            std::vector<T> result = unpack<TEndian>(r, status);
+            return std::move(result.cbegin(), result.cend(), out);
+        }
+
+        template<typename TEndian, typename TInput, typename OutputIterator>
+        typename std::enable_if<!nil::detail::is_range<OutputIterator>::value
+                                    && !nil::detail::is_similar_std_array<OutputIterator>::value,
+                                status_type>::type
+            unpack(const TInput &r, OutputIterator out) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            status_type status;
+            std::vector<T> result = unpack<TEndian>(r, status);
+            std::move(result.cbegin(), result.cend(), out);
+            return status;
+        }
+
+        template<typename TEndian, typename InputIterator, typename OutputIterator>
+        OutputIterator unpack(InputIterator first, InputIterator last, OutputIterator out, status_type &status) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            std::vector<T> result = unpack<TEndian>(first, last, status);
+            return std::move(result.cbegin(), result.cend(), out);
+        }
+
+        template<typename TEndian, typename InputIterator, typename OutputIterator>
+        typename std::enable_if<!nil::detail::is_range<OutputIterator>::value
+                                    && !nil::detail::is_similar_std_array<OutputIterator>::value,
+                                status_type>::type
+            unpack(InputIterator first, InputIterator last, OutputIterator out) {
+            using T = typename std::iterator_traits<OutputIterator>::value_type;
+            status_type status;
+            std::vector<T> result = unpack<TEndian>(first, last, status);
+            std::move(result.cbegin(), result.cend(), out);
+            return status;
+        }
+        // all with outputiterator end
+
+        template<typename TInput, typename SinglePassRange>
+        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value
+                                    && !(nil::detail::is_similar_std_array<SinglePassRange>::value),
+                                status_type>::type
+            unpack(const TInput &input, SinglePassRange &result) {
+            status_type status;
+            std::vector<typename SinglePassRange::value_type> v = unpack(input, status);
+            result = SinglePassRange(v.begin(), v.end());
+            return status;
+        }
+
+        template<typename TInput, typename TOutput>
+        typename std::enable_if<!nil::detail::is_range<TOutput>::value
+                                    || nil::detail::is_similar_std_array<TOutput>::value,
+                                status_type>::type
+            unpack(const TInput &input, TOutput &result) {
+            status_type status;
+            result = unpack(input, status);
+            return status;
+        }
+
+        template<typename TEndian, typename TInput, typename SinglePassRange>
+        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value
+                                    && !(nil::detail::is_similar_std_array<SinglePassRange>::value),
+                                status_type>::type
+            unpack(const TInput &input, SinglePassRange &result) {
+            status_type status;
+            std::vector<typename SinglePassRange::value_type> v = unpack<TEndian>(input, status);
+            result = SinglePassRange(v.begin(), v.end());
+            return status;
+        }
+
+        template<typename TEndian, typename TInput, typename TOutput>
+        typename std::enable_if<!nil::detail::is_range<TOutput>::value
+                                    || nil::detail::is_similar_std_array<TOutput>::value,
+                                status_type>::type
+            unpack(const TInput &input, TOutput &result) {
+            status_type status;
+            result = unpack<TEndian>(input, status);
+            return status;
+        }
+
+        template<typename TEndian, typename InputIterator, typename SinglePassRange>
+        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value
+                                    && !(nil::detail::is_similar_std_array<SinglePassRange>::value),
+                                status_type>::type
+            unpack(InputIterator first, InputIterator last, SinglePassRange &result) {
+            status_type status;
+            std::vector<typename SinglePassRange::value_type> v = unpack<TEndian>(first, last, status);
+            result = SinglePassRange(v.begin(), v.end());
+            return status;
+        }
+
+        template<typename TEndian, typename InputIterator, typename TOutput>
+        typename std::enable_if<!nil::detail::is_range<TOutput>::value
+                                    || nil::detail::is_similar_std_array<TOutput>::value,
+                                status_type>::type
+            unpack(InputIterator first, InputIterator last, TOutput &result) {
+            status_type status;
+            result = unpack<TEndian>(first, last, status);
+            return status;
+        }
     }    // namespace marshalling
 }    // namespace nil
 
-#endif    // MARSHALLING_DEMARSHALL_HPP
+#endif    // MARSHALLING_MARSHALL_UNPACK_NEW_HPP

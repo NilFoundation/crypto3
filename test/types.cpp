@@ -104,7 +104,7 @@ struct types_fixture {
                           status_type expectedStatus = status_type::success) {
 
         status_type status;
-        std::vector<char> outDataBuf =unpack<char>(field, status);
+        std::vector<char> outDataBuf = unpack(field, status);
 
         BOOST_CHECK(expectedStatus == status);
 

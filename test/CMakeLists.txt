@@ -42,7 +42,8 @@ endmacro()
 set(TESTS_NAMES
     "pack"
     "processing"
-    "types")
+    "types"
+    "interfaces")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_marshalling_test(${TEST_NAME})
