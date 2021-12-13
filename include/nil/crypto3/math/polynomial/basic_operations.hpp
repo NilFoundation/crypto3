@@ -52,18 +52,10 @@ namespace nil {
                         });
                 }
 
-                /**
-                 * Returns true if polynomial A is a zero polynomial.
-                 */
                 template<typename Range>
-                bool is_zero(const Range &a) {
-                    return std::all_of(
-                        std::begin(a),
-                        std::end(a),
-                        [](typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type i) {
-                            return i ==
-                                   typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type();
-                        });
+                void reverse(Range &a, std::size_t n) {
+                    std::reverse(std::begin(a), std::end(a));
+                    a.resize(n);
                 }
 
                 /**
@@ -77,6 +69,7 @@ namespace nil {
                            a.back() ==
                                typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type()) {
                         a.pop_back();
+                    }
                 }
 
                 /**
