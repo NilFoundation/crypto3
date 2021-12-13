@@ -125,7 +125,8 @@ namespace nil {
         template<typename TInputEndian, typename TOutputEndian, typename SinglePassRange, typename TOutputIterator>
         TOutputIterator repack(const SinglePassRange &rng_input, TOutputIterator out, status_type &status) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
-            std::vector<typename SinglePassRange::value_type> result
+            using T = typename std::iterator_traits<TOutputIterator>::value_type;
+            std::vector<T > result
                 = repack<TInputEndian, TOutputEndian>(rng_input, status);
             return std::move(result.cbegin(), result.cend(), out);
             ;
@@ -136,7 +137,8 @@ namespace nil {
             repack(const SinglePassRange &rng_input, TOutputIterator out) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
             status_type status;
-            std::vector<typename SinglePassRange::value_type> result
+            using T = typename std::iterator_traits<TOutputIterator>::value_type;
+            std::vector<T> result
                 = repack<TInputEndian, TOutputEndian>(rng_input, status);
             std::move(result.cbegin(), result.cend(), out);
             return status;
@@ -144,7 +146,8 @@ namespace nil {
 
         template<typename TInputEndian, typename TOutputEndian, typename InputIterator, typename TOutputIterator>
         TOutputIterator repack(InputIterator first, InputIterator last, TOutputIterator out, status_type &status) {
-            std::vector<typename InputIterator::value_type> result
+            using T = typename std::iterator_traits<TOutputIterator>::value_type;
+            std::vector<T> result
                 = repack<TInputEndian, TOutputEndian>(first, last, status);
             return std::move(result.cbegin(), result.cend(), out);
         }
@@ -152,8 +155,9 @@ namespace nil {
         template<typename TInputEndian, typename TOutputEndian, typename InputIterator, typename TOutputIterator>
         typename std::enable_if<!nil::detail::is_range<TOutputIterator>::value, status_type>::type
             repack(InputIterator first, InputIterator last, TOutputIterator out) {
+            using T = typename std::iterator_traits<TOutputIterator>::value_type;
             status_type status;
-            std::vector<typename InputIterator::value_type> result
+            std::vector<T> result
                 = repack<TInputEndian, TOutputEndian>(first, last, status);
             std::move(result.cbegin(), result.cend(), out);
             return status;
