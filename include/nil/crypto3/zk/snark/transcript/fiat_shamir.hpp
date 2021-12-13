@@ -26,6 +26,9 @@
 #ifndef CRYPTO3_ZK_TRANSCRIPT_FIAT_SHAMIR_HEURISTIC_HPP
 #define CRYPTO3_ZK_TRANSCRIPT_FIAT_SHAMIR_HEURISTIC_HPP
 
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+#include <nil/crypto3/hash/sha2.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -53,10 +56,10 @@ namespace nil {
                  *     }
                  * };
                  */
-                template<enum TChallenges, typename Hash = hashes::sha2>
+                template<typename TChallenges, typename Hash = hashes::sha2<256>>
                 class fiat_shamir_heuristic {
 
-                    accumulators::accumulator_set<Hash> acc;
+                    accumulator_set<Hash> acc;
                 public:
                     
                     fiat_shamir_heuristic() {
@@ -64,20 +67,20 @@ namespace nil {
                     }
 
                     template <typename TAny>
-                    operator (TAny data){
+                    void operator() (TAny data){
                         acc(data);
                     }
 
-                    template <challenges_ids ChallengeId>
+                    template <typename TChallenges::challenges_ids ChallengeId>
                     typename Hash::digest_type get_challenge(){
                         acc(ChallengeId);
-                        return extract::hash<hash_t>(acc);
+                        return accumulators::extract::hash<Hash>(acc);
                     }
 
-                    template <challenges_ids ChallengeId, std::size_t Index>
+                    template <typename TChallenges::challenges_ids ChallengeId, std::size_t Index>
                     typename Hash::digest_type get_challenge(){
                         acc(ChallengeId + Index);
-                        return extract::hash<hash_t>(acc);
+                        return accumulators::extract::hash<Hash>(acc);
                     }
                 };
             }    // namespace snark

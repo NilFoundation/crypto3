@@ -28,6 +28,8 @@
 
 #include <nil/crypto3/math/polynomial/polynom.hpp>
 
+#include <nil/crypto3/hash/sha2.hpp>
+
 #include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/types.hpp>

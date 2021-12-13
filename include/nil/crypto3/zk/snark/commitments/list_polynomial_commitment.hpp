@@ -26,7 +26,11 @@
 #ifndef CRYPTO3_ZK_FRI_COMMITMENT_SCHEME_HPP
 #define CRYPTO3_ZK_FRI_COMMITMENT_SCHEME_HPP
 
-#include <nil/crypto3/zk/snark/commitments/commitment.hpp>
+#include <nil/crypto3/math/polynomial/polynom.hpp>
+#include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
+
+#include <nil/crypto3/merkle/tree.hpp>
+#include <nil/crypto3/merkle/proof.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -50,30 +54,32 @@ namespace nil {
                     std::size_t r, std::size_t m=2>
                 class list_polynomial_commitment_scheme {
 
-                    typedef typename merkletree::MerkleTree<Hash> merkle_tree_type;
-                    typedef typename merkletree::MerkleProof<Hash> merkle_proof_type;
+                    typedef Hash transcript_hash_type;
+
+                    typedef merkle_tree<Hash, 2> merkle_tree_type;
+                    typedef merkle_proof<Hash, 2> merkle_proof_type;
 
                     constexpr static const math::polynomial::polynom<typename FieldType::value_type> 
                         q = {0, 0, 1};
 
                     struct transcript_round_manifest {
                         enum challenges_ids {x, y};
-                    }
+                    };
                 public:
 
                     using openning_type = merkle_proof_type;
-                    using commitment_type = typename merkle_tree_type::root_type;
+                    using commitment_type = typename merkle_tree_type::value_type;
 
                     struct proof_type {
                         std::array<merkle_proof_type, k> z_openings;
-                        std::array<std::array<merkle_proof_type, m * r>, lamda> alpha_openings;
-                        std::array<std::array<merkle_proof_type, r>, lamda> f_y_openings;
+                        std::array<std::array<merkle_proof_type, m * r>, lambda> alpha_openings;
+                        std::array<std::array<merkle_proof_type, r>, lambda> f_y_openings;
 
-                        std::array<std::array<commitment_type, r - 1>, lamda> f_commitments;
+                        std::array<std::array<commitment_type, r - 1>, lambda> f_commitments;
 
-                        std::array<std::array<typename FieldType::value_type>, lambda> 
+                        std::array<std::vector<typename FieldType::value_type>, lambda> 
                             f_ip1_coefficients;
-                    }
+                    };
 
                     // The result of this function is not commitment_type (as it would expected), 
                     // but the built Merkle tree. This is done so, because we often need to reuse 
@@ -81,10 +87,9 @@ namespace nil {
                     // After this function 
                     // result.root();
                     // should be called
-                    template <...>
                     static merkle_tree_type commit (const math::polynomial::polynom<
                             typename FieldType::value_type> &f, 
-                        const std::vector<...> &D){
+                        const std::vector<typename FieldType::value_type> &D){
 
                         std::vector<typename FieldType::value_type> y;
                         for (typename FieldType::value_type H : D){
@@ -94,12 +99,11 @@ namespace nil {
                         return merkle_tree_type(y);
                     }
 
-                    template <...>
                     static proof_type proof_eval (
                         std::array<typename FieldType::value_type, k> evaluation_points, 
                         const merkle_tree_type &T,
                         const math::polynomial::polynom<typename FieldType::value_type> &f, 
-                        const std::vector<...> &D){
+                        const std::vector<typename FieldType::value_type> &D){
 
                         proof_type proof;
 
@@ -184,13 +188,11 @@ namespace nil {
 
                         return proof;
                     }
-                };
 
-                template <...>
                     static bool verify_eval (std::array<typename FieldType::value_type, k> evaluation_points, 
                         commitment_type root,
                         proof_type proof,
-                        const std::vector<...> &D){
+                        const std::vector<typename FieldType::value_type> &D){
 
                         fiat_shamir_heuristic<transcript_round_manifest, transcript_hash_type> transcript;
 
