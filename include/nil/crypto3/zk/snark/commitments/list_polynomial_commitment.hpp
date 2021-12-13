@@ -138,7 +138,7 @@ namespace nil {
                             math::polynomial::polynom<typename FieldType::value_type> f_i = Q;
 
                             typename FieldType::value_type x_i = 
-                                transcript.get_challenge<transcript_round_manifest::challenges_ids::x, FieldType>();
+                                transcript.template get_challenge<transcript_round_manifest::challenges_ids::x, FieldType>();
 
                             std::array<merkle_proof_type, m*r> &alpha_openings = proof.alpha_openings[round_id];
                             std::array<merkle_proof_type, r> &f_y_openings = proof.f_y_openings[round_id];
@@ -150,12 +150,12 @@ namespace nil {
                             for (std::size_t i = 0; i <= r-1; i++){
 
                                 typename FieldType::value_type y_i = 
-                                    transcript.get_challenge<transcript_round_manifest::challenges_ids::y, i, FieldType>();
+                                    transcript.template get_challenge<transcript_round_manifest::challenges_ids::y, i, FieldType>();
 
                                 math::polynomial::polynom<typename FieldType::value_type> 
                                     sqr_polynom = {y_i, 0, -1};
-                                std::array<typename FieldType::value_type, m> s = 
-                                    math::polynomial::get_roots<m>(sqr_polynom);
+                                std::array<typename FieldType::value_type, m> s ;
+                                    // = math::polynomial::get_roots<m>(sqr_polynom);
 
                                 std::array<std::pair<typename FieldType::value_type, 
                                     typename FieldType::value_type>, m> p_y_i_interpolation_points;
@@ -177,14 +177,14 @@ namespace nil {
                                 std::size_t leaf_index = std::find(D.begin(), D.end(), y_i) - D.begin();
                                 f_y_openings[i] = merkle_proof_type(f_i_tree, leaf_index);
 
-                                x = q.evaluate(x);
+                                x_i = q.evaluate(x_i);
 
                                 if (i < r - 1){
-                                    f_i_tree = commit(f_i, D_ip1);
+                                    f_i_tree = commit(f_i, D);
                                     f_commitments[i] = f_i_tree.root();
                                     transcript(f_commitments[i]);
                                 } else {
-                                    f_ip1_coefficients = math::polynomial::get_coefficients(f_i);
+                                    f_ip1_coefficients = f_i;
                                 }
                             }
                         }
@@ -204,8 +204,8 @@ namespace nil {
                             typename FieldType::value_type>, k> U_interpolation_points;
 
                         for (std::size_t j = 0; j < k; j++){
-                            typename FieldType::value_type z_j = 
-                                algebra::marshalling<FieldType>(z_openings[j].leaf);
+                            typename FieldType::value_type z_j ;
+                                // = algebra::marshalling<FieldType>(z_openings[j].leaf);
                             if (!z_openings[j].validate(root)){
                                 return false;
                             }
@@ -216,22 +216,23 @@ namespace nil {
                         math::polynomial::polynom<typename FieldType::value_type> 
                             U = math::polynomial::lagrange_interpolation(U_interpolation_points);
 
-                        math::polynomial::polynom<typename FieldType::value_type> Q = (f - U);
-                        for (std::size_t j = 0; j < k; j++){
-                            Q = Q/(x - U_interpolation_points[j]);
-                        }
+                        math::polynomial::polynom<typename FieldType::value_type> Q ;
+                        // = (f - U);
+                        // for (std::size_t j = 0; j < k; j++){
+                        //     Q = Q/(x - U_interpolation_points[j]);
+                        // }
 
                         for (std::size_t round_id = 0; round_id < lambda; round_id++){
 
                             math::polynomial::polynom<typename FieldType::value_type> f_i = Q;
 
                             typename FieldType::value_type x_i = 
-                                transcript.get_challenge<transcript_round_manifest::challenges_ids::x, FieldType>();
+                                transcript.template get_challenge<transcript_round_manifest::challenges_ids::x, FieldType>();
 
                             std::array<merkle_proof_type, m*r> &alpha_openings = proof.alpha_openings[round_id];
                             std::array<merkle_proof_type, r> &f_y_openings = proof.f_y_openings[round_id];
                             std::array<commitment_type, r - 1> &f_commitments = proof.f_commitments[round_id];
-                            std::array<typename FieldType::value_type> &f_ip1_coefficients = 
+                            std::vector<typename FieldType::value_type> &f_ip1_coefficients = 
                                 proof.f_ip1_coefficients[round_id];
 
                             commitment_type &f_i_tree_root = root;
@@ -239,18 +240,18 @@ namespace nil {
                             for (std::size_t i = 0; i <= r-1; i++){
 
                                 typename FieldType::value_type y_i = 
-                                    transcript.get_challenge<transcript_round_manifest::challenges_ids::y, i, FieldType>();
+                                    transcript.template get_challenge<transcript_round_manifest::challenges_ids::y, i, FieldType>();
 
                                 math::polynomial::polynom<typename FieldType::value_type> sqr_polynom = {y_i, 0, -1};
-                                std::array<typename FieldType::value_type, m> s = 
-                                    math::polynomial::get_roots<m>(sqr_polynom);
+                                std::array<typename FieldType::value_type, m> s ;
+                                    // = math::polynomial::get_roots<m>(sqr_polynom);
 
                                 std::array<std::pair<typename FieldType::value_type, 
                                     typename FieldType::value_type>, m> p_y_i_interpolation_points;
 
                                 for (std::size_t j = 0; j < m; j++){
-                                    typename FieldType::value_type alpha_i_j = 
-                                        algebra::marshalling<FieldType>(alpha_openings[m*i + j].leaf);
+                                    typename FieldType::value_type alpha_i_j;
+                                        // = algebra::marshalling<FieldType>(alpha_openings[m*i + j].leaf);
                                     if (!alpha_openings[m*i + j].validate(f_i_tree_root)){
                                         return false;
                                     }
@@ -260,8 +261,8 @@ namespace nil {
                                 math::polynomial::polynom<typename FieldType::value_type> 
                                     p_y_i = math::polynomial::lagrange_interpolation(p_y_i_interpolation_points);
 
-                                typename FieldType::value_type f_y_i = 
-                                    algebra::marshalling<FieldType>(f_y_openings[i].leaf);
+                                typename FieldType::value_type f_y_i ;
+                                    // = algebra::marshalling<FieldType>(f_y_openings[i].leaf);
                                 if (!f_y_openings[i].validate(f_i_tree_root)){
                                     return false;
                                 }
@@ -270,23 +271,23 @@ namespace nil {
                                     return false;
                                 }
 
-                                x = q.evaluate(x);
+                                x_i = q.evaluate(x_i);
 
                                 if (i < r - 1){
                                     if (f_i != p_y_i){
                                         return false;
                                     }
 
-                                    f_commitments[i] = commit(f_i, D_ip1).root();
+                                    f_commitments[i] = commit(f_i, D).root();
                                     transcript(f_commitments[i]);
                                 } else {
                                     if (f_i != p_y_i){
                                         return false;
                                     }
 
-                                    if (math::polynomial::degree(f_i) != ...){
-                                        return false;
-                                    }
+                                    // if (f_i.size() != ...){
+                                    //     return false;
+                                    // }
                                 }
                             }
                         }
