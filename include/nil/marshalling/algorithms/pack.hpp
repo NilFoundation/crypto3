@@ -113,7 +113,7 @@ namespace nil {
         typename std::enable_if<
             std::is_integral<typename SinglePassRange::value_type>::value,
             nil::detail::itr_pack_impl<TEndian, typename SinglePassRange::const_iterator, OutputIterator>>::type
-            pack(SinglePassRange r, OutputIterator out, status_type &status) {
+            pack(const SinglePassRange &r, OutputIterator out, status_type &status) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
             return nil::detail::itr_pack_impl<TEndian, typename SinglePassRange::const_iterator, OutputIterator>(
                 r, out, status);
@@ -123,7 +123,7 @@ namespace nil {
         typename std::enable_if<std::is_integral<typename SinglePassRange::value_type>::value
                                     && nil::detail::is_iterator<OutputIterator>::value,
                                 status_type>::type
-            pack(SinglePassRange r, OutputIterator out) {
+            pack(const SinglePassRange &r, OutputIterator out) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
             BOOST_CONCEPT_ASSERT(
                 (boost::OutputIteratorConcept<OutputIterator,
@@ -158,7 +158,7 @@ namespace nil {
         typename std::enable_if<nil::detail::is_range<SinglePassRange2>::value
                                     && !nil::detail::is_similar_std_array<SinglePassRange2>::value,
                                 status_type>::type
-            pack(SinglePassRange1 rng_input, SinglePassRange2 &rng_output) {
+            pack(const SinglePassRange1 &rng_input, SinglePassRange2 &rng_output) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange1>));
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange2>));
             status_type status;
@@ -171,7 +171,7 @@ namespace nil {
         typename std::enable_if<!(nil::detail::is_range<TOutput>::value)
                                     || nil::detail::is_similar_std_array<TOutput>::value,
                                 status_type>::type
-            pack(SinglePassRange rng_input, TOutput &rng_output) {
+            pack(const SinglePassRange &rng_input, TOutput &rng_output) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
             status_type status;
             rng_output = pack<TEndian>(rng_input, status);
