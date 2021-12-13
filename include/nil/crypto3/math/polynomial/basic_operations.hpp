@@ -37,20 +37,6 @@ namespace nil {
     namespace crypto3 {
         namespace math {
             namespace polynomial {
-                
-                /**
-                 * Returns true if polynomial A is a zero polynomial.
-                 */
-                template<typename Range>
-                bool is_zero(const Range &a) {
-                    return std::all_of(
-                        std::begin(a),
-                        std::end(a),
-                        [](typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type i) {
-                            return i ==
-                                   typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type();
-                        });
-                }
 
                 /**
                  * Returns true if polynomial A is a zero polynomial.
@@ -61,9 +47,15 @@ namespace nil {
                         std::begin(a),
                         std::end(a),
                         [](typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type i) {
-                            return i ==
-                                   typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type();
+                            return i == typename std::iterator_traits<decltype(
+                                            std::begin(std::declval<Range>()))>::value_type();
                         });
+                }
+
+                template<typename Range>
+                void reverse(Range &a, std::size_t n) {
+                    std::reverse(std::begin(a), std::end(a));
+                    a.resize(n);
                 }
 
                 /**
@@ -73,21 +65,24 @@ namespace nil {
                  */
                 template<typename Range>
                 void condense(Range &a) {
-                    while (std::distance(std::cbegin(a), std::cend(a)) > 1 &&
-                           a.back() ==
-                               typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type()) {
+                    while (
+                        std::distance(std::cbegin(a), std::cend(a)) > 1 &&
+                        a.back() ==
+                            typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type()) {
                         a.pop_back();
+                    }
+
+                    condense(c);
                 }
 
                 /**
-                 * Computes the standard polynomial addition, polynomial A + polynomial B, and stores result in
-                 * polynomial C.
-                 */
+*Computes the standard polynomial addition, polynomial A + polynomial B,
+    and stores result in *polynomial C.*/
                 template<typename Range>
                 void addition(Range &c, const Range &a, const Range &b) {
 
-                    typedef
-                        typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type value_type;
+                    typedef typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type
+                        value_type;
 
                     if (is_zero(a)) {
                         c = b;
@@ -99,13 +94,13 @@ namespace nil {
 
                         if (a_size > b_size) {
                             c.resize(a_size);
-                            std::transform(std::begin(b), std::end(b), std::begin(a), std::begin(c),
-                                           std::plus<value_type>());
+                            std::transform(
+                                std::begin(b), std::end(b), std::begin(a), std::begin(c), std::plus<value_type>());
                             std::copy(std::begin(a) + b_size, std::end(a), std::begin(c) + b_size);
                         } else {
                             c.resize(b_size);
-                            std::transform(std::begin(a), std::end(a), std::begin(b), std::begin(c),
-                                           std::plus<value_type>());
+                            std::transform(
+                                std::begin(a), std::end(a), std::begin(b), std::begin(c), std::plus<value_type>());
                             std::copy(std::begin(b) + a_size, std::end(b), std::begin(c) + a_size);
                         }
                     }
@@ -114,14 +109,13 @@ namespace nil {
                 }
 
                 /**
-                 * Computes the standard polynomial subtraction, polynomial A - polynomial B, and stores result in
-                 * polynomial C.
-                 */
+*Computes the standard polynomial subtraction, polynomial A - polynomial B,
+    and stores result in *polynomial C.*/
                 template<typename Range>
                 void subtraction(Range &c, const Range &a, const Range &b) {
 
-                    typedef
-                        typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type value_type;
+                    typedef typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type
+                        value_type;
 
                     if (is_zero(b)) {
                         c = a;
@@ -134,7 +128,8 @@ namespace nil {
 
                         if (a_size > b_size) {
                             c.resize(a_size);
-                            std::transform(a.begin(), a.begin() + b_size, b.begin(), c.begin(), std::minus<value_type>());
+                            std::transform(
+                                a.begin(), a.begin() + b_size, b.begin(), c.begin(), std::minus<value_type>());
                             std::copy(a.begin() + b_size, a.end(), c.begin() + b_size);
                         } else {
                             c.resize(b_size);
@@ -147,14 +142,15 @@ namespace nil {
                 }
 
                 /**
-                 * Perform the multiplication of two polynomials, polynomial A * polynomial B, using FFT, and stores
+                 * Perform the multiplication of two polynomials, polynomial A * polynomial B, using FFT, and
+stores
                  * result in polynomial C.
                  */
                 template<typename Range>
                 void multiplication_on_fft(Range &c, const Range &a, const Range &b) {
 
-                    typedef
-                        typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type value_type;
+                    typedef typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type
+                        value_type;
 
                     typedef typename value_type::field_type FieldType;
                     BOOST_STATIC_ASSERT(algebra::is_field<FieldType>::value);
@@ -169,21 +165,21 @@ namespace nil {
                     v.resize(n, value_type::zero());
                     c.resize(n, value_type::zero());
 
-    #ifdef MULTICORE
+#ifdef MULTICORE
                     detail::basic_parallel_radix2_fft<FieldType>(u, omega);
                     detail::basic_parallel_radix2_fft<FieldType>(v, omega);
-    #else
+#else
                     detail::basic_serial_radix2_fft<FieldType>(u, omega);
                     detail::basic_serial_radix2_fft<FieldType>(v, omega);
-    #endif
+#endif
 
                     std::transform(u.begin(), u.end(), v.begin(), c.begin(), std::multiplies<value_type>());
 
-    #ifdef MULTICORE
+#ifdef MULTICORE
                     detail::basic_parallel_radix2_fft<FieldType>(c, omega.inversed());
-    #else
+#else
                     detail::basic_serial_radix2_fft<FieldType>(c, omega.inversed());
-    #endif
+#endif
 
                     const value_type sconst = value_type(n).inversed();
                     std::transform(c.begin(),
@@ -194,8 +190,8 @@ namespace nil {
                 }
 
                 /**
-                 * Perform the multiplication of two polynomials, polynomial A * polynomial B, and stores result in
-                 * polynomial C.
+                 * Perform the multiplication of two polynomials, polynomial A * polynomial B, and stores result
+                 * in polynomial C.
                  */
                 template<typename Range>
                 void multiplication(Range &c, const Range &a, const Range &b) {
@@ -210,8 +206,8 @@ namespace nil {
                 template<typename Range>
                 Range multiplication_transpose(const std::size_t &n, const Range &a, const Range &c) {
 
-                    typedef
-                        typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type value_type;
+                    typedef typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type
+                        value_type;
 
                     const std::size_t m = a.size();
                     // if (c.size() - 1 > m + n)
@@ -237,8 +233,8 @@ namespace nil {
                 template<typename Range>
                 void division(Range &q, Range &r, const Range &a, const Range &b) {
 
-                    typedef
-                        typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type value_type;
+                    typedef typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type
+                        value_type;
 
                     std::size_t d = b.size() - 1;       /* Degree of B */
                     value_type c = b.back().inversed(); /* Inverse of Leading Coefficient of B */
@@ -264,14 +260,14 @@ namespace nil {
                         auto glambda = [=](value_type x, value_type y) { return y - (x * lead_coeff); };
                         std::transform(b.begin(), b.end(), r.begin() + shift, r.begin() + shift, glambda);
                         condense(r);
-                        
+
                         r_deg = r.size() - 1;
                     }
                     condense(q);
                 }
             }    // namespace polynomial
-        }    // namespace math
-    }        // namespace crypto3
+        }        // namespace math
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_MATH_POLYNOMIAL_BASIC_OPERATIONS_HPP

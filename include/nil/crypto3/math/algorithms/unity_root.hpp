@@ -27,7 +27,7 @@
 #define CRYPTO3_MATH_UNITY_ROOT_HPP
 
 #include <type_traits>
-// #include <complex>
+#include <complex>
 
 #include <boost/math/constants/constants.hpp>
 #include <nil/crypto3/algebra/fields/params.hpp>
@@ -38,7 +38,7 @@ namespace nil {
 
             template<typename FieldType>
             constexpr typename std::enable_if<std::is_same<typename FieldType::value_type, std::complex<double>>::value,
-                                    typename FieldType::value_type>::type
+                                              typename FieldType::value_type>::type
                 unity_root(const std::size_t n) {
                 const double PI = boost::math::constants::pi<double>();
 
@@ -46,8 +46,9 @@ namespace nil {
             }
 
             template<typename FieldType>
-            constexpr typename std::enable_if<!std::is_same<typename FieldType::value_type, std::complex<double>>::value,
-                                    typename FieldType::value_type>::type
+            constexpr
+                typename std::enable_if<!std::is_same<typename FieldType::value_type, std::complex<double>>::value,
+                                        typename FieldType::value_type>::type
                 unity_root(const std::size_t n) {
 
                 typedef typename FieldType::value_type value_type;
@@ -66,8 +67,8 @@ namespace nil {
 
                 return omega;
             }
-        }        // namespace math
-    }            // namespace crypto3
+        }    // namespace math
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_MATH_UNITY_ROOT_HPP
