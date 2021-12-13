@@ -182,7 +182,7 @@ namespace nil {
                         this->terms.emplace_back(nlt);
                     }
 
-                    template <typename WiresAmount>
+                    template <std::size_t WiresAmount>
                     field_value_type evaluate(std::size_t row_index, 
                         const std::array<std::vector<field_value_type>, WiresAmount> &assignment) const {
                         field_value_type acc = field_value_type::zero();
@@ -222,18 +222,18 @@ namespace nil {
                         return (*this) * (-field_value_type::one());
                     }
 
-                    bool sort(){
+                    void sort(){
                         std::sort(terms.begin(), terms.end());
-                        std::vector<non_linear_term> new_terms;
+                        std::vector<non_linear_term<FieldType, RotationSupport>> new_terms;
 
                         if (terms.size()){
-                            new_terms.push_back(term[0]);
+                            new_terms.push_back(terms[0]);
 
                             for (std::size_t i = 1; i < terms.size(); i++){
                                 if (terms[i].vars == terms[i-1].vars){
                                     (new_terms.end() - 1)->coeff+=terms[i].coeff;
                                 } else {
-                                    new_terms.push_back(term[i])
+                                    new_terms.push_back(terms[i]);
                                 }
                             }
                         }
@@ -245,23 +245,23 @@ namespace nil {
                         this->sort();
                         other.sort();
 
-                        return (thisterms == otherterms);
+                        return (this->terms == other.terms);
                     }
                 };
 
-                template<typename FieldType>
+                template<typename FieldType, bool RotationSupport>
                 non_linear_combination<FieldType, RotationSupport> operator*(const typename FieldType::value_type &field_coeff,
                                                         const non_linear_combination<FieldType, RotationSupport> &lc) {
                     return lc * field_coeff;
                 }
 
-                template<typename FieldType>
+                template<typename FieldType, bool RotationSupport>
                 non_linear_combination<FieldType, RotationSupport> operator+(const typename FieldType::value_type &field_coeff,
                                                         const non_linear_combination<FieldType, RotationSupport> &lc) {
                     return non_linear_combination<FieldType, RotationSupport>(field_coeff) + lc;
                 }
 
-                template<typename FieldType>
+                template<typename FieldType, bool RotationSupport>
                 non_linear_combination<FieldType, RotationSupport> operator-(const typename FieldType::value_type &field_coeff,
                                                         const non_linear_combination<FieldType, RotationSupport> &lc) {
                     return non_linear_combination<FieldType, RotationSupport>(field_coeff) - lc;

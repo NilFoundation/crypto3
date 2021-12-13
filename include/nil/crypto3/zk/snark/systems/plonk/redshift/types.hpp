@@ -30,9 +30,11 @@
 #define CRYPTO3_PLONK_REDSHIFT_TYPES_POLICY_HPP
 
 #include <nil/crypto3/math/polynomial/polynom.hpp>
+#include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/detail/field_utils.hpp>
 
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/proof.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -51,31 +53,6 @@ namespace nil {
 
                         typedef plonk_constraint_system<FieldType, WiresAmount> constraint_system_type;
 
-                        typedef plonk_primary_input<FieldType> primary_input_type;
-
-                        typedef plonk_auxiliary_input<FieldType> auxiliary_input_type;
-
-                        /******************************** Proving key ********************************/
-
-                        /**
-                         * A proving key for the Redshift cheme.
-                         */
-                        typedef redshift_proving_key<FieldType, constraint_system_type> proving_key_type;
-
-                        /******************************* Verification key ****************************/
-
-                        /**
-                         * A verification key for the Redshift cheme.
-                         */
-                        typedef redshift_verification_key<FieldType> verification_key_type;
-
-                        /********************************** Key pair *********************************/
-
-                        /**
-                         * A key pair for the Redshift cheme, which consists of a proving key and a verification key.
-                         */
-                        typedef plonk_ppzksnark_keypair<proving_key_type, verification_key_type> keypair_type;
-
                         /*********************************** Proof ***********************************/
 
                         /**
@@ -86,29 +63,36 @@ namespace nil {
                          * about the structure for statistics purposes.
                          */
                         template <typename CommitmentSchemeType>
-                        typedef redshift_proof<CommitmentSchemeType> proof_type;
+                        using proof_type = redshift_proof<CommitmentSchemeType>;
 
                         template <std::size_t k>
                         struct preprocessed_data_type {
 
                             constexpr static const typename FieldType::value_type omega = 
-                                math::unity_root(get_power_of_two(k));
+                                math::unity_root<FieldType>(math::detail::get_power_of_two(k));
 
-                            std::vector<math::polynomial::polynom> selectors;
+                            std::vector<math::polynomial::polynom<typename FieldType::value_type>> selectors;
                             // S_sigma
-                            std::vector<math::polynomial::polynom> permutations;
+                            std::vector<math::polynomial::polynom<typename FieldType::value_type>> permutations;
                             // S_id
-                            std::vector<math::polynomial::polynom> identity_permutations;
+                            std::vector<math::polynomial::polynom<typename FieldType::value_type>> identity_permutations;
                             // c
-                            std::vector<math::polynomial::polynom> constraints;
+                            std::vector<math::polynomial::polynom<typename FieldType::value_type>> constraints;
                             
-                            std::vector<math::polynomial::polynom> Lagrange_basis;
+                            std::vector<math::polynomial::polynom<typename FieldType::value_type>> Lagrange_basis;
+
+                            math::polynomial::polynom<typename FieldType::value_type> Z;
 
                         };
 
-                        template<std::size_t AlphasAmount = 6>
+                        template<std::size_t AlphasAmount>
                         struct prover_fiat_shamir_heuristic_manifest {
-                            enum challenges_ids { beta, gamma, alpha, upsilon = alpha + AlphasAmount };
+                            enum challenges_ids { 
+                                beta, 
+                                gamma, 
+                                alpha, 
+                                upsilon = alpha + AlphasAmount 
+                            };
                         };
                     };
                 }    // namespace detail

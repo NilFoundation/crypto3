@@ -27,10 +27,12 @@
 #define CRYPTO3_ZK_FRI_COMMITMENT_SCHEME_HPP
 
 #include <nil/crypto3/math/polynomial/polynom.hpp>
-#include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 
 #include <nil/crypto3/merkle/tree.hpp>
 #include <nil/crypto3/merkle/proof.hpp>
+
+#include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -122,11 +124,12 @@ namespace nil {
                         }
 
                         math::polynomial::polynom<typename FieldType::value_type> 
-                            U = math::polynomial::Lagrange_interpolation(U_interpolation_points);
+                            U = math::polynomial::lagrange_interpolation(U_interpolation_points);
 
                         math::polynomial::polynom<typename FieldType::value_type> 
                             Q = (f - U);
                         for (std::size_t j = 0; j < k; j++){
+                            math::polynomial::polynom<typename FieldType::value_type> x = {1};
                             Q = Q/(x - U_interpolation_points[j]);
                         }
 
@@ -135,19 +138,19 @@ namespace nil {
                             math::polynomial::polynom<typename FieldType::value_type> f_i = Q;
 
                             typename FieldType::value_type x_i = 
-                                transcript.get_challenge<transcript_round_manifest::challenges_ids::x>();
+                                transcript.get_challenge<transcript_round_manifest::challenges_ids::x, FieldType>();
 
                             std::array<merkle_proof_type, m*r> &alpha_openings = proof.alpha_openings[round_id];
                             std::array<merkle_proof_type, r> &f_y_openings = proof.f_y_openings[round_id];
                             std::array<commitment_type, r - 1> &f_commitments = proof.f_commitments[round_id];
-                            std::array<typename FieldType::value_type> &f_ip1_coefficients = 
+                            std::vector<typename FieldType::value_type> &f_ip1_coefficients = 
                                 proof.f_ip1_coefficients[round_id];
                             merkle_tree_type &f_i_tree = T;
 
                             for (std::size_t i = 0; i <= r-1; i++){
 
                                 typename FieldType::value_type y_i = 
-                                    transcript.get_challenge<transcript_round_manifest::challenges_ids::y, i>();
+                                    transcript.get_challenge<transcript_round_manifest::challenges_ids::y, i, FieldType>();
 
                                 math::polynomial::polynom<typename FieldType::value_type> 
                                     sqr_polynom = {y_i, 0, -1};
@@ -166,7 +169,7 @@ namespace nil {
                                 }
 
                                 math::polynomial::polynom<typename FieldType::value_type> 
-                                    p_y_i = math::polynomial::Lagrange_interpolation(p_y_i_interpolation_points);
+                                    p_y_i = math::polynomial::lagrange_interpolation(p_y_i_interpolation_points);
 
                                 f_i = p_y_i;
 
@@ -211,7 +214,7 @@ namespace nil {
                         }
 
                         math::polynomial::polynom<typename FieldType::value_type> 
-                            U = math::polynomial::Lagrange_interpolation(U_interpolation_points);
+                            U = math::polynomial::lagrange_interpolation(U_interpolation_points);
 
                         math::polynomial::polynom<typename FieldType::value_type> Q = (f - U);
                         for (std::size_t j = 0; j < k; j++){
@@ -223,7 +226,7 @@ namespace nil {
                             math::polynomial::polynom<typename FieldType::value_type> f_i = Q;
 
                             typename FieldType::value_type x_i = 
-                                transcript.get_challenge<transcript_round_manifest::challenges_ids::x>();
+                                transcript.get_challenge<transcript_round_manifest::challenges_ids::x, FieldType>();
 
                             std::array<merkle_proof_type, m*r> &alpha_openings = proof.alpha_openings[round_id];
                             std::array<merkle_proof_type, r> &f_y_openings = proof.f_y_openings[round_id];
@@ -236,7 +239,7 @@ namespace nil {
                             for (std::size_t i = 0; i <= r-1; i++){
 
                                 typename FieldType::value_type y_i = 
-                                    transcript.get_challenge<transcript_round_manifest::challenges_ids::y, i>();
+                                    transcript.get_challenge<transcript_round_manifest::challenges_ids::y, i, FieldType>();
 
                                 math::polynomial::polynom<typename FieldType::value_type> sqr_polynom = {y_i, 0, -1};
                                 std::array<typename FieldType::value_type, m> s = 
@@ -255,7 +258,7 @@ namespace nil {
                                 }
 
                                 math::polynomial::polynom<typename FieldType::value_type> 
-                                    p_y_i = math::polynomial::Lagrange_interpolation(p_y_i_interpolation_points);
+                                    p_y_i = math::polynomial::lagrange_interpolation(p_y_i_interpolation_points);
 
                                 typename FieldType::value_type f_y_i = 
                                     algebra::marshalling<FieldType>(f_y_openings[i].leaf);

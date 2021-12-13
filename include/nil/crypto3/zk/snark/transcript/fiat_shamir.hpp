@@ -71,13 +71,13 @@ namespace nil {
                         acc(data);
                     }
 
-                    template <typename TChallenges::challenges_ids ChallengeId>
+                    template <typename TChallenges::challenges_ids ChallengeId, typename FieldType>
                     typename Hash::digest_type get_challenge(){
                         acc(ChallengeId);
                         return accumulators::extract::hash<Hash>(acc);
                     }
 
-                    template <typename TChallenges::challenges_ids ChallengeId, std::size_t Index>
+                    template <typename TChallenges::challenges_ids ChallengeId, std::size_t Index, typename FieldType>
                     typename Hash::digest_type get_challenge(){
                         acc(ChallengeId + Index);
                         return accumulators::extract::hash<Hash>(acc);

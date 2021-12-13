@@ -119,7 +119,7 @@ namespace nil {
                                 interpolation_points.push_back(std::make_pair(omega.pow(j), delta??? * omega.pow(j)));
                             }
 
-                            S_id[i] = math::polynomial::Lagrange_interpolation(interpolation_points);
+                            S_id[i] = math::polynomial::lagrange_interpolation(interpolation_points);
                         }
 
                         for (std::size_t i = 0; i < 3; i++) {
@@ -131,7 +131,7 @@ namespace nil {
                                     std::make_pair(omega.pow(j), delta.pow(i) * omega.pow(j)));
                             }
 
-                            S_sigma[i] = math::polynomial::Lagrange_interpolation(interpolation_points);
+                            S_sigma[i] = math::polynomial::lagrange_interpolation(interpolation_points);
                         }
 
                         math::polynomial::polynom Z = polynom_by_zeros(H_star);

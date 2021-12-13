@@ -26,9 +26,6 @@
 #ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PROOF_HPP
 #define CRYPTO3_ZK_PLONK_REDSHIFT_PROOF_HPP
 
-#include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
-#include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace zk {

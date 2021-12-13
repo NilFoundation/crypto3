@@ -83,15 +83,15 @@ namespace nil {
                         return true;
                     }
 
-                    std::vector<...> get_copy_constraints(){
+                    std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_copy_constraints(){
 
                     }
 
-                    std::vector<...> get_selectors(){
+                    std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_selectors(){
                         
                     }
 
-                    std::vector<...> get_lookups(){
+                    std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_lookups(){
                         
                     }
 
@@ -102,10 +102,10 @@ namespace nil {
 
                         std::array<math::polynomial::polynom<typename FieldType::value_type>, WiresAmount> wire_polynomials;
                         for (std::size_t wire_index = 0; wire_index < WiresAmount; wire_index++){
-                            wire_polynomials[wire_index] = math::polynomial::Lagrange_interpolation(full_variable_assignment[wire_index]);
+                            wire_polynomials[wire_index] = math::polynomial::lagrange_interpolation(full_variable_assignment[wire_index]);
                         }
 
-                        for (std::size_t constraint_index = 0; i < constraints.size(); constraint_index++){
+                        for (std::size_t constraint_index = 0; constraint_index < constraints.size(); constraint_index++){
 
                             for (auto &term: constraints[constraint_index].terms){
                                 
