@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -30,6 +30,7 @@
 
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/domains/detail/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/math/algorithms/unity_root.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -61,10 +62,10 @@ namespace nil {
                     if (small_m != 1ul << static_cast<std::size_t>(std::ceil(std::log2(small_m))))
                         throw std::invalid_argument("step_radix2(): expected small_m == 1ul<<log2(small_m)");
 
-                    omega = detail::unity_root<FieldType>(1ul << static_cast<std::size_t>(std::ceil(std::log2(m))));
+                    omega = unity_root<FieldType>(1ul << static_cast<std::size_t>(std::ceil(std::log2(m))));
 
                     big_omega = omega.squared();
-                    small_omega = detail::unity_root<FieldType>(small_m);
+                    small_omega = unity_root<FieldType>(small_m);
                 }
 
                 void fft(std::vector<value_type> &a) {
@@ -91,7 +92,7 @@ namespace nil {
                     }
 
                     _basic_radix2_fft<FieldType>(c, omega.squared());
-                    _basic_radix2_fft<FieldType>(e, detail::unity_root<FieldType>(small_m));
+                    _basic_radix2_fft<FieldType>(e, unity_root<FieldType>(small_m));
 
                     for (std::size_t i = 0; i < big_m; ++i) {
                         a[i] = c[i];
@@ -109,7 +110,7 @@ namespace nil {
                     std::vector<value_type> U1(a.begin() + big_m, a.end());
 
                     _basic_radix2_fft<FieldType>(U0, omega.squared().inversed());
-                    _basic_radix2_fft<FieldType>(U1, detail::unity_root<FieldType>(small_m).inversed());
+                    _basic_radix2_fft<FieldType>(U1, unity_root<FieldType>(small_m).inversed());
 
                     const value_type U0_size_inv = value_type(big_m).inversed();
                     for (std::size_t i = 0; i < big_m; ++i) {

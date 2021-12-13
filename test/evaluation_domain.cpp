@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -50,7 +50,7 @@
 #include <nil/crypto3/math/domains/geometric_sequence_domain.hpp>
 #include <nil/crypto3/math/domains/step_radix2_domain.hpp>
 
-#include <nil/crypto3/math/evaluation_domain.hpp>
+#include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/math/polynomial/evaluate.hpp>
 

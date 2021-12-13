@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -43,13 +43,14 @@ namespace nil {
              * Input: Polynomial A, Polynomial B.
              * Output: Polynomial G, Polynomial U, Polynomial V, such that G = (A * U) + (B * V).
              */
-            template<typename FieldType, typename Range1, typename Range2, typename Range3, typename Range4,
+            template<typename Range1, typename Range2, typename Range3, typename Range4,
                      typename Range5>
             void extended_euclidean(const Range1 &a, const Range2 &b, Range3 &g, Range4 &u, Range5 &v) {
 
-                typedef typename FieldType::value_type value_type;
+                typedef
+                    typename std::iterator_traits<decltype(std::begin(std::declval<Range1>()))>::value_type value_type;
 
-                if (_is_zero(b)) {
+                if (polynomial::is_zero(b)) {
                     g = a;
                     u = std::vector<value_type>(1, value_type::one());
                     v = std::vector<value_type>(1, value_type::zero());
@@ -65,10 +66,10 @@ namespace nil {
                 std::vector<value_type> R(1, value_type::zero());
                 std::vector<value_type> T(1, value_type::zero());
 
-                while (!_is_zero(V3)) {
-                    _polynomial_division<FieldType>(Q, R, G, V3);
-                    _polynomial_multiplication<FieldType>(G, V1, Q);
-                    _polynomial_subtraction(T, U, G);
+                while (!polynomial::is_zero(V3)) {
+                    polynomial::division(Q, R, G, V3);
+                    polynomial::multiplication(G, V1, Q);
+                    polynomial::subtraction(T, U, G);
 
                     U = V1;
                     G = V3;
@@ -76,9 +77,9 @@ namespace nil {
                     V3 = R;
                 }
 
-                _polynomial_multiplication<FieldType>(V3, a, U);
-                _polynomial_subtraction(V3, G, V3);
-                _polynomial_division<FieldType>(V1, R, V3, b);
+                polynomial::multiplication(V3, a, U);
+                polynomial::subtraction(V3, G, V3);
+                polynomial::division(V1, R, V3, b);
 
                 value_type lead_coeff = G.back().inversed();
                 std::transform(G.begin(), G.end(), G.begin(),

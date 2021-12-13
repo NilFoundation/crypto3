@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -26,8 +26,6 @@
 #ifndef CRYPTO3_MATH_MAKE_EVALUATION_DOMAIN_HPP
 #define CRYPTO3_MATH_MAKE_EVALUATION_DOMAIN_HPP
 
-#include <vector>
-
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/domains/arithmetic_sequence_domain.hpp>
 #include <nil/crypto3/math/domains/basic_radix2_domain.hpp>
@@ -35,7 +33,7 @@
 #include <nil/crypto3/math/domains/geometric_sequence_domain.hpp>
 #include <nil/crypto3/math/domains/step_radix2_domain.hpp>
 
-#include <nil/crypto3/math/detail/field_utils.hpp>
+#include <nil/crypto3/math/type_traits.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -49,114 +47,64 @@ namespace nil {
              The function get_evaluation_domain is chosen from different supported domains,
              depending on MinSize.
             */
-
-            namespace detail {
-                using namespace nil::crypto3::algebra;
-
-                template<typename FieldType>
-                bool is_basic_radix2_domain(std::size_t m) {
-                    const std::size_t log_m = static_cast<std::size_t>(std::ceil(std::log2(m)));
-
-                    return (m > 1) && (log_m <= fields::arithmetic_params<FieldType>::s) && (m == (1ul << log_m));
-                }
-
-                template<typename FieldType>
-                bool is_extended_radix2_domain(std::size_t m) {
-                    const std::size_t log_m = static_cast<std::size_t>(std::ceil(std::log2(m)));
-                    const std::size_t small_m = m / 2;
-                    const std::size_t log_small_m = static_cast<std::size_t>(std::ceil(std::log2(small_m)));
-
-                    return (m > 1) && (log_m == fields::arithmetic_params<FieldType>::s + 1) &&
-                           (small_m == (1ul << log_small_m)) &&
-                           (log_small_m <= fields::arithmetic_params<FieldType>::s);
-                }
-
-                template<typename FieldType>
-                bool is_step_radix2_domain(std::size_t m) {
-                    const std::size_t log_m = static_cast<std::size_t>(std::ceil(std::log2(m)));
-                    const std::size_t shift_log_m = (1ul << log_m);
-                    const std::size_t log_shift_log_m = static_cast<std::size_t>(std::ceil(std::log2(shift_log_m)));
-                    const std::size_t small_m = m - (1ul << (static_cast<std::size_t>(std::ceil(std::log2(m))) - 1));
-                    const std::size_t log_small_m = static_cast<std::size_t>(std::ceil(std::log2(small_m)));
-
-                    return (m > 1) && (small_m == (1ul << log_small_m)) && (shift_log_m == (1ul << log_shift_log_m)) &&
-                           (log_shift_log_m <= fields::arithmetic_params<FieldType>::s);
-                }
-
-                template<typename FieldType>
-                bool is_geometric_sequence_domain(std::size_t m) {
-                    return (m > 1) &&
-                           (typename FieldType::value_type(fields::arithmetic_params<FieldType>::geometric_generator) !=
-                            FieldType::value_type::zero());
-                }
-
-                template<typename FieldType>
-                bool is_arithmetic_sequence_domain(std::size_t m) {
-                    return (m > 1) && (typename FieldType::value_type(
-                                           fields::arithmetic_params<FieldType>::arithmetic_generator) !=
-                                       FieldType::value_type::zero());
-                }
-
-            }    // namespace detail
-
             template<typename FieldType>
             std::shared_ptr<evaluation_domain<FieldType>> make_evaluation_domain(std::size_t m) {
-                typedef std::shared_ptr<evaluation_domain<FieldType>> ret_type;
+                typedef std::shared_ptr<evaluation_domain<FieldType>> result_type;
 
                 const std::size_t big = 1ul << (std::size_t(std::ceil(std::log2(m))) - 1);
                 const std::size_t rounded_small = (1ul << std::size_t(std::ceil(std::log2(m - big))));
 
                 if (detail::is_basic_radix2_domain<FieldType>(m)) {
-                    ret_type result;
+                    result_type result;
                     result.reset(new basic_radix2_domain<FieldType>(m));
                     return result;
                 }
 
                 if (detail::is_extended_radix2_domain<FieldType>(m)) {
-                    ret_type result;
+                    result_type result;
                     result.reset(new extended_radix2_domain<FieldType>(m));
                     return result;
                 }
 
                 if (detail::is_step_radix2_domain<FieldType>(m)) {
-                    ret_type result;
+                    result_type result;
                     result.reset(new step_radix2_domain<FieldType>(m));
                     return result;
                 }
 
                 if (detail::is_basic_radix2_domain<FieldType>(big + rounded_small)) {
-                    ret_type result;
+                    result_type result;
                     result.reset(new basic_radix2_domain<FieldType>(big + rounded_small));
                     return result;
                 }
 
                 if (detail::is_extended_radix2_domain<FieldType>(big + rounded_small)) {
-                    ret_type result;
+                    result_type result;
                     result.reset(new extended_radix2_domain<FieldType>(big + rounded_small));
                     return result;
                 }
 
                 if (detail::is_step_radix2_domain<FieldType>(big + rounded_small)) {
-                    ret_type result;
+                    result_type result;
                     result.reset(new step_radix2_domain<FieldType>(big + rounded_small));
                     return result;
                 }
 
                 if (detail::is_geometric_sequence_domain<FieldType>(m)) {
-                    ret_type result;
+                    result_type result;
                     result.reset(new geometric_sequence_domain<FieldType>(m));
                     return result;
                 }
 
                 if (detail::is_arithmetic_sequence_domain<FieldType>(m)) {
-                    ret_type result;
+                    result_type result;
                     result.reset(new arithmetic_sequence_domain<FieldType>(m));
                     return result;
                 }
 
-                return ret_type();
+                return result_type();
             }
-        }    // namespace fft
+        }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
 

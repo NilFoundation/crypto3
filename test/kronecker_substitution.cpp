@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -51,10 +51,10 @@ BOOST_AUTO_TEST_CASE(standard_polynomial_multiplication) {
     std::vector<typename FieldType::value_type> b = {1, 2, 1, 1};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_multiplication_on_kronecker<FieldType>(c, a, b);
+    polynomial::multiplication_on_kronecker<FieldType>(c, a, b);
 
     std::vector<typename FieldType::value_type> c_answer(1, FieldType::value_type::zero());
-    _polynomial_multiplication<FieldType>(c_answer, a, b);
+    polynomial::multiplication(c_answer, a, b);
 
     for (std::size_t i = 0; i < c_answer.size(); i++) {
         BOOST_CHECK_EQUAL(c_answer[i].data, c[i].data);
@@ -67,10 +67,10 @@ BOOST_AUTO_TEST_CASE(squared_polynomial_multiplication) {
     std::vector<typename FieldType::value_type> b = a;
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_multiplication_on_kronecker<FieldType>(c, a, b);
+    polynomial::multiplication_on_kronecker<FieldType>(c, a, b);
 
     std::vector<typename FieldType::value_type> c_answer(1, FieldType::value_type::zero());
-    _polynomial_multiplication<FieldType>(c_answer, a, b);
+    polynomial::multiplication(c_answer, a, b);
 
     for (std::size_t i = 0; i < c_answer.size(); i++) {
         BOOST_CHECK_EQUAL(c_answer[i].data, c[i].data);

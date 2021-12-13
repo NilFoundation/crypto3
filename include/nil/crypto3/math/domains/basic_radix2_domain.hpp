@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -32,6 +32,7 @@
 
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/domains/detail/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/math/algorithms/unity_root.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -60,7 +61,7 @@ namespace nil {
                                 "basic_radix2(): expected logm <= fields::arithmetic_params<FieldType>::s");
                     }
 
-                    omega = detail::unity_root<FieldType>(m);
+                    omega = unity_root<FieldType>(m);
                 }
 
                 void fft(std::vector<value_type> &a) {
