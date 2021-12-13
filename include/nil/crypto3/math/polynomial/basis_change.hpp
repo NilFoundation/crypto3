@@ -103,17 +103,17 @@ namespace nil {
 
                 /* MonomialToNewton */
                 std::vector<value_type> I(T[m][0]);
-                _reverse(I, n);
+                polynomial::reverse(I, n);
 
                 std::vector<value_type> mod(n + 1, value_type::zero());
                 mod[n] = value_type::one();
 
-                extended_euclidean<FieldType>(mod, I, mod, mod, I);
+                extended_euclidean(mod, I, mod, mod, I);
 
                 I.resize(n);
 
                 std::vector<value_type> Q(polynomial::multiplication_transpose(n - 1, I, a));
-                _reverse(Q, n);
+                polynomial::reverse(Q, n);
 
                 /* TNewtonToMonomial */
                 std::vector<std::vector<value_type>> c(n);

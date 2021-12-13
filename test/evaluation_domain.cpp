@@ -50,7 +50,7 @@
 #include <nil/crypto3/math/domains/geometric_sequence_domain.hpp>
 #include <nil/crypto3/math/domains/step_radix2_domain.hpp>
 
-#include <nil/crypto3/math/evaluation_domain.hpp>
+#include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/math/polynomial/evaluate.hpp>
 

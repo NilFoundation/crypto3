@@ -35,6 +35,7 @@
 
 #include <nil/crypto3/algebra/type_traits.hpp>
 
+#include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/detail/field_utils.hpp>
 
 #ifdef MULTICORE

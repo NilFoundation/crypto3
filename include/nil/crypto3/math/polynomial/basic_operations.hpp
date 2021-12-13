@@ -29,9 +29,9 @@
 #include <algorithm>
 #include <vector>
 
-#include <nil/crypto3/math/detail/field_utils.hpp>
-
+#include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/domains/detail/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/math/detail/field_utils.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -161,7 +161,7 @@ namespace nil {
                     BOOST_STATIC_ASSERT(std::is_same<typename FieldType::value_type, value_type>::value);
 
                     const std::size_t n = detail::get_power_of_two(a.size() + b.size() - 1);
-                    value_type omega = detail::unity_root<FieldType>(n);
+                    value_type omega = unity_root<FieldType>(n);
 
                     Range u(a);
                     Range v(b);
@@ -218,7 +218,7 @@ namespace nil {
                     // throw InvalidSizeException("expected c.size() - 1 <= m + n");
 
                     Range r(a);
-                    _reverse(r, m);
+                    reverse(r, m);
                     multiplication(r, r, c);
 
                     /* Determine Middle Product */

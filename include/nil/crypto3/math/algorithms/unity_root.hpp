@@ -23,11 +23,11 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FIELD_UTILS_HPP
-#define CRYPTO3_ALGEBRA_FIELD_UTILS_HPP
+#ifndef CRYPTO3_MATH_UNITY_ROOT_HPP
+#define CRYPTO3_MATH_UNITY_ROOT_HPP
 
 #include <type_traits>
-#include <complex>
+// #include <complex>
 
 #include <boost/math/constants/constants.hpp>
 #include <nil/crypto3/algebra/fields/params.hpp>
@@ -35,41 +35,39 @@
 namespace nil {
     namespace crypto3 {
         namespace math {
-            namespace detail {
 
-                using namespace nil::crypto3::algebra;
+            template<typename FieldType>
+            constexpr typename std::enable_if<std::is_same<typename FieldType::value_type, std::complex<double>>::value,
+                                    typename FieldType::value_type>::type
+                unity_root(const std::size_t n) {
+                const double PI = boost::math::constants::pi<double>();
 
-                std::size_t bitreverse(std::size_t n, const std::size_t l) {
-                    std::size_t r = 0;
-                    for (std::size_t k = 0; k < l; ++k) {
-                        r = (r << 1) | (n & 1);
-                        n >>= 1;
-                    }
-                    return r;
+                return typename FieldType::value_type(cos(2 * PI / n), sin(2 * PI / n));
+            }
+
+            template<typename FieldType>
+            constexpr typename std::enable_if<!std::is_same<typename FieldType::value_type, std::complex<double>>::value,
+                                    typename FieldType::value_type>::type
+                unity_root(const std::size_t n) {
+
+                typedef typename FieldType::value_type value_type;
+
+                const std::size_t logn = std::ceil(std::log2(n));
+
+                if (n != (1u << logn))
+                    throw std::invalid_argument("expected n == (1u << logn)");
+                if (logn > algebra::fields::arithmetic_params<FieldType>::s)
+                    throw std::invalid_argument("expected logn <= arithmetic_params<FieldType>::s");
+
+                value_type omega = value_type(algebra::fields::arithmetic_params<FieldType>::root_of_unity);
+                for (std::size_t i = algebra::fields::arithmetic_params<FieldType>::s; i > logn; --i) {
+                    omega *= omega;
                 }
 
-                constexpr std::size_t get_power_of_two(std::size_t n) {
-                    n--;
-                    n |= n >> 1;
-                    n |= n >> 2;
-                    n |= n >> 4;
-                    n |= n >> 8;
-                    n |= n >> 16;
-                    n++;
-
-                    return n;
-                }
-
-                template<typename FieldType>
-                typename FieldType::value_type coset_shift() {
-                    return
-                        typename FieldType::value_type(fields::arithmetic_params<FieldType>::multiplicative_generator)
-                            .squared();
-                }
-
-            }    // namespace detail
-        }        // namespace fft
+                return omega;
+            }
+        }        // namespace math
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_FIELD_UTILS_HPP
+#endif    // CRYPTO3_MATH_UNITY_ROOT_HPP

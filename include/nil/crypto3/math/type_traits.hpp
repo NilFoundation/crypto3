@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MATH_MAKE_EVALUATION_DOMAIN_HPP
-#define CRYPTO3_MATH_MAKE_EVALUATION_DOMAIN_HPP
+#ifndef CRYPTO3_MATH_TYPE_TRAITS_HPP
+#define CRYPTO3_MATH_TYPE_TRAITS_HPP
 
 #include <vector>
 
@@ -40,6 +40,7 @@
 namespace nil {
     namespace crypto3 {
         namespace math {
+            namespace detail {
 
             /*!
             @brief
@@ -49,8 +50,6 @@ namespace nil {
              The function get_evaluation_domain is chosen from different supported domains,
              depending on MinSize.
             */
-
-            namespace detail {
                 using namespace nil::crypto3::algebra;
 
                 template<typename FieldType>
@@ -98,66 +97,8 @@ namespace nil {
                 }
 
             }    // namespace detail
-
-            template<typename FieldType>
-            std::shared_ptr<evaluation_domain<FieldType>> make_evaluation_domain(std::size_t m) {
-                typedef std::shared_ptr<evaluation_domain<FieldType>> ret_type;
-
-                const std::size_t big = 1ul << (std::size_t(std::ceil(std::log2(m))) - 1);
-                const std::size_t rounded_small = (1ul << std::size_t(std::ceil(std::log2(m - big))));
-
-                if (detail::is_basic_radix2_domain<FieldType>(m)) {
-                    ret_type result;
-                    result.reset(new basic_radix2_domain<FieldType>(m));
-                    return result;
-                }
-
-                if (detail::is_extended_radix2_domain<FieldType>(m)) {
-                    ret_type result;
-                    result.reset(new extended_radix2_domain<FieldType>(m));
-                    return result;
-                }
-
-                if (detail::is_step_radix2_domain<FieldType>(m)) {
-                    ret_type result;
-                    result.reset(new step_radix2_domain<FieldType>(m));
-                    return result;
-                }
-
-                if (detail::is_basic_radix2_domain<FieldType>(big + rounded_small)) {
-                    ret_type result;
-                    result.reset(new basic_radix2_domain<FieldType>(big + rounded_small));
-                    return result;
-                }
-
-                if (detail::is_extended_radix2_domain<FieldType>(big + rounded_small)) {
-                    ret_type result;
-                    result.reset(new extended_radix2_domain<FieldType>(big + rounded_small));
-                    return result;
-                }
-
-                if (detail::is_step_radix2_domain<FieldType>(big + rounded_small)) {
-                    ret_type result;
-                    result.reset(new step_radix2_domain<FieldType>(big + rounded_small));
-                    return result;
-                }
-
-                if (detail::is_geometric_sequence_domain<FieldType>(m)) {
-                    ret_type result;
-                    result.reset(new geometric_sequence_domain<FieldType>(m));
-                    return result;
-                }
-
-                if (detail::is_arithmetic_sequence_domain<FieldType>(m)) {
-                    ret_type result;
-                    result.reset(new arithmetic_sequence_domain<FieldType>(m));
-                    return result;
-                }
-
-                return ret_type();
-            }
-        }    // namespace fft
+        }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_MATH_MAKE_EVALUATION_DOMAIN_HPP
+#endif    // CRYPTO3_MATH_TYPE_TRAITS_HPP
