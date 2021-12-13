@@ -43,18 +43,18 @@ namespace nil {
                     std::size_t lambda, std::size_t k, std::size_t r, std::size_t m=2>
                 class redshift_prover {
 
-                    using types_policy = redshift_types_policy<FieldType, WiresAmount>;
+                    using types_policy = detail::redshift_types_policy<FieldType, WiresAmount>;
                     using transcript_manifest = types_policy::prover_fiat_shamir_heuristic_manifest<6>;
 
                     typedef hashes::sha2<256> merkle_hash_type;
                     typedef hashes::sha2<256> transcript_hash_type;
 
-                    typedef typename merkletree::MerkleTree<Hash> merkle_tree_type;
+                    typedef typename containers::merkletree<merkle_hash_type, 2> merkle_tree_type;
 
                     constexpr static const typename FieldType::value_type omega = 
                         algebra::get_root_of_unity<FieldType>()
                     typedef list_polynomial_commitment_scheme<FieldType, 
-                        Hash, lambda, k, r, m> lpc;
+                        merkle_hash_type, lambda, k, r, m> lpc;
 
                 public:
                     static inline typename types_policy::proof_type<lpc>
@@ -69,8 +69,8 @@ namespace nil {
 
                         fiat_shamir_heuristic<transcript_manifest, transcript_hash_type> transcript;
 
-                        ... setup_values = ...;
-                        transcript(setup_values);
+                        // ... setup_values = ...;
+                        // transcript(setup_values);
 
                         // 2 - Define new witness polynomials
                         // and 3 - Add commitments to fi to transcript
@@ -175,7 +175,7 @@ namespace nil {
                         transcript(Q_commitment);
 
                         // 13
-                        ... V = ...;
+                        // ... V = ...;
 
                         // 14
                         transcript(lpc::commit(V).root());
@@ -220,7 +220,7 @@ namespace nil {
                         }
 
                         // 19
-                        ...
+                        // ...
 
                         // 20
                         math::polynomial::polynom<typename FieldType::value_type> F_consolidated = 0;
@@ -273,7 +273,6 @@ namespace nil {
                                                               std::move(Q_lpc_proof), std::move(T_lpc_proofs));
 
                         return proof;
-                            }
                     }
                 };
             }    // namespace snark

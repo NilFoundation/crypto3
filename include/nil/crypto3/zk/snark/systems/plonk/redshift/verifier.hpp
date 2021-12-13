@@ -40,9 +40,11 @@ namespace nil {
                 template<typename FieldType, std::size_t lambda, std::size_t m=2>
                 class redshift_verifier {
 
-                    using types_policy = redshift_types_policy<FieldType>;
+                    using types_policy = detail::redshift_types_policy<FieldType>;
                     using transcript_manifest = types_policy::prover_fiat_shamir_heuristic_manifest<6>;
-                    using constraint_system_type = plonk_constraint_system<FieldType>;
+
+                    typedef hashes::sha2<256> merkle_hash_type;
+                    typedef hashes::sha2<256> transcript_hash_type;
 
                     constexpr static const std::size_t k = ...;
                     constexpr static const std::size_t r = ...;
@@ -50,7 +52,7 @@ namespace nil {
                     constexpr static const typename FieldType::value_type omega = 
                         algebra::get_root_of_unity<FieldType>()
                     typedef list_polynomial_commitment_scheme<FieldType, 
-                        Hash, lambda, k, r, m> lpc;
+                        merkle_hash_type, lambda, k, r, m> lpc;
 
                 public:
                     static inline bool process(const types_policy::verification_key_type &verification_key,

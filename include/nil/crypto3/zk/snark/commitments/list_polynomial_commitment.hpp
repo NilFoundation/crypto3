@@ -56,8 +56,8 @@ namespace nil {
 
                     typedef Hash transcript_hash_type;
 
-                    typedef merkle_tree<Hash, 2> merkle_tree_type;
-                    typedef merkle_proof<Hash, 2> merkle_proof_type;
+                    typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
+                    typedef typename containers::merkle_proof<Hash, 2> merkle_proof_type;
 
                     constexpr static const math::polynomial::polynom<typename FieldType::value_type> 
                         q = {0, 0, 1};
