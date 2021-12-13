@@ -53,30 +53,30 @@ namespace nil {
                 }
 
                 /**
+                 * Returns true if polynomial A is a zero polynomial.
+                 */
+                template<typename Range>
+                bool is_zero(const Range &a) {
+                    return std::all_of(
+                        std::begin(a),
+                        std::end(a),
+                        [](typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type i) {
+                            return i ==
+                                   typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type();
+                        });
+                }
+
+                /**
                  * Removes extraneous zero entries from in vector representation of polynomial.
                  * Example - Degree-4 Polynomial: [0, 1, 2, 3, 4, 0, 0, 0, 0] -> [0, 1, 2, 3, 4]
                  * Note: Simplest condensed form is a zero polynomial of vector form: [0]
                  */
                 template<typename Range>
                 void condense(Range &a) {
-                    for (auto first = std::begin(a);
-                         first != std::end(a) &&
-                         a.back() ==
-                             typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type();
-                         ++first) {
+                    while (std::distance(std::cbegin(a), std::cend(a)) > 1 &&
+                           a.back() ==
+                               typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type()) {
                         a.pop_back();
-                    }
-                }
-
-                /**
-                 * Compute the reverse polynomial up to vector size n (degree n-1).
-                 * Below we make use of the reversal endomorphism definition from
-                 * [Bostan, Lecerf, & Schost, 2003. Tellegen's Principle in Practice, on page 38].
-                 */
-                template<typename Range>
-                void reverse(Range &a, std::size_t n) {
-                    std::reverse(std::begin(a), std::end(a));
-                    a.resize(n);
                 }
 
                 /**
@@ -264,7 +264,7 @@ namespace nil {
                         auto glambda = [=](value_type x, value_type y) { return y - (x * lead_coeff); };
                         std::transform(b.begin(), b.end(), r.begin() + shift, r.begin() + shift, glambda);
                         condense(r);
-
+                        
                         r_deg = r.size() - 1;
                     }
                     condense(q);
