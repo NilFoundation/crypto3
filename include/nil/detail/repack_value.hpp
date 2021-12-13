@@ -73,8 +73,10 @@ namespace nil {
             inline operator T() {
                 marshalling::status_type result_status_unpack, result_status_pack;
 
-                std::vector<std::uint8_t> buffer = range_unpack_impl<TInputEndian, Iter>(iterator, count_elements, result_status_unpack);
-                T result = range_pack_impl<TOutputEndian, std::vector<std::uint8_t>::const_iterator>(buffer, result_status_pack);
+                std::vector<std::uint8_t> buffer
+                    = range_unpack_impl<TInputEndian, Iter>(iterator, count_elements, result_status_unpack);
+                T result = range_pack_impl<TOutputEndian, std::vector<std::uint8_t>::const_iterator>(
+                    buffer, result_status_pack);
                 *status = result_status_pack | result_status_unpack;
 
                 return result;
@@ -97,7 +99,8 @@ namespace nil {
             }
 
             template<typename InputIterator>
-            itr_repack_impl(InputIterator first, InputIterator last, OutputIterator out, marshalling::status_type &status) {
+            itr_repack_impl(InputIterator first, InputIterator last, OutputIterator out,
+                            marshalling::status_type &status) {
                 iterator = first;
                 out_iterator = out;
                 count_elements = std::distance(first, last);
@@ -108,15 +111,17 @@ namespace nil {
             inline operator T() {
                 marshalling::status_type result_status_unpack, result_status_pack;
 
-                std::vector<std::uint8_t> buffer = range_unpack_impl<TInputEndian, Iter>(iterator, count_elements, result_status_unpack);
-                out_iterator = range_pack_impl<TOutputEndian, std::vector<std::uint8_t>::const_iterator>(buffer, out_iterator, result_status_pack);
+                std::vector<std::uint8_t> buffer
+                    = range_unpack_impl<TInputEndian, Iter>(iterator, count_elements, result_status_unpack);
+                out_iterator = range_pack_impl<TOutputEndian, std::vector<std::uint8_t>::const_iterator>(
+                    buffer, out_iterator, result_status_pack);
                 *status = result_status_pack | result_status_unpack;
 
                 return out_iterator;
             }
         };
 
-    }    // namespace marshalling
+    }    // namespace detail
 }    // namespace nil
 
 #endif    // MARSHALLING_MARSHALL_REPACK_VALUE_HPP

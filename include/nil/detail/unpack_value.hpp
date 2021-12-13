@@ -56,7 +56,7 @@ namespace nil {
                 this->status = &status;
             }
 
-            template <typename SimilarStdArray>
+            template<typename SimilarStdArray>
             SimilarStdArray similar_std_array_marshalling() {
                 SimilarStdArray result;
                 typename SimilarStdArray::iterator buffer_begin = result.begin();
@@ -65,24 +65,33 @@ namespace nil {
                 return result;
             }
 
-            template<typename T, size_t ArraySize,
-                     typename = typename std::enable_if<std::is_same<T, bool>::value
-                                                        || std::is_same<T, std::uint8_t>::value>::type>
+            // TODO: output type from marshalling?
+            //            template<typename T, size_t ArraySize,
+            //                     typename = typename std::enable_if<std::is_same<T, bool>::value
+            //                                                        || std::is_same<T, std::uint8_t>::value>::type>
+            template<typename T, size_t ArraySize>
             inline operator std::array<T, ArraySize>() {
 
                 return similar_std_array_marshalling<std::array<T, ArraySize>>();
             }
 
-            template<typename T, size_t ArraySize,
-                typename = typename std::enable_if<std::is_same<T, bool>::value
-                                                   || std::is_same<T, std::uint8_t>::value>::type>
+            // TODO: output type from marshalling?
+            //            template<typename T, size_t ArraySize,
+            //                typename = typename std::enable_if<std::is_same<T, bool>::value
+            //                                                   || std::is_same<T, std::uint8_t>::value>::type>
+            template<typename T, size_t ArraySize>
             inline operator boost::array<T, ArraySize>() {
 
                 return similar_std_array_marshalling<boost::array<T, ArraySize>>();
             }
 
-            template<typename OutputRange, typename = typename std::enable_if<std::is_same<typename OutputRange::value_type, bool>::value
-                                                                              || std::is_same<typename OutputRange::value_type, std::uint8_t>::value>::type>
+            // TODO: output type from marshalling?
+            //            template<typename OutputRange, typename = typename std::enable_if<std::is_same<typename
+            //            OutputRange::value_type, bool>::value
+            //                                                                              || std::is_same<typename
+            //                                                                              OutputRange::value_type,
+            //                                                                              std::uint8_t>::value>::type>
+            template<typename OutputRange>
             inline operator OutputRange() const {
                 std::vector<std::uint8_t> result(input.length());
                 typename std::vector<std::uint8_t>::iterator buffer_begin = result.begin();
@@ -119,13 +128,14 @@ namespace nil {
                 this->status = &status;
             }
 
-            template<typename OutputRange, typename = typename std::enable_if<std::is_same<typename OutputRange::value_type, bool>::value
-                                                                    || std::is_same<typename OutputRange::value_type, std::uint8_t>::value>::type>
+            template<typename OutputRange,
+                     typename = typename std::enable_if<
+                         std::is_same<typename OutputRange::value_type, bool>::value
+                         || std::is_same<typename OutputRange::value_type, std::uint8_t>::value>::type>
             inline operator OutputRange() {
                 using Toutput = typename OutputRange::value_type;
                 using T = typename std::iterator_traits<Iter>::value_type;
-                using marshalling_type =
-                    typename marshalling::is_compatible<std::vector<T>>::template type<TEndian>;
+                using marshalling_type = typename marshalling::is_compatible<std::vector<T>>::template type<TEndian>;
                 using marshalling_internal_type = typename marshalling_type::element_type;
 
                 std::vector<marshalling_internal_type> values;
@@ -143,7 +153,7 @@ namespace nil {
                 return OutputRange(result.begin(), result.end());
             }
 
-            template <typename SimilarStdArray>
+            template<typename SimilarStdArray>
             SimilarStdArray similar_std_array_marshalling() {
                 using marshalling_type = typename marshalling::is_compatible<SimilarStdArray>::template type<TEndian>;
                 using marshalling_internal_type = typename marshalling_type::element_type;
@@ -170,8 +180,8 @@ namespace nil {
             }
 
             template<typename T, size_t ArraySize,
-                typename = typename std::enable_if<std::is_same<T, bool>::value
-                                                   || std::is_same<T, std::uint8_t>::value>::type>
+                     typename = typename std::enable_if<std::is_same<T, bool>::value
+                                                        || std::is_same<T, std::uint8_t>::value>::type>
             inline operator boost::array<T, ArraySize>() {
                 return similar_std_array_marshalling<boost::array<T, ArraySize>>();
             }
@@ -194,7 +204,8 @@ namespace nil {
             }
 
             template<typename InputIterator>
-            itr_unpack_impl(InputIterator first, InputIterator last, OutputIterator out, marshalling::status_type &status) {
+            itr_unpack_impl(InputIterator first, InputIterator last, OutputIterator out,
+                            marshalling::status_type &status) {
                 iterator = first;
                 out_iterator = out;
                 count_elements = std::distance(first, last);
@@ -202,7 +213,8 @@ namespace nil {
             }
 
             template<typename SinglePassIterator>
-            itr_unpack_impl(const SinglePassIterator &iter, size_t len, OutputIterator out, marshalling::status_type &status) {
+            itr_unpack_impl(const SinglePassIterator &iter, size_t len, OutputIterator out,
+                            marshalling::status_type &status) {
                 iterator = iter;
                 out_iterator = out;
                 count_elements = len;
@@ -210,10 +222,9 @@ namespace nil {
             }
 
             inline operator OutputIterator() const {
-                using Toutput =typename std::iterator_traits<OutputIterator>::value_type;
+                using Toutput = typename std::iterator_traits<OutputIterator>::value_type;
                 using T = typename std::iterator_traits<Iter>::value_type;
-                using marshalling_type =
-                    typename marshalling::is_compatible<std::vector<T>>::template type<TEndian>;
+                using marshalling_type = typename marshalling::is_compatible<std::vector<T>>::template type<TEndian>;
                 using marshalling_internal_type = typename marshalling_type::element_type;
 
                 std::vector<marshalling_internal_type> values;
@@ -230,7 +241,7 @@ namespace nil {
                 return std::move(result.cbegin(), result.cend(), out_iterator);
             }
         };
-    }    // namespace marshalling
+    }    // namespace detail
 }    // namespace nil
 
 #endif    // MARSHALLING_MARSHALL_UNPACK_VALUE_HPP

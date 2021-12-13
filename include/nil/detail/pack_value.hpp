@@ -66,7 +66,7 @@ namespace nil {
                 this->status = &status;
             }
 
-            template <typename SimilarStdArray>
+            template<typename SimilarStdArray>
             SimilarStdArray similar_std_array_marshalling() {
                 using marshalling_type = typename marshalling::is_compatible<SimilarStdArray>::template type<TEndian>;
 
@@ -83,23 +83,24 @@ namespace nil {
             }
 
             template<typename T, size_t SizeArray,
-                     typename = typename std::enable_if<
-                         !nil::detail::is_container<typename marshalling::is_compatible<T>::template type<>>::value>::type>
+                     typename = typename std::enable_if<!nil::detail::is_container<
+                         typename marshalling::is_compatible<T>::template type<>>::value>::type>
             inline operator std::array<T, SizeArray>() {
 
                 return similar_std_array_marshalling<std::array<T, SizeArray>>();
             }
 
             template<typename T, size_t SizeArray,
-                typename = typename std::enable_if<
-                    !nil::detail::is_container<typename marshalling::is_compatible<T>::template type<>>::value>::type>
+                     typename = typename std::enable_if<!nil::detail::is_container<
+                         typename marshalling::is_compatible<T>::template type<>>::value>::type>
             inline operator boost::array<T, SizeArray>() {
 
                 return similar_std_array_marshalling<boost::array<T, SizeArray>>();
             }
 
             template<typename TMarshallingOutnput,
-                     typename = typename std::enable_if<marshalling::is_marshalling_type<TMarshallingOutnput>::value>::type>
+                     typename
+                     = typename std::enable_if<marshalling::is_marshalling_type<TMarshallingOutnput>::value>::type>
             inline operator TMarshallingOutnput() const {
 
                 TMarshallingOutnput result;
@@ -108,7 +109,8 @@ namespace nil {
                 return result;
             }
 
-            template<typename TOutput, typename = typename std::enable_if<marshalling::is_compatible<TOutput>::value>::type,
+            template<typename TOutput,
+                     typename = typename std::enable_if<marshalling::is_compatible<TOutput>::value>::type,
                      typename = typename std::enable_if<!nil::marshalling::is_container<
                          typename marshalling::is_compatible<TOutput>::template type<>>::value>::type>
             inline operator TOutput() const {
@@ -123,8 +125,11 @@ namespace nil {
                 return TOutput(m_val.value());
             }
 
-            template<typename OutputRange, typename = typename std::enable_if<!marshalling::is_marshalling_type<OutputRange>::value && !nil::marshalling::is_container<
-                typename marshalling::is_compatible<typename OutputRange::value_type>::template type<>>::value>::type>
+            template<typename OutputRange,
+                     typename
+                     = typename std::enable_if<!marshalling::is_marshalling_type<OutputRange>::value
+                                               && !nil::marshalling::is_container<typename marshalling::is_compatible<
+                                                   typename OutputRange::value_type>::template type<>>::value>::type>
             inline operator OutputRange() {
                 using T = typename OutputRange::value_type;
                 using marshalling_type = typename marshalling::is_compatible<std::vector<T>>::template type<TEndian>;
@@ -158,7 +163,8 @@ namespace nil {
             }
 
             template<typename InputIterator>
-            itr_pack_impl(InputIterator first, InputIterator last, OutputIterator out, marshalling::status_type &status) {
+            itr_pack_impl(InputIterator first, InputIterator last, OutputIterator out,
+                          marshalling::status_type &status) {
                 iterator = first;
                 out_iterator = out;
                 count_elements = std::distance(first, last);
@@ -180,7 +186,7 @@ namespace nil {
             }
         };
 
-    }    // namespace marshalling
+    }    // namespace detail
 }    // namespace nil
 
 #endif    // MARSHALLING_MARSHALL_PACK_VALUE_HPP
