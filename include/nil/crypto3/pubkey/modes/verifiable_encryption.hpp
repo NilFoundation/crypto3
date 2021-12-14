@@ -36,6 +36,7 @@
 #include <nil/crypto3/pubkey/operations/decrypt_op.hpp>
 #include <nil/crypto3/pubkey/operations/verify_encryption_op.hpp>
 #include <nil/crypto3/pubkey/operations/verify_decryption_op.hpp>
+#include <nil/crypto3/pubkey/operations/rerandomize_op.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -91,6 +92,8 @@ namespace nil {
                         encryption_verification_policy;
                     typedef detail::verifiable_encryption<scheme_type, verify_decryption_op>
                         decryption_verification_policy;
+                    typedef detail::verifiable_encryption<scheme_type, rerandomize_op>
+                        rerandomization_policy;
                 };
             }    // namespace modes
         }        // namespace pubkey

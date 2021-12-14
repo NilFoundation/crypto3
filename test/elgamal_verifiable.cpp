@@ -35,6 +35,8 @@
 #include <nil/crypto3/pubkey/algorithm/encrypt.hpp>
 #include <nil/crypto3/pubkey/algorithm/decrypt.hpp>
 #include <nil/crypto3/pubkey/algorithm/verify_encryption.hpp>
+#include <nil/crypto3/pubkey/algorithm/verify_decryption.hpp>
+#include <nil/crypto3/pubkey/algorithm/rerandomize.hpp>
 
 #include <nil/crypto3/pubkey/modes/verifiable_encryption.hpp>
 
@@ -82,7 +84,7 @@ void print_field_element(std::ostream &os, const fields::detail::element_fp12_2o
        << e.data[0].data[2].data[0].data << "," << e.data[0].data[2].data[1].data << "]],"
        << "[[" << e.data[1].data[0].data[0].data << "," << e.data[1].data[0].data[1].data << "],["
        << e.data[1].data[1].data[0].data << "," << e.data[1].data[1].data[1].data << "],["
-       << e.data[1].data[2].data[0].data << "," << e.data[1].data[2].data[1].data << "]]]";
+       << e.data[1].data[2].data[0].data << "," << e.data[1].data[2].data[1].data << "]]]" << std::endl;
 }
 
 template<typename CurveParams, typename Form>
@@ -202,6 +204,7 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     for (const auto m_i : m) {
         m_field.emplace_back(std::size_t(m_i));
     }
+    // std::vector<>
 
     const std::size_t eid_size = 64;
     std::vector<bool> eid(eid_size);
@@ -275,6 +278,57 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
         {std::get<0>(keypair), gg_keypair, cipher_text.second,
          typename proof_system::primary_input_type {std::cbegin(pinput) + m.size(), std::cend(pinput)}});
     BOOST_REQUIRE(enc_verification_ans);
+
+    bool dec_verification_ans = verify_decryption<encryption_scheme>(
+        cipher_text.first, decipher_text.first, {std::get<2>(keypair), gg_keypair, decipher_text.second});
+    BOOST_REQUIRE(dec_verification_ans);
+
+    /// Rerandomized cipher text
+    std::vector<typename pairing_curve_type::scalar_field_type::value_type> rnd_rerandomization;
+    for (std::size_t i = 0; i < 3; ++i) {
+        rnd_rerandomization.emplace_back(d());
+    }
+    typename encryption_scheme::cipher_type rerand_cipher_text = rerandomize<encryption_scheme>(
+        rnd_rerandomization, cipher_text.first, {std::get<0>(keypair), gg_keypair, cipher_text.second});
+
+    /// Decryption of the rerandomized cipher text
+    typename encryption_scheme::decipher_type decipher_rerand_text =
+        decrypt<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(
+            rerand_cipher_text.first, {std::get<1>(keypair), std::get<2>(keypair), gg_keypair});
+    BOOST_REQUIRE(decipher_rerand_text.first.size() == m_field.size());
+    for (std::size_t i = 0; i < m_field.size(); ++i) {
+        BOOST_REQUIRE(decipher_rerand_text.first[i] == m_field[i]);
+    }
+
+    /// Encryption verification of the rerandomized cipher text
+    enc_verification_ans = verify_encryption<encryption_scheme>(
+        rerand_cipher_text.first,
+        {std::get<0>(keypair), gg_keypair, rerand_cipher_text.second,
+         typename proof_system::primary_input_type {std::cbegin(pinput) + m.size(), std::cend(pinput)}});
+    BOOST_REQUIRE(enc_verification_ans);
+
+    /// Decryption verification of the rerandomized cipher text
+    dec_verification_ans =
+        verify_decryption<encryption_scheme>(rerand_cipher_text.first, decipher_rerand_text.first,
+                                             {std::get<2>(keypair), gg_keypair, decipher_rerand_text.second});
+    BOOST_REQUIRE(dec_verification_ans);
+
+    // TODO: add status return
+    // /// False-positive tests
+    // auto cipher_text_wrong = cipher_text.first;
+    // for (auto & c: cipher_text_wrong) {
+    //     c = c + std::iterator_traits<typename decltype(cipher_text.first)::iterator>::value_type::one();
+    // }
+    // typename encryption_scheme::decipher_type decipher_text_wrong =
+    //     decrypt<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(
+    //         cipher_text_wrong, {std::get<1>(keypair), std::get<2>(keypair), gg_keypair});
+    // BOOST_REQUIRE(decipher_text.first.size() == m_field.size());
+    // bool wrong_decryption_ans = true;
+    // for (std::size_t i = 0; i < m_field.size(); ++i) {
+    //     wrong_decryption_ans &= (decipher_text.first[i] == m_field[i]);
+    // }
+    // BOOST_REQUIRE(!wrong_decryption_ans);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

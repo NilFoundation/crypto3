@@ -44,6 +44,7 @@
 #include <nil/crypto3/pubkey/operations/decrypt_op.hpp>
 #include <nil/crypto3/pubkey/operations/verify_encryption_op.hpp>
 #include <nil/crypto3/pubkey/operations/verify_decryption_op.hpp>
+#include <nil/crypto3/pubkey/operations/rerandomize_op.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -85,6 +86,7 @@ namespace nil {
                 typedef typename Curve::template g2_type<> g2_type;
 
                 friend class decrypt_op<scheme_type>;
+                friend class verify_decryption_op<scheme_type>;
 
                 verification_key() = default;
                 verification_key(const typename g2_type::value_type &rho_g2,
@@ -189,7 +191,7 @@ namespace nil {
 
                 static inline internal_accumulator_type init_accumulator(const init_params_type &init_params) {
                     // TODO: check
-                    assert(init_params.gg_keypair.second.gamma_ABC_g1.rest.values.size() > init_params.msg_size);
+                    assert(init_params.gg_keypair.second.gamma_ABC_g1.rest.size() > init_params.msg_size);
                     return {init_params.gg_keypair, init_params.msg_size,
                             std::vector<typename scalar_field_type::value_type> {}};
                 }
@@ -208,7 +210,6 @@ namespace nil {
                     // TODO: check
                     assert(acc.rnd.size() >= 3 * acc.msg_size + 2);
                     auto rnd_iter = std::cbegin(acc.rnd);
-                    const size_t input_size = acc.gg_keypair.second.gamma_ABC_g1.rest.values.size();
 
                     typename scalar_field_type::value_type s_sum = scalar_field_type::value_type::zero();
 
@@ -241,7 +242,7 @@ namespace nil {
                         t = *rnd_iter++;
 
                         delta_s_g1.emplace_back(s * acc.gg_keypair.second.delta_g1);
-                        t_g1.emplace_back(t * acc.gg_keypair.second.gamma_ABC_g1.rest.values[i]);
+                        t_g1.emplace_back(t * acc.gg_keypair.second.gamma_ABC_g1.rest[i]);
                         t_g2.emplace_back(t * g2_type::value_type::one());
                         delta_sum_s_g1 = delta_sum_s_g1 + (s * t) * acc.gg_keypair.second.delta_g1;
                         gamma_inverse_sum_s_g1 = gamma_inverse_sum_s_g1 + s * acc.gg_keypair.second.gamma_g1;
@@ -278,7 +279,7 @@ namespace nil {
                     const typename proof_system_type::auxiliary_input_type &auxiliary_input;
                 };
                 struct internal_accumulator_type {
-                    std::vector<typename scalar_field_type::value_type> supplied_plain_text;
+                    std::vector<typename scalar_field_type::value_type> plain_text;
                     typename scalar_field_type::value_type r;
                     const public_key_type &pubkey;
                     const typename proof_system_type::keypair_type &gg_keypair;
@@ -300,7 +301,7 @@ namespace nil {
                 // TODO: use marshaling module instead of custom marshaling to process input data
                 template<typename InputIterator>
                 static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
-                    std::copy(first, last, std::back_inserter(acc.supplied_plain_text));
+                    std::copy(first, last, std::back_inserter(acc.plain_text));
                 }
 
                 template<typename InputRange>
@@ -310,27 +311,26 @@ namespace nil {
 
                 static inline result_type process(internal_accumulator_type &acc) {
                     // TODO: check
-                    assert(acc.gg_keypair.second.gamma_ABC_g1.rest.values.size() > acc.supplied_plain_text.size());
-                    assert(acc.primary_input.size() > acc.supplied_plain_text.size());
-                    assert(acc.gg_keypair.second.gamma_ABC_g1.rest.values.size() == acc.primary_input.size());
-                    assert(acc.supplied_plain_text.size() == acc.pubkey.delta_s_g1.size());
-                    assert(acc.supplied_plain_text.size() == acc.pubkey.t_g1.size());
-                    assert(acc.supplied_plain_text.size() == acc.pubkey.t_g2.size() - 1);
-                    for (std::size_t i = 0; i < acc.supplied_plain_text.size(); ++i) {
-                        assert(acc.primary_input[i] == acc.supplied_plain_text[i]);
+                    assert(acc.gg_keypair.second.gamma_ABC_g1.rest.size() > acc.plain_text.size());
+                    assert(acc.primary_input.size() > acc.plain_text.size());
+                    assert(acc.gg_keypair.second.gamma_ABC_g1.rest.size() == acc.primary_input.size());
+                    assert(acc.plain_text.size() == acc.pubkey.delta_s_g1.size());
+                    assert(acc.plain_text.size() == acc.pubkey.t_g1.size());
+                    assert(acc.plain_text.size() == acc.pubkey.t_g2.size() - 1);
+                    for (std::size_t i = 0; i < acc.plain_text.size(); ++i) {
+                        assert(acc.primary_input[i] == acc.plain_text[i]);
                     }
 
                     typename result_type::first_type ct_g1;
-                    ct_g1.reserve(acc.supplied_plain_text.size() + 2);
+                    ct_g1.reserve(acc.plain_text.size() + 2);
                     ct_g1.emplace_back(acc.r * acc.pubkey.delta_g1);
 
                     typename g1_type::value_type sum_tm_g1 = acc.r * acc.pubkey.delta_sum_s_g1;
 
-                    for (std::size_t i = 0; i < acc.supplied_plain_text.size(); ++i) {
+                    for (std::size_t i = 0; i < acc.plain_text.size(); ++i) {
                         ct_g1.emplace_back(acc.r * acc.pubkey.delta_s_g1[i] +
-                                           acc.supplied_plain_text[i] *
-                                               acc.gg_keypair.second.gamma_ABC_g1.rest.values[i]);
-                        sum_tm_g1 = sum_tm_g1 + acc.supplied_plain_text[i] * acc.pubkey.t_g1[i];
+                                           acc.plain_text[i] * acc.gg_keypair.second.gamma_ABC_g1.rest[i]);
+                        sum_tm_g1 = sum_tm_g1 + acc.plain_text[i] * acc.pubkey.t_g1[i];
                     }
                     ct_g1.emplace_back(sum_tm_g1);
                     auto proof = zk::snark::prove<proof_system_type>(acc.gg_keypair.first, acc.pubkey,
@@ -383,7 +383,7 @@ namespace nil {
 
                 static inline result_type process(internal_accumulator_type &acc) {
                     // TODO: check
-                    assert(acc.gg_keypair.second.gamma_ABC_g1.rest.values.size() > acc.cipher_text.size() - 2);
+                    assert(acc.gg_keypair.second.gamma_ABC_g1.rest.size() > acc.cipher_text.size() - 2);
                     assert(acc.cipher_text.size() - 2 == acc.vk.rho_sv_g2.size());
                     assert(acc.cipher_text.size() - 2 == acc.vk.rho_rhov_g2.size());
                     std::vector<typename scalar_field_type::value_type> m_new;
@@ -398,7 +398,7 @@ namespace nil {
                         typename gt_type::value_type dec_tmp = ci_sk_i * c0_sk_0.inversed();
                         auto discrete_log = gt_type::value_type::one();
                         typename gt_type::value_type bruteforce = algebra::pair_reduced<Curve>(
-                            acc.gg_keypair.second.gamma_ABC_g1.rest.values[j - 1], acc.vk.rho_rhov_g2[j - 1]);
+                            acc.gg_keypair.second.gamma_ABC_g1.rest[j - 1], acc.vk.rho_rhov_g2[j - 1]);
                         std::size_t exp = 0;
                         bool deciphered = false;
                         do {
@@ -468,7 +468,173 @@ namespace nil {
             };
 
             template<typename Curve, std::size_t BlockBits>
-            struct verify_decryption_op<elgamal_verifiable<Curve, BlockBits>> { };
+            struct verify_decryption_op<elgamal_verifiable<Curve, BlockBits>> {
+                typedef elgamal_verifiable<Curve, BlockBits> scheme_type;
+                typedef typename scheme_type::proof_system_type proof_system_type;
+                typedef typename scheme_type::public_key_type public_key_type;
+                typedef typename scheme_type::verification_key_type verification_key_type;
+
+                typedef typename Curve::scalar_field_type scalar_field_type;
+                typedef typename Curve::template g1_type<> g1_type;
+                typedef typename Curve::template g2_type<> g2_type;
+                typedef typename Curve::gt_type gt_type;
+
+                struct init_params_type {
+                    const verification_key_type &vk;
+                    const typename proof_system_type::keypair_type &gg_keypair;
+                    const typename g1_type::value_type &proof;
+                };
+                struct internal_accumulator_type {
+                    const verification_key_type &vk;
+                    const typename proof_system_type::keypair_type &gg_keypair;
+                    const typename g1_type::value_type &proof;
+                    std::vector<typename scalar_field_type::value_type> plain_text;
+                    std::vector<typename g1_type::value_type> cipher_text;
+                };
+                typedef bool result_type;
+
+                static inline internal_accumulator_type init_accumulator(const init_params_type &init_params) {
+                    return internal_accumulator_type {init_params.vk, init_params.gg_keypair, init_params.proof,
+                                                      std::vector<typename scalar_field_type::value_type> {},
+                                                      std::vector<typename g1_type::value_type> {}};
+                }
+
+                // TODO: process input data in place
+                // TODO: use marshaling module instead of custom marshaling to process input data
+                template<typename InputIterator>
+                static inline typename std::enable_if<
+                    std::is_same<typename scalar_field_type::value_type,
+                                 typename std::iterator_traits<InputIterator>::value_type>::value>::type
+                    update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
+                    std::copy(first, last, std::back_inserter(acc.plain_text));
+                }
+
+                template<typename InputIterator>
+                static inline typename std::enable_if<
+                    std::is_same<typename g1_type::value_type,
+                                 typename std::iterator_traits<InputIterator>::value_type>::value>::type
+                    update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
+                    std::copy(first, last, std::back_inserter(acc.cipher_text));
+                }
+
+                template<typename InputRange>
+                static inline void update(internal_accumulator_type &acc, InputRange range) {
+                    update(acc, std::cbegin(range), std::cend(range));
+                }
+
+                static inline result_type process(internal_accumulator_type &acc) {
+                    assert(acc.plain_text.size() + 2 == acc.cipher_text.size());
+                    assert(acc.gg_keypair.second.gamma_ABC_g1.rest.size() > acc.plain_text.size());
+                    typename gt_type::value_type vm_gt =
+                        algebra::pair_reduced<Curve>(acc.proof, g2_type::value_type::one());
+                    typename gt_type::value_type new_c0_v0_gt =
+                        algebra::pair_reduced<Curve>(acc.cipher_text[0], acc.vk.rho_g2);
+                    bool ans = (vm_gt == new_c0_v0_gt);
+                    std::cout << ans << std::endl;
+
+                    for (size_t i = 1; i < acc.cipher_text.size() - 1; ++i) {
+                        typename gt_type::value_type ci_v_nj_gt =
+                            algebra::pair_reduced<Curve>(acc.cipher_text[i], acc.vk.rho_rhov_g2[i - 1]);
+                        typename gt_type::value_type v_vj_gt =
+                            algebra::pair_reduced<Curve>(acc.proof, acc.vk.rho_sv_g2[i - 1]);
+                        typename gt_type::value_type verify_tmp = ci_v_nj_gt * v_vj_gt.inversed();
+                        typename gt_type::value_type verify_msg =
+                            algebra::pair_reduced<Curve>(acc.gg_keypair.second.gamma_ABC_g1.rest[i - 1],
+                                                         acc.vk.rho_rhov_g2[i - 1])
+                                .pow(acc.plain_text[i - 1].data);
+                        bool ans_m = (verify_tmp == verify_msg);
+                        ans &= ans_m;
+                    }
+
+                    return ans;
+                }
+            };
+
+            template<typename Curve, std::size_t BlockBits>
+            struct rerandomize_op<elgamal_verifiable<Curve, BlockBits>> {
+                typedef elgamal_verifiable<Curve, BlockBits> scheme_type;
+                typedef typename scheme_type::proof_system_type proof_system_type;
+                typedef typename scheme_type::public_key_type public_key_type;
+
+                typedef typename Curve::scalar_field_type scalar_field_type;
+                typedef typename Curve::template g1_type<> g1_type;
+                typedef typename Curve::template g2_type<> g2_type;
+                typedef typename Curve::gt_type gt_type;
+
+                struct init_params_type {
+                    const public_key_type &pubkey;
+                    const typename proof_system_type::keypair_type &gg_keypair;
+                    const typename proof_system_type::proof_type &proof;
+                };
+                struct internal_accumulator_type {
+                    const public_key_type &pubkey;
+                    const typename proof_system_type::keypair_type &gg_keypair;
+                    const typename proof_system_type::proof_type &proof;
+                    std::vector<typename scalar_field_type::value_type> rnd;
+                    std::vector<typename g1_type::value_type> cipher_text;
+                };
+                typedef typename scheme_type::cipher_type result_type;
+
+                static inline internal_accumulator_type init_accumulator(const init_params_type &init_params) {
+                    return internal_accumulator_type {init_params.pubkey, init_params.gg_keypair, init_params.proof,
+                                                      std::vector<typename scalar_field_type::value_type> {},
+                                                      std::vector<typename g1_type::value_type> {}};
+                }
+
+                // TODO: process input data in place
+                // TODO: use marshaling module instead of custom marshaling to process input data
+                template<typename InputIterator>
+                static inline typename std::enable_if<
+                    std::is_same<typename scalar_field_type::value_type,
+                                 typename std::iterator_traits<InputIterator>::value_type>::value>::type
+                    update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
+                    std::copy(first, last, std::back_inserter(acc.rnd));
+                }
+
+                template<typename InputIterator>
+                static inline typename std::enable_if<
+                    std::is_same<typename g1_type::value_type,
+                                 typename std::iterator_traits<InputIterator>::value_type>::value>::type
+                    update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
+                    std::copy(first, last, std::back_inserter(acc.cipher_text));
+                }
+
+                template<typename InputRange>
+                static inline void update(internal_accumulator_type &acc, InputRange range) {
+                    update(acc, std::cbegin(range), std::cend(range));
+                }
+
+                static inline result_type process(internal_accumulator_type &acc) {
+                    assert(acc.rnd.size() >= 3);
+                    assert(acc.pubkey.delta_s_g1.size() == acc.cipher_text.size() - 2);
+                    assert(acc.pubkey.t_g1.size() == acc.cipher_text.size() - 2);
+                    assert(acc.pubkey.t_g2.size() - 1 == acc.cipher_text.size() - 2);
+                    std::vector<typename g1_type::value_type> ct_g1;
+                    ct_g1.reserve(acc.cipher_text.size());
+
+                    auto rnd_it = std::cbegin(acc.rnd);
+                    typename scalar_field_type::value_type r = *rnd_it++;
+                    typename scalar_field_type::value_type z1 = *rnd_it++;
+                    typename scalar_field_type::value_type z2 = *rnd_it++;
+
+                    typename scalar_field_type::value_type z1_inverse = z1.inversed();
+
+                    ct_g1.emplace_back(acc.cipher_text.front() + r * acc.pubkey.delta_g1);
+                    for (size_t i = 1; i < acc.cipher_text.size() - 1; ++i) {
+                        ct_g1.emplace_back(acc.cipher_text[i] + r * acc.pubkey.delta_s_g1[i - 1]);
+                    }
+                    ct_g1.emplace_back(acc.cipher_text.back() + r * acc.pubkey.delta_sum_s_g1);
+
+                    typename g1_type::value_type g1_A = z1 * acc.proof.g_A;
+                    typename g2_type::value_type g2_B =
+                        z1_inverse * acc.proof.g_B + z2 * acc.gg_keypair.second.delta_g2;
+                    typename g1_type::value_type g1_C =
+                        acc.proof.g_C + z2 * g1_A + r * acc.pubkey.gamma_inverse_sum_s_g1;
+
+                    return std::make_pair(ct_g1, typename proof_system_type::proof_type {
+                                                     std::move(g1_A), std::move(g2_B), std::move(g1_C)});
+                }
+            };
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
