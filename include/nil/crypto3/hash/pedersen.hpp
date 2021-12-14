@@ -235,9 +235,8 @@ namespace nil {
                     auto result_point = nil::crypto3::hashes::accumulators::extract::to_curve<base_hash_type>(acc);
                     nil::marshalling::status_type status;
                     // TODO: check status
-                    result_type result =
-                        nil::marshalling::unpack<typename construction::params_type::digest_endian, bool>(result_point,
-                                                                                                          status);
+                    result_type result = nil::marshalling::unpack<typename construction::params_type::digest_endian>(
+                        result_point, status);
                     return result;
                 }
             };

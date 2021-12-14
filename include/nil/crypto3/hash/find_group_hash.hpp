@@ -116,8 +116,7 @@ namespace nil {
                             nil::crypto3::accumulators::extract::hash<hash_type>(acc_copy);
                         // TODO: generalize pack interface to accept arbitrary containers
                         std::vector<std::uint8_t> H_vec(std::cbegin(H), std::cend(H));
-                        point = nil::marshalling::pack<nil::marshalling::option::little_endian, group_value_type>(
-                            H_vec, status);
+                        point = nil::marshalling::pack<nil::marshalling::option::little_endian>(H_vec, status);
                         if (status == nil::marshalling::status_type::success) {
                             break;
                         }
