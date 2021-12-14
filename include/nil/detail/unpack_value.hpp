@@ -46,6 +46,18 @@
 namespace nil {
     namespace detail {
 
+        template <typename T, typename Input>
+        typename std::enable_if<std::is_same<T, bool>::value, size_t>::type
+            get_length(Input in) {
+                return in.bit_length();
+        }
+
+        template <typename T, typename Input>
+        typename std::enable_if<std::is_same<T, uint8_t>::value, size_t>::type
+            get_length(Input in) {
+            return in.length();
+        }
+
         template<typename TInput>
         struct value_unpack_impl {
             marshalling::status_type *status;
@@ -93,8 +105,9 @@ namespace nil {
             //                                                                              std::uint8_t>::value>::type>
             template<typename OutputRange>
             inline operator OutputRange() const {
-                std::vector<std::uint8_t> result(input.length());
-                typename std::vector<std::uint8_t>::iterator buffer_begin = result.begin();
+                using T = typename OutputRange::value_type;
+                std::vector<T> result(get_length<T>(input));
+                typename std::vector<T>::iterator buffer_begin = result.begin();
                 *status = input.write(buffer_begin, result.size());
 
                 return OutputRange(result.begin(), result.end());
@@ -106,6 +119,7 @@ namespace nil {
             marshalling::status_type *status;
             mutable Iter iterator;
             size_t count_elements;
+            using value_type = typename std::iterator_traits<Iter>::value_type;
 
             template<typename SinglePassRange>
             range_unpack_impl(const SinglePassRange &range, marshalling::status_type &status) {
@@ -134,8 +148,7 @@ namespace nil {
                          || std::is_same<typename OutputRange::value_type, std::uint8_t>::value>::type>
             inline operator OutputRange() {
                 using Toutput = typename OutputRange::value_type;
-                using T = typename std::iterator_traits<Iter>::value_type;
-                using marshalling_type = typename marshalling::is_compatible<std::vector<T>>::template type<TEndian>;
+                using marshalling_type = typename marshalling::is_compatible<std::vector<value_type>>::template type<TEndian>;
                 using marshalling_internal_type = typename marshalling_type::element_type;
 
                 std::vector<marshalling_internal_type> values;
@@ -146,7 +159,7 @@ namespace nil {
                 }
 
                 marshalling_type m_val = marshalling_type(values);
-                std::vector<Toutput> result(m_val.length());
+                std::vector<Toutput> result(get_length<Toutput>(m_val));
                 typename std::vector<Toutput>::iterator buffer_begin = result.begin();
                 *status = m_val.write(buffer_begin, result.size());
 
@@ -192,8 +205,9 @@ namespace nil {
             marshalling::status_type *status;
             mutable Iter iterator;
             size_t count_elements;
-            OutputIterator out_iterator;
+            mutable OutputIterator out_iterator;
             using value_type = typename std::iterator_traits<Iter>::value_type;
+            using output_value_type = typename std::iterator_traits<OutputIterator>::value_type;
 
             template<typename SinglePassRange>
             itr_unpack_impl(const SinglePassRange &range, OutputIterator out, marshalling::status_type &status) {
@@ -222,9 +236,7 @@ namespace nil {
             }
 
             inline operator OutputIterator() const {
-                using Toutput = typename std::iterator_traits<OutputIterator>::value_type;
-                using T = typename std::iterator_traits<Iter>::value_type;
-                using marshalling_type = typename marshalling::is_compatible<std::vector<T>>::template type<TEndian>;
+                using marshalling_type = typename marshalling::is_compatible<std::vector<value_type>>::template type<TEndian>;
                 using marshalling_internal_type = typename marshalling_type::element_type;
 
                 std::vector<marshalling_internal_type> values;
@@ -235,8 +247,8 @@ namespace nil {
                 }
 
                 marshalling_type m_val = marshalling_type(values);
-                std::vector<Toutput> result(m_val.length());
-                typename std::vector<Toutput>::iterator buffer_begin = result.begin();
+                std::vector<output_value_type> result(get_length<output_value_type>(m_val));
+                typename std::vector<output_value_type>::iterator buffer_begin = result.begin();
                 *status = m_val.write(buffer_begin, result.size());
                 return std::move(result.cbegin(), result.cend(), out_iterator);
             }
