@@ -276,17 +276,17 @@ namespace nil {
         };
 
         template<typename Value>
-        struct is_similar_std_array {
+        struct is_array {
             static const bool value = false;
         };
 
         template<typename T, size_t ArraySize>
-        struct is_similar_std_array<std::array<T, ArraySize>> {
+        struct is_array<std::array<T, ArraySize>> {
             static const bool value = true;
         };
 
         template<typename T, size_t ArraySize>
-        struct is_similar_std_array<boost::array<T, ArraySize>> {
+        struct is_array<boost::array<T, ArraySize>> {
             static const bool value = true;
         };
 
