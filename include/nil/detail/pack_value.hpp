@@ -127,7 +127,7 @@ namespace nil {
 
             template<typename OutputRange,
                      typename
-                     = typename std::enable_if<!marshalling::is_marshalling_type<OutputRange>::value
+                     = typename std::enable_if<nil::detail::is_range<OutputRange>::value && !marshalling::is_marshalling_type<OutputRange>::value
                                                && !nil::marshalling::is_container<typename marshalling::is_compatible<
                                                    typename OutputRange::value_type>::template type<>>::value>::type>
             inline operator OutputRange() {
