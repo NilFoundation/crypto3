@@ -83,7 +83,7 @@ namespace nil {
                                 const PublicKey &pubkey, const primary_input_type &unencrypted_primary_input,
                                 const proof_type &proof) {
 
-                        const std::size_t input_size = gg_keypair.second.gamma_ABC_g1.rest.values.size();
+                        const std::size_t input_size = gg_keypair.second.gamma_ABC_g1.rest.size();
                         const std::size_t ct_size = std::distance(first, last);
                         assert(input_size - 1 > ct_size - 2);
                         assert(unencrypted_primary_input.size() + (ct_size - 2) == input_size);
@@ -102,8 +102,8 @@ namespace nil {
                         assert((it1 == last - 1) && (it2 == std::cend(pubkey.t_g2)));
 
                         for (std::size_t i = ct_size - 2; i < input_size; ++i) {
-                            acc = acc + unencrypted_primary_input[i - ct_size + 2] *
-                                            gg_keypair.second.gamma_ABC_g1.rest.values[i];
+                            acc = acc +
+                                  unencrypted_primary_input[i - ct_size + 2] * gg_keypair.second.gamma_ABC_g1.rest[i];
                         }
                         typename gt_type::value_type presum_cipher =
                             algebra::pair_reduced<CurveType>(*(last - 1), g2_type::value_type::one());
