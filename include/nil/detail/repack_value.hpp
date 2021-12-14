@@ -88,7 +88,7 @@ namespace nil {
             marshalling::status_type *status;
             mutable Iter iterator;
             size_t count_elements;
-            OutputIterator out_iterator;
+            mutable OutputIterator out_iterator;
 
             template<typename SinglePassRange>
             itr_repack_impl(const SinglePassRange &range, OutputIterator out, marshalling::status_type &status) {
