@@ -127,7 +127,7 @@ namespace nil {
 
             template<typename OutputRange,
                      typename
-                     = typename std::enable_if<!marshalling::is_marshalling_type<OutputRange>::value
+                     = typename std::enable_if<nil::detail::is_range<OutputRange>::value && !marshalling::is_marshalling_type<OutputRange>::value
                                                && !nil::marshalling::is_container<typename marshalling::is_compatible<
                                                    typename OutputRange::value_type>::template type<>>::value>::type>
             inline operator OutputRange() {
@@ -150,9 +150,10 @@ namespace nil {
         struct itr_pack_impl {
             marshalling::status_type *status;
             mutable Iter iterator;
+            mutable OutputIterator out_iterator;
             size_t count_elements;
-            OutputIterator out_iterator;
             using value_type = typename std::iterator_traits<Iter>::value_type;
+            using output_value_type = typename std::iterator_traits<OutputIterator>::value_type;
 
             template<typename SinglePassRange>
             itr_pack_impl(const SinglePassRange &range, OutputIterator out, marshalling::status_type &status) {
@@ -172,17 +173,31 @@ namespace nil {
             }
 
             inline operator OutputIterator() const {
-                using T = typename std::iterator_traits<OutputIterator>::value_type;
-                using marshalling_type = typename marshalling::is_compatible<std::vector<T>>::template type<TEndian>;
+                using marshalling_type = typename marshalling::is_compatible<std::vector<output_value_type>>::template type<TEndian>;
                 marshalling_type m_val;
 
                 *status = m_val.read(iterator, count_elements);
-                std::vector<T> result;
+                std::vector<output_value_type> result;
                 for (const auto &val_i : m_val.value()) {
                     result.push_back(val_i.value());
                 }
 
                 return std::move(result.cbegin(), result.cend(), out_iterator);
+            }
+
+            inline operator marshalling::status_type() const {
+                using marshalling_type = typename marshalling::is_compatible<std::vector<output_value_type>>::template type<TEndian>;
+                marshalling_type m_val;
+
+                marshalling::status_type status;
+                status = m_val.read(iterator, count_elements);
+                std::vector<output_value_type> result;
+                for (const auto &val_i : m_val.value()) {
+                    result.push_back(val_i.value());
+                }
+
+                std::move(result.cbegin(), result.cend(), out_iterator);
+                return status;
             }
         };
 
