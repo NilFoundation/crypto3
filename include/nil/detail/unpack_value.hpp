@@ -68,33 +68,13 @@ namespace nil {
                 this->status = &status;
             }
 
-            template<typename SimilarStdArray>
-            SimilarStdArray similar_std_array_marshalling() {
-                SimilarStdArray result;
-                typename SimilarStdArray::iterator buffer_begin = result.begin();
+            template<typename Array, typename = typename std::enable_if<!std::is_constructible<Array, typename std::vector<typename Array::value_type>::iterator, typename std::vector<typename Array::value_type>::iterator>::value>::type>
+            inline operator Array() {
+                Array result;
+                typename Array::iterator buffer_begin = result.begin();
                 *status = input.write(buffer_begin, result.size());
 
                 return result;
-            }
-
-            // TODO: output type from marshalling?
-            //            template<typename T, size_t ArraySize,
-            //                     typename = typename std::enable_if<std::is_same<T, bool>::value
-            //                                                        || std::is_same<T, std::uint8_t>::value>::type>
-            template<typename T, size_t ArraySize>
-            inline operator std::array<T, ArraySize>() {
-
-                return similar_std_array_marshalling<std::array<T, ArraySize>>();
-            }
-
-            // TODO: output type from marshalling?
-            //            template<typename T, size_t ArraySize,
-            //                typename = typename std::enable_if<std::is_same<T, bool>::value
-            //                                                   || std::is_same<T, std::uint8_t>::value>::type>
-            template<typename T, size_t ArraySize>
-            inline operator boost::array<T, ArraySize>() {
-
-                return similar_std_array_marshalling<boost::array<T, ArraySize>>();
             }
 
             // TODO: output type from marshalling?
@@ -103,7 +83,7 @@ namespace nil {
             //                                                                              || std::is_same<typename
             //                                                                              OutputRange::value_type,
             //                                                                              std::uint8_t>::value>::type>
-            template<typename OutputRange>
+            template<typename OutputRange, typename = typename std::enable_if<std::is_constructible<OutputRange, typename std::vector<typename OutputRange::value_type>::iterator, typename std::vector<typename OutputRange::value_type>::iterator>::value>::type>
             inline operator OutputRange() const {
                 using T = typename OutputRange::value_type;
                 std::vector<T> result(get_length<T>(input));
@@ -144,8 +124,9 @@ namespace nil {
 
             template<typename OutputRange,
                      typename = typename std::enable_if<
-                         std::is_same<typename OutputRange::value_type, bool>::value
-                         || std::is_same<typename OutputRange::value_type, std::uint8_t>::value>::type>
+                         std::is_constructible<OutputRange, typename std::vector<typename OutputRange::value_type>::iterator, typename std::vector<typename OutputRange::value_type>::iterator>::value &&
+                                (std::is_same<typename OutputRange::value_type, bool>::value
+                         || std::is_same<typename OutputRange::value_type, std::uint8_t>::value)>::type>
             inline operator OutputRange() {
                 using Toutput = typename OutputRange::value_type;
                 using marshalling_type = typename marshalling::is_compatible<std::vector<value_type>>::template type<TEndian>;
@@ -166,9 +147,12 @@ namespace nil {
                 return OutputRange(result.begin(), result.end());
             }
 
-            template<typename SimilarStdArray, size_t ArraySize>
-            SimilarStdArray similar_std_array_marshalling() {
-                using marshalling_type = typename marshalling::is_compatible<std::array<value_type, ArraySize>>::template type<TEndian>;
+            template<typename Array,
+                     typename = typename std::enable_if<!std::is_constructible<Array, typename std::vector<typename Array::value_type>::iterator, typename std::vector<typename Array::value_type>::iterator>::value>::type,
+                     typename = typename std::enable_if<(std::is_same<typename Array::value_type, bool>::value
+                                                        || std::is_same<typename Array::value_type, std::uint8_t>::value)>::type>
+            inline operator Array() {
+                using marshalling_type = typename marshalling::is_compatible<Array>::template type<TEndian>;
                 using marshalling_internal_type = typename marshalling_type::element_type;
 
                 nil::marshalling::container::static_vector<marshalling_internal_type, marshalling_type::max_length()>
@@ -178,25 +162,11 @@ namespace nil {
                     values.emplace_back(*k);
                 }
                 marshalling_type m_val = marshalling_type(values);
-                SimilarStdArray result;
-                typename SimilarStdArray::iterator buffer_begin = result.begin();
+                Array result;
+                typename Array::iterator buffer_begin = result.begin();
                 *status = m_val.write(buffer_begin, result.size());
 
                 return result;
-            }
-
-            template<typename T, size_t ArraySize,
-                     typename = typename std::enable_if<std::is_same<T, bool>::value
-                                                        || std::is_same<T, std::uint8_t>::value>::type>
-            inline operator std::array<T, ArraySize>() {
-                return similar_std_array_marshalling<std::array<T, ArraySize>, ArraySize>();
-            }
-
-            template<typename T, size_t ArraySize,
-                     typename = typename std::enable_if<std::is_same<T, bool>::value
-                                                        || std::is_same<T, std::uint8_t>::value>::type>
-            inline operator boost::array<T, ArraySize>() {
-                return similar_std_array_marshalling<boost::array<T, ArraySize>, ArraySize>();
             }
         };
 
