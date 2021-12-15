@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_MARSHALL_NEW_HPP
-#define MARSHALLING_MARSHALL_NEW_HPP
+#ifndef MARSHALLING_ALGORITHMS_PACK_HPP
+#define MARSHALLING_ALGORITHMS_PACK_HPP
 
 #include <type_traits>
 
@@ -156,7 +156,7 @@ namespace nil {
 
         template<typename TEndian, typename SinglePassRange1, typename SinglePassRange2>
         typename std::enable_if<nil::detail::is_range<SinglePassRange2>::value
-                                    && !nil::detail::is_similar_std_array<SinglePassRange2>::value,
+                                    && !nil::detail::is_array<SinglePassRange2>::value,
                                 status_type>::type
             pack(const SinglePassRange1 &rng_input, SinglePassRange2 &rng_output) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange1>));
@@ -168,8 +168,7 @@ namespace nil {
         }
 
         template<typename TEndian, typename SinglePassRange, typename TOutput>
-        typename std::enable_if<!(nil::detail::is_range<TOutput>::value)
-                                    || nil::detail::is_similar_std_array<TOutput>::value,
+        typename std::enable_if<!(nil::detail::is_range<TOutput>::value) || nil::detail::is_array<TOutput>::value,
                                 status_type>::type
             pack(const SinglePassRange &rng_input, TOutput &rng_output) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
@@ -180,7 +179,7 @@ namespace nil {
 
         template<typename TEndian, typename InputIterator, typename SinglePassRange>
         typename std::enable_if<nil::detail::is_range<SinglePassRange>::value
-                                    && !(nil::detail::is_similar_std_array<SinglePassRange>::value),
+                                    && !(nil::detail::is_array<SinglePassRange>::value),
                                 status_type>::type
             pack(InputIterator first, InputIterator last, SinglePassRange &rng_output) {
             BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
@@ -192,8 +191,7 @@ namespace nil {
         }
 
         template<typename TEndian, typename InputIterator, typename TOutput>
-        typename std::enable_if<!nil::detail::is_range<TOutput>::value
-                                    || nil::detail::is_similar_std_array<TOutput>::value,
+        typename std::enable_if<!nil::detail::is_range<TOutput>::value || nil::detail::is_array<TOutput>::value,
                                 status_type>::type
             pack(InputIterator first, InputIterator last, TOutput &rng_output) {
             BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
@@ -201,7 +199,6 @@ namespace nil {
             rng_output = pack<TEndian>(first, last, status);
             return status;
         }
-
     }    // namespace marshalling
 }    // namespace nil
 

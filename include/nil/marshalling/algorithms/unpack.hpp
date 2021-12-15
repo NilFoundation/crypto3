@@ -170,7 +170,7 @@ namespace nil {
 
         template<typename TEndian, typename TInput, typename OutputIterator>
         typename std::enable_if<!nil::detail::is_range<OutputIterator>::value
-                                    && !nil::detail::is_similar_std_array<OutputIterator>::value,
+                                    && !nil::detail::is_array<OutputIterator>::value,
                                 status_type>::type
             unpack(const TInput &r, OutputIterator out) {
             using T = typename std::iterator_traits<OutputIterator>::value_type;
@@ -189,7 +189,7 @@ namespace nil {
 
         template<typename TEndian, typename InputIterator, typename OutputIterator>
         typename std::enable_if<!nil::detail::is_range<OutputIterator>::value
-                                    && !nil::detail::is_similar_std_array<OutputIterator>::value,
+                                    && !nil::detail::is_array<OutputIterator>::value,
                                 status_type>::type
             unpack(InputIterator first, InputIterator last, OutputIterator out) {
             using T = typename std::iterator_traits<OutputIterator>::value_type;
@@ -202,7 +202,7 @@ namespace nil {
 
         template<typename TInput, typename SinglePassRange>
         typename std::enable_if<nil::detail::is_range<SinglePassRange>::value
-                                    && !(nil::detail::is_similar_std_array<SinglePassRange>::value),
+                                    && !(nil::detail::is_array<SinglePassRange>::value),
                                 status_type>::type
             unpack(const TInput &input, SinglePassRange &result) {
             status_type status;
@@ -213,7 +213,7 @@ namespace nil {
 
         template<typename TInput, typename TOutput>
         typename std::enable_if<!nil::detail::is_range<TOutput>::value
-                                    || nil::detail::is_similar_std_array<TOutput>::value,
+                                    || nil::detail::is_array<TOutput>::value,
                                 status_type>::type
             unpack(const TInput &input, TOutput &result) {
             status_type status;
@@ -223,7 +223,7 @@ namespace nil {
 
         template<typename TEndian, typename TInput, typename SinglePassRange>
         typename std::enable_if<nil::detail::is_range<SinglePassRange>::value
-                                    && !(nil::detail::is_similar_std_array<SinglePassRange>::value),
+                                    && !(nil::detail::is_array<SinglePassRange>::value),
                                 status_type>::type
             unpack(const TInput &input, SinglePassRange &result) {
             status_type status;
@@ -234,7 +234,7 @@ namespace nil {
 
         template<typename TEndian, typename TInput, typename TOutput>
         typename std::enable_if<!nil::detail::is_range<TOutput>::value
-                                    || nil::detail::is_similar_std_array<TOutput>::value,
+                                    || nil::detail::is_array<TOutput>::value,
                                 status_type>::type
             unpack(const TInput &input, TOutput &result) {
             status_type status;
@@ -244,7 +244,7 @@ namespace nil {
 
         template<typename TEndian, typename InputIterator, typename SinglePassRange>
         typename std::enable_if<nil::detail::is_range<SinglePassRange>::value
-                                    && !(nil::detail::is_similar_std_array<SinglePassRange>::value),
+                                    && !(nil::detail::is_array<SinglePassRange>::value),
                                 status_type>::type
             unpack(InputIterator first, InputIterator last, SinglePassRange &result) {
             status_type status;
@@ -255,7 +255,7 @@ namespace nil {
 
         template<typename TEndian, typename InputIterator, typename TOutput>
         typename std::enable_if<!nil::detail::is_range<TOutput>::value
-                                    || nil::detail::is_similar_std_array<TOutput>::value,
+                                    || nil::detail::is_array<TOutput>::value,
                                 status_type>::type
             unpack(InputIterator first, InputIterator last, TOutput &result) {
             status_type status;

@@ -113,7 +113,7 @@ namespace nil {
 
         template<typename TInputEndian, typename TOutputEndian, typename SinglePassRange, typename TOutput>
         typename std::enable_if<!(nil::detail::is_range<TOutput>::value
-                                  || nil::detail::is_similar_std_array<TOutput>::value),
+                                  || nil::detail::is_array<TOutput>::value),
                                 status_type>::type
             repack(const SinglePassRange &rng_input, TOutput &rng_output) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
