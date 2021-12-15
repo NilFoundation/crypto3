@@ -62,11 +62,11 @@ void test_curve_element_non_fixed_size_container(std::vector<T> val_container) {
 
     nil::marshalling::status_type status;
     std::vector<unit_type> cv = 
-        nil::marshalling::unpack<Endianness, unit_type>(val_container, status);
+        nil::marshalling::unpack<Endianness>(val_container, status);
 
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    std::vector<T> test_val = nil::marshalling::pack<Endianness, std::vector<T>>(cv, status);
+    std::vector<T> test_val = nil::marshalling::pack<Endianness>(cv, status);
 
     BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), test_val.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
