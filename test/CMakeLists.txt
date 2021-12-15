@@ -20,6 +20,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        crypto3::algebra
                        crypto3::zk
                        crypto3::blueprint
+                       crypto3::pubkey
                        ${CMAKE_WORKSPACE_NAME}::crypto3_multiprecision
                        ${CMAKE_WORKSPACE_NAME}::crypto3_algebra
                        ${CMAKE_WORKSPACE_NAME}::core)
