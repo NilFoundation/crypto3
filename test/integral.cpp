@@ -105,12 +105,12 @@ void test_round_trip_fixed_precision_big_endian(T val) {
     export_bits(val, cv.begin() + begin_index, units_bits, true);
 
     nil::marshalling::status_type status;
-    T test_val = nil::marshalling::pack<nil::marshalling::option::big_endian, T>(cv, status);
+    T test_val = nil::marshalling::pack<nil::marshalling::option::big_endian>(cv, status);
 
     BOOST_CHECK(val == test_val);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    std::vector<unit_type> test_cv = nil::marshalling::unpack<nil::marshalling::option::big_endian, unit_type>(val, status);
+    std::vector<unit_type> test_cv = nil::marshalling::unpack<nil::marshalling::option::big_endian>(val, status);
 
     BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
@@ -131,12 +131,12 @@ void test_round_trip_fixed_precision_little_endian(T val) {
     cv.resize(unitblob_size, 0x00);
 
     nil::marshalling::status_type status;
-    T test_val = nil::marshalling::pack<nil::marshalling::option::little_endian, T>(cv, status);
+    T test_val = nil::marshalling::pack<nil::marshalling::option::little_endian>(cv, status);
 
     BOOST_CHECK(val == test_val);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    std::vector<unit_type> test_cv = nil::marshalling::unpack<nil::marshalling::option::little_endian, unit_type>(val, status);
+    std::vector<unit_type> test_cv = nil::marshalling::unpack<nil::marshalling::option::little_endian>(val, status);
 
     BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
@@ -168,12 +168,12 @@ void test_round_trip_non_fixed_precision(T val) {
         std::is_same<TEndianness, nil::marshalling::option::big_endian>::value?true:false);
 
     nil::marshalling::status_type status;
-    T test_val = nil::marshalling::pack<TEndianness, T>(cv, status);
+    T test_val = nil::marshalling::pack<TEndianness>(cv, status);
 
     BOOST_CHECK(val == test_val);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    std::vector<unit_type> test_cv = nil::marshalling::unpack<TEndianness, unit_type>(val, status);
+    std::vector<unit_type> test_cv = nil::marshalling::unpack<TEndianness>(val, status);
 
     BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);

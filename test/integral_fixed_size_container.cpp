@@ -120,14 +120,13 @@ void test_round_trip_fixed_size_container_fixed_precision_big_endian(
 
     nil::marshalling::status_type status;
     std::array<T, TSize> test_val = 
-        nil::marshalling::pack<nil::marshalling::option::big_endian, 
-        std::array<T, TSize>>(cv, status);
+        nil::marshalling::pack<nil::marshalling::option::big_endian>(cv, status);
 
     BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), test_val.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     std::vector<unit_type> test_cv = 
-        nil::marshalling::unpack<nil::marshalling::option::big_endian, unit_type>(val_container, status);
+        nil::marshalling::unpack<nil::marshalling::option::big_endian>(val_container, status);
 
     BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
@@ -160,14 +159,13 @@ void test_round_trip_fixed_size_container_fixed_precision_little_endian(
 
     nil::marshalling::status_type status;
     std::array<T, TSize> test_val = 
-        nil::marshalling::pack<nil::marshalling::option::little_endian, 
-        std::array<T, TSize>>(cv, status);
+        nil::marshalling::pack<nil::marshalling::option::little_endian>(cv, status);
 
     BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), test_val.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     std::vector<unit_type> test_cv = 
-        nil::marshalling::unpack<nil::marshalling::option::little_endian, unit_type>(val_container, status);
+        nil::marshalling::unpack<nil::marshalling::option::little_endian>(val_container, status);
 
     BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
