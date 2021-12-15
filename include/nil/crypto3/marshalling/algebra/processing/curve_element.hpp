@@ -265,9 +265,9 @@ namespace nil {
                     }
                 };
 
-                template<typename Endianness, typename Coordinates>
+                template<typename Coordinates>
                 struct curve_element_reader<
-                    Endianness,
+                    nil::marshalling::endian::big_endian,
                     typename algebra::curves::bls12_381::template g1_type<Coordinates,
                                                                           algebra::curves::forms::short_weierstrass>> {
                     using group_type = typename algebra::curves::bls12_381::
@@ -275,7 +275,7 @@ namespace nil {
                     using group_value_type = typename group_type::value_type;
                     using coordinates = typename group_value_type::coordinates;
                     using form = typename group_value_type::form;
-                    using endianness = Endianness;
+                    using endianness = nil::marshalling::endian::big_endian;
                     using params_type = curve_element_marshalling_params<group_type>;
 
                     template<typename TIter>
@@ -305,7 +305,7 @@ namespace nil {
                             point = g1_value_type();    // point at infinity
                         }
 
-                        integral_type x = read_data<sizeof_field_element, integral_type, Endianness>(iter);
+                        integral_type x = read_data<sizeof_field_element, integral_type, endianness>(iter);
 
                         g1_field_value_type x_mod(x);
                         g1_field_value_type y2_mod = x_mod.pow(3) + g1_field_value_type(4);
@@ -326,9 +326,9 @@ namespace nil {
                     }
                 };
 
-                template<typename Endianness, typename Coordinates>
+                template<typename Coordinates>
                 struct curve_element_reader<
-                    Endianness,
+                    nil::marshalling::endian::big_endian,
                     typename algebra::curves::bls12_381::template g2_type<Coordinates,
                                                                           algebra::curves::forms::short_weierstrass>> {
                     using group_type = typename algebra::curves::bls12_381::
@@ -336,7 +336,7 @@ namespace nil {
                     using group_value_type = typename group_type::value_type;
                     using coordinates = typename group_value_type::coordinates;
                     using form = typename group_value_type::form;
-                    using endianness = Endianness;
+                    using endianness = nil::marshalling::endian::big_endian;
                     using params_type = curve_element_marshalling_params<group_type>;
 
                     template<typename TIter>
