@@ -82,7 +82,6 @@ namespace nil {
             template<typename Curve, std::size_t BlockBits>
             struct verification_key<elgamal_verifiable<Curve, BlockBits>> {
                 typedef elgamal_verifiable<Curve, BlockBits> scheme_type;
-                typedef typename Curve::template g1_type<> g1_type;
                 typedef typename Curve::template g2_type<> g2_type;
 
                 friend class decrypt_op<scheme_type>;
@@ -102,7 +101,7 @@ namespace nil {
                     rho_sv_g2(std::move(rho_sv_g2)), rho_rhov_g2(std::move(rho_rhov_g2)) {
                 }
 
-            private:
+                // private:
                 typename g2_type::value_type rho_g2;
                 std::vector<typename g2_type::value_type> rho_sv_g2;
                 std::vector<typename g2_type::value_type> rho_rhov_g2;
@@ -141,6 +140,12 @@ namespace nil {
                     gamma_inverse_sum_s_g1(std::move(gamma_inverse_sum_s_g1)) {
                 }
 
+                bool operator==(const public_key &other) const {
+                    return delta_g1 == other.delta_g1 && delta_s_g1 == other.delta_s_g1 && t_g1 == other.t_g1 &&
+                           t_g2 == other.t_g2 && delta_sum_s_g1 == other.delta_sum_s_g1 &&
+                           gamma_inverse_sum_s_g1 == other.gamma_inverse_sum_s_g1;
+                }
+
                 typename g1_type::value_type delta_g1;
                 std::vector<typename g1_type::value_type> delta_s_g1;
                 std::vector<typename g1_type::value_type> t_g1;
@@ -160,7 +165,7 @@ namespace nil {
                 private_key(const typename scalar_field_type::value_type &rho) : rho(rho) {
                 }
 
-            private:
+                // private:
                 typename scalar_field_type::value_type rho;
             };
 
