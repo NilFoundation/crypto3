@@ -136,10 +136,10 @@ namespace nil {
          */
         template<typename TEndian, typename SinglePassRange>
         typename std::enable_if<nil::detail::is_range<SinglePassRange>::value,
-                                nil::detail::range_unpack_impl<TEndian, typename SinglePassRange::const_iterator>>::type
+                                nil::detail::range_unpack_impl<TEndian, SinglePassRange>>::type
             unpack(const SinglePassRange &r, status_type &status) {
 
-            return nil::detail::range_unpack_impl<TEndian, typename SinglePassRange::const_iterator>(r, status);
+            return nil::detail::range_unpack_impl<TEndian, SinglePassRange>(r, status);
         }
 
         template<typename TEndian, typename InputIterator>
