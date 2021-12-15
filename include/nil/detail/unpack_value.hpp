@@ -166,9 +166,9 @@ namespace nil {
                 return OutputRange(result.begin(), result.end());
             }
 
-            template<typename SimilarStdArray>
+            template<typename SimilarStdArray, size_t ArraySize>
             SimilarStdArray similar_std_array_marshalling() {
-                using marshalling_type = typename marshalling::is_compatible<SimilarStdArray>::template type<TEndian>;
+                using marshalling_type = typename marshalling::is_compatible<std::array<value_type, ArraySize>>::template type<TEndian>;
                 using marshalling_internal_type = typename marshalling_type::element_type;
 
                 nil::marshalling::container::static_vector<marshalling_internal_type, marshalling_type::max_length()>
@@ -189,14 +189,14 @@ namespace nil {
                      typename = typename std::enable_if<std::is_same<T, bool>::value
                                                         || std::is_same<T, std::uint8_t>::value>::type>
             inline operator std::array<T, ArraySize>() {
-                return similar_std_array_marshalling<std::array<T, ArraySize>>();
+                return similar_std_array_marshalling<std::array<T, ArraySize>, ArraySize>();
             }
 
             template<typename T, size_t ArraySize,
                      typename = typename std::enable_if<std::is_same<T, bool>::value
                                                         || std::is_same<T, std::uint8_t>::value>::type>
             inline operator boost::array<T, ArraySize>() {
-                return similar_std_array_marshalling<boost::array<T, ArraySize>>();
+                return similar_std_array_marshalling<boost::array<T, ArraySize>, ArraySize>();
             }
         };
 
