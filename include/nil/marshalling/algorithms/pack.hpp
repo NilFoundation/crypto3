@@ -50,6 +50,26 @@ namespace nil {
          * @brief Algorithms are meant to provide marshalling interface similar to STL algorithms' one.
          */
 
+        /*!
+         * @brief
+         *
+         * @ingroup marshalling_algorithms
+         *
+         * @tparam TEndian
+         * @tparam SinglePassRange
+         *
+         * @param r
+         *
+         * @return
+         */
+        template<typename TEndian, typename SinglePassRange>
+        typename std::enable_if<std::is_integral<typename SinglePassRange::value_type>::value,
+                                nil::detail::range_pack_impl<TEndian, typename SinglePassRange::const_iterator>>::type
+            pack(const SinglePassRange &r) {
+            BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+            status_type s;
+            return nil::detail::range_pack_impl<TEndian, typename SinglePassRange::const_iterator>(r, s);
+        }
 
         /*!
          * @brief
@@ -196,8 +216,8 @@ namespace nil {
             pack(const SinglePassRange &r, OutputIterator out) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
             status_type s;
-            return nil::detail::itr_pack_impl<TEndian, typename SinglePassRange::const_iterator, OutputIterator>(r, std::move(out),
-                                                                                                                 s);
+            return nil::detail::itr_pack_impl<TEndian, typename SinglePassRange::const_iterator, OutputIterator>(
+                r, std::move(out), s);
         }
 
         /*!
@@ -217,7 +237,8 @@ namespace nil {
                                     && nil::detail::is_iterator<OutputIterator>::value,
                                 nil::detail::itr_pack_impl<TEndian, InputIterator, OutputIterator>>::type
             pack(InputIterator first, InputIterator last, OutputIterator out, status_type &status) {
-            return nil::detail::itr_pack_impl<TEndian, InputIterator, OutputIterator>(first, last, std::move(out), status);
+            return nil::detail::itr_pack_impl<TEndian, InputIterator, OutputIterator>(first, last, std::move(out),
+                                                                                      status);
         }
 
         /*!
@@ -240,7 +261,8 @@ namespace nil {
                 (boost::OutputIteratorConcept<OutputIterator,
                                               typename std::iterator_traits<OutputIterator>::value_type>));
             status_type status;
-            status = nil::detail::itr_pack_impl<TEndian, InputIterator, OutputIterator>(first, last, std::move(out), status);
+            status = nil::detail::itr_pack_impl<TEndian, InputIterator, OutputIterator>(first, last, std::move(out),
+                                                                                        status);
             return status;
         }
 
@@ -278,7 +300,7 @@ namespace nil {
          */
         template<typename TEndian, typename SinglePassRange, typename TOutput>
         typename std::enable_if<!(nil::detail::is_range<TOutput>::value || nil::detail::is_iterator<TOutput>::value)
-                                    || nil::detail::is_array<TOutput>::value,
+                                 || nil::detail::is_array<TOutput>::value,
                                 status_type>::type
             pack(const SinglePassRange &rng_input, TOutput &rng_output) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
@@ -323,7 +345,7 @@ namespace nil {
          */
         template<typename TEndian, typename InputIterator, typename TOutput>
         typename std::enable_if<nil::detail::is_iterator<InputIterator>::value && !nil::detail::is_range<TOutput>::value
-                                    || nil::detail::is_array<TOutput>::value,
+                                || nil::detail::is_array<TOutput>::value,
                                 status_type>::type
             pack(InputIterator first, InputIterator last, TOutput &rng_output) {
             BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));

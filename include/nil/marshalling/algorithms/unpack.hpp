@@ -155,7 +155,7 @@ namespace nil {
             unpack(const TInput &r, OutputIterator out, status_type &status) {
             using T = typename std::iterator_traits<OutputIterator>::value_type;
             std::vector<T> result = unpack(r, status);
-            return std::move(result.cbegin(), result.cend(), out);;
+            return std::move(result.cbegin(), result.cend(), out);
         }
 
         template<typename InputIterator, typename OutputIterator>
@@ -217,7 +217,7 @@ namespace nil {
             unpack(InputIterator first, InputIterator last, OutputIterator out, status_type &status) {
             using T = typename std::iterator_traits<OutputIterator>::value_type;
             std::vector<T> result = unpack<TEndian>(first, last, status);
-            return std::move(result.cbegin(), result.cend(), out);;
+            return std::move(result.cbegin(), result.cend(), out);
         }
 
         template<typename TEndian, typename InputIterator, typename OutputIterator>
