@@ -67,11 +67,11 @@ void test_curve_element_big_endian(T val) {
     static_assert(nil::marshalling::is_compatible<T>::value);
 
     nil::marshalling::status_type status;
-    std::vector<unit_type> cv = nil::marshalling::unpack<Endianness, unit_type>(val, status);
+    std::vector<unit_type> cv = nil::marshalling::unpack<Endianness>(val, status);
 
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    T test_val = nil::marshalling::pack<Endianness, T>(cv, status);
+    T test_val = nil::marshalling::pack<Endianness>(cv, status);
 
     BOOST_CHECK(val == test_val);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(curve_element_jubjub_g1) {
         integral_type("34431432384332876907572759816814758423306059590054253468360681509944827160006"),
         integral_type("29404096654359671878917481308573927330727282437544669652502934947226949079135"));
     group_value_type point =
-        nil::marshalling::pack<nil::marshalling::option::little_endian, group_value_type>(blob, status);
+        nil::marshalling::pack<nil::marshalling::option::little_endian>(blob, status);
     BOOST_CHECK(point == expected);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(curve_element_jubjub_g1) {
     expected =
         group_value_type(integral_type("51845316313984588131191635700847278221892447412874386787531559514756013022179"),
                          integral_type("2267981809345781868602884763436767012634799368758626259799403354148032567692"));
-    point = nil::marshalling::pack<nil::marshalling::option::little_endian, group_value_type>(blob, status);
+    point = nil::marshalling::pack<nil::marshalling::option::little_endian>(blob, status);
     BOOST_CHECK(point == expected);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(curve_element_jubjub_g1) {
     expected = group_value_type(
         integral_type("25651767798190354528910599415746062172834836761677597036046682114031745402655"),
         integral_type("26902562127956316343893262683171938435197568407043214449144600616790024786852"));
-    point = nil::marshalling::pack<nil::marshalling::option::little_endian, group_value_type>(blob, status);
+    point = nil::marshalling::pack<nil::marshalling::option::little_endian>(blob, status);
     BOOST_CHECK(point == expected);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
@@ -150,24 +150,24 @@ BOOST_AUTO_TEST_CASE(curve_element_jubjub_g1) {
     expected = group_value_type(
         integral_type("40185837415754419626270588927415047095813982975230357263686068930519460729080"),
         integral_type("42008241830356574617713311689533669924455940847366394238316645523644983724540"));
-    point = nil::marshalling::pack<nil::marshalling::option::little_endian, group_value_type>(blob, status);
+    point = nil::marshalling::pack<nil::marshalling::option::little_endian>(blob, status);
     BOOST_CHECK(point == expected);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     /// deserialization of incorrect blobs
     blob = {0x8f, 0xcb, 0xae, 0xbb, 0x2b, 0x32, 0xa6, 0x98, 0xcb, 0x6,  0xba, 0x7f, 0xa7, 0xb7, 0xd9, 0x4b,
             0x37, 0x60, 0x2a, 0x7e, 0xa6, 0x20, 0xdc, 0xe2, 0x92, 0xf8, 0x87, 0xca, 0x5,  0xf7, 0x73, 0x7a};
-    nil::marshalling::pack<nil::marshalling::option::little_endian, group_value_type>(blob, status);
+    point = nil::marshalling::pack<nil::marshalling::option::little_endian>(blob, status);
     BOOST_CHECK(status != nil::marshalling::status_type::success);
 
     blob = {0x64, 0x43, 0x6c, 0xd4, 0x66, 0xa5, 0x8c, 0x71, 0x2f, 0x8c, 0x6b, 0xa7, 0x82, 0x5b, 0x55, 0xef,
             0xb,  0x9f, 0x4a, 0x1e, 0xdc, 0x26, 0xa5, 0x55, 0xf9, 0x35, 0x4e, 0x3e, 0x95, 0xd9, 0xe1, 0x8};
-    nil::marshalling::pack<nil::marshalling::option::little_endian, group_value_type>(blob, status);
+    point = nil::marshalling::pack<nil::marshalling::option::little_endian>(blob, status);
     BOOST_CHECK(status != nil::marshalling::status_type::success);
 
     blob = {0x0,  0xde, 0xe0, 0x91, 0xab, 0x96, 0xb2, 0x2,  0x28, 0xc0, 0x11, 0x5c, 0x1d, 0x1d, 0x21, 0xef,
             0x9a, 0xfe, 0x63, 0x55, 0x3f, 0x2c, 0xad, 0xc3, 0xbd, 0x16, 0x4f, 0x8d, 0x92, 0x2f, 0x3,  0x20};
-    nil::marshalling::pack<nil::marshalling::option::little_endian, group_value_type>(blob, status);
+    point = nil::marshalling::pack<nil::marshalling::option::little_endian>(blob, status);
     BOOST_CHECK(status != nil::marshalling::status_type::success);
 
     /// serialization
@@ -183,13 +183,13 @@ BOOST_AUTO_TEST_CASE(curve_element_jubjub_g1) {
         1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0,
         1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0};
     std::vector<std::uint8_t> cv =
-        nil::marshalling::unpack<nil::marshalling::option::little_endian, std::uint8_t>(point, status);
+        nil::marshalling::unpack<nil::marshalling::option::little_endian>(point, status);
     for (auto i = 0; i < expected_bits.size(); ++i) {
         BOOST_CHECK(expected_bits[i] == ((cv[i / 8] >> (i % 8)) & 1));
     }
 
     /// serialization into bits
-    std::vector<bool> cv_bits = nil::marshalling::unpack<nil::marshalling::option::little_endian, bool>(point, status);
+    std::vector<bool> cv_bits = nil::marshalling::unpack<nil::marshalling::option::little_endian>(point, status);
     auto it1 = expected_bits.begin();
     auto it2 = cv_bits.begin();
     while (it1 != expected_bits.end() && it2 != cv_bits.end()) {
