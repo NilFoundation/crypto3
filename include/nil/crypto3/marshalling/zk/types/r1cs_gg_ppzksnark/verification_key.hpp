@@ -147,12 +147,12 @@ namespace nil {
                         curve_element<TTypeBase, typename VerificationKey::curve_type::template g2_type<>>,
                         // delta_g1
                         curve_element<TTypeBase, typename VerificationKey::curve_type::template g1_type<>>,
+                        // gamma_g1
+                        curve_element<TTypeBase, typename VerificationKey::curve_type::template g1_type<>>,
                         // gamma_ABC_g1
                         accumulation_vector<
                             TTypeBase,
-                            zk::snark::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>>,
-                        // gamma_g1
-                        curve_element<TTypeBase, typename VerificationKey::curve_type::template g1_type<>>>>;
+                            zk::snark::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>>>>;
 
                 template<typename VerificationKey, typename Endianness>
                 r1cs_gg_ppzksnark_extended_verification_key<nil::marshalling::field_type<Endianness>, VerificationKey>
@@ -199,8 +199,8 @@ namespace nil {
                                         filled_gamma_g2,
                                         filled_delta_g2,
                                         filled_delta_g1,
-                                        filled_gamma_ABC_g1,
-                                        filled_gamma_g1));
+                                        filled_gamma_g1,
+                                        filled_gamma_ABC_g1));
                 }
 
                 template<typename VerificationKey, typename Endianness>
@@ -219,8 +219,8 @@ namespace nil {
                             make_accumulation_vector<zk::snark::accumulation_vector<
                                                          typename VerificationKey::curve_type::template g1_type<>>,
                                                      Endianness>(
-                                std::get<4>(filled_r1cs_gg_ppzksnark_extended_verification_key.value()))),
-                        std::move(std::get<5>(filled_r1cs_gg_ppzksnark_extended_verification_key.value()).value()));
+                                std::get<5>(filled_r1cs_gg_ppzksnark_extended_verification_key.value()))),
+                        std::move(std::get<4>(filled_r1cs_gg_ppzksnark_extended_verification_key.value()).value()));
                 }
 
                 template<typename TTypeBase,
