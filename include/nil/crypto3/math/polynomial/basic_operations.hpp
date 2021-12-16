@@ -47,8 +47,8 @@ namespace nil {
                         std::begin(a),
                         std::end(a),
                         [](typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type i) {
-                            return i == typename std::iterator_traits<decltype(
-                                            std::begin(std::declval<Range>()))>::value_type();
+                            return i == typename std::iterator_traits<decltype(std::begin(
+                                            std::declval<Range>()))>::value_type();
                         });
                 }
 
@@ -71,13 +71,12 @@ namespace nil {
                             typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type()) {
                         a.pop_back();
                     }
-
-                    condense(c);
                 }
 
                 /**
-*Computes the standard polynomial addition, polynomial A + polynomial B,
-    and stores result in *polynomial C.*/
+                 * Computes the standard polynomial addition, polynomial A + polynomial B, and stores result in
+                 * polynomial C.
+                 */
                 template<typename Range>
                 void addition(Range &c, const Range &a, const Range &b) {
 
@@ -109,8 +108,9 @@ namespace nil {
                 }
 
                 /**
-*Computes the standard polynomial subtraction, polynomial A - polynomial B,
-    and stores result in *polynomial C.*/
+                 * Computes the standard polynomial subtraction, polynomial A - polynomial B, and stores result in
+                 * polynomial C.
+                 */
                 template<typename Range>
                 void subtraction(Range &c, const Range &a, const Range &b) {
 
@@ -142,8 +142,7 @@ namespace nil {
                 }
 
                 /**
-                 * Perform the multiplication of two polynomials, polynomial A * polynomial B, using FFT, and
-stores
+                 * Perform the multiplication of two polynomials, polynomial A * polynomial B, using FFT, and stores
                  * result in polynomial C.
                  */
                 template<typename Range>
