@@ -181,14 +181,14 @@ namespace nil {
 
                     // f_v(X) - f_v(z) / (X - z)
                     std::vector<typename GroupType::curve_type::scalar_field_type::value_type> f_vX_sub_f_vZ;
-                    math::_polynomial_subtraction(f_vX_sub_f_vZ,
+                    math::polynomial::subtraction(f_vX_sub_f_vZ,
                                                   poly,
                                                   {{
                                                       eval_poly,
                                                   }});
                     std::vector<typename GroupType::curve_type::scalar_field_type::value_type> quotient_polynomial,
                         remainder_polynomial;
-                    math::_polynomial_division<typename GroupType::curve_type::scalar_field_type>(
+                    math::polynomial::division<typename GroupType::curve_type::scalar_field_type>(
                         quotient_polynomial, remainder_polynomial, f_vX_sub_f_vZ,
                         {{
                             neg_kzg_challenge,
@@ -227,8 +227,8 @@ namespace nil {
                     std::vector<typename CurveType::scalar_field_type::value_type> vkey_poly =
                         polynomial_coefficients_from_transcript<typename CurveType::scalar_field_type>(
                             transcript_first, transcript_last, CurveType::scalar_field_type::value_type::one());
-                    math::_condense(vkey_poly);
-                    BOOST_ASSERT(!math::_is_zero(vkey_poly));
+                    math::polynomial::condense(vkey_poly);
+                    BOOST_ASSERT(!math::polynomial::is_zero(vkey_poly));
 
                     typename CurveType::scalar_field_type::value_type vkey_poly_z =
                         polynomial_evaluation_product_form_from_transcript<typename CurveType::scalar_field_type>(
