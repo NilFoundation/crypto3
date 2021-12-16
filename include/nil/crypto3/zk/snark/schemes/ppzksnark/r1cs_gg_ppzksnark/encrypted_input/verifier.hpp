@@ -71,6 +71,7 @@ namespace nil {
                 public:
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::proof_type proof_type;
 
                     // TODO: add type constraints on PublicKey
@@ -79,18 +80,18 @@ namespace nil {
                         std::is_same<typename g1_type::value_type,
                                      typename std::iterator_traits<CipherTextIterator>::value_type>::value,
                         bool>::type
-                        process(CipherTextIterator first, CipherTextIterator last, const keypair_type &gg_keypair,
+                        process(CipherTextIterator first, CipherTextIterator last, const verification_key_type &gg_vk,
                                 const PublicKey &pubkey, const primary_input_type &unencrypted_primary_input,
                                 const proof_type &proof) {
 
-                        const std::size_t input_size = gg_keypair.second.gamma_ABC_g1.rest.size();
+                        const std::size_t input_size = gg_vk.gamma_ABC_g1.rest.size();
                         const std::size_t ct_size = std::distance(first, last);
                         assert(input_size - 1 > ct_size - 2);
                         assert(unencrypted_primary_input.size() + (ct_size - 2) == input_size);
                         assert(ct_size - 2 == pubkey.delta_s_g1.size());
                         assert(ct_size - 2 == pubkey.t_g1.size());
                         assert(ct_size - 2 == pubkey.t_g2.size() - 1);
-                        typename g1_type::value_type acc = gg_keypair.second.gamma_ABC_g1.first;
+                        typename g1_type::value_type acc = gg_vk.gamma_ABC_g1.first;
                         typename gt_type::value_type sum_cipher = gt_type::value_type::one();
 
                         auto it1 = first;
@@ -102,45 +103,44 @@ namespace nil {
                         assert((it1 == last - 1) && (it2 == std::cend(pubkey.t_g2)));
 
                         for (std::size_t i = ct_size - 2; i < input_size; ++i) {
-                            acc = acc +
-                                  unencrypted_primary_input[i - ct_size + 2] * gg_keypair.second.gamma_ABC_g1.rest[i];
+                            acc = acc + unencrypted_primary_input[i - ct_size + 2] * gg_vk.gamma_ABC_g1.rest[i];
                         }
                         typename gt_type::value_type presum_cipher =
                             algebra::pair_reduced<CurveType>(*(last - 1), g2_type::value_type::one());
                         bool ans1 = (sum_cipher == presum_cipher);
 
-                        // // TODO: optimize
-                        // typename gt_type::value_type QAPl = algebra::pair_reduced<CurveType>(proof.g_A, proof.g_B);
-                        // typename gt_type::value_type QAPr =
-                        //     algebra::pair_reduced<CurveType>(gg_keypair.first.alpha_g1, gg_keypair.first.beta_g2) *
-                        //     algebra::pair_reduced<CurveType>(acc, gg_keypair.second.gamma_g2) *
-                        //     algebra::pair_reduced<CurveType>(proof.g_C, gg_keypair.second.delta_g2);
-                        const g1_precomputed_type proof_g1_A_precomp = precompute_g1<CurveType>(proof.g_A);
-                        const g2_precomputed_type proof_g2_B_precomp = precompute_g2<CurveType>(proof.g_B);
-
-                        const g1_precomputed_type pk_g1_alpha_precomp =
-                            precompute_g1<CurveType>(gg_keypair.first.alpha_g1);
-                        const g2_precomputed_type pk_g2_beta_precomp =
-                            precompute_g2<CurveType>(gg_keypair.first.beta_g2);
-
-                        const g1_precomputed_type proof_g1_C_precomp = precompute_g1<CurveType>(proof.g_C);
-                        const g2_precomputed_type vk_g2_delta_precomp =
-                            precompute_g2<CurveType>(gg_keypair.second.delta_g2);
-
-                        const g1_precomputed_type proof_g1_cn_precomp = precompute_g1<CurveType>(acc);
-                        const g2_precomputed_type vk_g2_gamma_precomp =
-                            precompute_g2<CurveType>(gg_keypair.second.gamma_g2);
-
-                        typename gt_type::value_type QAPl_1 =
-                            miller_loop<CurveType>(proof_g1_A_precomp, proof_g2_B_precomp);
-                        typename gt_type::value_type QAPl_2 = double_miller_loop<CurveType>(
-                            proof_g1_C_precomp, vk_g2_delta_precomp, pk_g1_alpha_precomp, pk_g2_beta_precomp);
-
-                        typename gt_type::value_type QAPr_2 =
-                            miller_loop<CurveType>(proof_g1_cn_precomp, vk_g2_gamma_precomp);
-
-                        typename gt_type::value_type QAPl = final_exponentiation<CurveType>(QAPl_1 * QAPl_2.inversed());
-                        typename gt_type::value_type QAPr = final_exponentiation<CurveType>(QAPr_2);
+                        // TODO: optimize
+                        typename gt_type::value_type QAPl = algebra::pair_reduced<CurveType>(proof.g_A, proof.g_B);
+                        typename gt_type::value_type QAPr = gg_vk.alpha_g1_beta_g2 *
+                                                            algebra::pair_reduced<CurveType>(acc, gg_vk.gamma_g2) *
+                                                            algebra::pair_reduced<CurveType>(proof.g_C, gg_vk.delta_g2);
+                        // const g1_precomputed_type proof_g1_A_precomp = precompute_g1<CurveType>(proof.g_A);
+                        // const g2_precomputed_type proof_g2_B_precomp = precompute_g2<CurveType>(proof.g_B);
+                        //
+                        // const g1_precomputed_type pk_g1_alpha_precomp =
+                        //     precompute_g1<CurveType>(gg_keypair.first.alpha_g1);
+                        // const g2_precomputed_type pk_g2_beta_precomp =
+                        //     precompute_g2<CurveType>(gg_keypair.first.beta_g2);
+                        //
+                        // const g1_precomputed_type proof_g1_C_precomp = precompute_g1<CurveType>(proof.g_C);
+                        // const g2_precomputed_type vk_g2_delta_precomp =
+                        //     precompute_g2<CurveType>(gg_keypair.second.delta_g2);
+                        //
+                        // const g1_precomputed_type proof_g1_cn_precomp = precompute_g1<CurveType>(acc);
+                        // const g2_precomputed_type vk_g2_gamma_precomp =
+                        //     precompute_g2<CurveType>(gg_keypair.second.gamma_g2);
+                        //
+                        // typename gt_type::value_type QAPl_1 =
+                        //     miller_loop<CurveType>(proof_g1_A_precomp, proof_g2_B_precomp);
+                        // typename gt_type::value_type QAPl_2 = double_miller_loop<CurveType>(
+                        //     proof_g1_C_precomp, vk_g2_delta_precomp, pk_g1_alpha_precomp, pk_g2_beta_precomp);
+                        //
+                        // typename gt_type::value_type QAPr_2 =
+                        //     miller_loop<CurveType>(proof_g1_cn_precomp, vk_g2_gamma_precomp);
+                        //
+                        // typename gt_type::value_type QAPl = final_exponentiation<CurveType>(QAPl_1 *
+                        // QAPl_2.inversed()); typename gt_type::value_type QAPr =
+                        // final_exponentiation<CurveType>(QAPr_2);
 
                         bool ans2 = (QAPl == QAPr);
 

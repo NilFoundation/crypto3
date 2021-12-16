@@ -62,11 +62,11 @@ namespace nil {
 
                 template<typename ProofSystemType, typename CipherTextIterator, typename PublicKey>
                 static inline bool verify(CipherTextIterator first, CipherTextIterator last,
-                                          const typename ProofSystemType::keypair_type &keypair,
+                                          const typename ProofSystemType::verification_key_type &vk,
                                           const PublicKey &pubkey,
                                           const typename ProofSystemType::primary_input_type &unencrypted_primary_input,
                                           const typename ProofSystemType::proof_type &proof) {
-                    return ProofSystemType::verify(first, last, keypair, pubkey, unencrypted_primary_input, proof);
+                    return ProofSystemType::verify(first, last, vk, pubkey, unencrypted_primary_input, proof);
                 }
             }    // namespace snark
         }        // namespace zk

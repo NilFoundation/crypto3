@@ -277,10 +277,10 @@ namespace nil {
                     // Verification
                     template<typename CipherTextIterator, typename PublicKey>
                     static inline bool verify(CipherTextIterator first, CipherTextIterator last,
-                                              const keypair_type &keypair, const PublicKey &pubkey,
+                                              const verification_key_type &vk, const PublicKey &pubkey,
                                               const primary_input_type &unencrypted_primary_input,
                                               const proof_type &proof) {
-                        return Verifier::process(first, last, keypair, pubkey, unencrypted_primary_input, proof);
+                        return Verifier::process(first, last, vk, pubkey, unencrypted_primary_input, proof);
                     }
                 };
             }    // namespace snark
