@@ -45,8 +45,8 @@ namespace nil {
                     blueprint_linear_combination_vector<FieldType> result_bits;
 
                     blueprint_linear_combination_vector<FieldType> full_bits;
-                    std::shared_ptr<packing_component<FieldType>> unpack_bits;
-                    std::shared_ptr<packing_component<FieldType>> pack_result;
+                    std::shared_ptr<packing<FieldType>> unpack_bits;
+                    std::shared_ptr<packing<FieldType>> pack_result;
 
                     lastbits_component(blueprint<FieldType> &bp,
                                        const blueprint_variable<FieldType> &X,
@@ -63,8 +63,8 @@ namespace nil {
                             full_bits.emplace_back(full_bits_overflow);
                         }
 
-                        unpack_bits.reset(new packing_component<FieldType>(bp, full_bits, X));
-                        pack_result.reset(new packing_component<FieldType>(bp, result_bits, result));
+                        unpack_bits.reset(new packing<FieldType>(bp, full_bits, X));
+                        pack_result.reset(new packing<FieldType>(bp, result_bits, result));
                     }
 
                     void generate_r1cs_constraints() {
@@ -144,7 +144,7 @@ namespace nil {
                 public:
                     blueprint_variable_vector<FieldType> result_bits;
                     std::vector<std::shared_ptr<XOR3_component<FieldType>>> compute_bits;
-                    std::shared_ptr<packing_component<FieldType>> pack_result;
+                    std::shared_ptr<packing<FieldType>> pack_result;
 
                     small_sigma_component(blueprint<FieldType> &bp,
                                           const blueprint_variable_vector<FieldType> &W,
@@ -163,7 +163,7 @@ namespace nil {
                                 (i + shift < 32 ? W[i + shift] : blueprint_variable<FieldType>(0)), (i + shift >= 32),
                                 result_bits[i]));
                         }
-                        pack_result.reset(new packing_component<FieldType>(bp, result_bits, result));
+                        pack_result.reset(new packing<FieldType>(bp, result_bits, result));
                     }
 
                     void generate_r1cs_constraints() {
@@ -193,7 +193,7 @@ namespace nil {
                 public:
                     blueprint_variable_vector<FieldType> result_bits;
                     std::vector<std::shared_ptr<XOR3_component<FieldType>>> compute_bits;
-                    std::shared_ptr<packing_component<FieldType>> pack_result;
+                    std::shared_ptr<packing<FieldType>> pack_result;
 
                     big_sigma_component(blueprint<FieldType> &bp,
                                         const blueprint_linear_combination_vector<FieldType> &W,
@@ -212,7 +212,7 @@ namespace nil {
                                 SHA256_COMPONENT_ROTR(W, i, rot3), false, result_bits[i]));
                         }
 
-                        pack_result.reset(new packing_component<FieldType>(bp, result_bits, result));
+                        pack_result.reset(new packing<FieldType>(bp, result_bits, result));
                     }
 
                     void generate_r1cs_constraints() {
@@ -243,7 +243,7 @@ namespace nil {
                     blueprint_linear_combination_vector<FieldType> Y;
                     blueprint_linear_combination_vector<FieldType> Z;
                     blueprint_variable<FieldType> result;
-                    std::shared_ptr<packing_component<FieldType>> pack_result;
+                    std::shared_ptr<packing<FieldType>> pack_result;
 
                     choice_component(blueprint<FieldType> &bp,
                                      const blueprint_linear_combination_vector<FieldType> &X,
@@ -254,7 +254,7 @@ namespace nil {
                         X(X), Y(Y), Z(Z), result(result) {
 
                         result_bits.allocate(bp, 32);
-                        pack_result.reset(new packing_component<FieldType>(bp, result_bits, result));
+                        pack_result.reset(new packing<FieldType>(bp, result_bits, result));
                     }
 
                     void generate_r1cs_constraints() {
@@ -284,7 +284,7 @@ namespace nil {
                 class majority_component : public component<FieldType> {
                 private:
                     blueprint_variable_vector<FieldType> result_bits;
-                    std::shared_ptr<packing_component<FieldType>> pack_result;
+                    std::shared_ptr<packing<FieldType>> pack_result;
 
                 public:
                     blueprint_linear_combination_vector<FieldType> X;
@@ -300,7 +300,7 @@ namespace nil {
                         component<FieldType>(bp),
                         X(X), Y(Y), Z(Z), result(result) {
                         result_bits.allocate(bp, 32);
-                        pack_result.reset(new packing_component<FieldType>(bp, result_bits, result));
+                        pack_result.reset(new packing<FieldType>(bp, result_bits, result));
                     }
 
                     void generate_r1cs_constraints() {

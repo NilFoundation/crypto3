@@ -45,7 +45,7 @@ namespace nil {
                 class sha256_message_schedule_component : public component<FieldType> {
                 public:
                     std::vector<blueprint_variable_vector<FieldType>> W_bits;
-                    std::vector<std::shared_ptr<packing_component<FieldType>>> pack_W;
+                    std::vector<std::shared_ptr<packing<FieldType>>> pack_W;
 
                     std::vector<blueprint_variable<FieldType>> sigma0;
                     std::vector<blueprint_variable<FieldType>> sigma1;
@@ -71,7 +71,7 @@ namespace nil {
                                 M.rbegin() + (15 - i) * hashes::sha2<256>::word_bits,
                                 M.rbegin() + (16 - i) * hashes::sha2<256>::word_bits);
 
-                            pack_W[i].reset(new packing_component<FieldType>(bp, W_bits[i], packed_W[i]));
+                            pack_W[i].reset(new packing<FieldType>(bp, W_bits[i], packed_W[i]));
                         }
 
                         /* NB: some of those will be un-allocated */
@@ -154,9 +154,9 @@ namespace nil {
                     std::shared_ptr<choice_component<FieldType>> compute_choice;
                     std::shared_ptr<majority_component<FieldType>> compute_majority;
                     blueprint_variable<FieldType> packed_d;
-                    std::shared_ptr<packing_component<FieldType>> pack_d;
+                    std::shared_ptr<packing<FieldType>> pack_d;
                     blueprint_variable<FieldType> packed_h;
-                    std::shared_ptr<packing_component<FieldType>> pack_h;
+                    std::shared_ptr<packing<FieldType>> pack_h;
                     blueprint_variable<FieldType> unreduced_new_a;
                     blueprint_variable<FieldType> unreduced_new_e;
                     std::shared_ptr<lastbits_component<FieldType>> mod_reduce_new_a;
@@ -210,11 +210,11 @@ namespace nil {
 
                         /* pack d */
                         packed_d.allocate(bp);
-                        pack_d.reset(new packing_component<FieldType>(bp, d, packed_d));
+                        pack_d.reset(new packing<FieldType>(bp, d, packed_d));
 
                         /* pack h */
                         packed_h.allocate(bp);
-                        pack_h.reset(new packing_component<FieldType>(bp, h, packed_h));
+                        pack_h.reset(new packing<FieldType>(bp, h, packed_h));
 
                         /* compute the actual results for the round */
                         unreduced_new_a.allocate(bp);
