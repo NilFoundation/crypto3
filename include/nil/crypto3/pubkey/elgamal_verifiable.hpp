@@ -467,8 +467,8 @@ namespace nil {
 
                 static inline result_type process(internal_accumulator_type &acc) {
                     return zk::snark::verify<proof_system_type>(std::cbegin(acc.cipher_text),
-                                                                std::cend(acc.cipher_text), acc.gg_keypair, acc.pubkey,
-                                                                acc.unencrypted_primary_input, acc.proof);
+                                                                std::cend(acc.cipher_text), acc.gg_keypair.second,
+                                                                acc.pubkey, acc.unencrypted_primary_input, acc.proof);
                 }
             };
 
