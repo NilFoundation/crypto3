@@ -95,8 +95,41 @@ namespace nil {
                     return make_field_element_vector<typename PrimaryInput::value_type::field_type, Endianness>(
                         filled_r1cs_gg_ppzksnark_primary_input);
                 }
+
+                template<typename TTypeBase,
+                         typename CTGroupType,
+                         typename = typename std::enable_if<
+                             algebra::is_g1_group_element<typename CTGroupType::value_type>::value,
+                             bool>::type,
+                         typename... TOptions>
+                using r1cs_gg_ppzksnark_encrypted_primary_input =
+                    nil::marshalling::types::array_list<TTypeBase,
+                                                        curve_element<TTypeBase, CTGroupType>,
+                                                        nil::marshalling::option::sequence_size_field_prefix<
+                                                            nil::marshalling::types::integral<TTypeBase, std::size_t>>>;
+
+                template<typename InputRange,
+                         typename Endianness,
+                         typename GroupType =
+                             typename std::iterator_traits<typename InputRange::iterator>::value_type::group_type>
+                r1cs_gg_ppzksnark_encrypted_primary_input<nil::marshalling::field_type<Endianness>, GroupType>
+                    fill_r1cs_gg_ppzksnark_encrypted_primary_input(const InputRange &enc_primary_input) {
+
+                    return fill_curve_element_vector<GroupType, Endianness>(enc_primary_input);
+                }
+
+                template<typename InputRange,
+                         typename Endianness,
+                         typename GroupType =
+                             typename std::iterator_traits<typename InputRange::iterator>::value_type::group_type>
+                std::vector<typename GroupType::value_type> make_r1cs_gg_ppzksnark_encrypted_primary_input(
+                    r1cs_gg_ppzksnark_encrypted_primary_input<nil::marshalling::field_type<Endianness>, GroupType>
+                        filled_enc_primary_input) {
+
+                    return make_curve_element_vector<GroupType, Endianness>(filled_enc_primary_input);
+                }
             }    // namespace types
         }        // namespace marshalling
-    }        // namespace crypto3
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_MARSHALLING_R1CS_GG_PPZKSNARK_PRIMARY_INPUT_HPP
