@@ -237,6 +237,10 @@ namespace nil {
                     std::tuple<
                         // delta_g1
                         curve_element<TTypeBase, typename PublicKey::g1_type>,
+                        // delta_sum_s_g1
+                        curve_element<TTypeBase, typename PublicKey::g1_type>,
+                        // gamma_inverse_sum_s_g1
+                        curve_element<TTypeBase, typename PublicKey::g1_type>,
                         // delta_s_g1
                         nil::marshalling::types::array_list<
                             TTypeBase,
@@ -254,11 +258,7 @@ namespace nil {
                             TTypeBase,
                             curve_element<TTypeBase, typename PublicKey::g2_type>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
-                        // delta_sum_s_g1
-                        curve_element<TTypeBase, typename PublicKey::g1_type>,
-                        // gamma_inverse_sum_s_g1
-                        curve_element<TTypeBase, typename PublicKey::g1_type>>>;
+                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
 
                 template<typename TTypeBase,
                          typename PrivateKey,
@@ -320,11 +320,11 @@ namespace nil {
                     return elgamal_verifiable_public_key<nil::marshalling::field_type<Endianness>, PublicKey>(
                         std::make_tuple(
                             filled_delta_g1,
+                            filled_delta_sum_s_g1,
+                            filled_gamma_inverse_sum_s_g1,
                             fill_curve_element_vector<typename PublicKey::g1_type, Endianness>(key_inp.delta_s_g1),
                             fill_curve_element_vector<typename PublicKey::g1_type, Endianness>(key_inp.t_g1),
-                            fill_curve_element_vector<typename PublicKey::g2_type, Endianness>(key_inp.t_g2),
-                            filled_delta_sum_s_g1,
-                            filled_gamma_inverse_sum_s_g1));
+                            fill_curve_element_vector<typename PublicKey::g2_type, Endianness>(key_inp.t_g2)));
                 }
 
                 template<typename PublicKey, typename Endianness>
@@ -334,13 +334,13 @@ namespace nil {
 
                     return PublicKey(std::move(std::get<0>(filled_key_inp.value()).value()),
                                      std::move(make_curve_element_vector<typename PublicKey::g1_type, Endianness>(
-                                         std::get<1>(filled_key_inp.value()))),
-                                     std::move(make_curve_element_vector<typename PublicKey::g1_type, Endianness>(
-                                         std::get<2>(filled_key_inp.value()))),
-                                     std::move(make_curve_element_vector<typename PublicKey::g2_type, Endianness>(
                                          std::get<3>(filled_key_inp.value()))),
-                                     std::move(std::get<4>(filled_key_inp.value()).value()),
-                                     std::move(std::get<5>(filled_key_inp.value()).value()));
+                                     std::move(make_curve_element_vector<typename PublicKey::g1_type, Endianness>(
+                                         std::get<4>(filled_key_inp.value()))),
+                                     std::move(make_curve_element_vector<typename PublicKey::g2_type, Endianness>(
+                                         std::get<5>(filled_key_inp.value()))),
+                                     std::move(std::get<1>(filled_key_inp.value()).value()),
+                                     std::move(std::get<2>(filled_key_inp.value()).value()));
                 }
 
                 template<typename PrivateKey, typename Endianness>
