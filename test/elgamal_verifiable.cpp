@@ -322,43 +322,23 @@ struct test_policy {
 BOOST_AUTO_TEST_SUITE(pubkey_elgamal_verifiable_auto_test_suite)
 
 BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
-    using pairing_curve_type = curves::bls12_381;
-    using curve_type = curves::jubjub;
-    using base_points_generator_hash_type = hashes::sha2<256>;
-    using hash_params = hashes::find_group_hash_default_params;
-    using hash_component = components::pedersen<curve_type, base_points_generator_hash_type, hash_params>;
-    using hash_type = typename hash_component::hash_type;
-    using merkle_hash_component = hash_component;
-    using merkle_hash_type = typename merkle_hash_component::hash_type;
-    using field_type = typename hash_component::field_type;
-    constexpr std::size_t arity = 2;
-    using voting_component =
-        components::encrypted_input_voting<arity, hash_component, merkle_hash_component, field_type>;
-    using merkle_proof_component = typename voting_component::merkle_proof_component;
-    using encryption_scheme = elgamal_verifiable<pairing_curve_type>;
-    using proof_system = typename encryption_scheme::proof_system_type;
-    using marshaling_data_type = marshaling_verification_data_groth16_encrypted_input<
-        typename proof_system::verification_key_type, typename encryption_scheme::public_key_type,
-        typename proof_system::proof_type, typename proof_system::primary_input_type,
-        typename encryption_scheme::cipher_type::first_type>;
-
     /* prepare test */
     constexpr std::size_t tree_depth = 1;
     constexpr std::size_t participants_number = 1 << tree_depth;
-    auto secret_keys = generate_random_data<bool, hash_type::digest_bits>(participants_number);
-    std::vector<std::array<bool, hash_type::digest_bits>> public_keys;
+    auto secret_keys = generate_random_data<bool, test_policy::hash_type::digest_bits>(participants_number);
+    std::vector<std::array<bool, test_policy::hash_type::digest_bits>> public_keys;
     for (const auto &sk : secret_keys) {
-        std::array<bool, hash_type::digest_bits> pk;
-        hash<merkle_hash_type>(sk, std::begin(pk));
+        std::array<bool, test_policy::hash_type::digest_bits> pk;
+        hash<test_policy::merkle_hash_type>(sk, std::begin(pk));
         public_keys.emplace_back(pk);
     }
-    merkle_tree<merkle_hash_type, arity> tree(public_keys);
+    merkle_tree<test_policy::merkle_hash_type, test_policy::arity> tree(public_keys);
     std::size_t proof_idx = std::rand() % participants_number;
-    merkle_proof<merkle_hash_type, arity> proof(tree, proof_idx);
+    merkle_proof<test_policy::merkle_hash_type, test_policy::arity> proof(tree, proof_idx);
     auto tree_pk_leaf = tree[proof_idx];
 
     std::vector<bool> m = {0, 1, 0, 0, 0, 0, 0};
-    std::vector<typename pairing_curve_type::scalar_field_type::value_type> m_field;
+    std::vector<typename test_policy::pairing_curve_type::scalar_field_type::value_type> m_field;
     for (const auto m_i : m) {
         m_field.emplace_back(std::size_t(m_i));
     }
@@ -371,19 +351,20 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     std::vector<bool> eid_sk;
     std::copy(std::cbegin(eid), std::cend(eid), std::back_inserter(eid_sk));
     std::copy(std::cbegin(secret_keys[proof_idx]), std::cend(secret_keys[proof_idx]), std::back_inserter(eid_sk));
-    std::vector<bool> sn = hash<hash_type>(eid_sk);
+    std::vector<bool> sn = hash<test_policy::hash_type>(eid_sk);
 
-    components::blueprint<field_type> bp;
-    components::block_variable<field_type> m_block(bp, m.size());
-    components::block_variable<field_type> eid_block(bp, eid.size());
-    components::digest_variable<field_type> sn_digest(bp, hash_component::digest_bits);
-    components::digest_variable<field_type> root_digest(bp, merkle_hash_component::digest_bits);
-    components::blueprint_variable_vector<field_type> address_bits_va;
+    components::blueprint<test_policy::field_type> bp;
+    components::block_variable<test_policy::field_type> m_block(bp, m.size());
+    components::block_variable<test_policy::field_type> eid_block(bp, eid.size());
+    components::digest_variable<test_policy::field_type> sn_digest(bp, test_policy::hash_component::digest_bits);
+    components::digest_variable<test_policy::field_type> root_digest(bp,
+                                                                     test_policy::merkle_hash_component::digest_bits);
+    components::blueprint_variable_vector<test_policy::field_type> address_bits_va;
     address_bits_va.allocate(bp, tree_depth);
-    merkle_proof_component path_var(bp, tree_depth);
-    components::block_variable<field_type> sk_block(bp, secret_keys[proof_idx].size());
-    voting_component vote_var(bp, m_block, eid_block, sn_digest, root_digest, address_bits_va, path_var, sk_block,
-                              components::blueprint_variable<field_type>(0));
+    test_policy::merkle_proof_component path_var(bp, tree_depth);
+    components::block_variable<test_policy::field_type> sk_block(bp, secret_keys[proof_idx].size());
+    test_policy::voting_component vote_var(bp, m_block, eid_block, sn_digest, root_digest, address_bits_va, path_var,
+                                           sk_block, components::blueprint_variable<test_policy::field_type>(0));
 
     path_var.generate_r1cs_constraints();
     vote_var.generate_r1cs_constraints();
@@ -408,56 +389,58 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
 
     bp.set_input_sizes(vote_var.get_input_size());
 
-    typename proof_system::keypair_type gg_keypair = snark::generate<proof_system>(bp.get_constraint_system());
+    typename test_policy::proof_system::keypair_type gg_keypair =
+        snark::generate<test_policy::proof_system>(bp.get_constraint_system());
 
-    algebraic_random_device<typename pairing_curve_type::scalar_field_type> d;
-    std::vector<typename pairing_curve_type::scalar_field_type::value_type> rnd;
+    algebraic_random_device<typename test_policy::pairing_curve_type::scalar_field_type> d;
+    std::vector<typename test_policy::pairing_curve_type::scalar_field_type::value_type> rnd;
     for (std::size_t i = 0; i < m.size() * 3 + 2; ++i) {
         rnd.emplace_back(d());
     }
-    typename encryption_scheme::keypair_type keypair =
-        generate_keypair<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(rnd,
-                                                                                             {gg_keypair, m.size()});
+    typename test_policy::encryption_scheme::keypair_type keypair =
+        generate_keypair<test_policy::encryption_scheme, modes::verifiable_encryption<test_policy::encryption_scheme>>(
+            rnd, {gg_keypair, m.size()});
 
-    typename encryption_scheme::cipher_type cipher_text =
-        encrypt<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(
+    typename test_policy::encryption_scheme::cipher_type cipher_text =
+        encrypt<test_policy::encryption_scheme, modes::verifiable_encryption<test_policy::encryption_scheme>>(
             m_field, {d(), std::get<0>(keypair), gg_keypair, bp.primary_input(), bp.auxiliary_input()});
 
-    typename proof_system::primary_input_type pinput = bp.primary_input();
-    marshaling_data_type::write_data(
+    typename test_policy::proof_system::primary_input_type pinput = bp.primary_input();
+    test_policy::marshaling_data_type::write_data(
         gg_keypair.second, std::get<0>(keypair), cipher_text.second,
-        typename proof_system::primary_input_type {std::cbegin(pinput) + m.size(), std::cend(pinput)},
+        typename test_policy::proof_system::primary_input_type {std::cbegin(pinput) + m.size(), std::cend(pinput)},
         cipher_text.first);
 
-    typename encryption_scheme::decipher_type decipher_text =
-        decrypt<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(
+    typename test_policy::encryption_scheme::decipher_type decipher_text =
+        decrypt<test_policy::encryption_scheme, modes::verifiable_encryption<test_policy::encryption_scheme>>(
             cipher_text.first, {std::get<1>(keypair), std::get<2>(keypair), gg_keypair});
     BOOST_REQUIRE(decipher_text.first.size() == m_field.size());
     for (std::size_t i = 0; i < m_field.size(); ++i) {
         BOOST_REQUIRE(decipher_text.first[i] == m_field[i]);
     }
 
-    bool enc_verification_ans = verify_encryption<encryption_scheme>(
+    bool enc_verification_ans = verify_encryption<test_policy::encryption_scheme>(
         cipher_text.first,
         {std::get<0>(keypair), gg_keypair.second, cipher_text.second,
-         typename proof_system::primary_input_type {std::cbegin(pinput) + m.size(), std::cend(pinput)}});
+         typename test_policy::proof_system::primary_input_type {std::cbegin(pinput) + m.size(), std::cend(pinput)}});
     BOOST_REQUIRE(enc_verification_ans);
 
-    bool dec_verification_ans = verify_decryption<encryption_scheme>(
+    bool dec_verification_ans = verify_decryption<test_policy::encryption_scheme>(
         cipher_text.first, decipher_text.first, {std::get<2>(keypair), gg_keypair, decipher_text.second});
     BOOST_REQUIRE(dec_verification_ans);
 
     /// Rerandomized cipher text
-    std::vector<typename pairing_curve_type::scalar_field_type::value_type> rnd_rerandomization;
+    std::vector<typename test_policy::pairing_curve_type::scalar_field_type::value_type> rnd_rerandomization;
     for (std::size_t i = 0; i < 3; ++i) {
         rnd_rerandomization.emplace_back(d());
     }
-    typename encryption_scheme::cipher_type rerand_cipher_text = rerandomize<encryption_scheme>(
-        rnd_rerandomization, cipher_text.first, {std::get<0>(keypair), gg_keypair, cipher_text.second});
+    typename test_policy::encryption_scheme::cipher_type rerand_cipher_text =
+        rerandomize<test_policy::encryption_scheme>(rnd_rerandomization, cipher_text.first,
+                                                    {std::get<0>(keypair), gg_keypair, cipher_text.second});
 
     /// Decryption of the rerandomized cipher text
-    typename encryption_scheme::decipher_type decipher_rerand_text =
-        decrypt<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(
+    typename test_policy::encryption_scheme::decipher_type decipher_rerand_text =
+        decrypt<test_policy::encryption_scheme, modes::verifiable_encryption<test_policy::encryption_scheme>>(
             rerand_cipher_text.first, {std::get<1>(keypair), std::get<2>(keypair), gg_keypair});
     BOOST_REQUIRE(decipher_rerand_text.first.size() == m_field.size());
     for (std::size_t i = 0; i < m_field.size(); ++i) {
@@ -465,16 +448,16 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     }
 
     /// Encryption verification of the rerandomized cipher text
-    enc_verification_ans = verify_encryption<encryption_scheme>(
+    enc_verification_ans = verify_encryption<test_policy::encryption_scheme>(
         rerand_cipher_text.first,
         {std::get<0>(keypair), gg_keypair.second, rerand_cipher_text.second,
-         typename proof_system::primary_input_type {std::cbegin(pinput) + m.size(), std::cend(pinput)}});
+         typename test_policy::proof_system::primary_input_type {std::cbegin(pinput) + m.size(), std::cend(pinput)}});
     BOOST_REQUIRE(enc_verification_ans);
 
     /// Decryption verification of the rerandomized cipher text
-    dec_verification_ans =
-        verify_decryption<encryption_scheme>(rerand_cipher_text.first, decipher_rerand_text.first,
-                                             {std::get<2>(keypair), gg_keypair, decipher_rerand_text.second});
+    dec_verification_ans = verify_decryption<test_policy::encryption_scheme>(
+        rerand_cipher_text.first, decipher_rerand_text.first,
+        {std::get<2>(keypair), gg_keypair, decipher_rerand_text.second});
     BOOST_REQUIRE(dec_verification_ans);
 
     // TODO: add status return
