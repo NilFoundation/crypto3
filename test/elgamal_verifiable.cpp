@@ -26,6 +26,8 @@
 #define BOOST_TEST_MODULE pubkey_elgamal_verifiable_test
 
 #include <string>
+#include <type_traits>
+#include <functional>
 
 #include <boost/filesystem.hpp>
 
@@ -183,79 +185,81 @@ struct marshaling_verification_data_groth16_encrypted_input {
         nil::crypto3::marshalling::types::elgamal_verifiable_public_key<nil::marshalling::field_type<endianness>,
                                                                         PublicKey>;
     using ct_marshaling_type = nil::crypto3::marshalling::types::r1cs_gg_ppzksnark_encrypted_primary_input<
-        nil::marshalling::field_type<endianness>,
-        typename std::iterator_traits<typename CipherText::iterator>::value_type::group_type>;
+        nil::marshalling::field_type<endianness>, CipherText>;
     using pinput_marshaling_type =
         nil::crypto3::marshalling::types::r1cs_gg_ppzksnark_primary_input<nil::marshalling::field_type<endianness>,
                                                                           PInput>;
 
-    static inline auto proofout = boost::filesystem::path("proof");
-    static inline auto vkout = boost::filesystem::path("vkey");
-    static inline auto pubkeyout = boost::filesystem::path("pubkey");
-    static inline auto ctout = boost::filesystem::path("ctout");
-    static inline auto piout = boost::filesystem::path("pinput");
-    static inline auto fullout = boost::filesystem::path("fullout");
+    static inline std::string proof_path_str = "proof.bin";
+    static inline std::string vk_path_str = "vkey.bin";
+    static inline std::string pubkey_path_str = "pubkey.bin";
+    static inline std::string ct_path_str = "ct.bin";
+    static inline std::string unenc_pi_path_str = "unenc_pi.bin";
+    static inline std::string full_output_path_str = "data_encrypted_input.bin";
+    static inline auto proof_path = boost::filesystem::path(proof_path_str);
+    static inline auto vk_path = boost::filesystem::path(vk_path_str);
+    static inline auto pubkey_path = boost::filesystem::path(pubkey_path_str);
+    static inline auto ct_path = boost::filesystem::path(ct_path_str);
+    static inline auto unenc_pi_path = boost::filesystem::path(unenc_pi_path_str);
+    static inline auto full_output_path = boost::filesystem::path(full_output_path_str);
+
+    template<typename MarshalingType, typename InputObj, typename F>
+    static std::vector<std::uint8_t> serialize_obj(const InputObj &in_obj, const std::function<F> &f) {
+        MarshalingType filled_val = f(in_obj);
+        std::vector<std::uint8_t> blob(filled_val.length());
+        auto it = std::begin(blob);
+        nil::marshalling::status_type status = filled_val.write(it, blob.size());
+        return blob;
+    }
 
     static void write_data(const VerificationKey &vk, const PublicKey &pubkey, const Proof &proof, const PInput &pinput,
                            const CipherText &ct) {
-
-        proof_marshaling_type proof_filled_val =
-            nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_proof<Proof, endianness>(proof);
-        std::vector<std::uint8_t> proof_blob(proof_filled_val.length());
-        auto proof_it = std::begin(proof_blob);
-        nil::marshalling::status_type status = proof_filled_val.write(proof_it, proof_blob.size());
-        boost::filesystem::ofstream proof_out(proofout);
+        auto proof_blob = serialize_obj<proof_marshaling_type>(
+            proof, std::function(nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_proof<Proof, endianness>));
+        boost::filesystem::ofstream proof_out(proof_path);
         for (const auto b : proof_blob) {
             proof_out << b;
         }
         proof_out.close();
 
-        verification_key_marshaling_type vk_filled_val =
-            nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_verification_key<VerificationKey, endianness>(vk);
-        std::vector<std::uint8_t> vk_blob(vk_filled_val.length());
-        auto vk_it = std::begin(vk_blob);
-        status = vk_filled_val.write(vk_it, vk_blob.size());
-        boost::filesystem::ofstream vk_out(vkout);
+        auto vk_blob = serialize_obj<verification_key_marshaling_type>(
+            vk, std::function(nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_verification_key<VerificationKey,
+                                                                                                        endianness>));
+        boost::filesystem::ofstream vk_out(vk_path);
         for (const auto b : vk_blob) {
             vk_out << b;
         }
         vk_out.close();
 
-        public_key_marshaling_type pubkey_filled_val =
-            nil::crypto3::marshalling::types::fill_pubkey_key<PublicKey, endianness>(pubkey);
-        std::vector<std::uint8_t> pubkey_blob(pubkey_filled_val.length());
-        auto pubkey_it = std::begin(pubkey_blob);
-        status = pubkey_filled_val.write(pubkey_it, pubkey_blob.size());
-        boost::filesystem::ofstream pubkey_out(pubkeyout);
+        auto pubkey_blob = serialize_obj<public_key_marshaling_type>(
+            pubkey, std::function(nil::crypto3::marshalling::types::fill_pubkey_key<PublicKey, endianness>));
+        boost::filesystem::ofstream pubkey_out(pubkey_path);
         for (const auto b : pubkey_blob) {
             pubkey_out << b;
         }
         pubkey_out.close();
 
-        pinput_marshaling_type pinput_filled_val =
-            nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_primary_input<PInput, endianness>(pinput);
-        std::vector<std::uint8_t> pinput_blob(pinput_filled_val.length());
-        auto pinput_it = std::begin(pinput_blob);
-        status = pinput_filled_val.write(pinput_it, pinput_blob.size());
-        boost::filesystem::ofstream pinput_out(piout);
+        auto pinput_blob = serialize_obj<pinput_marshaling_type>(
+            pinput,
+            std::function(nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_primary_input<PInput, endianness>));
+        boost::filesystem::ofstream pinput_out(unenc_pi_path);
         for (const auto b : pinput_blob) {
             pinput_out << b;
         }
         pinput_out.close();
 
-        ct_marshaling_type ct_filled_val =
-            nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_encrypted_primary_input<CipherText, endianness>(
-                ct);
-        std::vector<std::uint8_t> ct_blob(ct_filled_val.length());
-        auto ct_it = std::begin(ct_blob);
-        status = ct_filled_val.write(ct_it, ct_blob.size());
-        boost::filesystem::ofstream ct_out(ctout);
+        auto ct_blob = serialize_obj<ct_marshaling_type>(
+            ct,
+            std::function(
+                nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_encrypted_primary_input<CipherText,
+                                                                                                 endianness>));
+        boost::filesystem::ofstream ct_out(ct_path);
         for (const auto b : ct_blob) {
             ct_out << b;
         }
         ct_out.close();
 
-        boost::filesystem::ofstream full_out(fullout);
+        boost::filesystem::ofstream full_out(full_output_path);
         for (const auto b : proof_blob) {
             full_out << b;
         }
@@ -297,16 +301,16 @@ struct marshaling_verification_data_groth16_encrypted_input {
 
     static std::tuple<Proof, VerificationKey, PublicKey, PInput, CipherText> read_data() {
         Proof proof = read_obj<Proof, proof_marshaling_type>(
-            proofout, nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_proof<Proof, endianness>);
+            proof_path, nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_proof<Proof, endianness>);
         VerificationKey vk = read_obj<VerificationKey, verification_key_marshaling_type>(
-            vkout,
+            vk_path,
             nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_verification_key<VerificationKey, endianness>);
         PublicKey pubkey = read_obj<PublicKey, public_key_marshaling_type>(
-            pubkeyout, nil::crypto3::marshalling::types::make_pubkey_key<PublicKey, endianness>);
+            pubkey_path, nil::crypto3::marshalling::types::make_pubkey_key<PublicKey, endianness>);
         PInput pinput = read_obj<PInput, pinput_marshaling_type>(
-            piout, nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_primary_input<PInput, endianness>);
+            unenc_pi_path, nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_primary_input<PInput, endianness>);
         CipherText ct = read_obj<CipherText, ct_marshaling_type>(
-            ctout,
+            ct_path,
             nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_encrypted_primary_input<CipherText, endianness>);
 
         return std::tuple {proof, vk, pubkey, pinput, ct};
