@@ -25,6 +25,8 @@
 
 #define BOOST_TEST_MODULE pubkey_elgamal_verifiable_test
 
+#undef NDEBUG
+
 #include <string>
 #include <type_traits>
 #include <functional>
@@ -199,13 +201,7 @@ struct marshaling_verification_data_groth16_encrypted_input {
     static inline std::string ct_path_str = "ct.bin";
     static inline std::string unenc_pi_path_str = "unenc_pi.bin";
     static inline std::string full_output_path_str = "data_encrypted_input.bin";
-
-    // static inline auto proof_path = boost::filesystem::path(proof_path_str);
-    // static inline auto vk_path = boost::filesystem::path(vk_path_str);
-    // static inline auto pubkey_path = boost::filesystem::path(pubkey_path_str);
-    // static inline auto ct_path = boost::filesystem::path(ct_path_str);
-    // static inline auto unenc_pi_path = boost::filesystem::path(unenc_pi_path_str);
-    // static inline auto full_output_path = boost::filesystem::path(full_output_path_str);
+    static inline std::string full_output_wrong_ct_path_str = "data_encrypted_input_wrong_ct.bin";
 
     static inline auto proof_path = std::filesystem::path(proof_path_str);
     static inline auto vk_path = std::filesystem::path(vk_path_str);
@@ -213,6 +209,7 @@ struct marshaling_verification_data_groth16_encrypted_input {
     static inline auto ct_path = std::filesystem::path(ct_path_str);
     static inline auto unenc_pi_path = std::filesystem::path(unenc_pi_path_str);
     static inline auto full_output_path = std::filesystem::path(full_output_path_str);
+    static inline auto full_output_wrong_ct_path = std::filesystem::path(full_output_wrong_ct_path_str);
 
     template<typename MarshalingType, typename InputObj, typename F>
     static std::vector<std::uint8_t> serialize_obj(const InputObj &in_obj, const std::function<F> &f) {
@@ -225,7 +222,6 @@ struct marshaling_verification_data_groth16_encrypted_input {
 
     template<typename Path, typename Blob>
     static void write_obj(const Path &path, std::initializer_list<Blob> blobs) {
-        // boost::filesystem::ofstream out(path);
         std::ofstream out(path, std::ios_base::binary);
         for (const auto &blob : blobs) {
             for (const auto b : blob) {
@@ -262,7 +258,19 @@ struct marshaling_verification_data_groth16_encrypted_input {
                                                                                                  endianness>));
         write_obj(ct_path, {ct_blob});
 
+        nil::crypto3::random::algebraic_random_device<
+            typename std::iterator_traits<typename CipherText::iterator>::value_type::group_type>
+            d;
+        auto ct_wrong = ct;
+        ct_wrong[std::rand() % ct.size()] = d();
+        auto ct_wrong_blob = serialize_obj<ct_marshaling_type>(
+            ct_wrong,
+            std::function(
+                nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_encrypted_primary_input<CipherText,
+                                                                                                 endianness>));
+
         write_obj(full_output_path, {proof_blob, vk_blob, pubkey_blob, ct_blob, pinput_blob});
+        write_obj(full_output_wrong_ct_path, {proof_blob, vk_blob, pubkey_blob, ct_wrong_blob, pinput_blob});
     }
 
     template<typename ReturnType, typename MarshalingType, typename Path>
@@ -308,6 +316,7 @@ struct test_policy {
     using merkle_hash_type = typename merkle_hash_component::hash_type;
     using field_type = typename hash_component::field_type;
     static constexpr std::size_t arity = 2;
+    static constexpr std::size_t tree_depth = 1;
     using voting_component =
         components::encrypted_input_voting<arity, hash_component, merkle_hash_component, field_type>;
     using merkle_proof_component = typename voting_component::merkle_proof_component;
@@ -323,8 +332,7 @@ BOOST_AUTO_TEST_SUITE(pubkey_elgamal_verifiable_auto_test_suite)
 
 BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     /* prepare test */
-    constexpr std::size_t tree_depth = 1;
-    constexpr std::size_t participants_number = 1 << tree_depth;
+    constexpr std::size_t participants_number = 1 << test_policy::tree_depth;
     auto secret_keys = generate_random_data<bool, test_policy::hash_type::digest_bits>(participants_number);
     std::vector<std::array<bool, test_policy::hash_type::digest_bits>> public_keys;
     for (const auto &sk : secret_keys) {
@@ -342,7 +350,6 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     for (const auto m_i : m) {
         m_field.emplace_back(std::size_t(m_i));
     }
-    // std::vector<>
 
     const std::size_t eid_size = 64;
     std::vector<bool> eid(eid_size);
@@ -360,8 +367,8 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     components::digest_variable<test_policy::field_type> root_digest(bp,
                                                                      test_policy::merkle_hash_component::digest_bits);
     components::blueprint_variable_vector<test_policy::field_type> address_bits_va;
-    address_bits_va.allocate(bp, tree_depth);
-    test_policy::merkle_proof_component path_var(bp, tree_depth);
+    address_bits_va.allocate(bp, test_policy::tree_depth);
+    test_policy::merkle_proof_component path_var(bp, test_policy::tree_depth);
     components::block_variable<test_policy::field_type> sk_block(bp, secret_keys[proof_idx].size());
     test_policy::voting_component vote_var(bp, m_block, eid_block, sn_digest, root_digest, address_bits_va, path_var,
                                            sk_block, components::blueprint_variable<test_policy::field_type>(0));
