@@ -434,13 +434,13 @@ namespace nil {
 
                 struct init_params_type {
                     const public_key_type &pubkey;
-                    const typename proof_system_type::keypair_type &gg_keypair;
+                    const typename proof_system_type::verification_key_type &gg_vk;
                     const typename proof_system_type::proof_type &proof;
                     const typename proof_system_type::primary_input_type &unencrypted_primary_input;
                 };
                 struct internal_accumulator_type {
                     const public_key_type &pubkey;
-                    const typename proof_system_type::keypair_type &gg_keypair;
+                    const typename proof_system_type::verification_key_type &gg_vk;
                     const typename proof_system_type::proof_type &proof;
                     const typename proof_system_type::primary_input_type &unencrypted_primary_input;
                     std::vector<typename g1_type::value_type> cipher_text;
@@ -448,7 +448,7 @@ namespace nil {
                 typedef bool result_type;
 
                 static inline internal_accumulator_type init_accumulator(const init_params_type &init_params) {
-                    return internal_accumulator_type {init_params.pubkey, init_params.gg_keypair, init_params.proof,
+                    return internal_accumulator_type {init_params.pubkey, init_params.gg_vk, init_params.proof,
                                                       init_params.unencrypted_primary_input,
                                                       std::vector<typename g1_type::value_type> {}};
                 }
@@ -467,8 +467,8 @@ namespace nil {
 
                 static inline result_type process(internal_accumulator_type &acc) {
                     return zk::snark::verify<proof_system_type>(std::cbegin(acc.cipher_text),
-                                                                std::cend(acc.cipher_text), acc.gg_keypair.second,
-                                                                acc.pubkey, acc.unencrypted_primary_input, acc.proof);
+                                                                std::cend(acc.cipher_text), acc.gg_vk, acc.pubkey,
+                                                                acc.unencrypted_primary_input, acc.proof);
                 }
             };
 

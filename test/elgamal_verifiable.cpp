@@ -30,6 +30,9 @@
 #include <functional>
 
 #include <boost/filesystem.hpp>
+#include <filesystem>
+#include <fstream>
+#include <sstream>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -196,12 +199,20 @@ struct marshaling_verification_data_groth16_encrypted_input {
     static inline std::string ct_path_str = "ct.bin";
     static inline std::string unenc_pi_path_str = "unenc_pi.bin";
     static inline std::string full_output_path_str = "data_encrypted_input.bin";
-    static inline auto proof_path = boost::filesystem::path(proof_path_str);
-    static inline auto vk_path = boost::filesystem::path(vk_path_str);
-    static inline auto pubkey_path = boost::filesystem::path(pubkey_path_str);
-    static inline auto ct_path = boost::filesystem::path(ct_path_str);
-    static inline auto unenc_pi_path = boost::filesystem::path(unenc_pi_path_str);
-    static inline auto full_output_path = boost::filesystem::path(full_output_path_str);
+
+    // static inline auto proof_path = boost::filesystem::path(proof_path_str);
+    // static inline auto vk_path = boost::filesystem::path(vk_path_str);
+    // static inline auto pubkey_path = boost::filesystem::path(pubkey_path_str);
+    // static inline auto ct_path = boost::filesystem::path(ct_path_str);
+    // static inline auto unenc_pi_path = boost::filesystem::path(unenc_pi_path_str);
+    // static inline auto full_output_path = boost::filesystem::path(full_output_path_str);
+
+    static inline auto proof_path = std::filesystem::path(proof_path_str);
+    static inline auto vk_path = std::filesystem::path(vk_path_str);
+    static inline auto pubkey_path = std::filesystem::path(pubkey_path_str);
+    static inline auto ct_path = std::filesystem::path(ct_path_str);
+    static inline auto unenc_pi_path = std::filesystem::path(unenc_pi_path_str);
+    static inline auto full_output_path = std::filesystem::path(full_output_path_str);
 
     template<typename MarshalingType, typename InputObj, typename F>
     static std::vector<std::uint8_t> serialize_obj(const InputObj &in_obj, const std::function<F> &f) {
@@ -212,90 +223,59 @@ struct marshaling_verification_data_groth16_encrypted_input {
         return blob;
     }
 
+    template<typename Path, typename Blob>
+    static void write_obj(const Path &path, std::initializer_list<Blob> blobs) {
+        // boost::filesystem::ofstream out(path);
+        std::ofstream out(path, std::ios_base::binary);
+        for (const auto &blob : blobs) {
+            for (const auto b : blob) {
+                out << b;
+            }
+        }
+        out.close();
+    }
+
     static void write_data(const VerificationKey &vk, const PublicKey &pubkey, const Proof &proof, const PInput &pinput,
                            const CipherText &ct) {
         auto proof_blob = serialize_obj<proof_marshaling_type>(
             proof, std::function(nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_proof<Proof, endianness>));
-        boost::filesystem::ofstream proof_out(proof_path);
-        for (const auto b : proof_blob) {
-            proof_out << b;
-        }
-        proof_out.close();
+        write_obj(proof_path, {proof_blob});
 
         auto vk_blob = serialize_obj<verification_key_marshaling_type>(
             vk, std::function(nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_verification_key<VerificationKey,
                                                                                                         endianness>));
-        boost::filesystem::ofstream vk_out(vk_path);
-        for (const auto b : vk_blob) {
-            vk_out << b;
-        }
-        vk_out.close();
+        write_obj(vk_path, {vk_blob});
 
         auto pubkey_blob = serialize_obj<public_key_marshaling_type>(
             pubkey, std::function(nil::crypto3::marshalling::types::fill_pubkey_key<PublicKey, endianness>));
-        boost::filesystem::ofstream pubkey_out(pubkey_path);
-        for (const auto b : pubkey_blob) {
-            pubkey_out << b;
-        }
-        pubkey_out.close();
+        write_obj(pubkey_path, {pubkey_blob});
 
         auto pinput_blob = serialize_obj<pinput_marshaling_type>(
             pinput,
             std::function(nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_primary_input<PInput, endianness>));
-        boost::filesystem::ofstream pinput_out(unenc_pi_path);
-        for (const auto b : pinput_blob) {
-            pinput_out << b;
-        }
-        pinput_out.close();
+        write_obj(unenc_pi_path, {pinput_blob});
 
         auto ct_blob = serialize_obj<ct_marshaling_type>(
             ct,
             std::function(
                 nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_encrypted_primary_input<CipherText,
                                                                                                  endianness>));
-        boost::filesystem::ofstream ct_out(ct_path);
-        for (const auto b : ct_blob) {
-            ct_out << b;
-        }
-        ct_out.close();
+        write_obj(ct_path, {ct_blob});
 
-        boost::filesystem::ofstream full_out(full_output_path);
-        for (const auto b : proof_blob) {
-            full_out << b;
-        }
-        for (const auto b : vk_blob) {
-            full_out << b;
-        }
-        for (const auto b : pubkey_blob) {
-            full_out << b;
-        }
-        for (const auto b : ct_blob) {
-            full_out << b;
-        }
-        for (const auto b : pinput_blob) {
-            full_out << b;
-        }
-        full_out.close();
+        write_obj(full_output_path, {proof_blob, vk_blob, pubkey_blob, ct_blob, pinput_blob});
     }
 
-    template<typename ReturnType, typename MarshalingType>
-    static ReturnType read_obj(const boost::filesystem::path &path, ReturnType (&f)(MarshalingType)) {
-        boost::filesystem::ifstream in(path, boost::filesystem::ifstream::binary);
-        std::string blob_str;
-        in >> blob_str;
-        in.close();
-        std::cout << blob_str.size() << std::endl;
-
-        // std::ifstream file(path.c_str(), std::ios::binary);
-        // std::vector<std::uint8_t> blob_str;
-        // std::copy(std::istream_iterator<std::uint8_t>(file),
-        //           std::istream_iterator<std::uint8_t>(),
-        //           std::back_inserter(blob_str));
-        // std::cout << blob_str.size() << std::endl;
+    template<typename ReturnType, typename MarshalingType, typename Path>
+    static ReturnType read_obj(const Path &path, ReturnType (&f)(MarshalingType)) {
+        std::ifstream in(path, std::ios_base::binary);
+        std::stringstream buffer;
+        buffer << in.rdbuf();
+        auto blob_str = buffer.str();
+        std::vector<std::uint8_t> blob(std::cbegin(blob_str), std::cend(blob_str));
 
         MarshalingType marshaling_obj;
-        auto it = std::cbegin(blob_str);
-        nil::marshalling::status_type status = marshaling_obj.read(it, blob_str.size());
+        auto it = std::cbegin(blob);
+        nil::marshalling::status_type status = marshaling_obj.read(it, blob.size());
         return f(marshaling_obj);
     }
 
@@ -459,7 +439,7 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
 
     bool enc_verification_ans = verify_encryption<encryption_scheme>(
         cipher_text.first,
-        {std::get<0>(keypair), gg_keypair, cipher_text.second,
+        {std::get<0>(keypair), gg_keypair.second, cipher_text.second,
          typename proof_system::primary_input_type {std::cbegin(pinput) + m.size(), std::cend(pinput)}});
     BOOST_REQUIRE(enc_verification_ans);
 
@@ -487,7 +467,7 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     /// Encryption verification of the rerandomized cipher text
     enc_verification_ans = verify_encryption<encryption_scheme>(
         rerand_cipher_text.first,
-        {std::get<0>(keypair), gg_keypair, rerand_cipher_text.second,
+        {std::get<0>(keypair), gg_keypair.second, rerand_cipher_text.second,
          typename proof_system::primary_input_type {std::cbegin(pinput) + m.size(), std::cend(pinput)}});
     BOOST_REQUIRE(enc_verification_ans);
 
@@ -514,8 +494,11 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     // BOOST_REQUIRE(!wrong_decryption_ans);
 }
 
-// BOOST_AUTO_TEST_CASE(elgamal_verifiable_restored_test) {
-//     auto [proof, vk, pubkey, pinput, ct] = test_policy::marshaling_data_type::read_data();
-// }
+BOOST_AUTO_TEST_CASE(elgamal_verifiable_restored_test) {
+    auto [proof, vk, pubkey, pinput, ct] = test_policy::marshaling_data_type::read_data();
+
+    bool enc_verification_ans = verify_encryption<test_policy::encryption_scheme>(ct, {pubkey, vk, proof, pinput});
+    BOOST_REQUIRE(enc_verification_ans);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
