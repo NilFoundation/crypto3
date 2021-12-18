@@ -43,8 +43,10 @@ namespace nil {
                 template<typename HashComponent = nil::crypto3::zk::components::pedersen<>,
                          typename FieldType = typename HashComponent::field_type, std::size_t Arity = 2>
                 struct merkle_proof : public component<FieldType> {
-                    using merkle_tree_container = nil::crypto3::merkle_tree<typename HashComponent::hash_type, Arity>;
-                    using merkle_proof_container = nil::crypto3::merkle_proof<typename HashComponent::hash_type, Arity>;
+                    using merkle_tree_container =
+                        nil::crypto3::containers::merkle_tree<typename HashComponent::hash_type, Arity>;
+                    using merkle_proof_container =
+                        nil::crypto3::containers::merkle_proof<typename HashComponent::hash_type, Arity>;
                     using path_type = std::vector<std::vector<digest_variable<FieldType>>>;
 
                     std::size_t address;
