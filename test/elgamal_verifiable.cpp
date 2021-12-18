@@ -340,9 +340,9 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
         hash<test_policy::merkle_hash_type>(sk, std::begin(pk));
         public_keys.emplace_back(pk);
     }
-    merkle_tree<test_policy::merkle_hash_type, test_policy::arity> tree(public_keys);
+    containers::merkle_tree<test_policy::merkle_hash_type, test_policy::arity> tree(public_keys);
     std::size_t proof_idx = std::rand() % participants_number;
-    merkle_proof<test_policy::merkle_hash_type, test_policy::arity> proof(tree, proof_idx);
+    containers::merkle_proof<test_policy::merkle_hash_type, test_policy::arity> proof(tree, proof_idx);
     auto tree_pk_leaf = tree[proof_idx];
 
     std::vector<bool> m = {0, 1, 0, 0, 0, 0, 0};
