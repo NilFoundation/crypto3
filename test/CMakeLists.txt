@@ -40,6 +40,7 @@ endmacro()
 
 set(TESTS_NAMES
     "evaluation_domain"
+    "expression"
     "kronecker_substitution"
     "polynomial_arithmetic"
     "polynom")
