@@ -65,8 +65,10 @@ namespace nil {
                         template <typename CommitmentSchemeType>
                         using proof_type = redshift_proof<CommitmentSchemeType>;
 
-                        template <std::size_t k>
+                        template <std::size_t k, typename ExpressionType>
                         struct preprocessed_data_type {
+
+                            typedef ExpressionType expression_type;
 
                             constexpr static const typename FieldType::value_type omega = 
                                 math::unity_root<FieldType>(math::detail::get_power_of_two(k));
@@ -77,7 +79,7 @@ namespace nil {
                             // S_id
                             std::vector<math::polynomial::polynom<typename FieldType::value_type>> identity_permutations;
                             // c
-                            std::vector<math::polynomial::polynom<typename FieldType::value_type>> constraints;
+                            std::vector<ExpressionType> constraints;
                             
                             std::vector<math::polynomial::polynom<typename FieldType::value_type>> Lagrange_basis;
 

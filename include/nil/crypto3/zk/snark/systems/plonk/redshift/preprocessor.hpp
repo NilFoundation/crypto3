@@ -35,7 +35,7 @@ namespace nil {
 
                 template<typename FieldType, std::size_t WiresAmount>
                 class redshift_preprocessor {
-                    typedef detail::redshift_types<FieldType, WiresAmount> types_policy;
+                    using types_policy = detail::redshift_types_policy<FieldType, WiresAmount>;
 
                 public:
                     static inline typename types_policy::preprocessed_data_type
@@ -44,13 +44,13 @@ namespace nil {
 
                         typename types_policy::preprocessed_data_type data;
 
-                        data.selectors = constraint_system.get_selectors();
-                        ... copy_constraints = constraint_system.get_copy_constraints();
+                        // data.selectors = constraint_system.get_selectors();
+                        // ... copy_constraints = constraint_system.get_copy_constraints();
 
-                        data.permutations = ...(copy_constraints);
-                        data.identity_permutations = ...(copy_constraints);
+                        // data.permutations = ...(copy_constraints);
+                        // data.identity_permutations = ...(copy_constraints);
 
-                        data.Lagrange_basis = math::polynomial::Lagrange_basis(data.omega, ...(assignments).n);
+                        // data.Lagrange_basis = math::polynomial::Lagrange_basis(data.omega, ...(assignments).n);
                     }
                 };
             }    // namespace snark
