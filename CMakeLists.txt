@@ -10,7 +10,7 @@ list(APPEND CMAKE_MODULE_PATH
         "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
         "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
 
-if(NOT ${CMAKE_WORKSPACE_NAME} STREQUAL crypto3)
+if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"))
     cm_workspace(crypto3)
 endif()
 
@@ -26,20 +26,15 @@ endif()
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_algebra)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_pkpad)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_random)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_zk)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_blueprint)
 
 option(BUILD_TESTS "Build unit tests" FALSE)
 option(BUILD_EXAMPLES "Build examples" FALSE)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_LIBRARIES
      ${CMAKE_WORKSPACE_NAME}::algebra
-     ${CMAKE_WORKSPACE_NAME}::pkpad
-     ${CMAKE_WORKSPACE_NAME}::random
      # TODO: add conditional link of zk depending on ElGamal
-     ${CMAKE_WORKSPACE_NAME}::zk
-     ${CMAKE_WORKSPACE_NAME}::blueprint)
+     ${CMAKE_WORKSPACE_NAME}::zk)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/pubkey/algorithm/sign.hpp

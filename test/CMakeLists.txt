@@ -5,10 +5,16 @@ if (NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
 endif ()
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_marshalling)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_random)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_blueprint)
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
         ${${CURRENT_PROJECT_NAME}_LIBRARIES}
         marshalling::crypto3_zk
+        ${CMAKE_WORKSPACE_NAME}::pkpad
+        ${CMAKE_WORKSPACE_NAME}::random
+        ${CMAKE_WORKSPACE_NAME}::blueprint
+
         ${Boost_LIBRARIES})
 
 macro(define_pubkey_test name)
