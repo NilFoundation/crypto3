@@ -46,70 +46,40 @@ BOOST_AUTO_TEST_SUITE(expression_test_suite)
 
 BOOST_AUTO_TEST_CASE(expression_field_evaluation) {
 
-    constexpr static typename expression::variable_type<0> const _0;
-    constexpr static typename expression::variable_type<1> const _1;
+    expressions::lazy_expression< typename FieldType::value_type > v0, v1;
 
-    auto expr = (_1 - _0) + _1 * 100;
+    expressions::lazy_expression< typename FieldType::value_type >  expr;
+    expr = (v1 - v0) + v1 * 100;
 
-    typename expression::assignment_type<typename FieldType::value_type, 2> ctx;
+    v0.assign(100);
+    v1.assign(505);
 
-    ctx[0] = typename FieldType::value_type(100);
-    ctx[1] = typename FieldType::value_type(505);
-
-    typename FieldType::value_type d = expression::eval( expr, ctx );
+    typename FieldType::value_type d = ((v1 - v0) + v1 * 100).evaluate();
 
     BOOST_CHECK_EQUAL((505 - 100) + 505*100, d.data);
 }
 
 BOOST_AUTO_TEST_CASE(expression_polynom_evaluation) {
 
-    constexpr static typename expression::variable_type<0> const _0;
-    constexpr static typename expression::variable_type<1> const _1;
+    expressions::lazy_expression< polynomial::polynom<typename FieldType::value_type> > v0, v1;
 
-    auto expr = _1 + _0;
+    using expr_type = typename boost::proto::terminal<polynomial::polynom<typename FieldType::value_type>>::type;
 
-    typename expression::assignment_type<polynomial::polynom<typename FieldType::value_type>, 2> ctx;
+    expressions::lazy_expression< polynomial::polynom<typename FieldType::value_type> >  expr;
+    expr = (v1 + v0);
 
-    ctx[0] = {1, 3, 4, 25, 6, 7, 7, 2};
-    ctx[1] = {9, 3, 11, 14, 7, 1, 5, 8};
+    boost::proto::display_expr(expr);
 
-    polynomial::polynom<typename FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 8, 12, 10};
-
-    polynomial::polynom<typename FieldType::value_type> d = expression::eval( expr, ctx );
-
-    for (std::size_t i = 0; i < d.size(); ++i) {
-        BOOST_CHECK_EQUAL(c_ans[i].data, d[i].data);
-    }
-}
-
-BOOST_AUTO_TEST_CASE(expression_polynom_and_field_evaluation) {
-
-    constexpr static typename expression::variable_type<0> const _0;
-    constexpr static typename expression::variable_type<1> const _1;
-
-    auto expr = _1 + _0;
-
-    typename expression::assignment_type<polynomial::polynom<typename FieldType::value_type>, 2> polynom_ctx;
-
-    polynom_ctx[0] = {1, 3, 4, 25, 6, 7, 7, 2};
-    polynom_ctx[1] = {9, 3, 11, 14, 7, 1, 5, 8};
+    v0.assign({1, 3, 4, 25, 6, 7, 7, 2});
+    v1.assign({9, 3, 11, 14, 7, 1, 5, 8});
 
     polynomial::polynom<typename FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 8, 12, 10};
 
-    polynomial::polynom<typename FieldType::value_type> d = expression::eval( expr, polynom_ctx );
+    polynomial::polynom<typename FieldType::value_type> d = expr.evaluate();
 
-    for (std::size_t i = 0; i < d.size(); ++i) {
+    for (std::size_t i = 0; i < c_ans.size(); ++i) {
         BOOST_CHECK_EQUAL(c_ans[i].data, d[i].data);
     }
-
-    typename expression::assignment_type<typename FieldType::value_type, 2> field_ctx;
-
-    field_ctx[0] = typename FieldType::value_type(100);
-    field_ctx[1] = typename FieldType::value_type(505);
-
-    typename FieldType::value_type e = expression::eval( expr, field_ctx );
-
-    BOOST_CHECK_EQUAL(505 + 100, e.data);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -31,47 +31,97 @@
 namespace nil {
     namespace crypto3 {
         namespace math {
-            namespace expression {
+            namespace expressions {
                 namespace detail {
-                    template<std::size_t I>
-                    struct placeholder
+                    template<typename Expr>
+                    struct lazy_expression_expr;
+
+                    // This grammar describes which lazy vector lazy_expressions
+                    // are allowed; namely, vector terminals and addition
+                    // and subtraction of lazy vector lazy_expressions.
+                    struct lazy_expression_grammar
+                      : boost::proto::or_<
+                            boost::proto::terminal< boost::proto::_ >
+                          , boost::proto::plus< lazy_expression_grammar, lazy_expression_grammar >
+                          , boost::proto::minus< lazy_expression_grammar, lazy_expression_grammar >
+                          , boost::proto::multiplies< lazy_expression_grammar, lazy_expression_grammar >
+                        >
                     {};
 
-                    template<typename ValueType, std::size_t VariablesAmount>
-                    struct expression_context
-                      : boost::proto::callable_context< expression_context<ValueType, VariablesAmount> const >
-                    {
-                        // Values to replace the placeholders
-                        std::array<ValueType, VariablesAmount> args;
+                    // Tell proto that in the lazy_expression_domain, all
+                    // lazy_expressions should be wrapped in laxy_vector_expr<>
+                    // and must conform to the lazy vector grammar.
+                    struct lazy_expression_domain
+                      : boost::proto::domain<boost::proto::generator<lazy_expression_expr>, lazy_expression_grammar>
+                    {};
 
-                        ValueType& operator [](std::size_t Index){
-                            return this->args[Index];
+                    // Here is an evaluation context that indexes into a lazy vector
+                    // expression, and combines the result.
+                    struct lazy_expression_subscript_context {
+                        lazy_expression_subscript_context(){}
+
+                        // Use default_eval for all the operations ...
+                        template<typename Expr, typename Tag = typename Expr::proto_tag>
+                        struct eval
+                          : boost::proto::default_eval<Expr, lazy_expression_subscript_context>
+                        {};
+
+                    };
+
+                    // Here is the domain-specific lazy_expression wrapper, which overrides
+                    // operator [] to evaluate the lazy_expression using the lazy_expression_subscript_context.
+                    template<typename Expr>
+                    struct lazy_expression_expr
+                      : boost::proto::extends<Expr, lazy_expression_expr<Expr>, lazy_expression_domain>
+                    {
+                      // typedef boost::proto::default_context lazy_expression_subscript_context;
+                        lazy_expression_expr( Expr const & expr = Expr() )
+                          : lazy_expression_expr::proto_extends( expr )
+                        {}
+
+                        // Use the lazy_expression_subscript_context<> to implement subscripting
+                        // of a lazy vector lazy_expression tree.
+                        typename boost::proto::result_of::eval< Expr, lazy_expression_subscript_context >::type
+                        evaluate()  {
+                            lazy_expression_subscript_context ctx;
+                            return boost::proto::eval(*this, ctx);
                         }
 
-                        // Define the result type of the calculator.
-                        // (This makes the expression_context "callable".)
-                        typedef ValueType result_type;
-
-                        // Handle the placeholders:
-                        template<std::size_t I>
-                        ValueType operator()(boost::proto::tag::terminal, placeholder<I>) const
-                        {
-                            return this->args[I];
+                        typename boost::proto::result_of::eval< Expr, lazy_expression_subscript_context >::type
+                        evaluate() const {
+                            lazy_expression_subscript_context ctx;
+                            return boost::proto::eval(*this, ctx);
                         }
                     };
+
                 }    // namespace detail
 
-                template <std::size_t Index>
-                using variable_type = typename boost::proto::terminal<detail::placeholder<Index>>::type;
+                // Here is our lazy_expression terminal, implemented in terms of detail::lazy_expression_expr
+                template< typename T >
+                struct lazy_expression
+                  : detail::lazy_expression_expr< typename boost::proto::terminal< T>::type >
+                {
+                    typedef typename boost::proto::terminal< T >::type expr_type;
 
-                template <typename ValueType, std::size_t VariablesAmount>
-                using assignment_type = detail::expression_context<ValueType, VariablesAmount>;
+                    lazy_expression( T const & value = T() )
+                      : detail::lazy_expression_expr<expr_type>( expr_type::make( T( value ) ) )
+                    {}
 
-                template <typename Expr, typename ValueType, std::size_t VariablesAmount>
-                ValueType eval(Expr expr, detail::expression_context<ValueType, VariablesAmount> ctx){
-                    return boost::proto::eval( expr, ctx );
-                }
-            }    // namespace expression
+                    // Here we define a += operator for lazy vector terminals that
+                    // takes a lazy vector lazy_expression and indexes it. expr.evaluate(i) here
+                    // uses lazy_expression_subscript_context<> under the covers.
+                    template< typename Expr >
+                    lazy_expression &operator = (Expr const & expr)
+                    {
+                        boost::proto::value(*this) = expr.evaluate();
+                        return *this;
+                    }
+
+                    void assign(T const & value){
+                        boost::proto::value(*this) = value;
+                    }
+                };
+            }    // namespace expressions
         }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
