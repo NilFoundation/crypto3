@@ -42,6 +42,7 @@
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
+#include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 
 namespace nil {
     namespace crypto3 {
