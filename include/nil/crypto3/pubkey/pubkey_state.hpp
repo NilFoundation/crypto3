@@ -29,6 +29,7 @@
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/framework/features.hpp>
 
+#include <nil/crypto3/pubkey/accumulators/pubkey.hpp>
 #include <nil/crypto3/pubkey/accumulators/sign.hpp>
 #include <nil/crypto3/pubkey/accumulators/verify.hpp>
 #include <nil/crypto3/pubkey/accumulators/aggregate.hpp>
@@ -38,6 +39,11 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+            template<typename ProcessingMode>
+            using pubkey_accumulator_set = boost::accumulators::accumulator_set<
+                typename ProcessingMode::result_type,
+                boost::accumulators::features<accumulators::tag::pubkey<ProcessingMode>>>;
+
             /*!
              * @brief Accumulator set with pre-defined signing accumulator params.
              *

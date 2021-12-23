@@ -4,8 +4,17 @@ if (NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
     cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 endif ()
 
+cm_find_package(${CMAKE_WORKSPACE_NAME}_marshalling)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_random)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_blueprint)
+
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
         ${${CURRENT_PROJECT_NAME}_LIBRARIES}
+        marshalling::crypto3_zk
+        ${CMAKE_WORKSPACE_NAME}::pkpad
+        ${CMAKE_WORKSPACE_NAME}::random
+        ${CMAKE_WORKSPACE_NAME}::blueprint
+
         ${Boost_LIBRARIES})
 
 macro(define_pubkey_test name)
@@ -31,7 +40,8 @@ set(TESTS_NAMES
         "ecdsa"
         "bls"
         "secret_sharing"
-        "eddsa")
+        "eddsa"
+        "elgamal_verifiable")
 
 foreach (TEST_NAME ${TESTS_NAMES})
     define_pubkey_test(${TEST_NAME})
