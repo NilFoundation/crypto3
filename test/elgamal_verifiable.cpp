@@ -60,7 +60,7 @@
 #include <nil/crypto3/random/algebraic_random_device.hpp>
 #include <nil/crypto3/random/algebraic_engine.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/algorithms/generate.hpp>
 
 #include <nil/crypto3/zk/components/voting/encrypted_input_voting.hpp>

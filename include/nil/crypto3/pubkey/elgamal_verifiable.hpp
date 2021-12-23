@@ -35,7 +35,7 @@
 
 #include <nil/crypto3/zk/snark/algorithms/prove.hpp>
 #include <nil/crypto3/zk/snark/algorithms/verify.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
 
 #include <nil/crypto3/pubkey/keys/private_key.hpp>
 #include <nil/crypto3/pubkey/keys/verification_key.hpp>
