@@ -42,6 +42,7 @@
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
+#include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -95,8 +96,44 @@ namespace nil {
                     return make_field_element_vector<typename PrimaryInput::value_type::field_type, Endianness>(
                         filled_r1cs_gg_ppzksnark_primary_input);
                 }
+
+                template<typename TTypeBase,
+                         typename EncPrimaryInput,
+                         typename = typename std::enable_if<
+                             algebra::is_g1_group_element<typename std::iterator_traits<
+                                 typename EncPrimaryInput::iterator>::value_type::group_type::value_type>::value,
+                             bool>::type,
+                         typename... TOptions>
+                using r1cs_gg_ppzksnark_encrypted_primary_input = nil::marshalling::types::array_list<
+                    TTypeBase,
+                    curve_element<
+                        TTypeBase,
+                        typename std::iterator_traits<typename EncPrimaryInput::iterator>::value_type::group_type>,
+                    nil::marshalling::option::sequence_size_field_prefix<
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>>>;
+
+                template<typename EncPrimaryInput,
+                         typename Endianness,
+                         typename GroupType =
+                             typename std::iterator_traits<typename EncPrimaryInput::iterator>::value_type::group_type>
+                r1cs_gg_ppzksnark_encrypted_primary_input<nil::marshalling::field_type<Endianness>, EncPrimaryInput>
+                    fill_r1cs_gg_ppzksnark_encrypted_primary_input(const EncPrimaryInput &enc_primary_input) {
+
+                    return fill_curve_element_vector<GroupType, Endianness>(enc_primary_input);
+                }
+
+                template<typename EncPrimaryInput,
+                         typename Endianness,
+                         typename GroupType =
+                             typename std::iterator_traits<typename EncPrimaryInput::iterator>::value_type::group_type>
+                std::vector<typename GroupType::value_type> make_r1cs_gg_ppzksnark_encrypted_primary_input(
+                    r1cs_gg_ppzksnark_encrypted_primary_input<nil::marshalling::field_type<Endianness>, EncPrimaryInput>
+                        filled_enc_primary_input) {
+
+                    return make_curve_element_vector<GroupType, Endianness>(filled_enc_primary_input);
+                }
             }    // namespace types
         }        // namespace marshalling
-    }        // namespace crypto3
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_MARSHALLING_R1CS_GG_PPZKSNARK_PRIMARY_INPUT_HPP

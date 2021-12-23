@@ -41,7 +41,7 @@
 
 #include <nil/crypto3/zk/components/blueprint.hpp>
 #include <nil/crypto3/zk/components/blueprint_variable.hpp>
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/algorithms/generate.hpp>
 #include <nil/crypto3/zk/snark/algorithms/verify.hpp>
 #include <nil/crypto3/zk/snark/algorithms/prove.hpp>
