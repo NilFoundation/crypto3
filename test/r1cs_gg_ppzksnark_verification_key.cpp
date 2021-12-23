@@ -266,6 +266,57 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_public_key_bls12_381_be) {
     std::cout << "BLS12-381 r1cs_gg_ppzksnark extended verification key big-endian test finished" << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_extended_verification_key_bls12_381_be_error_length) {
+    using endianness = nil::marshalling::option::big_endian;
+    using curve_type = nil::crypto3::algebra::curves::bls12<381>;
+    using key_type = zk::snark::r1cs_gg_ppzksnark_extended_verification_key<curve_type>;
+    using key_marshaling_type = nil::crypto3::marshalling::types::r1cs_gg_ppzksnark_extended_verification_key<
+        nil::marshalling::field_type<endianness>, key_type>;
+
+    using g1_type = typename curve_type::template g1_type<>;
+    using g2_type = typename curve_type::template g2_type<>;
+    using gt_type = typename curve_type::gt_type;
+
+    using gt_marshalling_type =
+        nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<endianness>, gt_type>;
+    using g2_marshalling_type =
+        nil::crypto3::marshalling::types::curve_element<nil::marshalling::field_type<endianness>, g2_type>;
+    using g1_marshalling_type =
+        nil::crypto3::marshalling::types::curve_element<nil::marshalling::field_type<endianness>, g1_type>;
+    using accumulation_vector_marshalling_type =
+        nil::crypto3::marshalling::types::accumulation_vector<nil::marshalling::field_type<endianness>,
+                                                              zk::snark::accumulation_vector<g1_type>>;
+    gt_marshalling_type gt_marshaling;
+    std::cout << "Not ok: " << gt_marshaling.length() << std::endl;
+
+    g2_marshalling_type g2_marshaling;
+    std::cout << "Ok: " << g2_marshaling.length() << std::endl;
+
+    g1_marshalling_type g1_marshaling;
+    std::cout << "Ok: " << g1_marshaling.length() << std::endl;
+
+    accumulation_vector_marshalling_type accumulation_vector_marshalling;
+    std::cout << "Seems ok, full information about size should be available after initialization: "
+              << accumulation_vector_marshalling.length() << std::endl;
+    typename g1_type::value_type first = nil::crypto3::algebra::random_element<g1_type>();
+    std::vector<typename g1_type::value_type> rest;
+    for (std::size_t i = 0; i < 5; i++) {
+        rest.push_back(nil::crypto3::algebra::random_element<g1_type>());
+    }
+    zk::snark::accumulation_vector<g1_type> acc_vec(std::move(first), std::move(rest));
+    accumulation_vector_marshalling_type filled_acc_vec =
+        nil::crypto3::marshalling::types::fill_accumulation_vector<zk::snark::accumulation_vector<g1_type>, endianness>(
+            acc_vec);
+    std::cout << "Ok: " << filled_acc_vec.length() << std::endl;
+
+    // key_type key(nil::crypto3::algebra::random_element<gt_type>(),
+    //              nil::crypto3::algebra::random_element<g2_type>(),
+    //              nil::crypto3::algebra::random_element<g2_type>(),
+    //              nil::crypto3::algebra::random_element<g1_type>(),
+    //              std::move(zk::snark::accumulation_vector<g1_type>(std::move(first), std::move(rest))),
+    //              nil::crypto3::algebra::random_element<g1_type>());
+}
+
 // BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_le) {
 //     std::cout << "BLS12-381 r1cs_gg_ppzksnark verification key little-endian test started" << std::endl;
 //     test_verification_key<nil::crypto3::algebra::curves::bls12<381>, nil::marshalling::option::little_endian, 5>();
