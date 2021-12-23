@@ -288,6 +288,9 @@ BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_extended_verification_key_bls12_381_be_er
                                                               zk::snark::accumulation_vector<g1_type>>;
     gt_marshalling_type gt_marshaling;
     std::cout << "Not ok: " << gt_marshaling.length() << std::endl;
+    gt_marshalling_type filled_gt = nil::crypto3::marshalling::types::fill_field_element<gt_type, endianness>(
+        nil::crypto3::algebra::random_element<gt_type>());
+    std::cout << "Ok only after initialization: " << filled_gt.length() << std::endl;
 
     g2_marshalling_type g2_marshaling;
     std::cout << "Ok: " << g2_marshaling.length() << std::endl;
