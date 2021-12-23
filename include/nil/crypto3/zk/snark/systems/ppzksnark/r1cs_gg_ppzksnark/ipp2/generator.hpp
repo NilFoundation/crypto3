@@ -26,8 +26,8 @@
 #ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_IPP2_GENERATOR_HPP
 #define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_IPP2_GENERATOR_HPP
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/generator.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 
 namespace nil {
     namespace crypto3 {

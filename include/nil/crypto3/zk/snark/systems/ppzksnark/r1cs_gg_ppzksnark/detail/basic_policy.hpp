@@ -57,14 +57,14 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_BASIC_POLICY_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_BASIC_POLICY_HPP
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/proving_key.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/verification_key.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/keypair.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/proof.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/proof.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verification_key.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/proving_key.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/verification_key.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/keypair.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/verification_key.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 
 namespace nil {
     namespace crypto3 {

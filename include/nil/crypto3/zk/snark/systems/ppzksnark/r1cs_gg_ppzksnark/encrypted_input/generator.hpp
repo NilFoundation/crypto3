@@ -27,7 +27,7 @@
 #ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_ENCRYPTED_INPUT_GENERATOR_HPP
 #define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_ENCRYPTED_INPUT_GENERATOR_HPP
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/generator.hpp>
 
 namespace nil {
     namespace crypto3 {

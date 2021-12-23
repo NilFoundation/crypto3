@@ -50,7 +50,7 @@
 #ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_ENCRYPTED_INPUT_VERIFIER_HPP
 #define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_ENCRYPTED_INPUT_VERIFIER_HPP
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/verifier.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/verifier.hpp>
 
 namespace nil {
     namespace crypto3 {

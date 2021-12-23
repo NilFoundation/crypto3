@@ -28,7 +28,7 @@
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/verification_key.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/verification_key.hpp>
 
 namespace nil {
     namespace crypto3 {

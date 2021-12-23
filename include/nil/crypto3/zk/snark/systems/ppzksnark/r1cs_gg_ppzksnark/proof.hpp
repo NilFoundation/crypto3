@@ -29,7 +29,7 @@
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>
 
 namespace nil {
     namespace crypto3 {
