@@ -56,7 +56,7 @@
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -65,11 +65,20 @@ namespace nil {
 
                 using namespace algebra;
 
+                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
+                class r1cs_gg_ppzksnark_process_verification_key;
+
+                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
+                class r1cs_gg_ppzksnark_verifier_weak_input_consistency;
+
+                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
+                class r1cs_gg_ppzksnark_verifier_strong_input_consistency;
+
                 /**
                  * Convert a (non-processed) verification key into a processed verification key.
                  */
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_process_verification_key {
+                class r1cs_gg_ppzksnark_process_verification_key<CurveType, ProvingMode::Basic> {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                 public:
@@ -106,7 +115,7 @@ namespace nil {
                 */
 
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_verifier_weak_input_consistency {
+                class r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType, ProvingMode::Basic> {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
@@ -178,7 +187,7 @@ namespace nil {
                 };
 
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_verifier_strong_input_consistency {
+                class r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Basic> {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                 public:
@@ -258,7 +267,8 @@ namespace nil {
                 //             affine_ate_precompute_g2<CurveType>(verification_key.delta_g2);
 
                 //         const accumulation_vector<g1_type> accumulated_IC =
-                //             verification_key.gamma_ABC_g1.accumulate_chunk(primary_input.begin(), primary_input.end(),
+                //             verification_key.gamma_ABC_g1.accumulate_chunk(primary_input.begin(),
+                //             primary_input.end(),
                 //                                                            0);
                 //         const typename g1_type::value_type &acc = accumulated_IC.first;
 

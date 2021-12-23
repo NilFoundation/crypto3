@@ -44,15 +44,25 @@ namespace nil {
                          typename Hash,
                          typename InputTranscriptIncludeIterator,
                          typename InputProofIterator>
-                typename ProofSystemType::aggregate_proof_type
-                    prove(const typename ProofSystemType::proving_srs_type &srs,
-                          InputTranscriptIncludeIterator transcript_include_first,
-                          InputTranscriptIncludeIterator transcript_include_last,
-                          InputProofIterator proofs_first,
-                          InputProofIterator proofs_last) {
+                typename ProofSystemType::proof_type prove(const typename ProofSystemType::proving_srs_type &srs,
+                                                           InputTranscriptIncludeIterator transcript_include_first,
+                                                           InputTranscriptIncludeIterator transcript_include_last,
+                                                           InputProofIterator proofs_first,
+                                                           InputProofIterator proofs_last) {
 
                     return ProofSystemType::template prove<Hash>(
                         srs, transcript_include_first, transcript_include_last, proofs_first, proofs_last);
+                }
+
+                template<typename ProofSystemType, typename PublicKey, typename ScalarValue>
+                typename ProofSystemType::proof_type
+                    prove(const typename ProofSystemType::proving_key_type &pk,
+                          const PublicKey &pubkey,
+                          const typename ProofSystemType::primary_input_type &primary_input,
+                          const typename ProofSystemType::auxiliary_input_type &auxiliary_input,
+                          const ScalarValue &r) {
+
+                    return ProofSystemType::prove(pk, pubkey, primary_input, auxiliary_input, r);
                 }
             }    // namespace snark
         }        // namespace zk

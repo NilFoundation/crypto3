@@ -47,7 +47,7 @@ namespace nil {
                     typedef CurveType curve_type;
                     typedef Hash hash_type;
 
-                    typedef marshalling::curve_bincode<curve_type> bincode;
+                    typedef nil::marshalling::curve_bincode<curve_type> bincode;
 
                     std::vector<std::uint8_t> buffer;
                     ::nil::crypto3::accumulator_set<Hash> hasher_acc;
@@ -87,8 +87,9 @@ namespace nil {
                     }
 
                     template<typename GroupType>
-                    inline typename std::enable_if<std::is_same<typename curve_type::template g1_type<>, GroupType>::value ||
-                                                   std::is_same<typename curve_type::template g2_type<>, GroupType>::value>::type
+                    inline typename std::enable_if<
+                        std::is_same<typename curve_type::template g1_type<>, GroupType>::value ||
+                        std::is_same<typename curve_type::template g2_type<>, GroupType>::value>::type
                         write(const typename GroupType::value_type &x) {
                         buffer.resize(bincode::template get_element_size<GroupType>());
                         bincode::template point_to_bytes<GroupType>(x, buffer.begin(), buffer.end());

@@ -45,11 +45,12 @@
 #include <nil/crypto3/algebra/multiexp/policies.hpp>
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/proof.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/transcript.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/transcript.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/prover.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -180,14 +181,14 @@ namespace nil {
 
                     // f_v(X) - f_v(z) / (X - z)
                     std::vector<typename GroupType::curve_type::scalar_field_type::value_type> f_vX_sub_f_vZ;
-                    math::_polynomial_subtraction(f_vX_sub_f_vZ,
+                    math::polynomial::subtraction(f_vX_sub_f_vZ,
                                                   poly,
                                                   {{
                                                       eval_poly,
                                                   }});
                     std::vector<typename GroupType::curve_type::scalar_field_type::value_type> quotient_polynomial,
                         remainder_polynomial;
-                    math::_polynomial_division<typename GroupType::curve_type::scalar_field_type>(
+                    math::polynomial::division<typename GroupType::curve_type::scalar_field_type>(
                         quotient_polynomial, remainder_polynomial, f_vX_sub_f_vZ,
                         {{
                             neg_kzg_challenge,
@@ -226,8 +227,8 @@ namespace nil {
                     std::vector<typename CurveType::scalar_field_type::value_type> vkey_poly =
                         polynomial_coefficients_from_transcript<typename CurveType::scalar_field_type>(
                             transcript_first, transcript_last, CurveType::scalar_field_type::value_type::one());
-                    math::_condense(vkey_poly);
-                    BOOST_ASSERT(!math::_is_zero(vkey_poly));
+                    math::polynomial::condense(vkey_poly);
+                    BOOST_ASSERT(!math::polynomial::is_zero(vkey_poly));
 
                     typename CurveType::scalar_field_type::value_type vkey_poly_z =
                         polynomial_evaluation_product_form_from_transcript<typename CurveType::scalar_field_type>(
@@ -306,7 +307,8 @@ namespace nil {
 
                     // the values of vectors A and B rescaled at each step of the loop
                     // the values of vectors C and r rescaled at each step of the loop
-                    std::vector<typename CurveType::template g1_type<>::value_type> m_a {a_first, a_last}, m_c {c_first, c_last};
+                    std::vector<typename CurveType::template g1_type<>::value_type> m_a {a_first, a_last},
+                        m_c {c_first, c_last};
                     std::vector<typename CurveType::template g2_type<>::value_type> m_b {b_first, b_last};
                     std::vector<typename CurveType::scalar_field_type::value_type> m_r {r_first, r_last};
 
@@ -324,8 +326,8 @@ namespace nil {
                     std::vector<
                         std::pair<typename CurveType::gt_type::value_type, typename CurveType::gt_type::value_type>>
                         z_ab;
-                    std::vector<
-                        std::pair<typename CurveType::template g1_type<>::value_type, typename CurveType::template g1_type<>::value_type>>
+                    std::vector<std::pair<typename CurveType::template g1_type<>::value_type,
+                                          typename CurveType::template g1_type<>::value_type>>
                         z_c;
                     std::vector<typename CurveType::scalar_field_type::value_type> challenges, challenges_inv;
 
@@ -353,22 +355,22 @@ namespace nil {
 
                         // \prod e(A_right,B_left)
                         typename CurveType::gt_type::value_type zab_l = CurveType::gt_type::value_type::one();
-                        std::for_each(boost::make_zip_iterator(boost::make_tuple(m_a.begin() + split, m_b.begin())),
-                                      boost::make_zip_iterator(boost::make_tuple(m_a.end(), m_b.begin() + split)),
-                                      [&](const boost::tuple<const typename CurveType::template g1_type<>::value_type &,
-                                                             const typename CurveType::template g2_type<>::value_type &> &t) {
-                                          zab_l = zab_l *
-                                                  algebra::pair<CurveType>(t.template get<0>(), t.template get<1>());
-                                      });
+                        std::for_each(
+                            boost::make_zip_iterator(boost::make_tuple(m_a.begin() + split, m_b.begin())),
+                            boost::make_zip_iterator(boost::make_tuple(m_a.end(), m_b.begin() + split)),
+                            [&](const boost::tuple<const typename CurveType::template g1_type<>::value_type &,
+                                                   const typename CurveType::template g2_type<>::value_type &> &t) {
+                                zab_l = zab_l * algebra::pair<CurveType>(t.template get<0>(), t.template get<1>());
+                            });
                         zab_l = algebra::final_exponentiation<CurveType>(zab_l);
                         typename CurveType::gt_type::value_type zab_r = CurveType::gt_type::value_type::one();
-                        std::for_each(boost::make_zip_iterator(boost::make_tuple(m_a.begin(), m_b.begin() + split)),
-                                      boost::make_zip_iterator(boost::make_tuple(m_a.begin() + split, m_b.end())),
-                                      [&](const boost::tuple<const typename CurveType::template g1_type<>::value_type &,
-                                                             const typename CurveType::template g2_type<>::value_type &> &t) {
-                                          zab_r = zab_r *
-                                                  algebra::pair<CurveType>(t.template get<0>(), t.template get<1>());
-                                      });
+                        std::for_each(
+                            boost::make_zip_iterator(boost::make_tuple(m_a.begin(), m_b.begin() + split)),
+                            boost::make_zip_iterator(boost::make_tuple(m_a.begin() + split, m_b.end())),
+                            [&](const boost::tuple<const typename CurveType::template g1_type<>::value_type &,
+                                                   const typename CurveType::template g2_type<>::value_type &> &t) {
+                                zab_r = zab_r * algebra::pair<CurveType>(t.template get<0>(), t.template get<1>());
+                            });
                         zab_r = algebra::final_exponentiation<CurveType>(zab_r);
 
                         // MIPP part
@@ -575,13 +577,13 @@ namespace nil {
                     // compute A * B^r for the verifier
                     // auto ip_ab = algebra::pair<CurveType>(a, b_r);
                     typename CurveType::gt_type::value_type ip_ab = CurveType::gt_type::value_type::one();
-                    std::for_each(boost::make_zip_iterator(boost::make_tuple(a.begin(), b_r.begin())),
-                                  boost::make_zip_iterator(boost::make_tuple(a.end(), b_r.end())),
-                                  [&](const boost::tuple<const typename CurveType::template g1_type<>::value_type &,
-                                                         const typename CurveType::template g2_type<>::value_type &> &t) {
-                                      ip_ab =
-                                          ip_ab * algebra::pair<CurveType>(t.template get<0>(), t.template get<1>());
-                                  });
+                    std::for_each(
+                        boost::make_zip_iterator(boost::make_tuple(a.begin(), b_r.begin())),
+                        boost::make_zip_iterator(boost::make_tuple(a.end(), b_r.end())),
+                        [&](const boost::tuple<const typename CurveType::template g1_type<>::value_type &,
+                                               const typename CurveType::template g2_type<>::value_type &> &t) {
+                            ip_ab = ip_ab * algebra::pair<CurveType>(t.template get<0>(), t.template get<1>());
+                        });
                     ip_ab = algebra::final_exponentiation<CurveType>(ip_ab);
                     // compute C^r for the verifier
                     typename CurveType::template g1_type<>::value_type agg_c =
@@ -606,38 +608,36 @@ namespace nil {
                     return {com_ab, com_c, ip_ab, agg_c, proof};
                 }
 
-                template<typename CurveType, typename BasicProver>
-                class r1cs_gg_ppzksnark_aggregate_prover {
+                template<typename CurveType>
+                class r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Aggregate> {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
+                    typedef r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Basic> basic_prover;
+                    typedef typename basic_prover::proof_type basic_proof_type;
 
                 public:
-
-                    typedef BasicProver basic_prover;
-
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::proving_srs_type proving_srs_type;
                     typedef typename policy_type::proof_type proof_type;
-                    typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
 
                     // Aggregate prove
                     template<typename Hash, typename InputTranscriptIncludeIterator, typename InputProofIterator>
-                    static inline aggregate_proof_type process(const proving_srs_type &srs,
-                                                               InputTranscriptIncludeIterator transcript_include_first,
-                                                               InputTranscriptIncludeIterator transcript_include_last,
-                                                               InputProofIterator proofs_first,
-                                                               InputProofIterator proofs_last) {
+                    static inline proof_type process(const proving_srs_type &srs,
+                                                     InputTranscriptIncludeIterator transcript_include_first,
+                                                     InputTranscriptIncludeIterator transcript_include_last,
+                                                     InputProofIterator proofs_first,
+                                                     InputProofIterator proofs_last) {
                         return aggregate_proofs<CurveType, Hash>(srs, transcript_include_first, transcript_include_last,
                                                                  proofs_first, proofs_last);
                     }
 
                     // Basic prove
-                    static inline proof_type process(const proving_key_type &pk,
-                                                     const primary_input_type &primary_input,
-                                                     const auxiliary_input_type &auxiliary_input) {
+                    static inline basic_proof_type process(const proving_key_type &pk,
+                                                           const primary_input_type &primary_input,
+                                                           const auxiliary_input_type &auxiliary_input) {
 
-                        return BasicProver::process(pk, primary_input, auxiliary_input);
+                        return basic_prover::process(pk, primary_input, auxiliary_input);
                     }
                 };
             }    // namespace snark

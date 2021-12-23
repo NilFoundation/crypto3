@@ -37,12 +37,14 @@
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
+                class r1cs_gg_ppzksnark_prover;
 
                 /**
                  * A prover algorithm for the R1CS GG-ppzkSNARK.
@@ -53,7 +55,7 @@ namespace nil {
                  * Above, CS is the R1CS constraint system that was given as input to the generator algorithm.
                  */
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_prover {
+                class r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Basic> {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;

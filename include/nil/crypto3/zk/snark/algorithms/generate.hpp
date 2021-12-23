@@ -31,17 +31,16 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename ProofSystemType>
-                typename ProofSystemType::keypair_type
-                    generate(const typename ProofSystemType::constraint_system_type &constraint_system) {
+                template<typename ProofSystemType, typename KeyPairType = typename ProofSystemType::keypair_type>
+                KeyPairType generate(const typename ProofSystemType::constraint_system_type &constraint_system) {
 
-                    return ProofSystemType::generate(constraint_system);
+                    return ProofSystemType::template generate<KeyPairType>(constraint_system);
                 }
 
-                template<typename ProofSystemType>
-                typename ProofSystemType::keypair_type generate(const typename ProofSystemType::circuit_type &circuit) {
+                template<typename ProofSystemType, typename KeyPairType = typename ProofSystemType::keypair_type>
+                KeyPairType generate(const typename ProofSystemType::circuit_type &circuit) {
 
-                    return ProofSystemType::generate(circuit);
+                    return ProofSystemType::template generate<KeyPairType>(circuit);
                 }
 
                 template<typename ProofSystemType>

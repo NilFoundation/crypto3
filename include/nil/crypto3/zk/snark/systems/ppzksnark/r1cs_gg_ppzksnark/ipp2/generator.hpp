@@ -26,23 +26,23 @@
 #ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_IPP2_GENERATOR_HPP
 #define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_IPP2_GENERATOR_HPP
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/generator.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_aggregate_generator {
+                class r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Aggregate> {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
+                    typedef r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Basic> basic_generator;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::template g1_type<> g1_type;
                     typedef typename CurveType::template g2_type<> g2_type;
 
                 public:
-
                     typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
@@ -67,7 +67,8 @@ namespace nil {
                               L_query,
                               r1cs_copy,
                               alpha_g1_beta_g2,
-                              gamma_ABC_g1] = std::move(basic_process(constraint_system));
+                              gamma_ABC_g1,
+                              gamma_g1] = std::move(basic_generator::basic_process(constraint_system));
 
                         verification_key_type vk(alpha_g1, beta_g2, gamma_g2, delta_g2, gamma_ABC_g1);
 

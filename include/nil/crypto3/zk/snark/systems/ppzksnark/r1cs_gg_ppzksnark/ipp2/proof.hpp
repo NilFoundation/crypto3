@@ -31,8 +31,9 @@
 #include <tuple>
 #include <cmath>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -59,8 +60,8 @@ namespace nil {
                     std::vector<
                         std::pair<typename curve_type::gt_type::value_type, typename curve_type::gt_type::value_type>>
                         z_ab;
-                    std::vector<
-                        std::pair<typename curve_type::template g1_type<>::value_type, typename curve_type::template g1_type<>::value_type>>
+                    std::vector<std::pair<typename curve_type::template g1_type<>::value_type,
+                                          typename curve_type::template g1_type<>::value_type>>
                         z_c;
                     typename curve_type::template g1_type<>::value_type final_a;
                     typename curve_type::template g2_type<>::value_type final_b;
@@ -68,9 +69,11 @@ namespace nil {
 
                     /// final commitment keys $v$ and $w$ - there is only one element at the
                     /// end for v1 and v2 hence it's a tuple.
-                    std::pair<typename curve_type::template g2_type<>::value_type, typename curve_type::template g2_type<>::value_type>
+                    std::pair<typename curve_type::template g2_type<>::value_type,
+                              typename curve_type::template g2_type<>::value_type>
                         final_vkey;
-                    std::pair<typename curve_type::template g1_type<>::value_type, typename curve_type::template g1_type<>::value_type>
+                    std::pair<typename curve_type::template g1_type<>::value_type,
+                              typename curve_type::template g1_type<>::value_type>
                         final_wkey;
 
                     static std::size_t log_proofs(std::size_t nproofs) {
@@ -108,7 +111,8 @@ namespace nil {
                     bool is_valid() const {
                         // 1. Check length of the proofs
                         if (tmipp.gipa.nproofs < 2 ||
-                            tmipp.gipa.nproofs > r1cs_gg_pp_zksnark_aggregate_srs<curve_type>::MAX_SRS_SIZE) {
+                            tmipp.gipa.nproofs >
+                                r1cs_gg_ppzksnark_aggregate_srs<curve_type>::MAX_SRS_SIZE) {
                             return false;
                         }
                         // 2. Check if it's a power of two
