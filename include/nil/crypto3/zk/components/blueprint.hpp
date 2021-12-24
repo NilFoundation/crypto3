@@ -34,6 +34,7 @@
 #include <vector>
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 
 #include <nil/crypto3/zk/components/blueprint_variable.hpp>
 #include <nil/crypto3/zk/components/blueprint_linear_combination.hpp>
@@ -43,22 +44,26 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TArithmetization, typename TBlueprintField>
+                template<typename TArithmetization>
                 class blueprint;
 
                 template<typename TBlueprintField>
-                class blueprint<snark::r1cs_constraint_system<TBlueprintField>, TBlueprintField> {
+                class blueprint<snark::r1cs_constraint_system<TBlueprintField>> {
+                    typedef snark::r1cs_constraint_system<TBlueprintField> TArithmetization;
+
                     snark::r1cs_variable_assignment<TBlueprintField> values; /* values[0] will hold the value of the first
                                                                 allocated variable of the blueprint, *NOT* constant 1 */
                     typename TBlueprintField::value_type constant_term;
 
                     typename snark::variable<TBlueprintField>::index_type next_free_var;
-                    typename blueprint_linear_combination<TBlueprintField>::index_type next_free_lc;
+                    typename blueprint_linear_combination<TArithmetization>::index_type next_free_lc;
                     std::vector<typename TBlueprintField::value_type> lc_values;
                     snark::r1cs_constraint_system<TBlueprintField> constraint_system;
 
                 public:
                     // typedef TBlueprintField field_type;
+
+                    using value_type = blueprint_variable<TArithmetization>;
 
                     blueprint() {
                         constant_term = TBlueprintField::value_type::one();
@@ -71,28 +76,28 @@ namespace nil {
                         std::fill(values.begin(), values.end(), TBlueprintField::value_type::zero());
                     }
 
-                    typename TBlueprintField::value_type &val(const blueprint_variable<TBlueprintField> &var) {
+                    typename TBlueprintField::value_type &val(const value_type &var) {
                         assert(var.index <= values.size());
                         return (var.index == 0 ? constant_term : values[var.index - 1]);
                     }
 
-                    typename TBlueprintField::value_type val(const blueprint_variable<TBlueprintField> &var) const {
+                    typename TBlueprintField::value_type val(const value_type &var) const {
                         assert(var.index <= values.size());
                         return (var.index == 0 ? constant_term : values[var.index - 1]);
                     }
 
-                    typename TBlueprintField::value_type &lc_val(const blueprint_linear_combination<TBlueprintField> &lc) {
+                    typename TBlueprintField::value_type &lc_val(const blueprint_linear_combination<TArithmetization> &lc) {
                         if (lc.is_variable) {
-                            return this->val(blueprint_variable<TBlueprintField>(lc.index));
+                            return this->val(value_type(lc.index));
                         } else {
                             assert(lc.index < lc_values.size());
                             return lc_values[lc.index];
                         }
                     }
 
-                    typename TBlueprintField::value_type lc_val(const blueprint_linear_combination<TBlueprintField> &lc) const {
+                    typename TBlueprintField::value_type lc_val(const blueprint_linear_combination<TArithmetization> &lc) const {
                         if (lc.is_variable) {
-                            return this->val(blueprint_variable<TBlueprintField>(lc.index));
+                            return this->val(value_type(lc.index));
                         } else {
                             assert(lc.index < lc_values.size());
                             return lc_values[lc.index];
@@ -141,8 +146,8 @@ namespace nil {
                         return constraint_system;
                     }
 
-                    friend class blueprint_variable<TBlueprintField>;
-                    friend class blueprint_linear_combination<TBlueprintField>;
+                    friend class blueprint_variable<TArithmetization>;
+                    friend class blueprint_linear_combination<TArithmetization>;
 
                 private:
                     typename snark::variable<TBlueprintField>::index_type allocate_var_index() {
@@ -151,22 +156,24 @@ namespace nil {
                         return next_free_var++;
                     }
 
-                    typename blueprint_linear_combination<TBlueprintField>::index_type allocate_lc_index() {
+                    typename blueprint_linear_combination<TArithmetization>::index_type allocate_lc_index() {
                         lc_values.emplace_back(TBlueprintField::value_type::zero());
                         return next_free_lc++;
                     }
                 };
 
                 template<typename TBlueprintField, std::size_t WiresAmount>
-                class blueprint <snark::plonk_constraint_system<TBlueprintField, WiresAmount>, TBlueprintField>{
+                class blueprint <snark::plonk_constraint_system<TBlueprintField, WiresAmount>>{
+
+                    typedef snark::plonk_constraint_system<TBlueprintField, WiresAmount> TArithmetization;
+
                     snark::plonk_variable_assignment<TBlueprintField, WiresAmount> assignments;
 
-                    snark::plonk_constraint_system<TBlueprintField, WiresAmount> constraint_system;
+                    TArithmetization constraint_system;
 
                 public:
 
-                    using value_type = blueprint_variable<TBlueprintField, 
-                        snark::plonk_constraint_system<TBlueprintField, WiresAmount>>;
+                    using value_type = blueprint_variable<TArithmetization>;
 
                     blueprint(){}
                     
@@ -186,6 +193,7 @@ namespace nil {
                         assert(var.index <= assignments.size());
                         assert(row_index < assignments[var.index].size());
                         return (assignments[var.index][row_index]);
+                    }
                     
 
                     void add_gate(const snark::plonk_constraint<TBlueprintField> &constr) {
@@ -204,11 +212,11 @@ namespace nil {
                         return WiresAmount;
                     }
 
-                    snark::plonk_variable_assignment<TBlueprintField> full_variable_assignment() const {
+                    snark::plonk_variable_assignment<TBlueprintField, WiresAmount> full_variable_assignment() const {
                         return assignments;
                     }
 
-                    snark::plonk_constraint_system<TBlueprintField> get_constraint_system() const {
+                    TArithmetization get_constraint_system() const {
                         return constraint_system;
                     }
 
