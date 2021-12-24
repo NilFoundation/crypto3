@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_FRI_COMMITMENT_SCHEME_HPP
-#define CRYPTO3_ZK_FRI_COMMITMENT_SCHEME_HPP
+#ifndef CRYPTO3_ZK_LIST_POLYNOMIAL_COMMITMENT_SCHEME_HPP
+#define CRYPTO3_ZK_LIST_POLYNOMIAL_COMMITMENT_SCHEME_HPP
 
 #include <nil/crypto3/math/polynomial/polynom.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
@@ -301,4 +301,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_FRI_COMMITMENT_SCHEME_HPP
+#endif    // CRYPTO3_ZK_LIST_POLYNOMIAL_COMMITMENT_SCHEME_HPP

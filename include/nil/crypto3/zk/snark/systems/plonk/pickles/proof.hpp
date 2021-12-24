@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -29,47 +30,54 @@
 #include <tuple>
 #include <vector>
 
+#include <nil/crypto3/zk/snark/commitments/pickles.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename CurveType>
-                struct LookupCommitments {
-                    std::vector<PolyComm<CurveType>> sorted;
-                    PolyComm<CurveType> aggreg;
-                };
 
-                template<typename CurveType>
-                struct ProverCommitments {
-                    // polynomial commitments
-                    std::array<PolyComm<CurveType>, COLUMNS> w_comm;
-                    PolyComm<CurveType> z_comm;
-                    PolyComm<CurveType> t_comm;
-                    LookupCommitments<CurveType> lookup;
-                }
+                template<typename CurveType, std::size_t WiresAmount, std::size_t LRRounds>
+                class ProverProof {
+                    typedef pickles_commitment_scheme<CurveType> commitment_scheme;
+                public:
 
-                template<typename CurveType>
-                struct ProverProof {
-                    typedef typename CurveType::scalar_group_type scalar_group_type;
-                    // polynomial commitments
-                    ProverCommitments<CurveType> commitments;
+                    // Commitments:
+                    std::array<typename commitment_scheme::commitment_type, WiresAmount + 1> w_comm;
 
-                    // batched commitment opening proof
-                    OpeningProof<CurveType> proof;
+                    typename commitment_scheme::commitment_type z_comm;
 
-                    // polynomial evaluations
-                    // TODO(mimoo): that really should be a type Evals { z: PE, zw: PE }
-                    std::array<ProofEvaluations<std::vector<typename scalar_group_type::value_type>>, 2> evals;
+                    // N_perm
+                    std::vector<typename commitment_scheme::commitment_type> t_comm;
 
-                    typename scalar_group_type::value_type ft_eval1;
+                    // Evaluations:
+                    std::array<typename commitment_scheme::evaluation_type, WiresAmount + 1> w_zeta;
+                    std::array<typename commitment_scheme::evaluation_type, WiresAmount + 1> w_zeta_omega;
 
-                    // public part of the witness
-                    std::vector<typename scalar_group_type::value_type> pub;
+                    typename commitment_scheme::evaluation_type z_zeta;
+                    typename commitment_scheme::evaluation_type z_zeta_omega;
 
-                    // The challenges underlying the optional polynomials folded into the proof
-                    std::vector<std::tuple<std::vector<typename scalar_group_type::value_type>, PolyComm<CurveType>>>
+                    // N_perm + 1
+                    std::vector<typename commitment_scheme::commitment_type> S_sigma_zeta;
+                    // N_perm + 1
+                    std::vector<typename commitment_scheme::commitment_type> S_sigma_zeta_omega;
+
+                    typename commitment_scheme::evaluation_type L_zeta_omega;
+
+                    // Opening proof
+                    std::array<typename CurveType::value_type, LRRounds> L;
+                    std::array<typename CurveType::value_type, LRRounds> R;
+
+                    typename CurveType::value_type sigma;
+                    typename CurveType::value_type G;
+
+                    typename CurveType::scalar_field_type::value_type z1,z2;
+
+                    // Previous challenges
+                    std::vector<std::tuple<std::vector<typename scalar_group_type::value_type>, 
+                        typename commitment_scheme::commitment_type>>
                         prev_challenges;
-                }
+                };
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
