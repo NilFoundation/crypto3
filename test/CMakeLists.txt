@@ -53,6 +53,10 @@ macro(define_blueprint_test test)
     endif()
 endmacro()
 
+set(BLUEPRINT_TESTS_FILES
+    "blueprint/plonk"
+    )
+
 set(PLONK_TESTS_FILES
     "algebra/plonk/fixed_base_scalar_mul_5_wires"
     )
@@ -99,7 +103,8 @@ SET(ALGEBRA_TESTS_FILES
     ${FIELDS_TESTS_FILES}
     ${PAIRING_TESTS_FILES})
 
-SET(ALL_TESTS_FILES 
+SET(ALL_TESTS_FILES
+    ${BLUEPRINT_TESTS_FILES}
     ${PLONK_TESTS_FILES}
     ${ALGEBRA_TESTS_FILES}
     ${HASHES_TESTS_FILES}
