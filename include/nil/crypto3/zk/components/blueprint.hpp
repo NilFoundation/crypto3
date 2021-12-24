@@ -195,6 +195,12 @@ namespace nil {
                         return (assignments[var.index][row_index]);
                     }
                     
+                    std::size_t allocate_rows(std::size_t required_amount = 1){
+                        static std::size_t next_row = 0;
+                        std::size_t result = next_row;
+                        next_row += required_amount;
+                        return result;
+                    }
 
                     void add_gate(const snark::plonk_constraint<TBlueprintField> &constr) {
                         constraint_system.constraints.emplace_back(constr);

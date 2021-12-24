@@ -27,26 +27,35 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <nil/crypto3/algebra/curves/mnt4.hpp>
-#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
-#include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
-#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
-#include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
-#include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
-#include <nil/crypto3/algebra/curves/mnt6.hpp>
-#include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
-#include <nil/crypto3/algebra/fields/mnt6/scalar_field.hpp>
-#include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
-#include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
-#include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/bls12.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
 
+#include <nil/crypto3/zk/components/blueprint.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/plonk/fixed_base_scalar_mul_5_wires.hpp>
+
+using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(fixed_base_scalar_mul_5_wires_test_suite)
 
 BOOST_AUTO_TEST_CASE(fixed_base_scalar_mul_5_wires_test_case) {
 
-    
+	using curve_type = algebra::curves::bls12<381>;
+	using TBlueprintField = typename curve_type::base_field_type;
+	constexpr std::size_t WiresAmount = 5;
+	constexpr typename curve_type::template g1_type<>::value_type B = curve_type::template g1_type<>::value_type::one();
+	using TArithmetization = zk::snark::plonk_constraint_system<TBlueprintField, WiresAmount>;
+
+	zk::components::blueprint<TArithmetization> bp;
+
+	BOOST_CHECK_EQUAL(0, bp.allocate_rows());
+	BOOST_CHECK_EQUAL(1, bp.allocate_rows(5));
+	BOOST_CHECK_EQUAL(6, bp.allocate_rows());
+
+	using component_type = zk::components::element_g1_fixed_base_scalar_mul<curve_type, TArithmetization>;
+
+	component_type scalar_mul_component(bp, B);
 
 }
 
