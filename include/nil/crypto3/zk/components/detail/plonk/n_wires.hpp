@@ -53,90 +53,72 @@ namespace nil {
 
                         typedef snark::plonk_constraint_system<TBlueprintField, WiresAmount> TArithmetization;
                         typedef blueprint<TArithmetization> blueprint_type;
-                    protected:
+                    public:
 
                         n_wires_helper(const blueprint_type &bp):component<TArithmetization>(bp){}
 
-
-                        constexpr static const typename blueprint_type::value_type w_o_jm2 = 
-                            typename blueprint_type::value_type (W0, 
-                            blueprint_type::value_type::rotation_type::pre_previous);
-                        constexpr static const typename blueprint_type::value_type w_1_jm2 = 
-                            typename blueprint_type::value_type(W1, 
-                            blueprint_type::value_type::rotation_type::pre_previous);
-                        constexpr static const typename blueprint_type::value_type w_2_jm2 = 
-                            typename blueprint_type::value_type(W2, 
-                            blueprint_type::value_type::rotation_type::pre_previous);
-                        constexpr static const typename blueprint_type::value_type w_3_jm2 = 
-                            typename blueprint_type::value_type(W3, 
-                            blueprint_type::value_type::rotation_type::pre_previous);
-                        constexpr static const typename blueprint_type::value_type w_4_jm2 = 
-                            typename blueprint_type::value_type(W4, 
-                            blueprint_type::value_type::rotation_type::pre_previous);
-
-                        constexpr static const typename blueprint_type::value_type w_o_jm1 = 
-                            typename blueprint_type::value_type(W0, 
-                            blueprint_type::value_type::rotation_type::previous);
-                        constexpr static const typename blueprint_type::value_type w_1_jm1 = 
-                            typename blueprint_type::value_type(W1, 
-                            blueprint_type::value_type::rotation_type::previous);
-                        constexpr static const typename blueprint_type::value_type w_2_jm1 = 
-                            typename blueprint_type::value_type(W2, 
-                            blueprint_type::value_type::rotation_type::previous);
-                        constexpr static const typename blueprint_type::value_type w_3_jm1 = 
-                            typename blueprint_type::value_type(W3, 
-                            blueprint_type::value_type::rotation_type::previous);
-                        constexpr static const typename blueprint_type::value_type w_4_jm1 = 
-                            typename blueprint_type::value_type(W4, 
-                            blueprint_type::value_type::rotation_type::previous);
-
-                        constexpr static const typename blueprint_type::value_type w_o_j = 
-                            typename blueprint_type::value_type(W0, 
-                            blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type w_1_j = 
-                            typename blueprint_type::value_type(W1, 
-                            blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type w_2_j = 
-                            typename blueprint_type::value_type(W2, 
-                            blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type w_3_j = 
-                            typename blueprint_type::value_type(W3, 
-                            blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type w_4_j = 
-                            typename blueprint_type::value_type(W4, 
-                            blueprint_type::value_type::rotation_type::current);
-
-                        constexpr static const typename blueprint_type::value_type w_o_jp1 = 
-                            typename blueprint_type::value_type(W0, 
-                            blueprint_type::value_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::value_type w_1_jp1 = 
-                            typename blueprint_type::value_type(W1, 
-                            blueprint_type::value_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::value_type w_2_jp1 = 
-                            typename blueprint_type::value_type(W2, 
-                            blueprint_type::value_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::value_type w_3_jp1 = 
-                            typename blueprint_type::value_type(W3, 
-                            blueprint_type::value_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::value_type w_4_jp1 = 
-                            typename blueprint_type::value_type(W4, 
-                            blueprint_type::value_type::rotation_type::next);
-
-                        constexpr static const typename blueprint_type::value_type w_o_jp2 = 
-                            typename blueprint_type::value_type(W0, 
-                            blueprint_type::value_type::rotation_type::after_next);
-                        constexpr static const typename blueprint_type::value_type w_1_jp2 = 
-                            typename blueprint_type::value_type(W1, 
-                            blueprint_type::value_type::rotation_type::after_next);
-                        constexpr static const typename blueprint_type::value_type w_2_jp2 = 
-                            typename blueprint_type::value_type(W2, 
-                            blueprint_type::value_type::rotation_type::after_next);
-                        constexpr static const typename blueprint_type::value_type w_3_jp2 = 
-                            typename blueprint_type::value_type(W3, 
-                            blueprint_type::value_type::rotation_type::after_next);
-                        constexpr static const typename blueprint_type::value_type w_4_jp2 = 
-                            typename blueprint_type::value_type(W4, 
-                            blueprint_type::value_type::rotation_type::after_next);
+                        constexpr static const std::array<std::array<typename blueprint_type::value_type, 5>,5> w = {{
+                            {{
+                                typename blueprint_type::value_type (W0, 
+                                blueprint_type::value_type::rotation_type::pre_previous),
+                                typename blueprint_type::value_type(W0, 
+                                blueprint_type::value_type::rotation_type::previous),
+                                typename blueprint_type::value_type(W0, 
+                                blueprint_type::value_type::rotation_type::current),
+                                typename blueprint_type::value_type(W0, 
+                                blueprint_type::value_type::rotation_type::next),
+                                typename blueprint_type::value_type(W0, 
+                                blueprint_type::value_type::rotation_type::after_next)
+                            }},
+                            {{
+                                typename blueprint_type::value_type (W1, 
+                                blueprint_type::value_type::rotation_type::pre_previous),
+                                typename blueprint_type::value_type(W1, 
+                                blueprint_type::value_type::rotation_type::previous),
+                                typename blueprint_type::value_type(W1, 
+                                blueprint_type::value_type::rotation_type::current),
+                                typename blueprint_type::value_type(W1, 
+                                blueprint_type::value_type::rotation_type::next),
+                                typename blueprint_type::value_type(W1, 
+                                blueprint_type::value_type::rotation_type::after_next)
+                            }},
+                            {{
+                                typename blueprint_type::value_type (W2, 
+                                blueprint_type::value_type::rotation_type::pre_previous),
+                                typename blueprint_type::value_type(W2, 
+                                blueprint_type::value_type::rotation_type::previous),
+                                typename blueprint_type::value_type(W2, 
+                                blueprint_type::value_type::rotation_type::current),
+                                typename blueprint_type::value_type(W2, 
+                                blueprint_type::value_type::rotation_type::next),
+                                typename blueprint_type::value_type(W2, 
+                                blueprint_type::value_type::rotation_type::after_next)
+                            }},
+                            {{
+                                typename blueprint_type::value_type (W3, 
+                                blueprint_type::value_type::rotation_type::pre_previous),
+                                typename blueprint_type::value_type(W3, 
+                                blueprint_type::value_type::rotation_type::previous),
+                                typename blueprint_type::value_type(W3, 
+                                blueprint_type::value_type::rotation_type::current),
+                                typename blueprint_type::value_type(W3, 
+                                blueprint_type::value_type::rotation_type::next),
+                                typename blueprint_type::value_type(W3, 
+                                blueprint_type::value_type::rotation_type::after_next)
+                            }},
+                            {{
+                                typename blueprint_type::value_type (W4, 
+                                blueprint_type::value_type::rotation_type::pre_previous),
+                                typename blueprint_type::value_type(W4, 
+                                blueprint_type::value_type::rotation_type::previous),
+                                typename blueprint_type::value_type(W4, 
+                                blueprint_type::value_type::rotation_type::current),
+                                typename blueprint_type::value_type(W4, 
+                                blueprint_type::value_type::rotation_type::next),
+                                typename blueprint_type::value_type(W4, 
+                                blueprint_type::value_type::rotation_type::after_next)
+                            }}
+                        }};
                     };
 
                 }    // namespace detail

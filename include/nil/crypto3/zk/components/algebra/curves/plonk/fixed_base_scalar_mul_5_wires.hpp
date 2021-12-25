@@ -64,8 +64,17 @@ namespace nil {
                     std::size_t j;
                     typename CurveType::template g1_type<>::value_type B;
 
-                    using w = detail::n_wires_helper<
+                    using n_wires_helper = detail::n_wires_helper<
                         snark::plonk_constraint_system<TBlueprintField, WiresAmount>, W0, W1, W2, W3, W4>;
+
+                    using n_wires_helper::w;
+                    enum indices{
+                        m2 = 0,
+                        m1,
+                        cur,
+                        p1,
+                        p2
+                    };
 
                 public:
 
@@ -144,21 +153,21 @@ namespace nil {
                 public:
                     void generate_gates() {
 
-                        this->bp.add_gate({j, j+2}, w::w_1_j * (w::w_1_j - 1));
-                        this->bp.add_gate({j, j+2}, w::w_2_j * (w::w_2_j - 1));
-                        this->bp.add_gate({j, j+1, j+3}, w::w_3_j * (w::w_3_j - 1));
-                        this->bp.add_gate({j+2, j+3}, w::w_4_j * (w::w_4_j - 1));
+                        this->bp.add_gate({j, j+2}, w[1][cur] * (w[1][cur] - 1));
+                        this->bp.add_gate({j, j+2}, w[2][cur] * (w[2][cur] - 1));
+                        this->bp.add_gate({j, j+1, j+3}, w[3][cur] * (w[3][cur] - 1));
+                        this->bp.add_gate({j+2, j+3}, w[4][cur] * (w[4][cur] - 1));
 
                         // j=0
-                        this->bp.add_gate(j, w::w_o_j - (w::w_1_j*4 + w::w_2_j*2 + w::w_3_j));
+                        this->bp.add_gate(j, w[0][cur] - (w[1][cur]*4 + w[2][cur]*2 + w[3][cur]));
 
-                        generate_phi3_gate(j, w::w_1_jp1, w::w_2_jp1, w::w_4_j, w::w_o_jp1, w::w_4_jp1, w::w_3_jp2);
-                        generate_phi4_gate(j, w::w_1_jp1, w::w_2_jp1, w::w_4_j, w::w_o_jp1, w::w_4_jp1, w::w_3_jp2);
+                        generate_phi3_gate(j, w[1][p1], w[2][p1], w[4][cur], w[0][p1], w[4][p1], w[3][p2]);
+                        generate_phi4_gate(j, w[1][p1], w[2][p1], w[4][cur], w[0][p1], w[4][p1], w[3][p2]);
 
                         // j+z, z=0 mod 5, z!=0
                         for (std::size_t z = 5; z <= 84; z+=5){
 
-                            this->bp.add_gate(j + z, w::w_o_j - (w::w_1_j*4 + w::w_2_j*2 + w::w_3_j + w::w_o_jm1 * 8));
+                            this->bp.add_gate(j + z, w[0][cur] - (w[1][cur]*4 + w[2][cur]*2 + w[3][cur] + w[0][m1] * 8));
 
                             std::array<typename CurveType::base_field_type::value_type, 7> u;
                             std::array<typename CurveType::base_field_type::value_type, 7> v;
@@ -168,16 +177,16 @@ namespace nil {
                                 v[i] = omega.Y;
                             }
 
-                            generate_phi1_gate(j+z, w::w_1_j, w::w_2_j, w::w_3_j, w::w_4_j, u);
-                            generate_phi2_gate(j+z, w::w_1_j, w::w_2_j, w::w_3_j, w::w_4_jp1, v);
-                            generate_phi3_gate(j+z, w::w_1_jp1, w::w_2_jp1, w::w_1_jm1, w::w_2_jm1, w::w_4_jp1, w::w_3_jp2);
-                            generate_phi4_gate(j+z, w::w_1_jp1, w::w_2_jp1, w::w_1_jm1, w::w_2_jm1, w::w_4_jp1, w::w_3_jp2);
+                            generate_phi1_gate(j+z, w[1][cur], w[2][cur], w[3][cur], w[4][cur], u);
+                            generate_phi2_gate(j+z, w[1][cur], w[2][cur], w[3][cur], w[4][p1], v);
+                            generate_phi3_gate(j+z, w[1][p1], w[2][p1], w[1][m1], w[2][m1], w[4][p1], w[3][p2]);
+                            generate_phi4_gate(j+z, w[1][p1], w[2][p1], w[1][m1], w[2][m1], w[4][p1], w[3][p2]);
                         }
 
                         // j+z, z=2 mod 5
                         for (std::size_t z = 2; z <= 84; z+=5){
 
-                            this->bp.add_gate(j + z, w::w_o_j - (w::w_1_j*4 + w::w_2_j*2 + w::w_3_jm1 + w::w_o_jm2 * 8));
+                            this->bp.add_gate(j + z, w[0][cur] - (w[1][cur]*4 + w[2][cur]*2 + w[3][m1] + w[0][m2] * 8));
 
                             std::array<typename CurveType::base_field_type::value_type, 7> u;
                             std::array<typename CurveType::base_field_type::value_type, 7> v;
@@ -187,10 +196,10 @@ namespace nil {
                                 v[i] = omega.Y;
                             }
 
-                            generate_phi1_gate(j+z, w::w_1_j, w::w_2_j, w::w_3_jm1, w::w_4_jm1, u);
-                            generate_phi2_gate(j+z, w::w_1_j, w::w_2_j, w::w_3_jm1, w::w_4_j, v);
-                            generate_phi3_gate(j+z, w::w_1_jp1, w::w_2_jp1, w::w_1_jm1, w::w_2_jm1, w::w_o_jp1, w::w_3_jp2);
-                            generate_phi4_gate(j+z, w::w_1_jp1, w::w_2_jp1, w::w_1_jm1, w::w_2_jm1, w::w_o_jp1, w::w_3_jp2);
+                            generate_phi1_gate(j+z, w[1][cur], w[2][cur], w[3][m1], w[4][m1], u);
+                            generate_phi2_gate(j+z, w[1][cur], w[2][cur], w[3][m1], w[4][cur], v);
+                            generate_phi3_gate(j+z, w[1][p1], w[2][p1], w[1][m1], w[2][m1], w[0][p1], w[3][p2]);
+                            generate_phi4_gate(j+z, w[1][p1], w[2][p1], w[1][m1], w[2][m1], w[0][p1], w[3][p2]);
                         }
 
                         // j+z, z=3 mod 5
@@ -204,17 +213,17 @@ namespace nil {
                                 v[i] = omega.Y;
                             }
 
-                            generate_phi1_gate(j+z, w::w_4_jm1, w::w_3_j, w::w_4_j, w::w_o_j, u);
-                            generate_phi2_gate(j+z, w::w_4_jm1, w::w_3_j, w::w_4_j, w::w_o_jp1, v);
+                            generate_phi1_gate(j+z, w[4][m1], w[3][cur], w[4][cur], w[0][cur], u);
+                            generate_phi2_gate(j+z, w[4][m1], w[3][cur], w[4][cur], w[0][p1], v);
                         }
 
                         // j+z, z=4 mod 5
                         for (std::size_t z = 4; z <= 84; z+=5){
 
-                            this->bp.add_gate(j + z - 1, w::w_o_jp1 - (w::w_4_jm1*4 + w::w_3_jm2*2 + w::w_4_jm2 + w::w_o_jm1 * 8));
+                            this->bp.add_gate(j + z - 1, w[0][p1] - (w[4][m1]*4 + w[3][m2]*2 + w[4][m2] + w[0][m1] * 8));
 
-                            generate_phi3_gate(j+z, w::w_1_jm2, w::w_2_j, w::w_1_jm1, w::w_2_jm1, w::w_4_jp1, w::w_o_jp2);
-                            generate_phi4_gate(j+z, w::w_1_jm2, w::w_2_j, w::w_1_jm1, w::w_2_jm1, w::w_4_jp1, w::w_o_jp2);
+                            generate_phi3_gate(j+z, w[1][m2], w[2][cur], w[1][m1], w[2][m1], w[4][p1], w[0][p2]);
+                            generate_phi4_gate(j+z, w[1][m2], w[2][cur], w[1][m1], w[2][m1], w[4][p1], w[0][p2]);
                         }
                     }
 
