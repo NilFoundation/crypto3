@@ -53,6 +53,12 @@ BOOST_AUTO_TEST_CASE(fixed_base_scalar_mul_5_wires_test_case) {
 
 	component_type scalar_mul_component(bp, B);
 
+	scalar_mul_component.generate_gates();
+
+	typename curve_type::scalar_field_type::value_type a = curve_type::scalar_field_type::value_type::one();
+	typename curve_type::template g1_type<>::value_type P = curve_type::template g1_type<>::value_type::one();
+
+	scalar_mul_component.generate_assignments(a, P);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

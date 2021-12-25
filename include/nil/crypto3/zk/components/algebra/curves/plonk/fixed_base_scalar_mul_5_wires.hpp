@@ -36,6 +36,7 @@
 
 #include <nil/crypto3/zk/components/blueprint.hpp>
 #include <nil/crypto3/zk/components/component.hpp>
+#include <nil/crypto3/zk/components/detail/plonk/n_wires.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -54,18 +55,23 @@ namespace nil {
                 class element_g1_fixed_base_scalar_mul<
                     CurveType, snark::plonk_constraint_system<TBlueprintField, WiresAmount>, 
                     W0, W1, W2, W3, W4> : 
-                    public component<snark::plonk_constraint_system<TBlueprintField, WiresAmount>> {
+                    public detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, WiresAmount>, W0, W1, W2, W3, W4> {
+
                     typedef snark::plonk_constraint_system<TBlueprintField, WiresAmount> TArithmetization;
 
                     typedef blueprint<TArithmetization> blueprint_type;
 
                     std::size_t j;
                     typename CurveType::template g1_type<>::value_type B;
+
+                    using w = detail::n_wires_helper<
+                        snark::plonk_constraint_system<TBlueprintField, WiresAmount>, W0, W1, W2, W3, W4>;
+
                 public:
 
                     element_g1_fixed_base_scalar_mul(blueprint_type &bp, 
                         typename CurveType::template g1_type<>::value_type B) :
-                        component<TArithmetization>(bp), B(B){
+                        detail::n_wires_helper<TArithmetization, W0, W1, W2, W3, W4>(bp), B(B){
 
                         j = this->bp.allocate_rows(85);
                     }
@@ -138,76 +144,21 @@ namespace nil {
                 public:
                     void generate_gates() {
 
-                        constexpr static const typename blueprint_type::value_type w_o_jm2(W0, 
-                            blueprint_type::value_type::rotation_type::pre_previous);
-                        constexpr static const typename blueprint_type::value_type w_1_jm2(W1, 
-                            blueprint_type::value_type::rotation_type::pre_previous);
-                        constexpr static const typename blueprint_type::value_type w_2_jm2(W2, 
-                            blueprint_type::value_type::rotation_type::pre_previous);
-                        constexpr static const typename blueprint_type::value_type w_3_jm2(W3, 
-                            blueprint_type::value_type::rotation_type::pre_previous);
-                        constexpr static const typename blueprint_type::value_type w_4_jm2(W4, 
-                            blueprint_type::value_type::rotation_type::pre_previous);
-
-                        constexpr static const typename blueprint_type::value_type w_o_jm1(W0, 
-                            blueprint_type::value_type::rotation_type::previous);
-                        constexpr static const typename blueprint_type::value_type w_1_jm1(W1, 
-                            blueprint_type::value_type::rotation_type::previous);
-                        constexpr static const typename blueprint_type::value_type w_2_jm1(W2, 
-                            blueprint_type::value_type::rotation_type::previous);
-                        constexpr static const typename blueprint_type::value_type w_3_jm1(W3, 
-                            blueprint_type::value_type::rotation_type::previous);
-                        constexpr static const typename blueprint_type::value_type w_4_jm1(W4, 
-                            blueprint_type::value_type::rotation_type::previous);
-
-                        constexpr static const typename blueprint_type::value_type w_o_j(W0, 
-                            blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type w_1_j(W1, 
-                            blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type w_2_j(W2, 
-                            blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type w_3_j(W3, 
-                            blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type w_4_j(W4, 
-                            blueprint_type::value_type::rotation_type::current);
-
-                        constexpr static const typename blueprint_type::value_type w_o_jp1(W0, 
-                            blueprint_type::value_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::value_type w_1_jp1(W1, 
-                            blueprint_type::value_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::value_type w_2_jp1(W2, 
-                            blueprint_type::value_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::value_type w_3_jp1(W3, 
-                            blueprint_type::value_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::value_type w_4_jp1(W4, 
-                            blueprint_type::value_type::rotation_type::next);
-
-                        constexpr static const typename blueprint_type::value_type w_o_jp2(W0, 
-                            blueprint_type::value_type::rotation_type::after_next);
-                        constexpr static const typename blueprint_type::value_type w_1_jp2(W1, 
-                            blueprint_type::value_type::rotation_type::after_next);
-                        constexpr static const typename blueprint_type::value_type w_2_jp2(W2, 
-                            blueprint_type::value_type::rotation_type::after_next);
-                        constexpr static const typename blueprint_type::value_type w_3_jp2(W3, 
-                            blueprint_type::value_type::rotation_type::after_next);
-                        constexpr static const typename blueprint_type::value_type w_4_jp2(W4, 
-                            blueprint_type::value_type::rotation_type::after_next);
-
-                        this->bp.add_gate({j, j+2}, w_1_j * (w_1_j - 1));
-                        this->bp.add_gate({j, j+2}, w_2_j * (w_2_j - 1));
-                        this->bp.add_gate({j, j+1, j+3}, w_3_j * (w_3_j - 1));
-                        this->bp.add_gate({j+2, j+3}, w_4_j * (w_4_j - 1));
+                        this->bp.add_gate({j, j+2}, w::w_1_j * (w::w_1_j - 1));
+                        this->bp.add_gate({j, j+2}, w::w_2_j * (w::w_2_j - 1));
+                        this->bp.add_gate({j, j+1, j+3}, w::w_3_j * (w::w_3_j - 1));
+                        this->bp.add_gate({j+2, j+3}, w::w_4_j * (w::w_4_j - 1));
 
                         // j=0
-                        this->bp.add_gate(j, w_o_j - (w_1_j*4 + w_2_j*2 + w_3_j));
+                        this->bp.add_gate(j, w::w_o_j - (w::w_1_j*4 + w::w_2_j*2 + w::w_3_j));
 
-                        generate_phi3_gate(j, w_1_jp1, w_2_jp1, w_4_j, w_o_jp1, w_4_jp1, w_3_jp2);
-                        generate_phi4_gate(j, w_1_jp1, w_2_jp1, w_4_j, w_o_jp1, w_4_jp1, w_3_jp2);
+                        generate_phi3_gate(j, w::w_1_jp1, w::w_2_jp1, w::w_4_j, w::w_o_jp1, w::w_4_jp1, w::w_3_jp2);
+                        generate_phi4_gate(j, w::w_1_jp1, w::w_2_jp1, w::w_4_j, w::w_o_jp1, w::w_4_jp1, w::w_3_jp2);
 
                         // j+z, z=0 mod 5, z!=0
                         for (std::size_t z = 5; z <= 84; z+=5){
 
-                            this->bp.add_gate(j + z, w_o_j - (w_1_j*4 + w_2_j*2 + w_3_j + w_o_jm1 * 8));
+                            this->bp.add_gate(j + z, w::w_o_j - (w::w_1_j*4 + w::w_2_j*2 + w::w_3_j + w::w_o_jm1 * 8));
 
                             std::array<typename CurveType::base_field_type::value_type, 7> u;
                             std::array<typename CurveType::base_field_type::value_type, 7> v;
@@ -217,16 +168,16 @@ namespace nil {
                                 v[i] = omega.Y;
                             }
 
-                            generate_phi1_gate(j+z, w_1_j, w_2_j, w_3_j, w_4_j, u);
-                            generate_phi2_gate(j+z, w_1_j, w_2_j, w_3_j, w_4_jp1, v);
-                            generate_phi3_gate(j+z, w_1_jp1, w_2_jp1, w_1_jm1, w_2_jm1, w_4_jp1, w_3_jp2);
-                            generate_phi4_gate(j+z, w_1_jp1, w_2_jp1, w_1_jm1, w_2_jm1, w_4_jp1, w_3_jp2);
+                            generate_phi1_gate(j+z, w::w_1_j, w::w_2_j, w::w_3_j, w::w_4_j, u);
+                            generate_phi2_gate(j+z, w::w_1_j, w::w_2_j, w::w_3_j, w::w_4_jp1, v);
+                            generate_phi3_gate(j+z, w::w_1_jp1, w::w_2_jp1, w::w_1_jm1, w::w_2_jm1, w::w_4_jp1, w::w_3_jp2);
+                            generate_phi4_gate(j+z, w::w_1_jp1, w::w_2_jp1, w::w_1_jm1, w::w_2_jm1, w::w_4_jp1, w::w_3_jp2);
                         }
 
                         // j+z, z=2 mod 5
                         for (std::size_t z = 2; z <= 84; z+=5){
 
-                            this->bp.add_gate(j + z, w_o_j - (w_1_j*4 + w_2_j*2 + w_3_jm1 + w_o_jm2 * 8));
+                            this->bp.add_gate(j + z, w::w_o_j - (w::w_1_j*4 + w::w_2_j*2 + w::w_3_jm1 + w::w_o_jm2 * 8));
 
                             std::array<typename CurveType::base_field_type::value_type, 7> u;
                             std::array<typename CurveType::base_field_type::value_type, 7> v;
@@ -236,10 +187,10 @@ namespace nil {
                                 v[i] = omega.Y;
                             }
 
-                            generate_phi1_gate(j+z, w_1_j, w_2_j, w_3_jm1, w_4_jm1, u);
-                            generate_phi2_gate(j+z, w_1_j, w_2_j, w_3_jm1, w_4_j, v);
-                            generate_phi3_gate(j+z, w_1_jp1, w_2_jp1, w_1_jm1, w_2_jm1, w_o_jp1, w_3_jp2);
-                            generate_phi4_gate(j+z, w_1_jp1, w_2_jp1, w_1_jm1, w_2_jm1, w_o_jp1, w_3_jp2);
+                            generate_phi1_gate(j+z, w::w_1_j, w::w_2_j, w::w_3_jm1, w::w_4_jm1, u);
+                            generate_phi2_gate(j+z, w::w_1_j, w::w_2_j, w::w_3_jm1, w::w_4_j, v);
+                            generate_phi3_gate(j+z, w::w_1_jp1, w::w_2_jp1, w::w_1_jm1, w::w_2_jm1, w::w_o_jp1, w::w_3_jp2);
+                            generate_phi4_gate(j+z, w::w_1_jp1, w::w_2_jp1, w::w_1_jm1, w::w_2_jm1, w::w_o_jp1, w::w_3_jp2);
                         }
 
                         // j+z, z=3 mod 5
@@ -253,22 +204,22 @@ namespace nil {
                                 v[i] = omega.Y;
                             }
 
-                            generate_phi1_gate(j+z, w_4_jm1, w_3_j, w_4_j, w_o_j, u);
-                            generate_phi2_gate(j+z, w_4_jm1, w_3_j, w_4_j, w_o_jp1, v);
+                            generate_phi1_gate(j+z, w::w_4_jm1, w::w_3_j, w::w_4_j, w::w_o_j, u);
+                            generate_phi2_gate(j+z, w::w_4_jm1, w::w_3_j, w::w_4_j, w::w_o_jp1, v);
                         }
 
                         // j+z, z=4 mod 5
                         for (std::size_t z = 4; z <= 84; z+=5){
 
-                            this->bp.add_gate(j + z - 1, w_o_jp1 - (w_4_jm1*4 + w_3_jm2*2 + w_4_jm2 + w_o_jm1 * 8));
+                            this->bp.add_gate(j + z - 1, w::w_o_jp1 - (w::w_4_jm1*4 + w::w_3_jm2*2 + w::w_4_jm2 + w::w_o_jm1 * 8));
 
-                            generate_phi3_gate(j+z, w_1_jm2, w_2_j, w_1_jm1, w_2_jm1, w_4_jp1, w_o_jp2);
-                            generate_phi4_gate(j+z, w_1_jm2, w_2_j, w_1_jm1, w_2_jm1, w_4_jp1, w_o_jp2);
+                            generate_phi3_gate(j+z, w::w_1_jm2, w::w_2_j, w::w_1_jm1, w::w_2_jm1, w::w_4_jp1, w::w_o_jp2);
+                            generate_phi4_gate(j+z, w::w_1_jm2, w::w_2_j, w::w_1_jm1, w::w_2_jm1, w::w_4_jp1, w::w_o_jp2);
                         }
                     }
 
-                    void generate_assignments(typename CurveType::scalar_field_type::value_type &a, 
-                                              typename CurveType::template g1_type<>::value_type &P) {
+                    void generate_assignments(const typename CurveType::scalar_field_type::value_type &a, 
+                                              const typename CurveType::template g1_type<>::value_type &P) {
 
                         std::array<bool, 9> b = marshalling::unpack(a);
 

@@ -36,17 +36,25 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TBlueprintField>
-                class sha256_plonk_sigma_0 : public component<TBlueprintField> {
-                    typedef snark::plonk_constraint_system<TBlueprintField> arithmetization_type;
+                template<typename TArithmetization,
+                    std::size_t W0 = 4, std::size_t W1 = 0, std::size_t W2 = 1, std::size_t W3 = 2, 
+                    std::size_t W4 = 3>
+                class sha256_plonk_sigma_0;
+
+                template<typename TBlueprintField, std::size_t WiresAmount>
+                class sha256_plonk_sigma_0<
+                    snark::plonk_constraint_system<TBlueprintField, WiresAmount>, 
+                    W0, W1, W2, W3, W4>> : 
+                    public component<snark::plonk_constraint_system<TBlueprintField, WiresAmount>> {
+
+                    typedef snark::plonk_constraint_system<TBlueprintField> TArithmetization;
                 public:
 
-                    range<arithmetization_type, TBlueprintField> range_proof;
+                    range<TArithmetization, W0, W1, W2, W3, W4> range_proof;
 
-                    sha256_plonk_sigma_0(blueprint<arithmetization_type, TBlueprintField> &bp,
-                                          const std::array<typename blueprint::wire_index_type, 4> &w_indexes,
+                    sha256_plonk_sigma_0(blueprint<TArithmetization, TBlueprintField> &bp,
                                           const ... &output) :
-                        component<FieldType>(bp), range_proof(input, 2**32) {
+                        component<TArithmetization>(bp), range_proof(input, 2**32) {
 
 
 
