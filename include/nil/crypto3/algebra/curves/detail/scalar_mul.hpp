@@ -124,6 +124,20 @@ namespace nil {
 
                         return right * left;
                     }
+
+                    template<typename GroupValueType>
+                    constexpr GroupValueType operator*(const GroupValueType &left,
+                        const std::size_t &right) {
+
+                        return scalar_mul(left, typename GroupValueType::field_type::integral_type::value_type(right));
+                    }
+
+                    template<typename GroupValueType>
+                    constexpr GroupValueType operator*(const std::size_t &left,
+                        const GroupValueType &right) {
+
+                        return right * left;
+                    }
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
