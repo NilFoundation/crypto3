@@ -184,14 +184,14 @@ namespace nil {
                     }
 
                     typename TBlueprintField::value_type &assignment(const value_type &var, std::size_t row_index) {
-                        assert(row_index < assignments.size());
-                        assert(var.index <= assignments[row_index].size());
-                        return (assignments[row_index][var.index]);
+                        assert(var.wire_index <= assignments.size());
+                        assert(row_index < assignments[var.wire_index].size());
+                        return (assignments[row_index][var.wire_index]);
                     }
 
                     typename TBlueprintField::value_type assignment(const value_type &var, std::size_t row_index) const {
-                        assert(var.index <= assignments.size());
-                        assert(row_index < assignments[var.index].size());
+                        assert(var.wire_index <= assignments.size());
+                        assert(row_index < assignments[var.wire_index].size());
                         return (assignments[var.index][row_index]);
                     }
                     
@@ -202,7 +202,11 @@ namespace nil {
                         return result;
                     }
 
-                    void add_gate(const snark::plonk_constraint<TBlueprintField> &constr) {
+                    void add_gate(std::size_t row_index, const snark::plonk_constraint<TBlueprintField> &constr) {
+                        constraint_system.constraints.emplace_back(constr);
+                    }
+
+                    void add_gate(std::initializer_list<std::size_t> row_indices,const snark::plonk_constraint<TBlueprintField> &constr) {
                         constraint_system.constraints.emplace_back(constr);
                     }
 

@@ -85,10 +85,12 @@ namespace nil {
                         j = this->bp.allocate_rows(85);
                     }
                 private:
-                    typename CurveType::template g1_type<>::value_type omega(
+                    typename CurveType::template g1_type<>::value_type get_omega(
                         std::size_t s, std::size_t i){
 
-                        return (i * math::detail::get_power_of_two(3*s))*B;
+                        std::size_t coef = i * math::detail::get_power_of_two(3*s);
+
+                        return coef*B;
                     }
 
                     void generate_phi1_gate(
@@ -97,7 +99,7 @@ namespace nil {
                         typename blueprint_type::value_type x_2,
                         typename blueprint_type::value_type x_3,
                         typename blueprint_type::value_type x_4,
-                        std::array<typename CurveType::base_field_type, 7> u) {
+                        std::array<typename CurveType::base_field_type::value_type, 7> u) {
 
                         this->bp.add_gate(row_index, 
                             x_3 * (-u[0] * x_2 * x_1 + u[0] * x_1 + u[0] * x_2
@@ -116,7 +118,7 @@ namespace nil {
                         typename blueprint_type::value_type x_2,
                         typename blueprint_type::value_type x_3,
                         typename blueprint_type::value_type x_4,
-                        std::array<typename CurveType::base_field_type, 7> v) {
+                        std::array<typename CurveType::base_field_type::value_type, 7> v) {
 
                         this->bp.add_gate(row_index, 
                             x_3 * (-v[0] * x_2 * x_1 + v[0] * x_1 + v[0] * x_2
@@ -137,7 +139,8 @@ namespace nil {
                         typename blueprint_type::value_type x_4,
                         typename blueprint_type::value_type x_5,
                         typename blueprint_type::value_type x_6) {
-                        this->bp.add_gate(row_index, x_1 * (1 + CurveType::d * x_3*x_4*x_5*x_6) - (x_3*x_6 + x_4*x_5));
+                        this->bp.add_gate(row_index, x_1 * (1 + CurveType::template g1_type<>::params_type::b 
+                            * x_3*x_4*x_5*x_6) - (x_3*x_6 + x_4*x_5));
                     }
 
                     void generate_phi4_gate(
@@ -148,7 +151,8 @@ namespace nil {
                         typename blueprint_type::value_type x_4,
                         typename blueprint_type::value_type x_5,
                         typename blueprint_type::value_type x_6) {
-                        this->bp.add_gate(row_index, x_2 * (1 - CurveType::d * x_3*x_4*x_5*x_6) - (x_3*x_5 + x_4*x_6));
+                        this->bp.add_gate(row_index, x_2 * (1 - CurveType::template g1_type<>::params_type::b 
+                            * x_3*x_4*x_5*x_6) - (x_3*x_5 + x_4*x_6));
                     }
                 public:
                     void generate_gates() {
@@ -172,7 +176,7 @@ namespace nil {
                             std::array<typename CurveType::base_field_type::value_type, 7> u;
                             std::array<typename CurveType::base_field_type::value_type, 7> v;
                             for (std::size_t i=0; i<7; i++){
-                                typename CurveType::template g1_type<>::value_type omega = omega(3*z/5, i);
+                                typename CurveType::template g1_type<>::value_type omega = get_omega(3*z/5, i);
                                 u[i] = omega.X;
                                 v[i] = omega.Y;
                             }
@@ -191,7 +195,7 @@ namespace nil {
                             std::array<typename CurveType::base_field_type::value_type, 7> u;
                             std::array<typename CurveType::base_field_type::value_type, 7> v;
                             for (std::size_t i=0; i<7; i++){
-                                typename CurveType::template g1_type<>::value_type omega = omega(3*(z-2)/5, i);
+                                typename CurveType::template g1_type<>::value_type omega = get_omega(3*(z-2)/5, i);
                                 u[i] = omega.X;
                                 v[i] = omega.Y;
                             }
@@ -208,7 +212,7 @@ namespace nil {
                             std::array<typename CurveType::base_field_type::value_type, 7> u;
                             std::array<typename CurveType::base_field_type::value_type, 7> v;
                             for (std::size_t i=0; i<7; i++){
-                                typename CurveType::template g1_type<>::value_type omega = omega(3*(z-3)/5, i);
+                                typename CurveType::template g1_type<>::value_type omega = get_omega(3*(z-3)/5, i);
                                 u[i] = omega.X;
                                 v[i] = omega.Y;
                             }
@@ -230,22 +234,23 @@ namespace nil {
                     void generate_assignments(const typename CurveType::scalar_field_type::value_type &a, 
                                               const typename CurveType::template g1_type<>::value_type &P) {
 
-                        std::array<bool, 9> b = marshalling::unpack(a);
+                        std::array<bool, 9> b ;
+                        // = marshalling::unpack(a);
 
-                        this->bp.val(W1, j) = b[0];
-                        this->bp.val(W2, j) = b[1];
-                        this->bp.val(W3, j) = b[2];
+                        this->bp.assignment(W1, j) = b[0];
+                        this->bp.assignment(W2, j) = b[1];
+                        this->bp.assignment(W3, j) = b[2];
 
-                        this->bp.val(W1, j+1) = P.X;
-                        this->bp.val(W2, j+1) = P.Y;
-                        this->bp.val(W3, j+1) = b[3];
+                        this->bp.assignment(W1, j+1) = P.X;
+                        this->bp.assignment(W2, j+1) = P.Y;
+                        this->bp.assignment(W3, j+1) = b[3];
 
-                        this->bp.val(W1, j+2) = b[4];
-                        this->bp.val(W2, j+2) = b[5];
-                        this->bp.val(W4, j+2) = b[6];
+                        this->bp.assignment(W1, j+2) = b[4];
+                        this->bp.assignment(W2, j+2) = b[5];
+                        this->bp.assignment(W4, j+2) = b[6];
 
-                        this->bp.val(W3, j+3) = b[7];
-                        this->bp.val(W4, j+3) = b[8];
+                        this->bp.assignment(W3, j+3) = b[7];
+                        this->bp.assignment(W4, j+3) = b[8];
                     }
                 };
 

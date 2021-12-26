@@ -55,7 +55,7 @@ namespace nil {
                         typedef blueprint<TArithmetization> blueprint_type;
                     public:
 
-                        n_wires_helper(const blueprint_type &bp):component<TArithmetization>(bp){}
+                        n_wires_helper(blueprint_type &bp):component<TArithmetization>(bp){}
 
                         constexpr static const std::array<std::array<typename blueprint_type::value_type, 5>,5> w = {{
                             {{
@@ -120,6 +120,14 @@ namespace nil {
                             }}
                         }};
                     };
+
+                    template<typename TBlueprintField, std::size_t WiresAmount,
+                        std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, 
+                        std::size_t W4>
+                    constexpr std::array<std::array<
+                        typename blueprint<snark::plonk_constraint_system<TBlueprintField, WiresAmount>>::value_type, 5>,5> 
+                        const n_wires_helper<snark::plonk_constraint_system<TBlueprintField, WiresAmount>, 
+                        W0, W1, W2, W3, W4>::w;
 
                 }    // namespace detail
             }    // namespace components
