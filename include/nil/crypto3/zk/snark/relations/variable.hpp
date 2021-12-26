@@ -141,18 +141,17 @@ namespace nil {
                     /**
                      * Mnemonic typedefs.
                      */
-                    typedef std::size_t wire_index_type;
                     enum rotation_type{
                         pre_previous = -2,
                         previous,
                         current,
-                        nex,
+                        next,
                         after_next
                     };
-                    wire_index_type wire_index;
+                    std::size_t wire_index;
                     rotation_type rotation;
 
-                    constexpr variable(const wire_index_type wire_index, rotation_type rotation = rotation_type::current) : 
+                    constexpr variable(const std::size_t wire_index, rotation_type rotation) : 
                         wire_index(wire_index), rotation(rotation) {};
 
                     non_linear_term<FieldType, RotationSupport> operator^(const std::size_t power) const {
@@ -164,12 +163,16 @@ namespace nil {
                         return non_linear_term<FieldType, RotationSupport>(*this) * field_coeff;
                     }
 
+                    non_linear_term<FieldType, RotationSupport> operator*(
+                        const variable &other) const {
+                        return non_linear_term<FieldType, RotationSupport>(*this) * other;
+                    }
+
                     non_linear_combination<FieldType, RotationSupport> operator+(
                         const non_linear_combination<FieldType, RotationSupport> &other) const {
-                        non_linear_combination<FieldType, RotationSupport> result;
+                        non_linear_combination<FieldType, RotationSupport> result (other);
 
                         result.add_term(*this);
-                        result.terms.insert(result.terms.begin(), other.terms.begin(), other.terms.end());
 
                         return result;
                     }
@@ -177,6 +180,11 @@ namespace nil {
                     non_linear_combination<FieldType, RotationSupport> operator-(
                         const non_linear_combination<FieldType, RotationSupport> &other) const {
                         return (*this) + (-other);
+                    }
+
+                    non_linear_combination<FieldType, RotationSupport> operator-(
+                        const typename FieldType::value_type &field_val) const {
+                        return (*this) - non_linear_combination<FieldType, true>(field_val);
                     }
 
                     non_linear_term<FieldType, RotationSupport> operator-() const {
@@ -200,15 +208,15 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                non_linear_combination<FieldType, true> operator+(const typename FieldType::value_type &field_coeff,
+                non_linear_combination<FieldType, true> operator+(const typename FieldType::value_type &field_val,
                                                         const variable<FieldType, true> &var) {
-                    return var + field_coeff;
+                    return var + field_val;
                 }
 
                 template<typename FieldType>
-                non_linear_combination<FieldType, true> operator-(const typename FieldType::value_type &field_coeff,
+                non_linear_combination<FieldType, true> operator-(const typename FieldType::value_type &field_val,
                                                         const variable<FieldType, true> &var) {
-                    return non_linear_combination<FieldType, true>(field_coeff) - var;
+                    return (- var) + field_val ;
                 }
 
             }    // namespace snark

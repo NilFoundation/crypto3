@@ -36,6 +36,8 @@
 #include <cstdlib>
 #include <vector>
 
+#include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
+
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
 #include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
 

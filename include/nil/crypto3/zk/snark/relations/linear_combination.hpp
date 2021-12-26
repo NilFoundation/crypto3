@@ -31,8 +31,9 @@
 #ifndef CRYPTO3_ZK_LINEAR_COMBINATION_HPP
 #define CRYPTO3_ZK_LINEAR_COMBINATION_HPP
 
-#include <nil/crypto3/zk/snark/relations/variable.hpp>
 #include <vector>
+
+#include <nil/crypto3/zk/snark/relations/variable.hpp>
 
 namespace nil {
     namespace crypto3 {
