@@ -55,6 +55,8 @@ namespace nil {
                     constexpr static const std::size_t value_bits = node_type::value_bits;
                     typedef typename node_type::value_type value_type;
 
+                    merkle_proof_impl(){};
+
                     merkle_proof_impl(merkle_tree<hash_type, arity> tree, std::size_t leaf_idx) {
                         root = tree.root();
                         path.resize(tree.row_count() - 1);
