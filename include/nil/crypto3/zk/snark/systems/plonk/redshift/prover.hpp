@@ -59,7 +59,7 @@ namespace nil {
 
                 public:
                     static inline typename types_policy::template proof_type<lpc>
-                        process(const typename types_policy::preprocessed_data_type preprocessed_data,
+                        process(const typename types_policy::template preprocessed_data_type<k> preprocessed_data,
                                 const typename types_policy::constraint_system_type &constraint_system,
                                 const typename types_policy::variable_assignment_type &assignments) {
 
@@ -195,11 +195,8 @@ namespace nil {
                         // transcript(lpc::commit(V, D_0).root());
 
                         // 15
-                        std::array<typename FieldType::value_type, 11> alphas;
-                        for (std::size_t i = 0; i < 11; i++) {
-                            alphas[i] =
-                                transcript.template get_challenge<transcript_manifest::challenges_ids::alpha, i, FieldType>();
-                        }
+                        std::array<typename FieldType::value_type, 11> alphas = 
+                            transcript.template get_challenges<transcript_manifest::challenges_ids::alpha, 11, FieldType>();
 
                         // 16
                         typename FieldType::value_type tau =

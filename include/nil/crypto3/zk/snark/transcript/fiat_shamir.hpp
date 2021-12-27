@@ -60,6 +60,7 @@ namespace nil {
                 class fiat_shamir_heuristic {
 
                     accumulator_set<Hash> acc;
+
                 public:
                     
                     fiat_shamir_heuristic() {
@@ -81,6 +82,21 @@ namespace nil {
                     typename Hash::digest_type get_challenge(){
                         acc(ChallengeId + Index);
                         return accumulators::extract::hash<Hash>(acc);
+                    }
+
+                    template <typename TChallenges::challenges_ids ChallengeId, 
+                        std::size_t ChallengesAmount, typename FieldType>
+                    std::array<typename Hash::digest_type, ChallengesAmount> get_challenges(){
+                        
+                        std::array<typename Hash::digest_type, ChallengesAmount> result;
+
+                        for (std::size_t i = 0; i < ChallengesAmount; i++){
+
+                            acc(ChallengeId + i);
+                            result[i] = accumulators::extract::hash<Hash>(acc);
+                        }
+
+                        return result;
                     }
                 };
             }    // namespace snark

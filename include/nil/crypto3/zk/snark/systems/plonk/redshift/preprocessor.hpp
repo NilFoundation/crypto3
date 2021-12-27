@@ -33,12 +33,12 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, std::size_t WiresAmount>
+                template<typename FieldType, std::size_t WiresAmount, std::size_t k>
                 class redshift_preprocessor {
                     using types_policy = detail::redshift_types_policy<FieldType, WiresAmount>;
 
                 public:
-                    static inline typename types_policy::preprocessed_data_type
+                    static inline typename types_policy::template preprocessed_data_type<k>
                         process(const typename types_policy::constraint_system_type &constraint_system, 
                                 const typename types_policy::variable_assignment_type &assignments) {
 

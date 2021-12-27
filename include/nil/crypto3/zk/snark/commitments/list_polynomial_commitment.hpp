@@ -67,6 +67,7 @@ namespace nil {
                     struct transcript_round_manifest {
                         enum challenges_ids {x, y};
                     };
+
                 public:
 
                     using openning_type = merkle_proof_type;
@@ -147,13 +148,16 @@ namespace nil {
                                 proof.f_ip1_coefficients[round_id];
                             merkle_tree_type &f_i_tree = T;
 
+                            auto y_arr = 
+                                transcript.template get_challenges<transcript_round_manifest::challenges_ids::y, r, FieldType>();
+
                             for (std::size_t i = 0; i <= r-1; i++){
 
-                                typename FieldType::value_type y_i = 
-                                    transcript.template get_challenge<transcript_round_manifest::challenges_ids::y, i, FieldType>();
+                                // typename FieldType::value_type y_i = 
+                                    // transcript.template get_challenge<transcript_round_manifest::challenges_ids::y, i, FieldType>();
 
                                 math::polynomial::polynom<typename FieldType::value_type> 
-                                    sqr_polynom = {y_i, 0, -1};
+                                    sqr_polynom = {y_arr[i], 0, -1};
                                 std::array<typename FieldType::value_type, m> s ;
                                     // = math::polynomial::get_roots<m>(sqr_polynom);
 
@@ -173,8 +177,8 @@ namespace nil {
 
                                 f_i = p_y_i;
 
-                                typename FieldType::value_type f_y_i = f_i.evaluate(y_i);
-                                std::size_t leaf_index = std::find(D.begin(), D.end(), y_i) - D.begin();
+                                typename FieldType::value_type f_y_i = f_i.evaluate(y_arr[i]);
+                                std::size_t leaf_index = std::find(D.begin(), D.end(), y_arr[i]) - D.begin();
                                 f_y_openings[i] = merkle_proof_type(f_i_tree, leaf_index);
 
                                 x_i = q.evaluate(x_i);
@@ -237,12 +241,12 @@ namespace nil {
 
                             commitment_type &f_i_tree_root = root;
 
+                            auto y_arr = 
+                                transcript.template get_challenges<transcript_round_manifest::challenges_ids::y, r, FieldType>();
+
                             for (std::size_t i = 0; i <= r-1; i++){
 
-                                typename FieldType::value_type y_i = 
-                                    transcript.template get_challenge<transcript_round_manifest::challenges_ids::y, i, FieldType>();
-
-                                math::polynomial::polynom<typename FieldType::value_type> sqr_polynom = {y_i, 0, -1};
+                                math::polynomial::polynom<typename FieldType::value_type> sqr_polynom = {y_arr[i], 0, -1};
                                 std::array<typename FieldType::value_type, m> s ;
                                     // = math::polynomial::get_roots<m>(sqr_polynom);
 

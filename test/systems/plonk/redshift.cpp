@@ -31,6 +31,11 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/bls12.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
+
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
@@ -39,8 +44,14 @@ using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(redshift_prover_test_suite)
 
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
+    
+    using curve_type = algebra::curves::bls12<381>;
 
-BOOST_AUTO_TEST_SUITE(redshift_proveron_test_suite)
+    zk::snark::redshift_preprocessor <typename curve_type::base_field_type, 5, 5> preprocess;
+
+    // auto preprocessed_data = preprocess::process(cs, assignments);
+	zk::snark::redshift_prover <typename curve_type::base_field_type, 5, 5, 5, 5> prove;
+}
 
 BOOST_AUTO_TEST_SUITE_END()
