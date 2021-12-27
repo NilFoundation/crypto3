@@ -61,7 +61,7 @@ namespace nil {
                     return next_pow2(n);
                 }
                 // Row_Count calculation given the number of _leafs in the tree and the branches.
-                size_t get_merkle_tree_row_count(size_t leafs, size_t branches) {
+                size_t merkle_tree_row_count(size_t leafs, size_t branches) {
                     // Optimization
                     if (branches == 2) {
                         return std::log2(leafs) + 1;
@@ -71,7 +71,7 @@ namespace nil {
                 }
 
                 // Tree length calculation given the number of _leafs in the tree and the branches.
-                size_t get_merkle_tree_len(size_t leafs, size_t branches) {
+                size_t merkle_tree_length(size_t leafs, size_t branches) {
                     // Optimization
                     size_t len = leafs;
                     if (branches == 2) {
@@ -88,10 +88,10 @@ namespace nil {
 
                 // Tree length calculation given the number of _leafs in the tree, the
                 // rows_to_discard, and the branches.
-                size_t get_merkle_tree_cache_size(size_t leafs, size_t branches, size_t rows_to_discard) {
+                size_t merkle_tree_cache_size(size_t leafs, size_t branches, size_t rows_to_discard) {
                     size_t shift = log2_pow2(branches);
-                    size_t len = get_merkle_tree_len(leafs, branches);
-                    size_t row_count = get_merkle_tree_row_count(leafs, branches);
+                    size_t len = merkle_tree_length(leafs, branches);
+                    size_t row_count = merkle_tree_row_count(leafs, branches);
 
                     // 'rc - 1' means that we start discarding rows above the base
                     // layer, which is included in the current rc.
@@ -128,14 +128,14 @@ namespace nil {
 
                 // Given a tree of 'rc' with the specified number of 'branches',
                 // calculate the length of hashes required for the proof.
-                size_t get_merkle_proof_lemma_len(size_t row_count, size_t branches) {
+                size_t merkle_proof_lemma_length(size_t row_count, size_t branches) {
                     return 2 + ((branches - 1) * (row_count - 1));
                 }
 
                 // This method returns the number of '_leafs' given a merkle tree
                 // length of 'len', where _leafs must be a power of 2, respecting the
                 // number of branches.
-                size_t get_merkle_tree_leafs(size_t len, size_t branches) {
+                size_t merkle_tree_leafs(size_t len, size_t branches) {
                     size_t leafs = 0;
                     // Optimization:
                     if (branches == 2) {
@@ -195,10 +195,10 @@ namespace nil {
                 public:
                     template<typename Hashable, size_t Size>
                     merkle_tree_impl(std::vector<std::array<Hashable, Size>> data) :
-                        _leafs(data.size()), _size(detail::get_merkle_tree_len(_leafs, Arity)) {
+                        _leafs(data.size()), _size(detail::merkle_tree_length(_leafs, Arity)) {
                         BOOST_ASSERT_MSG(data.size() % Arity == 0, "Wrong leafs number");
 
-                        rc = detail::get_merkle_tree_row_count(_leafs, Arity);
+                        rc = detail::merkle_tree_row_count(_leafs, Arity);
                         for (size_t i = 0; i < _size; ++i) {
                             boost::add_vertex(_t);
                         }
@@ -320,7 +320,7 @@ namespace nil {
                                                           detail::merkle_tree_impl<detail::merkle_tree_node<T>, Arity>,
                                                           detail::merkle_tree_impl<T, Arity>>::type;
         }    // namespace containers
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_TREE_HPP
