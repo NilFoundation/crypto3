@@ -245,10 +245,10 @@ namespace nil {
                             math::polynomial::polynom<typename FieldType::value_type> alphas_polynom = {alphas[i]};
                             F_consolidated = F_consolidated + alphas_polynom * F[i];
                         }
-
+                        
                         math::polynomial::polynom<typename FieldType::value_type> T_consolidated = 
                             F_consolidated / preprocessed_data.Z;
-
+                        
                         // 22
                         std::vector<math::polynomial::polynom<typename FieldType::value_type>> T(N_T);
                         // T = separate_T(T_consolidated);

@@ -63,18 +63,17 @@ namespace nil {
 
                 public:
                     
-                    fiat_shamir_heuristic() {
-                        acc();
+                    fiat_shamir_heuristic() : acc(){
                     }
 
                     template <typename TAny>
                     void operator() (TAny data){
-                        acc(data);
+                        // acc(data);
                     }
 
                     template <typename TChallenges::challenges_ids ChallengeId, typename FieldType>
                     typename FieldType::value_type get_challenge(){
-                        acc(ChallengeId);
+                        // acc(ChallengeId);
                         typename Hash::digest_type hash_res = accumulators::extract::hash<Hash>(acc);
 
                         return FieldType::value_type::one();
@@ -82,7 +81,7 @@ namespace nil {
 
                     template <typename TChallenges::challenges_ids ChallengeId, std::size_t Index, typename FieldType>
                     typename FieldType::value_type get_challenge(){
-                        acc(ChallengeId + Index);
+                        // acc(ChallengeId + Index);
                         typename Hash::digest_type hash_res = accumulators::extract::hash<Hash>(acc);
 
                         return FieldType::value_type::one();
@@ -97,7 +96,7 @@ namespace nil {
 
                         for (std::size_t i = 0; i < ChallengesAmount; i++){
 
-                            acc(ChallengeId + i);
+                            // acc(ChallengeId + i);
                             hash_results[i] = accumulators::extract::hash<Hash>(acc);
                         }
 

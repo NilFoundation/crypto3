@@ -74,6 +74,9 @@ namespace nil {
                     using commitment_type = typename merkle_tree_type::value_type;
 
                     struct proof_type {
+
+                        proof_type(){}
+
                         std::array<merkle_proof_type, k> z_openings;
                         std::array<std::array<merkle_proof_type, m * r>, lambda> alpha_openings;
                         std::array<std::array<merkle_proof_type, r>, lambda> f_y_openings;
@@ -90,8 +93,8 @@ namespace nil {
                     // After this function 
                     // result.root();
                     // should be called
-                    static merkle_tree_type commit (const math::polynomial::polynom<
-                            typename FieldType::value_type> &f, 
+                    static merkle_tree_type commit (
+                        const math::polynomial::polynom<typename FieldType::value_type> &f, 
                         const std::vector<typename FieldType::value_type> &D){
 
                         std::vector<typename FieldType::value_type> y;
@@ -99,7 +102,8 @@ namespace nil {
                             y.push_back(f.evaluate(H));
                         }
 
-                        return merkle_tree_type(y);
+                        std::vector<std::array<std::uint8_t, 96>> y_data;
+                        return merkle_tree_type(y_data);
                     }
 
                     static proof_type proof_eval (
@@ -134,8 +138,9 @@ namespace nil {
                         math::polynomial::polynom<typename FieldType::value_type> 
                             Q = (f - U);
                         for (std::size_t j = 0; j < k; j++){
-                            math::polynomial::polynom<typename FieldType::value_type> x = {1};
-                            Q = Q/(x - U_interpolation_points[j]);
+                            math::polynomial::polynom<typename FieldType::value_type> denominator_polynom = 
+                                {- evaluation_points[j], 1};
+                            Q = Q/denominator_polynom;
                         }
 
                         for (std::size_t round_id = 0; round_id < lambda; round_id++){
@@ -150,7 +155,7 @@ namespace nil {
                             std::array<commitment_type, r - 1> &f_commitments = proof.f_commitments[round_id];
                             std::vector<typename FieldType::value_type> &f_ip1_coefficients = 
                                 proof.f_ip1_coefficients[round_id];
-                            merkle_tree_type &f_i_tree = T;
+                            merkle_tree_type f_i_tree = T;
 
                             auto y_arr = 
                                 transcript.template get_challenges<transcript_round_manifest::challenges_ids::y, r, FieldType>();
