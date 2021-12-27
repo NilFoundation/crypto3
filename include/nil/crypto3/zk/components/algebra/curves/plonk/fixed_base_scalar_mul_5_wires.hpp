@@ -99,7 +99,7 @@ namespace nil {
                         typename blueprint_type::value_type x_2,
                         typename blueprint_type::value_type x_3,
                         typename blueprint_type::value_type x_4,
-                        std::array<typename CurveType::base_field_type::value_type, 7> u) {
+                        std::array<typename CurveType::base_field_type::value_type, 8> u) {
 
                         this->bp.add_gate(row_index, 
                             x_3 * (-u[0] * x_2 * x_1 + u[0] * x_1 + u[0] * x_2
@@ -118,7 +118,7 @@ namespace nil {
                         typename blueprint_type::value_type x_2,
                         typename blueprint_type::value_type x_3,
                         typename blueprint_type::value_type x_4,
-                        std::array<typename CurveType::base_field_type::value_type, 7> v) {
+                        std::array<typename CurveType::base_field_type::value_type, 8> v) {
 
                         this->bp.add_gate(row_index, 
                             x_3 * (-v[0] * x_2 * x_1 + v[0] * x_1 + v[0] * x_2
@@ -173,8 +173,9 @@ namespace nil {
 
                             this->bp.add_gate(j + z, w[0][cur] - (w[1][cur]*4 + w[2][cur]*2 + w[3][cur] + w[0][m1] * 8));
 
-                            std::array<typename CurveType::base_field_type::value_type, 7> u;
-                            std::array<typename CurveType::base_field_type::value_type, 7> v;
+                            std::array<typename CurveType::base_field_type::value_type, 8> u;
+                            std::array<typename CurveType::base_field_type::value_type, 8> v;
+
                             for (std::size_t i=0; i<7; i++){
                                 typename CurveType::template g1_type<>::value_type omega = get_omega(3*z/5, i);
                                 u[i] = omega.X;
@@ -192,8 +193,8 @@ namespace nil {
 
                             this->bp.add_gate(j + z, w[0][cur] - (w[1][cur]*4 + w[2][cur]*2 + w[3][m1] + w[0][m2] * 8));
 
-                            std::array<typename CurveType::base_field_type::value_type, 7> u;
-                            std::array<typename CurveType::base_field_type::value_type, 7> v;
+                            std::array<typename CurveType::base_field_type::value_type, 8> u;
+                            std::array<typename CurveType::base_field_type::value_type, 8> v;
                             for (std::size_t i=0; i<7; i++){
                                 typename CurveType::template g1_type<>::value_type omega = get_omega(3*(z-2)/5, i);
                                 u[i] = omega.X;
@@ -209,8 +210,8 @@ namespace nil {
                         // j+z, z=3 mod 5
                         for (std::size_t z = 3; z <= 84; z+=5){
 
-                            std::array<typename CurveType::base_field_type::value_type, 7> u;
-                            std::array<typename CurveType::base_field_type::value_type, 7> v;
+                            std::array<typename CurveType::base_field_type::value_type, 8> u;
+                            std::array<typename CurveType::base_field_type::value_type, 8> v;
                             for (std::size_t i=0; i<7; i++){
                                 typename CurveType::template g1_type<>::value_type omega = get_omega(3*(z-3)/5, i);
                                 u[i] = omega.X;

@@ -184,13 +184,16 @@ namespace nil {
                     }
 
                     typename TBlueprintField::value_type &assignment(const value_type &var, std::size_t row_index) {
-                        assert(var.wire_index <= assignments.size());
+                        assert(var.wire_index < assignments.size());
+                        if (row_index >= assignments[var.wire_index].size()){
+                            assignments[var.wire_index].resize(row_index + 1);
+                        }
                         assert(row_index < assignments[var.wire_index].size());
-                        return (assignments[row_index][var.wire_index]);
+                        return (assignments[var.wire_index][row_index]);
                     }
 
                     typename TBlueprintField::value_type assignment(const value_type &var, std::size_t row_index) const {
-                        assert(var.wire_index <= assignments.size());
+                        assert(var.wire_index < assignments.size());
                         assert(row_index < assignments[var.wire_index].size());
                         return (assignments[var.index][row_index]);
                     }
