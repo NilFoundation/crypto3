@@ -43,6 +43,20 @@ namespace nil {
                     return polynom<FieldValueType>();
                 }
 
+                template<typename FieldValueType, std::size_t ContainerSize>
+                polynom<FieldValueType> lagrange_interpolation(
+                    const std::array<std::pair<FieldValueType, FieldValueType>, ContainerSize> &points) {
+
+                    return polynom<FieldValueType>();
+                }
+
+                template<typename FieldValueType>
+                polynom<FieldValueType> lagrange_interpolation(
+                    const std::vector<FieldValueType> &points) {
+
+                    return polynom<FieldValueType>();
+                }
+
             }    // namespace polynomial
         }    // namespace math
     }        // namespace crypto3

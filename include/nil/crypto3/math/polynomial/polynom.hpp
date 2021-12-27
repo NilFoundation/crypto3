@@ -37,7 +37,7 @@ namespace nil {
             namespace polynomial {
 
                 template <typename FieldValueType>
-                class polynom : private std::vector<FieldValueType>{
+                class polynom : public std::vector<FieldValueType>{
 
                 public:
 
@@ -76,13 +76,23 @@ namespace nil {
                         };
 
                     template <typename Range>
-                    FieldValueType evaluate(Range &values){
+                    FieldValueType evaluate(Range &values) const{
 
                         assert(values.size() + 1 == this->size());
 
                         FieldValueType result = (*this)[0];
                         for (std::size_t i = 0; i < values.size(); i++){
                             result += (*this)[i + 1]*values[i];
+                        }
+
+                        return result;
+                    }
+
+                    FieldValueType evaluate(FieldValueType &value) const{
+
+                        FieldValueType result = 0;
+                        for (std::size_t i = 0; i < this->size(); i++){
+                            result += (*this)[i]*value.pow(i);
                         }
 
                         return result;
@@ -216,6 +226,13 @@ namespace nil {
                     polynom operator/(const polynom &other) const {
 
                         std::size_t d = other.size() - 1;       /* Degree of B */
+
+                        if ((d == 0) && (other[0] == 1)){
+                            return *this;
+                        } else {
+                            exit(0);
+                        }
+
                         FieldValueType c = other.back().inversed(); /* Inverse of Leading Coefficient of B */
 
                         polynom r(*this);
