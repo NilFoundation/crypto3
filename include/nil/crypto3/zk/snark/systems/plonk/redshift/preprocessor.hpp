@@ -26,6 +26,9 @@
 #ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PREPROCESSOR_HPP
 #define CRYPTO3_ZK_PLONK_REDSHIFT_PREPROCESSOR_HPP
 
+#include <nil/crypto3/math/algorithms/unity_root.hpp>
+#include <nil/crypto3/math/detail/field_utils.hpp>
+
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/types.hpp>
 
 namespace nil {
@@ -42,8 +45,10 @@ namespace nil {
                         process(const typename types_policy::constraint_system_type &constraint_system, 
                                 const typename types_policy::variable_assignment_type &assignments) {
 
-                        typename types_policy::preprocessed_data_type data;
+                        typename types_policy::template preprocessed_data_type<k> data;
 
+                        data.omega = 
+                                math::unity_root<FieldType>(math::detail::get_power_of_two(k));
                         // data.selectors = constraint_system.get_selectors();
                         // ... copy_constraints = constraint_system.get_copy_constraints();
 
@@ -51,6 +56,8 @@ namespace nil {
                         // data.identity_permutations = ...(copy_constraints);
 
                         // data.Lagrange_basis = math::polynomial::Lagrange_basis(data.omega, ...(assignments).n);
+
+                        return data;
                     }
                 };
             }    // namespace snark

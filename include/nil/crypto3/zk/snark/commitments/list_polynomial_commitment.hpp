@@ -61,8 +61,8 @@ namespace nil {
                     typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
                     typedef typename containers::merkle_proof<Hash, 2> merkle_proof_type;
 
-                    constexpr static const math::polynomial::polynom<typename FieldType::value_type> 
-                        q = {0, 0, 1};
+                    // static const math::polynomial::polynom<typename FieldType::value_type> 
+                    //     q = {0, 0, 1};
 
                     struct transcript_round_manifest {
                         enum challenges_ids {x, y};
@@ -107,6 +107,10 @@ namespace nil {
                         const merkle_tree_type &T,
                         const math::polynomial::polynom<typename FieldType::value_type> &f, 
                         const std::vector<typename FieldType::value_type> &D){
+
+                        // temporary definition, until polynom is constexpr
+                        const math::polynomial::polynom<typename FieldType::value_type> 
+                            q = {0, 0, 1};
 
                         proof_type proof;
 
@@ -200,6 +204,10 @@ namespace nil {
                         commitment_type root,
                         proof_type proof,
                         const std::vector<typename FieldType::value_type> &D){
+
+                        // temporary definition, until polynom is constexpr
+                        const math::polynomial::polynom<typename FieldType::value_type> 
+                            q = {0, 0, 1};
 
                         fiat_shamir_heuristic<transcript_round_manifest, transcript_hash_type> transcript;
 

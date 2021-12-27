@@ -70,8 +70,7 @@ namespace nil {
                         template <std::size_t k>
                         struct preprocessed_data_type {
 
-                            constexpr static const typename FieldType::value_type omega = 
-                                math::unity_root<FieldType>(math::detail::get_power_of_two(k));
+                            typename FieldType::value_type omega;
 
                             std::vector<math::polynomial::polynom<typename FieldType::value_type>> selectors;
                             // S_sigma
@@ -93,7 +92,8 @@ namespace nil {
                                 beta, 
                                 gamma, 
                                 alpha, 
-                                upsilon = alpha + AlphasAmount 
+                                upsilon = alpha + AlphasAmount,
+                                tau
                             };
                         };
                     };

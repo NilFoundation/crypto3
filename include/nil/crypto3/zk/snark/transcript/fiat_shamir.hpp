@@ -73,27 +73,32 @@ namespace nil {
                     }
 
                     template <typename TChallenges::challenges_ids ChallengeId, typename FieldType>
-                    typename Hash::digest_type get_challenge(){
+                    typename FieldType::value_type get_challenge(){
                         acc(ChallengeId);
-                        return accumulators::extract::hash<Hash>(acc);
+                        typename Hash::digest_type hash_res = accumulators::extract::hash<Hash>(acc);
+
+                        return FieldType::value_type::one();
                     }
 
                     template <typename TChallenges::challenges_ids ChallengeId, std::size_t Index, typename FieldType>
-                    typename Hash::digest_type get_challenge(){
+                    typename FieldType::value_type get_challenge(){
                         acc(ChallengeId + Index);
-                        return accumulators::extract::hash<Hash>(acc);
+                        typename Hash::digest_type hash_res = accumulators::extract::hash<Hash>(acc);
+
+                        return FieldType::value_type::one();
                     }
 
                     template <typename TChallenges::challenges_ids ChallengeId, 
                         std::size_t ChallengesAmount, typename FieldType>
-                    std::array<typename Hash::digest_type, ChallengesAmount> get_challenges(){
+                    std::array<typename FieldType::value_type, ChallengesAmount> get_challenges(){
                         
-                        std::array<typename Hash::digest_type, ChallengesAmount> result;
+                        std::array<typename Hash::digest_type, ChallengesAmount> hash_results;
+                        std::array<typename FieldType::value_type, ChallengesAmount> result;
 
                         for (std::size_t i = 0; i < ChallengesAmount; i++){
 
                             acc(ChallengeId + i);
-                            result[i] = accumulators::extract::hash<Hash>(acc);
+                            hash_results[i] = accumulators::extract::hash<Hash>(acc);
                         }
 
                         return result;

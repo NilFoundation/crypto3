@@ -214,12 +214,13 @@ namespace nil {
                             std::size_t n_i;
                             for (std::size_t j = 0; j < n_i; j++){
                                 std::size_t d_i_j;
-                                gates[i] += preprocessed_data.constraints[j][i] * tau.pow(d_i_j);
+                                math::polynomial::polynom<typename FieldType::value_type> tau_polynom = {tau.pow(d_i_j)};
+                                gates[i] = gates[i] + preprocessed_data.constraints[j] * tau_polynom;
                             }
 
                             // gates[i] *= preprocessed_data.selectors[i];
 
-                            N_T = std::max(N_T, gates[i].degree() - 1);
+                            N_T = std::max(N_T, gates[i].size() - 1);
                         }                        
 
                         // 18
@@ -229,19 +230,20 @@ namespace nil {
                         // F[2] = P * p1 - (P << 1);
                         // F[3] = Q * q1 - (Q << 1);
                         // F[4] = preprocessed_data.Lagrange_basis[n] * ((P << 1) - (Q << 1));
-                        F[5] = preprocessed_data.PI;
+                        // F[5] = preprocessed_data.PI;
 
                         for (std::size_t i = 0; i < N_sel; i++) {
-                            F[5] += gates[i];
+                            F[5] = F[5] + gates[i];
                         }
 
                         // 19
                         // ...
 
                         // 20
-                        math::polynomial::polynom<typename FieldType::value_type> F_consolidated = 0;
+                        math::polynomial::polynom<typename FieldType::value_type> F_consolidated = {0};
                         for (std::size_t i = 0; i < 11; i++) {
-                            F_consolidated += alphas[i] * F[i];
+                            math::polynomial::polynom<typename FieldType::value_type> alphas_polynom = {alphas[i]};
+                            F_consolidated = F_consolidated + alphas_polynom * F[i];
                         }
 
                         math::polynomial::polynom<typename FieldType::value_type> T_consolidated = 
@@ -256,7 +258,7 @@ namespace nil {
                         std::vector<typename lpc::commitment_type> T_commitments;
 
                         for (std::size_t i = 0; i < N_perm + 1; i++) {
-                            T_trees.push_back(lpc::commit(T[i]));
+                            T_trees.push_back(lpc::commit(T[i], D_0));
                             T_commitments.push_back(T_trees[i].root());
                         }
 
@@ -265,7 +267,7 @@ namespace nil {
 
                         std::array<typename FieldType::value_type, k> 
                             fT_evaluation_points = {upsilon};
-                        std::vector<typename lpc::proof> f_lpc_proofs(N_wires);
+                        std::vector<typename lpc::proof_type> f_lpc_proofs(N_wires);
 
                         // for (std::size_t i = 0; i < N_wires; i++){
                         //     f_lpc_proofs.push_back(lpc::proof_eval(fT_evaluation_points, f_trees[i], f[i], D_0));
@@ -276,13 +278,13 @@ namespace nil {
                         // typename lpc::proof P_lpc_proof = lpc::proof_eval(PQ_evaluation_points, P_tree, P, D_0);
                         // typename lpc::proof Q_lpc_proof = lpc::proof_eval(PQ_evaluation_points, Q_tree, Q, D_0);
 
-                        std::vector<typename lpc::proof> T_lpc_proofs(N_perm + 1);
+                        std::vector<typename lpc::proof_type> T_lpc_proofs(N_perm + 1);
 
                         for (std::size_t i = 0; i < N_perm + 1; i++){
                             T_lpc_proofs.push_back(lpc::proof_eval(fT_evaluation_points, T_trees[i], T[i], D_0));
                         }
 
-                        typename types_policy::proof_type proof ;
+                        typename types_policy::template proof_type<lpc> proof ;
                             // = typename types_policy::proof_type(std::move(f_commitments), std::move(P_commitment),
                             //                                   std::move(Q_commitment), std::move(T_commitments),
                             //                                   std::move(f_lpc_proofs), std::move(P_lpc_proof),

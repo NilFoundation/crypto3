@@ -98,7 +98,7 @@ namespace nil {
                     }
 
                     std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_polynoms(
-                        plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment){
+                        plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment) const{
 
                         std::vector<math::polynomial::polynom<typename FieldType::value_type>> result(constraints.size());
 
@@ -116,10 +116,10 @@ namespace nil {
 
                                 // TODO: Rotation isn't taken into consideration
                                 for (auto &var: term.vars){
-                                    term_polynom *= wire_polynomials[var.index];
+                                    term_polynom = term_polynom * wire_polynomials[var.wire_index];
                                 }
 
-                                result[constraint_index] += term_polynom;
+                                result[constraint_index] = result[constraint_index] + term_polynom;
                             }
                         }
 

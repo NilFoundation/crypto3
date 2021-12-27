@@ -34,6 +34,8 @@ namespace nil {
                 template<typename CommitmentSchemeType>
                 struct redshift_proof {
 
+                    redshift_proof(){}
+                    
                     std::vector<typename CommitmentSchemeType::commitment_type> f_commitments;
 
                     typename CommitmentSchemeType::commitment_type P_commitment;
