@@ -32,6 +32,10 @@
 #include <nil/crypto3/algebra/curves/params/multiexp/bls12.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
 
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
+// #include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
+
 #include <nil/crypto3/zk/components/blueprint.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/plonk/fixed_base_scalar_mul_5_wires.hpp>
 
@@ -59,6 +63,16 @@ BOOST_AUTO_TEST_CASE(fixed_base_scalar_mul_5_wires_test_case) {
 	typename curve_type::template g1_type<>::value_type P = curve_type::template g1_type<>::value_type::one();
 
 	scalar_mul_component.generate_assignments(a, P);
+
+	auto cs = bp.get_constraint_system();
+
+	auto assignments = bp.full_variable_assignment();
+
+	typedef zk::snark::redshift_preprocessor <typename curve_type::base_field_type, 5, 1> preprocess_type;
+
+    auto preprocessed_data = preprocess_type::process(cs, assignments);
+	typedef zk::snark::redshift_prover <typename curve_type::base_field_type, 5, 5, 1, 5> prove_type;
+	auto proof = prove_type::process(preprocessed_data, cs, assignments);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
