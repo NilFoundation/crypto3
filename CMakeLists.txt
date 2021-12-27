@@ -37,9 +37,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
 include(CMConfig)
 include(CMSetupVersion)
 
-if(NOT CMAKE_WORKSPACE_NAME)
-    cm_workspace(crypto3)
-endif()
+cm_workspace(crypto3)
 
 macro(cm_find_package NAME)
     if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
@@ -53,7 +51,7 @@ cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
-if(NOT Boost_FOUND)
+if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
     cm_find_package(Boost REQUIRED COMPONENTS filesystem)
 endif()
 
@@ -86,13 +84,13 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
 
                       ${CMAKE_WORKSPACE_NAME}::algebra
                       ${CMAKE_WORKSPACE_NAME}::hash
-#                      crypto3::multiprecision
-#                      crypto3::zk
-#
-#                      marshalling::core
-#                      marshalling::crypto3_algebra
-#                      marshalling::crypto3_multiprecision
-#                      marshalling::crypto3_zk
+                      #                      crypto3::multiprecision
+                      #                      crypto3::zk
+                      #
+                      #                      marshalling::core
+                      #                      marshalling::crypto3_algebra
+                      #                      marshalling::crypto3_multiprecision
+                      #                      marshalling::crypto3_zk
 
                       ${Boost_LIBRARIES})
 
