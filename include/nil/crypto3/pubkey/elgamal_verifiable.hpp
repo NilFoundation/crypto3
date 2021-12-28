@@ -535,7 +535,6 @@ namespace nil {
                     typename gt_type::value_type new_c0_v0_gt =
                         algebra::pair_reduced<Curve>(acc.cipher_text[0], acc.vk.rho_g2);
                     bool ans = (vm_gt == new_c0_v0_gt);
-                    std::cout << ans << std::endl;
 
                     for (size_t i = 1; i < acc.cipher_text.size() - 1; ++i) {
                         typename gt_type::value_type ci_v_nj_gt =
