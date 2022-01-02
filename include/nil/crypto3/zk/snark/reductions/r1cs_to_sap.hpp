@@ -88,7 +88,7 @@ namespace nil {
                              * constraints come from.
                              */
                             return math::make_evaluation_domain<FieldType>(2 * cs.num_constraints() +
-                                                                          2 * cs.num_inputs() + 1);
+                                                                           2 * cs.num_inputs() + 1);
                         }
 
                         /**
@@ -99,8 +99,10 @@ namespace nil {
 
                             std::size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
 
-                            std::vector<std::map<std::size_t, typename FieldType::value_type>> A_in_Lagrange_basis(sap_num_variables + 1);
-                            std::vector<std::map<std::size_t, typename FieldType::value_type>> C_in_Lagrange_basis(sap_num_variables + 1);
+                            std::vector<std::map<std::size_t, typename FieldType::value_type>> A_in_Lagrange_basis(
+                                sap_num_variables + 1);
+                            std::vector<std::map<std::size_t, typename FieldType::value_type>> C_in_Lagrange_basis(
+                                sap_num_variables + 1);
 
                             /**
                              * process R1CS constraints, converting a constraint of the form
@@ -173,10 +175,8 @@ namespace nil {
                             C_in_Lagrange_basis[0][extra_constr_offset] = FieldType::value_type::one();
 
                             for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
-                                A_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] +=
-                                    FieldType::value_type::one();
-                                A_in_Lagrange_basis[0][extra_constr_offset + 2 * i - 1] +=
-                                    FieldType::value_type::one();
+                                A_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] += FieldType::value_type::one();
+                                A_in_Lagrange_basis[0][extra_constr_offset + 2 * i - 1] += FieldType::value_type::one();
                                 C_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] +=
                                     times_four(FieldType::value_type::one());
                                 C_in_Lagrange_basis[extra_var_offset2 + i][extra_constr_offset + 2 * i - 1] +=
@@ -395,9 +395,10 @@ namespace nil {
                             coefficients_for_H[0] -= d2;
                             domain->add_poly_z(d1 * d1, coefficients_for_H);
 
-                            math::multiply_by_coset(aA,
-                                                   typename FieldType::value_type(
-                                                       fields::arithmetic_params<FieldType>::multiplicative_generator));
+                            math::multiply_by_coset(
+                                aA,
+                                typename FieldType::value_type(
+                                    fields::arithmetic_params<FieldType>::multiplicative_generator));
                             domain->fft(aA);
 
                             std::vector<typename FieldType::value_type> &H_tmp =
@@ -432,9 +433,10 @@ namespace nil {
 
                             domain->inverse_fft(aC);
 
-                            math::multiply_by_coset(aC,
-                                                   typename FieldType::value_type(
-                                                       fields::arithmetic_params<FieldType>::multiplicative_generator));
+                            math::multiply_by_coset(
+                                aC,
+                                typename FieldType::value_type(
+                                    fields::arithmetic_params<FieldType>::multiplicative_generator));
                             domain->fft(aC);
 
 #ifdef MULTICORE

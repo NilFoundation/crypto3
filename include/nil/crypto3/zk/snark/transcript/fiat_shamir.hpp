@@ -38,7 +38,7 @@ namespace nil {
                  * @brief Fiat–Shamir heuristic.
                  * @tparam Hash Hash function, which serves as a non-interactive random oracle.
                  * @tparam TManifest Fiat-Shamir Heuristic Manifest in the following form:
-                 * 
+                 *
                  * template<typename ...>
                  * struct fiat_shamir_heuristic_manifest {
                  *
@@ -62,39 +62,38 @@ namespace nil {
                     accumulator_set<Hash> acc;
 
                 public:
-                    
-                    fiat_shamir_heuristic() : acc(){
+                    fiat_shamir_heuristic() : acc() {
                     }
 
-                    template <typename TAny>
-                    void operator() (TAny data){
+                    template<typename TAny>
+                    void operator()(TAny data) {
                         // acc(data);
                     }
 
-                    template <typename TChallenges::challenges_ids ChallengeId, typename FieldType>
-                    typename FieldType::value_type get_challenge(){
+                    template<typename TChallenges::challenges_ids ChallengeId, typename FieldType>
+                    typename FieldType::value_type get_challenge() {
                         // acc(ChallengeId);
                         typename Hash::digest_type hash_res = accumulators::extract::hash<Hash>(acc);
 
                         return FieldType::value_type::one();
                     }
 
-                    template <typename TChallenges::challenges_ids ChallengeId, std::size_t Index, typename FieldType>
-                    typename FieldType::value_type get_challenge(){
+                    template<typename TChallenges::challenges_ids ChallengeId, std::size_t Index, typename FieldType>
+                    typename FieldType::value_type get_challenge() {
                         // acc(ChallengeId + Index);
                         typename Hash::digest_type hash_res = accumulators::extract::hash<Hash>(acc);
 
                         return FieldType::value_type::one();
                     }
 
-                    template <typename TChallenges::challenges_ids ChallengeId, 
-                        std::size_t ChallengesAmount, typename FieldType>
-                    std::array<typename FieldType::value_type, ChallengesAmount> get_challenges(){
-                        
+                    template<typename TChallenges::challenges_ids ChallengeId, std::size_t ChallengesAmount,
+                             typename FieldType>
+                    std::array<typename FieldType::value_type, ChallengesAmount> get_challenges() {
+
                         std::array<typename Hash::digest_type, ChallengesAmount> hash_results;
                         std::array<typename FieldType::value_type, ChallengesAmount> result;
 
-                        for (std::size_t i = 0; i < ChallengesAmount; i++){
+                        for (std::size_t i = 0; i < ChallengesAmount; i++) {
 
                             // acc(ChallengeId + i);
                             hash_results[i] = accumulators::extract::hash<Hash>(acc);

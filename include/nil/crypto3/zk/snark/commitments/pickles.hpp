@@ -33,10 +33,9 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template <typename CurveType>
+                template<typename CurveType>
                 class pickles_commitment_scheme {
                 public:
-
                     using evaluation_type = typename CurveType::scalar_field_type::value_type;
                     using commitment_type = typename CurveType::value_type;
 
@@ -45,11 +44,9 @@ namespace nil {
                     }
 
                     struct proof_type {
-                        
                     };
 
-                    static commitment_type commit (){
-
+                    static commitment_type commit() {
                     }
                 };
 

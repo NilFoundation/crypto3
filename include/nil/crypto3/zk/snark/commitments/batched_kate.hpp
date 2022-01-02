@@ -35,32 +35,29 @@ namespace nil {
 
                 /**
                  * @brief Based on the Ploynomial Commitment description from \[Plonk].
-                 * 
+                 *
                  * References:
                  * \[Plonk]:
-                 * "PlonK: Permutations over Lagrange-bases for 
+                 * "PlonK: Permutations over Lagrange-bases for
                  * Oecumenical Noninteractive arguments of Knowledge",
                  * Ariel Gabizon, Zachary J. Williamson, Oana Ciobotaru,
                  * Aztec,
                  * <https://eprint.iacr.org/2019/953.pdf>
                  */
-                class batched_kate_commitment_scheme: commitment_scheme<...> {
-                    typedef TCommitment ...;
-                    typedef TDecommitmentInfo ...;
-                    typedef TSRS ...;
-                    typedef TData ...;
+                class batched_kate_commitment_scheme : commitment_scheme<...> {
+                    typedef TCommitment...;
+                    typedef TDecommitmentInfo...;
+                    typedef TSRS...;
+                    typedef TData...;
+
                 public:
-
-                    virtual std::pair<TCommitment, TDecommitmentInfo> commit (TSRS PK, TData phi){
-
+                    virtual std::pair<TCommitment, TDecommitmentInfo> commit(TSRS PK, TData phi) {
                     }
 
-                    virtual ... open(TSRS PK, TCommitment C, TData phi, TDecommitmentInfo d){
-
+                    virtual... open(TSRS PK, TCommitment C, TData phi, TDecommitmentInfo d) {
                     }
 
-                    virtual bool verify(TSRS PK, TCommitment C, TData phi, TDecommitmentInfo d){
-
+                    virtual bool verify(TSRS PK, TCommitment C, TData phi, TDecommitmentInfo d) {
                     }
                 };
 

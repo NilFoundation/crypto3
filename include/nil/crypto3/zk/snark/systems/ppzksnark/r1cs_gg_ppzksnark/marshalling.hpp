@@ -151,7 +151,7 @@ namespace nil {
                                    status_type &processingStatus) {
 
                 processingStatus = status_type::success;
-                
+
                 using integral_type = typename FieldType::integral_type;
                 using field_type = FieldType;
 
@@ -372,24 +372,28 @@ namespace nil {
                                         typename std::vector<chunk_type>::const_iterator read_iter_end,
                                         status_type &processingStatus) {
 
-                typename CurveType::template g2_type<>::value_type g = g2_group_type_process<typename CurveType::template g2_type<>>(
-                    read_iter_begin, read_iter_begin + g2_byteblob_size, processingStatus);
+                typename CurveType::template g2_type<>::value_type g =
+                    g2_group_type_process<typename CurveType::template g2_type<>>(
+                        read_iter_begin, read_iter_begin + g2_byteblob_size, processingStatus);
 
-                typename CurveType::template g1_type<>::value_type h = g1_group_type_process<typename CurveType::template g1_type<>>(
-                    read_iter_begin + g2_byteblob_size,
-                    read_iter_begin + g2_byteblob_size + g1_byteblob_size,
-                    processingStatus);
-                return crypto3::zk::snark::detail::element_kc<typename CurveType::template g2_type<>, typename CurveType::template g1_type<>>(
-                    g, h);
+                typename CurveType::template g1_type<>::value_type h =
+                    g1_group_type_process<typename CurveType::template g1_type<>>(read_iter_begin + g2_byteblob_size,
+                                                                                  read_iter_begin + g2_byteblob_size +
+                                                                                      g1_byteblob_size,
+                                                                                  processingStatus);
+                return crypto3::zk::snark::detail::element_kc<typename CurveType::template g2_type<>,
+                                                              typename CurveType::template g1_type<>>(g, h);
             }
 
-            static inline knowledge_commitment_vector<typename CurveType::template g2_type<>, typename CurveType::template g1_type<>>
+            static inline knowledge_commitment_vector<typename CurveType::template g2_type<>,
+                                                      typename CurveType::template g1_type<>>
                 g2g1_knowledge_commitment_vector_process(
                     typename std::vector<chunk_type>::const_iterator read_iter_begin,
                     typename std::vector<chunk_type>::const_iterator read_iter_end,
                     status_type &processingStatus) {
 
-                using T = knowledge_commitment<typename CurveType::template g2_type<>, typename CurveType::template g1_type<>>;
+                using T = knowledge_commitment<typename CurveType::template g2_type<>,
+                                               typename CurveType::template g1_type<>>;
 
                 if (std::distance(read_iter_begin, read_iter_end) < std_size_t_byteblob_size) {
 
@@ -609,27 +613,29 @@ namespace nil {
                     return typename scheme_type::verification_key_type();
                 }
 
-                typename CurveType::template g2_type<>::value_type gamma_g2 = g2_group_type_process<typename CurveType::template g2_type<>>(
-                    read_iter_begin + gt_byteblob_size,
-                    read_iter_begin + gt_byteblob_size + g2_byteblob_size,
-                    processingStatus);
+                typename CurveType::template g2_type<>::value_type gamma_g2 =
+                    g2_group_type_process<typename CurveType::template g2_type<>>(read_iter_begin + gt_byteblob_size,
+                                                                                  read_iter_begin + gt_byteblob_size +
+                                                                                      g2_byteblob_size,
+                                                                                  processingStatus);
                 if (processingStatus != status_type::success) {
                     return typename scheme_type::verification_key_type();
                 }
 
-                typename CurveType::template g2_type<>::value_type delta_g2 = g2_group_type_process<typename CurveType::template g2_type<>>(
-                    read_iter_begin + gt_byteblob_size + g2_byteblob_size,
-                    read_iter_begin + gt_byteblob_size + g2_byteblob_size + g2_byteblob_size,
-                    processingStatus);
+                typename CurveType::template g2_type<>::value_type delta_g2 =
+                    g2_group_type_process<typename CurveType::template g2_type<>>(
+                        read_iter_begin + gt_byteblob_size + g2_byteblob_size,
+                        read_iter_begin + gt_byteblob_size + g2_byteblob_size + g2_byteblob_size,
+                        processingStatus);
                 if (processingStatus != status_type::success) {
                     return typename scheme_type::verification_key_type();
                 }
 
                 accumulation_vector<typename CurveType::template g1_type<>> gamma_ABC_g1 =
-                    g1_accumulation_vector_process<typename CurveType::template g1_type<>>(read_iter_begin + gt_byteblob_size +
-                                                                                    g2_byteblob_size + g2_byteblob_size,
-                                                                                read_iter_end,
-                                                                                processingStatus);
+                    g1_accumulation_vector_process<typename CurveType::template g1_type<>>(
+                        read_iter_begin + gt_byteblob_size + g2_byteblob_size + g2_byteblob_size,
+                        read_iter_end,
+                        processingStatus);
 
                 if (processingStatus != status_type::success) {
                     return typename scheme_type::verification_key_type();
@@ -645,20 +651,25 @@ namespace nil {
 
                 auto read_iter_current_begin = read_iter_begin;
 
-                typename CurveType::template g1_type<>::value_type alpha_g1 = g1_group_type_process<typename CurveType::template g1_type<>>(
-                    read_iter_current_begin, read_iter_current_begin + g1_byteblob_size, processingStatus);
+                typename CurveType::template g1_type<>::value_type alpha_g1 =
+                    g1_group_type_process<typename CurveType::template g1_type<>>(
+                        read_iter_current_begin, read_iter_current_begin + g1_byteblob_size, processingStatus);
                 read_iter_current_begin += g1_byteblob_size;
-                typename CurveType::template g1_type<>::value_type beta_g1 = g1_group_type_process<typename CurveType::template g1_type<>>(
-                    read_iter_current_begin, read_iter_current_begin + g1_byteblob_size, processingStatus);
+                typename CurveType::template g1_type<>::value_type beta_g1 =
+                    g1_group_type_process<typename CurveType::template g1_type<>>(
+                        read_iter_current_begin, read_iter_current_begin + g1_byteblob_size, processingStatus);
                 read_iter_current_begin += g1_byteblob_size;
-                typename CurveType::template g2_type<>::value_type beta_g2 = g2_group_type_process<typename CurveType::template g2_type<>>(
-                    read_iter_current_begin, read_iter_current_begin + g2_byteblob_size, processingStatus);
+                typename CurveType::template g2_type<>::value_type beta_g2 =
+                    g2_group_type_process<typename CurveType::template g2_type<>>(
+                        read_iter_current_begin, read_iter_current_begin + g2_byteblob_size, processingStatus);
                 read_iter_current_begin += g2_byteblob_size;
-                typename CurveType::template g1_type<>::value_type delta_g1 = g1_group_type_process<typename CurveType::template g1_type<>>(
-                    read_iter_current_begin, read_iter_current_begin + g1_byteblob_size, processingStatus);
+                typename CurveType::template g1_type<>::value_type delta_g1 =
+                    g1_group_type_process<typename CurveType::template g1_type<>>(
+                        read_iter_current_begin, read_iter_current_begin + g1_byteblob_size, processingStatus);
                 read_iter_current_begin += g1_byteblob_size;
-                typename CurveType::template g2_type<>::value_type delta_g2 = g2_group_type_process<typename CurveType::template g2_type<>>(
-                    read_iter_current_begin, read_iter_current_begin + g2_byteblob_size, processingStatus);
+                typename CurveType::template g2_type<>::value_type delta_g2 =
+                    g2_group_type_process<typename CurveType::template g2_type<>>(
+                        read_iter_current_begin, read_iter_current_begin + g2_byteblob_size, processingStatus);
                 read_iter_current_begin += g2_byteblob_size;
                 std::size_t A_query_size = std_size_t_process(
                     read_iter_current_begin, read_iter_current_begin + std_size_t_byteblob_size, processingStatus);
@@ -677,8 +688,9 @@ namespace nil {
 
                 read_iter_current_begin += std_size_t_byteblob_size;
 
-                knowledge_commitment_vector<typename CurveType::template g2_type<>, typename CurveType::template g1_type<>> B_query =
-                    g2g1_knowledge_commitment_vector_process(
+                knowledge_commitment_vector<typename CurveType::template g2_type<>,
+                                            typename CurveType::template g1_type<>>
+                    B_query = g2g1_knowledge_commitment_vector_process(
                         read_iter_current_begin, read_iter_current_begin + total_B_query_size, processingStatus);
 
                 read_iter_current_begin += total_B_query_size;
@@ -772,26 +784,29 @@ namespace nil {
                     return typename scheme_type::proof_type();
                 }
 
-                typename CurveType::template g1_type<>::value_type g_A = g1_group_type_process<typename CurveType::template g1_type<>>(
-                    read_iter_begin, read_iter_begin + g1_byteblob_size, processingStatus);
+                typename CurveType::template g1_type<>::value_type g_A =
+                    g1_group_type_process<typename CurveType::template g1_type<>>(
+                        read_iter_begin, read_iter_begin + g1_byteblob_size, processingStatus);
 
                 if (processingStatus != status_type::success) {
                     return typename scheme_type::proof_type();
                 }
 
-                typename CurveType::template g2_type<>::value_type g_B = g2_group_type_process<typename CurveType::template g2_type<>>(
-                    read_iter_begin + g1_byteblob_size,
-                    read_iter_begin + g1_byteblob_size + g2_byteblob_size,
-                    processingStatus);
+                typename CurveType::template g2_type<>::value_type g_B =
+                    g2_group_type_process<typename CurveType::template g2_type<>>(read_iter_begin + g1_byteblob_size,
+                                                                                  read_iter_begin + g1_byteblob_size +
+                                                                                      g2_byteblob_size,
+                                                                                  processingStatus);
 
                 if (processingStatus != status_type::success) {
                     return typename scheme_type::proof_type();
                 }
 
-                typename CurveType::template g1_type<>::value_type g_C = g1_group_type_process<typename CurveType::template g1_type<>>(
-                    read_iter_begin + g1_byteblob_size + g2_byteblob_size,
-                    read_iter_begin + g1_byteblob_size + g2_byteblob_size + g1_byteblob_size,
-                    processingStatus);
+                typename CurveType::template g1_type<>::value_type g_C =
+                    g1_group_type_process<typename CurveType::template g1_type<>>(
+                        read_iter_begin + g1_byteblob_size + g2_byteblob_size,
+                        read_iter_begin + g1_byteblob_size + g2_byteblob_size + g1_byteblob_size,
+                        processingStatus);
 
                 if (processingStatus != status_type::success) {
                     return typename scheme_type::proof_type();
@@ -1046,24 +1061,28 @@ namespace nil {
                 }
             }
 
-            static inline void g2g1_element_kc_process(
-                crypto3::zk::snark::detail::element_kc<typename CurveType::template g2_type<>, typename CurveType::template g1_type<>>
-                    input_ek,
-                std::vector<chunk_type>::iterator &write_iter) {
+            static inline void
+                g2g1_element_kc_process(crypto3::zk::snark::detail::element_kc<typename CurveType::template g2_type<>,
+                                                                               typename CurveType::template g1_type<>>
+                                            input_ek,
+                                        std::vector<chunk_type>::iterator &write_iter) {
 
                 g2_group_type_process<typename CurveType::template g2_type<>>(input_ek.g, write_iter);
                 g1_group_type_process<typename CurveType::template g1_type<>>(input_ek.h, write_iter);
             }
 
             static inline std::size_t get_g2g1_knowledge_commitment_vector_size(
-                knowledge_commitment_vector<typename CurveType::template g2_type<>, typename CurveType::template g1_type<>> input_kv) {
+                knowledge_commitment_vector<typename CurveType::template g2_type<>,
+                                            typename CurveType::template g1_type<>>
+                    input_kv) {
 
                 return (2 + input_kv.indices.size()) * std_size_t_byteblob_size +
                        input_kv.values.size() * (g2_byteblob_size + g1_byteblob_size);
             }
 
             static inline void g2g1_knowledge_commitment_vector_process(
-                knowledge_commitment_vector<typename CurveType::template g2_type<>, typename CurveType::template g1_type<>>
+                knowledge_commitment_vector<typename CurveType::template g2_type<>,
+                                            typename CurveType::template g1_type<>>
                     input_kv,
                 std::vector<chunk_type>::iterator &write_iter) {
 
@@ -1086,15 +1105,13 @@ namespace nil {
 
             static inline std::vector<chunk_type> process(typename scheme_type::proving_key_type pk) {
 
-                std::size_t proving_key_size = 3*g1_byteblob_size + 
-                    2*g2_byteblob_size + pk.A_query.size()*g1_byteblob_size +
-                    get_g2g1_knowledge_commitment_vector_size(pk.B_query) + 
-                    pk.H_query.size()*g1_byteblob_size + 
-                    pk.L_query.size()*g1_byteblob_size +
-                    2 * std_size_t_byteblob_size;
+                std::size_t proving_key_size =
+                    3 * g1_byteblob_size + 2 * g2_byteblob_size + pk.A_query.size() * g1_byteblob_size +
+                    get_g2g1_knowledge_commitment_vector_size(pk.B_query) + pk.H_query.size() * g1_byteblob_size +
+                    pk.L_query.size() * g1_byteblob_size + 2 * std_size_t_byteblob_size;
 
-                for (auto it = pk.constraint_system.constraints.begin(); 
-                        it != pk.constraint_system.constraints.end(); it++) {
+                for (auto it = pk.constraint_system.constraints.begin(); it != pk.constraint_system.constraints.end();
+                     it++) {
                     proving_key_size += get_r1cs_constraint_byteblob_size(*it);
                 }
 

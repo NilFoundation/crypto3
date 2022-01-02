@@ -65,6 +65,7 @@ namespace nil {
                     typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
                     using g1_type = typename CurveType::template g1_type<>;
                     using g2_type = typename CurveType::template g2_type<>;
+
                 public:
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
@@ -73,10 +74,8 @@ namespace nil {
 
                         processed_verification_key_type pvk;
 
-                        pvk.pp_G1_one_precomp =
-                            precompute_g1<CurveType>(g1_type::value_type::one());
-                        pvk.pp_G2_one_precomp =
-                            precompute_g2<CurveType>(g2_type::value_type::one());
+                        pvk.pp_G1_one_precomp = precompute_g1<CurveType>(g1_type::value_type::one());
+                        pvk.pp_G2_one_precomp = precompute_g2<CurveType>(g2_type::value_type::one());
 
                         pvk.vk_tilde_g2_precomp = precompute_g2<CurveType>(vk.tilde_g2);
                         pvk.vk_alpha_tilde_g2_precomp = precompute_g2<CurveType>(vk.alpha_tilde_g2);
@@ -111,9 +110,8 @@ namespace nil {
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
 
-                        return process(
-                            uscs_ppzksnark_process_verification_key<CurveType>::process(vk),
-                            primary_input, proof);
+                        return process(uscs_ppzksnark_process_verification_key<CurveType>::process(vk), primary_input,
+                                       proof);
                     }
 
                     /**
@@ -128,8 +126,7 @@ namespace nil {
                         assert(pvk.encoded_IC_query.domain_size() >= primary_input.size());
 
                         const accumulation_vector<typename CurveType::template g1_type<>> accumulated_IC =
-                            pvk.encoded_IC_query.accumulate_chunk(
-                                primary_input.begin(), primary_input.end(), 0);
+                            pvk.encoded_IC_query.accumulate_chunk(primary_input.begin(), primary_input.end(), 0);
                         assert(accumulated_IC.is_fully_accumulated());
                         const typename CurveType::template g1_type<>::value_type &acc = accumulated_IC.first;
 

@@ -42,6 +42,7 @@ namespace nil {
 
                     using g1_type = typename curve_type::template g1_type<>;
                     using g2_type = typename curve_type::template g2_type<>;
+
                 public:
                     // H
                     typename g2_type::value_type H;
@@ -82,8 +83,7 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return (G1_size() * g1_type::value_bits +
-                                G2_size() * g2_type::value_bits);
+                        return (G1_size() * g1_type::value_bits + G2_size() * g2_type::value_bits);
                     }
 
                     bool operator==(const r1cs_se_ppzksnark_verification_key &other) const {

@@ -45,13 +45,13 @@ using namespace nil::crypto3;
 BOOST_AUTO_TEST_SUITE(redshift_prover_test_suite)
 
 BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
-    
+
     using curve_type = algebra::curves::bls12<381>;
 
-    zk::snark::redshift_preprocessor <typename curve_type::base_field_type, 5, 2> preprocess;
+    zk::snark::redshift_preprocessor<typename curve_type::base_field_type, 5, 2> preprocess;
 
     // auto preprocessed_data = preprocess::process(cs, assignments);
-	zk::snark::redshift_prover <typename curve_type::base_field_type, 5, 2, 2, 2> prove;
+    zk::snark::redshift_prover<typename curve_type::base_field_type, 5, 2, 2, 2> prove;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

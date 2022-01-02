@@ -63,7 +63,7 @@ namespace nil {
 
                     std::vector<plonk_constraint<FieldType>> constraints;
 
-                    plonk_constraint_system(){
+                    plonk_constraint_system() {
                     }
 
                     constexpr std::size_t num_wires() const {
@@ -74,10 +74,11 @@ namespace nil {
                         return constraints.size();
                     }
 
-                    bool is_satisfied(plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment) const {
+                    bool
+                        is_satisfied(plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment) const {
 
                         for (std::size_t c = 0; c < constraints.size(); ++c) {
-                            if(!constraints[c].a.evaluate(full_variable_assignment).is_zero()) {
+                            if (!constraints[c].a.evaluate(full_variable_assignment).is_zero()) {
                                 return false;
                             }
                         }
@@ -85,37 +86,37 @@ namespace nil {
                         return true;
                     }
 
-                    std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_copy_constraints(){
-
+                    std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_copy_constraints() {
                     }
 
-                    std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_selectors(){
-                        
+                    std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_selectors() {
                     }
 
-                    std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_lookups(){
-                        
+                    std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_lookups() {
                     }
 
-                    std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_polynoms(
-                        plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment) const{
+                    std::vector<math::polynomial::polynom<typename FieldType::value_type>>
+                        get_polynoms(plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment) const {
 
-                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> result(constraints.size());
+                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> result(
+                            constraints.size());
 
-                        std::array<math::polynomial::polynom<typename FieldType::value_type>, WiresAmount> wire_polynomials;
-                        for (std::size_t wire_index = 0; wire_index < WiresAmount; wire_index++){
-                            wire_polynomials[wire_index] = math::polynomial::lagrange_interpolation(full_variable_assignment[wire_index]);
+                        std::array<math::polynomial::polynom<typename FieldType::value_type>, WiresAmount>
+                            wire_polynomials;
+                        for (std::size_t wire_index = 0; wire_index < WiresAmount; wire_index++) {
+                            wire_polynomials[wire_index] =
+                                math::polynomial::lagrange_interpolation(full_variable_assignment[wire_index]);
                         }
 
-                        for (std::size_t constraint_index = 0; constraint_index < constraints.size(); constraint_index++){
+                        for (std::size_t constraint_index = 0; constraint_index < constraints.size();
+                             constraint_index++) {
 
-                            for (auto &term: constraints[constraint_index].terms){
-                                
-                                math::polynomial::polynom<typename FieldType::value_type> 
-                                    term_polynom = {term.coeff};
+                            for (auto &term : constraints[constraint_index].terms) {
+
+                                math::polynomial::polynom<typename FieldType::value_type> term_polynom = {term.coeff};
 
                                 // TODO: Rotation isn't taken into consideration
-                                for (auto &var: term.vars){
+                                for (auto &var : term.vars) {
                                     term_polynom = term_polynom * wire_polynomials[var.wire_index];
                                 }
 
@@ -124,7 +125,6 @@ namespace nil {
                         }
 
                         return result;
-
                     }
 
                     void add_constraint(const plonk_constraint<FieldType> &c) {

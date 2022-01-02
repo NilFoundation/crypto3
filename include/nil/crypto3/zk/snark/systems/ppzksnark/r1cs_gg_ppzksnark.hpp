@@ -49,11 +49,10 @@ namespace nil {
                     std::is_same<r1cs_gg_ppzksnark_generator<CurveType>, Generator>::value &&
                         std::is_same<r1cs_gg_ppzksnark_prover<CurveType>, Prover>::value &&
                         (std::is_same<r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType>, Verifier>::value ||
-                         std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>,
-                                      Verifier>::value 
-                        // || std::is_same<r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>,
-                        //               Verifier>::value
-                                      )>;
+                         std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>, Verifier>::value
+                         // || std::is_same<r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>,
+                         //               Verifier>::value
+                         )>;
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
                 using is_aggregate_mode = typename std::integral_constant<
@@ -138,7 +137,7 @@ namespace nil {
                 class r1cs_gg_ppzksnark<
                     CurveType, Generator, Prover, Verifier, ProvingMode::Aggregate,
                     typename std::enable_if<is_aggregate_mode<CurveType, Generator, Prover, Verifier>::value>::type> {
-                        
+
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
 
                 public:

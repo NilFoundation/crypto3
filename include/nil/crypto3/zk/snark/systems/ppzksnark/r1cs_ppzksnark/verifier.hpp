@@ -45,6 +45,7 @@ namespace nil {
                     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
                     using g2_type = typename CurveType::template g2_type<>;
+
                 public:
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
@@ -104,9 +105,8 @@ namespace nil {
                     static inline bool process(const verification_key_type &verification_key,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        return process(
-                            r1cs_ppzksnark_process_verification_key<CurveType>::process(verification_key), primary_input,
-                            proof);
+                        return process(r1cs_ppzksnark_process_verification_key<CurveType>::process(verification_key),
+                                       primary_input, proof);
                     }
 
                     /**
@@ -121,8 +121,8 @@ namespace nil {
                         assert(processed_verification_key.encoded_IC_query.domain_size() >= primary_input.size());
 
                         const accumulation_vector<g1_type> accumulated_IC =
-                            processed_verification_key.encoded_IC_query.accumulate_chunk(
-                                primary_input.begin(), primary_input.end(), 0);
+                            processed_verification_key.encoded_IC_query.accumulate_chunk(primary_input.begin(),
+                                                                                         primary_input.end(), 0);
                         const g1_value_type &acc = accumulated_IC.first;
 
                         bool result = true;
@@ -134,8 +134,8 @@ namespace nil {
                         g1_precomputed_type proof_g_A_h_precomp = precompute_g1<CurveType>(proof.g_A.h);
                         typename gt_type::value_type kc_A_1 = miller_loop<CurveType>(
                             proof_g_A_g_precomp, processed_verification_key.vk_alphaA_g2_precomp);
-                        typename gt_type::value_type kc_A_2 = miller_loop<CurveType>(
-                            proof_g_A_h_precomp, processed_verification_key.pp_G2_one_precomp);
+                        typename gt_type::value_type kc_A_2 =
+                            miller_loop<CurveType>(proof_g_A_h_precomp, processed_verification_key.pp_G2_one_precomp);
                         gt_value_type kc_A = final_exponentiation<CurveType>(kc_A_1 * kc_A_2.unitary_inversed());
                         if (kc_A != gt_value_type::one()) {
                             result = false;
@@ -145,8 +145,8 @@ namespace nil {
                         g1_precomputed_type proof_g_B_h_precomp = precompute_g1<CurveType>(proof.g_B.h);
                         typename gt_type::value_type kc_B_1 = miller_loop<CurveType>(
                             processed_verification_key.vk_alphaB_g1_precomp, proof_g_B_g_precomp);
-                        typename gt_type::value_type kc_B_2 = miller_loop<CurveType>(
-                            proof_g_B_h_precomp, processed_verification_key.pp_G2_one_precomp);
+                        typename gt_type::value_type kc_B_2 =
+                            miller_loop<CurveType>(proof_g_B_h_precomp, processed_verification_key.pp_G2_one_precomp);
                         gt_value_type kc_B = final_exponentiation<CurveType>(kc_B_1 * kc_B_2.unitary_inversed());
                         if (kc_B != gt_value_type::one()) {
                             result = false;
@@ -156,8 +156,8 @@ namespace nil {
                         g1_precomputed_type proof_g_C_h_precomp = precompute_g1<CurveType>(proof.g_C.h);
                         typename gt_type::value_type kc_C_1 = miller_loop<CurveType>(
                             proof_g_C_g_precomp, processed_verification_key.vk_alphaC_g2_precomp);
-                        typename gt_type::value_type kc_C_2 = miller_loop<CurveType>(
-                            proof_g_C_h_precomp, processed_verification_key.pp_G2_one_precomp);
+                        typename gt_type::value_type kc_C_2 =
+                            miller_loop<CurveType>(proof_g_C_h_precomp, processed_verification_key.pp_G2_one_precomp);
                         gt_value_type kc_C = final_exponentiation<CurveType>(kc_C_1 * kc_C_2.unitary_inversed());
                         if (kc_C != gt_value_type::one()) {
                             result = false;
@@ -180,8 +180,8 @@ namespace nil {
                         g1_precomputed_type proof_g_K_precomp = precompute_g1<CurveType>(proof.g_K);
                         g1_precomputed_type proof_g_A_g_acc_C_precomp =
                             precompute_g1<CurveType>((proof.g_A.g + acc) + proof.g_C.g);
-                        typename gt_type::value_type K_1 = miller_loop<CurveType>(
-                            proof_g_K_precomp, processed_verification_key.vk_gamma_g2_precomp);
+                        typename gt_type::value_type K_1 =
+                            miller_loop<CurveType>(proof_g_K_precomp, processed_verification_key.vk_gamma_g2_precomp);
                         typename gt_type::value_type K_23 = double_miller_loop<CurveType>(
                             proof_g_A_g_acc_C_precomp, processed_verification_key.vk_gamma_beta_g2_precomp,
                             processed_verification_key.vk_gamma_beta_g1_precomp, proof_g_B_g_precomp);
@@ -212,9 +212,8 @@ namespace nil {
                     static inline bool process(const verification_key_type &verification_key,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        return process(
-                            r1cs_ppzksnark_process_verification_key<CurveType>::process(verification_key), primary_input,
-                            proof);
+                        return process(r1cs_ppzksnark_process_verification_key<CurveType>::process(verification_key),
+                                       primary_input, proof);
                     }
 
                     /**
@@ -302,7 +301,8 @@ namespace nil {
                 //         affine_ate_g1_precomp proof_g_A_g_precomp = affine_ate_precompute_g1<CurveType>(proof.g_A.g);
                 //         affine_ate_g1_precomp proof_g_A_h_precomp = affine_ate_precompute_g1<CurveType>(proof.g_A.h);
                 //         typename gt_type::value_type kc_A_miller = affine_ate_e_over_e_miller_loop<CurveType>(
-                //             proof_g_A_g_precomp, pvk_vk_alphaA_g2_precomp, proof_g_A_h_precomp, pvk_pp_G2_one_precomp);
+                //             proof_g_A_g_precomp, pvk_vk_alphaA_g2_precomp, proof_g_A_h_precomp,
+                //             pvk_pp_G2_one_precomp);
                 //         gt_value_type kc_A = final_exponentiation<CurveType>(kc_A_miller);
 
                 //         if (kc_A != gt_value_type::one()) {
@@ -314,7 +314,8 @@ namespace nil {
                 //         affine_ate_g1_precomp proof_g_B_h_precomp =
                 //             affine_ate_precompute_g1<CurveType>(proof.g_B.h);
                 //         typename gt_type::value_type kc_B_miller = affine_ate_e_over_e_miller_loop<CurveType>(
-                //             pvk_vk_alphaB_g1_precomp, proof_g_B_g_precomp, proof_g_B_h_precomp, pvk_pp_G2_one_precomp);
+                //             pvk_vk_alphaB_g1_precomp, proof_g_B_g_precomp, proof_g_B_h_precomp,
+                //             pvk_pp_G2_one_precomp);
                 //         gt_value_type kc_B = final_exponentiation<CurveType>(kc_B_miller);
                 //         if (kc_B != gt_value_type::one()) {
                 //             result = false;
@@ -325,7 +326,8 @@ namespace nil {
                 //         affine_ate_g1_precomp proof_g_C_h_precomp =
                 //             affine_ate_precompute_g1<CurveType>(proof.g_C.h);
                 //         typename gt_type::value_type kc_C_miller = affine_ate_e_over_e_miller_loop<CurveType>(
-                //             proof_g_C_g_precomp, pvk_vk_alphaC_g2_precomp, proof_g_C_h_precomp, pvk_pp_G2_one_precomp);
+                //             proof_g_C_g_precomp, pvk_vk_alphaC_g2_precomp, proof_g_C_h_precomp,
+                //             pvk_pp_G2_one_precomp);
                 //         gt_value_type kc_C = final_exponentiation<CurveType>(kc_C_miller);
                 //         if (kc_C != gt_value_type::one()) {
                 //             result = false;
@@ -336,8 +338,8 @@ namespace nil {
                 //         affine_ate_g1_precomp proof_g_H_precomp = affine_ate_precompute_g1<CurveType>(proof.g_H);
                 //         typename gt_type::value_type QAP_miller =
                 //             affine_ate_e_times_e_over_e_miller_loop<CurveType>(
-                //                 proof_g_H_precomp, pvk_vk_rC_Z_g2_precomp, proof_g_C_g_precomp, pvk_pp_G2_one_precomp,
-                //                 proof_g_A_g_acc_precomp, proof_g_B_g_precomp);
+                //                 proof_g_H_precomp, pvk_vk_rC_Z_g2_precomp, proof_g_C_g_precomp,
+                //                 pvk_pp_G2_one_precomp, proof_g_A_g_acc_precomp, proof_g_B_g_precomp);
                 //         gt_value_type QAP = final_exponentiation<CurveType>(QAP_miller);
                 //         if (QAP != gt_value_type::one()) {
                 //             result = false;
@@ -348,8 +350,9 @@ namespace nil {
                 //             affine_ate_precompute_g1<CurveType>((proof.g_A.g + acc) + proof.g_C.g);
                 //         typename gt_type::value_type K_miller =
                 //             affine_ate_e_times_e_over_e_miller_loop<CurveType>(
-                //                 proof_g_A_g_acc_C_precomp, pvk_vk_gamma_beta_g2_precomp, pvk_vk_gamma_beta_g1_precomp,
-                //                 proof_g_B_g_precomp, proof_g_K_precomp, pvk_vk_gamma_g2_precomp);
+                //                 proof_g_A_g_acc_C_precomp, pvk_vk_gamma_beta_g2_precomp,
+                //                 pvk_vk_gamma_beta_g1_precomp, proof_g_B_g_precomp, proof_g_K_precomp,
+                //                 pvk_vk_gamma_g2_precomp);
                 //         gt_value_type K = final_exponentiation<CurveType>(K_miller);
                 //         if (K != gt_value_type::one()) {
                 //             result = false;

@@ -37,7 +37,7 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, std::size_t lambda, std::size_t m=2>
+                template<typename FieldType, std::size_t lambda, std::size_t m = 2>
                 class redshift_verifier {
 
                     using types_policy = detail::redshift_types_policy<FieldType>;
@@ -49,10 +49,10 @@ namespace nil {
                     constexpr static const std::size_t k = ...;
                     constexpr static const std::size_t r = ...;
 
-                    constexpr static const typename FieldType::value_type omega = 
-                        algebra::get_root_of_unity<FieldType>()
-                    typedef list_polynomial_commitment_scheme<FieldType, 
-                        merkle_hash_type, lambda, k, r, m> lpc;
+                    constexpr static const typename FieldType::value_type omega =
+                        algebra::get_root_of_unity<FieldType>() typedef list_polynomial_commitment_scheme<
+                            FieldType, merkle_hash_type, lambda, k, r, m>
+                            lpc;
 
                 public:
                     static inline bool process(const types_policy::verification_key_type &verification_key,
@@ -79,10 +79,8 @@ namespace nil {
                         typename transcript_hash_type::digest_type gamma_bytes =
                             transcript.get_challenge<transcript_manifest::challenges_ids::gamma>();
 
-                        typename FieldType::value_type beta =
-                            algebra::marshalling<FieldType>(beta_bytes);
-                        typename FieldType::value_type gamma =
-                            algebra::marshalling<FieldType>(gamma_bytes);
+                        typename FieldType::value_type beta = algebra::marshalling<FieldType>(beta_bytes);
+                        typename FieldType::value_type gamma = algebra::marshalling<FieldType>(gamma_bytes);
 
                         transcript(proof.P_commitment);
                         transcript(proof.Q_commitment);
@@ -101,39 +99,33 @@ namespace nil {
                         typename transcript_hash_type::digest_type upsilon_bytes =
                             transcript.get_challenge<transcript_manifest::challenges_ids::upsilon>();
 
-                        typename FieldType::value_type upsilon =
-                            algebra::marshalling<FieldType>(upsilon_bytes);
+                        typename FieldType::value_type upsilon = algebra::marshalling<FieldType>(upsilon_bytes);
 
-                        std::array<typename FieldType::value_type, k> 
-                            fT_evaluation_points = {upsilon};
+                        std::array<typename FieldType::value_type, k> fT_evaluation_points = {upsilon};
 
-                        for (std::size_t i = 0; i < N_wires; i++){
-                            if (!lpc::verify_eval(fT_evaluation_points, proof.f_commitments[i],
-                                proof.f_lpc_proofs[i], ...)){
+                        for (std::size_t i = 0; i < N_wires; i++) {
+                            if (!lpc::verify_eval(fT_evaluation_points, proof.f_commitments[i], proof.f_lpc_proofs[i],
+                                                  ...)) {
                                 return false;
                             }
                         }
 
-                        std::array<typename FieldType::value_type, k> 
-                            PQ_evaluation_points = {upsilon, upsilon * omega};
-                        if (!lpc::verify_eval(PQ_evaluation_points, proof.P_commitment,
-                            proof.P_lpc_proof, ...)){
+                        std::array<typename FieldType::value_type, k> PQ_evaluation_points = {upsilon, upsilon * omega};
+                        if (!lpc::verify_eval(PQ_evaluation_points, proof.P_commitment, proof.P_lpc_proof, ...)) {
                             return false;
                         }
-                        if (!lpc::verify_eval(PQ_evaluation_points, proof.Q_commitment,
-                            proof.Q_lpc_proof, ...)){
+                        if (!lpc::verify_eval(PQ_evaluation_points, proof.Q_commitment, proof.Q_lpc_proof, ...)) {
                             return false;
                         }
 
-                        for (std::size_t i = 0; i < N_perm + 1; i++){
-                            if (!lpc::verify_eval(fT_evaluation_points, proof.T_commitments[i],
-                                proof.T_lpc_proofs[i], ...)){
+                        for (std::size_t i = 0; i < N_perm + 1; i++) {
+                            if (!lpc::verify_eval(fT_evaluation_points, proof.T_commitments[i], proof.T_lpc_proofs[i],
+                                                  ...)) {
                                 return false;
                             }
                         }
 
-                        std::array<math::polynomial::polynom<typename FieldType::value_type>, 6>
-                                F;
+                        std::array<math::polynomial::polynom<typename FieldType::value_type>, 6> F;
                         F[0] = verification_key.L_basis[1] * (P - 1);
                         F[1] = verification_key.L_basis[1] * (Q - 1);
                         F[2] = P * p_1 - (P << 1);

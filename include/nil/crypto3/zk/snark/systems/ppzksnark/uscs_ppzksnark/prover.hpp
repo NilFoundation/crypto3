@@ -58,10 +58,12 @@ namespace nil {
 
                     using g1_type = typename CurveType::template g1_type<>;
                     using g2_type = typename CurveType::template g2_type<>;
+
                 public:
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-                    typedef typename policy_type::proving_key_type proving_key_type;;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    ;
                     typedef typename policy_type::proof_type proof_type;
 
                     static inline proof_type process(const proving_key_type &proving_key,

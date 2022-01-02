@@ -40,8 +40,8 @@ namespace nil {
                 template<typename CurveType, std::size_t WiresAmount, std::size_t LRRounds>
                 class ProverProof {
                     typedef pickles_commitment_scheme<CurveType> commitment_scheme;
-                public:
 
+                public:
                     // Commitments:
                     std::array<typename commitment_scheme::commitment_type, WiresAmount + 1> w_comm;
 
@@ -71,11 +71,11 @@ namespace nil {
                     typename CurveType::value_type sigma;
                     typename CurveType::value_type G;
 
-                    typename CurveType::scalar_field_type::value_type z1,z2;
+                    typename CurveType::scalar_field_type::value_type z1, z2;
 
                     // Previous challenges
-                    std::vector<std::tuple<std::vector<typename scalar_group_type::value_type>, 
-                        typename commitment_scheme::commitment_type>>
+                    std::vector<std::tuple<std::vector<typename scalar_group_type::value_type>,
+                                           typename commitment_scheme::commitment_type>>
                         prev_challenges;
                 };
             }    // namespace snark

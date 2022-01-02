@@ -98,8 +98,8 @@ namespace nil {
                     }
 
                     static inline bool verify(const typename Verifier::verification_key_type &vk,
-                                               const primary_input_type &primary_input,
-                                               const proof_type &proof) {
+                                              const primary_input_type &primary_input,
+                                              const proof_type &proof) {
                         return Verifier::process(vk, primary_input, proof);
                     }
 

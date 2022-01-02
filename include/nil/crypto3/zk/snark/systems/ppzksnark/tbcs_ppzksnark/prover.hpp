@@ -67,12 +67,14 @@ namespace nil {
                         typedef typename CurveType::scalar_field_type FieldType;
 
                         const uscs_variable_assignment<FieldType> uscs_va =
-                            reductions::tbcs_to_uscs<FieldType>::witness_map(pk.circuit, primary_input, auxiliary_input);
+                            reductions::tbcs_to_uscs<FieldType>::witness_map(
+                                pk.circuit, primary_input, auxiliary_input);
                         const uscs_primary_input<FieldType> uscs_pi =
                             algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
                         const uscs_auxiliary_input<FieldType> uscs_ai(
                             uscs_va.begin() + primary_input.size(),
-                            uscs_va.end());    // TODO: faster to just change bacs_to_r1cs<field_type>::witness_map into two :(
+                            uscs_va.end());    // TODO: faster to just change bacs_to_r1cs<field_type>::witness_map into
+                                               // two :(
 
                         return prove<uscs_ppzksnark<CurveType>>(pk.uscs_pk, uscs_pi, uscs_ai);
                     }

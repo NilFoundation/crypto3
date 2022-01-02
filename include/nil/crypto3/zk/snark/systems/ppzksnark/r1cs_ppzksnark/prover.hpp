@@ -79,8 +79,8 @@ namespace nil {
                                                                      d3 = algebra::random_element<scalar_field_type>();
 
                         const qap_witness<scalar_field_type> qap_wit =
-                            reductions::r1cs_to_qap<scalar_field_type>::witness_map(proving_key.constraint_system, primary_input,
-                                                                                    auxiliary_input, d1, d2, d3);
+                            reductions::r1cs_to_qap<scalar_field_type>::witness_map(
+                                proving_key.constraint_system, primary_input, auxiliary_input, d1, d2, d3);
 
                         typename knowledge_commitment<g1_type, g1_type>::value_type g_A =
                             proving_key.A_query[0] + qap_wit.d1 * proving_key.A_query[qap_wit.num_variables + 1];
@@ -121,12 +121,11 @@ namespace nil {
                                         qap_wit.coefficients_for_H.begin(),
                                         qap_wit.coefficients_for_H.begin() + qap_wit.degree + 1, chunks);
 
-                        g_K =
-                            g_K + algebra::multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
-                                      proving_key.K_query.begin() + 1,
-                                      proving_key.K_query.begin() + 1 + qap_wit.num_variables,
-                                      qap_wit.coefficients_for_ABCs.begin(),
-                                      qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
+                        g_K = g_K + algebra::multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
+                                        proving_key.K_query.begin() + 1,
+                                        proving_key.K_query.begin() + 1 + qap_wit.num_variables,
+                                        qap_wit.coefficients_for_ABCs.begin(),
+                                        qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
                         return proof_type(std::move(g_A), std::move(g_B), std::move(g_C), std::move(g_H),
                                           std::move(g_K));

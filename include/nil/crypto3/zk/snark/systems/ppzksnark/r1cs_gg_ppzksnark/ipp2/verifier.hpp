@@ -350,7 +350,8 @@ namespace nil {
                                                const std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
                                                                r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>> &,
                                                const std::pair<typename CurveType::template g1_type<>::value_type,
-                                                               typename CurveType::template g1_type<>::value_type> &> &t) {
+                                                               typename CurveType::template g1_type<>::value_type> &>
+                                &t) {
                             // .write(&zab_l)
                             tr.template write<typename CurveType::gt_type>(t.template get<1>().first);
                             // .write(&zab_r)
@@ -663,6 +664,7 @@ namespace nil {
                 template<typename CurveType, typename BasicVerifier>
                 class r1cs_gg_ppzksnark_aggregate_verifier {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
+
                 public:
                     typedef BasicVerifier basic_verifier;
                     typedef typename policy_type::primary_input_type primary_input_type;

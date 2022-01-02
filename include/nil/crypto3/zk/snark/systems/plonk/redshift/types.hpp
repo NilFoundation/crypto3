@@ -64,10 +64,10 @@ namespace nil {
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        template <typename CommitmentSchemeType>
+                        template<typename CommitmentSchemeType>
                         using proof_type = redshift_proof<CommitmentSchemeType>;
 
-                        template <std::size_t k>
+                        template<std::size_t k>
                         struct preprocessed_data_type {
 
                             typename FieldType::value_type omega;
@@ -76,25 +76,19 @@ namespace nil {
                             // S_sigma
                             std::vector<math::polynomial::polynom<typename FieldType::value_type>> permutations;
                             // S_id
-                            std::vector<math::polynomial::polynom<typename FieldType::value_type>> identity_permutations;
+                            std::vector<math::polynomial::polynom<typename FieldType::value_type>>
+                                identity_permutations;
                             // c
                             std::vector<math::polynomial::polynom<typename FieldType::value_type>> constraints;
-                            
+
                             std::vector<math::polynomial::polynom<typename FieldType::value_type>> Lagrange_basis;
 
                             math::polynomial::polynom<typename FieldType::value_type> Z;
-
                         };
 
                         template<std::size_t AlphasAmount>
                         struct prover_fiat_shamir_heuristic_manifest {
-                            enum challenges_ids { 
-                                beta, 
-                                gamma, 
-                                alpha, 
-                                upsilon = alpha + AlphasAmount,
-                                tau
-                            };
+                            enum challenges_ids { beta, gamma, alpha, upsilon = alpha + AlphasAmount, tau };
                         };
                     };
                 }    // namespace detail

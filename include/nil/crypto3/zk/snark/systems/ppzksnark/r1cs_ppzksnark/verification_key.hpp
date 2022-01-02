@@ -45,7 +45,6 @@ namespace nil {
                     using g2_type = typename CurveType::template g2_type<>;
 
                 public:
-
                     typename g2_type::value_type alphaA_g2;
                     typename g1_type::value_type alphaB_g1;
                     typename g2_type::value_type alphaC_g2;
@@ -78,8 +77,7 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return (2 * g1_type::value_bits + encoded_IC_query.size_in_bits() +
-                                5 * g2_type::value_bits);
+                        return (2 * g1_type::value_bits + encoded_IC_query.size_in_bits() + 5 * g2_type::value_bits);
                     }
 
                     bool operator==(const r1cs_ppzksnark_verification_key &other) const {
@@ -104,7 +102,6 @@ namespace nil {
                     using pairing_policy = pairing::pairing_policy<CurveType>;
 
                 public:
-
                     typename pairing_policy::g2_precomputed_type pp_G2_one_precomp;
                     typename pairing_policy::g2_precomputed_type vk_alphaA_g2_precomp;
                     typename pairing_policy::g1_precomputed_type vk_alphaB_g1_precomp;

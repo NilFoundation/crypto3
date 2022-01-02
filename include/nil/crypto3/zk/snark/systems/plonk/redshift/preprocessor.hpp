@@ -42,13 +42,12 @@ namespace nil {
 
                 public:
                     static inline typename types_policy::template preprocessed_data_type<k>
-                        process(const typename types_policy::constraint_system_type &constraint_system, 
+                        process(const typename types_policy::constraint_system_type &constraint_system,
                                 const typename types_policy::variable_assignment_type &assignments) {
 
                         typename types_policy::template preprocessed_data_type<k> data;
 
-                        data.omega = 
-                                math::unity_root<FieldType>(math::detail::get_power_of_two(k));
+                        data.omega = math::unity_root<FieldType>(math::detail::get_power_of_two(k));
                         data.Z = {1};
                         // data.selectors = constraint_system.get_selectors();
                         // ... copy_constraints = constraint_system.get_copy_constraints();

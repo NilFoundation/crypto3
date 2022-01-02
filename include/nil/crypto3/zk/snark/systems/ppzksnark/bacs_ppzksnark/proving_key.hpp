@@ -48,13 +48,11 @@ namespace nil {
 
                     bacs_ppzksnark_proving_key(bacs_ppzksnark_proving_key &&other) = default;
 
-                    bacs_ppzksnark_proving_key(const circuit_type &circuit, 
-                                               const r1cs_proving_key_type &r1cs_pk) :
+                    bacs_ppzksnark_proving_key(const circuit_type &circuit, const r1cs_proving_key_type &r1cs_pk) :
                         circuit(circuit), r1cs_pk(r1cs_pk) {
                     }
 
-                    bacs_ppzksnark_proving_key(circuit_type &&circuit, 
-                                               r1cs_proving_key_type &&r1cs_pk) :
+                    bacs_ppzksnark_proving_key(circuit_type &&circuit, r1cs_proving_key_type &&r1cs_pk) :
                         circuit(std::move(circuit)), r1cs_pk(std::move(r1cs_pk)) {
                     }
 

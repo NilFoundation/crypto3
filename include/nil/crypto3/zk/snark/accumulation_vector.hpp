@@ -47,7 +47,7 @@ namespace nil {
 
                 public:
                     using group_type = Type;
-                    
+
                     underlying_value_type first;
                     sparse_vector<Type> rest;
 

@@ -53,7 +53,7 @@ namespace nil {
                     template<typename Type1, typename Type2>
                     struct element_kc {
 
-                        //using group_type = commitments<Type1, Type2>;
+                        // using group_type = commitments<Type1, Type2>;
 
                         typename Type1::value_type g;
                         typename Type2::value_type h;
@@ -178,27 +178,25 @@ namespace nil {
                         return element_kc<Type1, Type2>(rhs * lhs.g, rhs * lhs.h);
                     }
 
-                    template<
-                        typename Type1,
-                        typename Type2,
-                        typename FieldValueType,
-                        typename = typename std::enable_if<
-                            algebra::is_field<typename FieldValueType::field_type>::value &&
-                                !algebra::is_extended_field<typename FieldValueType::field_type>::value,
-                            FieldValueType>::type>
+                    template<typename Type1,
+                             typename Type2,
+                             typename FieldValueType,
+                             typename = typename std::enable_if<
+                                 algebra::is_field<typename FieldValueType::field_type>::value &&
+                                     !algebra::is_extended_field<typename FieldValueType::field_type>::value,
+                                 FieldValueType>::type>
                     element_kc<Type1, Type2> operator*(const FieldValueType &lhs, const element_kc<Type1, Type2> &rhs) {
 
                         return lhs.data * rhs;
                     }
 
-                    template<
-                        typename Type1,
-                        typename Type2,
-                        typename FieldValueType,
-                        typename = typename std::enable_if<
-                            algebra::is_field<typename FieldValueType::field_type>::value &&
-                                !algebra::is_extended_field<typename FieldValueType::field_type>::value,
-                            FieldValueType>::type>
+                    template<typename Type1,
+                             typename Type2,
+                             typename FieldValueType,
+                             typename = typename std::enable_if<
+                                 algebra::is_field<typename FieldValueType::field_type>::value &&
+                                     !algebra::is_extended_field<typename FieldValueType::field_type>::value,
+                                 FieldValueType>::type>
                     element_kc<Type1, Type2> operator*(const element_kc<Type1, Type2> &lhs, const FieldValueType &rhs) {
 
                         return lhs * rhs.data;

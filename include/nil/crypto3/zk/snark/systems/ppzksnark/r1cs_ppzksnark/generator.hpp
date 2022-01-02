@@ -161,25 +161,30 @@ namespace nil {
                             scalar_field_type::value_bits, g2_window, g2_type::value_type::one());
 
                         knowledge_commitment_vector<g1_type, g1_type> A_query =
-                            kc_batch_exp<g1_type, g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window, g1_window, g1_table,
-                                                  g1_table, rA, rA * alphaA, At, chunks);
+                            kc_batch_exp<g1_type, g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window,
+                                                                              g1_window, g1_table, g1_table, rA,
+                                                                              rA * alphaA, At, chunks);
 
                         knowledge_commitment_vector<g2_type, g1_type> B_query =
-                            kc_batch_exp<g2_type, g1_type, scalar_field_type>(scalar_field_type::value_bits, g2_window, g1_window, g2_table, g1_table, rB,
-                                           rB * alphaB, Bt, chunks);
+                            kc_batch_exp<g2_type, g1_type, scalar_field_type>(scalar_field_type::value_bits, g2_window,
+                                                                              g1_window, g2_table, g1_table, rB,
+                                                                              rB * alphaB, Bt, chunks);
 
                         knowledge_commitment_vector<g1_type, g1_type> C_query =
-                            kc_batch_exp<g1_type, g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window, g1_window, g1_table, g1_table, rC,
-                                           rC * alphaC, Ct, chunks);
+                            kc_batch_exp<g1_type, g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window,
+                                                                              g1_window, g1_table, g1_table, rC,
+                                                                              rC * alphaC, Ct, chunks);
 
                         typename std::vector<typename g1_type::value_type> H_query =
-                            algebra::batch_exp<g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window, g1_table, Ht);
+                            algebra::batch_exp<g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window,
+                                                                           g1_table, Ht);
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<g1_type>(H_query);
 #endif
 
                         typename std::vector<typename g1_type::value_type> K_query =
-                            algebra::batch_exp<g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window, g1_table, Kt);
+                            algebra::batch_exp<g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window,
+                                                                           g1_table, Kt);
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<g1_type>(K_query);
 #endif
@@ -200,7 +205,8 @@ namespace nil {
                             multiplied_IC_coefficients.emplace_back(rA * IC_coefficients[i]);
                         }
                         typename std::vector<typename g1_type::value_type> encoded_IC_values =
-                            algebra::batch_exp<g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window, g1_table, multiplied_IC_coefficients);
+                            algebra::batch_exp<g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window,
+                                                                           g1_table, multiplied_IC_coefficients);
 
                         accumulation_vector<g1_type> encoded_IC_query(std::move(encoded_IC_base),
                                                                       std::move(encoded_IC_values));
@@ -214,7 +220,6 @@ namespace nil {
                                                                std::move(H_query),
                                                                std::move(K_query),
                                                                std::move(cs_copy));
-
 
                         return keypair_type(std::move(pk), std::move(vk));
                     }

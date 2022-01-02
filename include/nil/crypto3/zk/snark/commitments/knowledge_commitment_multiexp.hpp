@@ -129,8 +129,10 @@ namespace nil {
                     for (std::size_t pos = start_pos; pos != end_pos; ++pos) {
                         if (!v[pos].is_zero()) {
                             res.values.emplace_back(typename knowledge_commitment<T1, T2>::value_type(
-                                algebra::windowed_exp<T1, FieldType>(scalar_size, T1_window, T1_table, T1_coeff * v[pos]),
-                                algebra::windowed_exp<T2, FieldType>(scalar_size, T2_window, T2_table, T2_coeff * v[pos])));
+                                algebra::windowed_exp<T1, FieldType>(scalar_size, T1_window, T1_table,
+                                                                     T1_coeff * v[pos]),
+                                algebra::windowed_exp<T2, FieldType>(scalar_size, T2_window, T2_table,
+                                                                     T2_coeff * v[pos])));
                             res.indices.emplace_back(pos);
                         }
                     }

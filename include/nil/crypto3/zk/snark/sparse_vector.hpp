@@ -50,10 +50,9 @@ namespace nil {
                     using group_type = Type;
 
                 private:
-                    using underlying_value_type = 
-                        typename group_type::value_type;
+                    using underlying_value_type = typename group_type::value_type;
+
                 public:
-                    
                     std::vector<std::size_t> indices;
                     std::vector<underlying_value_type> values;
                     std::size_t domain_size_;

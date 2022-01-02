@@ -258,7 +258,8 @@ namespace nil {
                 //             affine_ate_precompute_g2<CurveType>(verification_key.delta_g2);
 
                 //         const accumulation_vector<g1_type> accumulated_IC =
-                //             verification_key.gamma_ABC_g1.accumulate_chunk(primary_input.begin(), primary_input.end(),
+                //             verification_key.gamma_ABC_g1.accumulate_chunk(primary_input.begin(),
+                //             primary_input.end(),
                 //                                                            0);
                 //         const typename g1_type::value_type &acc = accumulated_IC.first;
 

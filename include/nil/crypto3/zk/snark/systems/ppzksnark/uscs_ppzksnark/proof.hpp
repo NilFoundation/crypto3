@@ -43,7 +43,6 @@ namespace nil {
                     using g2_type = typename CurveType::template g2_type<>;
 
                 public:
-
                     typename g1_type::value_type V_g1;
                     typename g1_type::value_type alpha_V_g1;
                     typename g1_type::value_type H_g1;

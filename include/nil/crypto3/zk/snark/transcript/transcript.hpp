@@ -34,12 +34,12 @@ namespace nil {
                 /*!
                  * @brief Transcript policy. Assumed to be inherited by particular algorithms.
                  * @tparam TManifest Transcript Manifest in the following form:
-                 * 
-                 * 
+                 *
+                 *
                  * class transcript_manifest {
                  *
                  *  std::size_t gammas_amount = 5;
-                 *  
+                 *
                  *  public:
                  *   enum challenges_ids{
                  *      alpha,
@@ -53,9 +53,9 @@ namespace nil {
                  *   typedef std::tuple<...> processors;
                  * };
                  *
-                 * In the case above we have following list of challenges: (\alpha, \beta, 
+                 * In the case above we have following list of challenges: (\alpha, \beta,
                  * \gamma_0, \gamma_1, \gamma_2, \gamma_3, \gamma_4, \delta, \varepsilon)
-                 * 
+                 *
                  */
                 template<typename TManifest>
                 class transcript {
@@ -63,19 +63,21 @@ namespace nil {
                     typename TManifest::challenges challenges;
 
                     std::size_t next_challenge_id = 0;
-                public:
-                    
-                    transcript (){}
 
-                    transcript (std::tuple<> in_challenges): challenges(in_challenges){}
+                public:
+                    transcript() {
+                    }
+
+                    transcript(std::tuple<> in_challenges) : challenges(in_challenges) {
+                    }
 
                     /*!
                      * @brief For ordinary challenges. \alpha
                      * @tparam ChallengeId Ordinary challenge ID. In the example above it's \alpha.
                      *
                      */
-                    template <typename TManifest::challenges_ids ChallengeId>
-                    bool set_challenge(std::tuple_element<ChallengeId, typename TManifest::challenges> value){
+                    template<typename TManifest::challenges_ids ChallengeId>
+                    bool set_challenge(std::tuple_element<ChallengeId, typename TManifest::challenges> value) {
                         std::get<ChallengeId>(challenges) = value;
 
                         return (ChallengeId == next_challenge_id++);
@@ -87,12 +89,13 @@ namespace nil {
                      * @tparam Index Index of the particular challenge. In the example above it's \alpha_i.
                      *
                      */
-                    template <typename TManifest::challenges_ids ChallengeId, std::size_t Index>
-                    bool set_challenge(std::tuple_element<Index, 
-                        std::tuple_element<ChallengeId, typename TManifest::challenges>> value){
+                    template<typename TManifest::challenges_ids ChallengeId, std::size_t Index>
+                    bool set_challenge(
+                        std::tuple_element<Index, std::tuple_element<ChallengeId, typename TManifest::challenges>>
+                            value) {
                         std::get<Index>(std::get<ChallengeId>(challenges)) = value;
 
-                        return (ChallengeId+Index == next_challenge_id++);
+                        return (ChallengeId + Index == next_challenge_id++);
                     }
 
                     /*!
@@ -100,8 +103,8 @@ namespace nil {
                      * @tparam ChallengeId Ordinary challenge ID. In the example above it's \alpha.
                      *
                      */
-                    template <typename TManifest::challenges_ids ChallengeId>
-                    std::tuple_element<ChallengeId, typename TManifest::challenges> get_challenge() const{
+                    template<typename TManifest::challenges_ids ChallengeId>
+                    std::tuple_element<ChallengeId, typename TManifest::challenges> get_challenge() const {
                         return std::get<ChallengeId>(challenges);
                     }
 
@@ -111,9 +114,9 @@ namespace nil {
                      * @tparam Index Index of the particular challenge. In the example above it's \alpha_i.
                      *
                      */
-                    template <typename TManifest::challenges_ids ChallengeId, std::size_t Index>
-                    std::tuple_element<Index, 
-                        std::tuple_element<ChallengeId, typename TManifest::challenges>> get_challenge() const{
+                    template<typename TManifest::challenges_ids ChallengeId, std::size_t Index>
+                    std::tuple_element<Index, std::tuple_element<ChallengeId, typename TManifest::challenges>>
+                        get_challenge() const {
                         return std::get<Index>(std::get<ChallengeId>(challenges));
                     }
 
@@ -122,8 +125,9 @@ namespace nil {
                      * @tparam ChallengeId Ordinary challenge ID. In the example above it's \alpha.
                      *
                      */
-                    template <typename TManifest::challenges_ids ChallengeId>
-                    std::tuple_element<ChallengeId, typename TManifest::processors>::result_type get_challenge_result(){
+                    template<typename TManifest::challenges_ids ChallengeId>
+                    std::tuple_element<ChallengeId, typename TManifest::processors>::result_type
+                        get_challenge_result() {
                         return std::tuple_element<ChallengeId, typename TManifest::processors>(
                             get_challenge<ChallengeId>());
                     }
@@ -134,10 +138,12 @@ namespace nil {
                      * @tparam Index Index of the particular challenge. In the example above it's \alpha_i.
                      *
                      */
-                    template <typename TManifest::challenges_ids ChallengeId, std::size_t Index>
-                    std::tuple_element<Index, 
-                        std::tuple_element<ChallengeId, typename TManifest::processors>>::result_type get_challenge_result(){
-                        return std::tuple_element<Index, std::tuple_element<ChallengeId, typename TManifest::processors>>(
+                    template<typename TManifest::challenges_ids ChallengeId, std::size_t Index>
+                    std::tuple_element<Index,
+                                       std::tuple_element<ChallengeId, typename TManifest::processors>>::result_type
+                        get_challenge_result() {
+                        return std::tuple_element<Index,
+                                                  std::tuple_element<ChallengeId, typename TManifest::processors>>(
                             get_challenge<ChallengeId, Index>());
                     }
                 };
