@@ -39,14 +39,12 @@ namespace nil {
                     using evaluation_type = typename CurveType::scalar_field_type::value_type;
                     using commitment_type = typename CurveType::value_type;
 
-                    struct openning_type {
+                    struct openning_type { };
 
-                    }
-
-                    struct proof_type {
-                    };
+                    struct proof_type { };
 
                     static commitment_type commit() {
+                        return commitment_type();
                     }
                 };
 
