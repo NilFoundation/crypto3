@@ -60,7 +60,7 @@ namespace nil {
 
                     typedef blueprint<arithmetization_type> blueprint_type;
 
-                    typename blueprint_type::row_index_type j;
+                    std::size_t j;
 
                     constexpr static const std::size_t endo = 3;
 
@@ -107,7 +107,7 @@ namespace nil {
                         constexpr static const typename blueprint_type::variable_type next_n(
                             W6, blueprint_type::variable_type::rotation_type::next);
 
-                        for (typename blueprint_type::row_index_type z = 0; z <= 63; z++) {
+                        for (std::size_t z = 0; z <= 63; z++) {
                             bp.add_gate(j + z, b_1 * (b_1 - 1));
                             bp.add_gate(j + z, b_2 * (b_2 - 1));
                             bp.add_gate(j + z, b_3 * (b_3 - 1));
@@ -150,7 +150,7 @@ namespace nil {
 
                         std::array<bool, 4> b = marshalling::unpack(r);
 
-                        for (typename blueprint_type::row_index_type z = 0; z <= 63; z++) {
+                        for (std::size_t z = 0; z <= 63; z++) {
                             bp.val(W0, j + z) = T.X;
                             bp.val(W1, j + z) = T.Y;
                             bp.val(W2, j + z) = S.X;

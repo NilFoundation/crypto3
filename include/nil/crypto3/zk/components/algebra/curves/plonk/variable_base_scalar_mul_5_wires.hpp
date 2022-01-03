@@ -49,7 +49,7 @@ namespace nil {
 
                     typedef blueprint<arithmetization_type> blueprint_type;
 
-                    typename blueprint_type::row_index_type j;
+                    std::size_t j;
 
                 public:
                     element_g1_variable_base_scalar_mul_plonk(blueprint_type &bp) : component<TBlueprintField>(bp) {
@@ -58,7 +58,7 @@ namespace nil {
                     }
 
                 private:
-                    void generate_phi1_gate(typename blueprint_type::row_index_type row_index,
+                    void generate_phi1_gate(std::size_t row_index,
                                             typename blueprint_type::variable_type b,
                                             typename blueprint_type::variable_type x_1,
                                             typename blueprint_type::variable_type y_1,
@@ -73,7 +73,7 @@ namespace nil {
                                                (y_1 ^ 2 + x_1 ^ 2) * (y_1 ^ 2 - x_1 ^ 2) * x_2 * b));
                     }
 
-                    void generate_phi2_gate(typename blueprint_type::row_index_type row_index,
+                    void generate_phi2_gate(std::size_t row_index,
                                             typename blueprint_type::variable_type b,
                                             typename blueprint_type::variable_type x_1,
                                             typename blueprint_type::variable_type y_1,
@@ -156,7 +156,7 @@ namespace nil {
                         generate_phi2_gate(j + 1, w_1_jm1, w_1_jp1, w_2_jp1, w_1_jp1, w_2_jp1, w_3_jm1);
 
                         // j+z, z=0 mod 5, z!=0
-                        for (typename blueprint_type::row_index_type z = 5; z <= 84; z += 5) {
+                        for (std::size_t z = 5; z <= 84; z += 5) {
 
                             this->bp.add_gate(j + z, w_o_j - (w_1_j * 2 + w_4_j + w_o_jm1));
 
@@ -165,7 +165,7 @@ namespace nil {
                         }
 
                         // j+z, z=1 mod 5
-                        for (typename blueprint_type::row_index_type z = 1; z <= 84; z += 5) {
+                        for (std::size_t z = 1; z <= 84; z += 5) {
 
                             this->bp.add_gate(j + z, w_o_j - (w_o_jm1 + w_4_j));
 
@@ -175,7 +175,7 @@ namespace nil {
                         }
 
                         // j+z, z=2 mod 5
-                        for (typename blueprint_type::row_index_type z = 2; z <= 84; z += 5) {
+                        for (std::size_t z = 2; z <= 84; z += 5) {
 
                             this->bp.add_gate(j + z, w_o_j - (w_o_jm1 + w_4_j));
 
@@ -183,7 +183,7 @@ namespace nil {
                         }
 
                         // j+z, z=3 mod 5
-                        for (typename blueprint_type::row_index_type z = 2; z <= 84; z += 5) {
+                        for (std::size_t z = 2; z <= 84; z += 5) {
 
                             this->bp.add_gate(j + z, w_o_j - (w_o_jm1 + w_4_j));
 
@@ -193,7 +193,7 @@ namespace nil {
                         }
 
                         // j+z, z=4 mod 5
-                        for (typename blueprint_type::row_index_type z = 4; z <= 84; z += 5) {
+                        for (std::size_t z = 4; z <= 84; z += 5) {
 
                             this->bp.add_gate(j + z, w_o_j - (w_o_jm1 + w_4_j));
 

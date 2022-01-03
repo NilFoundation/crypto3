@@ -48,7 +48,7 @@ namespace nil {
 
                     typedef blueprint<arithmetization_type, TBlueprintField> blueprint_type;
 
-                    typename blueprint_type::row_index_type j;
+                    std::size_t j;
 
                     range_plonk<TBlueprintField> range_proof;
                     sha512_plonk<TBlueprintField> sha512;

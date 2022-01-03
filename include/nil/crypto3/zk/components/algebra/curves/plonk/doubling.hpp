@@ -43,7 +43,7 @@ namespace nil {
 
                     typedef blueprint<arithmetization_type, TBlueprintField> blueprint_type;
 
-                    typename blueprint_type::row_index_type i;
+                    std::size_t i;
                 public:
 
                     element_g1_doubling_plonk(blueprint_type &bp) :
