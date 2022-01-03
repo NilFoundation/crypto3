@@ -29,29 +29,43 @@
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_ENDO_SCALAR_MUL_COMPONENT_15_WIRES_HPP
 
 #include <nil/crypto3/zk/components/blueprint.hpp>
+#include <nil/crypto3/zk/components/component.hpp>
+
+#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
 
-                template<typename TBlueprintField, typename CurveType, 
-                    std::size_t W0 = 0, std::size_t W1 = 1, std::size_t W2 = 2, std::size_t W3 = 3, 
-                    std::size_t W4 = 4, std::size_t W5 = 5, std::size_t W6 = 6, std::size_t W7 = 7,
-                    std::size_t W8 = 8, std::size_t W9 = 9, std::size_t W10 = 10, std::size_t W11 = 11,
-                    std::size_t W12 = 12, std::size_t W13 = 13, std::size_t W14 = 14>
+                template<typename TBlueprintField,
+                         typename CurveType,
+                         std::size_t W0 = 0,
+                         std::size_t W1 = 1,
+                         std::size_t W2 = 2,
+                         std::size_t W3 = 3,
+                         std::size_t W4 = 4,
+                         std::size_t W5 = 5,
+                         std::size_t W6 = 6,
+                         std::size_t W7 = 7,
+                         std::size_t W8 = 8,
+                         std::size_t W9 = 9,
+                         std::size_t W10 = 10,
+                         std::size_t W11 = 11,
+                         std::size_t W12 = 12,
+                         std::size_t W13 = 13,
+                         std::size_t W14 = 14>
                 class element_g1_variable_base_endo_scalar_mul_plonk : public component<TBlueprintField> {
                     typedef snark::plonk_constraint_system<TBlueprintField> arithmetization_type;
 
-                    typedef blueprint<arithmetization_type, TBlueprintField> blueprint_type;
+                    typedef blueprint<arithmetization_type> blueprint_type;
 
                     typename blueprint_type::row_index_type j;
 
                     constexpr static const std::size_t endo = 3;
-                public:
 
-                    element_g1_variable_base_endo_scalar_mul_plonk(blueprint_type &bp) :
-                        component<FieldType>(bp){
+                public:
+                    element_g1_variable_base_endo_scalar_mul_plonk(blueprint_type &bp) : component<FieldType>(bp) {
 
                         // the last row is only for the n
                         j = bp.allocate_rows(64 + 1);
@@ -59,73 +73,84 @@ namespace nil {
 
                     void generate_gates() {
 
-                        constexpr static const typename blueprint_type::variable_type x_T(W0, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type y_T(W1, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type x_S(W2, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type y_S(W3, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type x_P(W4, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type y_P(W5, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type n(W6, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type x_R(W7, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type y_R(W8, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type s_1(W9, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type s_3(W10, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type b_1(W11, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type b_2(W12, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type b_3(W13, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type b_4(W14, 
-                            blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type x_T(
+                            W0, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type y_T(
+                            W1, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type x_S(
+                            W2, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type y_S(
+                            W3, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type x_P(
+                            W4, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type y_P(
+                            W5, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type n(
+                            W6, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type x_R(
+                            W7, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type y_R(
+                            W8, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type s_1(
+                            W9, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type s_3(
+                            W10, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type b_1(
+                            W11, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type b_2(
+                            W12, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type b_3(
+                            W13, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type b_4(
+                            W14, blueprint_type::variable_type::rotation_type::current);
 
-                        constexpr static const typename blueprint_type::variable_type next_n(W6, 
-                            blueprint_type::variable_type::rotation_type::next);
+                        constexpr static const typename blueprint_type::variable_type next_n(
+                            W6, blueprint_type::variable_type::rotation_type::next);
 
-                        for (typename blueprint_type::row_index_type z = 0; z <= 63; z++){
+                        for (typename blueprint_type::row_index_type z = 0; z <= 63; z++) {
                             bp.add_gate(j + z, b_1 * (b_1 - 1));
                             bp.add_gate(j + z, b_2 * (b_2 - 1));
                             bp.add_gate(j + z, b_3 * (b_3 - 1));
                             bp.add_gate(j + z, b_4 * (b_4 - 1));
 
                             bp.add_gate(j + z, ((1 + (endo - 1) * b_2) * x_T - x_P) * s_1 - (2 * b_1 - 1) * y_T + y_P);
-                            bp.add_gate(j + z, (2 * x_P - s_1^2 + (1 + (endo - 1) * b_2) * x_T) * ((x_P - x_R) * s_1 + y_R + y_P) - (x_P - x_R) * 2 * y_P);
-                            bp.add_gate(j + z, (y_R + yP)^2 - ((xP - x_R)^2 * (s_1^2 - (1 + (endo - 1) * b_2) * x_T + x_R)));
-                            bp.add_gate(j + z, ((1 + (endo - 1) * b_2) * x_T - x_R) * s_3 - (2 * b_3-1) * y_T + y_R);
-                            bp.add_gate(j + z, (2 * x_R - s_3^2 + (1 + (endo - 1) * b_4) * x_T) * ((x_R - x_S) * s_3 + y_S + y_R) - (x_R - x_S) * 2 * y_R);
-                            bp.add_gate(j + z, (y_S + y_R)^2 - ((x_R - x_S)^2 * (s_3^2 - (1 + (endo - 1) * b_4) * x_T + x_S)));
+                            bp.add_gate(j + z,
+                                        (2 * x_P - s_1 ^ 2 + (1 + (endo - 1) * b_2) * x_T) *
+                                                ((x_P - x_R) * s_1 + y_R + y_P) -
+                                            (x_P - x_R) * 2 * y_P);
+                            bp.add_gate(j + z,
+                                        (y_R + yP) ^
+                                            2 - ((xP - x_R) ^ 2 * (s_1 ^ 2 - (1 + (endo - 1) * b_2) * x_T + x_R)));
+                            bp.add_gate(j + z, ((1 + (endo - 1) * b_2) * x_T - x_R) * s_3 - (2 * b_3 - 1) * y_T + y_R);
+                            bp.add_gate(j + z,
+                                        (2 * x_R - s_3 ^ 2 + (1 + (endo - 1) * b_4) * x_T) *
+                                                ((x_R - x_S) * s_3 + y_S + y_R) -
+                                            (x_R - x_S) * 2 * y_R);
+                            bp.add_gate(j + z,
+                                        (y_S + y_R) ^
+                                            2 - ((x_R - x_S) ^ 2 * (s_3 ^ 2 - (1 + (endo - 1) * b_4) * x_T + x_S)));
                             bp.add_gate(j + z, n - (16 * next_n + 8 * b_1 + 4 * b_2 + 2 * b_3 + b_4));
                         }
                     }
 
                 private:
-                    static typename CurveType::scalar_field_type::value_type lambda(
-                        typename CurveType::g1_type<>::value_type P1,
-                        typename CurveType::g1_type<>::value_type P2){
-                        return (P1.Y - P2.Y)*(P1.X - P2.X);
+                    static typename CurveType::scalar_field_type::value_type
+                        lambda(typename CurveType::g1_type<>::value_type P1,
+                               typename CurveType::g1_type<>::value_type P2) {
+                        return (P1.Y - P2.Y) * (P1.X - P2.X);
                     }
+
                 public:
-                    void generate_assignments(typename CurveType::scalar_field_type::value_type &r, 
+                    void generate_assignments(typename CurveType::scalar_field_type::value_type &r,
                                               typename CurveType::g1_type<>::value_type &T) {
 
                         typename CurveType::g1_type<>::value_type Q = ...;
                         typename CurveType::g1_type<>::value_type S = ...;
                         typename CurveType::g1_type<>::value_type R = S + Q;
-                        
+
                         std::array<bool, 4> b = marshalling::unpack(r);
 
-                        for (typename blueprint_type::row_index_type z = 0; z <= 63; z++){
+                        for (typename blueprint_type::row_index_type z = 0; z <= 63; z++) {
                             bp.val(W0, j + z) = T.X;
                             bp.val(W1, j + z) = T.Y;
                             bp.val(W2, j + z) = S.X;
@@ -143,7 +168,7 @@ namespace nil {
                             bp.val(W14, j + z) = b[3];
                         }
 
-                        bp.val(W6, j+64) = 0;
+                        bp.val(W6, j + 64) = 0;
                     }
                 };
 

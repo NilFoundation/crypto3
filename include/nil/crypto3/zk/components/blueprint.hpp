@@ -51,8 +51,9 @@ namespace nil {
                 class blueprint<snark::r1cs_constraint_system<TBlueprintField>> {
                     typedef snark::r1cs_constraint_system<TBlueprintField> TArithmetization;
 
-                    snark::r1cs_variable_assignment<TBlueprintField> values; /* values[0] will hold the value of the first
-                                                                allocated variable of the blueprint, *NOT* constant 1 */
+                    snark::r1cs_variable_assignment<TBlueprintField>
+                        values; /* values[0] will hold the value of the first
+                   allocated variable of the blueprint, *NOT* constant 1 */
                     typename TBlueprintField::value_type constant_term;
 
                     typename snark::variable<TBlueprintField>::index_type next_free_var;
@@ -71,7 +72,7 @@ namespace nil {
                         next_free_var = 1; /* to account for constant 1 term */
                         next_free_lc = 0;
                     }
-                    
+
                     void clear_values() {
                         std::fill(values.begin(), values.end(), TBlueprintField::value_type::zero());
                     }
@@ -86,7 +87,8 @@ namespace nil {
                         return (var.index == 0 ? constant_term : values[var.index - 1]);
                     }
 
-                    typename TBlueprintField::value_type &lc_val(const blueprint_linear_combination<TArithmetization> &lc) {
+                    typename TBlueprintField::value_type &
+                        lc_val(const blueprint_linear_combination<TArithmetization> &lc) {
                         if (lc.is_variable) {
                             return this->val(value_type(lc.index));
                         } else {
@@ -95,7 +97,8 @@ namespace nil {
                         }
                     }
 
-                    typename TBlueprintField::value_type lc_val(const blueprint_linear_combination<TArithmetization> &lc) const {
+                    typename TBlueprintField::value_type
+                        lc_val(const blueprint_linear_combination<TArithmetization> &lc) const {
                         if (lc.is_variable) {
                             return this->val(value_type(lc.index));
                         } else {
@@ -135,11 +138,13 @@ namespace nil {
                     }
 
                     snark::r1cs_primary_input<TBlueprintField> primary_input() const {
-                        return snark::r1cs_primary_input<TBlueprintField>(values.begin(), values.begin() + num_inputs());
+                        return snark::r1cs_primary_input<TBlueprintField>(values.begin(),
+                                                                          values.begin() + num_inputs());
                     }
 
                     snark::r1cs_auxiliary_input<TBlueprintField> auxiliary_input() const {
-                        return snark::r1cs_auxiliary_input<TBlueprintField>(values.begin() + num_inputs(), values.end());
+                        return snark::r1cs_auxiliary_input<TBlueprintField>(values.begin() + num_inputs(),
+                                                                            values.end());
                     }
 
                     snark::r1cs_constraint_system<TBlueprintField> get_constraint_system() const {
@@ -163,7 +168,7 @@ namespace nil {
                 };
 
                 template<typename TBlueprintField, std::size_t WiresAmount>
-                class blueprint <snark::plonk_constraint_system<TBlueprintField, WiresAmount>>{
+                class blueprint<snark::plonk_constraint_system<TBlueprintField, WiresAmount>> {
 
                     typedef snark::plonk_constraint_system<TBlueprintField, WiresAmount> TArithmetization;
 
@@ -172,33 +177,34 @@ namespace nil {
                     TArithmetization constraint_system;
 
                 public:
-
                     using value_type = blueprint_variable<TArithmetization>;
 
-                    blueprint(){}
-                    
+                    blueprint() {
+                    }
+
                     void clear_assignments() {
-                        for (auto iter = assignments.begin(); iter != assignments.end(); iter++){
+                        for (auto iter = assignments.begin(); iter != assignments.end(); iter++) {
                             std::fill(iter->begin(), iter->end(), TBlueprintField::value_type::zero());
                         }
                     }
 
                     typename TBlueprintField::value_type &assignment(const value_type &var, std::size_t row_index) {
                         assert(var.wire_index < assignments.size());
-                        if (row_index >= assignments[var.wire_index].size()){
+                        if (row_index >= assignments[var.wire_index].size()) {
                             assignments[var.wire_index].resize(row_index + 1);
                         }
                         assert(row_index < assignments[var.wire_index].size());
                         return (assignments[var.wire_index][row_index]);
                     }
 
-                    typename TBlueprintField::value_type assignment(const value_type &var, std::size_t row_index) const {
+                    typename TBlueprintField::value_type assignment(const value_type &var,
+                                                                    std::size_t row_index) const {
                         assert(var.wire_index < assignments.size());
                         assert(row_index < assignments[var.wire_index].size());
                         return (assignments[var.index][row_index]);
                     }
-                    
-                    std::size_t allocate_rows(std::size_t required_amount = 1){
+
+                    std::size_t allocate_rows(std::size_t required_amount = 1) {
                         static std::size_t next_row = 0;
                         std::size_t result = next_row;
                         next_row += required_amount;
@@ -209,7 +215,8 @@ namespace nil {
                         constraint_system.constraints.emplace_back(constr);
                     }
 
-                    void add_gate(std::initializer_list<std::size_t> row_indices,const snark::plonk_constraint<TBlueprintField> &constr) {
+                    void add_gate(std::initializer_list<std::size_t> row_indices,
+                                  const snark::plonk_constraint<TBlueprintField> &constr) {
                         constraint_system.constraints.emplace_back(constr);
                     }
 
