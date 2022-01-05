@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PROVER_HPP
 #define CRYPTO3_ZK_PLONK_REDSHIFT_PROVER_HPP
 
-#include <nil/crypto3/math/polynomial/polynom.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 
 #include <nil/crypto3/hash/sha2.hpp>
@@ -89,14 +89,14 @@ namespace nil {
 
                         // 2 - Define new witness polynomials
                         // and 3 - Add commitments to fi to transcript
-                        // std::vector<math::polynomial::polynom<typename FieldType::value_type>> f =
-                        //     constraint_system.get_polynoms(assignments);
+                        // std::vector<math::polynomial::polynomial<typename FieldType::value_type>> f =
+                        //     constraint_system.polynoms(assignments);
 
                         // std::vector<merkle_tree_type> f_trees;
                         // std::vector<typename lpc::commitment_type> f_commitments;
 
                         // for (std::size_t i = 0; i < N_wires; i++) {
-                        //     math::polynomial::polynom<typename FieldType::value_type> h;
+                        //     math::polynomial::polynomial<typename FieldType::value_type> h;
                         //     f[i] = f[i] + h * preprocessed_data.Z;
                         //     f_trees.push_back(lpc::commit(f[i]));
                         //     f_commitments[i].push_back(f_trees[i].root());
@@ -115,8 +115,8 @@ namespace nil {
                         // std::vector<typename FieldType::value_type> S;
 
                         // 6
-                        // math::polynomial::polynom<typename FieldType::value_type> A1;
-                        // math::polynomial::polynom<typename FieldType::value_type> S1;
+                        // math::polynomial::polynomial<typename FieldType::value_type> A1;
+                        // math::polynomial::polynomial<typename FieldType::value_type> S1;
 
                         // 7
                         // merkle_tree_type A1_tree = lpc::commit(A1);
@@ -138,15 +138,15 @@ namespace nil {
 
                         // 9
                         // and 10
-                        // std::vector<math::polynomial::polynom<typename FieldType::value_type>> p(N_perm);
-                        // std::vector<math::polynomial::polynom<typename FieldType::value_type>> q(N_perm);
+                        // std::vector<math::polynomial::polynomial<typename FieldType::value_type>> p(N_perm);
+                        // std::vector<math::polynomial::polynomial<typename FieldType::value_type>> q(N_perm);
 
-                        // math::polynomial::polynom<typename FieldType::value_type> p1 = {1};
-                        // math::polynomial::polynom<typename FieldType::value_type> q1 = {1};
+                        // math::polynomial::polynomial<typename FieldType::value_type> p1 = {1};
+                        // math::polynomial::polynomial<typename FieldType::value_type> q1 = {1};
 
-                        // std::vector<math::polynomial::polynom<typename FieldType::value_type>>
+                        // std::vector<math::polynomial::polynomial<typename FieldType::value_type>>
                         //     &S_sigma = preprocessed_data.permutations;
-                        // std::vector<math::polynomial::polynom<typename FieldType::value_type>>
+                        // std::vector<math::polynomial::polynomial<typename FieldType::value_type>>
                         //     &S_id = preprocessed_data.identity_permutations;
 
                         // for (std::size_t j = 0; j < N_perm; j++) {
@@ -183,9 +183,9 @@ namespace nil {
                         //     Q_mul_result));
                         // }
 
-                        // math::polynomial::polynom<typename FieldType::value_type> P =
+                        // math::polynomial::polynomial<typename FieldType::value_type> P =
                         //     math::polynomial::lagrange_interpolation(P_interpolation_points);
-                        // math::polynomial::polynom<typename FieldType::value_type> Q =
+                        // math::polynomial::polynomial<typename FieldType::value_type> Q =
                         //     math::polynomial::lagrange_interpolation(Q_interpolation_points);
 
                         // 12
@@ -198,7 +198,7 @@ namespace nil {
                         // transcript(Q_commitment);
 
                         // 13
-                        // math::polynomial::polynom<typename FieldType::value_type> V;
+                        // math::polynomial::polynomial<typename FieldType::value_type> V;
 
                         // 14
                         // transcript(lpc::commit(V, D_0).root());
@@ -215,16 +215,16 @@ namespace nil {
                         // 17
                         // and 21
                         std::size_t N_T = N_perm;
-                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> gates(N_sel);
-                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> constraints =
-                            constraint_system.get_polynoms(assignments);
+                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> gates(N_sel);
+                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> constraints =
+                            constraint_system.polynoms(assignments);
 
                         for (std::size_t i = 0; i < N_sel; i++) {
                             gates[i] = {0};
                             std::size_t n_i;
                             for (std::size_t j = 0; j < n_i; j++) {
                                 std::size_t d_i_j;
-                                math::polynomial::polynom<typename FieldType::value_type> tau_polynom = {
+                                math::polynomial::polynomial<typename FieldType::value_type> tau_polynom = {
                                     tau.pow(d_i_j)};
                                 gates[i] = gates[i] + preprocessed_data.constraints[j] * tau_polynom;
                             }
@@ -235,7 +235,7 @@ namespace nil {
                         }
 
                         // 18
-                        std::array<math::polynomial::polynom<typename FieldType::value_type>, 11> F;
+                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, 11> F;
                         // F[0] = preprocessed_data.Lagrange_basis[1] * (P - 1);
                         // F[1] = preprocessed_data.Lagrange_basis[1] * (Q - 1);
                         // F[2] = P * p1 - (P << 1);
@@ -251,17 +251,17 @@ namespace nil {
                         // ...
 
                         // 20
-                        math::polynomial::polynom<typename FieldType::value_type> F_consolidated = {0};
+                        math::polynomial::polynomial<typename FieldType::value_type> F_consolidated = {0};
                         for (std::size_t i = 0; i < 11; i++) {
-                            math::polynomial::polynom<typename FieldType::value_type> alphas_polynom = {alphas[i]};
+                            math::polynomial::polynomial<typename FieldType::value_type> alphas_polynom = {alphas[i]};
                             F_consolidated = F_consolidated + alphas_polynom * F[i];
                         }
 
-                        math::polynomial::polynom<typename FieldType::value_type> T_consolidated =
+                        math::polynomial::polynomial<typename FieldType::value_type> T_consolidated =
                             F_consolidated / preprocessed_data.Z;
 
                         // 22
-                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> T(N_T);
+                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> T(N_T);
                         // T = separate_T(T_consolidated);
 
                         // 23

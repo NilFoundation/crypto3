@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_PICKLES_COMMITMENT_SCHEME_HPP
 #define CRYPTO3_ZK_PICKLES_COMMITMENT_SCHEME_HPP
 
-#include <nil/crypto3/math/polynomial/polynom.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 namespace nil {
     namespace crypto3 {

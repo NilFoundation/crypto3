@@ -86,22 +86,25 @@ namespace nil {
                         return true;
                     }
 
-                    std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_copy_constraints() {
+                    std::vector<math::polynomial::polynomial<typename FieldType::value_type>> copy_constraints() {
+                        return {};
                     }
 
-                    std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_selectors() {
+                    std::vector<math::polynomial::polynomial<typename FieldType::value_type>> selectors() {
+                        return {};
                     }
 
-                    std::vector<math::polynomial::polynom<typename FieldType::value_type>> get_lookups() {
+                    std::vector<math::polynomial::polynomial<typename FieldType::value_type>> lookups() {
+                        return {};
                     }
 
-                    std::vector<math::polynomial::polynom<typename FieldType::value_type>>
-                        get_polynoms(plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment) const {
+                    std::vector<math::polynomial::polynomial<typename FieldType::value_type>>
+                        polynoms(plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment) const {
 
-                        std::vector<math::polynomial::polynom<typename FieldType::value_type>> result(
+                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> result(
                             constraints.size());
 
-                        std::array<math::polynomial::polynom<typename FieldType::value_type>, WiresAmount>
+                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, WiresAmount>
                             wire_polynomials;
                         for (std::size_t wire_index = 0; wire_index < WiresAmount; wire_index++) {
                             wire_polynomials[wire_index] =
@@ -113,7 +116,7 @@ namespace nil {
 
                             for (auto &term : constraints[constraint_index].terms) {
 
-                                math::polynomial::polynom<typename FieldType::value_type> term_polynom = {term.coeff};
+                                math::polynomial::polynomial<typename FieldType::value_type> term_polynom = {term.coeff};
 
                                 // TODO: Rotation isn't taken into consideration
                                 for (auto &var : term.vars) {
@@ -135,7 +138,6 @@ namespace nil {
                         return (this->constraints == other.constraints);
                     }
                 };
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

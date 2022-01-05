@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_LIST_POLYNOMIAL_COMMITMENT_SCHEME_HPP
 #define CRYPTO3_ZK_LIST_POLYNOMIAL_COMMITMENT_SCHEME_HPP
 
-#include <nil/crypto3/math/polynomial/polynom.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 
 #include <nil/crypto3/merkle/tree.hpp>
@@ -65,7 +65,7 @@ namespace nil {
                     typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
                     typedef typename containers::merkle_proof<Hash, 2> merkle_proof_type;
 
-                    // static const math::polynomial::polynom<typename FieldType::value_type>
+                    // static const math::polynomial::polynomial<typename FieldType::value_type>
                     //     q = {0, 0, 1};
 
                     struct transcript_round_manifest {
@@ -96,7 +96,7 @@ namespace nil {
                     // After this function
                     // result.root();
                     // should be called
-                    static merkle_tree_type commit(const math::polynomial::polynom<typename FieldType::value_type> &f,
+                    static merkle_tree_type commit(const math::polynomial::polynomial<typename FieldType::value_type> &f,
                                                    const std::vector<typename FieldType::value_type> &D) {
 
                         std::vector<typename FieldType::value_type> y;
@@ -110,11 +110,11 @@ namespace nil {
 
                     static proof_type proof_eval(std::array<typename FieldType::value_type, k> evaluation_points,
                                                  const merkle_tree_type &T,
-                                                 const math::polynomial::polynom<typename FieldType::value_type> &f,
+                                                 const math::polynomial::polynomial<typename FieldType::value_type> &f,
                                                  const std::vector<typename FieldType::value_type> &D) {
 
-                        // temporary definition, until polynom is constexpr
-                        const math::polynomial::polynom<typename FieldType::value_type> q = {0, 0, 1};
+                        // temporary definition, until polynomial is constexpr
+                        const math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
                         proof_type proof;
 
@@ -131,19 +131,19 @@ namespace nil {
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], z_j);
                         }
 
-                        math::polynomial::polynom<typename FieldType::value_type> U =
+                        math::polynomial::polynomial<typename FieldType::value_type> U =
                             math::polynomial::lagrange_interpolation(U_interpolation_points);
 
-                        math::polynomial::polynom<typename FieldType::value_type> Q = (f - U);
+                        math::polynomial::polynomial<typename FieldType::value_type> Q = (f - U);
                         for (std::size_t j = 0; j < k; j++) {
-                            math::polynomial::polynom<typename FieldType::value_type> denominator_polynom = {
+                            math::polynomial::polynomial<typename FieldType::value_type> denominator_polynom = {
                                 -evaluation_points[j], 1};
                             Q = Q / denominator_polynom;
                         }
 
                         for (std::size_t round_id = 0; round_id < lambda; round_id++) {
 
-                            math::polynomial::polynom<typename FieldType::value_type> f_i = Q;
+                            math::polynomial::polynomial<typename FieldType::value_type> f_i = Q;
 
                             typename FieldType::value_type x_i =
                                 transcript
@@ -167,7 +167,7 @@ namespace nil {
                                 // transcript.template get_challenge<transcript_round_manifest::challenges_ids::y, i,
                                 // FieldType>();
 
-                                math::polynomial::polynom<typename FieldType::value_type> sqr_polynom = {y_arr[i], 0,
+                                math::polynomial::polynomial<typename FieldType::value_type> sqr_polynom = {y_arr[i], 0,
                                                                                                          -1};
                                 std::array<typename FieldType::value_type, m> s;
                                 // = math::polynomial::get_roots<m>(sqr_polynom);
@@ -182,7 +182,7 @@ namespace nil {
                                     p_y_i_interpolation_points[j] = std::make_pair(s[j], alpha_i_j);
                                 }
 
-                                math::polynomial::polynom<typename FieldType::value_type> p_y_i =
+                                math::polynomial::polynomial<typename FieldType::value_type> p_y_i =
                                     math::polynomial::lagrange_interpolation(p_y_i_interpolation_points);
 
                                 f_i = p_y_i;
@@ -211,8 +211,8 @@ namespace nil {
                                             proof_type proof,
                                             const std::vector<typename FieldType::value_type> &D) {
 
-                        // temporary definition, until polynom is constexpr
-                        const math::polynomial::polynom<typename FieldType::value_type> q = {0, 0, 1};
+                        // temporary definition, until polynomial is constexpr
+                        const math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
                         fiat_shamir_heuristic<transcript_round_manifest, transcript_hash_type> transcript;
 
@@ -230,10 +230,10 @@ namespace nil {
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], z_j);
                         }
 
-                        math::polynomial::polynom<typename FieldType::value_type> U =
+                        math::polynomial::polynomial<typename FieldType::value_type> U =
                             math::polynomial::lagrange_interpolation(U_interpolation_points);
 
-                        math::polynomial::polynom<typename FieldType::value_type> Q;
+                        math::polynomial::polynomial<typename FieldType::value_type> Q;
                         // = (f - U);
                         // for (std::size_t j = 0; j < k; j++){
                         //     Q = Q/(x - U_interpolation_points[j]);
@@ -241,7 +241,7 @@ namespace nil {
 
                         for (std::size_t round_id = 0; round_id < lambda; round_id++) {
 
-                            math::polynomial::polynom<typename FieldType::value_type> f_i = Q;
+                            math::polynomial::polynomial<typename FieldType::value_type> f_i = Q;
 
                             typename FieldType::value_type x_i =
                                 transcript
@@ -262,7 +262,7 @@ namespace nil {
 
                             for (std::size_t i = 0; i <= r - 1; i++) {
 
-                                math::polynomial::polynom<typename FieldType::value_type> sqr_polynom = {y_arr[i], 0,
+                                math::polynomial::polynomial<typename FieldType::value_type> sqr_polynom = {y_arr[i], 0,
                                                                                                          -1};
                                 std::array<typename FieldType::value_type, m> s;
                                 // = math::polynomial::get_roots<m>(sqr_polynom);
@@ -279,7 +279,7 @@ namespace nil {
                                     p_y_i_interpolation_points[j] = std::make_pair(s[j], alpha_i_j);
                                 }
 
-                                math::polynomial::polynom<typename FieldType::value_type> p_y_i =
+                                math::polynomial::polynomial<typename FieldType::value_type> p_y_i =
                                     math::polynomial::lagrange_interpolation(p_y_i_interpolation_points);
 
                                 typename FieldType::value_type f_y_i;

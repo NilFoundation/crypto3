@@ -32,7 +32,7 @@
 #define CRYPTO3_ZK_NON_LINEAR_COMBINATION_HPP
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
-#include <nil/crypto3/math/polynomial/polynom.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <vector>
 
 namespace nil {
@@ -215,12 +215,12 @@ namespace nil {
                     }
 
                     template<std::size_t WiresAmount>
-                    math::polynomial::polynom<field_value_type> evaluate(
+                    math::polynomial::polynomial<field_value_type> evaluate(
                         std::size_t row_index,
-                        const std::array<math::polynomial::polynom<field_value_type>, WiresAmount> &assignment) const {
-                        math::polynomial::polynom<field_value_type> acc = {0};
+                        const std::array<math::polynomial::polynomial<field_value_type>, WiresAmount> &assignment) const {
+                        math::polynomial::polynomial<field_value_type> acc = {0};
                         for (non_linear_combination &nlt : terms) {
-                            math::polynomial::polynom<field_value_type> term_value = {nlt.coeff};
+                            math::polynomial::polynomial<field_value_type> term_value = {nlt.coeff};
 
                             for (variable<FieldType, RotationSupport> &var : nlt.vars) {
                                 term_value *= assignment[var.wire_index];
