@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_MATH_LAGRANGE_INTERPOLATION_HPP
 #define CRYPTO3_MATH_LAGRANGE_INTERPOLATION_HPP
 
-#include <nil/crypto3/math/polynomial/polynom.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -34,27 +34,27 @@ namespace nil {
             namespace polynomial {
 
                 /*!
-                 * @brief Perform polynom Lagrange interpolation from points.
+                 * @brief Perform polynomial Lagrange interpolation from points.
                  */
                 template<typename FieldValueType>
-                polynom<FieldValueType> lagrange_interpolation(
+                polynomial<FieldValueType> lagrange_interpolation(
                     const std::vector<std::pair<FieldValueType, FieldValueType>> &points) {
 
-                    return polynom<FieldValueType>();
+                    return polynomial<FieldValueType>();
                 }
 
                 template<typename FieldValueType, std::size_t ContainerSize>
-                polynom<FieldValueType> lagrange_interpolation(
+                polynomial<FieldValueType> lagrange_interpolation(
                     const std::array<std::pair<FieldValueType, FieldValueType>, ContainerSize> &points) {
 
-                    return polynom<FieldValueType>();
+                    return polynomial<FieldValueType>();
                 }
 
                 template<typename FieldValueType>
-                polynom<FieldValueType> lagrange_interpolation(
+                polynomial<FieldValueType> lagrange_interpolation(
                     const std::vector<FieldValueType> &points) {
 
-                    return polynom<FieldValueType>();
+                    return polynomial<FieldValueType>();
                 }
 
             }    // namespace polynomial
