@@ -56,7 +56,7 @@ namespace nil {
                          std::size_t W13 = 13,
                          std::size_t W14 = 14>
                 class element_g1_variable_base_endo_scalar_mul_plonk : public component<TBlueprintField> {
-                    typedef snark::plonk_constraint_system<TBlueprintField> arithmetization_type;
+                    typedef snark::plonk_constraint_system<TBlueprintField, 15> arithmetization_type;
 
                     typedef blueprint<arithmetization_type> blueprint_type;
 
@@ -65,113 +65,115 @@ namespace nil {
                     constexpr static const std::size_t endo = 3;
 
                 public:
-                    element_g1_variable_base_endo_scalar_mul_plonk(blueprint_type &bp) : component<FieldType>(bp) {
+                    element_g1_variable_base_endo_scalar_mul_plonk(blueprint_type &bp) :
+                        component<TBlueprintField>(bp) {
 
                         // the last row is only for the n
-                        j = bp.allocate_rows(64 + 1);
+                        j = this->bp.allocate_rows(64 + 1);
                     }
 
                     void generate_gates() {
 
-                        constexpr static const typename blueprint_type::variable_type x_T(
-                            W0, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type y_T(
-                            W1, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type x_S(
-                            W2, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type y_S(
-                            W3, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type x_P(
-                            W4, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type y_P(
-                            W5, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type n(
-                            W6, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type x_R(
-                            W7, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type y_R(
-                            W8, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type s_1(
-                            W9, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type s_3(
-                            W10, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type b_1(
-                            W11, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type b_2(
-                            W12, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type b_3(
-                            W13, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type b_4(
-                            W14, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type x_T(
+                            W0, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type y_T(
+                            W1, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type x_S(
+                            W2, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type y_S(
+                            W3, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type x_P(
+                            W4, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type y_P(
+                            W5, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type n(
+                            W6, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type x_R(
+                            W7, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type y_R(
+                            W8, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type s_1(
+                            W9, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type s_3(
+                            W10, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type b_1(
+                            W11, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type b_2(
+                            W12, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type b_3(
+                            W13, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type b_4(
+                            W14, blueprint_type::value_type::rotation_type::current);
 
-                        constexpr static const typename blueprint_type::variable_type next_n(
-                            W6, blueprint_type::variable_type::rotation_type::next);
+                        constexpr static const typename blueprint_type::value_type next_n(
+                            W6, blueprint_type::value_type::rotation_type::next);
 
                         for (std::size_t z = 0; z <= 63; z++) {
-                            bp.add_gate(j + z, b_1 * (b_1 - 1));
-                            bp.add_gate(j + z, b_2 * (b_2 - 1));
-                            bp.add_gate(j + z, b_3 * (b_3 - 1));
-                            bp.add_gate(j + z, b_4 * (b_4 - 1));
+                            this->bp.add_gate(j + z, b_1 * (b_1 - 1));
+                            this->bp.add_gate(j + z, b_2 * (b_2 - 1));
+                            this->bp.add_gate(j + z, b_3 * (b_3 - 1));
+                            this->bp.add_gate(j + z, b_4 * (b_4 - 1));
 
-                            bp.add_gate(j + z, ((1 + (endo - 1) * b_2) * x_T - x_P) * s_1 - (2 * b_1 - 1) * y_T + y_P);
-                            bp.add_gate(j + z,
-                                        (2 * x_P - s_1 ^ 2 + (1 + (endo - 1) * b_2) * x_T) *
-                                                ((x_P - x_R) * s_1 + y_R + y_P) -
-                                            (x_P - x_R) * 2 * y_P);
-                            bp.add_gate(j + z,
-                                        (y_R + yP) ^
-                                            2 - ((xP - x_R) ^ 2 * (s_1 ^ 2 - (1 + (endo - 1) * b_2) * x_T + x_R)));
-                            bp.add_gate(j + z, ((1 + (endo - 1) * b_2) * x_T - x_R) * s_3 - (2 * b_3 - 1) * y_T + y_R);
-                            bp.add_gate(j + z,
-                                        (2 * x_R - s_3 ^ 2 + (1 + (endo - 1) * b_4) * x_T) *
-                                                ((x_R - x_S) * s_3 + y_S + y_R) -
-                                            (x_R - x_S) * 2 * y_R);
-                            bp.add_gate(j + z,
-                                        (y_S + y_R) ^
-                                            2 - ((x_R - x_S) ^ 2 * (s_3 ^ 2 - (1 + (endo - 1) * b_4) * x_T + x_S)));
-                            bp.add_gate(j + z, n - (16 * next_n + 8 * b_1 + 4 * b_2 + 2 * b_3 + b_4));
+                            this->bp.add_gate(j + z,
+                                              ((1 + (endo - 1) * b_2) * x_T - x_P) * s_1 - (2 * b_1 - 1) * y_T + y_P);
+                            this->bp.add_gate(j + z,
+                                              (2 * x_P - s_1 ^ 2 + (1 + (endo - 1) * b_2) * x_T) *
+                                                      ((x_P - x_R) * s_1 + y_R + y_P) -
+                                                  (x_P - x_R) * 2 * y_P);
+                            this->bp.add_gate(
+                                j + z,
+                                (y_R + y_P) ^ 2 - ((x_P - x_R) ^ 2 * (s_1 ^ 2 - (1 + (endo - 1) * b_2) * x_T + x_R)));
+                            this->bp.add_gate(j + z,
+                                              ((1 + (endo - 1) * b_2) * x_T - x_R) * s_3 - (2 * b_3 - 1) * y_T + y_R);
+                            this->bp.add_gate(j + z,
+                                              (2 * x_R - s_3 ^ 2 + (1 + (endo - 1) * b_4) * x_T) *
+                                                      ((x_R - x_S) * s_3 + y_S + y_R) -
+                                                  (x_R - x_S) * 2 * y_R);
+                            this->bp.add_gate(
+                                j + z,
+                                (y_S + y_R) ^ 2 - ((x_R - x_S) ^ 2 * (s_3 ^ 2 - (1 + (endo - 1) * b_4) * x_T + x_S)));
+                            this->bp.add_gate(j + z, n - (16 * next_n + 8 * b_1 + 4 * b_2 + 2 * b_3 + b_4));
                         }
                     }
 
                 private:
                     static typename CurveType::scalar_field_type::value_type
-                        lambda(typename CurveType::g1_type<>::value_type P1,
-                               typename CurveType::g1_type<>::value_type P2) {
+                        lambda(typename CurveType::template g1_type<>::value_type P1,
+                               typename CurveType::template g1_type<>::value_type P2) {
                         return (P1.Y - P2.Y) * (P1.X - P2.X);
                     }
 
                 public:
                     void generate_assignments(typename CurveType::scalar_field_type::value_type &r,
-                                              typename CurveType::g1_type<>::value_type &T) {
+                                              typename CurveType::template g1_type<>::value_type &T) {
 
-                        typename CurveType::g1_type<>::value_type Q = ...;
-                        typename CurveType::g1_type<>::value_type S = ...;
-                        typename CurveType::g1_type<>::value_type R = S + Q;
+                        typename CurveType::template g1_type<>::value_type Q = ...;
+                        typename CurveType::template g1_type<>::value_type S = ...;
+                        typename CurveType::template g1_type<>::value_type R = S + Q;
 
                         std::array<bool, 4> b = marshalling::unpack(r);
 
                         for (std::size_t z = 0; z <= 63; z++) {
-                            bp.val(W0, j + z) = T.X;
-                            bp.val(W1, j + z) = T.Y;
-                            bp.val(W2, j + z) = S.X;
-                            bp.val(W3, j + z) = S.Y;
-                            bp.val(W4, j + z) = Q.X;
-                            bp.val(W5, j + z) = Q.Y;
-                            bp.val(W6, j + z) = r;
-                            bp.val(W7, j + z) = R.X;
-                            bp.val(W8, j + z) = R.Y;
-                            bp.val(W9, j + z) = lambda(S, Q);
-                            bp.val(W10, j + z) = lambda(R, S);
-                            bp.val(W11, j + z) = b[0];
-                            bp.val(W12, j + z) = b[1];
-                            bp.val(W13, j + z) = b[2];
-                            bp.val(W14, j + z) = b[3];
+                            this->bp.val(W0, j + z) = T.X;
+                            this->bp.val(W1, j + z) = T.Y;
+                            this->bp.val(W2, j + z) = S.X;
+                            this->bp.val(W3, j + z) = S.Y;
+                            this->bp.val(W4, j + z) = Q.X;
+                            this->bp.val(W5, j + z) = Q.Y;
+                            this->bp.val(W6, j + z) = r;
+                            this->bp.val(W7, j + z) = R.X;
+                            this->bp.val(W8, j + z) = R.Y;
+                            this->bp.val(W9, j + z) = lambda(S, Q);
+                            this->bp.val(W10, j + z) = lambda(R, S);
+                            this->bp.val(W11, j + z) = b[0];
+                            this->bp.val(W12, j + z) = b[1];
+                            this->bp.val(W13, j + z) = b[2];
+                            this->bp.val(W14, j + z) = b[3];
                         }
 
-                        bp.val(W6, j + 64) = 0;
+                        this->bp.val(W6, j + 64) = 0;
                     }
                 };
-
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
