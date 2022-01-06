@@ -136,10 +136,10 @@ namespace nil {
          */
         template<typename TEndian, typename SinglePassRange>
         typename std::enable_if<nil::detail::is_range<SinglePassRange>::value,
-                                nil::detail::range_unpack_impl<TEndian, SinglePassRange>>::type
+                                nil::detail::range_unpack_impl<TEndian, typename SinglePassRange::const_iterator>>::type
             unpack(const SinglePassRange &r, status_type &status) {
 
-            return nil::detail::range_unpack_impl<TEndian, SinglePassRange>(r, status);
+            return nil::detail::range_unpack_impl<TEndian, typename SinglePassRange::const_iterator>(r, status);
         }
 
         template<typename TEndian, typename InputIterator>
@@ -247,7 +247,7 @@ namespace nil {
 
         template<typename TInput, typename TOutput>
         typename std::enable_if<!nil::detail::is_range<TOutput>::value
-                                    || nil::detail::is_array<TOutput>::value,
+                                    || nil::detail::is_array<TOutput>::value && !std::is_same<TOutput, status_type>::value,
                                 status_type>::type
             unpack(const TInput &input, TOutput &result) {
             status_type status;
@@ -268,7 +268,7 @@ namespace nil {
 
         template<typename TEndian, typename TInput, typename TOutput>
         typename std::enable_if<!nil::detail::is_range<TOutput>::value
-                                    || nil::detail::is_array<TOutput>::value,
+                                    || nil::detail::is_array<TOutput>::value && !std::is_same<TOutput, status_type>::value,
                                 status_type>::type
             unpack(const TInput &input, TOutput &result) {
             status_type status;
@@ -290,7 +290,7 @@ namespace nil {
 
         template<typename TEndian, typename InputIterator, typename TOutput>
         typename std::enable_if<nil::detail::is_iterator<InputIterator>::value && !nil::detail::is_range<TOutput>::value
-                                    || nil::detail::is_array<TOutput>::value,
+                                    || nil::detail::is_array<TOutput>::value && !std::is_same<TOutput, status_type>::value,
                                 status_type>::type
             unpack(InputIterator first, InputIterator last, TOutput &result) {
             status_type status;

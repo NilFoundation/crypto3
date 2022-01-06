@@ -81,194 +81,194 @@ void resize(boost::array<T, ArraySize> &t, size_t count) {
 }
 
 template<typename T, typename TInput>
-typename std::enable_if<!nil::detail::has_begin<TInput>::value, void>::type pack_2(TInput in) {
+typename std::enable_if<!nil::detail::has_begin<TInput>::value, void>::type repack_2(TInput in) {
 }
 
 template<typename T, typename TInput>
-typename std::enable_if<!nil::detail::has_begin<TInput>::value, void>::type pack_4(TInput in) {
+typename std::enable_if<!nil::detail::has_begin<TInput>::value, void>::type repack_4(TInput in) {
 }
 
 template<typename T, typename TInput>
-typename std::enable_if<!nil::detail::has_begin<T>::value, void>::type pack_5(TInput in) {
-}
-
-template<typename T, typename TInput>
-typename std::enable_if<!nil::detail::has_begin<T>::value || !nil::detail::has_begin<TInput>::value, void>::type
-    pack_6(TInput in) {
-}
-
-template<typename T, typename TInput>
-typename std::enable_if<!nil::detail::has_begin<T>::value, void>::type pack_7(TInput in) {
+typename std::enable_if<!nil::detail::has_begin<T>::value, void>::type repack_5(TInput in) {
 }
 
 template<typename T, typename TInput>
 typename std::enable_if<!nil::detail::has_begin<T>::value || !nil::detail::has_begin<TInput>::value, void>::type
-    pack_8(TInput in) {
+    repack_6(TInput in) {
 }
 
 template<typename T, typename TInput>
-void pack_1(TInput in) {
+typename std::enable_if<!nil::detail::has_begin<T>::value, void>::type repack_7(TInput in) {
+}
+
+template<typename T, typename TInput>
+typename std::enable_if<!nil::detail::has_begin<T>::value || !nil::detail::has_begin<TInput>::value, void>::type
+    repack_8(TInput in) {
+}
+
+template<typename T, typename TInput>
+void repack_1(TInput in) {
     status_type status;
-    T result = pack<option::big_endian>(in, status);
+    T result = repack<option::big_endian, option::big_endian>(in, status);
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
-typename std::enable_if<nil::detail::has_begin<TInput>::value, void>::type pack_2(TInput in) {
+typename std::enable_if<nil::detail::has_begin<TInput>::value, void>::type repack_2(TInput in) {
     status_type status;
-    T result = pack<option::big_endian>(in.begin(), in.end(), status);
+    T result = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), status);
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
-void pack_3(TInput in) {
+void repack_3(TInput in) {
     status_type status;
     T result;
-    status = pack<option::big_endian>(in, result);
+    status = repack<option::big_endian, option::big_endian>(in, result);
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
-typename std::enable_if<nil::detail::has_begin<TInput>::value, void>::type pack_4(TInput in) {
+typename std::enable_if<nil::detail::has_begin<TInput>::value, void>::type repack_4(TInput in) {
     status_type status;
     T result;
-    status = pack<option::big_endian>(in.begin(), in.end(), result);
+    status = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), result);
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
-typename std::enable_if<nil::detail::has_begin<T>::value, void>::type pack_5(TInput in) {
+typename std::enable_if<nil::detail::has_begin<T>::value, void>::type repack_5(TInput in) {
     status_type status;
     T result;
     resize(result, 2);
     typename T::iterator itr = result.begin();
-    itr = pack<option::big_endian>(in, result.begin(), status);
+    itr = repack<option::big_endian, option::big_endian>(in, result.begin(), status);
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
 typename std::enable_if<nil::detail::has_begin<T>::value && nil::detail::has_begin<TInput>::value, void>::type
-    pack_6(TInput in) {
+    repack_6(TInput in) {
     status_type status;
     T result;
     resize(result, 2);
     typename T::iterator itr = result.begin();
-    itr = pack<option::big_endian>(in.begin(), in.end(), result.begin(), status);
+    itr = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), result.begin(), status);
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
-typename std::enable_if<nil::detail::has_begin<T>::value, void>::type pack_7(TInput in) {
+typename std::enable_if<nil::detail::has_begin<T>::value, void>::type repack_7(TInput in) {
     status_type status;
     T result;
     resize(result, 2);
-    status = pack<option::big_endian>(in, result.begin());
+    status = repack<option::big_endian, option::big_endian>(in, result.begin());
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
 typename std::enable_if<nil::detail::has_begin<T>::value && nil::detail::has_begin<TInput>::value, void>::type
-    pack_8(TInput in) {
+    repack_8(TInput in) {
     status_type status;
     T result;
     resize(result, 2);
-    status = pack<option::big_endian>(in.begin(), in.end(), result.begin());
+    status = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), result.begin());
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
-typename std::enable_if<!nil::detail::has_begin<TInput>::value, void>::type unpack_2(TInput in) {
+typename std::enable_if<!nil::detail::has_begin<TInput>::value, void>::type repack_2_unpack(TInput in) {
 }
 
 template<typename T, typename TInput>
-typename std::enable_if<!nil::detail::has_begin<TInput>::value, void>::type unpack_4(TInput in) {
+typename std::enable_if<!nil::detail::has_begin<TInput>::value, void>::type repack_4_unpack(TInput in) {
 }
 
 template<typename T, typename TInput>
-typename std::enable_if<!nil::detail::has_begin<T>::value, void>::type unpack_5(TInput in) {
+typename std::enable_if<!nil::detail::has_begin<T>::value, void>::type repack_5_unpack(TInput in) {
 }
 
 template<typename T, typename TInput>
 typename std::enable_if<!nil::detail::has_begin<T>::value || !nil::detail::has_begin<TInput>::value, void>::type
-    unpack_6(TInput in) {
+    repack_6_unpack(TInput in) {
 }
 
 template<typename T, typename TInput>
-typename std::enable_if<!nil::detail::has_begin<T>::value, void>::type unpack_7(TInput in) {
+typename std::enable_if<!nil::detail::has_begin<T>::value, void>::type repack_7_unpack(TInput in) {
 }
 
 template<typename T, typename TInput>
 typename std::enable_if<!nil::detail::has_begin<T>::value || !nil::detail::has_begin<TInput>::value, void>::type
-    unpack_8(TInput in) {
+    repack_8_unpack(TInput in) {
 }
 
 template<typename T, typename TInput>
-void unpack_1(TInput in) {
+void repack_1_unpack(TInput in) {
     status_type status;
-    T result = unpack<option::big_endian>(in, status);
+    T result = repack<option::big_endian, option::big_endian>(in, status);
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
-typename std::enable_if<nil::detail::has_begin<TInput>::value, void>::type unpack_2(TInput in) {
+typename std::enable_if<nil::detail::has_begin<TInput>::value, void>::type repack_2_unpack(TInput in) {
     status_type status;
-    T result = unpack<option::big_endian>(in.begin(), in.end(), status);
+    T result = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), status);
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
-void unpack_3(TInput in) {
-    status_type status;
-    T result;
-    status = unpack<option::big_endian>(in, result);
-    BOOST_CHECK(status == status_type::success);
-}
-
-template<typename T, typename TInput>
-typename std::enable_if<nil::detail::has_begin<TInput>::value, void>::type unpack_4(TInput in) {
+void repack_3_unpack(TInput in) {
     status_type status;
     T result;
-    status = unpack<option::big_endian>(in.begin(), in.end(), result);
+    status = repack<option::big_endian, option::big_endian>(in, result);
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
-typename std::enable_if<nil::detail::has_begin<T>::value, void>::type unpack_5(TInput in) {
+typename std::enable_if<nil::detail::has_begin<TInput>::value, void>::type repack_4_unpack(TInput in) {
+    status_type status;
+    T result;
+    status = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), result);
+    BOOST_CHECK(status == status_type::success);
+}
+
+template<typename T, typename TInput>
+typename std::enable_if<nil::detail::has_begin<T>::value, void>::type repack_5_unpack(TInput in) {
     status_type status;
     T result;
     resize(result, 4);
     typename T::iterator itr = result.begin();
-    itr = unpack<option::big_endian>(in, result.begin(), status);
+    itr = repack<option::big_endian, option::big_endian>(in, result.begin(), status);
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
 typename std::enable_if<nil::detail::has_begin<T>::value && nil::detail::has_begin<TInput>::value, void>::type
-    unpack_6(TInput in) {
+    repack_6_unpack(TInput in) {
     status_type status;
     T result;
     resize(result, 4);
     typename T::iterator itr = result.begin();
-    itr = unpack<option::big_endian>(in.begin(), in.end(), result.begin(), status);
+    itr = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), result.begin(), status);
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
-typename std::enable_if<nil::detail::has_begin<T>::value, void>::type unpack_7(TInput in) {
+typename std::enable_if<nil::detail::has_begin<T>::value, void>::type repack_7_unpack(TInput in) {
     status_type status;
     T result;
     resize(result, 4);
-    status = unpack<option::big_endian>(in, result.begin());
+    status = repack<option::big_endian, option::big_endian>(in, result.begin());
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
 typename std::enable_if<nil::detail::has_begin<T>::value && nil::detail::has_begin<TInput>::value, void>::type
-    unpack_8(TInput in) {
+    repack_8_unpack(TInput in) {
     status_type status;
     T result;
     resize(result, 4);
-    status = unpack<option::big_endian>(in.begin(), in.end(), result.begin());
+    status = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), result.begin());
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -276,21 +276,21 @@ template<typename T, typename Tinput>
 void test_unpack_marshalling(Tinput in) {
     status_type status;
 
-    T result1 = unpack(in, status);
+    T result1 = repack<option::big_endian, option::big_endian>(in, status);
     BOOST_CHECK(status == status_type::success);
 
     T result3;
-    status = unpack(in, result3);
+    status = repack<option::big_endian, option::big_endian>(in, result3);
     BOOST_CHECK(status == status_type::success);
 
     T result5;
     resize(result5, 4);
-    unpack(in, result5.begin(), status);
+    repack<option::big_endian, option::big_endian>(in, result5.begin(), status);
     BOOST_CHECK(status == status_type::success);
 
     T result7;
     resize(result7, 4);
-    status = unpack(in, result7.begin());
+    status = repack<option::big_endian, option::big_endian>(in, result7.begin());
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -300,47 +300,47 @@ typedef boost::mpl::list<std::vector<uint16_t>,
                          boost::array<uint16_t, 2>,
                          std::uint32_t,
                          types::integral<field_type<option::big_endian>, std::uint16_t>>
-    test_types_pack;
+    test_types_repack;
 
 template<typename T, typename TInput>
-void call_pack(TInput in) {
-    pack_1<T>(in);
-    pack_2<T>(in);
-    pack_3<T>(in);
-    pack_4<T>(in);
-    pack_5<T>(in);
-    pack_6<T>(in);
-    pack_7<T>(in);
-    pack_8<T>(in);
+void call_repack(TInput in) {
+    repack_1<T>(in);
+    repack_2<T>(in);
+    repack_3<T>(in);
+    repack_4<T>(in);
+    repack_5<T>(in);
+    repack_6<T>(in);
+    repack_7<T>(in);
+    repack_8<T>(in);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(pack_test, T, test_types_pack) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(pack_test, T, test_types_repack) {
     std::vector<uint8_t> in1 = {0x12, 0x34, 0x56, 0x78};
-    call_pack<T>(in1);
+    call_repack<T>(in1);
 
     std::array<uint8_t, 4> in2 = {0x12, 0x34, 0x56, 0x78};
-    call_pack<T>(in1);
+    call_repack<T>(in1);
 }
 
 typedef boost::mpl::list<std::vector<uint8_t>,
                          std::array<uint8_t, 4>,
                          boost::container::static_vector<uint8_t, 4>,
                          boost::array<uint8_t, 4>>
-    test_types_unpack;
+    test_types_repack_unpack;
 
 template<typename T, typename TInput>
 void call_unpack(TInput in) {
-    unpack_1<T>(in);
-    unpack_2<T>(in);
-    unpack_3<T>(in);
-    unpack_4<T>(in);
-    unpack_5<T>(in);
-    unpack_6<T>(in);
-    unpack_7<T>(in);
-    unpack_8<T>(in);
+    repack_1_unpack<T>(in);
+    repack_2_unpack<T>(in);
+    repack_3_unpack<T>(in);
+    repack_4_unpack<T>(in);
+    repack_5_unpack<T>(in);
+    repack_6_unpack<T>(in);
+    repack_7_unpack<T>(in);
+    repack_8_unpack<T>(in);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(unpack_test, T, test_types_unpack) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(unpack_test, T, test_types_repack_unpack) {
     std::vector<uint16_t> in1 = {{0x1234, 0x5678}};
     call_unpack<T>(in1);
 

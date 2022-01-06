@@ -46,8 +46,42 @@
 #include <nil/detail/unpack_value.hpp>
 #include <nil/detail/pack_value.hpp>
 
+#include <nil/marshalling/algorithms/unpack.hpp>
+
 namespace nil {
     namespace detail {
+        template<typename TInputEndian, typename TOutputEndian, typename TInput>
+        struct value_repack_impl {
+            marshalling::status_type *status;
+            TInput input;
+
+            value_repack_impl(const TInput &input, marshalling::status_type &status) {
+                this->input = input;
+                this->status = &status;
+            }
+
+            template<typename T>
+            inline operator T() {
+                marshalling::status_type result_status_unpack, result_status_pack;
+
+                if constexpr(!marshalling::is_marshalling_type<TInput>::value) {
+                    using marshalling_type = typename marshalling::is_compatible<TInput>::template type<TInputEndian>;
+                    std::vector<std::uint8_t> buffer = value_unpack_impl<marshalling_type>(marshalling_type(input), result_status_unpack);
+                    T result = range_pack_impl<TOutputEndian, std::vector<std::uint8_t>::const_iterator>(
+                        buffer, result_status_pack);
+                    *status = result_status_pack | result_status_unpack;
+
+                    return result;
+                } else {
+                    std::vector<std::uint8_t> buffer = value_unpack_impl<TInput>(input, result_status_unpack);
+                    T result = range_pack_impl<TOutputEndian, std::vector<std::uint8_t>::const_iterator>(
+                        buffer, result_status_pack);
+                    *status = result_status_pack | result_status_unpack;
+
+                    return result;
+                }
+            }
+        };
 
         template<typename TInputEndian, typename TOutputEndian, typename Iter>
         struct range_repack_impl {

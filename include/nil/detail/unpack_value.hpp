@@ -94,26 +94,29 @@ namespace nil {
             }
         };
 
-        template<typename TEndian, typename Input>
+        template<typename TEndian, typename Iter>
         struct range_unpack_impl {
             marshalling::status_type *status;
-            mutable typename std::conditional<nil::detail::is_iterator<Input>::value, Input, typename Input::const_iterator>::type iterator;
+            mutable Iter iterator;
             size_t count_elements;
-            using value_type = typename Input::value_type;
+            using value_type = typename std::iterator_traits<Iter>::value_type;
 
-            range_unpack_impl(const Input &range, marshalling::status_type &status) {
+            template <typename SinglePassRange>
+            range_unpack_impl(const SinglePassRange &range, marshalling::status_type &status) {
                 iterator = range.begin();
                 count_elements = std::distance(range.begin(), range.end());
                 this->status = &status;
             }
 
-            range_unpack_impl(Input first, Input last, marshalling::status_type &status) {
+            template <typename InputIterator>
+            range_unpack_impl(InputIterator first, InputIterator last, marshalling::status_type &status) {
                 iterator = first;
                 count_elements = std::distance(first, last);
                 this->status = &status;
             }
 
-            range_unpack_impl(const Input &iter, size_t len, marshalling::status_type &status) {
+            template <typename InputIterator>
+            range_unpack_impl(const InputIterator &iter, size_t len, marshalling::status_type &status) {
                 iterator = iter;
                 count_elements = len;
                 this->status = &status;
@@ -127,9 +130,11 @@ namespace nil {
             inline operator OutputRange() {
                 using Toutput = typename OutputRange::value_type;
 
-                using marshalling_type = typename marshalling::is_compatible<Input>::template type<TEndian>;
+                using marshalling_type = typename marshalling::is_compatible<std::vector<value_type>>::template type<TEndian>;
                 using marshalling_internal_type = typename marshalling_type::element_type;
-                using marshalling_vector = typename std::conditional<marshalling::is_compatible<Input>::fixed_size, nil::marshalling::container::static_vector<marshalling_internal_type, marshalling_type::max_length()>, std::vector<marshalling_internal_type>>::type;
+
+                //                using marshalling_vector = typename std::conditional<marshalling::is_compatible<Input>::fixed_size, nil::marshalling::container::static_vector<marshalling_internal_type, marshalling_type::max_length()>, std::vector<marshalling_internal_type>>::type;
+                using marshalling_vector = std::vector<marshalling_internal_type>;
                 marshalling_vector values;
 
                 auto k = iterator;
@@ -151,10 +156,11 @@ namespace nil {
                                                         (std::is_same<typename Array::value_type, bool>::value
                                                         || std::is_same<typename Array::value_type, std::uint8_t>::value)>::type>
             inline operator Array() {
-                using marshalling_type = typename marshalling::is_compatible<Input>::template type<TEndian>;
+                using marshalling_type = typename marshalling::is_compatible<std::vector<value_type>>::template type<TEndian>;
                 using marshalling_internal_type = typename marshalling_type::element_type;
 
-                using marshalling_vector = typename std::conditional<marshalling::is_compatible<Input>::fixed_size, nil::marshalling::container::static_vector<marshalling_internal_type, marshalling_type::max_length()>, std::vector<marshalling_internal_type>>::type;
+//                using marshalling_vector = typename std::conditional<marshalling::is_compatible<Input>::fixed_size, nil::marshalling::container::static_vector<marshalling_internal_type, marshalling_type::max_length()>, std::vector<marshalling_internal_type>>::type;
+                using marshalling_vector = std::vector<marshalling_internal_type>;
                 marshalling_vector values;
                 auto k = iterator;
                 for (int i = 0; i < count_elements; ++i, ++k) {
