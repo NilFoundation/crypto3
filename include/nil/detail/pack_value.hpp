@@ -66,6 +66,13 @@ namespace nil {
                 this->status = &status;
             }
 
+            template<typename InputIterator>
+            range_pack_impl(InputIterator first, size_t len, marshalling::status_type &status) {
+                iterator = first;
+                count_elements = len;
+                this->status = &status;
+            }
+
             template<typename SimilarStdArray>
             SimilarStdArray similar_std_array_marshalling() {
                 using marshalling_type = typename marshalling::is_compatible<SimilarStdArray>::template type<TEndian>;
@@ -169,6 +176,14 @@ namespace nil {
                 iterator = first;
                 out_iterator = out;
                 count_elements = std::distance(first, last);
+                this->status = &status;
+            }
+
+            template<typename InputIterator>
+            itr_pack_impl(const InputIterator &range, size_t len, OutputIterator out, marshalling::status_type &status) {
+                out_iterator = out;
+                iterator = range;
+                count_elements = len;
                 this->status = &status;
             }
 

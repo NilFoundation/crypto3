@@ -256,7 +256,7 @@ namespace nil {
             repack(const TInput &val, TOutputIterator out) {
             status_type status;
             using T = typename std::iterator_traits<TOutputIterator>::value_type;
-            std::vector<T> result  = repack<TInputEndian, TOutputEndian>(val, status);
+            std::vector<T> result = repack<TInputEndian, TOutputEndian>(val, status);
             std::move(result.cbegin(), result.cend(), out);
             return status;
         }
