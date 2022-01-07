@@ -48,10 +48,26 @@
 
 namespace nil {
     namespace detail {
+
+//        template<typename Input, typename Output>
+//        struct only_unpack {
+//            static const bool value = !nil::marshalling::is_supported_representation_type<typename std::iterator_traits<Input>::value_type>::value
+//                                      && (nil::marshalling::is_supported_representation_type<Output>::value ||
+//                                          nil::marshalling::is_supported_representation_type<typename std::iterator_traits<Output>::value_type>::value);
+//        };
+//
+//        template<typename Input, typename Output>
+//        struct only_pack {
+//            static const bool value = nil::marshalling::is_supported_representation_type<
+//                typename std::iterator_traits<Input>::value_type>::value;
+//        };
+
         template<typename TInputEndian, typename TOutputEndian, typename TInput>
         struct value_repack_impl {
             marshalling::status_type *status;
             TInput input;
+//            using marshalling_type = typename
+//                                std::conditional<marshalling::is_marshalling_type<TInput>::value, TInput, typename marshalling::is_compatible<TInput>::template type<TInputEndian>>::type;
 
             value_repack_impl(const TInput &input, marshalling::status_type &status) {
                 this->input = input;
@@ -95,6 +111,7 @@ namespace nil {
             mutable Iter iterator;
             size_t count_elements;
             using input_value = typename std::iterator_traits<Iter>::value_type;
+
             template<typename SinglePassRange>
             range_repack_impl(const SinglePassRange &range, marshalling::status_type &status) {
                 iterator = range.begin();
@@ -132,8 +149,6 @@ namespace nil {
             inline operator T() {
                 marshalling::status_type status_unpack;
 
-                std::vector<std::uint8_t> buffer;
-
                 T result = range_unpack_impl<TInputEndian, Iter>(iterator, count_elements, status_unpack);
                 *status = status_unpack;
 
@@ -164,6 +179,7 @@ namespace nil {
             mutable Iter iterator;
             size_t count_elements;
             mutable OutputIterator out_iterator;
+            using input_value = typename std::iterator_traits<Iter>::value_type;
 
             template<typename SinglePassRange>
             itr_repack_impl(const SinglePassRange &range, OutputIterator out, marshalling::status_type &status) {
@@ -200,9 +216,25 @@ namespace nil {
             template<typename T,
                      typename
                      = typename std::enable_if<std::is_same<T, T>::value
+                                               && !nil::marshalling::is_supported_representation_type<input_value>::value
+                                               && (nil::marshalling::is_supported_representation_type<T>::value ||
+                                                   nil::marshalling::is_supported_representation_type<typename std::iterator_traits<T>::value_type>::value)>::type,
+                     bool Enable = true>
+            inline operator T() {
+                marshalling::status_type status_unpack;
+
+                T result = range_unpack_impl<TInputEndian, Iter>(iterator, count_elements, out_iterator, status_unpack);
+                *status = status_unpack;
+
+                return out_iterator;
+            }
+
+            template<typename T,
+                     typename
+                     = typename std::enable_if<std::is_same<T, T>::value
                                                && !nil::marshalling::is_supported_representation_type<
                                                    typename std::iterator_traits<Iter>::value_type>::value>::type,
-                     bool Enable = true>
+                     bool Enable1 = true, bool Enable2 = true>
             inline operator T() {
                 marshalling::status_type status_unpack, status_pack;
 
