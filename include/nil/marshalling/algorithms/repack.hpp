@@ -27,7 +27,7 @@
 #ifndef MARSHALLING_REPACK_NEW_HPP
 #define MARSHALLING_REPACK_NEW_HPP
 
-#include <nil/detail/repack_value.hpp>
+#include <nil/marshalling/detail/repack_value.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -61,20 +61,19 @@ namespace nil {
         template<typename TOutputEndian = option::big_endian, typename TInputEndian = option::big_endian, typename SinglePassRange>
         typename std::enable_if<
             nil::detail::is_range<SinglePassRange>::value,
-            nil::detail::range_repack_impl<TInputEndian, TOutputEndian, typename SinglePassRange::const_iterator>>::type
+            detail::range_repack_impl<TInputEndian, TOutputEndian, typename SinglePassRange::const_iterator>>::type
 
             repack(const SinglePassRange &val, status_type &status) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
-            return nil::detail::
-                range_repack_impl<TInputEndian, TOutputEndian, typename SinglePassRange::const_iterator>(val, status);
+            return detail::range_repack_impl<TInputEndian, TOutputEndian, typename SinglePassRange::const_iterator>(val, status);
         }
 
         template<typename TOutputEndian = option::big_endian, typename TInputEndian = option::big_endian, typename TInput>
         typename std::enable_if<!nil::detail::is_range<TInput>::value,
-                                nil::detail::value_repack_impl<TInputEndian, TOutputEndian, TInput>>::type
+                                detail::value_repack_impl<TInputEndian, TOutputEndian, TInput>>::type
 
             repack(const TInput &val, status_type &status) {
-            return nil::detail::value_repack_impl<TInputEndian, TOutputEndian, TInput>(val, status);
+            return detail::value_repack_impl<TInputEndian, TOutputEndian, TInput>(val, status);
         }
 
         /*!
@@ -96,10 +95,10 @@ namespace nil {
         typename std::enable_if<
             nil::detail::is_iterator<InputIterator>::value
                 && std::is_integral<typename std::iterator_traits<InputIterator>::value_type>::value,
-            nil::detail::range_repack_impl<TInputEndian, TOutputEndian, InputIterator>>::type
+            detail::range_repack_impl<TInputEndian, TOutputEndian, InputIterator>>::type
             repack(InputIterator first, InputIterator last, status_type &status) {
             BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
-            return nil::detail::range_repack_impl<TInputEndian, TOutputEndian, InputIterator>(first, last, status);
+            return detail::range_repack_impl<TInputEndian, TOutputEndian, InputIterator>(first, last, status);
         }
 
         template<typename TOutputEndian = option::big_endian, typename TInputEndian = option::big_endian, typename TInput, typename TOutputIterator>
