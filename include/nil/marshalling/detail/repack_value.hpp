@@ -60,7 +60,9 @@ namespace nil {
 
                 template<typename T,
                          typename = typename std::enable_if<std::is_same<T, T>::value
-                                                            && marshalling::is_marshalling_type<TInput>::value>::type>
+                                                            && marshalling::is_marshalling_type<TInput>::value && !(nil::marshalling::is_supported_representation_type<T>::value
+                                                                                                                   || nil::marshalling::is_supported_representation_type<
+                                                                                                                       typename T::value_type>::value)>::type>
                 inline operator T() {
                     marshalling::status_type status_unpack, status_pack;
                     std::vector<std::uint8_t> buffer = value_unpack_impl<TInput>(input, status_unpack);
@@ -73,8 +75,11 @@ namespace nil {
                 }
 
                 template<typename T,
-                         typename = typename std::enable_if<std::is_same<T, T>::value
-                                                            && !marshalling::is_marshalling_type<TInput>::value>::type,
+                         typename = typename std::enable_if<
+                             std::is_same<T, T>::value && !marshalling::is_marshalling_type<TInput>::value
+                             && !(nil::marshalling::is_supported_representation_type<T>::value
+                                  || nil::marshalling::is_supported_representation_type<
+                                      typename T::value_type>::value)>::type,
                          bool Enable = true>
                 inline operator T() {
                     marshalling::status_type status_unpack, status_pack;
@@ -91,11 +96,10 @@ namespace nil {
 
                 template<typename T,
                          typename = typename std::enable_if<
-                             std::is_same<T, T>::value
-                             && !marshalling::is_marshalling_type<TInput>::value
+                             std::is_same<T, T>::value && !marshalling::is_marshalling_type<TInput>::value
                              && (nil::marshalling::is_supported_representation_type<T>::value
                                  || nil::marshalling::is_supported_representation_type<
-                                     typename std::iterator_traits<T>::value_type>::value)>::type,
+                                     typename T::value_type>::value)>::type,
                          bool Enable1 = true, bool Enable2 = true>
                 inline operator T() {
                     marshalling::status_type status_unpack;
@@ -110,11 +114,10 @@ namespace nil {
 
                 template<typename T,
                          typename = typename std::enable_if<
-                             std::is_same<T, T>::value
-                             && marshalling::is_marshalling_type<TInput>::value
+                             std::is_same<T, T>::value && marshalling::is_marshalling_type<TInput>::value
                              && (nil::marshalling::is_supported_representation_type<T>::value
                                  || nil::marshalling::is_supported_representation_type<
-                                     typename std::iterator_traits<T>::value_type>::value)>::type,
+                                     typename T::value_type>::value)>::type,
                          bool Enable1 = true, bool Enable2 = true, bool Enable3 = true>
                 inline operator T() {
                     marshalling::status_type status_unpack;
@@ -166,7 +169,7 @@ namespace nil {
                              && !nil::marshalling::is_supported_representation_type<input_value>::value
                              && (nil::marshalling::is_supported_representation_type<T>::value
                                  || nil::marshalling::is_supported_representation_type<
-                                     typename std::iterator_traits<T>::value_type>::value)>::type,
+                                     typename T::value_type>::value)>::type,
                          bool Enable = true>
                 inline operator T() {
                     marshalling::status_type status_unpack;
@@ -180,7 +183,9 @@ namespace nil {
                 template<typename T,
                          typename = typename std::enable_if<
                              std::is_same<T, T>::value
-                             && !nil::marshalling::is_supported_representation_type<input_value>::value>::type,
+                             && !nil::marshalling::is_supported_representation_type<input_value>::value && !(nil::marshalling::is_supported_representation_type<T>::value
+                                                                                                            || nil::marshalling::is_supported_representation_type<
+                                                                                                                typename T::value_type>::value)>::type,
                          bool Enable1 = true, bool Enable2 = true>
                 inline operator T() {
                     marshalling::status_type status_unpack, status_pack;
@@ -241,7 +246,7 @@ namespace nil {
                              && !nil::marshalling::is_supported_representation_type<input_value>::value
                              && (nil::marshalling::is_supported_representation_type<T>::value
                                  || nil::marshalling::is_supported_representation_type<
-                                     typename std::iterator_traits<T>::value_type>::value)>::type,
+                                     typename T::value_type>::value)>::type,
                          bool Enable = true>
                 inline operator T() {
                     marshalling::status_type status_unpack;
