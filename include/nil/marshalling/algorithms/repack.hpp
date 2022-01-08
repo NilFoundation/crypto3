@@ -117,7 +117,7 @@ namespace nil {
             repack(const SinglePassRange &rng_input, TOutputIterator out, status_type &status) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
             using T = typename std::iterator_traits<TOutputIterator>::value_type;
-            std::vector<T> result = repack<TInputEndian, TOutputEndian>(rng_input, status);
+            std::vector<T> result = repack<TOutputEndian, TInputEndian>(rng_input, status);
             return std::move(result.cbegin(), result.cend(), out);
         }
 
@@ -127,7 +127,7 @@ namespace nil {
                                 TOutputIterator>::type
             repack(InputIterator first, InputIterator last, TOutputIterator out, status_type &status) {
             using T = typename std::iterator_traits<TOutputIterator>::value_type;
-            std::vector<T> result = repack<TInputEndian, TOutputEndian>(first, last, status);
+            std::vector<T> result = repack<TOutputEndian, TInputEndian>(first, last, status);
             return std::move(result.cbegin(), result.cend(), out);
         }
 
@@ -141,7 +141,7 @@ namespace nil {
             repack(const TInput &val, SinglePassRange &rng_output) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
             status_type status;
-            std::vector<typename SinglePassRange::value_type> result  = repack<TInputEndian, TOutputEndian>(val, status);
+            std::vector<typename SinglePassRange::value_type> result  = repack<TOutputEndian, TInputEndian>(val, status);
             rng_output = SinglePassRange(result.begin(), result.end());
             return status;
         }
@@ -156,7 +156,7 @@ namespace nil {
             repack(const TInput &val, SinglePassRange &rng_output) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
             status_type status;
-            rng_output  = repack<TInputEndian, TOutputEndian>(val, status);
+            rng_output  = repack<TOutputEndian, TInputEndian>(val, status);
             return status;
         }
 
@@ -172,7 +172,7 @@ namespace nil {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange2>));
             status_type status;
             std::vector<typename SinglePassRange2::value_type> result
-                = repack<TInputEndian, TOutputEndian>(rng_input, status);
+                = repack<TOutputEndian, TInputEndian>(rng_input, status);
             rng_output = SinglePassRange2(result.begin(), result.end());
             return status;
         }
@@ -189,7 +189,7 @@ namespace nil {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange1>));
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange2>));
             status_type status;
-            rng_output = repack<TInputEndian, TOutputEndian>(rng_input, status);
+            rng_output = repack<TOutputEndian, TInputEndian>(rng_input, status);
             return status;
         }
 
@@ -205,7 +205,7 @@ namespace nil {
             BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
             status_type status;
             std::vector<typename SinglePassRange::value_type> result
-                = repack<TInputEndian, TOutputEndian>(first, last, status);
+                = repack<TOutputEndian, TInputEndian>(first, last, status);
             rng_output = SinglePassRange(result.begin(), result.end());
             return status;
         }
@@ -220,7 +220,7 @@ namespace nil {
             repack(InputIterator first, InputIterator last, SinglePassRange &rng_output) {
             BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
             status_type status;
-            rng_output = repack<TInputEndian, TOutputEndian>(first, last, status);
+            rng_output = repack<TOutputEndian, TInputEndian>(first, last, status);
             return status;
         }
 
@@ -232,7 +232,7 @@ namespace nil {
             repack(InputIterator first, InputIterator last, TOutput &rng_output) {
             BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
             status_type status;
-            rng_output = repack<TInputEndian, TOutputEndian>(first, last, status);
+            rng_output = repack<TOutputEndian, TInputEndian>(first, last, status);
             return status;
         }
 
@@ -244,7 +244,7 @@ namespace nil {
             repack(const SinglePassRange &rng_input, TOutput &rng_output) {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
             status_type status;
-            rng_output = repack<TInputEndian, TOutputEndian>(rng_input, status);
+            rng_output = repack<TOutputEndian, TInputEndian>(rng_input, status);
             return status;
         }
 
@@ -255,7 +255,7 @@ namespace nil {
             repack(const TInput &val, TOutputIterator out) {
             status_type status;
             using T = typename std::iterator_traits<TOutputIterator>::value_type;
-            std::vector<T> result = repack<TInputEndian, TOutputEndian>(val, status);
+            std::vector<T> result = repack<TOutputEndian, TInputEndian>(val, status);
             std::move(result.cbegin(), result.cend(), out);
             return status;
         }
@@ -268,7 +268,7 @@ namespace nil {
             BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
             status_type status;
             using T = typename std::iterator_traits<TOutputIterator>::value_type;
-            std::vector<T> result = repack<TInputEndian, TOutputEndian>(rng_input, status);
+            std::vector<T> result = repack<TOutputEndian, TInputEndian>(rng_input, status);
             std::move(result.cbegin(), result.cend(), out);
             return status;
         }
@@ -280,7 +280,7 @@ namespace nil {
             repack(InputIterator first, InputIterator last, TOutputIterator out) {
             using T = typename std::iterator_traits<TOutputIterator>::value_type;
             status_type status;
-            std::vector<T> result = repack<TInputEndian, TOutputEndian>(first, last, status);
+            std::vector<T> result = repack<TOutputEndian, TInputEndian>(first, last, status);
             std::move(result.cbegin(), result.cend(), out);
             return status;
         }

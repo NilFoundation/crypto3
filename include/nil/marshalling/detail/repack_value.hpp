@@ -48,31 +48,10 @@ namespace nil {
     namespace marshalling {
         namespace detail {
 
-            //        template<typename Input, typename Output>
-            //        struct only_unpack {
-            //            static const bool value = !nil::marshalling::is_supported_representation_type<typename
-            //            std::iterator_traits<Input>::value_type>::value
-            //                                      &&
-            //                                      (nil::marshalling::is_supported_representation_type<Output>::value
-            //                                      ||
-            //                                          nil::marshalling::is_supported_representation_type<typename
-            //                                          std::iterator_traits<Output>::value_type>::value);
-            //        };
-            //
-            //        template<typename Input, typename Output>
-            //        struct only_pack {
-            //            static const bool value = nil::marshalling::is_supported_representation_type<
-            //                typename std::iterator_traits<Input>::value_type>::value;
-            //        };
-
             template<typename TInputEndian, typename TOutputEndian, typename TInput>
             struct value_repack_impl {
                 marshalling::status_type *status;
                 TInput input;
-                //            using marshalling_type = typename
-                //                                std::conditional<marshalling::is_marshalling_type<TInput>::value,
-                //                                TInput, typename marshalling::is_compatible<TInput>::template
-                //                                type<TInputEndian>>::type;
 
                 value_repack_impl(const TInput &input, marshalling::status_type &status) {
                     this->input = input;
@@ -100,11 +79,48 @@ namespace nil {
                 inline operator T() {
                     marshalling::status_type status_unpack, status_pack;
                     using marshalling_type = typename marshalling::is_compatible<TInput>::template type<TInputEndian>;
+
                     std::vector<std::uint8_t> buffer
                         = value_unpack_impl<marshalling_type>(marshalling_type(input), status_unpack);
                     T result = range_pack_impl<TOutputEndian, std::vector<std::uint8_t>::const_iterator>(buffer,
                                                                                                          status_pack);
                     *status = status_pack | status_unpack;
+
+                    return result;
+                }
+
+                template<typename T,
+                         typename = typename std::enable_if<
+                             std::is_same<T, T>::value
+                             && !marshalling::is_marshalling_type<TInput>::value
+                             && (nil::marshalling::is_supported_representation_type<T>::value
+                                 || nil::marshalling::is_supported_representation_type<
+                                     typename std::iterator_traits<T>::value_type>::value)>::type,
+                         bool Enable1 = true, bool Enable2 = true>
+                inline operator T() {
+                    marshalling::status_type status_unpack;
+
+                    using marshalling_type = typename marshalling::is_compatible<TInput>::template type<TInputEndian>;
+
+                    T result = value_unpack_impl<marshalling_type>(marshalling_type(input), status_unpack);
+                    *status = status_unpack;
+
+                    return result;
+                }
+
+                template<typename T,
+                         typename = typename std::enable_if<
+                             std::is_same<T, T>::value
+                             && marshalling::is_marshalling_type<TInput>::value
+                             && (nil::marshalling::is_supported_representation_type<T>::value
+                                 || nil::marshalling::is_supported_representation_type<
+                                     typename std::iterator_traits<T>::value_type>::value)>::type,
+                         bool Enable1 = true, bool Enable2 = true, bool Enable3 = true>
+                inline operator T() {
+                    marshalling::status_type status_unpack;
+
+                    T result = value_unpack_impl<TInput>(input, status_unpack);
+                    *status = status_unpack;
 
                     return result;
                 }
