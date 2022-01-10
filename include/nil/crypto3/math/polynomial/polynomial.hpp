@@ -77,7 +77,7 @@ namespace nil {
                     }
 
                     ~polynomial() {
-                        val.~vector<FieldValueType, Allocator>();
+                        val.~vector();
                     }
 
                     polynomial(const polynomial& x) : val(x) {
