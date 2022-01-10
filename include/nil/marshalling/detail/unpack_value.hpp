@@ -53,7 +53,7 @@ namespace nil {
             }
 
             template<typename T, typename Input>
-            typename std::enable_if<std::is_same<T, uint8_t>::value, size_t>::type get_length(Input in) {
+            typename std::enable_if<!std::is_same<T, bool>::value, size_t>::type get_length(Input in) {
                 return in.length();
             }
 

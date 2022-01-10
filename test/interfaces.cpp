@@ -46,7 +46,7 @@
 #include <nil/marshalling/types/no_value.hpp>
 #include <nil/marshalling/types/variant.hpp>
 
-#include <nil/marshalling/algorithms/repack.hpp>
+#include <nil/marshalling/algorithms/pack.hpp>
 
 #include <boost/container/static_vector.hpp>
 
@@ -107,14 +107,14 @@ typename std::enable_if<!nil::detail::has_begin<T>::value || !nil::detail::has_b
 template<typename T, typename TInput>
 void repack_1(TInput in, size_t result_size) {
     status_type status;
-    T result = repack<option::big_endian, option::big_endian>(in, status);
+    T result = pack<option::big_endian, option::big_endian>(in, status);
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
 typename std::enable_if<nil::detail::has_begin<TInput>::value, void>::type repack_2(TInput in, size_t result_size) {
     status_type status;
-    T result = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), status);
+    T result = pack<option::big_endian, option::big_endian>(in.begin(), in.end(), status);
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -122,7 +122,7 @@ template<typename T, typename TInput>
 void repack_3(TInput in, size_t result_size) {
     status_type status;
     T result;
-    status = repack<option::big_endian, option::big_endian>(in, result);
+    status = pack<option::big_endian, option::big_endian>(in, result);
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -130,7 +130,7 @@ template<typename T, typename TInput>
 typename std::enable_if<nil::detail::has_begin<TInput>::value, void>::type repack_4(TInput in, size_t result_size) {
     status_type status;
     T result;
-    status = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), result);
+    status = pack<option::big_endian, option::big_endian>(in.begin(), in.end(), result);
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -140,7 +140,7 @@ typename std::enable_if<nil::detail::has_begin<T>::value, void>::type repack_5(T
     T result;
     resize(result, result_size);
     typename T::iterator itr = result.begin();
-    itr = repack<option::big_endian, option::big_endian>(in, result.begin(), status);
+    itr = pack<option::big_endian, option::big_endian>(in, result.begin(), status);
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -151,7 +151,7 @@ typename std::enable_if<nil::detail::has_begin<T>::value && nil::detail::has_beg
     T result;
     resize(result, result_size);
     typename T::iterator itr = result.begin();
-    itr = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), result.begin(), status);
+    itr = pack<option::big_endian, option::big_endian>(in.begin(), in.end(), result.begin(), status);
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -160,7 +160,7 @@ typename std::enable_if<nil::detail::has_begin<T>::value, void>::type repack_7(T
     status_type status;
     T result;
     resize(result, result_size);
-    status = repack<option::big_endian, option::big_endian>(in, result.begin());
+    status = pack<option::big_endian, option::big_endian>(in, result.begin());
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -170,7 +170,7 @@ typename std::enable_if<nil::detail::has_begin<T>::value && nil::detail::has_beg
     status_type status;
     T result;
     resize(result, result_size);
-    status = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), result.begin());
+    status = pack<option::big_endian, option::big_endian>(in.begin(), in.end(), result.begin());
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -234,38 +234,38 @@ BOOST_AUTO_TEST_CASE(repack_test) {
 
     status_type status;
 
-    T result1 = repack<option::big_endian, option::big_endian>(in, status);
+    T result1 = pack<option::big_endian, option::big_endian>(in, status);
     BOOST_CHECK(status == status_type::success);
 
-    T result2 = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), status);
+    T result2 = pack<option::big_endian, option::big_endian>(in.begin(), in.end(), status);
     BOOST_CHECK(status == status_type::success);
 
     T result3;
-    status = repack<option::big_endian, option::big_endian>(in, result3);
+    status = pack<option::big_endian, option::big_endian>(in, result3);
     BOOST_CHECK(status == status_type::success);
 
     T result4;
-    status = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), result4);
+    status = pack<option::big_endian, option::big_endian>(in.begin(), in.end(), result4);
     BOOST_CHECK(status == status_type::success);
 
     T result5;
     resize(result5, 2);
-    repack<option::big_endian, option::big_endian>(in, result5.begin(), status);
+    pack<option::big_endian, option::big_endian>(in, result5.begin(), status);
     BOOST_CHECK(status == status_type::success);
 
     T result6;
     resize(result6, 2);
-    repack<option::big_endian, option::big_endian>(in.begin(), in.end(), result6.begin(), status);
+    pack<option::big_endian, option::big_endian>(in.begin(), in.end(), result6.begin(), status);
     BOOST_CHECK(status == status_type::success);
 
     T result7;
     resize(result7, 2);
-    status = repack<option::big_endian, option::big_endian>(in, result7.begin());
+    status = pack<option::big_endian, option::big_endian>(in, result7.begin());
     BOOST_CHECK(status == status_type::success);
 
     T result8;
     resize(result8, 2);
-    status = repack<option::big_endian, option::big_endian>(in.begin(), in.end(), result8.begin());
+    status = pack<option::big_endian, option::big_endian>(in.begin(), in.end(), result8.begin());
     BOOST_CHECK(status == status_type::success);
 }
 
