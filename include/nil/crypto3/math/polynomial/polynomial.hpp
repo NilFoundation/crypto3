@@ -95,6 +95,16 @@ namespace nil {
                         return *this;
                     }
 
+                    polynomial& operator=(const container_type& x) {
+                        val = x;
+                        return *this;
+                    }
+
+                    polynomial& operator=(container_type&& x) {
+                        val = x;
+                        return *this;
+                    }
+
                     polynomial(std::initializer_list<value_type> il) : val(il) {
                     }
 
@@ -103,10 +113,10 @@ namespace nil {
 
                     polynomial(polynomial&& x)
                         BOOST_NOEXCEPT(std::is_nothrow_move_constructible<allocator_type>::value) :
-                        val(std::move(x)) {
+                        val(x.val) {
                     }
 
-                    polynomial(polynomial&& x, const allocator_type& a) : val(std::move(x), a) {
+                    polynomial(polynomial&& x, const allocator_type& a) : val(x.val, a) {
                     }
 
                     polynomial& operator=(std::initializer_list<value_type> il) {
