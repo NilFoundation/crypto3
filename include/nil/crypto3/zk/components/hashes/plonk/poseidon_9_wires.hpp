@@ -38,35 +38,51 @@ namespace nil {
 
                 template<typename TArithmetization,
                          typename CurveType,
-                         std::size_t W0 = 4,
-                         std::size_t W1 = 0,
-                         std::size_t W2 = 1,
-                         std::size_t W3 = 2,
-                         std::size_t W4 = 3>
+                         std::size_t W1 = 1,
+                         std::size_t W2 = 2,
+                         std::size_t W3 = 3,
+                         std::size_t W4 = 4,
+                         std::size_t W5 = 5,
+                         std::size_t W6 = 6,
+                         std::size_t W7 = 7,
+                         std::size_t W8 = 8,
+                         std::size_t W9 = 9>
                 class poseidon_plonk;
 
                 template<typename TBlueprintField,
                          typename CurveType,
-                         std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
                          std::size_t W3,
-                         std::size_t W4>
-                class poseidon_plonk<snark::plonk_constraint_system<TBlueprintField, 5>,
+                         std::size_t W4,
+                         std::size_t W5,
+                         std::size_t W6,
+                         std::size_t W7,
+                         std::size_t W8,
+                         std::size_t W9>
+                class poseidon_plonk<snark::plonk_constraint_system<TBlueprintField, 9>,
                                                        CurveType,
-                                                       W0,
                                                        W1,
                                                        W2,
                                                        W3,
-                                                       W4>
-                    : public detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 5>,
-                                                    W0,
+                                                       W4,
+                                                       W5,
+                                                       W6,
+                                                       W7,
+                                                       W8,
+                                                       W9>
+                    : public detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 9>,
                                                     W1,
                                                     W2,
                                                     W3,
-                                                    W4> {
+                                                    W4,
+                                                    W5,
+                                                    W6,
+                                                    W7,
+                                                    W8,
+                                                    W9> {
 
-                    typedef snark::plonk_constraint_system<TBlueprintField, 5> TArithmetization;
+                    typedef snark::plonk_constraint_system<TBlueprintField, 9> TArithmetization;
                     typedef blueprint<TArithmetization> blueprint_type;
 
                     constexpr algebra::matrix<typename CurveType::scalar_field_type::value_type, 3, 3> M;
@@ -75,12 +91,16 @@ namespace nil {
                     std::size_t j;
 
                     using n_wires_helper =
-                        detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 5>,
-                                               W0,
+                        detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 9>,
                                                W1,
                                                W2,
                                                W3,
-                                               W4>;
+                                               W4,
+                                               W5,
+                                               W6,
+                                               W7,
+                                               W8,
+                                               W9>;
 
                     using n_wires_helper::w;
                     enum indices { m2 = 0, m1, cur, p1, p2 };
@@ -88,7 +108,7 @@ namespace nil {
                 public:
 
                     poseidon_plonk(blueprint_type &bp) :
-                        detail::n_wires_helper<TArithmetization, W0, W1, W2, W3, W4>(bp) {
+                        detail::n_wires_helper<TArithmetization, W1, W2, W3, W4, W5, W6, W7, W8, W9>(bp) {
 
                         j = bp.allocate_row();
 
@@ -113,9 +133,9 @@ namespace nil {
                         bp.add_gate(j + 1, w[5][cur] - (w[1][cur]^5 * M[1][0] + w[2][cur]^5 * M[1][1] + w[3][cur]^5 * M[1][2] + RC[1]));
                         bp.add_gate(j + 1, w[6][cur] - (w[1][cur]^5 * M[2][0] + w[2][cur]^5 * M[2][1] + w[3][cur]^5 * M[2][2] + RC[2]));
 
-                        bp.add_gate(j + 1, w[7][cur] - (w[4][cur]^5 * M[0][0] + w[5][cur]^5 * M[0][1] + w[6][cur]^5 * M[0][2] + RC[0]));
-                        bp.add_gate(j + 1, w[8][cur] - (w[4][cur]^5 * M[1][0] + w[5][cur]^5 * M[1][1] + w[6][cur]^5 * M[1][2] + RC[1]));
-                        bp.add_gate(j + 1, w[9][cur] - (w[4][cur]^5 * M[2][0] + w[5][cur]^5 * M[2][1] + w[6][cur]^5 * M[2][2] + RC[2]));
+                        bp.add_gate(j + 1, w[7][cur] - (w[4][cur] * M[0][0] + w[5][cur] * M[0][1] + w[6][cur]^5 * M[0][2] + RC[0]));
+                        bp.add_gate(j + 1, w[8][cur] - (w[4][cur] * M[1][0] + w[5][cur] * M[1][1] + w[6][cur]^5 * M[1][2] + RC[1]));
+                        bp.add_gate(j + 1, w[9][cur] - (w[4][cur] * M[2][0] + w[5][cur] * M[2][1] + w[6][cur]^5 * M[2][2] + RC[2]));
                         
                         // For $j + k$, $k \in \{2, 19\}$:    
                         for (std::size_t z=2; z <= 19; z++){
@@ -131,6 +151,32 @@ namespace nil {
                             bp.add_gate(j + z, w[8][cur] - (w[4][cur] * M[1][0] + w[5][cur] * M[1][1] + w[6][cur]^5 * M[1][2] + RC[1]));
                             bp.add_gate(j + z, w[9][cur] - (w[4][cur] * M[2][0] + w[5][cur] * M[2][1] + w[6][cur]^5 * M[2][2] + RC[2]));
                         }
+                        
+                        // For $j + 20$:
+                        bp.add_gate(j + 20, w[1][cur] - (w[7][m1] * M[0][0] + w[8][m1] * M[0][1] + w[9][m1]^5 * M[0][2] + RC[0]));
+                        bp.add_gate(j + 20, w[2][cur] - (w[7][m1] * M[1][0] + w[8][m1] * M[1][1] + w[9][m1]^5 * M[1][2] + RC[1]));
+                        bp.add_gate(j + 20, w[3][cur] - (w[7][m1] * M[2][0] + w[8][m1] * M[2][1] + w[9][m1]^5 * M[2][2] + RC[2]));
+
+                        bp.add_gate(j + 20, w[4][cur] - (w[1][cur] * M[0][0] + w[2][cur] * M[0][1] + w[3][cur]^5 * M[0][2] + RC[0]));
+                        bp.add_gate(j + 20, w[5][cur] - (w[1][cur] * M[1][0] + w[2][cur] * M[1][1] + w[3][cur]^5 * M[1][2] + RC[1]));
+                        bp.add_gate(j + 20, w[6][cur] - (w[1][cur] * M[2][0] + w[2][cur] * M[2][1] + w[3][cur]^5 * M[2][2] + RC[2]));
+
+                        bp.add_gate(j + 20, w[7][cur] - (w[3][cur]^5 * M[0][0] + w[4][cur]^5 * M[0][1] + w[5][cur]^5 * M[0][2] + RC[0]));
+                        bp.add_gate(j + 20, w[8][cur] - (w[3][cur]^5 * M[1][0] + w[4][cur]^5 * M[1][1] + w[5][cur]^5 * M[1][2] + RC[1]));
+                        bp.add_gate(j + 20, w[9][cur] - (w[3][cur]^5 * M[2][0] + w[4][cur]^5 * M[2][1] + w[5][cur]^5 * M[2][2] + RC[2]));
+
+                        // For $j + 21$:
+                        bp.add_gate(j + 21, w[1][cur] - (w[3][m1]^5 * M[0][0] + w[8][m1]^5 * M[0][1] + w[9][m1]^5 * M[0][2] + RC[0]));
+                        bp.add_gate(j + 21, w[2][cur] - (w[3][m1]^5 * M[1][0] + w[8][m1]^5 * M[1][1] + w[9][m1]^5 * M[1][2] + RC[1]));
+                        bp.add_gate(j + 21, w[3][cur] - (w[3][m1]^5 * M[2][0] + w[8][m1]^5 * M[2][1] + w[9][m1]^5 * M[2][2] + RC[2]));
+
+                        bp.add_gate(j + 21, w[4][cur] - (w[1][cur]^5 * M[0][0] + w[2][cur]^5 * M[0][1] + w[3][cur]^5 * M[0][2] + RC[0]));
+                        bp.add_gate(j + 21, w[5][cur] - (w[1][cur]^5 * M[1][0] + w[2][cur]^5 * M[1][1] + w[3][cur]^5 * M[1][2] + RC[1]));
+                        bp.add_gate(j + 21, w[6][cur] - (w[1][cur]^5 * M[2][0] + w[2][cur]^5 * M[2][1] + w[3][cur]^5 * M[2][2] + RC[2]));
+
+                        bp.add_gate(j + 21, w[7][cur] - (w[3][cur]^5 * M[0][0] + w[4][cur]^5 * M[0][1] + w[5][cur]^5 * M[0][2] + RC[0]));
+                        bp.add_gate(j + 21, w[8][cur] - (w[3][cur]^5 * M[1][0] + w[4][cur]^5 * M[1][1] + w[5][cur]^5 * M[1][2] + RC[1]));
+                        bp.add_gate(j + 21, w[9][cur] - (w[3][cur]^5 * M[2][0] + w[4][cur]^5 * M[2][1] + w[5][cur]^5 * M[2][2] + RC[2]));
 
                     }
 
