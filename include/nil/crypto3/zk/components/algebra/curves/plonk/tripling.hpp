@@ -37,16 +37,45 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TBlueprintField, typename CurveType, 
-                    std::size_t W0 = 0, std::size_t W1 = 1, std::size_t W2 = 2, std::size_t W3 = 3, 
-                    std::size_t W4 = 4, std::size_t W5 = 5, std::size_t W6 = 6, std::size_t W7 = 7>
-                class element_g1_tripling_plonk : public component<TBlueprintField> {
-                    typedef snark::plonk_constraint_system<TBlueprintField> arithmetization_type;
+                template<typename TArithmetization, 
+                         typename CurveType, 
+                         std::size_t W0 = 0,
+                         std::size_t W1 = 1,
+                         std::size_t W2 = 2,
+                         std::size_t W3 = 3,
+                         std::size_t W4 = 4,
+                         std::size_t W5 = 5,
+                         std::size_t W6 = 6,
+                         std::size_t W7 = 7>
+                class element_g1_tripling_plonk;
 
-                    typedef blueprint<arithmetization_type, TBlueprintField> blueprint_type;
+                template<typename TBlueprintField,
+                         typename CurveType,
+                         std::size_t W0,
+                         std::size_t W1,
+                         std::size_t W2,
+                         std::size_t W3,
+                         std::size_t W4,
+                         std::size_t W5,
+                         std::size_t W6,
+                         std::size_t W7>
+                class element_g1_tripling_plonk<snark::plonk_constraint_system<TBlueprintField, 8>,
+                                                       CurveType,
+                                                       W0,
+                                                       W1,
+                                                       W2,
+                                                       W3,
+                                                       W4,
+                                                       W5,
+                                                       W6,
+                                                       W7>
+                    : public component<TBlueprintField> {
 
-                    element_g1_doubling_plonk<TBlueprintField, CurveType, W0, W1, W2, W3, W6> doubling_component;
-                    element_g1_addition_plonk<TBlueprintField, CurveType, W0, W1, W2, W3, W4, W5, W7> addition_component;
+                    typedef snark::plonk_constraint_system<TBlueprintField, 8> arithmetization_type;
+                    typedef blueprint<arithmetization_type> blueprint_type;
+
+                    element_g1_doubling_plonk<arithmetization_type, CurveType, W0, W1, W2, W3, W6> doubling_component;
+                    element_g1_addition_plonk<arithmetization_type, CurveType, W0, W1, W2, W3, W4, W5, W7> addition_component;
                 public:
 
                     element_g1_tripling_plonk(blueprint_type &bp) :

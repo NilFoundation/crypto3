@@ -35,13 +35,33 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TBlueprintField, typename CurveType, 
-                    std::size_t W0 = 0, std::size_t W1 = 1, std::size_t W2 = 2, std::size_t W3 = 3, 
-                    std::size_t W6 = 6>
-                class element_g1_doubling_plonk : public component<TBlueprintField> {
-                    typedef snark::plonk_constraint_system<TBlueprintField> arithmetization_type;
+                template<typename TArithmetization, 
+                         typename CurveType, 
+                         std::size_t W0 = 0,
+                         std::size_t W1 = 1,
+                         std::size_t W2 = 2,
+                         std::size_t W3 = 3,
+                         std::size_t W6 = 6>
+                class element_g1_doubling_plonk;
 
-                    typedef blueprint<arithmetization_type, TBlueprintField> blueprint_type;
+                template<typename TBlueprintField,
+                         typename CurveType,
+                         std::size_t W0,
+                         std::size_t W1,
+                         std::size_t W2,
+                         std::size_t W3,
+                         std::size_t W6>
+                class element_g1_doubling_plonk<snark::plonk_constraint_system<TBlueprintField, 5>,
+                                                       CurveType,
+                                                       W0,
+                                                       W1,
+                                                       W2,
+                                                       W3,
+                                                       W6>
+                    : public component<TBlueprintField> {
+
+                    typedef snark::plonk_constraint_system<TBlueprintField, 5> arithmetization_type;
+                    typedef blueprint<arithmetization_type> blueprint_type;
 
                     std::size_t i;
                 public:

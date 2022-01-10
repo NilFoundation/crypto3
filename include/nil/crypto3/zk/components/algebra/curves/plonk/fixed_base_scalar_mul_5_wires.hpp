@@ -43,8 +43,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename CurveType,
-                         typename TArithmetization,
+                template<typename TArithmetization,
+                         typename CurveType,
                          std::size_t W0 = 4,
                          std::size_t W1 = 0,
                          std::size_t W2 = 1,
@@ -53,36 +53,34 @@ namespace nil {
                 class element_g1_fixed_base_scalar_mul;
 
                 template<typename TBlueprintField,
-                         std::size_t WiresAmount,
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
                          std::size_t W3,
                          std::size_t W4>
-                class element_g1_fixed_base_scalar_mul<CurveType,
-                                                       snark::plonk_constraint_system<TBlueprintField, WiresAmount>,
+                class element_g1_fixed_base_scalar_mul<snark::plonk_constraint_system<TBlueprintField, 5>,
+                                                       CurveType,
                                                        W0,
                                                        W1,
                                                        W2,
                                                        W3,
                                                        W4>
-                    : public detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, WiresAmount>,
+                    : public detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 5>,
                                                     W0,
                                                     W1,
                                                     W2,
                                                     W3,
                                                     W4> {
 
-                    typedef snark::plonk_constraint_system<TBlueprintField, WiresAmount> TArithmetization;
-
+                    typedef snark::plonk_constraint_system<TBlueprintField, 5> TArithmetization;
                     typedef blueprint<TArithmetization> blueprint_type;
 
                     std::size_t j;
                     typename CurveType::template g1_type<>::value_type B;
 
                     using n_wires_helper =
-                        detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, WiresAmount>,
+                        detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 5>,
                                                W0,
                                                W1,
                                                W2,

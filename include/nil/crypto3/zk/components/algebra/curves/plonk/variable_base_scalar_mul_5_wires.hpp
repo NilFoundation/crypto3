@@ -37,22 +37,56 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-                template<typename TBlueprintField,
+
+                template<typename TArithmetization,
                          typename CurveType,
                          std::size_t W0 = 4,
                          std::size_t W1 = 0,
                          std::size_t W2 = 1,
                          std::size_t W3 = 2,
                          std::size_t W4 = 3>
-                class element_g1_variable_base_scalar_mul_plonk : public component<TBlueprintField> {
-                    typedef snark::plonk_constraint_system<TBlueprintField, 5> arithmetization_type;
+                class element_g1_variable_base_scalar_mul_plonk;
 
+                template<typename TBlueprintField,
+                         typename CurveType,
+                         std::size_t W0,
+                         std::size_t W1,
+                         std::size_t W2,
+                         std::size_t W3,
+                         std::size_t W4>
+                class element_g1_variable_base_scalar_mul_plonk<snark::plonk_constraint_system<TBlueprintField, 5>,
+                                                       CurveType,
+                                                       W0,
+                                                       W1,
+                                                       W2,
+                                                       W3,
+                                                       W4>
+                    : public detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 5>,
+                                                    W0,
+                                                    W1,
+                                                    W2,
+                                                    W3,
+                                                    W4> {
+
+                    typedef snark::plonk_constraint_system<TBlueprintField, 5> arithmetization_type;
                     typedef blueprint<arithmetization_type> blueprint_type;
 
                     std::size_t j;
 
+                    using n_wires_helper =
+                        detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 5>,
+                                               W0,
+                                               W1,
+                                               W2,
+                                               W3,
+                                               W4>;
+
+                    using n_wires_helper::w;
+                    enum indices { m2 = 0, m1, cur, p1, p2 };
+
                 public:
-                    element_g1_variable_base_scalar_mul_plonk(blueprint_type &bp) : component<TBlueprintField>(bp) {
+                    element_g1_variable_base_scalar_mul_plonk(blueprint_type &bp) : 
+                        detail::n_wires_helper<TArithmetization, W0, W1, W2, W3, W4>(bp) {
 
                         j = bp.allocate_rows(213);
                     }
@@ -91,115 +125,60 @@ namespace nil {
                 public:
                     void generate_gates() {
 
-                        constexpr static const typename blueprint_type::value_type w_o_jp2(
-                            W0, blueprint_type::value_type::rotation_type::pre_previous);
-                        constexpr static const typename blueprint_type::value_type w_1_jp2(
-                            W1, blueprint_type::value_type::rotation_type::pre_previous);
-                        constexpr static const typename blueprint_type::value_type w_2_jp2(
-                            W2, blueprint_type::value_type::rotation_type::pre_previous);
-                        constexpr static const typename blueprint_type::value_type w_3_jp2(
-                            W3, blueprint_type::value_type::rotation_type::pre_previous);
-                        constexpr static const typename blueprint_type::value_type w_4_jp2(
-                            W4, blueprint_type::value_type::rotation_type::pre_previous);
-
-                        constexpr static const typename blueprint_type::value_type w_o_jm1(
-                            W0, blueprint_type::value_type::rotation_type::previous);
-                        constexpr static const typename blueprint_type::value_type w_1_jm1(
-                            W1, blueprint_type::value_type::rotation_type::previous);
-                        constexpr static const typename blueprint_type::value_type w_2_jm1(
-                            W2, blueprint_type::value_type::rotation_type::previous);
-                        constexpr static const typename blueprint_type::value_type w_3_jm1(
-                            W3, blueprint_type::value_type::rotation_type::previous);
-                        constexpr static const typename blueprint_type::value_type w_4_jm1(
-                            W4, blueprint_type::value_type::rotation_type::previous);
-
-                        constexpr static const typename blueprint_type::value_type w_o_j(
-                            W0, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type w_1_j(
-                            W1, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type w_2_j(
-                            W2, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type w_3_j(
-                            W3, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type w_4_j(
-                            W4, blueprint_type::value_type::rotation_type::current);
-
-                        constexpr static const typename blueprint_type::value_type w_o_jp1(
-                            W0, blueprint_type::value_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::value_type w_1_jp1(
-                            W1, blueprint_type::value_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::value_type w_2_jp1(
-                            W2, blueprint_type::value_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::value_type w_3_jp1(
-                            W3, blueprint_type::value_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::value_type w_4_jp1(
-                            W4, blueprint_type::value_type::rotation_type::next);
-
-                        constexpr static const typename blueprint_type::value_type w_o_jm2(
-                            W0, blueprint_type::value_type::rotation_type::after_next);
-                        constexpr static const typename blueprint_type::value_type w_1_jm2(
-                            W1, blueprint_type::value_type::rotation_type::after_next);
-                        constexpr static const typename blueprint_type::value_type w_2_jm2(
-                            W2, blueprint_type::value_type::rotation_type::after_next);
-                        constexpr static const typename blueprint_type::value_type w_3_jm2(
-                            W3, blueprint_type::value_type::rotation_type::after_next);
-                        constexpr static const typename blueprint_type::value_type w_4_jm2(
-                            W4, blueprint_type::value_type::rotation_type::after_next);
-
-                        this->bp.add_gate(j, w_1_j * (w_1_j - 1));
-                        this->bp.add_gate({j + w_1_j + 211}, w_4_j * (w_4_j - 1));
-                        this->bp.add_gate(j + 211, w_3_j * (w_3_j - 1));
+                        this->bp.add_gate(j, w[1][cur] * (w[1][cur] - 1));
+                        this->bp.add_gate({j + w[1][cur] + 211}, w[4][cur] * (w[4][cur] - 1));
+                        this->bp.add_gate(j + 211, w[3][cur] * (w[3][cur] - 1));
 
                         // j=0
-                        this->bp.add_gate(j, w_o_j - (w_1_j * 2 + w_4_j));
-                        generate_phi1_gate(j + 1, w_1_jm1, w_1_jp1, w_2_jp1, w_1_jp1, w_2_jp1, w_2_jm1);
-                        generate_phi2_gate(j + 1, w_1_jm1, w_1_jp1, w_2_jp1, w_1_jp1, w_2_jp1, w_3_jm1);
+                        this->bp.add_gate(j, w[0][cur] - (w[1][cur] * 2 + w[4][cur]));
+                        generate_phi1_gate(j + 1, w[1][m1], w[1][p1], w[2][p1], w[1][p1], w[2][p1], w[2][m1]);
+                        generate_phi2_gate(j + 1, w[1][m1], w[1][p1], w[2][p1], w[1][p1], w[2][p1], w[3][m1]);
 
                         // j+z, z=0 mod 5, z!=0
                         for (std::size_t z = 5; z <= 84; z += 5) {
 
-                            this->bp.add_gate(j + z, w_o_j - (w_1_j * 2 + w_4_j + w_o_jm1));
+                            this->bp.add_gate(j + z, w[0][cur] - (w[1][cur] * 2 + w[4][cur] + w[0][m1]));
 
-                            generate_phi1_gate(j + z, w_4_j, w_2_jm1, w_3_jm1, w_1_jp2, w_2_jp2, w_2_j);
-                            generate_phi2_gate(j + z, w_4_j, w_2_jm1, w_3_jm1, w_1_jp2, w_2_jp2, w_3_j);
+                            generate_phi1_gate(j + z, w[4][cur], w[2][m1], w[3][m1], w[1][p2], w[2][p2], w[2][cur]);
+                            generate_phi2_gate(j + z, w[4][cur], w[2][m1], w[3][m1], w[1][p2], w[2][p2], w[3][cur]);
                         }
 
                         // j+z, z=1 mod 5
                         for (std::size_t z = 1; z <= 84; z += 5) {
 
-                            this->bp.add_gate(j + z, w_o_j - (w_o_jm1 + w_4_j));
+                            this->bp.add_gate(j + z, w[0][cur] - (w[0][m1] + w[4][cur]));
 
-                            generate_phi1_gate(j + z, w_4_jm1, w_2_jm1, w_3_jm1, w_1_jp1, w_2_jp1, w_1_j);
-                            generate_phi2_gate(j + z, w_4_jm1, w_2_jm1, w_3_jm1, w_1_jp1, w_2_jp1, w_2_j);
-                            generate_phi1_gate(j + z, w_4_j, w_1_j, w_2_j, w_1_jp1, w_2_jp1, w_3_j);
+                            generate_phi1_gate(j + z, w[4][m1], w[2][m1], w[3][m1], w[1][p1], w[2][p1], w[1][cur]);
+                            generate_phi2_gate(j + z, w[4][m1], w[2][m1], w[3][m1], w[1][p1], w[2][p1], w[2][cur]);
+                            generate_phi1_gate(j + z, w[4][cur], w[1][cur], w[2][cur], w[1][p1], w[2][p1], w[3][cur]);
                         }
 
                         // j+z, z=2 mod 5
                         for (std::size_t z = 2; z <= 84; z += 5) {
 
-                            this->bp.add_gate(j + z, w_o_j - (w_o_jm1 + w_4_j));
+                            this->bp.add_gate(j + z, w[0][cur] - (w[0][m1] + w[4][cur]));
 
-                            generate_phi2_gate(j + z, w_4_jm1, w_1_jm1, w_2_jm1, w_1_j, w_2_j, w_3_j);
+                            generate_phi2_gate(j + z, w[4][m1], w[1][m1], w[2][m1], w[1][cur], w[2][cur], w[3][cur]);
                         }
 
                         // j+z, z=3 mod 5
                         for (std::size_t z = 2; z <= 84; z += 5) {
 
-                            this->bp.add_gate(j + z, w_o_j - (w_o_jm1 + w_4_j));
+                            this->bp.add_gate(j + z, w[0][cur] - (w[0][m1] + w[4][cur]));
 
-                            generate_phi1_gate(j + z, w_4_jm1, w_3_jm2, w_3_jm1, w_1_jm1, w_2_jm1, w_1_j);
-                            generate_phi2_gate(j + z, w_4_jm1, w_3_jm2, w_3_jm1, w_1_jm1, w_2_jm1, w_2_j);
-                            generate_phi1_gate(j + z, w_4_j, w_1_j, w_2_j, w_1_jm1, w_2_jm1, w_3_j);
+                            generate_phi1_gate(j + z, w[4][m1], w[3][m2], w[3][m1], w[1][m1], w[2][m1], w[1][cur]);
+                            generate_phi2_gate(j + z, w[4][m1], w[3][m2], w[3][m1], w[1][m1], w[2][m1], w[2][cur]);
+                            generate_phi1_gate(j + z, w[4][cur], w[1][cur], w[2][cur], w[1][m1], w[2][m1], w[3][cur]);
                         }
 
                         // j+z, z=4 mod 5
                         for (std::size_t z = 4; z <= 84; z += 5) {
 
-                            this->bp.add_gate(j + z, w_o_j - (w_o_jm1 + w_4_j));
+                            this->bp.add_gate(j + z, w[0][cur] - (w[0][m1] + w[4][cur]));
 
-                            generate_phi1_gate(j + z, w_4_jm1, w_1_jm1, w_2_jm1, w_1_jm2, w_2_jm2, w_1_j);
-                            generate_phi2_gate(j + z, w_4_j, w_3_jm1, w_1_j, w_1_jm2, w_2_jm2, w_2_j);
-                            generate_phi1_gate(j + z, w_4_j, w_3_jm1, w_1_j, w_1_jm2, w_2_jm2, w_3_j);
+                            generate_phi1_gate(j + z, w[4][m1], w[1][m1], w[2][m1], w[1][m2], w[2][m2], w[1][cur]);
+                            generate_phi2_gate(j + z, w[4][cur], w[3][m1], w[1][cur], w[1][m2], w[2][m2], w[2][cur]);
+                            generate_phi1_gate(j + z, w[4][cur], w[3][m1], w[1][cur], w[1][m2], w[2][m2], w[3][cur]);
                         }
                     }
 
