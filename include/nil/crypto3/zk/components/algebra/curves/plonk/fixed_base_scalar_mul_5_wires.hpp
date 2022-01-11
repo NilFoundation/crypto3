@@ -22,8 +22,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for auxiliary components for the SHA256 component.
-//---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_FIXED_BASE_SCALAR_MUL_COMPONENT_5_WIRES_HPP
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_FIXED_BASE_SCALAR_MUL_COMPONENT_5_WIRES_HPP
@@ -66,12 +64,8 @@ namespace nil {
                                                        W2,
                                                        W3,
                                                        W4>
-                    : public detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 5>,
-                                                    W0,
-                                                    W1,
-                                                    W2,
-                                                    W3,
-                                                    W4> {
+                    : public detail::
+                          n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 5>, W0, W1, W2, W3, W4> {
 
                     typedef snark::plonk_constraint_system<TBlueprintField, 5> TArithmetization;
                     typedef blueprint<TArithmetization> blueprint_type;
@@ -80,12 +74,7 @@ namespace nil {
                     typename CurveType::template g1_type<>::value_type B;
 
                     using n_wires_helper =
-                        detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 5>,
-                                               W0,
-                                               W1,
-                                               W2,
-                                               W3,
-                                               W4>;
+                        detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 5>, W0, W1, W2, W3, W4>;
 
                     using n_wires_helper::w;
                     enum indices { m2 = 0, m1, cur, p1, p2 };
@@ -255,7 +244,7 @@ namespace nil {
                     void generate_assignments(const typename CurveType::scalar_field_type::value_type &a,
                                               const typename CurveType::template g1_type<>::value_type &P) {
 
-                        std::array<bool, 9> b;
+                        std::array<bool, 9> b{};
                         // = marshalling::unpack(a);
 
                         this->bp.assignment(W1, j) = b[0];

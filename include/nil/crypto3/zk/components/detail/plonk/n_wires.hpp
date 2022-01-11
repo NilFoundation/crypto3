@@ -22,8 +22,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for auxiliary components for the SHA256 component.
-//---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_N_WIRES_HELPER_HPP
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_N_WIRES_HELPER_HPP
@@ -122,11 +120,11 @@ namespace nil {
                     };
 
                     template<typename TBlueprintField, std::size_t WiresAmount,
-                        std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, 
+                        std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3,
                         std::size_t W4>
                     constexpr std::array<std::array<
-                        typename blueprint<snark::plonk_constraint_system<TBlueprintField, WiresAmount>>::value_type, 5>,5> 
-                        const n_wires_helper<snark::plonk_constraint_system<TBlueprintField, WiresAmount>, 
+                        typename blueprint<snark::plonk_constraint_system<TBlueprintField, WiresAmount>>::value_type, 5>,5>
+                        const n_wires_helper<snark::plonk_constraint_system<TBlueprintField, WiresAmount>,
                         W0, W1, W2, W3, W4>::w;
 
                 }    // namespace detail

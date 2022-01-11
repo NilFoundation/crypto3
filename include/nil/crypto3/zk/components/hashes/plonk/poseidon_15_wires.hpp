@@ -22,14 +22,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for auxiliary components for the SHA256 component.
-//---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_POSEIDON_15_WIRES_HPP
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_POSEIDON_15_WIRES_HPP
 
+#include <nil/crypto3/algebra/matrix/matrix.hpp>
+
 #include <nil/crypto3/zk/components/blueprint.hpp>
 #include <nil/crypto3/zk/components/blueprint_variable.hpp>
+#include <nil/crypto3/zk/components/detail/plonk/n_wires.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -73,101 +74,129 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class poseidon_plonk<snark::plonk_constraint_system<TBlueprintField, 15>,
-                                                                     CurveType,
-                                                                     W0,
-                                                                     W1,
-                                                                     W2,
-                                                                     W3,
-                                                                     W4,
-                                                                     W5,
-                                                                     W6,
-                                                                     W7,
-                                                                     W8,
-                                                                     W9,
-                                                                     W10,
-                                                                     W11,
-                                                                     W12,
-                                                                     W13,
-                                                                     W14> : public component<TBlueprintField> {
+                                     CurveType,
+                                     W0,
+                                     W1,
+                                     W2,
+                                     W3,
+                                     W4,
+                                     W5,
+                                     W6,
+                                     W7,
+                                     W8,
+                                     W9,
+                                     W10,
+                                     W11,
+                                     W12,
+                                     W13,
+                                     W14> : public component<TBlueprintField> {
                     typedef snark::plonk_constraint_system<TBlueprintField, 15> arithmetization_type;
 
                     typedef blueprint<arithmetization_type> blueprint_type;
 
-                    constexpr algebra::matrix<typename CurveType::scalar_field_type::value_type, 3, 3> M;
-                    constexpr algebra::vector<typename CurveType::scalar_field_type::value_type, 3> RC;
+                    constexpr static const algebra::matrix<typename CurveType::scalar_field_type::value_type, 3, 3> M;
+                    constexpr static const algebra::vector<typename CurveType::scalar_field_type::value_type, 3> RC;
 
                     std::size_t j;
-                public:
 
-                    poseidon_plonk(blueprint_type &bp) :
-                        component<FieldType>(bp) {
+                public:
+                    poseidon_plonk(blueprint_type &bp) : component<TBlueprintField>(bp) {
 
                         j = bp.allocate_rows(12);
-
                     }
 
                     void generate_gates() {
 
-                        constexpr static const typename blueprint_type::variable_type T_0_0(W0, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_0_1(W1, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_0_2(W2, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_4_0(W3, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_4_1(W4, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_4_2(W5, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_1_0(W6, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_1_1(W7, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_1_2(W8, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_2_0(W9, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_2_1(W10, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_2_2(W11, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_3_0(W12, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_3_1(W13, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_3_2(W14, 
-                            blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_0_0(
+                            W0, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_0_1(
+                            W1, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_0_2(
+                            W2, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_4_0(
+                            W3, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_4_1(
+                            W4, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_4_2(
+                            W5, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_1_0(
+                            W6, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_1_1(
+                            W7, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_1_2(
+                            W8, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_2_0(
+                            W9, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_2_1(
+                            W10, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_2_2(
+                            W11, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_3_0(
+                            W12, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_3_1(
+                            W13, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::variable_type T_3_2(
+                            W14, blueprint_type::variable_type::rotation_type::current);
 
-                        constexpr static const typename blueprint_type::variable_type T_0_0_next(W0, 
-                            blueprint_type::variable_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::variable_type T_0_1_next(W1, 
-                            blueprint_type::variable_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::variable_type T_0_2_next(W2, 
-                            blueprint_type::variable_type::rotation_type::next);
+                        constexpr static const typename blueprint_type::variable_type T_0_0_next(
+                            W0, blueprint_type::variable_type::rotation_type::next);
+                        constexpr static const typename blueprint_type::variable_type T_0_1_next(
+                            W1, blueprint_type::variable_type::rotation_type::next);
+                        constexpr static const typename blueprint_type::variable_type T_0_2_next(
+                            W2, blueprint_type::variable_type::rotation_type::next);
 
-                        //TODO: The gates are similar for each z, it can be optimized using selectors
-                        for (std::size_t z=0; z <= 11; z++){
+                        // TODO: The gates are similar for each z, it can be optimized using selectors
+                        for (std::size_t z = 0; z <= 11; z++) {
 
-                            bp.add_gate(j + z, T_1_0 - (T_0_0^5 * M[0][0] + T_0_1^5 * M[0][1] + T_0_2^5 * M[0][2] + RC[0]));
-                            bp.add_gate(j + z, T_1_1 - (T_0_0^5 * M[1][0] + T_0_1^5 * M[1][1] + T_0_2^5 * M[1][2] + RC[1]));
-                            bp.add_gate(j + z, T_1_2 - (T_0_0^5 * M[2][0] + T_0_1^5 * M[2][1] + T_0_2^5 * M[2][2] + RC[2]));
+                            this->bp.add_gate(j + z,
+                                        T_1_0 -
+                                            (T_0_0 ^ 5 * M[0][0] + T_0_1 ^ 5 * M[0][1] + T_0_2 ^ 5 * M[0][2] + RC[0]));
+                            this->bp.add_gate(j + z,
+                                        T_1_1 -
+                                            (T_0_0 ^ 5 * M[1][0] + T_0_1 ^ 5 * M[1][1] + T_0_2 ^ 5 * M[1][2] + RC[1]));
+                            this->bp.add_gate(j + z,
+                                        T_1_2 -
+                                            (T_0_0 ^ 5 * M[2][0] + T_0_1 ^ 5 * M[2][1] + T_0_2 ^ 5 * M[2][2] + RC[2]));
 
-                            bp.add_gate(j + z, T_2_0 - (T_1_0^5 * M[0][0] + T_1_1^5 * M[0][1] + T_1_2^5 * M[0][2] + RC[0]));
-                            bp.add_gate(j + z, T_2_1 - (T_1_0^5 * M[1][0] + T_1_1^5 * M[1][1] + T_1_2^5 * M[1][2] + RC[1]));
-                            bp.add_gate(j + z, T_2_2 - (T_1_0^5 * M[2][0] + T_1_1^5 * M[2][1] + T_1_2^5 * M[2][2] + RC[2]));
+                            this->bp.add_gate(j + z,
+                                        T_2_0 -
+                                            (T_1_0 ^ 5 * M[0][0] + T_1_1 ^ 5 * M[0][1] + T_1_2 ^ 5 * M[0][2] + RC[0]));
+                            this->bp.add_gate(j + z,
+                                        T_2_1 -
+                                            (T_1_0 ^ 5 * M[1][0] + T_1_1 ^ 5 * M[1][1] + T_1_2 ^ 5 * M[1][2] + RC[1]));
+                            this->bp.add_gate(j + z,
+                                        T_2_2 -
+                                            (T_1_0 ^ 5 * M[2][0] + T_1_1 ^ 5 * M[2][1] + T_1_2 ^ 5 * M[2][2] + RC[2]));
 
-                            bp.add_gate(j + z, T_3_0 - (T_2_0^5 * M[0][0] + T_2_1^5 * M[0][1] + T_2_2^5 * M[0][2] + RC[0]));
-                            bp.add_gate(j + z, T_3_1 - (T_2_0^5 * M[1][0] + T_2_1^5 * M[1][1] + T_2_2^5 * M[1][2] + RC[1]));
-                            bp.add_gate(j + z, T_3_2 - (T_2_0^5 * M[2][0] + T_2_1^5 * M[2][1] + T_2_2^5 * M[2][2] + RC[2]));
+                            this->bp.add_gate(j + z,
+                                        T_3_0 -
+                                            (T_2_0 ^ 5 * M[0][0] + T_2_1 ^ 5 * M[0][1] + T_2_2 ^ 5 * M[0][2] + RC[0]));
+                            this->bp.add_gate(j + z,
+                                        T_3_1 -
+                                            (T_2_0 ^ 5 * M[1][0] + T_2_1 ^ 5 * M[1][1] + T_2_2 ^ 5 * M[1][2] + RC[1]));
+                            this->bp.add_gate(j + z,
+                                        T_3_2 -
+                                            (T_2_0 ^ 5 * M[2][0] + T_2_1 ^ 5 * M[2][1] + T_2_2 ^ 5 * M[2][2] + RC[2]));
 
-                            bp.add_gate(j + z, T_4_0 - (T_3_0^5 * M[0][0] + T_3_1^5 * M[0][1] + T_3_2^5 * M[0][2] + RC[0]));
-                            bp.add_gate(j + z, T_4_1 - (T_3_0^5 * M[1][0] + T_3_1^5 * M[1][1] + T_3_2^5 * M[1][2] + RC[1]));
-                            bp.add_gate(j + z, T_4_2 - (T_3_0^5 * M[2][0] + T_3_1^5 * M[2][1] + T_3_2^5 * M[2][2] + RC[2]));
+                            this->bp.add_gate(j + z,
+                                        T_4_0 -
+                                            (T_3_0 ^ 5 * M[0][0] + T_3_1 ^ 5 * M[0][1] + T_3_2 ^ 5 * M[0][2] + RC[0]));
+                            this->bp.add_gate(j + z,
+                                        T_4_1 -
+                                            (T_3_0 ^ 5 * M[1][0] + T_3_1 ^ 5 * M[1][1] + T_3_2 ^ 5 * M[1][2] + RC[1]));
+                            this->bp.add_gate(j + z,
+                                        T_4_2 -
+                                            (T_3_0 ^ 5 * M[2][0] + T_3_1 ^ 5 * M[2][1] + T_3_2 ^ 5 * M[2][2] + RC[2]));
 
-                            bp.add_gate(j + z, T_0_0_next - (T_4_0^5 * M[0][0] + T_4_1^5 * M[0][1] + T_4_2^5 * M[0][2] + RC[0]));
-                            bp.add_gate(j + z, T_0_1_next - (T_4_0^5 * M[1][0] + T_4_1^5 * M[1][1] + T_4_2^5 * M[1][2] + RC[1]));
-                            bp.add_gate(j + z, T_0_2_next - (T_4_0^5 * M[2][0] + T_4_1^5 * M[2][1] + T_4_2^5 * M[2][2] + RC[2]));
+                            this->bp.add_gate(j + z,
+                                        T_0_0_next -
+                                            (T_4_0 ^ 5 * M[0][0] + T_4_1 ^ 5 * M[0][1] + T_4_2 ^ 5 * M[0][2] + RC[0]));
+                            this->bp.add_gate(j + z,
+                                        T_0_1_next -
+                                            (T_4_0 ^ 5 * M[1][0] + T_4_1 ^ 5 * M[1][1] + T_4_2 ^ 5 * M[1][2] + RC[1]));
+                            this->bp.add_gate(j + z,
+                                        T_0_2_next -
+                                            (T_4_0 ^ 5 * M[2][0] + T_4_1 ^ 5 * M[2][1] + T_4_2 ^ 5 * M[2][2] + RC[2]));
                         }
                     }
 
