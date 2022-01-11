@@ -40,7 +40,6 @@
 #include <nil/crypto3/multiprecision/number.hpp>
 
 #include <nil/marshalling/algorithms/pack.hpp>
-#include <nil/marshalling/algorithms/unpack.hpp>
 
 #include <nil/crypto3/marshalling/multiprecision/types/integral.hpp>
 
@@ -110,7 +109,7 @@ void test_round_trip_fixed_precision_big_endian(T val) {
     BOOST_CHECK(val == test_val);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    std::vector<unit_type> test_cv = nil::marshalling::unpack<nil::marshalling::option::big_endian>(val, status);
+    std::vector<unit_type> test_cv = nil::marshalling::pack<nil::marshalling::option::big_endian>(val, status);
 
     BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
@@ -136,7 +135,7 @@ void test_round_trip_fixed_precision_little_endian(T val) {
     BOOST_CHECK(val == test_val);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    std::vector<unit_type> test_cv = nil::marshalling::unpack<nil::marshalling::option::little_endian>(val, status);
+    std::vector<unit_type> test_cv = nil::marshalling::pack<nil::marshalling::option::little_endian>(val, status);
 
     BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
@@ -173,7 +172,7 @@ void test_round_trip_non_fixed_precision(T val) {
     BOOST_CHECK(val == test_val);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    std::vector<unit_type> test_cv = nil::marshalling::unpack<TEndianness>(val, status);
+    std::vector<unit_type> test_cv = nil::marshalling::pack<TEndianness>(val, status);
 
     BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);

@@ -39,7 +39,6 @@
 #include <nil/crypto3/multiprecision/number.hpp>
 
 #include <nil/marshalling/algorithms/pack.hpp>
-#include <nil/marshalling/algorithms/unpack.hpp>
 
 #include <nil/crypto3/marshalling/multiprecision/types/integral.hpp>
 
