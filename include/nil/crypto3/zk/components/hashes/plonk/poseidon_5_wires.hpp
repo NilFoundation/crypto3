@@ -75,7 +75,7 @@ namespace nil {
                     poseidon_plonk(blueprint_type &bp) :
                         detail::n_wires_helper<TArithmetization, W0, W1, W2, W3, W4>(bp) {
 
-                        j = bp.allocate_row();
+                        j = bp.allocate_rows();
                     }
 
                     void generate_gates() {
