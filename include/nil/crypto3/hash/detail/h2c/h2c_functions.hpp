@@ -507,10 +507,9 @@ namespace nil {
                                           std::cbegin(uniform_bytes) + elm_offset + L,
                                           std::back_inserter(imported_octets));
                                 nil::marshalling::status_type status;
-                                coordinates[j] = modular_type(
-                                    nil::marshalling::pack<nil::marshalling::option::big_endian,
-                                                           multiprecision::cpp_int>(imported_octets, status),
-                                    suite_type::p);
+                                multiprecision::cpp_int tmp = nil::marshalling::pack<nil::marshalling::option::big_endian,
+                                                                                     multiprecision::cpp_int>(imported_octets, status);
+                                coordinates[j] = modular_type(tmp, suite_type::p);
                             }
                             result[i] = coordinates[0];
                         }
@@ -537,10 +536,9 @@ namespace nil {
                                           std::cbegin(uniform_bytes) + elm_offset + L,
                                           std::back_inserter(imported_octets));
                                 nil::marshalling::status_type status;
-                                coordinates[j] = modular_type(
-                                    nil::marshalling::pack<nil::marshalling::option::big_endian,
-                                                           multiprecision::cpp_int>(imported_octets, status),
-                                    suite_type::p);
+                                multiprecision::cpp_int tmp = nil::marshalling::pack<nil::marshalling::option::big_endian,
+                                                                                     multiprecision::cpp_int>(imported_octets, status);
+                                coordinates[j] = modular_type(tmp, suite_type::p);
                             }
                             result[i] = field_value_type(coordinates[0], coordinates[1]);
                         }
