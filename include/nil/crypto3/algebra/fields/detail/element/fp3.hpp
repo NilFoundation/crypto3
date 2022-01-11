@@ -27,6 +27,7 @@
 #define CRYPTO3_ALGEBRA_FIELDS_ELEMENT_FP3_HPP
 
 #include <nil/crypto3/algebra/fields/detail/exponentiation.hpp>
+#include <nil/crypto3/algebra/fields/detail/element/operations.hpp>
 
 namespace nil {
     namespace crypto3 {

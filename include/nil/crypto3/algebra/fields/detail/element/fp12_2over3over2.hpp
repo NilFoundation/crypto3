@@ -27,6 +27,7 @@
 #define CRYPTO3_ALGEBRA_FIELDS_ELEMENT_FP12_2OVER3OVER2_HPP
 
 #include <nil/crypto3/algebra/fields/detail/exponentiation.hpp>
+#include <nil/crypto3/algebra/fields/detail/element/operations.hpp>
 
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>

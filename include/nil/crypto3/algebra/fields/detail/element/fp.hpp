@@ -27,6 +27,7 @@
 #define CRYPTO3_ALGEBRA_FIELDS_ELEMENT_FP_HPP
 
 #include <nil/crypto3/algebra/fields/detail/exponentiation.hpp>
+#include <nil/crypto3/algebra/fields/detail/element/operations.hpp>
 
 #include <nil/crypto3/multiprecision/ressol.hpp>
 #include <nil/crypto3/multiprecision/inverse.hpp>
@@ -42,7 +43,6 @@ namespace nil {
         namespace algebra {
             namespace fields {
                 namespace detail {
-
                     template<typename FieldParams>
                     class element_fp {
                         typedef FieldParams policy_type;
