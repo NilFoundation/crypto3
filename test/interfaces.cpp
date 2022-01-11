@@ -107,14 +107,14 @@ typename std::enable_if<!nil::detail::has_begin<T>::value || !nil::detail::has_b
 template<typename T, typename TInput>
 void repack_1(TInput in, size_t result_size) {
     status_type status;
-    T result = pack<option::big_endian, option::big_endian>(in, status);
+    T result = pack(in, status);
     BOOST_CHECK(status == status_type::success);
 }
 
 template<typename T, typename TInput>
 typename std::enable_if<nil::detail::has_begin<TInput>::value, void>::type repack_2(TInput in, size_t result_size) {
     status_type status;
-    T result = pack<option::big_endian, option::big_endian>(in.begin(), in.end(), status);
+    T result = pack(in.begin(), in.end(), status);
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -122,7 +122,7 @@ template<typename T, typename TInput>
 void repack_3(TInput in, size_t result_size) {
     status_type status;
     T result;
-    status = pack<option::big_endian, option::big_endian>(in, result);
+    status = pack(in, result);
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -130,7 +130,7 @@ template<typename T, typename TInput>
 typename std::enable_if<nil::detail::has_begin<TInput>::value, void>::type repack_4(TInput in, size_t result_size) {
     status_type status;
     T result;
-    status = pack<option::big_endian, option::big_endian>(in.begin(), in.end(), result);
+    status = pack(in.begin(), in.end(), result);
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -140,7 +140,7 @@ typename std::enable_if<nil::detail::has_begin<T>::value, void>::type repack_5(T
     T result;
     resize(result, result_size);
     typename T::iterator itr = result.begin();
-    itr = pack<option::big_endian, option::big_endian>(in, result.begin(), status);
+    itr = pack(in, result.begin(), status);
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -151,7 +151,7 @@ typename std::enable_if<nil::detail::has_begin<T>::value && nil::detail::has_beg
     T result;
     resize(result, result_size);
     typename T::iterator itr = result.begin();
-    itr = pack<option::big_endian, option::big_endian>(in.begin(), in.end(), result.begin(), status);
+    itr = pack(in.begin(), in.end(), result.begin(), status);
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -160,7 +160,7 @@ typename std::enable_if<nil::detail::has_begin<T>::value, void>::type repack_7(T
     status_type status;
     T result;
     resize(result, result_size);
-    status = pack<option::big_endian, option::big_endian>(in, result.begin());
+    status = pack(in, result.begin());
     BOOST_CHECK(status == status_type::success);
 }
 
@@ -170,14 +170,18 @@ typename std::enable_if<nil::detail::has_begin<T>::value && nil::detail::has_beg
     status_type status;
     T result;
     resize(result, result_size);
-    status = pack<option::big_endian, option::big_endian>(in.begin(), in.end(), result.begin());
+    status = pack(in.begin(), in.end(), result.begin());
     BOOST_CHECK(status == status_type::success);
 }
 
 typedef boost::mpl::list<std::vector<uint16_t>, std::array<uint16_t, 2>, boost::container::static_vector<uint16_t, 2>,
                          boost::array<uint16_t, 2>, std::uint32_t,
                          types::integral<field_type<option::big_endian>, std::uint16_t>>
-    test_types_repack;
+    test_types_pack;
+
+typedef boost::mpl::list<std::vector<uint8_t>, std::array<uint8_t, 4>, boost::container::static_vector<uint8_t, 4>,
+                         boost::array<uint8_t, 4>>
+    test_types_unpack;
 
 template<typename T, typename TInput>
 void call_repack(TInput in, size_t result_size) {
@@ -191,7 +195,7 @@ void call_repack(TInput in, size_t result_size) {
     repack_8<T>(in, result_size);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(pack_test, T, test_types_repack) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(only_pack_test, T, test_types_pack) {
     std::vector<uint8_t> in1 = {0x12, 0x34, 0x56, 0x78};
     call_repack<T>(in1, 2);
 
@@ -199,11 +203,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pack_test, T, test_types_repack) {
     call_repack<T>(in1, 2);
 }
 
-typedef boost::mpl::list<std::vector<uint8_t>, std::array<uint8_t, 4>, boost::container::static_vector<uint8_t, 4>,
-                         boost::array<uint8_t, 4>>
-    test_types_repack_unpack;
-
-BOOST_AUTO_TEST_CASE_TEMPLATE(unpack_test, T, test_types_repack_unpack) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(only_unpack_test, T, test_types_unpack) {
     std::vector<uint16_t> in1 = {{0x1234, 0x5678}};
     call_repack<T>(in1, 4);
 
@@ -226,47 +226,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(unpack_test, T, test_types_repack_unpack) {
     call_repack<T>(in4, 4);
 }
 
-BOOST_AUTO_TEST_CASE(repack_test) {
-    using T = std::vector<std::uint16_t>;
-    using Tout = std::vector<std::uint32_t>;
-    std::vector<std::uint16_t> in = {0x1234, 0x5678, 0x90ab, 0xcdef};
-    std::vector<std::uint32_t> res = {{0x12345678, 0x90abcdef}};
-
-    status_type status;
-
-    T result1 = pack<option::big_endian, option::big_endian>(in, status);
-    BOOST_CHECK(status == status_type::success);
-
-    T result2 = pack<option::big_endian, option::big_endian>(in.begin(), in.end(), status);
-    BOOST_CHECK(status == status_type::success);
-
-    T result3;
-    status = pack<option::big_endian, option::big_endian>(in, result3);
-    BOOST_CHECK(status == status_type::success);
-
-    T result4;
-    status = pack<option::big_endian, option::big_endian>(in.begin(), in.end(), result4);
-    BOOST_CHECK(status == status_type::success);
-
-    T result5;
-    resize(result5, 2);
-    pack<option::big_endian, option::big_endian>(in, result5.begin(), status);
-    BOOST_CHECK(status == status_type::success);
-
-    T result6;
-    resize(result6, 2);
-    pack<option::big_endian, option::big_endian>(in.begin(), in.end(), result6.begin(), status);
-    BOOST_CHECK(status == status_type::success);
-
-    T result7;
-    resize(result7, 2);
-    status = pack<option::big_endian, option::big_endian>(in, result7.begin());
-    BOOST_CHECK(status == status_type::success);
-
-    T result8;
-    resize(result8, 2);
-    status = pack<option::big_endian, option::big_endian>(in.begin(), in.end(), result8.begin());
-    BOOST_CHECK(status == status_type::success);
+BOOST_AUTO_TEST_CASE_TEMPLATE(unpack_and_pack_test, T, test_types_pack) {
+    std::vector<std::uint32_t> in = {0x12345678};
+    call_repack<T>(in, 2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

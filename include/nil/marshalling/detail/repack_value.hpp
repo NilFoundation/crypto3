@@ -98,7 +98,7 @@ namespace nil {
                 inline operator T() {
                     marshalling::status_type status_unpack;
 
-                    using marshalling_type = typename marshalling::is_compatible<TInput>::template type<TInputEndian>;
+                    using marshalling_type = typename marshalling::is_compatible<TInput>::template type<TOutputEndian>;
 
                     T result = value_unpack_impl<marshalling_type>(marshalling_type(input), status_unpack);
                     *status = status_unpack;
@@ -163,7 +163,7 @@ namespace nil {
                                      typename T::value_type>::value)>::type,
                          bool Enable = true>
                 inline operator T() {
-                    T result = range_unpack_impl<TInputEndian, Iter>(iterator, count_elements, status_unpack);
+                    T result = range_unpack_impl<TOutputEndian, Iter>(iterator, count_elements, status_unpack);
                     *status = status_unpack;
                     return result;
                 }
@@ -233,7 +233,7 @@ namespace nil {
                     marshalling::status_type status_unpack;
 
                     T result
-                        = range_unpack_impl<TInputEndian, Iter>(iterator, count_elements, out_iterator, status_unpack);
+                        = range_unpack_impl<TOutputEndian, Iter>(iterator, count_elements, out_iterator, status_unpack);
                     *status = status_unpack;
 
                     return out_iterator;
