@@ -57,6 +57,7 @@ namespace nil {
 
                 if (n != (1u << logn))
                     throw std::invalid_argument("expected n == (1u << logn)");
+                exit(0);
                 if (logn > algebra::fields::arithmetic_params<FieldType>::s)
                     throw std::invalid_argument("expected logn <= arithmetic_params<FieldType>::s");
 
