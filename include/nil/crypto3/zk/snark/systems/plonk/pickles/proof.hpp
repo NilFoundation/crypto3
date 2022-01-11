@@ -74,7 +74,7 @@ namespace nil {
                     typename CurveType::scalar_field_type::value_type z1, z2;
 
                     // Previous challenges
-                    std::vector<std::tuple<std::vector<typename scalar_group_type::value_type>,
+                    std::vector<std::tuple<std::vector<typename CurveType::scalar_field_type::value_type>,
                                            typename commitment_scheme::commitment_type>>
                         prev_challenges;
                 };
