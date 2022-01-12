@@ -194,6 +194,10 @@ if(BUILD_TESTS)
     add_subdirectory(test)
 endif()
 
+if(BUILD_EXAMPLES)
+    add_subdirectory(example)
+endif()
+
 if((CMAKE_COMPILER_IS_GNUCC) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
     set(extra_flags_list -Wall -Wextra -Wcast-align -Wcast-qual
         -Wctor-dtor-privacy -Wmissing-include-dirs -Woverloaded-virtual

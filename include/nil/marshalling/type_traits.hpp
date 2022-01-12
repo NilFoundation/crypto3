@@ -190,11 +190,21 @@ namespace nil {
             static const bool value = true;
         };
 
-        template<typename T>
+        template<typename T, typename Enabled = void>
         struct is_supported_representation_type {
-            static const bool value = std::is_same<std::uint8_t, T>::value
-                                      || std::is_same<std::int8_t, T>::value
-                                      || std::is_same<char, T>::value;
+            static const bool value = false;
+        };
+
+        template<typename T>
+        struct is_supported_representation_type<T,  typename std::enable_if<std::is_same<std::uint8_t, T>::value
+                || std::is_same<std::int8_t, T>::value
+                || std::is_same<char, T>::value || std::is_same<bool, T>::value>::type> {
+            static const bool value = true;
+        };
+
+        template<typename T>
+        struct is_supported_representation_type<T,  typename std::enable_if<is_supported_representation_type<typename T::value_type>::value>::type> {
+            static const bool value = true;
         };
 
 
