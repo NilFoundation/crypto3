@@ -242,7 +242,7 @@ namespace nil {
                         hasher->generate_r1cs_witness();
 
                         /* do unpacking in place */
-                        const std::vector<bool> input = input_block.bits.get_bits(this->bp);
+                        const std::vector<bool> input = input_block.bits.bits(this->bp);
                         for (std::size_t i = 0; i < dimension; ++i) {
                             blueprint_variable_vector<FieldType> va(
                                 output_digest.bits.begin() + i * FieldType::value_bits,

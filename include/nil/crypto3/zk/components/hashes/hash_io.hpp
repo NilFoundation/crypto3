@@ -76,7 +76,7 @@ namespace nil {
                     }
 
                     std::vector<bool> get_digest() const {
-                        return bits.get_bits(this->bp);
+                        return bits.bits(this->bp);
                     }
                 };
 
@@ -118,7 +118,7 @@ namespace nil {
                     }
 
                     std::vector<bool> get_block() const {
-                        return bits.get_bits(this->bp);
+                        return bits.bits(this->bp);
                     }
                 };
 

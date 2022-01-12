@@ -51,7 +51,7 @@ namespace nil {
                 // class blueprint_variable;
 
                 template<typename TBlueprintField>
-                class blueprint_variable<snark::r1cs_constraint_system<TBlueprintField>> : 
+                class blueprint_variable<snark::r1cs_constraint_system<TBlueprintField>> :
                     public snark::variable<TBlueprintField, false> {
                 public:
                     blueprint_variable(const typename snark::variable<TBlueprintField>::index_type index = 0) :
@@ -68,7 +68,7 @@ namespace nil {
                 };
 
                 template<typename TBlueprintField, std::size_t WiresAmount>
-                class blueprint_variable<snark::plonk_constraint_system<TBlueprintField, WiresAmount>> : 
+                class blueprint_variable<snark::plonk_constraint_system<TBlueprintField, WiresAmount>> :
                     public snark::variable<TBlueprintField, true> {
 
                 public:
@@ -155,7 +155,7 @@ namespace nil {
                         }
                     }
 
-                    std::vector<field_value_type> get_vals(const blueprint<TArithmetization> &bp) const {
+                    std::vector<field_value_type> values(const blueprint<TArithmetization> &bp) const {
                         std::vector<field_value_type> result(this->size());
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             result[i] = bp.val((*this)[i]);
@@ -163,7 +163,7 @@ namespace nil {
                         return result;
                     }
 
-                    std::vector<bool> get_bits(const blueprint<TArithmetization> &bp) const {
+                    std::vector<bool> bits(const blueprint<TArithmetization> &bp) const {
                         std::vector<bool> result;
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             const field_value_type v = bp.val((*this)[i]);
@@ -173,7 +173,7 @@ namespace nil {
                         return result;
                     }
 
-                    field_value_type get_field_element_from_bits(const blueprint<TArithmetization> &bp) const {
+                    field_value_type field_element_from_bits(const blueprint<TArithmetization> &bp) const {
                         field_value_type result = field_value_type::zero();
 
                         for (std::size_t i = 0; i < this->size(); ++i) {

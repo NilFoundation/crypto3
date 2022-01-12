@@ -101,7 +101,7 @@ void test_merkle_tree_check_update_component() {
     mls.generate_r1cs_constraints();
 
     address_bits_va.fill_with_bits(bp, address_bits);
-    BOOST_REQUIRE(address_bits_va.get_field_element_from_bits(bp) == address);
+    BOOST_REQUIRE(address_bits_va.field_element_from_bits(bp) == address);
     prev_leaf_digest.generate_r1cs_witness(loaded_leaf);
     prev_path_var.generate_r1cs_witness(address, prev_path);
     next_leaf_digest.generate_r1cs_witness(stored_leaf);
@@ -168,7 +168,7 @@ void test_merkle_tree_check_read_component() {
     ml.generate_r1cs_constraints();
 
     address_bits_va.fill_with_bits(bp, address_bits);
-    BOOST_REQUIRE(address_bits_va.get_field_element_from_bits(bp) == address);
+    BOOST_REQUIRE(address_bits_va.field_element_from_bits(bp) == address);
     leaf_digest.generate_r1cs_witness(leaf);
     path_var.generate_r1cs_witness(address, path);
     ml.generate_r1cs_witness();
