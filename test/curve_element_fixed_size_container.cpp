@@ -39,7 +39,6 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
 #include <nil/marshalling/algorithms/pack.hpp>
-#include <nil/marshalling/algorithms/unpack.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 
@@ -73,7 +72,7 @@ void test_curve_element_fixed_size_container_big_endian(std::array<T, TSize> val
 
     nil::marshalling::status_type status;
     std::vector<unit_type> cv =
-        nil::marshalling::unpack<Endianness>(val_container, status);
+        nil::marshalling::pack<Endianness>(val_container, status);
 
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 

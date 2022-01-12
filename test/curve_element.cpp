@@ -42,7 +42,6 @@
 #include <nil/crypto3/algebra/curves/jubjub.hpp>
 
 #include <nil/marshalling/algorithms/pack.hpp>
-#include <nil/marshalling/algorithms/unpack.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 
@@ -67,7 +66,7 @@ void test_curve_element_big_endian(T val) {
     static_assert(nil::marshalling::is_compatible<T>::value);
 
     nil::marshalling::status_type status;
-    std::vector<unit_type> cv = nil::marshalling::unpack<Endianness>(val, status);
+    std::vector<unit_type> cv = nil::marshalling::pack<Endianness>(val, status);
 
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
@@ -183,13 +182,13 @@ BOOST_AUTO_TEST_CASE(curve_element_jubjub_g1) {
         1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0,
         1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0};
     std::vector<std::uint8_t> cv =
-        nil::marshalling::unpack<nil::marshalling::option::little_endian>(point, status);
+        nil::marshalling::pack<nil::marshalling::option::little_endian>(point, status);
     for (auto i = 0; i < expected_bits.size(); ++i) {
         BOOST_CHECK(expected_bits[i] == ((cv[i / 8] >> (i % 8)) & 1));
     }
 
     /// serialization into bits
-    std::vector<bool> cv_bits = nil::marshalling::unpack<nil::marshalling::option::little_endian>(point, status);
+    std::vector<bool> cv_bits = nil::marshalling::pack<nil::marshalling::option::little_endian>(point, status);
     auto it1 = expected_bits.begin();
     auto it2 = cv_bits.begin();
     while (it1 != expected_bits.end() && it2 != cv_bits.end()) {
