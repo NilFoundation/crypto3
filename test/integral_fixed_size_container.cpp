@@ -42,7 +42,6 @@
 #include <nil/crypto3/multiprecision/number.hpp>
 
 #include <nil/marshalling/algorithms/pack.hpp>
-#include <nil/marshalling/algorithms/unpack.hpp>
 
 #include <nil/crypto3/marshalling/multiprecision/types/integral.hpp>
 
@@ -126,7 +125,7 @@ void test_round_trip_fixed_size_container_fixed_precision_big_endian(
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     std::vector<unit_type> test_cv = 
-        nil::marshalling::unpack<nil::marshalling::option::big_endian>(val_container, status);
+        nil::marshalling::pack<nil::marshalling::option::big_endian>(val_container, status);
 
     BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
@@ -165,7 +164,7 @@ void test_round_trip_fixed_size_container_fixed_precision_little_endian(
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     std::vector<unit_type> test_cv = 
-        nil::marshalling::unpack<nil::marshalling::option::little_endian>(val_container, status);
+        nil::marshalling::pack<nil::marshalling::option::little_endian>(val_container, status);
 
     BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
@@ -185,24 +184,24 @@ void test_round_trip_fixed_size_container_fixed_precision() {
     }
 }
 
-BOOST_AUTO_TEST_SUITE(integral_test_suite)
+BOOST_AUTO_TEST_SUITE(integral_fixed_test_suite)
 
-BOOST_AUTO_TEST_CASE(integral_checked_int1024) {
+BOOST_AUTO_TEST_CASE(integral_fixed_checked_int1024) {
     test_round_trip_fixed_size_container_fixed_precision<nil::crypto3::multiprecision::checked_int1024_t, 128>();
 }
 
-BOOST_AUTO_TEST_CASE(integral_cpp_uint512) {
+BOOST_AUTO_TEST_CASE(integral_fixed_cpp_uint512) {
     test_round_trip_fixed_size_container_fixed_precision<nil::crypto3::multiprecision::checked_uint512_t, 128>();
 }
 
-BOOST_AUTO_TEST_CASE(integral_cpp_int_backend_64) {
+BOOST_AUTO_TEST_CASE(integral_fixed_cpp_int_backend_64) {
     test_round_trip_fixed_size_container_fixed_precision<
         nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
             64, 64, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>,
         128>();
 }
 
-BOOST_AUTO_TEST_CASE(integral_cpp_int_backend_23) {
+BOOST_AUTO_TEST_CASE(integral_fixed_cpp_int_backend_23) {
     test_round_trip_fixed_size_container_fixed_precision<
         nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
             23, 23, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>,
