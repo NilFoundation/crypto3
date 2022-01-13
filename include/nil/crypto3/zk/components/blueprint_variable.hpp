@@ -72,10 +72,13 @@ namespace nil {
                     public snark::variable<TBlueprintField, true> {
 
                 public:
+                    
+                    std::size_t copy_constraint_index;
+
                     constexpr blueprint_variable(const std::size_t wire_index, 
                         typename snark::variable<TBlueprintField, true>::rotation_type rotation = 
                             snark::variable<TBlueprintField, true>::rotation_type::current) :
-                        snark::variable<TBlueprintField, true>(wire_index, rotation) {};
+                        snark::variable<TBlueprintField, true>(wire_index, rotation), copy_constraint_index(0) {};
                 };
 
                 template<typename TArithmetization>

@@ -169,17 +169,21 @@ namespace nil {
 
                 template<typename TBlueprintField, std::size_t WiresAmount>
                 class blueprint<snark::plonk_constraint_system<TBlueprintField, WiresAmount>> {
-
+                public:
+                    using value_type = blueprint_variable<TArithmetization>;
+                private:
                     typedef snark::plonk_constraint_system<TBlueprintField, WiresAmount> TArithmetization;
 
                     snark::plonk_variable_assignment<TBlueprintField, WiresAmount> assignments;
+                    std::vector<std::vector<value_type>> copy_constraints;
 
                     TArithmetization constraint_system;
 
                 public:
-                    using value_type = blueprint_variable<TArithmetization>;
 
                     blueprint() {
+                        copy_constraints.reserve(1);
+                        copy_constraints[0] = std::vector<value_type>();
                     }
 
                     void clear_assignments() {
@@ -218,6 +222,34 @@ namespace nil {
                     void add_gate(std::initializer_list<std::size_t> row_indices,
                                   const snark::plonk_constraint<TBlueprintField> &constr) {
                         constraint_system.constraints.emplace_back(constr);
+                    }
+
+                    void add_copy_constraint(value_type &A, value_type &B) {
+                        if (A.copy_constraint_index == 0 && B.copy_constraint_index == 0){
+                            std::vector<value_type> copy_constraint = {A, B};
+                            copy_constraints.push_back(copy_constraint);
+                            A.copy_constraint_index = B.copy_constraint_index = copy_constraints.size() + 1;
+                        } else {
+
+                            if (A.copy_constraint_index != B.copy_constraint_index){
+                                value_type &left = A;
+                                value_type &right = B;
+                                if (copy_constraints[A.copy_constraint_index].size() < 
+                                    copy_constraints[B.copy_constraint_index].size()){
+                                    left = B;
+                                    right = A;
+                                }
+
+                                std::copy(copy_constraints[right.copy_constraint_index].begin(), 
+                                    copy_constraints[right.copy_constraint_index].end(),
+                                    copy_constraints[left.copy_constraint_index].end());
+                                for (value_type & var: copy_constraints[right.copy_constraint_index]){
+                                    var.copy_constraint_index = left.copy_constraint_index;
+                                }
+
+                                copy_constraints[right.copy_constraint_index].resize(0);
+                            }
+                        }
                     }
 
                     bool is_satisfied() const {
