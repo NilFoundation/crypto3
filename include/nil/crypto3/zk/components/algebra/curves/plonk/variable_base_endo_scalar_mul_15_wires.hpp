@@ -28,6 +28,8 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_ENDO_SCALAR_MUL_COMPONENT_15_WIRES_HPP
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_ENDO_SCALAR_MUL_COMPONENT_15_WIRES_HPP
 
+#include <nil/marshalling/algorithms/pack.hpp>
+
 #include <nil/crypto3/zk/components/blueprint.hpp>
 #include <nil/crypto3/zk/components/component.hpp>
 
@@ -186,7 +188,7 @@ namespace nil {
                         typename CurveType::template g1_type<>::value_type S = ...;
                         typename CurveType::template g1_type<>::value_type R = S + Q;
 
-                        std::array<bool, 4> b = marshalling::unpack(r);
+                        std::array<bool, 4> b = marshalling::pack(r);
 
                         for (std::size_t z = 0; z <= 63; z++) {
                             this->bp.val(W0, j + z) = T.X;
