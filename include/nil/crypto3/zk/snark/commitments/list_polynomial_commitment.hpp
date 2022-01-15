@@ -87,7 +87,8 @@ namespace nil {
 
                         std::array<std::array<commitment_type, r - 1>, lambda> f_commitments;
 
-                        std::array<std::vector<typename FieldType::value_type>, lambda> f_ip1_coefficients;
+                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, lambda>
+                            f_ip1_coefficients;
                     };
 
                     // The result of this function is not commitment_type (as it would expected),
@@ -96,8 +97,9 @@ namespace nil {
                     // After this function
                     // result.root();
                     // should be called
-                    static merkle_tree_type commit(const math::polynomial::polynomial<typename FieldType::value_type> &f,
-                                                   const std::vector<typename FieldType::value_type> &D) {
+                    static merkle_tree_type
+                        commit(const math::polynomial::polynomial<typename FieldType::value_type> &f,
+                               const std::vector<typename FieldType::value_type> &D) {
 
                         std::vector<typename FieldType::value_type> y;
                         for (typename FieldType::value_type H : D) {
@@ -152,7 +154,7 @@ namespace nil {
                             std::array<merkle_proof_type, m *r> &alpha_openings = proof.alpha_openings[round_id];
                             std::array<merkle_proof_type, r> &f_y_openings = proof.f_y_openings[round_id];
                             std::array<commitment_type, r - 1> &f_commitments = proof.f_commitments[round_id];
-                            std::vector<typename FieldType::value_type> &f_ip1_coefficients =
+                            math::polynomial::polynomial<typename FieldType::value_type> &f_ip1_coefficients =
                                 proof.f_ip1_coefficients[round_id];
                             merkle_tree_type f_i_tree = T;
 
@@ -168,7 +170,7 @@ namespace nil {
                                 // FieldType>();
 
                                 math::polynomial::polynomial<typename FieldType::value_type> sqr_polynom = {y_arr[i], 0,
-                                                                                                         -1};
+                                                                                                            -1};
                                 std::array<typename FieldType::value_type, m> s;
                                 // = math::polynomial::get_roots<m>(sqr_polynom);
 
@@ -263,7 +265,7 @@ namespace nil {
                             for (std::size_t i = 0; i <= r - 1; i++) {
 
                                 math::polynomial::polynomial<typename FieldType::value_type> sqr_polynom = {y_arr[i], 0,
-                                                                                                         -1};
+                                                                                                            -1};
                                 std::array<typename FieldType::value_type, m> s;
                                 // = math::polynomial::get_roots<m>(sqr_polynom);
 
