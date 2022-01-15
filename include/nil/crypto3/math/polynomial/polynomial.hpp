@@ -80,9 +80,9 @@ namespace nil {
                         val.~vector();
                     }
 
-                    polynomial(const polynomial& x) : val(x) {
+                    polynomial(const polynomial& x) : val(x.val) {
                     }
-                    polynomial(const polynomial& x, const allocator_type& a) : val(x, a) {
+                    polynomial(const polynomial& x, const allocator_type& a) : val(x.val, a) {
                     }
 
                     polynomial& operator=(const polynomial& x) {
@@ -474,17 +474,19 @@ namespace nil {
                         std::size_t shift;
 
                         while (r_deg >= d && !r.is_zero()) {
-                            if (r_deg >= d)
+                            if (r_deg >= d) {
                                 shift = r_deg - d;
-                            else
+                            } else {
                                 shift = 0;
+                            }
 
                             FieldValueType lead_coeff = r.back() * c;
 
                             q[shift] += lead_coeff;
 
-                            if (other.size() + shift + 1 > r.size())
+                            if (other.size() + shift + 1 > r.size()) {
                                 r.resize(other.size() + shift + 1);
+                            }
                             auto glambda = [=](FieldValueType x, FieldValueType y) { return y - (x * lead_coeff); };
                             std::transform(other.begin(), other.end(), r.begin() + shift, r.begin() + shift, glambda);
                             r.condense();
@@ -513,17 +515,19 @@ namespace nil {
                         std::size_t shift;
 
                         while (r_deg >= d && !r.is_zero()) {
-                            if (r_deg >= d)
+                            if (r_deg >= d) {
                                 shift = r_deg - d;
-                            else
+                            } else {
                                 shift = 0;
+                            }
 
                             FieldValueType lead_coeff = r.back() * c;
 
                             q[shift] += lead_coeff;
 
-                            if (other.size() + shift + 1 > r.size())
+                            if (other.size() + shift + 1 > r.size()) {
                                 r.resize(other.size() + shift + 1);
+                            }
                             auto glambda = [=](FieldValueType x, FieldValueType y) { return y - (x * lead_coeff); };
                             std::transform(other.begin(), other.end(), r.begin() + shift, r.begin() + shift, glambda);
                             r.condense();
