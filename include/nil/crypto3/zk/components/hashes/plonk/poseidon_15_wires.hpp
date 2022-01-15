@@ -89,7 +89,7 @@ namespace nil {
                                      W11,
                                      W12,
                                      W13,
-                                     W14> : public component<TBlueprintField> {
+                                     W14> : public component<snark::plonk_constraint_system<TBlueprintField, 15>> {
                     typedef snark::plonk_constraint_system<TBlueprintField, 15> arithmetization_type;
 
                     typedef blueprint<arithmetization_type> blueprint_type;
@@ -100,7 +100,7 @@ namespace nil {
                     std::size_t j;
 
                 public:
-                    poseidon_plonk(blueprint_type &bp) : component<TBlueprintField>(bp) {
+                    poseidon_plonk(blueprint_type &bp) : component<arithmetization_type>(bp) {
 
                         j = bp.allocate_rows(12);
                     }
@@ -148,55 +148,55 @@ namespace nil {
                         // TODO: The gates are similar for each z, it can be optimized using selectors
                         for (std::size_t z = 0; z <= 11; z++) {
 
-                            this->bp.add_gate(j + z,
-                                        T_1_0 -
-                                            (T_0_0 ^ 5 * M[0][0] + T_0_1 ^ 5 * M[0][1] + T_0_2 ^ 5 * M[0][2] + RC[0]));
-                            this->bp.add_gate(j + z,
-                                        T_1_1 -
-                                            (T_0_0 ^ 5 * M[1][0] + T_0_1 ^ 5 * M[1][1] + T_0_2 ^ 5 * M[1][2] + RC[1]));
-                            this->bp.add_gate(j + z,
-                                        T_1_2 -
-                                            (T_0_0 ^ 5 * M[2][0] + T_0_1 ^ 5 * M[2][1] + T_0_2 ^ 5 * M[2][2] + RC[2]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_1_0 - (T_0_0 ^ 5 * M[0][0] + T_0_1 ^ 5 * M[0][1] + T_0_2 ^ 5 * M[0][2] + RC[0]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_1_1 - (T_0_0 ^ 5 * M[1][0] + T_0_1 ^ 5 * M[1][1] + T_0_2 ^ 5 * M[1][2] + RC[1]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_1_2 - (T_0_0 ^ 5 * M[2][0] + T_0_1 ^ 5 * M[2][1] + T_0_2 ^ 5 * M[2][2] + RC[2]));
 
-                            this->bp.add_gate(j + z,
-                                        T_2_0 -
-                                            (T_1_0 ^ 5 * M[0][0] + T_1_1 ^ 5 * M[0][1] + T_1_2 ^ 5 * M[0][2] + RC[0]));
-                            this->bp.add_gate(j + z,
-                                        T_2_1 -
-                                            (T_1_0 ^ 5 * M[1][0] + T_1_1 ^ 5 * M[1][1] + T_1_2 ^ 5 * M[1][2] + RC[1]));
-                            this->bp.add_gate(j + z,
-                                        T_2_2 -
-                                            (T_1_0 ^ 5 * M[2][0] + T_1_1 ^ 5 * M[2][1] + T_1_2 ^ 5 * M[2][2] + RC[2]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_2_0 - (T_1_0 ^ 5 * M[0][0] + T_1_1 ^ 5 * M[0][1] + T_1_2 ^ 5 * M[0][2] + RC[0]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_2_1 - (T_1_0 ^ 5 * M[1][0] + T_1_1 ^ 5 * M[1][1] + T_1_2 ^ 5 * M[1][2] + RC[1]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_2_2 - (T_1_0 ^ 5 * M[2][0] + T_1_1 ^ 5 * M[2][1] + T_1_2 ^ 5 * M[2][2] + RC[2]));
 
-                            this->bp.add_gate(j + z,
-                                        T_3_0 -
-                                            (T_2_0 ^ 5 * M[0][0] + T_2_1 ^ 5 * M[0][1] + T_2_2 ^ 5 * M[0][2] + RC[0]));
-                            this->bp.add_gate(j + z,
-                                        T_3_1 -
-                                            (T_2_0 ^ 5 * M[1][0] + T_2_1 ^ 5 * M[1][1] + T_2_2 ^ 5 * M[1][2] + RC[1]));
-                            this->bp.add_gate(j + z,
-                                        T_3_2 -
-                                            (T_2_0 ^ 5 * M[2][0] + T_2_1 ^ 5 * M[2][1] + T_2_2 ^ 5 * M[2][2] + RC[2]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_3_0 - (T_2_0 ^ 5 * M[0][0] + T_2_1 ^ 5 * M[0][1] + T_2_2 ^ 5 * M[0][2] + RC[0]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_3_1 - (T_2_0 ^ 5 * M[1][0] + T_2_1 ^ 5 * M[1][1] + T_2_2 ^ 5 * M[1][2] + RC[1]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_3_2 - (T_2_0 ^ 5 * M[2][0] + T_2_1 ^ 5 * M[2][1] + T_2_2 ^ 5 * M[2][2] + RC[2]));
 
-                            this->bp.add_gate(j + z,
-                                        T_4_0 -
-                                            (T_3_0 ^ 5 * M[0][0] + T_3_1 ^ 5 * M[0][1] + T_3_2 ^ 5 * M[0][2] + RC[0]));
-                            this->bp.add_gate(j + z,
-                                        T_4_1 -
-                                            (T_3_0 ^ 5 * M[1][0] + T_3_1 ^ 5 * M[1][1] + T_3_2 ^ 5 * M[1][2] + RC[1]));
-                            this->bp.add_gate(j + z,
-                                        T_4_2 -
-                                            (T_3_0 ^ 5 * M[2][0] + T_3_1 ^ 5 * M[2][1] + T_3_2 ^ 5 * M[2][2] + RC[2]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_4_0 - (T_3_0 ^ 5 * M[0][0] + T_3_1 ^ 5 * M[0][1] + T_3_2 ^ 5 * M[0][2] + RC[0]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_4_1 - (T_3_0 ^ 5 * M[1][0] + T_3_1 ^ 5 * M[1][1] + T_3_2 ^ 5 * M[1][2] + RC[1]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_4_2 - (T_3_0 ^ 5 * M[2][0] + T_3_1 ^ 5 * M[2][1] + T_3_2 ^ 5 * M[2][2] + RC[2]));
 
-                            this->bp.add_gate(j + z,
-                                        T_0_0_next -
-                                            (T_4_0 ^ 5 * M[0][0] + T_4_1 ^ 5 * M[0][1] + T_4_2 ^ 5 * M[0][2] + RC[0]));
-                            this->bp.add_gate(j + z,
-                                        T_0_1_next -
-                                            (T_4_0 ^ 5 * M[1][0] + T_4_1 ^ 5 * M[1][1] + T_4_2 ^ 5 * M[1][2] + RC[1]));
-                            this->bp.add_gate(j + z,
-                                        T_0_2_next -
-                                            (T_4_0 ^ 5 * M[2][0] + T_4_1 ^ 5 * M[2][1] + T_4_2 ^ 5 * M[2][2] + RC[2]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_0_0_next - (T_4_0 ^ 5 * M[0][0] + T_4_1 ^ 5 * M[0][1] + T_4_2 ^ 5 * M[0][2] + RC[0]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_0_1_next - (T_4_0 ^ 5 * M[1][0] + T_4_1 ^ 5 * M[1][1] + T_4_2 ^ 5 * M[1][2] + RC[1]));
+                            this->bp.add_gate(
+                                j + z,
+                                T_0_2_next - (T_4_0 ^ 5 * M[2][0] + T_4_1 ^ 5 * M[2][1] + T_4_2 ^ 5 * M[2][2] + RC[2]));
                         }
                     }
 

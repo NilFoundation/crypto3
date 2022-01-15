@@ -76,23 +76,24 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class element_g1_variable_base_endo_scalar_mul_plonk<snark::plonk_constraint_system<TBlueprintField, 15>,
-                                                                     CurveType,
-                                                                     W0,
-                                                                     W1,
-                                                                     W2,
-                                                                     W3,
-                                                                     W4,
-                                                                     W5,
-                                                                     W6,
-                                                                     W7,
-                                                                     W8,
-                                                                     W9,
-                                                                     W10,
-                                                                     W11,
-                                                                     W12,
-                                                                     W13,
-                                                                     W14> : public component<TBlueprintField> {
+                class element_g1_variable_base_endo_scalar_mul_plonk<
+                    snark::plonk_constraint_system<TBlueprintField, 15>,
+                    CurveType,
+                    W0,
+                    W1,
+                    W2,
+                    W3,
+                    W4,
+                    W5,
+                    W6,
+                    W7,
+                    W8,
+                    W9,
+                    W10,
+                    W11,
+                    W12,
+                    W13,
+                    W14> : public component<snark::plonk_constraint_system<TBlueprintField, 15>> {
                     typedef snark::plonk_constraint_system<TBlueprintField, 15> arithmetization_type;
 
                     typedef blueprint<arithmetization_type> blueprint_type;
@@ -103,7 +104,7 @@ namespace nil {
 
                 public:
                     element_g1_variable_base_endo_scalar_mul_plonk(blueprint_type &bp) :
-                        component<TBlueprintField>(bp) {
+                        component<arithmetization_type>(bp) {
 
                         // the last row is only for the n
                         j = this->bp.allocate_rows(64 + 1);
