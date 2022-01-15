@@ -192,24 +192,24 @@ namespace nil {
                         std::array<bool, 4> b = marshalling::pack(r);
 
                         for (std::size_t z = 0; z <= 63; z++) {
-                            this->bp.val(W0, j + z) = T.X;
-                            this->bp.val(W1, j + z) = T.Y;
-                            this->bp.val(W2, j + z) = S.X;
-                            this->bp.val(W3, j + z) = S.Y;
-                            this->bp.val(W4, j + z) = Q.X;
-                            this->bp.val(W5, j + z) = Q.Y;
-                            this->bp.val(W6, j + z) = r;
-                            this->bp.val(W7, j + z) = R.X;
-                            this->bp.val(W8, j + z) = R.Y;
-                            this->bp.val(W9, j + z) = lambda(S, Q);
-                            this->bp.val(W10, j + z) = lambda(R, S);
-                            this->bp.val(W11, j + z) = b[0];
-                            this->bp.val(W12, j + z) = b[1];
-                            this->bp.val(W13, j + z) = b[2];
-                            this->bp.val(W14, j + z) = b[3];
+                            this->bp.assignment(W0, j + z) = T.X;
+                            this->bp.assignment(W1, j + z) = T.Y;
+                            this->bp.assignment(W2, j + z) = S.X;
+                            this->bp.assignment(W3, j + z) = S.Y;
+                            this->bp.assignment(W4, j + z) = Q.X;
+                            this->bp.assignment(W5, j + z) = Q.Y;
+                            this->bp.assignment(W6, j + z) = r;
+                            this->bp.assignment(W7, j + z) = R.X;
+                            this->bp.assignment(W8, j + z) = R.Y;
+                            this->bp.assignment(W9, j + z) = lambda(S, Q);
+                            this->bp.assignment(W10, j + z) = lambda(R, S);
+                            this->bp.assignment(W11, j + z) = b[0];
+                            this->bp.assignment(W12, j + z) = b[1];
+                            this->bp.assignment(W13, j + z) = b[2];
+                            this->bp.assignment(W14, j + z) = b[3];
                         }
 
-                        this->bp.val(W6, j + 64) = 0;
+                        this->bp.assignment(W6, j + 64) = 0;
                     }
                 };
             }    // namespace components

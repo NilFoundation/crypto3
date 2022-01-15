@@ -107,43 +107,43 @@ namespace nil {
 
                     void generate_gates() {
 
-                        constexpr static const typename blueprint_type::variable_type T_0_0(
-                            W0, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_0_1(
-                            W1, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_0_2(
-                            W2, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_4_0(
-                            W3, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_4_1(
-                            W4, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_4_2(
-                            W5, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_1_0(
-                            W6, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_1_1(
-                            W7, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_1_2(
-                            W8, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_2_0(
-                            W9, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_2_1(
-                            W10, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_2_2(
-                            W11, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_3_0(
-                            W12, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_3_1(
-                            W13, blueprint_type::variable_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::variable_type T_3_2(
-                            W14, blueprint_type::variable_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_0_0(
+                            W0, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_0_1(
+                            W1, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_0_2(
+                            W2, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_4_0(
+                            W3, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_4_1(
+                            W4, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_4_2(
+                            W5, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_1_0(
+                            W6, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_1_1(
+                            W7, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_1_2(
+                            W8, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_2_0(
+                            W9, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_2_1(
+                            W10, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_2_2(
+                            W11, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_3_0(
+                            W12, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_3_1(
+                            W13, blueprint_type::value_type::rotation_type::current);
+                        constexpr static const typename blueprint_type::value_type T_3_2(
+                            W14, blueprint_type::value_type::rotation_type::current);
 
-                        constexpr static const typename blueprint_type::variable_type T_0_0_next(
-                            W0, blueprint_type::variable_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::variable_type T_0_1_next(
-                            W1, blueprint_type::variable_type::rotation_type::next);
-                        constexpr static const typename blueprint_type::variable_type T_0_2_next(
-                            W2, blueprint_type::variable_type::rotation_type::next);
+                        constexpr static const typename blueprint_type::value_type T_0_0_next(
+                            W0, blueprint_type::value_type::rotation_type::next);
+                        constexpr static const typename blueprint_type::value_type T_0_1_next(
+                            W1, blueprint_type::value_type::rotation_type::next);
+                        constexpr static const typename blueprint_type::value_type T_0_2_next(
+                            W2, blueprint_type::value_type::rotation_type::next);
 
                         // TODO: The gates are similar for each z, it can be optimized using selectors
                         for (std::size_t z = 0; z <= 11; z++) {
