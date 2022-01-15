@@ -169,10 +169,10 @@ namespace nil {
 
                 template<typename TBlueprintField, std::size_t WiresAmount>
                 class blueprint<snark::plonk_constraint_system<TBlueprintField, WiresAmount>> {
+                    typedef snark::plonk_constraint_system<TBlueprintField, WiresAmount> TArithmetization;
                 public:
                     using value_type = blueprint_variable<TArithmetization>;
                 private:
-                    typedef snark::plonk_constraint_system<TBlueprintField, WiresAmount> TArithmetization;
 
                     snark::plonk_variable_assignment<TBlueprintField, WiresAmount> assignments;
                     std::vector<std::vector<value_type>> copy_constraints;
