@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE fixed_base_scalar_mul_5_wires_test
+#define BOOST_TEST_MODULE fixed_base_scalar_mul_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -38,6 +38,7 @@
 
 #include <nil/crypto3/zk/components/blueprint.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/plonk/fixed_base_scalar_mul_5_wires.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/plonk/fixed_base_scalar_mul_9_wires.hpp>
 
 using namespace nil::crypto3;
 
@@ -53,9 +54,9 @@ BOOST_AUTO_TEST_CASE(fixed_base_scalar_mul_5_wires_test_case) {
 
 	zk::components::blueprint<TArithmetization> bp;
 
-	using component_type = zk::components::element_g1_fixed_base_scalar_mul<curve_type, TArithmetization>;
+	using component_type = zk::components::element_g1_fixed_base_scalar_mul<TArithmetization, curve_type, 0, 1, 2, 3, 4>;
 
-	component_type scalar_mul_component(bp, B);
+	component_type scalar_mul_component = component_type(bp, B);
 
 	scalar_mul_component.generate_gates();
 
@@ -72,6 +73,38 @@ BOOST_AUTO_TEST_CASE(fixed_base_scalar_mul_5_wires_test_case) {
 
     auto preprocessed_data = preprocess_type::process(cs, assignments);
 	typedef zk::snark::redshift_prover <typename curve_type::base_field_type, 5, 5, 1, 5> prove_type;
+	auto proof = prove_type::process(preprocessed_data, cs, assignments);
+}
+
+BOOST_AUTO_TEST_CASE(fixed_base_scalar_mul_9_wires_test_case) {
+
+	using curve_type = algebra::curves::bls12<381>;
+	using TBlueprintField = typename curve_type::base_field_type;
+	constexpr std::size_t WiresAmount = 9;
+	constexpr typename curve_type::template g1_type<>::value_type B = curve_type::template g1_type<>::value_type::one();
+	using TArithmetization = zk::snark::plonk_constraint_system<TBlueprintField, WiresAmount>;
+
+	zk::components::blueprint<TArithmetization> bp;
+
+	using component_type = zk::components::element_g1_fixed_base_scalar_mul<TArithmetization, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
+
+	component_type scalar_mul_component = component_type(bp, B);
+
+	scalar_mul_component.generate_gates();
+
+	typename curve_type::scalar_field_type::value_type a = curve_type::scalar_field_type::value_type::one();
+	typename curve_type::template g1_type<>::value_type P = curve_type::template g1_type<>::value_type::one();
+
+	scalar_mul_component.generate_assignments(a, P);
+
+	auto cs = bp.get_constraint_system();
+
+	auto assignments = bp.full_variable_assignment();
+
+	typedef zk::snark::redshift_preprocessor <typename curve_type::base_field_type, 9, 1> preprocess_type;
+
+    auto preprocessed_data = preprocess_type::process(cs, assignments);
+	typedef zk::snark::redshift_prover <typename curve_type::base_field_type, 9, 5, 1, 5> prove_type;
 	auto proof = prove_type::process(preprocessed_data, cs, assignments);
 }
 

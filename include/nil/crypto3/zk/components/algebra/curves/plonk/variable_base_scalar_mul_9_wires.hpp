@@ -25,8 +25,8 @@
 // @file Declaration of interfaces for auxiliary components for the SHA256 component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_5_WIRES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_5_WIRES_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_9_WIRES_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_9_WIRES_HPP
 
 #include <nil/crypto3/zk/components/blueprint.hpp>
 #include <nil/crypto3/zk/components/component.hpp>
@@ -53,40 +53,56 @@ namespace nil {
                          std::size_t W1,
                          std::size_t W2,
                          std::size_t W3,
-                         std::size_t W4>
-                class element_g1_variable_base_scalar_mul<snark::plonk_constraint_system<TBlueprintField, 5>,
+                         std::size_t W4,
+                         std::size_t W5,
+                         std::size_t W6,
+                         std::size_t W7,
+                         std::size_t W8>
+                class element_g1_variable_base_scalar_mul<snark::plonk_constraint_system<TBlueprintField, 9>,
                                                        CurveType,
                                                        W0,
                                                        W1,
                                                        W2,
                                                        W3,
-                                                       W4>
-                    : public detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 5>,
+                                                       W4,
+                                                       W5,
+                                                       W6,
+                                                       W7,
+                                                       W8>
+                    : public detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 9>,
                                                     W0,
                                                     W1,
                                                     W2,
                                                     W3,
-                                                    W4> {
+                                                    W4,
+                                                    W5,
+                                                    W6,
+                                                    W7,
+                                                    W8> {
 
-                    typedef snark::plonk_constraint_system<TBlueprintField, 5> arithmetization_type;
+                    typedef snark::plonk_constraint_system<TBlueprintField, 9> arithmetization_type;
                     typedef blueprint<arithmetization_type> blueprint_type;
 
                     std::size_t j;
 
                     using n_wires_helper =
-                        detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 5>,
+                        detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 9>,
                                                W0,
                                                W1,
                                                W2,
                                                W3,
-                                               W4>;
+                                               W4,
+                                               W5,
+                                               W6,
+                                               W7,
+                                               W8>;
 
                     using n_wires_helper::w;
                     enum indices { m2 = 0, m1, cur, p1, p2 };
 
                 public:
                     element_g1_variable_base_scalar_mul(blueprint_type &bp) : 
-                        detail::n_wires_helper<arithmetization_type, W0, W1, W2, W3, W4>(bp) {
+                        n_wires_helper(bp) {
 
                         j = bp.allocate_rows(213);
                     }
@@ -191,4 +207,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_5_WIRES_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_9_WIRES_HPP

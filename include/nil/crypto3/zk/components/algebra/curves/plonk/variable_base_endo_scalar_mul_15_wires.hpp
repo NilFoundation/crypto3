@@ -42,22 +42,8 @@ namespace nil {
 
                 template<typename TArithmetization,
                          typename CurveType,
-                         std::size_t W0 = 0,
-                         std::size_t W1 = 1,
-                         std::size_t W2 = 2,
-                         std::size_t W3 = 3,
-                         std::size_t W4 = 4,
-                         std::size_t W5 = 5,
-                         std::size_t W6 = 6,
-                         std::size_t W7 = 7,
-                         std::size_t W8 = 8,
-                         std::size_t W9 = 9,
-                         std::size_t W10 = 10,
-                         std::size_t W11 = 11,
-                         std::size_t W12 = 12,
-                         std::size_t W13 = 13,
-                         std::size_t W14 = 14>
-                class element_g1_variable_base_endo_scalar_mul_plonk;
+                         std::size_t... WireIndexes>
+                class element_g1_variable_base_endo_scalar_mul;
 
                 template<typename TBlueprintField,
                          typename CurveType,
@@ -76,7 +62,7 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class element_g1_variable_base_endo_scalar_mul_plonk<
+                class element_g1_variable_base_endo_scalar_mul<
                     snark::plonk_constraint_system<TBlueprintField, 15>,
                     CurveType,
                     W0,
@@ -103,7 +89,7 @@ namespace nil {
                     constexpr static const std::size_t endo = 3;
 
                 public:
-                    element_g1_variable_base_endo_scalar_mul_plonk(blueprint_type &bp) :
+                    element_g1_variable_base_endo_scalar_mul(blueprint_type &bp) :
                         component<arithmetization_type>(bp) {
 
                         // the last row is only for the n

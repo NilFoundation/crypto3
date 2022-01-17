@@ -58,7 +58,8 @@ set(BLUEPRINT_TESTS_FILES
     )
 
 set(PLONK_TESTS_FILES
-    "algebra/plonk/fixed_base_scalar_mul_5_wires"
+    "algebra/plonk/fixed_base_scalar_mul"
+    "algebra/plonk/variable_base_scalar_mul"
     )
 
 set(FIELDS_TESTS_FILES

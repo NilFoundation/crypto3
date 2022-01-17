@@ -37,14 +37,8 @@ namespace nil {
 
                 template<typename TArithmetization, 
                          typename CurveType, 
-                         std::size_t W0 = 0,
-                         std::size_t W1 = 1,
-                         std::size_t W2 = 2,
-                         std::size_t W3 = 3,
-                         std::size_t W4 = 4,
-                         std::size_t W5 = 5,
-                         std::size_t W6 = 6>
-                class element_g1_addition_plonk;
+                         std::size_t... WireIndexes>
+                class element_g1_addition;
 
                 template<typename TBlueprintField,
                          typename CurveType,
@@ -55,7 +49,7 @@ namespace nil {
                          std::size_t W4,
                          std::size_t W5,
                          std::size_t W6>
-                class element_g1_addition_plonk<snark::plonk_constraint_system<TBlueprintField, 7>,
+                class element_g1_addition<snark::plonk_constraint_system<TBlueprintField, 7>,
                                                        CurveType,
                                                        W0,
                                                        W1,
@@ -72,7 +66,7 @@ namespace nil {
                     std::size_t i;
                 public:
 
-                    element_g1_addition_plonk(blueprint_type &bp) :
+                    element_g1_addition(blueprint_type &bp) :
                         component<FieldType>(bp) {
                         i = bp.allocate_row();
                     }
