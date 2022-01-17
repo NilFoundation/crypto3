@@ -36,7 +36,6 @@
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
 #include <nil/marshalling/algorithms/pack.hpp>
-#include <nil/marshalling/algorithms/unpack.hpp>
 #include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
