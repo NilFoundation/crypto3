@@ -89,119 +89,122 @@ namespace nil {
 
                         // 2 - Define new witness polynomials
                         // and 3 - Add commitments to fi to transcript
-                        // std::vector<math::polynomial::polynomial<typename FieldType::value_type>> f =
-                        //     constraint_system.polynoms(assignments);
+                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> f =
+                            constraint_system.polynoms(assignments);
 
-                        // std::vector<merkle_tree_type> f_trees;
-                        // std::vector<typename lpc::commitment_type> f_commitments;
+                        std::vector<merkle_tree_type> f_trees;
+                        std::vector<typename lpc::commitment_type> f_commitments;
 
-                        // for (std::size_t i = 0; i < N_wires; i++) {
-                        //     math::polynomial::polynomial<typename FieldType::value_type> h;
-                        //     f[i] = f[i] + h * preprocessed_data.Z;
-                        //     f_trees.push_back(lpc::commit(f[i]));
-                        //     f_commitments[i].push_back(f_trees[i].root());
-                        //     transcript(f_commitments[i]);
-                        // }
+                        for (std::size_t i = 0; i < N_wires; i++) {
+                            math::polynomial::polynomial<typename FieldType::value_type> h;
+                            f[i] = f[i] + h * preprocessed_data.Z;
+                            f_trees.push_back(lpc::commit(f[i], D_0));
+                            f_commitments.push_back(f_trees[i].root());
+                            transcript(f_commitments[i]);
+                        }
 
                         // 4
-                        // typename FieldType::value_type teta =
-                        //     transcript.template get_challenge<transcript_manifest::challenges_ids::teta,
-                        //     FieldType>();
+                        typename FieldType::value_type teta =
+                            transcript.template get_challenge<transcript_manifest::challenges_ids::teta,
+                            FieldType>();
 
                         // 5
                         // A(teta)
-                        // std::vector<typename FieldType::value_type> A;
+                        std::vector<typename FieldType::value_type> A;
                         // S(teta)
-                        // std::vector<typename FieldType::value_type> S;
+                        std::vector<typename FieldType::value_type> S;
 
                         // 6
-                        // math::polynomial::polynomial<typename FieldType::value_type> A1;
-                        // math::polynomial::polynomial<typename FieldType::value_type> S1;
+                        math::polynomial::polynomial<typename FieldType::value_type> A1;
+                        math::polynomial::polynomial<typename FieldType::value_type> S1;
 
                         // 7
-                        // merkle_tree_type A1_tree = lpc::commit(A1);
-                        // merkle_tree_type S1_tree = lpc::commit(S1);
-                        // typename lpc::commitment_type A1_commitment = A1_tree.root();
-                        // typename lpc::commitment_type S1_commitment = S1_tree.root();
+                        merkle_tree_type A1_tree = lpc::commit(A1, D_0);
+                        merkle_tree_type S1_tree = lpc::commit(S1, D_0);
+                        typename lpc::commitment_type A1_commitment = A1_tree.root();
+                        typename lpc::commitment_type S1_commitment = S1_tree.root();
 
-                        // transcript(A1_commitment);
-                        // transcript(S1_commitment);
+                        transcript(A1_commitment);
+                        transcript(S1_commitment);
 
                         // 8
-                        // typename FieldType::value_type beta =
-                        //     transcript.template get_challenge<transcript_manifest::challenges_ids::beta,
-                        //     FieldType>();
+                        typename FieldType::value_type beta =
+                            transcript.template get_challenge<transcript_manifest::challenges_ids::beta,
+                            FieldType>();
 
-                        // typename FieldType::value_type gamma =
-                        //     transcript.template get_challenge<transcript_manifest::challenges_ids::gamma,
-                        //     FieldType>();
+                        typename FieldType::value_type gamma =
+                            transcript.template get_challenge<transcript_manifest::challenges_ids::gamma,
+                            FieldType>();
 
                         // 9
                         // and 10
-                        // std::vector<math::polynomial::polynomial<typename FieldType::value_type>> p(N_perm);
-                        // std::vector<math::polynomial::polynomial<typename FieldType::value_type>> q(N_perm);
+                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> p(N_perm);
+                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> q(N_perm);
 
-                        // math::polynomial::polynomial<typename FieldType::value_type> p1 = {1};
-                        // math::polynomial::polynomial<typename FieldType::value_type> q1 = {1};
+                        math::polynomial::polynomial<typename FieldType::value_type> p1 = {1};
+                        math::polynomial::polynomial<typename FieldType::value_type> q1 = {1};
 
-                        // std::vector<math::polynomial::polynomial<typename FieldType::value_type>>
-                        //     &S_sigma = preprocessed_data.permutations;
-                        // std::vector<math::polynomial::polynomial<typename FieldType::value_type>>
-                        //     &S_id = preprocessed_data.identity_permutations;
+                        const std::vector<math::polynomial::polynomial<typename FieldType::value_type>>
+                            &S_sigma = preprocessed_data.permutations;
+                        const std::vector<math::polynomial::polynomial<typename FieldType::value_type>>
+                            &S_id = preprocessed_data.identity_permutations;
 
-                        // for (std::size_t j = 0; j < N_perm; j++) {
-                        //     p.push_back(f[j] + beta * S_id[j] + gamma);
-                        //     q.push_back(f[j] + beta * S_sigma[j] + gamma);
+                        for (std::size_t j = 0; j < N_perm; j++) {
+                            math::polynomial::polynomial<typename FieldType::value_type> beta_polynom = {beta};
+                            math::polynomial::polynomial<typename FieldType::value_type> gamma_polynom = {gamma};
 
-                        //     p1 *= p[j];
-                        //     q1 *= q[j];
-                        // }
+                            p.push_back(f[j] + beta_polynom * S_id[j] + gamma_polynom);
+                            q.push_back(f[j] + beta_polynom * S_sigma[j] + gamma_polynom);
+
+                            p1 = p1 * p[j];
+                            q1 = q1 * q[j];
+                        }
 
                         // 11
-                        // std::vector<std::pair<typename FieldType::value_type,
-                        //                       typename FieldType::value_type>>
-                        //     P_interpolation_points(n + 1);
-                        // std::vector<std::pair<typename FieldType::value_type,
-                        //                       typename FieldType::value_type>>
-                        //     Q_interpolation_points(n + 1);
+                        std::vector<std::pair<typename FieldType::value_type,
+                                              typename FieldType::value_type>>
+                            P_interpolation_points(n + 1);
+                        std::vector<std::pair<typename FieldType::value_type,
+                                              typename FieldType::value_type>>
+                            Q_interpolation_points(n + 1);
 
-                        // P_interpolation_points.push_back(std::make_pair(preprocessed_data.omega, 1));
-                        // for (std::size_t i = 2; i <= n + 1; i++) {
+                        P_interpolation_points.push_back(std::make_pair(preprocessed_data.omega, 1));
+                        for (std::size_t i = 2; i <= n + 1; i++) {
 
-                        //     typename FieldType::value_type P_mul_result =
-                        //         typename FieldType::one();
-                        //     typename FieldType::value_type Q_mul_result =
-                        //         typename FieldType::one();
-                        //     for (std::size_t j = 1; j < i; j++) {
-                        //         P_mul_result *= p1(preprocessed_data.omega.pow(i));
-                        //         Q_mul_result *= q1(preprocessed_data.omega.pow(i));
-                        //     }
+                            typename FieldType::value_type P_mul_result =
+                                FieldType::value_type::one();
+                            typename FieldType::value_type Q_mul_result =
+                                FieldType::value_type::one();
+                            for (std::size_t j = 1; j < i; j++) {
+                                P_mul_result *= p1.evaluate(preprocessed_data.omega.pow(i));
+                                Q_mul_result *= q1.evaluate(preprocessed_data.omega.pow(i));
+                            }
 
-                        //     P_interpolation_points.push_back(std::make_pair(preprocessed_data.omega.pow(i),
-                        //     P_mul_result));
-                        //     Q_interpolation_points.push_back(std::make_pair(preprocessed_data.omega.pow(i),
-                        //     Q_mul_result));
-                        // }
+                            P_interpolation_points.push_back(std::make_pair(preprocessed_data.omega.pow(i),
+                                P_mul_result));
+                            Q_interpolation_points.push_back(std::make_pair(preprocessed_data.omega.pow(i),
+                                Q_mul_result));
+                        }
 
-                        // math::polynomial::polynomial<typename FieldType::value_type> P =
-                        //     math::polynomial::lagrange_interpolation(P_interpolation_points);
-                        // math::polynomial::polynomial<typename FieldType::value_type> Q =
-                        //     math::polynomial::lagrange_interpolation(Q_interpolation_points);
+                        math::polynomial::polynomial<typename FieldType::value_type> P;
+                        //     = math::polynomial::lagrange_interpolation(P_interpolation_points);
+                        math::polynomial::polynomial<typename FieldType::value_type> Q;
+                        //     = math::polynomial::lagrange_interpolation(Q_interpolation_points);
 
                         // 12
-                        // merkle_tree_type P_tree = lpc::commit(P);
-                        // merkle_tree_type Q_tree = lpc::commit(Q);
-                        // typename lpc::commitment_type P_commitment = P_tree.root();
-                        // typename lpc::commitment_type Q_commitment = Q_tree.root();
+                        merkle_tree_type P_tree = lpc::commit(P, D_0);
+                        merkle_tree_type Q_tree = lpc::commit(Q, D_0);
+                        typename lpc::commitment_type P_commitment = P_tree.root();
+                        typename lpc::commitment_type Q_commitment = Q_tree.root();
 
-                        // transcript(P_commitment);
-                        // transcript(Q_commitment);
+                        transcript(P_commitment);
+                        transcript(Q_commitment);
 
                         // 13
-                        // math::polynomial::polynomial<typename FieldType::value_type> V;
+                        math::polynomial::polynomial<typename FieldType::value_type> V;
 
                         // 14
-                        // transcript(lpc::commit(V, D_0).root());
+                        transcript(lpc::commit(V, D_0).root());
 
                         // 15
                         std::array<typename FieldType::value_type, 11> alphas =

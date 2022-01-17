@@ -88,7 +88,7 @@ namespace nil {
 
                         template<std::size_t AlphasAmount>
                         struct prover_fiat_shamir_heuristic_manifest {
-                            enum challenges_ids { beta, gamma, alpha, upsilon = alpha + AlphasAmount, tau };
+                            enum challenges_ids { beta, gamma, alpha, upsilon = alpha + AlphasAmount, tau , teta};
                         };
                     };
                 }    // namespace detail
