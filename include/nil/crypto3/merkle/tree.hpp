@@ -193,8 +193,10 @@ namespace nil {
                     typedef typename boost::property_map<graph_type, vertex_hash_t>::type vertex_name_map_type;
 
                 public:
-                    template<typename Hashable, size_t Size>
-                    merkle_tree_impl(std::vector<std::array<Hashable, Size>> data) :
+                    template<
+                        typename LeafRange,
+                        typename Hashable = typename std::iterator_traits<typename LeafRange::iterator>::value_type>
+                    merkle_tree_impl(std::vector<LeafRange> data) :
                         _leafs(data.size()), _size(detail::merkle_tree_length(_leafs, Arity)) {
                         BOOST_ASSERT_MSG(data.size() % Arity == 0, "Wrong leafs number");
 
