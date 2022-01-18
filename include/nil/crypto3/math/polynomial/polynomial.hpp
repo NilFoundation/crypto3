@@ -85,6 +85,24 @@ namespace nil {
                     polynomial(const polynomial& x, const allocator_type& a) : val(x.val, a) {
                     }
 
+                    polynomial(std::initializer_list<value_type> il) : val(il) {
+                    }
+
+                    polynomial(std::initializer_list<value_type> il, const allocator_type& a) : val(il, a) {
+                    }
+
+                    polynomial(polynomial&& x)
+                        BOOST_NOEXCEPT(std::is_nothrow_move_constructible<allocator_type>::value) :
+                        val(x.val) {
+                    }
+
+                    polynomial(polynomial&& x, const allocator_type& a) : val(x.val, a) {
+                    }
+
+                    polynomial(const FieldValueType& value, std::size_t power = 0) : val(power + 1, FieldValueType(0)) {
+                        (*this)[power] = value;
+                    }
+
                     polynomial& operator=(const polynomial& x) {
                         val = x.val;
                         return *this;
@@ -103,20 +121,6 @@ namespace nil {
                     polynomial& operator=(container_type&& x) {
                         val = x;
                         return *this;
-                    }
-
-                    polynomial(std::initializer_list<value_type> il) : val(il) {
-                    }
-
-                    polynomial(std::initializer_list<value_type> il, const allocator_type& a) : val(il, a) {
-                    }
-
-                    polynomial(polynomial&& x)
-                        BOOST_NOEXCEPT(std::is_nothrow_move_constructible<allocator_type>::value) :
-                        val(x.val) {
-                    }
-
-                    polynomial(polynomial&& x, const allocator_type& a) : val(x.val, a) {
                     }
 
                     polynomial& operator=(std::initializer_list<value_type> il) {
@@ -308,12 +312,8 @@ namespace nil {
                         val.swap(other.val);
                     }
 
-                    polynomial(FieldValueType value, std::size_t power) : val(power + 1, FieldValueType(0)) {
-                        (*this)[power] = value;
-                    }
-
                     template<typename Range>
-                    FieldValueType evaluate(Range& values) const {
+                    FieldValueType evaluate(const Range& values) const {
 
                         assert(values.size() + 1 == this->size());
 
@@ -325,7 +325,7 @@ namespace nil {
                         return result;
                     }
 
-                    FieldValueType evaluate(FieldValueType& value) const {
+                    FieldValueType evaluate(const FieldValueType& value) const {
 
                         FieldValueType result = 0;
                         for (std::size_t i = 0; i < this->size(); i++) {
@@ -538,6 +538,70 @@ namespace nil {
                         return r;
                     }
                 };
+
+                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
+                polynomial<FieldValueType, Allocator> operator+(
+                    const polynomial<FieldValueType, Allocator>& A, 
+                    const FieldValueType& B) {
+
+                    return A+B;
+                }
+
+                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
+                polynomial<FieldValueType, Allocator> operator+(
+                    const FieldValueType& A,
+                    const polynomial<FieldValueType, Allocator>& B) {
+
+                    return A+B;
+                }
+
+                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
+                polynomial<FieldValueType, Allocator> operator-(
+                    const polynomial<FieldValueType, Allocator>& A, 
+                    const FieldValueType& B) {
+
+                    return A-B;
+                }
+
+                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
+                polynomial<FieldValueType, Allocator> operator-(
+                    const FieldValueType& A,
+                    const polynomial<FieldValueType, Allocator>& B) {
+
+                    return A-B;
+                }
+
+                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
+                polynomial<FieldValueType, Allocator> operator*(
+                    const polynomial<FieldValueType, Allocator>& A, 
+                    const FieldValueType& B) {
+
+                    return A*B;
+                }
+
+                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
+                polynomial<FieldValueType, Allocator> operator*(
+                    const FieldValueType& A,
+                    const polynomial<FieldValueType, Allocator>& B) {
+
+                    return A*B;
+                }
+
+                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
+                polynomial<FieldValueType, Allocator> operator/(
+                    const polynomial<FieldValueType, Allocator>& A, 
+                    const FieldValueType& B) {
+
+                    return A/B;
+                }
+
+                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
+                polynomial<FieldValueType, Allocator> operator/(
+                    const FieldValueType& A,
+                    const polynomial<FieldValueType, Allocator>& B) {
+
+                    return A/B;
+                }
             }    // namespace polynomial
         }        // namespace math
     }            // namespace crypto3

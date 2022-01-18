@@ -43,7 +43,7 @@ set(TESTS_NAMES
     "expression"
     "kronecker_substitution"
     "polynomial_arithmetic"
-    "polynom")
+    "polynomial")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_math_test(${TEST_NAME})
