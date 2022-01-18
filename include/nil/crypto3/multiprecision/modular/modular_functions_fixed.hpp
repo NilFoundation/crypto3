@@ -35,7 +35,7 @@ namespace nil {
                 constexpr typename std::conditional<is_trivial_cpp_int<Backend>::value,
                                                     typename trivial_limb_type<max_precision<Backend>::value>::type,
                                                     limb_type>::type
-                    get_limb_value(const Backend& b, const std::size_t i) {
+                    get_limb_value(const Backend &b, const std::size_t i) {
                     if (i < b.size()) {
                         return b.limbs()[i];
                     }
@@ -47,7 +47,7 @@ namespace nil {
                 //
                 template<typename, typename Backend>
                 constexpr typename boost::enable_if_c<!is_trivial_cpp_int<Backend>::value, limb_type>::type
-                    custom_get_limb_value(const Backend& b, const std::size_t i) {
+                    custom_get_limb_value(const Backend &b, const std::size_t i) {
                     return b.limbs()[i];
                 }
 
@@ -61,7 +61,7 @@ namespace nil {
                         sizeof(typename trivial_limb_type<max_precision<Backend>::value>::type) >=
                             sizeof(internal_limb_type),
                     internal_limb_type>::type
-                    custom_get_limb_value(const Backend& b, const std::size_t i) {
+                    custom_get_limb_value(const Backend &b, const std::size_t i) {
                     return static_cast<internal_limb_type>(b.limbs()[0] >> (sizeof(internal_limb_type) * CHAR_BIT * i));
                 }
 
@@ -70,7 +70,7 @@ namespace nil {
                 //
                 template<typename, typename Backend>
                 constexpr typename boost::enable_if_c<!is_trivial_cpp_int<Backend>::value>::type
-                    custom_set_limb_value(Backend& b, const std::size_t i, limb_type v) {
+                    custom_set_limb_value(Backend &b, const std::size_t i, limb_type v) {
                     b.limbs()[i] = v;
                 }
 
@@ -87,7 +87,7 @@ namespace nil {
                     is_trivial_cpp_int<Backend>::value &&
                     sizeof(typename trivial_limb_type<max_precision<Backend>::value>::type) >=
                         sizeof(internal_limb_type)>::type
-                    custom_set_limb_value(Backend& b, const std::size_t i, internal_limb_type v) {
+                    custom_set_limb_value(Backend &b, const std::size_t i, internal_limb_type v) {
                     using local_limb_type = typename trivial_limb_type<max_precision<Backend>::value>::type;
 
                     //
@@ -120,20 +120,20 @@ namespace nil {
 
                 template<typename Backend>
                 constexpr typename std::enable_if<!is_trivial_cpp_int<Backend>::value>::type
-                    adjust_backend_size(Backend& b, std::size_t mod_size) {
+                    adjust_backend_size(Backend &b, std::size_t mod_size) {
                     assert(mod_size + 1 <= Backend::internal_limb_count);
                     b.resize(b.limbs()[mod_size] != 0 ? mod_size + 1 : mod_size, 1);
                 }
 
                 template<typename Backend>
                 constexpr typename std::enable_if<is_trivial_cpp_int<Backend>::value>::type
-                    adjust_backend_size(Backend& b, std::size_t mod_size) {
+                    adjust_backend_size(Backend &b, std::size_t mod_size) {
                     assert(mod_size == 1);
                     b.resize(mod_size, 1);
                 }
 
                 template<typename Backend>
-                constexpr bool check_modulus_constraints(const Backend& m) {
+                constexpr bool check_modulus_constraints(const Backend &m) {
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
                     using default_ops::eval_lt;
 
@@ -141,18 +141,14 @@ namespace nil {
                 }
 
                 template<typename Backend>
-                constexpr bool check_montgomery_constraints(const Backend& m) {
-                    using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
-                    using default_ops::eval_eq;
-                    using default_ops::eval_modulus;
-
-                    Backend tmp;
-                    eval_modulus(tmp, m, static_cast<ui_type>(2u));
-                    return !eval_eq(tmp, static_cast<ui_type>(0u));
+                constexpr bool check_montgomery_constraints(const Backend &m) {
+                    using default_ops::eval_bit_test;
+                    // Check m % 2 == 0
+                    return eval_bit_test(m, 0);
                 }
 
                 template<typename Backend>
-                constexpr bool check_montgomery_constraints(const modular_functions_fixed<Backend>& mo) {
+                constexpr bool check_montgomery_constraints(const modular_functions_fixed<Backend> &mo) {
                     return check_montgomery_constraints(mo.get_mod().backend());
                 }
 
@@ -161,7 +157,7 @@ namespace nil {
                 // due to non-constexpr nature of right_shift_byte
                 //
                 template<typename Backend>
-                constexpr void custom_right_shift(Backend& b, unsigned s) {
+                constexpr void custom_right_shift(Backend &b, unsigned s) {
                     using default_ops::eval_left_shift;
                     using default_ops::eval_right_shift;
 
@@ -201,7 +197,7 @@ namespace nil {
 
                     constexpr static auto limb_bits = policy_type::limb_bits;
 
-                    constexpr void initialize_modulus(const number_type& m) {
+                    constexpr void initialize_modulus(const number_type &m) {
                         BOOST_ASSERT(check_modulus_constraints(m.backend()));
 
                         get_mod() = m;
@@ -226,10 +222,10 @@ namespace nil {
                     }
 
                     /*
-                    * Compute -input^-1 mod 2^limb_bits. Throws an exception if input
-                    * is even. If input is odd, then input and 2^n are relatively prime
-                    * and an inverse exists.
-                    */
+                     * Compute -input^-1 mod 2^limb_bits. Throws an exception if input
+                     * is even. If input is odd, then input and 2^n are relatively prime
+                     * and an inverse exists.
+                     */
                     constexpr internal_limb_type monty_inverse(internal_limb_type a) {
                         BOOST_ASSERT(check_montgomery_constraints(get_mod().backend()));
 
@@ -276,53 +272,53 @@ namespace nil {
                                       decltype(m_modulus_mask)(static_cast<internal_limb_type>(1u)));
                     }
 
-                    constexpr void initialize(const number_type& m) {
+                    constexpr void initialize(const number_type &m) {
                         initialize_modulus(m);
                         initialize_barrett_params();
                         initialize_montgomery_params();
                     }
 
                 public:
-                    constexpr auto& get_mod() {
+                    constexpr auto &get_mod() {
                         return m_mod;
                     }
-                    constexpr auto& get_mu() {
+                    constexpr auto &get_mu() {
                         return m_barrett_mu;
                     }
-                    constexpr auto& get_r2() {
+                    constexpr auto &get_r2() {
                         return m_montgomery_r2;
                     }
-                    constexpr auto& get_p_dash() {
+                    constexpr auto &get_p_dash() {
                         return m_montgomery_p_dash;
                     }
-                    constexpr auto& get_modulus_mask() {
+                    constexpr auto &get_modulus_mask() {
                         return m_modulus_mask;
                     }
 
-                    constexpr const auto& get_mod() const {
+                    constexpr const auto &get_mod() const {
                         return m_mod;
                     }
-                    constexpr const auto& get_mu() const {
+                    constexpr const auto &get_mu() const {
                         return m_barrett_mu;
                     }
-                    constexpr const auto& get_r2() const {
+                    constexpr const auto &get_r2() const {
                         return m_montgomery_r2;
                     }
                     constexpr auto get_p_dash() const {
                         return m_montgomery_p_dash;
                     }
-                    constexpr const auto& get_modulus_mask() const {
+                    constexpr const auto &get_modulus_mask() const {
                         return m_modulus_mask;
                     }
 
                     constexpr modular_functions_fixed() {
                     }
 
-                    constexpr modular_functions_fixed(const number_type& m) {
+                    constexpr modular_functions_fixed(const number_type &m) {
                         initialize(m);
                     }
 
-                    constexpr modular_functions_fixed(const modular_functions_fixed& o) {
+                    constexpr modular_functions_fixed(const modular_functions_fixed &o) {
                         get_mod() = o.get_mod();
                         get_mu() = o.get_mu();
                         get_r2() = o.get_r2();
@@ -331,7 +327,7 @@ namespace nil {
                     }
 
                     template<typename Backend1>
-                    constexpr void barrett_reduce(Backend1& result) const {
+                    constexpr void barrett_reduce(Backend1 &result) const {
                         barrett_reduce(result, result);
                     }
 
@@ -340,7 +336,7 @@ namespace nil {
                     //
                     template<typename Backend1, typename Backend2>
                     constexpr typename std::enable_if<std::is_integral<Backend2>::value>::type
-                        barrett_reduce(Backend1& result, Backend2 input) const {
+                        barrett_reduce(Backend1 &result, Backend2 input) const {
                         using input_number_type = typename std::conditional<
                             bool(sizeof(Backend2) * CHAR_BIT > MinBits),
                             number<modular_fixed_cpp_int_backend<sizeof(Backend2) * CHAR_BIT, SignType, Checked>>,
@@ -356,8 +352,9 @@ namespace nil {
                     //
                     template<typename Backend1, typename Backend2,
                              typename boost::enable_if_c<
-                                 max_precision<Backend2>::value < max_precision<Backend>::value, bool>::type = true>
-                             constexpr void barrett_reduce(Backend1& result, const Backend2 &input) const {
+                                 max_precision<Backend2>::value<max_precision<Backend>::value, bool>::type =
+                                     true> constexpr void barrett_reduce(Backend1 &result, const Backend2 &input)
+                                 const {
                         Backend input_adjusted(input);
                         barrett_reduce(result, input_adjusted);
                     }
@@ -368,7 +365,7 @@ namespace nil {
                                  max_precision<Backend1>::value >= max_precision<Backend>::value &&
                                  /// to prevent problems with trivial cpp_int
                                  max_precision<Backend2>::value >= max_precision<Backend>::value>::type>
-                    constexpr void barrett_reduce(Backend1& result, Backend2 input) const {
+                    constexpr void barrett_reduce(Backend1 &result, Backend2 input) const {
                         using default_ops::eval_add;
                         using default_ops::eval_eq;
                         using default_ops::eval_lt;
@@ -404,7 +401,7 @@ namespace nil {
                     }
 
                     template<typename Backend1>
-                    constexpr void montgomery_reduce(Backend1& result) const {
+                    constexpr void montgomery_reduce(Backend1 &result) const {
                         montgomery_reduce(result, result);
                     }
 
@@ -414,7 +411,7 @@ namespace nil {
                                  max_precision<Backend1>::value >= max_precision<Backend>::value &&
                                  /// input number should be represented by backend of appropriate size
                                  max_precision<Backend_doubled_limbs>::value >= max_precision<Backend2>::value>::type>
-                    constexpr void montgomery_reduce(Backend1& result, const Backend2& input) const {
+                    constexpr void montgomery_reduce(Backend1 &result, const Backend2 &input) const {
                         using default_ops::eval_add;
                         using default_ops::eval_bitwise_and;
                         using default_ops::eval_left_shift;
@@ -445,7 +442,7 @@ namespace nil {
                     }
 
                     template<typename Backend1, typename Backend2>
-                    constexpr void regular_add(Backend1& result, const Backend2& y) const {
+                    constexpr void regular_add(Backend1 &result, const Backend2 &y) const {
                         regular_add(result, result, y);
                     }
 
@@ -453,21 +450,26 @@ namespace nil {
                              /// result should fit in the output parameter
                              typename = typename boost::enable_if_c<max_precision<Backend1>::value >=
                                                                     max_precision<Backend>::value>::type>
-                    constexpr void regular_add(Backend1& result, const Backend2& x, const Backend3& y) const {
+                    constexpr void regular_add(Backend1 &result, const Backend2 &x, const Backend3 &y) const {
                         using default_ops::eval_add;
                         using default_ops::eval_lt;
+                        using default_ops::eval_subtract;
 
                         // TODO: maybe reduce input parameters
                         /// input parameters should be lesser than modulus
                         // BOOST_ASSERT(eval_lt(x, get_mod().backend()) && eval_lt(y, get_mod().backend()));
 
-                        Backend_padded_limbs tmp(x);
+                        using T = typename policy_type::Backend_padded_limbs_u;
+                        T tmp(x), modulus(get_mod().backend());
                         eval_add(tmp, y);
-                        barrett_reduce(result, tmp);
+                        if (!eval_lt(tmp, modulus)) {
+                            eval_subtract(tmp, modulus);
+                        }
+                        result = tmp;
                     }
 
                     template<typename Backend1, typename Backend2>
-                    constexpr void regular_mul(Backend1& result, const Backend2& y) const {
+                    constexpr void regular_mul(Backend1 &result, const Backend2 &y) const {
                         regular_mul(result, result, y);
                     }
 
@@ -475,7 +477,7 @@ namespace nil {
                              /// result should fit in the output parameter
                              typename = typename boost::enable_if_c<max_precision<Backend1>::value >=
                                                                     max_precision<Backend>::value>::type>
-                    constexpr void regular_mul(Backend1& result, const Backend2& x, const Backend3& y) const {
+                    constexpr void regular_mul(Backend1 &result, const Backend2 &x, const Backend3 &y) const {
                         using default_ops::eval_lt;
                         using default_ops::eval_multiply;
 
@@ -489,7 +491,7 @@ namespace nil {
                     }
 
                     template<typename Backend1, typename Backend2>
-                    constexpr void montgomery_mul(Backend1& result, const Backend2& y) const {
+                    constexpr void montgomery_mul(Backend1 &result, const Backend2 &y) const {
                         montgomery_mul(result, result, y);
                     }
 
@@ -500,7 +502,7 @@ namespace nil {
                              /// result should fit in the output parameter
                              typename = typename boost::enable_if_c<max_precision<Backend1>::value >=
                                                                     max_precision<Backend>::value>::type>
-                    constexpr void montgomery_mul(Backend1& result, const Backend2& x, const Backend3& y) const {
+                    constexpr void montgomery_mul(Backend1 &result, const Backend2 &x, const Backend3 &y) const {
                         using default_ops::eval_bitwise_and;
                         using default_ops::eval_lt;
                         using default_ops::eval_subtract;
@@ -510,30 +512,33 @@ namespace nil {
                         // BOOST_ASSERT(eval_lt(x, get_mod().backend()) && eval_lt(y, get_mod().backend()));
 
                         Backend_padded_limbs A(internal_limb_type(0u));
+                        const auto mod_size = get_mod().backend().size();
+                        auto mod_last_limb =
+                            static_cast<internal_double_limb_type>(get_limb_value(get_mod().backend(), 0));
+                        auto y_last_limb = get_limb_value(y, 0);
 
-                        for (auto i = 0; i < get_mod().backend().size(); i++) {
+                        for (auto i = 0; i < mod_size; i++) {
+                            auto x_i = get_limb_value(x, i);
+                            auto A_0 = A.limbs()[0];
                             internal_limb_type u_i =
-                                (A.limbs()[0] + get_limb_value(x, i) * get_limb_value(y, 0)) * get_p_dash();
+                                (A_0 + x_i * y_last_limb) * get_p_dash();
 
                             // A += x[i] * y + u_i * m followed by a 1 limb-shift to the right
                             internal_limb_type k = 0;
                             internal_limb_type k2 = 0;
 
                             internal_double_limb_type z =
-                                static_cast<internal_double_limb_type>(get_limb_value(y, 0)) *
-                                    static_cast<internal_double_limb_type>(get_limb_value(x, i)) +
-                                A.limbs()[0] + k;
-                            internal_double_limb_type z2 =
-                                static_cast<internal_double_limb_type>(get_limb_value(get_mod().backend(), 0)) *
-                                    static_cast<internal_double_limb_type>(u_i) +
-                                static_cast<internal_limb_type>(z) + k2;
+                                static_cast<internal_double_limb_type>(y_last_limb) *
+                                    static_cast<internal_double_limb_type>(x_i) + A_0 + k;
+                            internal_double_limb_type z2 = mod_last_limb * static_cast<internal_double_limb_type>(u_i) +
+                                                           static_cast<internal_limb_type>(z) + k2;
                             k = static_cast<internal_limb_type>(z >> std::numeric_limits<internal_limb_type>::digits);
                             k2 = static_cast<internal_limb_type>(z2 >> std::numeric_limits<internal_limb_type>::digits);
 
-                            for (auto j = 1; j < get_mod().backend().size(); ++j) {
+                            for (auto j = 1; j < mod_size; ++j) {
                                 internal_double_limb_type t =
                                     static_cast<internal_double_limb_type>(get_limb_value(y, j)) *
-                                        static_cast<internal_double_limb_type>(get_limb_value(x, i)) +
+                                        static_cast<internal_double_limb_type>(x_i) +
                                     A.limbs()[j] + k;
                                 internal_double_limb_type t2 =
                                     static_cast<internal_double_limb_type>(get_limb_value(get_mod().backend(), j)) *
@@ -547,30 +552,28 @@ namespace nil {
                             }
                             internal_double_limb_type tmp =
                                 static_cast<internal_double_limb_type>(
-                                    custom_get_limb_value<internal_limb_type>(A, get_mod().backend().size())) +
+                                    custom_get_limb_value<internal_limb_type>(A, mod_size)) +
                                 k + k2;
-                            custom_set_limb_value<internal_limb_type>(A, get_mod().backend().size() - 1,
+                            custom_set_limb_value<internal_limb_type>(A, mod_size - 1,
                                                                       static_cast<internal_limb_type>(tmp));
                             custom_set_limb_value<internal_limb_type>(
-                                A, get_mod().backend().size(),
+                                A, mod_size,
                                 static_cast<internal_limb_type>(tmp >>
                                                                 std::numeric_limits<internal_limb_type>::digits));
                         }
                         //
                         // recover correct size of backend content
                         //
-                        adjust_backend_size(A, get_mod().backend().size());
+                        adjust_backend_size(A, mod_size);
 
                         if (!eval_lt(A, get_mod().backend())) {
                             eval_subtract(A, get_mod().backend());
                         }
-                        // TODO: maybe bitwise AND is not necessary
-                        // eval_bitwise_and(A, get_modulus_mask());
                         result = A;
                     }
 
                     template<typename Backend1, typename Backend2>
-                    constexpr void regular_exp(Backend1& result, const Backend2& exp) const {
+                    constexpr void regular_exp(Backend1 &result, const Backend2 &exp) const {
                         regular_exp(result, result, exp);
                     }
 
@@ -578,10 +581,11 @@ namespace nil {
                              /// result should fit in the output parameter
                              typename = typename boost::enable_if_c<max_precision<Backend1>::value >=
                                                                     max_precision<Backend>::value>::type>
-                    constexpr void regular_exp(Backend1& result, Backend2& a, Backend3 exp) const {
+                    constexpr void regular_exp(Backend1 &result, Backend2 &a, Backend3 exp) const {
                         using default_ops::eval_eq;
                         using default_ops::eval_lt;
                         using default_ops::eval_multiply;
+                        using default_ops::eval_is_zero;
 
                         // TODO: maybe reduce input parameter
                         /// input parameter should be lesser than modulus
@@ -604,7 +608,7 @@ namespace nil {
                             if (lsb) {
                                 eval_multiply(res, base);
                                 barrett_reduce(res);
-                                if (eval_eq(exp, static_cast<internal_limb_type>(0u))) {
+                                if (eval_is_zero(exp)) {
                                     break;
                                 }
                             }
@@ -615,7 +619,7 @@ namespace nil {
                     }
 
                     template<typename Backend1, typename Backend2>
-                    constexpr void montgomery_exp(Backend1& result, const Backend2& exp) const {
+                    constexpr void montgomery_exp(Backend1 &result, const Backend2 &exp) const {
                         montgomery_exp(result, result, exp);
                     }
 
@@ -623,7 +627,7 @@ namespace nil {
                              /// result should fit in the output parameter
                              typename = typename boost::enable_if_c<max_precision<Backend1>::value >=
                                                                     max_precision<Backend>::value>::type>
-                    constexpr void montgomery_exp(Backend1& result, const Backend2& a, Backend3 exp) const {
+                    constexpr void montgomery_exp(Backend1 &result, const Backend2 &a, Backend3 exp) const {
                         using default_ops::eval_eq;
                         using default_ops::eval_lt;
                         using default_ops::eval_multiply;
@@ -668,7 +672,7 @@ namespace nil {
                         result = R_mod_m;
                     }
 
-                    constexpr void swap(modular_functions_fixed& o) {
+                    constexpr void swap(modular_functions_fixed &o) {
                         get_mod().swap(o.get_mod());
                         get_mu().swap(o.get_mu());
                         get_r2().swap(o.get_r2());
@@ -680,14 +684,14 @@ namespace nil {
                         get_modulus_mask().swap(o.get_modulus_mask());
                     }
 
-                    constexpr modular_functions_fixed& operator=(const modular_functions_fixed& o) {
+                    constexpr modular_functions_fixed &operator=(const modular_functions_fixed &o) {
                         modular_functions_fixed tmp(o);
                         swap(tmp);
 
                         return *this;
                     }
 
-                    constexpr modular_functions_fixed& operator=(const number_type& m) {
+                    constexpr modular_functions_fixed &operator=(const number_type &m) {
                         initialize(m);
 
                         return *this;

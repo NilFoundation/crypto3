@@ -85,8 +85,14 @@ namespace nil {
                     typedef modular_fixed_cpp_int_backend<BitsCount_quadruple_1, SignType, Checked> Backend_quadruple_1;
                     typedef modular_fixed_cpp_int_backend<BitsCount_padded_limbs, SignType, Checked>
                         Backend_padded_limbs;
+                    typedef modular_fixed_cpp_int_backend<BitsCount_padded_limbs, cpp_integer_type::unsigned_magnitude,
+                                                          Checked>
+                        Backend_padded_limbs_u;
                     typedef modular_fixed_cpp_int_backend<BitsCount_doubled_limbs, SignType, Checked>
                         Backend_doubled_limbs;
+                    typedef modular_fixed_cpp_int_backend<BitsCount_doubled_limbs, cpp_integer_type::unsigned_magnitude,
+                                                          Checked>
+                        Backend_doubled_limbs_u;
                     typedef modular_fixed_cpp_int_backend<BitsCount_doubled_padded_limbs, SignType, Checked>
                         Backend_doubled_padded_limbs;
 

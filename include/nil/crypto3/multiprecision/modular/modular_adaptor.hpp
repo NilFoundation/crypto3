@@ -543,15 +543,11 @@ namespace nil {
 
                 template<typename Backend>
                 constexpr void eval_inverse_mod(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& input) {
+                    Backend new_base, res;
 
-                    number<Backend> new_base, res;
-
-                    input.mod_data().adjust_regular(new_base.backend(), input.base_data());
-                    eval_inverse_mod(res.backend(), new_base.backend(), input.mod_data().get_mod().backend());
-                    number<modular_adaptor<Backend>> res_mod(res, input.mod_data().get_mod());
-
-//                    assign_components(res_mod.backend(), res.backend(), input.mod_data().get_mod().backend());
-                    result = res_mod.backend();
+                    input.mod_data().adjust_regular(new_base, input.base_data());
+                    eval_inverse_mod(res, new_base, input.mod_data().get_mod().backend());
+                    assign_components(result, res, input.mod_data().get_mod().backend());
                 }
             }    // namespace backends
 
