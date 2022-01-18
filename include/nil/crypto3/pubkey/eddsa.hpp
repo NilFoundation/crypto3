@@ -177,15 +177,13 @@ namespace nil {
                 constexpr static const std::size_t public_key_bits = base_field_type::modulus_bits;
                 static_assert(32 * std::numeric_limits<std::uint8_t>::digits - 1 == public_key_bits,
                               "wrong octet length of public key");
-                typedef std::array<std::uint8_t,
-                                   public_key_bits / std::numeric_limits<std::uint8_t>::digits +
-                                       (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 :
-                                                                                                                    0)>
+                typedef static_digest<public_key_bits +
+                                      (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 :
+                                                                                                                   0)>
                     public_key_type;
 
                 constexpr static const std::size_t signature_bits = 64 * std::numeric_limits<std::uint8_t>::digits;
-                typedef std::array<std::uint8_t, signature_bits / std::numeric_limits<std::uint8_t>::digits>
-                    signature_type;
+                typedef static_digest<signature_bits> signature_type;
 
                 public_key() = delete;
                 public_key(const public_key_type &key) : pubkey_point(read_pubkey(key)), pubkey(key) {
@@ -293,10 +291,9 @@ namespace nil {
                 constexpr static const std::size_t private_key_bits = base_field_type::modulus_bits;
                 static_assert(32 * std::numeric_limits<std::uint8_t>::digits - 1 == private_key_bits,
                               "wrong octet length of private key");
-                typedef std::array<std::uint8_t,
-                                   private_key_bits / std::numeric_limits<std::uint8_t>::digits +
-                                       (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 :
-                                                                                                                    0)>
+                typedef static_digest<private_key_bits +
+                                      (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 :
+                                                                                                                   0)>
                     private_key_type;
 
                 constexpr static const std::size_t public_key_bits = scheme_public_key_type::public_key_bits;
