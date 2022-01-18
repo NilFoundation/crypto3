@@ -197,7 +197,7 @@ namespace nil {
                         }
 
                         constexpr element_fp inversed() const {
-                            return element_fp(inverse_extended_euclidean_algorithm(data));
+                            return element_fp(inverse_mod(data));
                         }
 
                         // TODO: complete method
