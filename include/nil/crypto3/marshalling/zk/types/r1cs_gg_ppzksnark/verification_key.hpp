@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -223,6 +224,7 @@ namespace nil {
                         std::move(std::get<4>(filled_r1cs_gg_ppzksnark_extended_verification_key.value()).value()));
                 }
 
+                // TODO: move to pubkey marshaling
                 template<typename TTypeBase,
                          typename PublicKey,
                          typename =
@@ -260,6 +262,7 @@ namespace nil {
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
 
+                // TODO: move to pubkey marshaling
                 template<typename TTypeBase,
                          typename PrivateKey,
                          typename =
@@ -275,6 +278,7 @@ namespace nil {
                         // rho
                         field_element<TTypeBase, typename PrivateKey::scalar_field_type>>>;
 
+                // TODO: move to pubkey marshaling
                 template<typename TTypeBase,
                          typename VerificationKey,
                          typename = typename std::enable_if<
@@ -302,9 +306,10 @@ namespace nil {
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
 
+                // TODO: move to pubkey marshaling
                 template<typename PublicKey, typename Endianness>
                 elgamal_verifiable_public_key<nil::marshalling::field_type<Endianness>, PublicKey>
-                    fill_pubkey_key(const PublicKey &key_inp) {
+                    fill_public_key(const PublicKey &key_inp) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
@@ -327,10 +332,10 @@ namespace nil {
                             fill_curve_element_vector<typename PublicKey::g2_type, Endianness>(key_inp.t_g2)));
                 }
 
+                // TODO: move to pubkey marshaling
                 template<typename PublicKey, typename Endianness>
-                PublicKey
-                    make_pubkey_key(elgamal_verifiable_public_key<nil::marshalling::field_type<Endianness>, PublicKey>
-                                        filled_key_inp) {
+                PublicKey make_public_key(const elgamal_verifiable_public_key<nil::marshalling::field_type<Endianness>,
+                                                                              PublicKey> &filled_key_inp) {
 
                     return PublicKey(std::move(std::get<0>(filled_key_inp.value()).value()),
                                      std::move(make_curve_element_vector<typename PublicKey::g1_type, Endianness>(
@@ -343,9 +348,10 @@ namespace nil {
                                      std::move(std::get<2>(filled_key_inp.value()).value()));
                 }
 
+                // TODO: move to pubkey marshaling
                 template<typename PrivateKey, typename Endianness>
                 elgamal_verifiable_private_key<nil::marshalling::field_type<Endianness>, PrivateKey>
-                    fill_pubkey_key(const PrivateKey &key_inp) {
+                    fill_private_key(const PrivateKey &key_inp) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
@@ -358,13 +364,43 @@ namespace nil {
                         std::make_tuple(filled_rho));
                 }
 
+                // TODO: move to pubkey marshaling
                 template<typename PrivateKey, typename Endianness>
                 PrivateKey
-                    make_pubkey_key(elgamal_verifiable_private_key<nil::marshalling::field_type<Endianness>, PrivateKey>
-                                        filled_key_inp) {
+                    make_private_key(const elgamal_verifiable_private_key<nil::marshalling::field_type<Endianness>,
+                                                                          PrivateKey> &filled_key_inp) {
 
                     return PrivateKey(std::move(make_field_element<typename PrivateKey::scalar_field_type, Endianness>(
                         std::get<0>(filled_key_inp.value()))));
+                }
+
+                // TODO: move to pubkey marshaling
+                template<typename VerificationKey, typename Endianness>
+                elgamal_verifiable_verification_key<nil::marshalling::field_type<Endianness>, VerificationKey>
+                    fill_verification_key(const VerificationKey &key_inp) {
+
+                    using TTypeBase = nil::marshalling::field_type<Endianness>;
+                    using curve_g2_element_type = curve_element<TTypeBase, typename VerificationKey::g2_type>;
+
+                    curve_g2_element_type filled_rho_g2 = curve_g2_element_type(key_inp.rho_g2);
+                    return elgamal_verifiable_verification_key<TTypeBase, VerificationKey>(std::make_tuple(
+                        filled_rho_g2,
+                        fill_curve_element_vector<typename VerificationKey::g2_type, Endianness>(key_inp.rho_sv_g2),
+                        fill_curve_element_vector<typename VerificationKey::g2_type, Endianness>(key_inp.rho_rhov_g2)));
+                }
+
+                // TODO: move to pubkey marshaling
+                template<typename VerificationKey, typename Endianness>
+                VerificationKey make_verification_key(
+                    const elgamal_verifiable_verification_key<nil::marshalling::field_type<Endianness>, VerificationKey>
+                        &filled_key_inp) {
+
+                    return VerificationKey(
+                        std::move(std::get<0>(filled_key_inp.value()).value()),
+                        std::move(make_curve_element_vector<typename VerificationKey::g2_type, Endianness>(
+                            std::get<1>(filled_key_inp.value()))),
+                        std::move(make_curve_element_vector<typename VerificationKey::g2_type, Endianness>(
+                            std::get<2>(filled_key_inp.value()))));
                 }
             }    // namespace types
         }        // namespace marshalling
