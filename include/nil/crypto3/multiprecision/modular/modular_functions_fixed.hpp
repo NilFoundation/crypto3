@@ -200,7 +200,7 @@ namespace nil {
                     constexpr void initialize_modulus(const number_type &m) {
                         BOOST_ASSERT(check_modulus_constraints(m.backend()));
 
-                        get_mod() = m;
+                        m_mod = m;
                     }
 
                     constexpr void initialize_barrett_params() {
@@ -208,14 +208,14 @@ namespace nil {
                         using default_ops::eval_divide;
                         using default_ops::eval_msb;
 
-                        get_mu() = static_cast<internal_limb_type>(0u);
+                        m_barrett_mu = static_cast<internal_limb_type>(0u);
 
-                        eval_bit_set(get_mu(), 2u * (1u + eval_msb(get_mod().backend())));
-                        eval_divide(get_mu(), get_mod().backend());
+                        eval_bit_set(m_barrett_mu, 2u * (1u + eval_msb(m_mod.backend())));
+                        eval_divide(m_barrett_mu, m_mod.backend());
                     }
 
                     constexpr void initialize_montgomery_params() {
-                        if (check_montgomery_constraints(get_mod().backend())) {
+                        if (check_montgomery_constraints(m_mod.backend())) {
                             find_const_variables();
                             find_modulus_mask();
                         }
@@ -227,7 +227,7 @@ namespace nil {
                      * and an inverse exists.
                      */
                     constexpr internal_limb_type monty_inverse(internal_limb_type a) {
-                        BOOST_ASSERT(check_montgomery_constraints(get_mod().backend()));
+                        BOOST_ASSERT(check_montgomery_constraints(m_mod.backend()));
 
                         internal_limb_type b = 1;
                         internal_limb_type r = 0;
@@ -252,23 +252,23 @@ namespace nil {
                         using default_ops::eval_gt;
                         using default_ops::eval_multiply;
 
-                        BOOST_ASSERT(check_montgomery_constraints(get_mod().backend()) &&
-                                     check_modulus_constraints(get_mod().backend()));
+                        BOOST_ASSERT(check_montgomery_constraints(m_mod.backend()) &&
+                                     check_modulus_constraints(m_mod.backend()));
 
-                        get_p_dash() = monty_inverse(get_mod().backend().limbs()[0]);
+                        m_montgomery_p_dash = monty_inverse(m_mod.backend().limbs()[0]);
 
                         Backend_doubled_padded_limbs r;
-                        eval_bit_set(r, get_mod().backend().size() * limb_bits);
+                        eval_bit_set(r, m_mod.backend().size() * limb_bits);
                         eval_multiply(r, r);
                         barrett_reduce(r);
 
-                        get_r2() = static_cast<Backend>(r);
+                        m_montgomery_r2 = static_cast<Backend>(r);
                     }
 
                     constexpr void find_modulus_mask() {
-                        get_modulus_mask() = static_cast<internal_limb_type>(1u);
-                        eval_left_shift(get_modulus_mask(), get_mod().backend().size() * limb_bits);
-                        eval_subtract(get_modulus_mask(),
+                        m_modulus_mask = static_cast<internal_limb_type>(1u);
+                        eval_left_shift(m_modulus_mask, m_mod.backend().size() * limb_bits);
+                        eval_subtract(m_modulus_mask,
                                       decltype(m_modulus_mask)(static_cast<internal_limb_type>(1u)));
                     }
 
@@ -319,11 +319,11 @@ namespace nil {
                     }
 
                     constexpr modular_functions_fixed(const modular_functions_fixed &o) {
-                        get_mod() = o.get_mod();
-                        get_mu() = o.get_mu();
-                        get_r2() = o.get_r2();
-                        get_p_dash() = o.get_p_dash();
-                        get_modulus_mask() = o.get_modulus_mask();
+                        m_mod = o.get_mod();
+                        m_barrett_mu = o.get_mu();
+                        m_montgomery_r2 = o.get_r2();
+                        m_montgomery_p_dash = o.get_p_dash();
+                        m_modulus_mask = o.get_modulus_mask();
                     }
 
                     template<typename Backend1>
@@ -377,7 +377,7 @@ namespace nil {
                         //
                         // to prevent problems with trivial cpp_int
                         //
-                        Backend2 modulus(get_mod().backend());
+                        Backend2 modulus(m_mod.backend());
 
                         if (eval_lt(input, modulus)) {
                             while (eval_lt(input, 0u)) {
@@ -386,7 +386,7 @@ namespace nil {
                         } else if (eval_msb(input) < 2u * eval_msb(modulus) + 1u) {
                             Backend_quadruple_1 t1(input);
 
-                            eval_multiply(t1, get_mu());
+                            eval_multiply(t1, m_barrett_mu);
                             custom_right_shift(t1, 2u * (1u + eval_msb(modulus)));
                             eval_multiply(t1, modulus);
                             eval_subtract(input, t1);
@@ -422,20 +422,20 @@ namespace nil {
                         Backend_doubled_padded_limbs accum(input);
                         Backend_doubled_padded_limbs prod;
 
-                        for (auto i = 0; i < get_mod().backend().size(); ++i) {
+                        for (auto i = 0; i < m_mod.backend().size(); ++i) {
                             eval_multiply(
-                                prod, get_mod().backend(),
+                                prod, m_mod.backend(),
                                 static_cast<internal_limb_type>(custom_get_limb_value<internal_limb_type>(accum, i) *
                                                                 /// to prevent overflow error in constexpr
-                                                                static_cast<double_limb_type>(get_p_dash())));
+                                                                static_cast<double_limb_type>(m_montgomery_p_dash)));
                             eval_left_shift(prod, i * limb_bits);
                             eval_add(accum, prod);
                         }
 
-                        custom_right_shift(accum, get_mod().backend().size() * limb_bits);
+                        custom_right_shift(accum, m_mod.backend().size() * limb_bits);
 
-                        if (!eval_lt(accum, get_mod().backend())) {
-                            eval_subtract(accum, get_mod().backend());
+                        if (!eval_lt(accum, m_mod.backend())) {
+                            eval_subtract(accum, m_mod.backend());
                         }
                         eval_bitwise_and(accum, m_modulus_mask);
                         result = accum;
@@ -457,10 +457,10 @@ namespace nil {
 
                         // TODO: maybe reduce input parameters
                         /// input parameters should be lesser than modulus
-                        // BOOST_ASSERT(eval_lt(x, get_mod().backend()) && eval_lt(y, get_mod().backend()));
+                        // BOOST_ASSERT(eval_lt(x, m_mod.backend()) && eval_lt(y, m_mod.backend()));
 
                         using T = typename policy_type::Backend_padded_limbs_u;
-                        T tmp(x), modulus(get_mod().backend());
+                        T tmp(x), modulus(m_mod.backend());
                         eval_add(tmp, y);
                         if (!eval_lt(tmp, modulus)) {
                             eval_subtract(tmp, modulus);
@@ -483,7 +483,7 @@ namespace nil {
 
                         // TODO: maybe reduce input parameters
                         /// input parameters should be lesser than modulus
-                        // BOOST_ASSERT(eval_lt(x, get_mod().backend()) && eval_lt(y, get_mod().backend()));
+                        // BOOST_ASSERT(eval_lt(x, m_mod.backend()) && eval_lt(y, m_mod.backend()));
 
                         Backend_doubled_limbs tmp(x);
                         eval_multiply(tmp, y);
@@ -509,19 +509,19 @@ namespace nil {
 
                         // TODO: maybe reduce input parameters
                         /// input parameters should be lesser than modulus
-                        // BOOST_ASSERT(eval_lt(x, get_mod().backend()) && eval_lt(y, get_mod().backend()));
+                        // BOOST_ASSERT(eval_lt(x, m_mod.backend()) && eval_lt(y, m_mod.backend()));
 
                         Backend_padded_limbs A(internal_limb_type(0u));
-                        const auto mod_size = get_mod().backend().size();
+                        const auto mod_size = m_mod.backend().size();
                         auto mod_last_limb =
-                            static_cast<internal_double_limb_type>(get_limb_value(get_mod().backend(), 0));
+                            static_cast<internal_double_limb_type>(get_limb_value(m_mod.backend(), 0));
                         auto y_last_limb = get_limb_value(y, 0);
 
                         for (auto i = 0; i < mod_size; i++) {
                             auto x_i = get_limb_value(x, i);
                             auto A_0 = A.limbs()[0];
                             internal_limb_type u_i =
-                                (A_0 + x_i * y_last_limb) * get_p_dash();
+                                (A_0 + x_i * y_last_limb) * m_montgomery_p_dash;
 
                             // A += x[i] * y + u_i * m followed by a 1 limb-shift to the right
                             internal_limb_type k = 0;
@@ -541,7 +541,7 @@ namespace nil {
                                         static_cast<internal_double_limb_type>(x_i) +
                                     A.limbs()[j] + k;
                                 internal_double_limb_type t2 =
-                                    static_cast<internal_double_limb_type>(get_limb_value(get_mod().backend(), j)) *
+                                    static_cast<internal_double_limb_type>(get_limb_value(m_mod.backend(), j)) *
                                         static_cast<internal_double_limb_type>(u_i) +
                                     static_cast<internal_limb_type>(t) + k2;
                                 A.limbs()[j - 1] = static_cast<internal_limb_type>(t2);
@@ -566,8 +566,8 @@ namespace nil {
                         //
                         adjust_backend_size(A, mod_size);
 
-                        if (!eval_lt(A, get_mod().backend())) {
-                            eval_subtract(A, get_mod().backend());
+                        if (!eval_lt(A, m_mod.backend())) {
+                            eval_subtract(A, m_mod.backend());
                         }
                         result = A;
                     }
@@ -589,13 +589,13 @@ namespace nil {
 
                         // TODO: maybe reduce input parameter
                         /// input parameter should be lesser than modulus
-                        // BOOST_ASSERT(eval_lt(a, get_mod().backend()));
+                        // BOOST_ASSERT(eval_lt(a, m_mod.backend()));
 
                         if (eval_eq(exp, static_cast<internal_limb_type>(0u))) {
                             result = static_cast<internal_limb_type>(1u);
                             return;
                         }
-                        if (eval_eq(get_mod().backend(), static_cast<internal_limb_type>(1u))) {
+                        if (eval_eq(m_mod.backend(), static_cast<internal_limb_type>(1u))) {
                             result = static_cast<internal_limb_type>(0u);
                             return;
                         }
@@ -634,10 +634,10 @@ namespace nil {
 
                         // TODO: maybe reduce input parameter
                         /// input parameter should be lesser than modulus
-                        // BOOST_ASSERT(eval_lt(a, get_mod().backend()));
+                        // BOOST_ASSERT(eval_lt(a, m_mod.backend()));
 
                         Backend_doubled_limbs tmp(static_cast<internal_limb_type>(1u));
-                        eval_multiply(tmp, get_r2());
+                        eval_multiply(tmp, m_montgomery_r2);
                         montgomery_reduce(tmp);
                         Backend R_mod_m(tmp);
 
@@ -649,11 +649,11 @@ namespace nil {
                             // TODO: restructure code
                             // adjust_modular
                             //
-                            eval_multiply(result, get_r2());
+                            eval_multiply(result, m_montgomery_r2);
                             montgomery_reduce(result);
                             return;
                         }
-                        if (eval_eq(get_mod().backend(), static_cast<internal_limb_type>(1u))) {
+                        if (eval_eq(m_mod.backend(), static_cast<internal_limb_type>(1u))) {
                             result = static_cast<internal_limb_type>(0u);
                             return;
                         }
@@ -673,15 +673,15 @@ namespace nil {
                     }
 
                     constexpr void swap(modular_functions_fixed &o) {
-                        get_mod().swap(o.get_mod());
-                        get_mu().swap(o.get_mu());
-                        get_r2().swap(o.get_r2());
+                        m_mod.swap(o.get_mod());
+                        m_barrett_mu.swap(o.get_mu());
+                        m_montgomery_r2.swap(o.get_r2());
 
-                        auto tmp_p_dash = get_p_dash();
-                        get_p_dash() = o.get_p_dash();
+                        auto tmp_p_dash = m_montgomery_p_dash;
+                        m_montgomery_p_dash = o.get_p_dash();
                         o.get_p_dash() = tmp_p_dash;
 
-                        get_modulus_mask().swap(o.get_modulus_mask());
+                        m_modulus_mask.swap(o.get_modulus_mask());
                     }
 
                     constexpr modular_functions_fixed &operator=(const modular_functions_fixed &o) {

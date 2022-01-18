@@ -42,7 +42,7 @@ namespace nil {
 
             public:
                 constexpr auto get_mod() const {
-                    return get_mod_obj().get_mod();
+                    return m_mod_obj.get_mod();
                 }
 
                 // TODO: add universal ref constructor
@@ -57,10 +57,10 @@ namespace nil {
 
                 template<typename Backend1>
                 constexpr void reduce(Backend1& result) const {
-                    if (check_montgomery_constraints(get_mod_obj())) {
-                        get_mod_obj().montgomery_reduce(result);
+                    if (check_montgomery_constraints(m_mod_obj)) {
+                        m_mod_obj.montgomery_reduce(result);
                     } else {
-                        get_mod_obj().barrett_reduce(result);
+                        m_mod_obj.barrett_reduce(result);
                     }
                 }
 
@@ -74,15 +74,15 @@ namespace nil {
                 constexpr typename boost::enable_if_c<boost::is_same<Backend1, Backend>::value>::type
                     adjust_modular(Backend1& result, Backend2 input) {
                     Backend_doubled_limbs tmp;
-                    get_mod_obj().barrett_reduce(tmp, input);
-                    if (check_montgomery_constraints(get_mod_obj())) {
+                    m_mod_obj.barrett_reduce(tmp, input);
+                    if (check_montgomery_constraints(m_mod_obj)) {
                         //
                         // to prevent problems with trivial cpp_int
                         //
-                        Backend_doubled_limbs r2(get_mod_obj().get_r2());
+                        Backend_doubled_limbs r2(m_mod_obj.get_r2());
 
                         eval_multiply(tmp, r2);
-                        get_mod_obj().montgomery_reduce(tmp);
+                        m_mod_obj.montgomery_reduce(tmp);
                     }
                     result = tmp;
                 }
@@ -94,8 +94,8 @@ namespace nil {
                         backends::max_precision<Backend1>::value >= backends::max_precision<Backend2>::value>::type>
                 constexpr void adjust_regular(Backend1& result, const Backend2& input) const {
                     result = input;
-                    if (check_montgomery_constraints(get_mod_obj())) {
-                        get_mod_obj().montgomery_reduce(result);
+                    if (check_montgomery_constraints(m_mod_obj)) {
+                        m_mod_obj.montgomery_reduce(result);
                     }
                 }
 
@@ -106,10 +106,10 @@ namespace nil {
 
                 template<typename Backend1, typename Backend2, typename T>
                 constexpr void mod_exp(Backend1& result, const Backend2& a, const T& exp) const {
-                    if (check_montgomery_constraints(get_mod_obj())) {
-                        get_mod_obj().montgomery_exp(result, a, exp);
+                    if (check_montgomery_constraints(m_mod_obj)) {
+                        m_mod_obj.montgomery_exp(result, a, exp);
                     } else {
-                        get_mod_obj().regular_exp(result, a, exp);
+                        m_mod_obj.regular_exp(result, a, exp);
                     }
                 }
 
@@ -120,10 +120,10 @@ namespace nil {
 
                 template<typename Backend1, typename Backend2, typename Backend3>
                 constexpr void mod_mul(Backend1& result, const Backend2& x, const Backend3& y) {
-                    if (check_montgomery_constraints(get_mod_obj())) {
-                        get_mod_obj().montgomery_mul(result, x, y);
+                    if (check_montgomery_constraints(m_mod_obj)) {
+                        m_mod_obj.montgomery_mul(result, x, y);
                     } else {
-                        get_mod_obj().regular_mul(result, x, y);
+                        m_mod_obj.regular_mul(result, x, y);
                     }
                 }
 
@@ -134,7 +134,7 @@ namespace nil {
 
                 template<typename Backend1, typename Backend2, typename Backend3>
                 constexpr void mod_add(Backend1& result, const Backend2& x, const Backend3& y) {
-                    get_mod_obj().regular_add(result, x, y);
+                    m_mod_obj.regular_add(result, x, y);
                 }
 
                 template<typename Backend1, expression_template_option ExpressionTemplates>
@@ -148,7 +148,7 @@ namespace nil {
                 }
 
                 constexpr void swap(modular_params& o) {
-                    get_mod_obj().swap(o.get_mod_obj());
+                    m_mod_obj.swap(o.get_mod_obj());
                 }
 
                 constexpr modular_params& operator=(const modular_params& o) {

@@ -67,18 +67,18 @@ namespace nil {
 
                     template<typename Backend1, typename Backend2>
                     constexpr modular_adaptor(const Backend1 &b, const Backend2 &m) : m_mod(m) {
-                        mod_data().adjust_modular(base_data(), b);
+                        m_mod.adjust_modular(m_base, b);
                     }
 
                     constexpr explicit modular_adaptor(const Backend &m) :
                         m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u)),
                         m_mod(number_type(m)) {
-                        mod_data().adjust_modular(base_data());
+                        m_mod.adjust_modular(m_base);
                     }
 
                     constexpr explicit modular_adaptor(const number_type &m) :
                         m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u)), m_mod(m) {
-                        mod_data().adjust_modular(base_data());
+                        m_mod.adjust_modular(m_base);
                     }
 
                     // TODO: check correctness of the method
@@ -96,9 +96,9 @@ namespace nil {
                                 ++p;
                             part.assign(s, p);
                             if (!part.empty())
-                                m_base() = part.c_str();
+                                m_base = part.c_str();
                             else
-                                m_base() = zero;
+                                m_base = zero;
                             s = p;
                             if (*p && (*p != ')')) {
                                 ++p;
@@ -108,12 +108,12 @@ namespace nil {
                             } else
                                 part.erase();
                             if (!part.empty())
-                                m_mod() = part.c_str();
+                                m_mod = part.c_str();
                             else
-                                m_mod() = zero;
+                                m_mod = zero;
                         } else {
-                            base_data() = s;
-                            m_mod() = zero;
+                            m_base = s;
+                            m_mod = zero;
                         }
                         return *this;
                     }
@@ -122,32 +122,32 @@ namespace nil {
                         //
                         // modulus values should be the same
                         //
-                        BOOST_ASSERT(!mod_data().compare(o.mod_data()));
+                        BOOST_ASSERT(!m_mod.compare(o.mod_data()));
 
-                        Backend tmp1 = base_data();
+                        Backend tmp1 = m_base;
                         Backend tmp2 = o.base_data();
-                        mod_data().adjust_regular(tmp1, base_data());
-                        mod_data().adjust_regular(tmp2, o.base_data());
+                        m_mod.adjust_regular(tmp1, m_base);
+                        m_mod.adjust_regular(tmp2, o.base_data());
                         return tmp1.compare(tmp2);
                     }
 
                     template<typename T>
                     constexpr int compare(const T &a) const {
-                        modular_adaptor tmp(a, mod_data());
+                        modular_adaptor tmp(a, m_mod);
                         return compare(tmp);
                     }
 
                     constexpr void swap(modular_adaptor &o) {
                         base_data().swap(o.base_data());
                         // TODO: add swap to modulus_type
-                        mod_data().swap(o.mod_data());
+                        m_mod.swap(o.mod_data());
                     }
 
                     constexpr modular_adaptor &operator=(const modular_adaptor &o) {
                         //                        modular_adaptor tmp(o);
                         //                        swap(tmp);
-                        base_data() = o.base_data();
-                        mod_data() = o.mod_data();
+                        m_base = o.base_data();
+                        m_mod = o.m_mod;
 
                         return *this;
                     }
@@ -156,8 +156,8 @@ namespace nil {
                     constexpr modular_adaptor &operator=(modular_adaptor &&o) BOOST_NOEXCEPT {
                         //                        modular_adaptor tmp(o);
                         //                        swap(tmp);
-                        base_data() = o.base_data();
-                        mod_data() = o.mod_data();
+                        m_base = o.base_data();
+                        m_mod = o.mod_data();
 
                         return *this;
                     }
@@ -165,13 +165,13 @@ namespace nil {
 
                     inline std::string str(std::streamsize dig, std::ios_base::fmtflags f) const {
                         Backend tmp;
-                        mod_data().adjust_regular(tmp, base_data());
+                        m_mod.adjust_regular(tmp, m_base);
                         return tmp.str(dig, f);
                     }
 
                     constexpr void negate() {
-                        base_data().negate();
-                        eval_add(base_data(), mod_data().get_mod().backend());
+                        m_base.negate();
+                        eval_add(m_base, m_mod.get_mod().backend());
                     }
 
                 protected:
