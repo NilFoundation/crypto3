@@ -62,6 +62,22 @@ namespace nil {
                     r1cs_gg_ppzksnark_proving_key(r1cs_gg_ppzksnark_proving_key &&other) = default;
 
                     r1cs_gg_ppzksnark_proving_key(
+                        const typename CurveType::template g1_type<>::value_type &alpha_g1,
+                        const typename CurveType::template g1_type<>::value_type &beta_g1,
+                        const typename CurveType::template g2_type<>::value_type &beta_g2,
+                        const typename CurveType::template g1_type<>::value_type &delta_g1,
+                        const typename CurveType::template g2_type<>::value_type &delta_g2,
+                        const std::vector<typename CurveType::template g1_type<>::value_type> &A_query,
+                        const knowledge_commitment_vector<typename CurveType::template g2_type<>,
+                                                          typename CurveType::template g1_type<>> &B_query,
+                        const std::vector<typename CurveType::template g1_type<>::value_type> &H_query,
+                        const std::vector<typename CurveType::template g1_type<>::value_type> &L_query,
+                        const constraint_system_type &constraint_system) :
+                        alpha_g1(alpha_g1),
+                        beta_g1(beta_g1), beta_g2(beta_g2), delta_g1(delta_g1), delta_g2(delta_g2), A_query(A_query),
+                        B_query(B_query), H_query(H_query), L_query(L_query), constraint_system(constraint_system) {};
+
+                    r1cs_gg_ppzksnark_proving_key(
                         typename CurveType::template g1_type<>::value_type &&alpha_g1,
                         typename CurveType::template g1_type<>::value_type &&beta_g1,
                         typename CurveType::template g2_type<>::value_type &&beta_g2,

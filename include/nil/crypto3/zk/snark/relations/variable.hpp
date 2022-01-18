@@ -141,11 +141,10 @@ namespace nil {
                  * A linear term represents a formal expression of the form "coeff * x_{index}".
                  */
                 template<typename FieldType>
-                class linear_term {
+                struct linear_term {
                     typedef FieldType field_type;
                     typedef typename field_type::value_type field_value_type;
 
-                public:
                     typename variable<FieldType>::index_type index;
                     field_value_type coeff;
 
@@ -227,11 +226,10 @@ namespace nil {
                  * A linear combination represents a formal expression of the form "sum_i coeff_i * x_{index_i}".
                  */
                 template<typename FieldType>
-                class linear_combination {
+                struct linear_combination {
                     typedef FieldType field_type;
                     typedef typename field_type::value_type field_value_type;
 
-                public:
                     std::vector<linear_term<FieldType>> terms;
 
                     linear_combination() {};
