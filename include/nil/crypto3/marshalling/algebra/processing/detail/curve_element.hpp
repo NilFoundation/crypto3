@@ -85,7 +85,7 @@ namespace nil {
                         // TODO: did not work as affine point should be fixed for zero-point
                         if (point.is_zero()) {
                             result |= I_bit;
-                        } else if (compression && sign_gf_p<typename GroupValueType::field_type>(point.Y)) {
+                        } else if (compression && sign_gf_p<typename GroupValueType::field_type>(point.to_affine().Y)) {
                             result |= S_bit;
                         }
                         return result;

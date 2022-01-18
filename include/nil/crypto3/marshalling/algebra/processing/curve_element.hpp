@@ -110,7 +110,7 @@ namespace nil {
                         typename group_type::curve_type::template g1_type<typename algebra::curves::coordinates::affine,
                                                                           form>::value_type point_affine =
                             point.to_affine();
-                        chunk_type m_unit = detail::evaluate_m_unit<chunk_type>(point_affine, true);
+                        chunk_type m_unit = detail::evaluate_m_unit<chunk_type>(point, true);
                         if (!(I_bit & m_unit)) {
                             // We assume here, that write_data doesn't change the iter
                             write_data<params_type::bit_length(), endianness>(
@@ -151,7 +151,7 @@ namespace nil {
                         typename group_type::curve_type::template g2_type<typename algebra::curves::coordinates::affine,
                                                                           form>::value_type point_affine =
                             point.to_affine();
-                        chunk_type m_unit = detail::evaluate_m_unit<chunk_type>(point_affine, true);
+                        chunk_type m_unit = detail::evaluate_m_unit<chunk_type>(point, true);
                         if (!(I_bit & m_unit)) {
                             TIter write_iter = iter;
                             // We assume here, that write_data doesn't change the iter
@@ -303,6 +303,7 @@ namespace nil {
                             BOOST_ASSERT(iter + sizeof_field_element_chunks_count ==
                                          std::find(iter, iter + sizeof_field_element_chunks_count, true));
                             point = g1_value_type();    // point at infinity
+                            return nil::marshalling::status_type::success;
                         }
 
                         integral_type x = read_data<sizeof_field_element, integral_type, endianness>(iter);
@@ -364,6 +365,7 @@ namespace nil {
                             BOOST_ASSERT(iter + 2 * sizeof_field_element_chunks_count ==
                                          std::find(iter, iter + 2 * sizeof_field_element_chunks_count, true));
                             point = g2_value_type();    // point at infinity
+                            return nil::marshalling::status_type::success;
                         }
 
                         TIter read_iter = iter;
