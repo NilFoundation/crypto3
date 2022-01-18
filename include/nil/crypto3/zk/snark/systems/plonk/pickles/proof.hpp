@@ -37,8 +37,8 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename CurveType, std::size_t WiresAmount, std::size_t LRRounds>
-                class ProverProof {
+                template<typename CurveType, std::size_t WiresAmount>
+                class pickles_proof {
                     typedef pickles_commitment_scheme<CurveType> commitment_scheme;
 
                 public:
@@ -65,11 +65,11 @@ namespace nil {
                     typename commitment_scheme::evaluation_type L_zeta_omega;
 
                     // Opening proof
-                    std::array<typename CurveType::value_type, LRRounds> L;
-                    std::array<typename CurveType::value_type, LRRounds> R;
+                    std::vector<typename CurveType::template g1_type<>::value_type> L;
+                    std::vector<typename CurveType::template g1_type<>::value_type> R;
 
-                    typename CurveType::value_type sigma;
-                    typename CurveType::value_type G;
+                    typename CurveType::template g1_type<>::value_type sigma;
+                    typename CurveType::template g1_type<>::value_type G;
 
                     typename CurveType::scalar_field_type::value_type z1, z2;
 

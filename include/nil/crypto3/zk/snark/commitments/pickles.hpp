@@ -36,8 +36,8 @@ namespace nil {
                 template<typename CurveType>
                 class pickles_commitment_scheme {
                 public:
-                    using evaluation_type = typename CurveType::scalar_field_type::value_type;
-                    using commitment_type = typename CurveType::value_type;
+                    typedef typename CurveType::scalar_field_type::value_type evaluation_type;
+                    typedef typename CurveType::template g1_type<>::value_type commitment_type;
 
                     struct openning_type { };
 
