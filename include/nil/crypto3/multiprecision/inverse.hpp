@@ -16,6 +16,7 @@
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/cpp_int/cpp_int_config.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
+#include <nil/crypto3/multiprecision/modular/modular_adaptor_fixed.hpp>
 #include <nil/crypto3/multiprecision/modular/inverse.hpp>
 
 namespace nil {
@@ -66,7 +67,7 @@ namespace nil {
             template<typename Backend, expression_template_option ExpressionTemplates>
             constexpr number<modular_adaptor<Backend>, ExpressionTemplates>
             inverse_mod(const number<modular_adaptor<Backend>, ExpressionTemplates>& modular) {
-                number<modular_adaptor<Backend>> res;
+                number<modular_adaptor<Backend>, ExpressionTemplates> res;
                 backends::eval_inverse_mod(res.backend(), modular.backend());
                 return res;
             }

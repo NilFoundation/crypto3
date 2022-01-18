@@ -277,6 +277,19 @@ namespace nil {
                     eval_powm(result, b, exp);
                 }
 
+                template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+                constexpr void eval_inverse_mod(modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>& result,
+                                                const modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>& input) {
+                    using Backend = modular_fixed_cpp_int_backend<MinBits, SignType, Checked>;
+                    using Backend_padded_limbs = typename modular_params<Backend>::policy_type::Backend_padded_limbs;
+
+                    Backend_padded_limbs new_base, res, tmp = input.mod_data().get_mod().backend();
+
+                    input.mod_data().adjust_regular(new_base, input.base_data());
+                    eval_inverse_mod(res, new_base, tmp);
+                    assign_components(result, res, input.mod_data().get_mod().backend());
+                }
+
             }    // namespace backends
 
             using backends::cpp_int_backend;
