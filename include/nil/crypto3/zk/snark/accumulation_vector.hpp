@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -54,6 +55,8 @@ namespace nil {
                     accumulation_vector() = default;
                     accumulation_vector(const accumulation_vector<Type> &other) = default;
                     accumulation_vector(accumulation_vector<Type> &&other) = default;
+                    accumulation_vector(const underlying_value_type &first, sparse_vector<Type> &&rest) :
+                        first(first), rest(std::move(rest)) {};
                     accumulation_vector(underlying_value_type &&first, sparse_vector<Type> &&rest) :
                         first(std::move(first)), rest(std::move(rest)) {};
                     accumulation_vector(underlying_value_type &&first, std::vector<underlying_value_type> &&v) :
