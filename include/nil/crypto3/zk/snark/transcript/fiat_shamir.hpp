@@ -67,6 +67,7 @@ namespace nil {
 
                     template<typename TAny>
                     void operator()(TAny data) {
+                        
                         // acc(data);
                     }
 

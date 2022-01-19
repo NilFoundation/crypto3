@@ -81,6 +81,12 @@ namespace nil {
 
                         std::size_t N_rows = n;
 
+                        std::vector<typename FieldType::value_type> omega_powers(std::max({N_wires, N_perm, N_rows}) + 1 + 1);
+                        omega_powers[0] = FieldType::value_type::one();
+                        for (std::size_t power = 1; power < omega_powers.size(); power++) {
+                            omega_powers[power] = preprocessed_data.omega * omega_powers[power - 1];
+                        }
+
                         std::vector<typename FieldType::value_type> D_0(n);
                         for (std::size_t power = 1; power <= n; power++) {
                             D_0.emplace_back(preprocessed_data.omega.pow(power));
@@ -121,8 +127,8 @@ namespace nil {
                         // std::copy(PI.begin(), PI.end(), f.begin() + N_perm);
 
                         // 4. For $1 < j \leq N_{\texttt{rows}}$ calculate $g_j, h_j$
-                        std::vector<typename FieldType::value_type> g(N_rows + 1);
-                        std::vector<typename FieldType::value_type> h(N_rows + 1);
+                        std::vector<typename FieldType::value_type> g_points(N_rows + 1);
+                        std::vector<typename FieldType::value_type> h_points(N_rows + 1);
 
                         const std::vector<math::polynomial::polynomial<typename FieldType::value_type>>
                             &S_sigma = preprocessed_data.permutations;
@@ -130,17 +136,37 @@ namespace nil {
                             &S_id = preprocessed_data.identity_permutations;
 
                         for (std::size_t j = 1; j <= N_rows; j++) {
-                            g[j] = FieldType::value_type::one();
-                            h[j] = FieldType::value_type::one();
+                            g_points[j] = FieldType::value_type::one();
+                            h_points[j] = FieldType::value_type::one();
                             for (std::size_t i = 0; i < N_perm + N_PI; i++){
 
-                                g[j] *= (f[j].evaluate(D_0[j]) + beta * S_id[j].evaluate(D_0[j]) + gamma);
-                                h[j] *= (f[j].evaluate(D_0[j]) + beta * S_sigma[j].evaluate(D_0[j]) + gamma);
+                                g_points[j] *= (f[j].evaluate(D_0[j]) + beta * S_id[j].evaluate(D_0[j]) + gamma);
+                                h_points[j] *= (f[j].evaluate(D_0[j]) + beta * S_sigma[j].evaluate(D_0[j]) + gamma);
                             }
                         }
                         // 5. Calculate $V_P$
-                        math::polynomial::polynomial<typename FieldType::value_type> V_P;
-                        
+                        std::vector<std::pair<typename FieldType::value_type,
+                                              typename FieldType::value_type>>
+                            V_P_interpolation_points(n + 1);
+
+                        V_P_interpolation_points.push_back(std::make_pair(omega_powers[1], 1));
+                        for (std::size_t j = 2; j < N_rows + 1; j++) {
+
+                            typename FieldType::value_type tmp_mul_result =
+                                FieldType::value_type::one();
+                            for (std::size_t i = 1; i <= j - 1; i++) {
+                                tmp_mul_result *= g_points[i]/h_points[i];
+                            }
+
+                            V_P_interpolation_points.push_back(std::make_pair(omega_powers[j],
+                                tmp_mul_result));
+                        }
+
+                        V_P_interpolation_points.push_back(std::make_pair(omega_powers[N_rows + 1], 1));
+
+                        math::polynomial::polynomial<typename FieldType::value_type> V_P
+                            = math::polynomial::lagrange_interpolation(V_P_interpolation_points);
+
                         // 6. Compute and add commitment to $V_P$ to $\text{transcript}$.
                         merkle_tree_type V_P_tree = lpc::commit(V_P, D_0);
                         typename lpc::commitment_type V_P_commitment = V_P_tree.root();
@@ -151,24 +177,64 @@ namespace nil {
                             transcript.template get_challenge<transcript_manifest::challenges_ids::teta,
                             FieldType>();
 
-                        // 5
-                        // A(teta)
-                        std::vector<typename FieldType::value_type> A;
-                        // S(teta)
-                        std::vector<typename FieldType::value_type> S;
+                        // 8. Get lookup_gate_i and table_value_i
 
-                        // 6
-                        math::polynomial::polynomial<typename FieldType::value_type> A1;
-                        math::polynomial::polynomial<typename FieldType::value_type> S1;
+                        // 9. Construct the input lookup compression and table compression.
+                        math::polynomial::polynomial<typename FieldType::value_type> A_compr;
+                        math::polynomial::polynomial<typename FieldType::value_type> S_compr;
 
-                        // 7
-                        merkle_tree_type A1_tree = lpc::commit(A1, D_0);
-                        merkle_tree_type S1_tree = lpc::commit(S1, D_0);
-                        typename lpc::commitment_type A1_commitment = A1_tree.root();
-                        typename lpc::commitment_type S1_commitment = S1_tree.root();
+                        // 10. Produce the permutation polynomials $S_{\texttt{perm}}(X)$ and $A_{\texttt{perm}}(X)$
+                        math::polynomial::polynomial<typename FieldType::value_type> A_perm;
+                        math::polynomial::polynomial<typename FieldType::value_type> S_perm;
 
-                        transcript(A1_commitment);
-                        transcript(S1_commitment);
+                        // 11. Compute and add commitments to $A_{\texttt{perm}}$ and $S_{\texttt{perm}}$ to $\text{transcript}$
+
+                        merkle_tree_type A_perm_tree = lpc::commit(A_perm, D_0);
+                        typename lpc::commitment_type A_perm_commitment = A_perm_tree.root();
+                        transcript(A_perm_commitment);
+
+                        merkle_tree_type S_perm_tree = lpc::commit(S_perm, D_0);
+                        typename lpc::commitment_type S_perm_commitment = S_perm_tree.root();
+                        transcript(S_perm_commitment);
+
+                        // 12. Compute $V_L(X)$
+                        std::vector<std::pair<typename FieldType::value_type,
+                                              typename FieldType::value_type>>
+                            V_L_interpolation_points(n + 1);
+
+                        V_L_interpolation_points.push_back(std::make_pair(omega_powers[1], 1));
+                        for (std::size_t j = 2; j < N_rows + 1; j++) {
+
+                            typename FieldType::value_type tmp_mul_result =
+                                FieldType::value_type::one();
+                            for (std::size_t i = 1; i <= j - 1; i++) {
+                                tmp_mul_result *= 
+                                ((A_compr.evaluate(omega_powers[i]) + beta) * (S_compr.evaluate(omega_powers[i]) + gamma))/
+                                ((A_perm.evaluate(omega_powers[i]) + beta) * (S_perm.evaluate(omega_powers[i]) + gamma));
+                            }
+
+                            V_L_interpolation_points.push_back(std::make_pair(omega_powers[j],
+                                tmp_mul_result));
+                        }
+
+                        V_L_interpolation_points.push_back(std::make_pair(omega_powers[N_rows + 1], 1));
+
+                        math::polynomial::polynomial<typename FieldType::value_type> V_L
+                            = math::polynomial::lagrange_interpolation(V_L_interpolation_points);
+
+                        // 13. Compute and add commitments to $V_L$ to $\text{transcript}$
+                        merkle_tree_type V_L_tree = lpc::commit(V_L, D_0);
+                        typename lpc::commitment_type V_L_commitment = V_L_tree.root();
+                        transcript(V_L_commitment);
+
+                        // 14. Get $\alpha_0, \dots, \alpha_8 \in \mathbb{F}$ from $hash(\text{transcript})$
+                        std::array<typename FieldType::value_type, 9> alphas =
+                            transcript
+                                .template get_challenges<transcript_manifest::challenges_ids::alpha, 9, FieldType>();
+
+                        // 15. Get $\tau$ from $hash(\text{transcript})$
+                        typename FieldType::value_type tau =
+                            transcript.template get_challenge<transcript_manifest::challenges_ids::tau, FieldType>();
 
                         // 9
                         // and 10
@@ -196,7 +262,7 @@ namespace nil {
                                               typename FieldType::value_type>>
                             Q_interpolation_points(n + 1);
 
-                        P_interpolation_points.push_back(std::make_pair(preprocessed_data.omega, 1));
+                        P_interpolation_points.push_back(std::make_pair(omega_powers[1], 1));
                         for (std::size_t i = 2; i <= n + 1; i++) {
 
                             typename FieldType::value_type P_mul_result =
@@ -204,13 +270,13 @@ namespace nil {
                             typename FieldType::value_type Q_mul_result =
                                 FieldType::value_type::one();
                             for (std::size_t j = 1; j < i; j++) {
-                                P_mul_result *= p1.evaluate(preprocessed_data.omega.pow(i));
-                                Q_mul_result *= q1.evaluate(preprocessed_data.omega.pow(i));
+                                P_mul_result *= p1.evaluate(omega_powers[i]);
+                                Q_mul_result *= q1.evaluate(omega_powers[i]);
                             }
 
-                            P_interpolation_points.push_back(std::make_pair(preprocessed_data.omega.pow(i),
+                            P_interpolation_points.push_back(std::make_pair(omega_powers[i],
                                 P_mul_result));
-                            Q_interpolation_points.push_back(std::make_pair(preprocessed_data.omega.pow(i),
+                            Q_interpolation_points.push_back(std::make_pair(omega_powers[i],
                                 Q_mul_result));
                         }
 
@@ -233,15 +299,6 @@ namespace nil {
 
                         // 14
                         transcript(lpc::commit(V, D_0).root());
-
-                        // 15
-                        std::array<typename FieldType::value_type, 11> alphas =
-                            transcript
-                                .template get_challenges<transcript_manifest::challenges_ids::alpha, 11, FieldType>();
-
-                        // 16
-                        typename FieldType::value_type tau =
-                            transcript.template get_challenge<transcript_manifest::challenges_ids::tau, FieldType>();
 
                         // 17
                         // and 21
