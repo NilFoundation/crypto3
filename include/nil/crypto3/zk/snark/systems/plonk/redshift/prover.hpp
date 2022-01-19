@@ -236,23 +236,38 @@ namespace nil {
                         typename FieldType::value_type tau =
                             transcript.template get_challenge<transcript_manifest::challenges_ids::tau, FieldType>();
 
-                        // 9
-                        // and 10
-                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> p(N_perm);
-                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> q(N_perm);
+                        // 16. Computing gates
+                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> gates(N_sel);
+                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> constraints =
+                            constraint_system.polynoms(assignments);
 
-                        math::polynomial::polynomial<typename FieldType::value_type> p1 = {1};
-                        math::polynomial::polynomial<typename FieldType::value_type> q1 = {1};
+                        for (std::size_t i = 0; i <= N_sel - 1; i++) {
+                            gates[i] = {0};
+                            std::size_t n_i;
+                            for (std::size_t j = 0; j < n_i; j++) {
+                                std::size_t d_i_j;
+                                gates[i] = gates[i] + preprocessed_data.constraints[j] * tau.pow(d_i_j);
+                            }
 
-                        for (std::size_t j = 0; j < N_perm; j++) {
-                            math::polynomial::polynomial<typename FieldType::value_type> tmp = 
-                                beta  - S_id[j];
-                            p.push_back(f[j] + beta * S_id[j] + gamma);
-                            q.push_back(f[j] + beta * S_sigma[j] + gamma);
+                            // gates[i] *= preprocessed_data.selectors[i];
 
-                            p1 = p1 * p[j];
-                            q1 = q1 * q[j];
+                            N_T = std::max(N_T, gates[i].size() - 1);
                         }
+
+                        // 17. Denote g_1,2, h_1,2
+                        math::polynomial::polynomial<typename FieldType::value_type> g_1 = {1};
+                        math::polynomial::polynomial<typename FieldType::value_type> g_2;
+                        math::polynomial::polynomial<typename FieldType::value_type> h_1 = {1},
+                        math::polynomial::polynomial<typename FieldType::value_type> h_2;
+
+
+                        for (std::size_t i = 0; i <= N_perm + N_PI - 1; i++) {
+                            g_1[j] = g_1[j] * ( f[j] + beta * S_id[j] + gamma );
+                            h_1[j] = h_1[j] * ( f[j] + beta * S_sigma[j] + gamma );
+                        }
+
+                        g_2[j] = (A_compr + beta) * (S_compr + gamma);
+                        h_2[j] = (A_perm + beta) * (S_perm + gamma);
 
                         // 11
                         std::vector<std::pair<typename FieldType::value_type,
@@ -299,26 +314,6 @@ namespace nil {
 
                         // 14
                         transcript(lpc::commit(V, D_0).root());
-
-                        // 17
-                        // and 21
-                        std::size_t N_T = N_perm;
-                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> gates(N_sel);
-                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> constraints =
-                            constraint_system.polynoms(assignments);
-
-                        for (std::size_t i = 0; i < N_sel; i++) {
-                            gates[i] = {0};
-                            std::size_t n_i;
-                            for (std::size_t j = 0; j < n_i; j++) {
-                                std::size_t d_i_j;
-                                gates[i] = gates[i] + preprocessed_data.constraints[j] * tau.pow(d_i_j);
-                            }
-
-                            // gates[i] *= preprocessed_data.selectors[i];
-
-                            N_T = std::max(N_T, gates[i].size() - 1);
-                        }
 
                         // 18
                         std::array<math::polynomial::polynomial<typename FieldType::value_type>, 11> F;
