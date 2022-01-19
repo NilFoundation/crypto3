@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -61,7 +62,7 @@ namespace nil {
                     template<typename FieldType>
                     typename std::enable_if<!(algebra::is_extended_field<FieldType>::value),
                                             std::array<typename FieldType::integral_type, FieldType::arity>>::type
-                        obtain_field_data(typename FieldType::value_type field_elem) {
+                        obtain_field_data(const typename FieldType::value_type &field_elem) {
 
                         std::array<typename FieldType::integral_type, FieldType::arity> result;
                         result[0] = typename FieldType::integral_type(field_elem.data);
@@ -71,7 +72,7 @@ namespace nil {
                     template<typename FieldType>
                     typename std::enable_if<algebra::is_extended_field<FieldType>::value,
                                             std::array<typename FieldType::integral_type, FieldType::arity>>::type
-                        obtain_field_data(typename FieldType::value_type field_elem) {
+                        obtain_field_data(const typename FieldType::value_type &field_elem) {
 
                         std::array<typename FieldType::integral_type, FieldType::arity> result;
 
@@ -92,7 +93,7 @@ namespace nil {
                 typename std::enable_if<algebra::is_field<FieldType>::value &&
                                             algebra::is_extended_field<FieldType>::value,
                                         field_element<nil::marshalling::field_type<Endianness>, FieldType>>::type
-                    fill_field_element(typename FieldType::value_type field_elem) {
+                    fill_field_element(const typename FieldType::value_type &field_elem) {
                     using field_element_type = field_element<nil::marshalling::field_type<Endianness>, FieldType>;
                     using integral_type =
                         integral<nil::marshalling::field_type<Endianness>, typename FieldType::integral_type>;
@@ -111,7 +112,7 @@ namespace nil {
                 typename std::enable_if<algebra::is_field<FieldType>::value &&
                                             !(algebra::is_extended_field<FieldType>::value),
                                         field_element<nil::marshalling::field_type<Endianness>, FieldType>>::type
-                    fill_field_element(typename FieldType::value_type field_elem) {
+                    fill_field_element(const typename FieldType::value_type &field_elem) {
                     using field_element_type = field_element<nil::marshalling::field_type<Endianness>, FieldType>;
                     using integral_type =
                         integral<nil::marshalling::field_type<Endianness>, typename FieldType::integral_type>;
@@ -125,7 +126,7 @@ namespace nil {
                     field_element<nil::marshalling::field_type<Endianness>, FieldType>,
                     nil::marshalling::option::sequence_size_field_prefix<
                         nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>
-                    fill_field_element_vector(std::vector<typename FieldType::value_type> field_elem_vector) {
+                    fill_field_element_vector(const std::vector<typename FieldType::value_type> &field_elem_vector) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
@@ -152,7 +153,7 @@ namespace nil {
                                                 !(algebra::is_extended_field<FieldType>::value),
                                             typename FieldType::value_type>::type
                         make_field_element(typename std::array<typename FieldType::integral_type,
-                                                                    FieldType::arity>::iterator field_elem_data_iter) {
+                                                               FieldType::arity>::iterator field_elem_data_iter) {
 
                         return typename FieldType::value_type(*field_elem_data_iter);
                     }
@@ -161,7 +162,7 @@ namespace nil {
                     typename std::enable_if<algebra::is_extended_field<FieldType>::value,
                                             typename FieldType::value_type>::type
                         make_field_element(typename std::array<typename FieldType::integral_type,
-                                                                    FieldType::arity>::iterator field_elem_data_iter) {
+                                                               FieldType::arity>::iterator field_elem_data_iter) {
 
                         constexpr static const std::size_t cur_arity =
                             FieldType::arity / FieldType::underlying_field_type::arity;
@@ -181,8 +182,8 @@ namespace nil {
                 template<typename FieldType, typename Endianness>
                 typename std::enable_if<algebra::is_extended_field<FieldType>::value,
                                         typename FieldType::value_type>::type
-                    make_field_element(field_element<nil::marshalling::field_type<Endianness>, FieldType>
-                                                field_elem) {
+                    make_field_element(
+                        const field_element<nil::marshalling::field_type<Endianness>, FieldType> &field_elem) {
 
                     std::array<typename FieldType::integral_type, FieldType::arity> field_elem_data;
 
@@ -197,23 +198,23 @@ namespace nil {
                 typename std::enable_if<algebra::is_field<FieldType>::value &&
                                             !(algebra::is_extended_field<FieldType>::value),
                                         typename FieldType::value_type>::type
-                    make_field_element(field_element<nil::marshalling::field_type<Endianness>, FieldType>
-                                                field_elem) {
+                    make_field_element(
+                        const field_element<nil::marshalling::field_type<Endianness>, FieldType> &field_elem) {
 
                     return typename FieldType::value_type(field_elem.value());
                 }
 
                 template<typename FieldType, typename Endianness>
                 std::vector<typename FieldType::value_type> make_field_element_vector(
-                    nil::marshalling::types::array_list<
+                    const nil::marshalling::types::array_list<
                         nil::marshalling::field_type<Endianness>,
                         field_element<nil::marshalling::field_type<Endianness>, FieldType>,
                         nil::marshalling::option::sequence_size_field_prefix<
                             nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>
-                        field_elem_vector) {
+                        &field_elem_vector) {
 
                     std::vector<typename FieldType::value_type> result;
-                    std::vector<field_element<nil::marshalling::field_type<Endianness>, FieldType>> &values =
+                    const std::vector<field_element<nil::marshalling::field_type<Endianness>, FieldType>> &values =
                         field_elem_vector.value();
                     std::size_t size = values.size();
 

@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -292,15 +293,15 @@ namespace nil {
                 typename std::enable_if<algebra::is_field<FieldType>::value &&
                                             !(algebra::is_extended_field<FieldType>::value),
                                         int>::type
-                    compare_field_data(typename FieldType::value_type field_elem1,
-                                       typename FieldType::value_type field_elem2) {
+                    compare_field_data(const typename FieldType::value_type &field_elem1,
+                                       const typename FieldType::value_type &field_elem2) {
                     return (field_elem1.data < field_elem2.data) ? -1 : ((field_elem1.data > field_elem2.data) ? 1 : 0);
                 }
 
                 template<typename FieldType>
                 typename std::enable_if<algebra::is_extended_field<FieldType>::value, bool>::type
-                    compare_field_data(typename FieldType::value_type field_elem1,
-                                       typename FieldType::value_type field_elem2) {
+                    compare_field_data(const typename FieldType::value_type &field_elem1,
+                                       const typename FieldType::value_type &field_elem2) {
                     for (std::size_t i = 0; i < FieldType::arity; i++) {
 
                         int compare_result = compare_field_data<typename FieldType::underlying_field_type>(
@@ -360,7 +361,8 @@ namespace nil {
                     curve_element<nil::marshalling::field_type<Endianness>, CurveGroupType>,
                     nil::marshalling::option::sequence_size_field_prefix<
                         nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>
-                    fill_curve_element_vector(std::vector<typename CurveGroupType::value_type> curve_elem_vector) {
+                    fill_curve_element_vector(
+                        const std::vector<typename CurveGroupType::value_type> &curve_elem_vector) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
@@ -383,15 +385,15 @@ namespace nil {
 
                 template<typename CurveGroupType, typename Endianness>
                 std::vector<typename CurveGroupType::value_type> make_curve_element_vector(
-                    nil::marshalling::types::array_list<
+                    const nil::marshalling::types::array_list<
                         nil::marshalling::field_type<Endianness>,
                         curve_element<nil::marshalling::field_type<Endianness>, CurveGroupType>,
                         nil::marshalling::option::sequence_size_field_prefix<
                             nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>
-                        curve_elem_vector) {
+                        &curve_elem_vector) {
 
                     std::vector<typename CurveGroupType::value_type> result;
-                    std::vector<curve_element<nil::marshalling::field_type<Endianness>, CurveGroupType>> &values =
+                    const std::vector<curve_element<nil::marshalling::field_type<Endianness>, CurveGroupType>> &values =
                         curve_elem_vector.value();
                     std::size_t size = values.size();
 
