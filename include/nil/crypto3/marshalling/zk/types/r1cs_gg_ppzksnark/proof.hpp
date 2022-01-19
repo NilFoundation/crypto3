@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -51,86 +52,53 @@ namespace nil {
         namespace marshalling {
             namespace types {
 
-                template<typename TTypeBase, 
+                template<typename TTypeBase,
                          typename ProofType,
                          typename = typename std::enable_if<
-                             std::is_same<ProofType, 
-                                zk::snark::r1cs_gg_ppzksnark_proof<
-                                    typename ProofType::curve_type
-                                >
-                             >::value,
+                             std::is_same<ProofType,
+                                          zk::snark::r1cs_gg_ppzksnark_proof<typename ProofType::curve_type>>::value,
                              bool>::type,
                          typename... TOptions>
-                using r1cs_gg_ppzksnark_proof = 
-                    nil::marshalling::types::bundle<
-                        TTypeBase,
-                        std::tuple<
-                            // g_A
-                            curve_element<
-                                TTypeBase, 
-                                typename ProofType::curve_type::template g1_type<>
-                            >,
-                            // g_B
-                            curve_element<
-                                TTypeBase, 
-                                typename ProofType::curve_type::template g2_type<>
-                            >,
-                            // g_C
-                            curve_element<
-                                TTypeBase, 
-                                typename ProofType::curve_type::template g1_type<>
-                            >
-                        >
-                    >;
+                using r1cs_gg_ppzksnark_proof = nil::marshalling::types::bundle<
+                    TTypeBase,
+                    std::tuple<
+                        // g_A
+                        curve_element<TTypeBase, typename ProofType::curve_type::template g1_type<>>,
+                        // g_B
+                        curve_element<TTypeBase, typename ProofType::curve_type::template g2_type<>>,
+                        // g_C
+                        curve_element<TTypeBase, typename ProofType::curve_type::template g1_type<>>>>;
 
-                template <typename ProofType, 
-                          typename Endianness>
-                r1cs_gg_ppzksnark_proof<nil::marshalling::field_type<
-                                Endianness>,
-                                ProofType>
-                    fill_r1cs_gg_ppzksnark_proof(ProofType r1cs_gg_ppzksnark_proof_inp){
+                template<typename ProofType, typename Endianness>
+                r1cs_gg_ppzksnark_proof<nil::marshalling::field_type<Endianness>, ProofType>
+                    fill_r1cs_gg_ppzksnark_proof(const ProofType &r1cs_gg_ppzksnark_proof_inp) {
 
-                    using TTypeBase = nil::marshalling::field_type<
-                                Endianness>;
-                    
-                    using curve_g1_element_type = 
-                        curve_element<
-                            TTypeBase,
-                            typename ProofType::curve_type::template g1_type<>
-                        >;
+                    using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-                    using curve_g2_element_type = 
-                        curve_element<
-                            TTypeBase,
-                            typename ProofType::curve_type::template g2_type<>
-                        >;
+                    using curve_g1_element_type =
+                        curve_element<TTypeBase, typename ProofType::curve_type::template g1_type<>>;
 
-                    return r1cs_gg_ppzksnark_proof<nil::marshalling::field_type<
-                                Endianness>,
-                                ProofType>(
-                                    std::make_tuple(
-                                        curve_g1_element_type(r1cs_gg_ppzksnark_proof_inp.g_A), 
-                                        curve_g2_element_type(r1cs_gg_ppzksnark_proof_inp.g_B), 
-                                        curve_g1_element_type(r1cs_gg_ppzksnark_proof_inp.g_C)
-                                        ));
+                    using curve_g2_element_type =
+                        curve_element<TTypeBase, typename ProofType::curve_type::template g2_type<>>;
+
+                    return r1cs_gg_ppzksnark_proof<nil::marshalling::field_type<Endianness>, ProofType>(
+                        std::make_tuple(curve_g1_element_type(r1cs_gg_ppzksnark_proof_inp.g_A),
+                                        curve_g2_element_type(r1cs_gg_ppzksnark_proof_inp.g_B),
+                                        curve_g1_element_type(r1cs_gg_ppzksnark_proof_inp.g_C)));
                 }
 
-                template <typename ProofType, 
-                          typename Endianness>
+                template<typename ProofType, typename Endianness>
                 ProofType make_r1cs_gg_ppzksnark_proof(
-                        r1cs_gg_ppzksnark_proof<nil::marshalling::field_type<
-                                Endianness>,
-                                ProofType> filled_r1cs_gg_ppzksnark_proof){
+                    const r1cs_gg_ppzksnark_proof<nil::marshalling::field_type<Endianness>, ProofType>
+                        &filled_r1cs_gg_ppzksnark_proof) {
 
-                    return ProofType (
-                        std::move(std::get<0>(filled_r1cs_gg_ppzksnark_proof.value()).value()),
-                        std::move(std::get<1>(filled_r1cs_gg_ppzksnark_proof.value()).value()),
-                        std::move(std::get<2>(filled_r1cs_gg_ppzksnark_proof.value()).value())
-                        );
+                    return ProofType(std::move(std::get<0>(filled_r1cs_gg_ppzksnark_proof.value()).value()),
+                                     std::move(std::get<1>(filled_r1cs_gg_ppzksnark_proof.value()).value()),
+                                     std::move(std::get<2>(filled_r1cs_gg_ppzksnark_proof.value()).value()));
                 }
 
             }    // namespace types
         }        // namespace marshalling
-    }        // namespace crypto3
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_MARSHALLING_R1CS_GG_PPZKSNARK_PROOF_HPP

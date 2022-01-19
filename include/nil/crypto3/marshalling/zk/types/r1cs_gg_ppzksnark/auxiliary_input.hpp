@@ -2,7 +2,7 @@
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2021 Noam Yemini <@NoamDev at GitHub>
-
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -54,51 +54,35 @@ namespace nil {
                          typename AuxiliaryInput,
                          typename = typename std::enable_if<
                              std::is_same<AuxiliaryInput,
-                                zk::snark::r1cs_auxiliary_input<
-                                    typename AuxiliaryInput::value_type::field_type
-                                >
-                             >::value,
+                                          zk::snark::r1cs_auxiliary_input<
+                                              typename AuxiliaryInput::value_type::field_type>>::value,
                              bool>::type,
                          typename... TOptions>
-                using r1cs_gg_ppzksnark_auxiliary_input =
-                    nil::marshalling::types::array_list<
-                        TTypeBase,
-                        field_element<
-                            TTypeBase,
-                            typename AuxiliaryInput::value_type::field_type
-                        >,
-                        nil::marshalling::option::sequence_size_field_prefix<
-                            nil::marshalling::types::integral<
-                                TTypeBase,
-                                std::size_t
-                            >
-                        >
-                    >;
+                using r1cs_gg_ppzksnark_auxiliary_input = nil::marshalling::types::array_list<
+                    TTypeBase,
+                    field_element<TTypeBase, typename AuxiliaryInput::value_type::field_type>,
+                    nil::marshalling::option::sequence_size_field_prefix<
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>>>;
 
-                template <typename AuxiliaryInput,
-                          typename Endianness>
-                r1cs_gg_ppzksnark_auxiliary_input<nil::marshalling::field_type<
-                                Endianness>,
-                                AuxiliaryInput>
-                    fill_r1cs_gg_ppzksnark_auxiliary_input(AuxiliaryInput r1cs_gg_ppzksnark_auxiliary_input_inp){
+                template<typename AuxiliaryInput, typename Endianness>
+                r1cs_gg_ppzksnark_auxiliary_input<nil::marshalling::field_type<Endianness>, AuxiliaryInput>
+                    fill_r1cs_gg_ppzksnark_auxiliary_input(
+                        const AuxiliaryInput &r1cs_gg_ppzksnark_auxiliary_input_inp) {
 
-                    return fill_field_element_vector<typename AuxiliaryInput::value_type::field_type,
-                                Endianness>(r1cs_gg_ppzksnark_auxiliary_input_inp);
+                    return fill_field_element_vector<typename AuxiliaryInput::value_type::field_type, Endianness>(
+                        r1cs_gg_ppzksnark_auxiliary_input_inp);
                 }
 
-                template <typename AuxiliaryInput,
-                          typename Endianness>
-                AuxiliaryInput
-                    make_r1cs_gg_ppzksnark_auxiliary_input(
-                        r1cs_gg_ppzksnark_auxiliary_input<nil::marshalling::field_type<
-                                Endianness>,
-                                AuxiliaryInput> filled_r1cs_gg_ppzksnark_auxiliary_input){
+                template<typename AuxiliaryInput, typename Endianness>
+                AuxiliaryInput make_r1cs_gg_ppzksnark_auxiliary_input(
+                    const r1cs_gg_ppzksnark_auxiliary_input<nil::marshalling::field_type<Endianness>, AuxiliaryInput>
+                        &filled_r1cs_gg_ppzksnark_auxiliary_input) {
 
                     return make_field_element_vector<typename AuxiliaryInput::value_type::field_type, Endianness>(
                         filled_r1cs_gg_ppzksnark_auxiliary_input);
                 }
             }    // namespace types
         }        // namespace marshalling
-    }        // namespace crypto3
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_MARSHALLING_R1CS_GG_PPZKSNARK_AUXILIARY_INPUT_HPP

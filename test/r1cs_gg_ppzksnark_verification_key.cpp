@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -117,9 +118,9 @@ void test_pubkey(const Key &val) {
     using unit_type = unsigned char;
     using key_marshaling_type = KeyMarshaling;
 
-    key_marshaling_type filled_val = types::fill_pubkey_key<Key, Endianness>(val);
+    key_marshaling_type filled_val = types::fill_public_key<Key, Endianness>(val);
 
-    Key constructed_val = types::make_pubkey_key<Key, Endianness>(filled_val);
+    Key constructed_val = types::make_public_key<Key, Endianness>(filled_val);
     BOOST_CHECK(val == constructed_val);
 
     std::size_t unitblob_size = filled_val.length();
@@ -136,7 +137,7 @@ void test_pubkey(const Key &val) {
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
 
-    Key constructed_val_read = types::make_pubkey_key<Key, Endianness>(test_val_read);
+    Key constructed_val_read = types::make_public_key<Key, Endianness>(test_val_read);
 
     BOOST_CHECK(val == constructed_val_read);
 }
@@ -144,7 +145,7 @@ void test_pubkey(const Key &val) {
 template<typename VerificationKey, typename VerificationKeyMarshaling, typename Endianness, std::size_t TSize,
          typename CurveType = typename VerificationKey::curve_type>
 typename std::enable_if<
-    std::is_same<zk::snark::r1cs_gg_ppzksnark_verification_key<CurveType>, VerificationKey>::value>::type
+    std::is_same<nil::crypto3::zk::snark::r1cs_gg_ppzksnark_verification_key<CurveType>, VerificationKey>::value>::type
     test_verification_key() {
     using g1_type = typename CurveType::template g1_type<>;
     using g2_type = typename CurveType::template g2_type<>;
@@ -161,18 +162,18 @@ typename std::enable_if<
         for (std::size_t i = 0; i < TSize; i++) {
             rest.push_back(nil::crypto3::algebra::random_element<g1_type>());
         }
-        test_verification_key<Endianness, VerificationKeyMarshaling>(
-            VerificationKey(nil::crypto3::algebra::random_element<gt_type>(),
-                            nil::crypto3::algebra::random_element<g2_type>(),
-                            nil::crypto3::algebra::random_element<g2_type>(),
-                            std::move(zk::snark::accumulation_vector<g1_type>(std::move(first), std::move(rest)))));
+        test_verification_key<Endianness, VerificationKeyMarshaling>(VerificationKey(
+            nil::crypto3::algebra::random_element<gt_type>(),
+            nil::crypto3::algebra::random_element<g2_type>(),
+            nil::crypto3::algebra::random_element<g2_type>(),
+            std::move(nil::crypto3::zk::snark::accumulation_vector<g1_type>(std::move(first), std::move(rest)))));
     }
 }
 
 template<typename VerificationKey, typename VerificationKeyMarshaling, typename Endianness, std::size_t TSize,
          typename CurveType = typename VerificationKey::curve_type>
-typename std::enable_if<
-    std::is_same<zk::snark::r1cs_gg_ppzksnark_extended_verification_key<CurveType>, VerificationKey>::value>::type
+typename std::enable_if<std::is_same<nil::crypto3::zk::snark::r1cs_gg_ppzksnark_extended_verification_key<CurveType>,
+                                     VerificationKey>::value>::type
     test_verification_key() {
     using g1_type = typename CurveType::template g1_type<>;
     using g2_type = typename CurveType::template g2_type<>;
@@ -189,13 +190,13 @@ typename std::enable_if<
         for (std::size_t i = 0; i < TSize; i++) {
             rest.push_back(nil::crypto3::algebra::random_element<g1_type>());
         }
-        test_verification_key<Endianness, VerificationKeyMarshaling>(
-            VerificationKey(nil::crypto3::algebra::random_element<gt_type>(),
-                            nil::crypto3::algebra::random_element<g2_type>(),
-                            nil::crypto3::algebra::random_element<g2_type>(),
-                            nil::crypto3::algebra::random_element<g1_type>(),
-                            std::move(zk::snark::accumulation_vector<g1_type>(std::move(first), std::move(rest))),
-                            nil::crypto3::algebra::random_element<g1_type>()));
+        test_verification_key<Endianness, VerificationKeyMarshaling>(VerificationKey(
+            nil::crypto3::algebra::random_element<gt_type>(),
+            nil::crypto3::algebra::random_element<g2_type>(),
+            nil::crypto3::algebra::random_element<g2_type>(),
+            nil::crypto3::algebra::random_element<g1_type>(),
+            std::move(nil::crypto3::zk::snark::accumulation_vector<g1_type>(std::move(first), std::move(rest))),
+            nil::crypto3::algebra::random_element<g1_type>()));
     }
 }
 
@@ -203,8 +204,8 @@ typename std::enable_if<
 template<typename PublicKey, typename PublicKeyMarshaling, typename Endianness, std::size_t TSize,
          typename CurveType = typename PublicKey::scheme_type::curve_type>
 typename std::enable_if<
-    std::is_same<pubkey::public_key<pubkey::elgamal_verifiable<typename PublicKey::scheme_type::curve_type,
-                                                               PublicKey::scheme_type::block_bits>>,
+    std::is_same<nil::crypto3::pubkey::public_key<nil::crypto3::pubkey::elgamal_verifiable<
+                     typename PublicKey::scheme_type::curve_type, PublicKey::scheme_type::block_bits>>,
                  PublicKey>::value>::type
     test_pubkey() {
     using g1_type = typename PublicKey::g1_type;
@@ -235,7 +236,8 @@ BOOST_AUTO_TEST_SUITE(verification_key_test_suite)
 
 BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_verification_key_bls12_381_be) {
     using endianness = nil::marshalling::option::big_endian;
-    using key_type = zk::snark::r1cs_gg_ppzksnark_verification_key<nil::crypto3::algebra::curves::bls12<381>>;
+    using key_type =
+        nil::crypto3::zk::snark::r1cs_gg_ppzksnark_verification_key<nil::crypto3::algebra::curves::bls12<381>>;
     using key_marshaling_type =
         nil::crypto3::marshalling::types::r1cs_gg_ppzksnark_verification_key<nil::marshalling::field_type<endianness>,
                                                                              key_type>;
@@ -246,7 +248,8 @@ BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_verification_key_bls12_381_be) {
 
 BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_extended_verification_key_bls12_381_be) {
     using endianness = nil::marshalling::option::big_endian;
-    using key_type = zk::snark::r1cs_gg_ppzksnark_extended_verification_key<nil::crypto3::algebra::curves::bls12<381>>;
+    using key_type =
+        nil::crypto3::zk::snark::r1cs_gg_ppzksnark_extended_verification_key<nil::crypto3::algebra::curves::bls12<381>>;
     using key_marshaling_type = nil::crypto3::marshalling::types::r1cs_gg_ppzksnark_extended_verification_key<
         nil::marshalling::field_type<endianness>, key_type>;
     std::cout << "BLS12-381 r1cs_gg_ppzksnark extended verification key big-endian test started" << std::endl;
@@ -257,7 +260,8 @@ BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_extended_verification_key_bls12_381_be) {
 // TODO: move to pubkey marshling
 BOOST_AUTO_TEST_CASE(elgamal_verifiable_public_key_bls12_381_be) {
     using endianness = nil::marshalling::option::big_endian;
-    using key_type = pubkey::public_key<pubkey::elgamal_verifiable<nil::crypto3::algebra::curves::bls12<381>>>;
+    using key_type = nil::crypto3::pubkey::public_key<
+        nil::crypto3::pubkey::elgamal_verifiable<nil::crypto3::algebra::curves::bls12<381>>>;
     using key_marshaling_type =
         nil::crypto3::marshalling::types::elgamal_verifiable_public_key<nil::marshalling::field_type<endianness>,
                                                                         key_type>;
@@ -269,7 +273,7 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_public_key_bls12_381_be) {
 BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_extended_verification_key_bls12_381_be_error_length) {
     using endianness = nil::marshalling::option::big_endian;
     using curve_type = nil::crypto3::algebra::curves::bls12<381>;
-    using key_type = zk::snark::r1cs_gg_ppzksnark_extended_verification_key<curve_type>;
+    using key_type = nil::crypto3::zk::snark::r1cs_gg_ppzksnark_extended_verification_key<curve_type>;
     using key_marshaling_type = nil::crypto3::marshalling::types::r1cs_gg_ppzksnark_extended_verification_key<
         nil::marshalling::field_type<endianness>, key_type>;
 
@@ -285,7 +289,7 @@ BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_extended_verification_key_bls12_381_be_er
         nil::crypto3::marshalling::types::curve_element<nil::marshalling::field_type<endianness>, g1_type>;
     using accumulation_vector_marshalling_type =
         nil::crypto3::marshalling::types::accumulation_vector<nil::marshalling::field_type<endianness>,
-                                                              zk::snark::accumulation_vector<g1_type>>;
+                                                              nil::crypto3::zk::snark::accumulation_vector<g1_type>>;
     gt_marshalling_type gt_marshaling;
     std::cout << "Not ok: " << gt_marshaling.length() << std::endl;
     gt_marshalling_type filled_gt = nil::crypto3::marshalling::types::fill_field_element<gt_type, endianness>(
@@ -306,10 +310,9 @@ BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_extended_verification_key_bls12_381_be_er
     for (std::size_t i = 0; i < 5; i++) {
         rest.push_back(nil::crypto3::algebra::random_element<g1_type>());
     }
-    zk::snark::accumulation_vector<g1_type> acc_vec(std::move(first), std::move(rest));
-    accumulation_vector_marshalling_type filled_acc_vec =
-        nil::crypto3::marshalling::types::fill_accumulation_vector<zk::snark::accumulation_vector<g1_type>, endianness>(
-            acc_vec);
+    nil::crypto3::zk::snark::accumulation_vector<g1_type> acc_vec(std::move(first), std::move(rest));
+    accumulation_vector_marshalling_type filled_acc_vec = nil::crypto3::marshalling::types::fill_accumulation_vector<
+        nil::crypto3::zk::snark::accumulation_vector<g1_type>, endianness>(acc_vec);
     std::cout << "Ok: " << filled_acc_vec.length() << std::endl;
 
     // key_type key(nil::crypto3::algebra::random_element<gt_type>(),

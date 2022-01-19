@@ -79,7 +79,8 @@ namespace nil {
 
                 template<typename VerificationKey, typename Endianness>
                 r1cs_gg_ppzksnark_verification_key<nil::marshalling::field_type<Endianness>, VerificationKey>
-                    fill_r1cs_gg_ppzksnark_verification_key(VerificationKey r1cs_gg_ppzksnark_verification_key_inp) {
+                    fill_r1cs_gg_ppzksnark_verification_key(
+                        const VerificationKey &r1cs_gg_ppzksnark_verification_key_inp) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
@@ -114,8 +115,8 @@ namespace nil {
 
                 template<typename VerificationKey, typename Endianness>
                 VerificationKey make_r1cs_gg_ppzksnark_verification_key(
-                    r1cs_gg_ppzksnark_verification_key<nil::marshalling::field_type<Endianness>, VerificationKey>
-                        filled_r1cs_gg_ppzksnark_verification_key) {
+                    const r1cs_gg_ppzksnark_verification_key<nil::marshalling::field_type<Endianness>, VerificationKey>
+                        &filled_r1cs_gg_ppzksnark_verification_key) {
 
                     return VerificationKey(
                         std::move(make_field_element<typename VerificationKey::curve_type::gt_type, Endianness>(
@@ -157,7 +158,8 @@ namespace nil {
 
                 template<typename VerificationKey, typename Endianness>
                 r1cs_gg_ppzksnark_extended_verification_key<nil::marshalling::field_type<Endianness>, VerificationKey>
-                    fill_r1cs_gg_ppzksnark_verification_key(VerificationKey r1cs_gg_ppzksnark_verification_key_inp) {
+                    fill_r1cs_gg_ppzksnark_verification_key(
+                        const VerificationKey &r1cs_gg_ppzksnark_verification_key_inp) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
@@ -206,9 +208,9 @@ namespace nil {
 
                 template<typename VerificationKey, typename Endianness>
                 VerificationKey make_r1cs_gg_ppzksnark_verification_key(
-                    r1cs_gg_ppzksnark_extended_verification_key<nil::marshalling::field_type<Endianness>,
-                                                                VerificationKey>
-                        filled_r1cs_gg_ppzksnark_extended_verification_key) {
+                    const r1cs_gg_ppzksnark_extended_verification_key<nil::marshalling::field_type<Endianness>,
+                                                                      VerificationKey>
+                        &filled_r1cs_gg_ppzksnark_extended_verification_key) {
 
                     return VerificationKey(
                         std::move(make_field_element<typename VerificationKey::curve_type::gt_type, Endianness>(

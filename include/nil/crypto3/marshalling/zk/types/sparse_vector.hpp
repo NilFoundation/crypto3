@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -92,7 +93,7 @@ namespace nil {
 
                 template<typename SparseVector, typename Endianness>
                 sparse_vector<nil::marshalling::field_type<Endianness>, SparseVector>
-                    fill_sparse_vector(SparseVector sparse_vector_inp) {
+                    fill_sparse_vector(const SparseVector &sparse_vector_inp) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
@@ -117,15 +118,16 @@ namespace nil {
                 }
 
                 template<typename SparseVector, typename Endianness>
-                SparseVector make_sparse_vector(sparse_vector<nil::marshalling::field_type<Endianness>, SparseVector>
-                                                    filled_sparse_vector) {
+                SparseVector make_sparse_vector(
+                    const sparse_vector<nil::marshalling::field_type<Endianness>, SparseVector> &filled_sparse_vector) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
                     using integral_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
 
                     std::vector<std::size_t> constructed_indices;
-                    std::vector<integral_type> &filled_indices = std::get<0>(filled_sparse_vector.value()).value();
+                    const std::vector<integral_type> &filled_indices =
+                        std::get<0>(filled_sparse_vector.value()).value();
                     std::size_t size = filled_indices.size();
 
                     for (std::size_t i = 0; i < size; i++) {

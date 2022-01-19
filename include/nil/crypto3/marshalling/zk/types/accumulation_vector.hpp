@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -48,78 +49,49 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                template<typename TTypeBase,
-                         typename AccumulationVector,
-                         typename = typename std::enable_if<
-                             std::is_same<AccumulationVector, 
-                                zk::snark::accumulation_vector<
-                                    typename AccumulationVector::group_type
-                                >
-                             >::value,
-                             bool>::type,
-                         typename... TOptions>
-                using accumulation_vector = 
-                    nil::marshalling::types::bundle<
-                        TTypeBase,
-                        std::tuple<
-                            curve_element<
-                                TTypeBase, 
-                                typename AccumulationVector::group_type
-                            >,
-                            sparse_vector<
-                                TTypeBase, 
-                                zk::snark::sparse_vector< 
-                                    typename AccumulationVector::group_type
-                                >
-                            >
-                        >
-                    >;
+                template<
+                    typename TTypeBase,
+                    typename AccumulationVector,
+                    typename = typename std::enable_if<
+                        std::is_same<AccumulationVector,
+                                     zk::snark::accumulation_vector<typename AccumulationVector::group_type>>::value,
+                        bool>::type,
+                    typename... TOptions>
+                using accumulation_vector = nil::marshalling::types::bundle<
+                    TTypeBase,
+                    std::tuple<
+                        curve_element<TTypeBase, typename AccumulationVector::group_type>,
+                        sparse_vector<TTypeBase, zk::snark::sparse_vector<typename AccumulationVector::group_type>>>>;
 
-                template <typename AccumulationVector, 
-                          typename Endianness>
-                accumulation_vector<nil::marshalling::field_type<
-                                Endianness>,
-                                AccumulationVector>
-                    fill_accumulation_vector(AccumulationVector accumulation_vector_inp){
+                template<typename AccumulationVector, typename Endianness>
+                accumulation_vector<nil::marshalling::field_type<Endianness>, AccumulationVector>
+                    fill_accumulation_vector(const AccumulationVector &accumulation_vector_inp) {
 
-                    using TTypeBase = nil::marshalling::field_type<
-                                Endianness>;
+                    using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-                    using curve_element_type = 
-                        curve_element<
-                            TTypeBase,
-                            typename AccumulationVector::group_type
-                        >;
+                    using curve_element_type = curve_element<TTypeBase, typename AccumulationVector::group_type>;
 
-                    curve_element_type filled_first = 
-                        curve_element_type (accumulation_vector_inp.first);
+                    curve_element_type filled_first = curve_element_type(accumulation_vector_inp.first);
 
-                    return accumulation_vector<nil::marshalling::field_type<
-                                Endianness>,
-                                AccumulationVector>(
-                                    std::make_tuple(
-                                        filled_first,
-                                        fill_sparse_vector<
-                                            zk::snark::sparse_vector<
-                                                typename AccumulationVector::group_type>, 
-                                            Endianness>(accumulation_vector_inp.rest)));
+                    return accumulation_vector<nil::marshalling::field_type<Endianness>, AccumulationVector>(
+                        std::make_tuple(
+                            filled_first,
+                            fill_sparse_vector<zk::snark::sparse_vector<typename AccumulationVector::group_type>,
+                                               Endianness>(accumulation_vector_inp.rest)));
                 }
 
-                template <typename AccumulationVector, 
-                          typename Endianness>
+                template<typename AccumulationVector, typename Endianness>
                 AccumulationVector make_accumulation_vector(
-                        accumulation_vector<nil::marshalling::field_type<
-                                Endianness>,
-                                AccumulationVector> filled_accumulation_vector){
+                    const accumulation_vector<nil::marshalling::field_type<Endianness>, AccumulationVector>
+                        &filled_accumulation_vector) {
 
-                    return AccumulationVector (
+                    return AccumulationVector(
                         std::move(std::get<0>(filled_accumulation_vector.value()).value()),
                         std::move(make_sparse_vector<zk::snark::sparse_vector<typename AccumulationVector::group_type>,
-                                                     Endianness>(std::get<1>(filled_accumulation_vector.value())))
-                            );
+                                                     Endianness>(std::get<1>(filled_accumulation_vector.value()))));
                 }
             }    // namespace types
         }        // namespace marshalling
-    }        // namespace crypto3
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_MARSHALLING_ACCUMULATION_VECTOR_HPP
