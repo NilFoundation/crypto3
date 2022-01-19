@@ -65,6 +65,7 @@ set(TESTS_NAMES
     "static_digest"
     "tiger"
     "h2c"
+    "h2f"
     "find_group_hash"
     "pedersen")
 
