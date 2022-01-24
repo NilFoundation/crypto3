@@ -53,13 +53,13 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            enum class EddsaVariant { basic, ctx, ph };
+            enum class eddsa_type { basic, ctx, ph };
 
-            template<EddsaVariant, typename Params, typename = void>
+            template<eddsa_type, typename Params, typename = void>
             struct eddsa_policy;
 
             template<typename Params>
-            struct eddsa_policy<EddsaVariant::basic, Params> {
+            struct eddsa_policy<eddsa_type::basic, Params> {
                 typedef Params params_type;
                 typedef std::vector<std::uint8_t> dom_type;
                 typedef hashes::sha2<512> hash_type;
@@ -72,7 +72,7 @@ namespace nil {
 
             template<typename Params>
             struct eddsa_policy<
-                EddsaVariant::ctx, Params,
+                eddsa_type::ctx, Params,
                 typename std::enable_if<
                     is_eddsa_params<Params>::value &&
                     std::is_same<std::uint8_t, typename std::iterator_traits<typename Params::context_type::iterator>::
@@ -102,7 +102,7 @@ namespace nil {
 
             template<typename Params>
             struct eddsa_policy<
-                EddsaVariant::ph, Params,
+                eddsa_type::ph, Params,
                 typename std::enable_if<
                     is_eddsa_params<Params>::value &&
                     std::is_same<std::uint8_t, typename std::iterator_traits<typename Params::context_type::iterator>::
@@ -130,10 +130,10 @@ namespace nil {
                 }
             };
 
-            template<typename CurveGroup, EddsaVariant eddsa_variant, typename Params>
+            template<typename CurveGroup, eddsa_type eddsa_variant, typename Params>
             struct eddsa;
 
-            template<typename Coordinates, EddsaVariant eddsa_variant, typename Params>
+            template<typename Coordinates, eddsa_type eddsa_variant, typename Params>
             struct eddsa<
                 typename algebra::curves::curve25519::g1_type<Coordinates, algebra::curves::forms::twisted_edwards>,
                 eddsa_variant, Params> {
@@ -143,7 +143,7 @@ namespace nil {
                 typedef eddsa_policy<eddsa_variant, Params> policy_type;
             };
 
-            template<typename CurveGroup, EddsaVariant eddsa_variant, typename Params>
+            template<typename CurveGroup, eddsa_type eddsa_variant, typename Params>
             struct public_key<eddsa<CurveGroup, eddsa_variant, Params>> {
                 typedef eddsa<CurveGroup, eddsa_variant, Params> scheme_type;
                 typedef typename scheme_type::policy_type policy_type;
@@ -263,7 +263,7 @@ namespace nil {
                 public_key_type pubkey;
             };
 
-            template<typename CurveGroup, EddsaVariant eddsa_variant, typename Params>
+            template<typename CurveGroup, eddsa_type eddsa_variant, typename Params>
             struct private_key<eddsa<CurveGroup, eddsa_variant, Params>>
                 : public public_key<eddsa<CurveGroup, eddsa_variant, Params>> {
                 typedef eddsa<CurveGroup, eddsa_variant, Params> scheme_type;

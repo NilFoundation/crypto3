@@ -118,7 +118,7 @@ struct test_eddsa_params_void {
     static inline const context_type context = {};
 };
 
-template<pubkey::EddsaVariant eddsa_variant,
+template<pubkey::eddsa_type eddsa_variant,
          typename Params,
          typename InputRange,
          typename Group = algebra::curves::curve25519::template g1_type<>>
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(eddsa_key_gen_test) {
     using base_field_value_type = typename base_field_type::value_type;
     using base_integral_type = typename base_field_type::integral_type;
 
-    using scheme_type = pubkey::eddsa<group_type, pubkey::EddsaVariant::ctx, test_eddsa_params_foo>;
+    using scheme_type = pubkey::eddsa<group_type, pubkey::eddsa_type::ctx, test_eddsa_params_foo>;
     using private_key_type = pubkey::private_key<scheme_type>;
     using public_key_type = pubkey::public_key<scheme_type>;
     using _private_key_type = typename private_key_type::private_key_type;
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE(eddsa_basic_test) {
     using group_affine_value_type = typename group_affine_type::value_type;
 
     using params_type = void;
-    using scheme_type = pubkey::eddsa<group_type, pubkey::EddsaVariant::basic, params_type>;
+    using scheme_type = pubkey::eddsa<group_type, pubkey::eddsa_type::basic, params_type>;
     using private_key_type = pubkey::private_key<scheme_type>;
     using public_key_type = pubkey::public_key<scheme_type>;
     using _private_key_type = typename private_key_type::private_key_type;
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE(eddsa_basic_test) {
         0x84, 0x87, 0x7f, 0x1e, 0xb8, 0xe5, 0xd9, 0x74, 0xd8, 0x73, 0xe0, 0x65, 0x22, 0x49, 0x01, 0x55,
         0x5f, 0xb8, 0x82, 0x15, 0x90, 0xa3, 0x3b, 0xac, 0xc6, 0x1e, 0x39, 0x70, 0x1c, 0xf9, 0xb4, 0x6b,
         0xd2, 0x5b, 0xf5, 0xf0, 0x59, 0x5b, 0xbe, 0x24, 0x65, 0x51, 0x41, 0x43, 0x8e, 0x7a, 0x10, 0x0b};
-    check_eddsa<pubkey::EddsaVariant::basic, params_type>(
+    check_eddsa<pubkey::eddsa_type::basic, params_type>(
         msg1, private_key_type(privkey1), public_key_type(etalon_pubkey1), etalon_sig1);
 
     // -----TEST 2
@@ -228,7 +228,7 @@ BOOST_AUTO_TEST_CASE(eddsa_basic_test) {
         0xa2, 0xb2, 0x7b, 0x54, 0x16, 0x50, 0x3f, 0x8f, 0xb3, 0x76, 0x22, 0x23, 0xeb, 0xdb, 0x69, 0xda,
         0x08, 0x5a, 0xc1, 0xe4, 0x3e, 0x15, 0x99, 0x6e, 0x45, 0x8f, 0x36, 0x13, 0xd0, 0xf1, 0x1d, 0x8c,
         0x38, 0x7b, 0x2e, 0xae, 0xb4, 0x30, 0x2a, 0xee, 0xb0, 0x0d, 0x29, 0x16, 0x12, 0xbb, 0x0c, 0x00};
-    check_eddsa<pubkey::EddsaVariant::basic, params_type>(
+    check_eddsa<pubkey::eddsa_type::basic, params_type>(
         msg2, private_key_type(privkey2), public_key_type(etalon_pubkey2), etalon_sig2);
 
     // -----TEST 3
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE(eddsa_basic_test) {
         0x0c, 0xe5, 0x48, 0xa2, 0x84, 0x74, 0x3a, 0x44, 0x5e, 0x36, 0x80, 0xd7, 0xdb, 0x5a, 0xc3, 0xac,
         0x18, 0xff, 0x9b, 0x53, 0x8d, 0x16, 0xf2, 0x90, 0xae, 0x67, 0xf7, 0x60, 0x98, 0x4d, 0xc6, 0x59,
         0x4a, 0x7c, 0x15, 0xe9, 0x71, 0x6e, 0xd2, 0x8d, 0xc0, 0x27, 0xbe, 0xce, 0xea, 0x1e, 0xc4, 0x0a};
-    check_eddsa<pubkey::EddsaVariant::basic, params_type>(
+    check_eddsa<pubkey::eddsa_type::basic, params_type>(
         msg3, private_key_type(privkey3), public_key_type(etalon_pubkey3), etalon_sig3);
 
     // -----TEST 1024
@@ -317,7 +317,7 @@ BOOST_AUTO_TEST_CASE(eddsa_basic_test) {
         0x87, 0xdf, 0x5e, 0x48, 0x43, 0xb2, 0xcb, 0xdb, 0x67, 0xcb, 0xf6, 0xe4, 0x60, 0xfe, 0xc3, 0x50,
         0xaa, 0x53, 0x71, 0xb1, 0x50, 0x8f, 0x9f, 0x45, 0x28, 0xec, 0xea, 0x23, 0xc4, 0x36, 0xd9, 0x4b,
         0x5e, 0x8f, 0xcd, 0x4f, 0x68, 0x1e, 0x30, 0xa6, 0xac, 0x00, 0xa9, 0x70, 0x4a, 0x18, 0x8a, 0x03};
-    check_eddsa<pubkey::EddsaVariant::basic, params_type>(
+    check_eddsa<pubkey::eddsa_type::basic, params_type>(
         msg4, private_key_type(privkey4), public_key_type(etalon_pubkey4), etalon_sig4);
 
     // -----TEST SHA(abc)
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE(eddsa_basic_test) {
         0x20, 0x10, 0x09, 0xa3, 0xef, 0xbf, 0x3e, 0xcb, 0x69, 0xbe, 0xa2, 0x18, 0x6c, 0x26, 0xb5, 0x89,
         0x09, 0x35, 0x1f, 0xc9, 0xac, 0x90, 0xb3, 0xec, 0xfd, 0xfb, 0xc7, 0xc6, 0x64, 0x31, 0xe0, 0x30,
         0x3d, 0xca, 0x17, 0x9c, 0x13, 0x8a, 0xc1, 0x7a, 0xd9, 0xbe, 0xf1, 0x17, 0x73, 0x31, 0xa7, 0x04};
-    check_eddsa<pubkey::EddsaVariant::basic, params_type>(
+    check_eddsa<pubkey::eddsa_type::basic, params_type>(
         msg5, private_key_type(privkey5), public_key_type(etalon_pubkey5), etalon_sig5);
 }
 
@@ -350,12 +350,12 @@ BOOST_AUTO_TEST_CASE(eddsa_ctx_test) {
     using group_affine_value_type = typename group_affine_type::value_type;
 
     using params_type1 = test_eddsa_params_foo;
-    using scheme_type1 = pubkey::eddsa<group_type, pubkey::EddsaVariant::ctx, params_type1>;
+    using scheme_type1 = pubkey::eddsa<group_type, pubkey::eddsa_type::ctx, params_type1>;
     using private_key_type1 = pubkey::private_key<scheme_type1>;
     using public_key_type1 = pubkey::public_key<scheme_type1>;
 
     using params_type2 = test_eddsa_params_bar;
-    using scheme_type2 = pubkey::eddsa<group_type, pubkey::EddsaVariant::ctx, params_type2>;
+    using scheme_type2 = pubkey::eddsa<group_type, pubkey::eddsa_type::ctx, params_type2>;
     using private_key_type2 = pubkey::private_key<scheme_type2>;
     using public_key_type2 = pubkey::public_key<scheme_type2>;
 
@@ -377,7 +377,7 @@ BOOST_AUTO_TEST_CASE(eddsa_ctx_test) {
                                   0x73, 0x23, 0x19, 0x8d, 0xd8, 0x7a, 0x8b, 0x36, 0x95, 0x0b, 0x95, 0x13, 0x00,
                                   0x22, 0x90, 0x7a, 0x7f, 0xb7, 0xc4, 0xe9, 0xb2, 0xd5, 0xf6, 0xcc, 0xa6, 0x85,
                                   0xa5, 0x87, 0xb4, 0xb2, 0x1f, 0x4b, 0x88, 0x8e, 0x4e, 0x7e, 0xdb, 0x0d};
-    check_eddsa<pubkey::EddsaVariant::ctx, params_type1>(
+    check_eddsa<pubkey::eddsa_type::ctx, params_type1>(
         msg1, private_key_type1(privkey1), public_key_type1(etalon_pubkey1), etalon_sig1);
 
     // -----bar
@@ -394,7 +394,7 @@ BOOST_AUTO_TEST_CASE(eddsa_ctx_test) {
                                   0xab, 0x6d, 0xbc, 0xb1, 0xae, 0xe3, 0x21, 0x6c, 0x48, 0xe8, 0xb3, 0xb6, 0x64,
                                   0x31, 0xb5, 0xb1, 0x86, 0xd1, 0xd2, 0x8f, 0x8e, 0xe1, 0x5a, 0x5c, 0xa2, 0xdf,
                                   0x66, 0x68, 0x34, 0x62, 0x91, 0xc2, 0x04, 0x3d, 0x4e, 0xb3, 0xe9, 0x0d};
-    check_eddsa<pubkey::EddsaVariant::ctx, params_type2>(
+    check_eddsa<pubkey::eddsa_type::ctx, params_type2>(
         msg2, private_key_type2(privkey2), public_key_type2(etalon_pubkey2), etalon_sig2);
 
     // -----foo2
@@ -411,7 +411,7 @@ BOOST_AUTO_TEST_CASE(eddsa_ctx_test) {
                                   0x2a, 0x1d, 0x20, 0xdc, 0x64, 0x90, 0x89, 0x22, 0xa8, 0xb0, 0x52, 0xcf, 0x99,
                                   0xb7, 0xc4, 0xfe, 0x10, 0x7a, 0x5a, 0xbb, 0x5b, 0x2c, 0x40, 0x85, 0xae, 0x75,
                                   0x89, 0x0d, 0x02, 0xdf, 0x26, 0x26, 0x9d, 0x89, 0x45, 0xf8, 0x4b, 0x0b};
-    check_eddsa<pubkey::EddsaVariant::ctx, params_type1>(
+    check_eddsa<pubkey::eddsa_type::ctx, params_type1>(
         msg3, private_key_type1(privkey3), public_key_type1(etalon_pubkey3), etalon_sig3);
 
     // -----foo3
@@ -428,7 +428,7 @@ BOOST_AUTO_TEST_CASE(eddsa_ctx_test) {
                                   0x73, 0x10, 0x6a, 0x84, 0xad, 0x85, 0xe9, 0xb8, 0x6a, 0x7b, 0x60, 0x05, 0xea,
                                   0x86, 0x83, 0x37, 0xff, 0x2d, 0x20, 0xa7, 0xf5, 0xfb, 0xd4, 0xcd, 0x10, 0xb0,
                                   0xbe, 0x49, 0xa6, 0x8d, 0xa2, 0xb2, 0xe0, 0xdc, 0x0a, 0xd8, 0x96, 0x0f};
-    check_eddsa<pubkey::EddsaVariant::ctx, params_type1>(
+    check_eddsa<pubkey::eddsa_type::ctx, params_type1>(
         msg4, private_key_type1(privkey4), public_key_type1(etalon_pubkey4), etalon_sig4);
 }
 
@@ -441,7 +441,7 @@ BOOST_AUTO_TEST_CASE(eddsa_ph_test) {
     using group_affine_value_type = typename group_affine_type::value_type;
 
     using params_type = test_eddsa_params_void;
-    using scheme_type = pubkey::eddsa<group_type, pubkey::EddsaVariant::ph, params_type>;
+    using scheme_type = pubkey::eddsa<group_type, pubkey::eddsa_type::ph, params_type>;
     using private_key_type = pubkey::private_key<scheme_type>;
     using public_key_type = pubkey::public_key<scheme_type>;
     using _private_key_type = typename private_key_type::private_key_type;
@@ -460,7 +460,7 @@ BOOST_AUTO_TEST_CASE(eddsa_ph_test) {
         0x9e, 0x46, 0x2b, 0x46, 0x9c, 0x7f, 0xf8, 0x76, 0x39, 0x49, 0x9b, 0xb9, 0x4e, 0x6d, 0xae, 0x41,
         0x31, 0xf8, 0x50, 0x42, 0x46, 0x3c, 0x2a, 0x35, 0x5a, 0x20, 0x03, 0xd0, 0x62, 0xad, 0xf5, 0xaa,
         0xa1, 0x0b, 0x8c, 0x61, 0xe6, 0x36, 0x06, 0x2a, 0xaa, 0xd1, 0x1c, 0x2a, 0x26, 0x08, 0x34, 0x06};
-    check_eddsa<pubkey::EddsaVariant::ph, params_type>(
+    check_eddsa<pubkey::eddsa_type::ph, params_type>(
         msg1, private_key_type(privkey1), public_key_type(etalon_pubkey1), etalon_sig1);
 }
 
