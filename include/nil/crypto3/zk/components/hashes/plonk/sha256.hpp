@@ -88,7 +88,7 @@ namespace nil {
 
                 private:
 
-                    void generate_sigma0_gate() {
+                    void generate_sigma0_gates() {
 
                         this->bp.add_gate(j + 0, w[0][cur] - (w[1][cur] + w[2][cur] * 2**3 + w[3][cur] * 2**7 + w[4][cur] * 2**18));
                         this->bp.add_gate(j + 0, (w[1][cur] - 7) * (w[1][cur] - 6) * (w[1][cur] - 5) * (w[1][cur] - 4) * (w[1][cur] - 3) * (w[1][cur] - 2) * (w[1][cur] - 1) * w[1][cur]);
@@ -100,7 +100,7 @@ namespace nil {
                         this->bp.add_gate(j + 1, (w[8][cur] - 3) * (w[8][cur] - 2) * (w[8][cur] - 1) * w[8][cur]);
                     }
 
-                    void generate_sigma1_gate() {
+                    void generate_sigma1_gates() {
 
                         this->bp.add_gate(j+3, w[0][cur] - (w[1][cur] + w[2][cur] * 2*10 + w[3][cur] * 2*17 + w[4][cur] * 2*19));
                         this->bp.add_gate(j+3, (w[3][cur] - 3) * (w[3][cur] - 2) * (w[3][cur] - 1) * w[3][cur]);
@@ -112,7 +112,7 @@ namespace nil {
                         this->bp.add_gate(j+3, (w[8][cur] - 3) * (w[8][cur] - 2) * (w[8][cur] - 1) * w[8][cur]);
                     }
 
-                    void generate_Sigma0_gate() {
+                    void generate_Sigma0_gates() {
 
                         this->bp.add_gate(j + 7, w[0][cur] - (w[2][cur] + w[3][cur] * 2**2 + w[4][cur] * 2**13 + w[5][cur] * 2**22));
                         this->bp.add_gate(j + 5, w[0][cur] - (w[2][p1] + w[3][p1] * 4**2 + w[4][p1] * 4**13 + w[5][p1] * 4**22));
@@ -125,7 +125,7 @@ namespace nil {
                         this->bp.add_gate(j + 6, (w[7][cur] - 3) * (w[7][cur] - 2) * (w[7][cur] - 1) * w[7][cur]);
                     }
 
-                    void generate_Sigma1_gate() {
+                    void generate_Sigma1_gates() {
                         this->bp.add_gate(j + 0, w[0][cur] - (w[2][cur] + w[3][cur] * 2**[6] + w[4][cur] * 2**[11] + w[5][cur] * 2**[25]));
                         this->bp.add_gate(j + 1, w[0][cur] - (w[1][m1] + w[2][cur] * 7**[6] + w[3][cur] * 7**[11] + w[4][cur] * 7**[25]));
                         this->bp.add_gate(j + 1, w[5][cur] + w[6][cur] * 4**[14] + w[7][cur] * 4**[28] + w[8][cur] * 2**[30] - 
@@ -136,12 +136,12 @@ namespace nil {
                         this->bp.add_gate(j + 1, (w[4][cur] - 3) * (w[4][cur] - 2) * (w[4][cur] - 1) * w[4][cur]);
                     }
 
-                    void generate_Maj_gate() {
+                    void generate_Maj_gates() {
                         this->bp.add_gate(j + 4, w[0][cur] + w[1][cur] * 4**8 + w[2][cur] * 4*(8 * 2) + w[3][cur] * 4*(8 * 3) - 
                             (w[0][p1] + w[1][p1] + w[4][p1]));
                     }
 
-                    void generate_Ch_gate(){
+                    void generate_Ch_gates(){
                         this->bp.add_gate(j + 2, w[0][cur] + w[1][cur] * 7**8 + w[2][cur] * 7**(8 * 2) + w[3][cur] * 7**(8 * 3) - 
                             (w[0][m1] + 2 * w[1][m1] + 3 * w[0][p1]));
                     }
@@ -150,8 +150,12 @@ namespace nil {
 
                     void generate_gates() {
 
-                        this->bp.add_gate({j[cur], w[1][cur] * (w[1][cur] - 1));
-
+                        generate_sigma0_gates();
+                        generate_sigma1_gates();
+                        generate_Sigma0_gates();
+                        generate_Sigma1_gates();
+                        generate_Maj_gates();
+                        generate_Ch_gates();
                     }
 
                     void generate_assignments() {
