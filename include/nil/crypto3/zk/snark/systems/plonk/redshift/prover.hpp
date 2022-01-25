@@ -144,7 +144,7 @@ namespace nil {
                             }
                         }
                         // 5. Calculate $V_P$
-                        std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>>
+                        std::vector<typename FieldType::value_type>
                             V_P_interpolation_points(N_rows + 1);
 
                         V_P_interpolation_points.push_back(FieldType::value_type::one());

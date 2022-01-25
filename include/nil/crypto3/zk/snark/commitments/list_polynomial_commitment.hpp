@@ -54,9 +54,9 @@ namespace nil {
                  */
                 template<typename FieldType,
                          typename Hash,
-                         std::size_t lambda,
-                         std::size_t k,
-                         std::size_t r,
+                         std::size_t lambda = 40,
+                         std::size_t k = 1,
+                         std::size_t r = 1,
                          std::size_t m = 2>
                 class list_polynomial_commitment_scheme {
 
@@ -145,63 +145,66 @@ namespace nil {
 
                         for (std::size_t round_id = 0; round_id < lambda; round_id++) {
 
-                            math::polynomial::polynomial<typename FieldType::value_type> f_i = Q;
+                            math::polynomial::polynomial<typename FieldType::value_type> f_round = Q;
 
-                            typename FieldType::value_type x_i =
+                            typename FieldType::value_type x_0 =
                                 transcript
                                     .template get_challenge<transcript_round_manifest::challenges_ids::x, FieldType>();
+
+                            typename FieldType::value_type x_round = x_0;
 
                             std::array<merkle_proof_type, m *r> &alpha_openings = proof.alpha_openings[round_id];
                             std::array<merkle_proof_type, r> &f_y_openings = proof.f_y_openings[round_id];
                             std::array<commitment_type, r - 1> &f_commitments = proof.f_commitments[round_id];
                             math::polynomial::polynomial<typename FieldType::value_type> &f_ip1_coefficients =
                                 proof.f_ip1_coefficients[round_id];
-                            merkle_tree_type f_i_tree = T;
+                            merkle_tree_type f_round_tree = T;
 
-                            auto y_arr =
+                            std::array<typename FieldType::value_type, r> y_challenges =
                                 transcript.template get_challenges<transcript_round_manifest::challenges_ids::y,
                                                                    r,
                                                                    FieldType>();
 
                             for (std::size_t i = 0; i <= r - 1; i++) {
 
-                                // typename FieldType::value_type y_i =
-                                // transcript.template get_challenge<transcript_round_manifest::challenges_ids::y, i,
-                                // FieldType>();
+                                typename FieldType::value_type y_i = y_challenges[i];
 
-                                math::polynomial::polynomial<typename FieldType::value_type> sqr_polynom = {y_arr[i], 0,
+                                math::polynomial::polynomial<typename FieldType::value_type> sqr_polynom = {y_challenges[i], 0,
                                                                                                             -1};
+                                
+                                // m = 2, so:
                                 std::array<typename FieldType::value_type, m> s;
-                                // = math::polynomial::get_roots<m>(sqr_polynom);
+                                s[0] = y_i.sqrt();
+                                s[1] = -s[0];
 
                                 std::array<std::pair<typename FieldType::value_type, typename FieldType::value_type>, m>
                                     p_y_i_interpolation_points;
 
                                 for (std::size_t j = 0; j < m; j++) {
-                                    typename FieldType::value_type alpha_i_j = f_i.evaluate(s[j]);
+                                    typename FieldType::value_type alpha_i_j = f_round.evaluate(s[j]);
                                     std::size_t leaf_index = std::find(D.begin(), D.end(), s[j]) - D.begin();
-                                    alpha_openings[m * i + j] = merkle_proof_type(f_i_tree, leaf_index);
+                                    alpha_openings[m * i + j] = merkle_proof_type(f_round_tree, leaf_index);
                                     p_y_i_interpolation_points[j] = std::make_pair(s[j], alpha_i_j);
                                 }
 
-                                math::polynomial::polynomial<typename FieldType::value_type> p_y_i =
+                                math::polynomial::polynomial<typename FieldType::value_type> p_y =
                                     math::polynomial::lagrange_interpolation(p_y_i_interpolation_points);
 
-                                f_i = p_y_i;
+                                f_round = p_y;
 
-                                typename FieldType::value_type f_y_i = f_i.evaluate(y_arr[i]);
-                                std::size_t leaf_index = std::find(D.begin(), D.end(), y_arr[i]) - D.begin();
-                                f_y_openings[i] = merkle_proof_type(f_i_tree, leaf_index);
-
-                                x_i = q.evaluate(x_i);
+                                typename FieldType::value_type f_y_i = f_round.evaluate(y_challenges[i]);
+                                std::size_t leaf_index = std::find(D.begin(), D.end(), y_challenges[i]) - D.begin();
+                                f_y_openings[i] = merkle_proof_type(f_round_tree, leaf_index);
 
                                 if (i < r - 1) {
-                                    f_i_tree = commit(f_i, D);
-                                    f_commitments[i] = f_i_tree.root();
+                                    f_round_tree = commit(f_round, D);
+                                    f_commitments[i] = f_round_tree.root();
                                     transcript(f_commitments[i]);
                                 } else {
-                                    f_ip1_coefficients = f_i;
+                                    f_ip1_coefficients = f_round;
                                 }
+
+                                x_round = q.evaluate(x_round);
                             }
                         }
 
@@ -245,7 +248,7 @@ namespace nil {
 
                             math::polynomial::polynomial<typename FieldType::value_type> f_i = Q;
 
-                            typename FieldType::value_type x_i =
+                            typename FieldType::value_type x_round =
                                 transcript
                                     .template get_challenge<transcript_round_manifest::challenges_ids::x, FieldType>();
 
@@ -290,11 +293,11 @@ namespace nil {
                                     return false;
                                 }
 
-                                if (f_y_i != p_y_i.evaluate(x_i)) {
+                                if (f_y_i != p_y_i.evaluate(x_round)) {
                                     return false;
                                 }
 
-                                x_i = q.evaluate(x_i);
+                                x_round = q.evaluate(x_round);
 
                                 if (i < r - 1) {
                                     if (f_i != p_y_i) {

@@ -52,9 +52,12 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
-    constexpr static const std::size_t lambda = 4;
-    constexpr static const std::size_t k = 4;
-    constexpr static const std::size_t r = 4;
+    constexpr static const std::size_t lambda = 40;
+    constexpr static const std::size_t k = 1;
+
+    constexpr static const std::size_t d = 5;
+
+    constexpr static const std::size_t r = std::ceil(std::log2(d - k));
     constexpr static const std::size_t m = 2;
 
     typedef list_polynomial_commitment_scheme<typename curve_type::base_field_type, 
