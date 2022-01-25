@@ -40,14 +40,44 @@ namespace nil {
                 polynomial<FieldValueType> lagrange_interpolation(
                     const std::vector<std::pair<FieldValueType, FieldValueType>> &points) {
 
-                    return polynomial<FieldValueType>();
+                    std::size_t n = points.size();
+
+                    std::vector<typename FieldType::value_type>
+                            interpolation_points(n);
+
+                    for (std::size_t i = 0; i < n; i++){
+                        interpolation_points[i] = std::get<1>(points[i]);
+                    }
+
+                    // temporary implementation for zk PLONK purposes
+                    const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
+                            math::make_evaluation_domain<FieldType>(n);
+
+                    domain->inverse_fft(interpolation_points);
+
+                    return polynomial<FieldValueType>(interpolation_points);
                 }
 
                 template<typename FieldValueType, std::size_t ContainerSize>
                 polynomial<FieldValueType> lagrange_interpolation(
                     const std::array<std::pair<FieldValueType, FieldValueType>, ContainerSize> &points) {
 
-                    return polynomial<FieldValueType>();
+                    std::size_t n = points.size();
+
+                    std::vector<typename FieldType::value_type>
+                            interpolation_points(n);
+
+                    for (std::size_t i = 0; i < n; i++){
+                        interpolation_points[i] = std::get<1>(points[i]);
+                    }
+
+                    // temporary implementation for zk PLONK purposes
+                    const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
+                            math::make_evaluation_domain<FieldType>(n);
+
+                    domain->inverse_fft(interpolation_points);
+
+                    return polynomial<FieldValueType>(interpolation_points);
                 }
 
                 template<typename FieldValueType>
