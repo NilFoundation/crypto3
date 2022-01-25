@@ -70,8 +70,8 @@ namespace nil {
                     template<typename TAny>
                     void operator()(TAny data) {
                         nil::marshalling::status_type status;
-                        std::vector<std::uint8_t> byte_data = nil::marshalling::pack(data, status);
-                        acc(data);
+                        typename Hash::construction::type::block_type byte_data = nil::marshalling::pack(data, status);
+                        acc(byte_data);
                     }
 
                     template<typename TChallenges::challenges_ids ChallengeId, typename FieldType>

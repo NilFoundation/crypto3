@@ -35,6 +35,9 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 #include <nil/crypto3/algebra/curves/params/multiexp/bls12.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
+
+#include <nil/crypto3/math/algorithms/unity_root.hpp>
 
 #include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
 
@@ -46,6 +49,7 @@ BOOST_AUTO_TEST_SUITE(lpc_test_suite)
 BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     using curve_type = algebra::curves::bls12<381>;
+    using FieldType = typename curve_type::base_field_type;
 
     typedef hashes::sha2<256> merkle_hash_type;
     typedef hashes::sha2<256> transcript_hash_type;
@@ -60,11 +64,23 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     constexpr static const std::size_t r = std::ceil(std::log2(d - k));
     constexpr static const std::size_t m = 2;
 
-    typedef list_polynomial_commitment_scheme<typename curve_type::base_field_type, 
+    typedef list_polynomial_commitment_scheme<FieldType, 
         merkle_hash_type, lambda, k, r, m> lpc;
 
+    typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::get_power_of_two(k));
 
+    std::vector<typename FieldType::value_type> D_0(10);
+    for (std::size_t power = 1; power <= 10; power++) {
+        D_0.emplace_back(omega.pow(power));
+    }
 
+    const math::polynomial::polynomial<typename FieldType::value_type> f = {0, 0, 1};
+
+    merkle_tree_type T = lpc::commit(f, D_0);
+
+    std::array<typename FieldType::value_type, 1> evaluation_points = {algebra::random_element<FieldType>()};
+
+    lpc::proof_eval(evaluation_points, T, f, D_0);
 
 }
 
