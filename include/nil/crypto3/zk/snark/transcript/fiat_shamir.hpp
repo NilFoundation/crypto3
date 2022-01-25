@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_ZK_TRANSCRIPT_FIAT_SHAMIR_HEURISTIC_HPP
 #define CRYPTO3_ZK_TRANSCRIPT_FIAT_SHAMIR_HEURISTIC_HPP
 
+#include <nil/marshalling/algorithms/pack.hpp>
+
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 
@@ -67,8 +69,9 @@ namespace nil {
 
                     template<typename TAny>
                     void operator()(TAny data) {
-                        
-                        // acc(data);
+                        nil::marshalling::status_type status;
+                        std::vector<std::uint8_t> byte_data = nil::marshalling::pack(data, status);
+                        acc(data);
                     }
 
                     template<typename TChallenges::challenges_ids ChallengeId, typename FieldType>

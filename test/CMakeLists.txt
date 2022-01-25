@@ -47,6 +47,8 @@ macro(define_zk_test test)
 endmacro()
 
 set(TESTS_NAMES
+    "commitment/lpc"
+
     "routing_algorithms/test_routing_algorithms"
 
     "relations/numeric/qap"
