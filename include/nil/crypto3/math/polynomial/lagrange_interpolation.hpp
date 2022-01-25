@@ -57,7 +57,7 @@ namespace nil {
 
                     domain->inverse_fft(interpolation_points);
 
-                    return polynomial<FieldValueType>(interpolation_points);
+                    return polynomial<FieldValueType>(interpolation_points.begin(), interpolation_points.end());
                 }
 
                 template<typename FieldValueType, std::size_t ContainerSize>
@@ -79,7 +79,7 @@ namespace nil {
 
                     domain->inverse_fft(interpolation_points);
 
-                    return polynomial<FieldValueType>(interpolation_points);
+                    return polynomial<FieldValueType>(interpolation_points.begin(), interpolation_points.end());
                 }
 
                 template<typename FieldValueType>
