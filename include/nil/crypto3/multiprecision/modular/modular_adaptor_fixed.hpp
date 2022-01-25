@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -133,21 +134,21 @@ namespace nil {
 
                     template<typename T>
                     constexpr int compare(const T &a) const {
-                        modular_adaptor tmp(a, m_mod);
-                        return compare(tmp);
+                        Backend tmp1 = m_base;
+                        m_mod.adjust_regular(tmp1, m_base);
+
+                        return tmp1.compare(a);
                     }
 
                     constexpr void swap(modular_adaptor &o) {
-                        base_data().swap(o.base_data());
+                        m_base.swap(o.base_data());
                         // TODO: add swap to modulus_type
                         m_mod.swap(o.mod_data());
                     }
 
                     constexpr modular_adaptor &operator=(const modular_adaptor &o) {
-                        //                        modular_adaptor tmp(o);
-                        //                        swap(tmp);
                         m_base = o.base_data();
-                        m_mod = o.m_mod;
+                        m_mod = o.mod_data();
 
                         return *this;
                     }
