@@ -27,6 +27,8 @@
 #define CRYPTO3_MATH_LAGRANGE_INTERPOLATION_HPP
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -42,7 +44,7 @@ namespace nil {
 
                     std::size_t n = points.size();
 
-                    std::vector<typename FieldType::value_type>
+                    std::vector<FieldValueType>
                             interpolation_points(n);
 
                     for (std::size_t i = 0; i < n; i++){
@@ -50,8 +52,8 @@ namespace nil {
                     }
 
                     // temporary implementation for zk PLONK purposes
-                    const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
-                            math::make_evaluation_domain<FieldType>(n);
+                    const std::shared_ptr<math::evaluation_domain<typename FieldValueType::field_type>> domain =
+                            math::make_evaluation_domain<typename FieldValueType::field_type>(n);
 
                     domain->inverse_fft(interpolation_points);
 
@@ -64,7 +66,7 @@ namespace nil {
 
                     std::size_t n = points.size();
 
-                    std::vector<typename FieldType::value_type>
+                    std::vector<FieldValueType>
                             interpolation_points(n);
 
                     for (std::size_t i = 0; i < n; i++){
@@ -72,8 +74,8 @@ namespace nil {
                     }
 
                     // temporary implementation for zk PLONK purposes
-                    const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
-                            math::make_evaluation_domain<FieldType>(n);
+                    const std::shared_ptr<math::evaluation_domain<typename FieldValueType::field_type>> domain =
+                            math::make_evaluation_domain<typename FieldValueType::field_type>(n);
 
                     domain->inverse_fft(interpolation_points);
 
