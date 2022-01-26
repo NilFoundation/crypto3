@@ -76,9 +76,7 @@ namespace nil {
                         val(first, last, a) {
                     }
 
-                    ~polynomial() {
-                        val.~vector();
-                    }
+                    ~polynomial() = default;
 
                     polynomial(const polynomial& x) : val(x.val) {
                     }
@@ -349,8 +347,9 @@ namespace nil {
                      * Note: Simplest condensed form is a zero polynomial of vector form: [0]
                      */
                     void condense() {
-                        for (auto first = this->begin(); first != this->end() && this->back() == FieldValueType();
-                             ++first) {
+                        while (std::distance(this->cbegin(), this->cend()) > 1 &&
+                               this->back() == typename std::iterator_traits<decltype(std::begin(
+                                                   std::declval<container_type>()))>::value_type()) {
                             this->pop_back();
                         }
                     }
@@ -457,14 +456,7 @@ namespace nil {
                      */
                     polynomial operator/(const polynomial& other) const {
 
-                        std::size_t d = other.size() - 1; /* Degree of B */
-
-                        if ((d == 0) && (other[0] == 1)) {
-                            return *this;
-                        } else {
-                            exit(0);
-                        }
-
+                        std::size_t d = other.size() - 1;           /* Degree of B */
                         FieldValueType c = other.back().inversed(); /* Inverse of Leading Coefficient of B */
 
                         polynomial r(*this);
@@ -487,7 +479,9 @@ namespace nil {
                             if (other.size() + shift + 1 > r.size()) {
                                 r.resize(other.size() + shift + 1);
                             }
-                            auto glambda = [=](FieldValueType x, FieldValueType y) { return y - (x * lead_coeff); };
+                            auto glambda = [=](const FieldValueType& x, const FieldValueType& y) {
+                                return y - (x * lead_coeff);
+                            };
                             std::transform(other.begin(), other.end(), r.begin() + shift, r.begin() + shift, glambda);
                             r.condense();
 
@@ -540,67 +534,59 @@ namespace nil {
                 };
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator+(
-                    const polynomial<FieldValueType, Allocator>& A, 
-                    const FieldValueType& B) {
+                polynomial<FieldValueType, Allocator> operator+(const polynomial<FieldValueType, Allocator>& A,
+                                                                const FieldValueType& B) {
 
-                    return A+B;
+                    return A + B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator+(
-                    const FieldValueType& A,
-                    const polynomial<FieldValueType, Allocator>& B) {
+                polynomial<FieldValueType, Allocator> operator+(const FieldValueType& A,
+                                                                const polynomial<FieldValueType, Allocator>& B) {
 
-                    return A+B;
+                    return A + B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator-(
-                    const polynomial<FieldValueType, Allocator>& A, 
-                    const FieldValueType& B) {
+                polynomial<FieldValueType, Allocator> operator-(const polynomial<FieldValueType, Allocator>& A,
+                                                                const FieldValueType& B) {
 
-                    return A-B;
+                    return A - B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator-(
-                    const FieldValueType& A,
-                    const polynomial<FieldValueType, Allocator>& B) {
+                polynomial<FieldValueType, Allocator> operator-(const FieldValueType& A,
+                                                                const polynomial<FieldValueType, Allocator>& B) {
 
-                    return A-B;
+                    return A - B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator*(
-                    const polynomial<FieldValueType, Allocator>& A, 
-                    const FieldValueType& B) {
+                polynomial<FieldValueType, Allocator> operator*(const polynomial<FieldValueType, Allocator>& A,
+                                                                const FieldValueType& B) {
 
-                    return A*B;
+                    return A * B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator*(
-                    const FieldValueType& A,
-                    const polynomial<FieldValueType, Allocator>& B) {
+                polynomial<FieldValueType, Allocator> operator*(const FieldValueType& A,
+                                                                const polynomial<FieldValueType, Allocator>& B) {
 
-                    return A*B;
+                    return A * B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator/(
-                    const polynomial<FieldValueType, Allocator>& A, 
-                    const FieldValueType& B) {
+                polynomial<FieldValueType, Allocator> operator/(const polynomial<FieldValueType, Allocator>& A,
+                                                                const FieldValueType& B) {
 
-                    return A/B;
+                    return A / B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator/(
-                    const FieldValueType& A,
-                    const polynomial<FieldValueType, Allocator>& B) {
+                polynomial<FieldValueType, Allocator> operator/(const FieldValueType& A,
+                                                                const polynomial<FieldValueType, Allocator>& B) {
 
-                    return A/B;
+                    return A / B;
                 }
             }    // namespace polynomial
         }        // namespace math
