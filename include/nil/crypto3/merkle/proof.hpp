@@ -55,7 +55,7 @@ namespace nil {
                     constexpr static const std::size_t value_bits = node_type::value_bits;
                     typedef typename node_type::value_type value_type;
 
-                    merkle_proof_impl(){};
+                    merkle_proof_impl() : li(0) {};
 
                     merkle_proof_impl(merkle_tree<hash_type, arity> tree, std::size_t leaf_idx) {
                         root = tree.root();
@@ -99,7 +99,8 @@ namespace nil {
                                     crypto3::hash<hash_type>(d.begin(), d.end(), acc);
                                     was_missing = true;
                                 }
-                                crypto3::hash<hash_type>(path[cur_row][i].hash.begin(), path[cur_row][i].hash.end(), acc);
+                                crypto3::hash<hash_type>(path[cur_row][i].hash.begin(), path[cur_row][i].hash.end(),
+                                                         acc);
                             }
                             if (!was_missing) {
                                 crypto3::hash<hash_type>(d.begin(), d.end(), acc);
@@ -112,6 +113,9 @@ namespace nil {
                     std::size_t leaf_index() {
                         return li;
                     }
+
+                    friend bool operator==(const merkle_proof_impl &lhs, const merkle_proof_impl &rhs);
+                    friend bool operator!=(const merkle_proof_impl &lhs, const merkle_proof_impl &rhs);
 
                 private:
                     std::size_t li;
@@ -134,12 +138,25 @@ namespace nil {
                 };
             }    // namespace detail
 
+            template<typename NodeType, std::size_t Arity>
+            bool operator==(const detail::merkle_proof_impl<NodeType, Arity> &lhs,
+                            const detail::merkle_proof_impl<NodeType, Arity> &rhs) {
+                return lhs.li == rhs.li && lhs.root == rhs.root && lhs.path == rhs.path;
+            }
+
+            template<typename NodeType, std::size_t Arity>
+            bool operator!=(const detail::merkle_proof_impl<NodeType, Arity> &lhs,
+                            const detail::merkle_proof_impl<NodeType, Arity> &rhs) {
+                return !(lhs == rhs);
+            }
+
             template<typename T, std::size_t Arity>
-            using merkle_proof = typename std::conditional<nil::crypto3::detail::is_hash<T>::value,
-                                                           detail::merkle_proof_impl<detail::merkle_tree_node<T>, Arity>,
-                                                           detail::merkle_proof_impl<T, Arity>>::type;
+            using merkle_proof =
+                typename std::conditional<nil::crypto3::detail::is_hash<T>::value,
+                                          detail::merkle_proof_impl<detail::merkle_tree_node<T>, Arity>,
+                                          detail::merkle_proof_impl<T, Arity>>::type;
         }    // namespace containers
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif
