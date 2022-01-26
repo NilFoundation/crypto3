@@ -61,11 +61,10 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     constexpr static const std::size_t d = 5;
 
-    constexpr static const std::size_t r = std::ceil(std::log2(d - k));
+    constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef list_polynomial_commitment_scheme<FieldType, 
-        merkle_hash_type, lambda, k, r, m> lpc;
+    typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> lpc;
 
     typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::get_power_of_two(k));
 
@@ -81,7 +80,6 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     std::array<typename FieldType::value_type, 1> evaluation_points = {algebra::random_element<FieldType>()};
 
     lpc::proof_eval(evaluation_points, T, f, D_0);
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()
