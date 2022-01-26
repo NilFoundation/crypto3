@@ -55,9 +55,9 @@ namespace nil {
 
                 const std::size_t logn = std::ceil(std::log2(n));
 
-                if (n != (1u << logn))
+                if (n != (1u << logn)) {
                     throw std::invalid_argument("expected n == (1u << logn)");
-                exit(0);
+                }
                 if (logn > algebra::fields::arithmetic_params<FieldType>::s)
                     throw std::invalid_argument("expected logn <= arithmetic_params<FieldType>::s");
 

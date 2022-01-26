@@ -68,12 +68,11 @@ namespace nil {
                     }
                     polynomial(size_type n, const value_type& x, const allocator_type& a) : val(n, x, a) {
                     }
-                    template<typename _InputIterator>
-                    polynomial(_InputIterator first, _InputIterator last) : val(first, last) {
+                    template<typename InputIterator>
+                    polynomial(InputIterator first, InputIterator last) : val(first, last) {
                     }
-                    template<typename _InputIterator>
-                    polynomial(_InputIterator first, _InputIterator last, const allocator_type& a) :
-                        val(first, last, a) {
+                    template<typename InputIterator>
+                    polynomial(InputIterator first, InputIterator last, const allocator_type& a) : val(first, last, a) {
                     }
 
                     ~polynomial() {
@@ -126,6 +125,13 @@ namespace nil {
                     polynomial& operator=(std::initializer_list<value_type> il) {
                         val.assign(il.begin(), il.end());
                         return *this;
+                    }
+
+                    bool operator==(const polynomial& rhs) const {
+                        return val == rhs.val;
+                    }
+                    bool operator!=(const polynomial& rhs) const {
+                        return !(rhs == *this);
                     }
 
                     template<typename InputIterator>
@@ -205,24 +211,24 @@ namespace nil {
                     size_type max_size() const BOOST_NOEXCEPT {
                         return val.max_size();
                     }
-                    void reserve(size_type __n) {
-                        return val.reserve(__n);
+                    void reserve(size_type _n) {
+                        return val.reserve(_n);
                     }
                     void shrink_to_fit() BOOST_NOEXCEPT {
                         return val.shrink_to_fit();
                     }
 
-                    reference operator[](size_type __n) BOOST_NOEXCEPT {
-                        return val[__n];
+                    reference operator[](size_type _n) BOOST_NOEXCEPT {
+                        return val[_n];
                     }
-                    const_reference operator[](size_type __n) const BOOST_NOEXCEPT {
-                        return val[__n];
+                    const_reference operator[](size_type _n) const BOOST_NOEXCEPT {
+                        return val[_n];
                     }
-                    reference at(size_type __n) {
-                        return val.at(__n);
+                    reference at(size_type _n) {
+                        return val.at(_n);
                     }
-                    const_reference at(size_type __n) const {
-                        return val.at(__n);
+                    const_reference at(size_type _n) const {
+                        return val.at(_n);
                     }
 
                     reference front() BOOST_NOEXCEPT {
@@ -246,66 +252,66 @@ namespace nil {
                         return val.data();
                     }
 
-                    void push_back(const_reference __x) {
-                        val.push_back(__x);
+                    void push_back(const_reference _x) {
+                        val.push_back(_x);
                     }
 
-                    void push_back(value_type&& __x) {
-                        val.push_back(__x);
+                    void push_back(value_type&& _x) {
+                        val.push_back(_x);
                     }
 
                     template<class... _Args>
-                    reference emplace_back(_Args&&... __args) {
-                        return val.template emplace_back(__args...);
+                    reference emplace_back(_Args&&... _args) {
+                        return val.template emplace_back(_args...);
                     }
 
                     void pop_back() {
                         val.pop_back();
                     }
 
-                    iterator insert(const_iterator __position, const_reference __x) {
-                        return val.insert(__position, __x);
+                    iterator insert(const_iterator _position, const_reference _x) {
+                        return val.insert(_position, _x);
                     }
 
-                    iterator insert(const_iterator __position, value_type&& __x) {
-                        return val.insert(__position, __x);
+                    iterator insert(const_iterator _position, value_type&& _x) {
+                        return val.insert(_position, _x);
                     }
                     template<class... _Args>
-                    iterator emplace(const_iterator __position, _Args&&... __args) {
-                        return val.template emplace(__position, __args...);
+                    iterator emplace(const_iterator _position, _Args&&... _args) {
+                        return val.template emplace(_position, _args...);
                     }
 
-                    iterator insert(const_iterator __position, size_type __n, const_reference __x) {
-                        return val.insert(__position, __n, __x);
+                    iterator insert(const_iterator _position, size_type _n, const_reference _x) {
+                        return val.insert(_position, _n, _x);
                     }
 
                     template<class _InputIterator>
-                    iterator insert(const_iterator __position, _InputIterator __first, _InputIterator __last) {
-                        return val.insert(__position, __first, __last);
+                    iterator insert(const_iterator _position, _InputIterator _first, _InputIterator _last) {
+                        return val.insert(_position, _first, _last);
                     }
 
-                    iterator insert(const_iterator __position, std::initializer_list<value_type> __il) {
-                        return insert(__position, __il.begin(), __il.end());
+                    iterator insert(const_iterator _position, std::initializer_list<value_type> _il) {
+                        return insert(_position, _il.begin(), _il.end());
                     }
 
-                    iterator erase(const_iterator __position) {
-                        return val.erase(__position);
+                    iterator erase(const_iterator _position) {
+                        return val.erase(_position);
                     }
 
-                    iterator erase(const_iterator __first, const_iterator __last) {
-                        return val.erase(__first, __last);
+                    iterator erase(const_iterator _first, const_iterator _last) {
+                        return val.erase(_first, _last);
                     }
 
                     void clear() BOOST_NOEXCEPT {
                         val.clear();
                     }
 
-                    void resize(size_type __sz) {
-                        return val.resize(__sz);
+                    void resize(size_type _sz) {
+                        return val.resize(_sz);
                     }
 
-                    void resize(size_type __sz, const_reference __x) {
-                        return val.resize(__sz, __x);
+                    void resize(size_type _sz, const_reference _x) {
+                        return val.resize(_sz, _x);
                     }
 
                     void swap(polynomial& other) {
@@ -461,8 +467,6 @@ namespace nil {
 
                         if ((d == 0) && (other[0] == 1)) {
                             return *this;
-                        } else {
-                            exit(0);
                         }
 
                         FieldValueType c = other.back().inversed(); /* Inverse of Leading Coefficient of B */
@@ -540,67 +544,59 @@ namespace nil {
                 };
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator+(
-                    const polynomial<FieldValueType, Allocator>& A, 
-                    const FieldValueType& B) {
+                polynomial<FieldValueType, Allocator> operator+(const polynomial<FieldValueType, Allocator>& A,
+                                                                const FieldValueType& B) {
 
-                    return A+B;
+                    return A + B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator+(
-                    const FieldValueType& A,
-                    const polynomial<FieldValueType, Allocator>& B) {
+                polynomial<FieldValueType, Allocator> operator+(const FieldValueType& A,
+                                                                const polynomial<FieldValueType, Allocator>& B) {
 
-                    return A+B;
+                    return A + B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator-(
-                    const polynomial<FieldValueType, Allocator>& A, 
-                    const FieldValueType& B) {
+                polynomial<FieldValueType, Allocator> operator-(const polynomial<FieldValueType, Allocator>& A,
+                                                                const FieldValueType& B) {
 
-                    return A-B;
+                    return A - B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator-(
-                    const FieldValueType& A,
-                    const polynomial<FieldValueType, Allocator>& B) {
+                polynomial<FieldValueType, Allocator> operator-(const FieldValueType& A,
+                                                                const polynomial<FieldValueType, Allocator>& B) {
 
-                    return A-B;
+                    return A - B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator*(
-                    const polynomial<FieldValueType, Allocator>& A, 
-                    const FieldValueType& B) {
+                polynomial<FieldValueType, Allocator> operator*(const polynomial<FieldValueType, Allocator>& A,
+                                                                const FieldValueType& B) {
 
-                    return A*B;
+                    return A * B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator*(
-                    const FieldValueType& A,
-                    const polynomial<FieldValueType, Allocator>& B) {
+                polynomial<FieldValueType, Allocator> operator*(const FieldValueType& A,
+                                                                const polynomial<FieldValueType, Allocator>& B) {
 
-                    return A*B;
+                    return A * B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator/(
-                    const polynomial<FieldValueType, Allocator>& A, 
-                    const FieldValueType& B) {
+                polynomial<FieldValueType, Allocator> operator/(const polynomial<FieldValueType, Allocator>& A,
+                                                                const FieldValueType& B) {
 
-                    return A/B;
+                    return A / B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
-                polynomial<FieldValueType, Allocator> operator/(
-                    const FieldValueType& A,
-                    const polynomial<FieldValueType, Allocator>& B) {
+                polynomial<FieldValueType, Allocator> operator/(const FieldValueType& A,
+                                                                const polynomial<FieldValueType, Allocator>& B) {
 
-                    return A/B;
+                    return A / B;
                 }
             }    // namespace polynomial
         }        // namespace math
