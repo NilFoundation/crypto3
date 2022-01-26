@@ -55,10 +55,12 @@ namespace nil {
 
                 const std::size_t logn = std::ceil(std::log2(n));
 
-                if (n != (1u << logn))
+                if (n != (1u << logn)) {
                     throw std::invalid_argument("expected n == (1u << logn)");
-                if (logn > algebra::fields::arithmetic_params<FieldType>::s)
+                }
+                if (logn > algebra::fields::arithmetic_params<FieldType>::s) {
                     throw std::invalid_argument("expected logn <= arithmetic_params<FieldType>::s");
+                }
 
                 value_type omega = value_type(algebra::fields::arithmetic_params<FieldType>::root_of_unity);
                 for (std::size_t i = algebra::fields::arithmetic_params<FieldType>::s; i > logn; --i) {
