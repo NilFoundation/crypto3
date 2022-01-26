@@ -77,9 +77,14 @@ namespace nil {
                     using commitment_type = typename merkle_tree_type::value_type;
 
                     struct proof_type {
-                        friend bool operator==(const proof_type &lhs, const proof_type &rhs);
-
-                        friend bool operator!=(const proof_type &lhs, const proof_type &rhs);
+                        bool operator==(const proof_type &rhs) const {
+                            return z_openings == rhs.z_openings && alpha_openings == rhs.alpha_openings &&
+                                   f_y_openings == rhs.f_y_openings && f_commitments == rhs.f_commitments &&
+                                   f_ip1_coefficients == rhs.f_ip1_coefficients;
+                        }
+                        bool operator!=(const proof_type &rhs) const {
+                            return !(rhs == *this);
+                        }
 
                         std::array<merkle_proof_type, k> z_openings;
                         std::array<std::array<merkle_proof_type, m * r>, lambda> alpha_openings;
@@ -102,8 +107,9 @@ namespace nil {
                                const std::vector<typename FieldType::value_type> &D) {
 
                         std::vector<typename FieldType::value_type> y;
+                        y.reserve(D.size());
                         for (typename FieldType::value_type H : D) {
-                            y.push_back(f.evaluate(H));
+                            y.emplace_back(f.evaluate(H));
                         }
 
                         std::vector<std::array<std::uint8_t, 96>> y_data;
@@ -320,34 +326,6 @@ namespace nil {
                         return true;
                     }
                 };
-
-                template<typename FieldType,
-                         typename Hash,
-                         std::size_t lambda = 40,
-                         std::size_t k = 1,
-                         std::size_t r = 1,
-                         std::size_t m = 2>
-                bool operator==(
-                    const typename list_polynomial_commitment_scheme<FieldType, Hash, lambda, k, r, m>::proof_type &lhs,
-                    const typename list_polynomial_commitment_scheme<FieldType, Hash, lambda, k, r, m>::proof_type
-                        &rhs) {
-                    return lhs.z_openings == rhs.z_openings && lhs.alpha_openings == rhs.alpha_openings &&
-                           lhs.f_y_openings == rhs.f_y_openings && lhs.f_commitments == rhs.f_commitments &&
-                           lhs.f_ip1_coefficients == rhs.f_ip1_coefficients;
-                }
-
-                template<typename FieldType,
-                         typename Hash,
-                         std::size_t lambda = 40,
-                         std::size_t k = 1,
-                         std::size_t r = 1,
-                         std::size_t m = 2>
-                bool operator!=(
-                    const typename list_polynomial_commitment_scheme<FieldType, Hash, lambda, k, r, m>::proof_type &lhs,
-                    const typename list_polynomial_commitment_scheme<FieldType, Hash, lambda, k, r, m>::proof_type
-                        &rhs) {
-                    return !(lhs == rhs);
-                }
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

@@ -128,7 +128,6 @@ bool process_command_line(const int argc, const char **argv, bool &profile_gp, s
 
         if (vm.count("v")) {
             algebra::print_compilation_info();
-            exit(0);
         }
 
         if (vm.count("help")) {
