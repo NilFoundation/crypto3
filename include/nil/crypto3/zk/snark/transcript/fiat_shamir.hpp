@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -27,9 +28,12 @@
 #define CRYPTO3_ZK_TRANSCRIPT_FIAT_SHAMIR_HEURISTIC_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
+#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
+
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -105,6 +109,62 @@ namespace nil {
 
                         return result;
                     }
+                };
+
+                template<typename Hash = hashes::sha2<256>>
+                struct fiat_shamir_heuristic_updated {
+                    typedef Hash hash_type;
+
+                    template<typename InputRange>
+                    fiat_shamir_heuristic_updated(const InputRange &r) : state(hash<hash_type>(r)) {
+                    }
+
+                    template<typename InputIterator>
+                    fiat_shamir_heuristic_updated(InputIterator first, InputIterator last) :
+                        state(hash<hash_type>(first, last)) {
+                    }
+
+                    template<typename InputRange>
+                    void operator()(const InputRange &r) {
+                        auto acc_convertible = hash<hash_type>(state);
+                        state = accumulators::extract::hash<hash_type>(
+                            hash<hash_type>(r, static_cast<accumulator_set<hash_type> &>(acc_convertible)));
+                    }
+
+                    template<typename InputIterator>
+                    void operator()(InputIterator first, InputIterator last) {
+                        auto acc_convertible = hash<hash_type>(state);
+                        state = accumulators::extract::hash<hash_type>(
+                            hash<hash_type>(first, last, static_cast<accumulator_set<hash_type> &>(acc_convertible)));
+                    }
+
+                    template<typename Field>
+                    typename std::enable_if<(Hash::digest_bits >= Field::modulus_bits),
+                                            typename Field::value_type>::type
+                        get_challenge() {
+
+                        state = hash<hash_type>(state);
+                        nil::marshalling::status_type status;
+                        nil::crypto3::multiprecision::cpp_int raw_result = nil::marshalling::pack(state, status);
+
+                        return raw_result;
+                    }
+
+                    template<typename Field, std::size_t N>
+                    typename std::enable_if<(Hash::digest_bits >= Field::modulus_bits),
+                                            std::array<typename Field::value_type, N>>::type
+                        get_challenges() {
+
+                        std::array<typename Field::value_type, N> result;
+                        for (auto &ch : result) {
+                            ch = get_challenge<Field>();
+                        }
+
+                        return result;
+                    }
+
+                private:
+                    typename hash_type::digest_type state;
                 };
             }    // namespace snark
         }        // namespace zk

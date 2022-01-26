@@ -70,7 +70,9 @@ set(TESTS_NAMES
     "systems/ppzksnark/ram_ppzksnark/ram_ppzksnark"
     "systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark"
     "systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark"
-    "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity")
+    "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity"
+
+    "transcript/transcript")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_zk_test(${TEST_NAME})
