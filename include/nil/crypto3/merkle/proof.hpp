@@ -114,8 +114,12 @@ namespace nil {
                         return li;
                     }
 
-                    friend bool operator==(const merkle_proof_impl &lhs, const merkle_proof_impl &rhs);
-                    friend bool operator!=(const merkle_proof_impl &lhs, const merkle_proof_impl &rhs);
+                    bool operator==(const merkle_proof_impl &rhs) const {
+                        return li == rhs.li && root == rhs.root && path == rhs.path;
+                    }
+                    bool operator!=(const merkle_proof_impl &rhs) const {
+                        return !(rhs == *this);
+                    }
 
                 private:
                     std::size_t li;
@@ -127,6 +131,13 @@ namespace nil {
                         }
                         path_element_type() {
                         }
+
+                        bool operator==(const path_element_type &rhs) const {
+                            return hash == rhs.hash && position == rhs.position;
+                        }
+                        bool operator!=(const path_element_type &rhs) const {
+                            return !(rhs == *this);
+                        }
                         value_type hash;
                         std::size_t position;
                     };
@@ -137,18 +148,6 @@ namespace nil {
                     friend class nil::crypto3::zk::components::merkle_proof;
                 };
             }    // namespace detail
-
-            template<typename NodeType, std::size_t Arity>
-            bool operator==(const detail::merkle_proof_impl<NodeType, Arity> &lhs,
-                            const detail::merkle_proof_impl<NodeType, Arity> &rhs) {
-                return lhs.li == rhs.li && lhs.root == rhs.root && lhs.path == rhs.path;
-            }
-
-            template<typename NodeType, std::size_t Arity>
-            bool operator!=(const detail::merkle_proof_impl<NodeType, Arity> &lhs,
-                            const detail::merkle_proof_impl<NodeType, Arity> &rhs) {
-                return !(lhs == rhs);
-            }
 
             template<typename T, std::size_t Arity>
             using merkle_proof =
