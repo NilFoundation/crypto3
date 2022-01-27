@@ -21,6 +21,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        crypto3::zk
                        crypto3::blueprint
                        crypto3::pubkey
+                       crypto3::hash
                        ${CMAKE_WORKSPACE_NAME}::crypto3_multiprecision
                        ${CMAKE_WORKSPACE_NAME}::crypto3_algebra
                        ${CMAKE_WORKSPACE_NAME}::core)
@@ -52,6 +53,7 @@ macro(define_marshalling_test test)
 endmacro()
 
 set(TESTS_NAMES
+    "merkle_proof"
     "accumulation_vector"
     "sparse_vector"
     "r1cs_gg_ppzksnark_primary_input"
