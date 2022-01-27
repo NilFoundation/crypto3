@@ -32,6 +32,7 @@
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
+#include <nil/crypto3/hash/keccak.hpp>
 
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
@@ -111,7 +112,7 @@ namespace nil {
                     }
                 };
 
-                template<typename Hash = hashes::sha2<256>>
+                template<typename Hash = hashes::keccak_1600<256>>
                 struct fiat_shamir_heuristic_updated {
                     typedef Hash hash_type;
 
