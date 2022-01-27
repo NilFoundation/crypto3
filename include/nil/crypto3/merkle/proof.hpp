@@ -43,6 +43,12 @@ namespace nil {
                 struct merkle_proof;
             }    // namespace components
         }        // namespace zk
+        namespace marshalling {
+            namespace types {
+                template<typename, typename>
+                struct merkle_proof_marshalling;
+            }
+        }    // namespace marshalling
         namespace containers {
             namespace detail {
                 template<typename NodeType, std::size_t Arity = 2>
@@ -110,7 +116,7 @@ namespace nil {
                         return (d == root);
                     }
 
-                    std::size_t leaf_index() {
+                    std::size_t leaf_index() const {
                         return li;
                     }
 
@@ -120,11 +126,6 @@ namespace nil {
                     bool operator!=(const merkle_proof_impl &rhs) const {
                         return !(rhs == *this);
                     }
-
-                private:
-                    std::size_t li;
-
-                    value_type root;
 
                     struct path_element_type {
                         path_element_type(value_type x, size_t pos) : hash(x), position(pos) {
@@ -138,14 +139,42 @@ namespace nil {
                         bool operator!=(const path_element_type &rhs) const {
                             return !(rhs == *this);
                         }
+
+                        const value_type &get_hash() const {
+                            return hash;
+                        }
+
+                        std::size_t get_position() const {
+                            return position;
+                        }
+
                         value_type hash;
                         std::size_t position;
+
+                        template<typename, typename>
+                        friend class nil::crypto3::marshalling::types::merkle_proof_marshalling;
                     };
 
-                    std::vector<std::array<path_element_type, Arity - 1>> path;
+                    typedef std::vector<std::array<path_element_type, Arity - 1>> path_type;
+
+                    const value_type &get_root() const {
+                        return root;
+                    }
+
+                    const path_type &get_path() const {
+                        return path;
+                    }
+
+                private:
+                    std::size_t li;
+                    value_type root;
+                    path_type path;
 
                     template<typename, typename, std::size_t>
                     friend class nil::crypto3::zk::components::merkle_proof;
+
+                    template<typename, typename>
+                    friend class nil::crypto3::marshalling::types::merkle_proof_marshalling;
                 };
             }    // namespace detail
 
