@@ -87,7 +87,9 @@ namespace nil {
                                                 nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
                                         // position
                                         nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
-                                nil::marshalling::option::fixed_size_storage<MerkleProof::arity - 1>>,
+                                // TODO: use nil::marshalling::option::fixed_size_storage<MerkleProof::arity - 1>
+                                nil::marshalling::option::sequence_size_field_prefix<
+                                    nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
 
@@ -142,7 +144,7 @@ namespace nil {
                     using layer_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase,
                         layer_element_marshalling_type,
-                        nil::marshalling::option::fixed_size_storage<MerkleProof::arity - 1>>;
+                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
                     using path_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase,
                         layer_marshalling_type,
@@ -155,20 +157,17 @@ namespace nil {
                     }
 
                     path_marshalling_type filled_path;
-                    auto &filled_path_val = filled_path.value();
                     for (const auto &layer : mp.get_path()) {
                         layer_marshalling_type filled_layer;
-                        auto &filled_layer_val = filled_layer.value();
                         for (const auto &el : layer) {
                             digest_marshalling_type filled_layer_element_hash;
-                            auto &filled_layer_element_hash_val = filled_layer_element_hash.value();
                             for (const auto c : el.get_hash()) {
-                                filled_layer_element_hash_val.push_back(octet_marshalling_type(c));
+                                filled_layer_element_hash.value().push_back(octet_marshalling_type(c));
                             }
-                            filled_layer_val.push_back(layer_element_marshalling_type(std::make_tuple(
+                            filled_layer.value().push_back(layer_element_marshalling_type(std::make_tuple(
                                 filled_layer_element_hash, size_t_marshalling_type(el.get_position()))));
                         }
-                        filled_path_val.push_back(filled_layer);
+                        filled_path.value().push_back(filled_layer);
                     }
 
                     return merkle_proof<nil::marshalling::field_type<Endianness>, MerkleProof>(

@@ -80,7 +80,8 @@ void test_merkle_proof(std::size_t tree_depth) {
     using namespace nil::crypto3::marshalling;
     using merkle_tree_type = nil::crypto3::containers::merkle_tree<Hash, Arity>;
     using merkle_proof_type = nil::crypto3::containers::merkle_proof<Hash, Arity>;
-    using merkle_tree_marshalling_type = types::merkle_proof<nil::marshalling::field_type<Endianness>, merkle_proof_type>;
+    using merkle_proof_marshalling_type =
+        types::merkle_proof<nil::marshalling::field_type<Endianness>, merkle_proof_type>;
 
     std::size_t leafs_number = 1 << tree_depth;
     auto data = generate_random_data<std::uint8_t, 32>(leafs_number);
@@ -90,38 +91,18 @@ void test_merkle_proof(std::size_t tree_depth) {
 
     auto filled_merkle_proof = types::fill_merkle_proof<merkle_proof_type, Endianness>(proof);
     merkle_proof_type _proof = types::make_merkle_proof<merkle_proof_type, Endianness>(filled_merkle_proof);
-    std::cout << (proof == _proof) << std::endl;
+    BOOST_CHECK(proof == _proof);
 
-//    std::size_t units_bits = 8;
-//    using unit_type = unsigned char;
-//    using accumulation_vector_type =
-//        types::accumulation_vector<nil::marshalling::field_type<Endianness>, zk::snark::accumulation_vector<GroupType>>;
-//
-//    accumulation_vector_type filled_val =
-//        types::fill_accumulation_vector<zk::snark::accumulation_vector<GroupType>, Endianness>(val);
-//
-//    zk::snark::accumulation_vector<GroupType> constructed_val =
-//        types::make_accumulation_vector<zk::snark::accumulation_vector<GroupType>, Endianness>(filled_val);
-//    BOOST_CHECK(val == constructed_val);
-//
-//    std::size_t unitblob_size = filled_val.length();
-//
-//    std::vector<unit_type> cv;
-//    cv.resize(unitblob_size, 0x00);
-//
-//    auto write_iter = cv.begin();
-//
-//    nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
-//
-//    accumulation_vector_type test_val_read;
-//
-//    auto read_iter = cv.begin();
-//    status = test_val_read.read(read_iter, cv.size());
-//
-//    zk::snark::accumulation_vector<GroupType> constructed_val_read =
-//        types::make_accumulation_vector<zk::snark::accumulation_vector<GroupType>, Endianness>(test_val_read);
-//
-//    BOOST_CHECK(val == constructed_val_read);
+    std::vector<std::uint8_t> cv;
+    cv.resize(filled_merkle_proof.length(), 0x00);
+    auto write_iter = cv.begin();
+    nil::marshalling::status_type status = filled_merkle_proof.write(write_iter, cv.size());
+
+    merkle_proof_marshalling_type test_val_read;
+    auto read_iter = cv.begin();
+    status = test_val_read.read(read_iter, cv.size());
+    merkle_proof_type constructed_val_read = types::make_merkle_proof<merkle_proof_type, Endianness>(test_val_read);
+    BOOST_CHECK(proof == constructed_val_read);
 }
 
 BOOST_AUTO_TEST_SUITE(marshalling_merkle_proof_test_suite)
