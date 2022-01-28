@@ -39,7 +39,6 @@
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
 
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/proof.hpp>
-#include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -52,35 +51,60 @@ namespace nil {
                              bool>::type,
                          typename... TOptions>
                 using redshift_proof = nil::marshalling::types::bundle<
-                    TTypeBase, std::tuple<
-                                   // std::vector<typename CommitmentSchemeType::commitment_type> f_commitments
-                                   nil::marshalling::types::array_list<
-                                       TTypeBase, merkle_proof<TTypeBase, typename RedshiftProof::lpc::openning_type>,
-                                       nil::marshalling::option::sequence_size_field_prefix<
-                                           nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
-                                   // typename CommitmentSchemeType::commitment_type P_commitment
-                                   merkle_proof<TTypeBase, typename RedshiftProof::lpc::openning_type>,
-                                   // typename CommitmentSchemeType::commitment_type Q_commitment
-                                   merkle_proof<TTypeBase, typename RedshiftProof::lpc::openning_type>,
-                                   // std::vector<typename CommitmentSchemeType::commitment_type> T_commitments
-                                   nil::marshalling::types::array_list<
-                                       TTypeBase, merkle_proof<TTypeBase, typename RedshiftProof::lpc::openning_type>,
-                                       nil::marshalling::option::sequence_size_field_prefix<
-                                           nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
-                                   // std::vector<typename CommitmentSchemeType::proof_type> f_lpc_proofs
-                                   nil::marshalling::types::array_list<
-                                       TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::lpc>,
-                                       nil::marshalling::option::sequence_size_field_prefix<
-                                           nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
-                                   // typename CommitmentSchemeType::proof_type P_lpc_proof
-                                   lpc_proof<TTypeBase, typename RedshiftProof::lpc>,
-                                   // typename CommitmentSchemeType::proof_type Q_lpc_proof
-                                   lpc_proof<TTypeBase, typename RedshiftProof::lpc>,
-                                   // std::vector<typename CommitmentSchemeType::proof_type> T_lpc_proofs
-                                   nil::marshalling::types::array_list<
-                                       TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::lpc>,
-                                       nil::marshalling::option::sequence_size_field_prefix<
-                                           nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
+                    TTypeBase,
+                    std::tuple<
+                        // std::vector<typename RedshiftProof::commitment_scheme_type::commitment_type> f_commitments
+                        nil::marshalling::types::array_list<
+                            TTypeBase,
+                            // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
+                            // TODO: review std::uint8_t type usage (for example, pedersen outputs array of bits)
+                            // typename RedshiftProof::commitment_scheme_type::commitment_type
+                            nil::marshalling::types::array_list<
+                                TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
+                                nil::marshalling::option::sequence_size_field_prefix<
+                                    nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                            nil::marshalling::option::sequence_size_field_prefix<
+                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                        // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
+                        // TODO: review std::uint8_t type usage (for example, pedersen outputs array of bits)
+                        // typename RedshiftProof::commitment_scheme_type::commitment_type P_commitment
+                        nil::marshalling::types::array_list<
+                            TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
+                            nil::marshalling::option::sequence_size_field_prefix<
+                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                        // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
+                        // TODO: review std::uint8_t type usage (for example, pedersen outputs array of bits)
+                        // typename RedshiftProof::commitment_scheme_type::commitment_type Q_commitment
+                        nil::marshalling::types::array_list<
+                            TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
+                            nil::marshalling::option::sequence_size_field_prefix<
+                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                        // std::vector<typename CommitmentSchemeType::commitment_type> T_commitments
+                        nil::marshalling::types::array_list<
+                            TTypeBase,
+                            // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
+                            // TODO: review std::uint8_t type usage (for example, pedersen outputs array of bits)
+                            // typename RedshiftProof::commitment_scheme_type::commitment_type
+                            nil::marshalling::types::array_list<
+                                TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
+                                nil::marshalling::option::sequence_size_field_prefix<
+                                    nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                            nil::marshalling::option::sequence_size_field_prefix<
+                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                        // std::vector<typename CommitmentSchemeType::proof_type> f_lpc_proofs
+                        nil::marshalling::types::array_list<
+                            TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::lpc>,
+                            nil::marshalling::option::sequence_size_field_prefix<
+                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                        // typename CommitmentSchemeType::proof_type P_lpc_proof
+                        lpc_proof<TTypeBase, typename RedshiftProof::lpc>,
+                        // typename CommitmentSchemeType::proof_type Q_lpc_proof
+                        lpc_proof<TTypeBase, typename RedshiftProof::lpc>,
+                        // std::vector<typename CommitmentSchemeType::proof_type> T_lpc_proofs
+                        nil::marshalling::types::array_list<
+                            TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::lpc>,
+                            nil::marshalling::option::sequence_size_field_prefix<
+                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
             }    // namespace types
         }        // namespace marshalling
     }            // namespace crypto3

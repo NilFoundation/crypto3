@@ -22,6 +22,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        crypto3::blueprint
                        crypto3::pubkey
                        crypto3::hash
+                       crypto3::random
                        ${CMAKE_WORKSPACE_NAME}::crypto3_multiprecision
                        ${CMAKE_WORKSPACE_NAME}::crypto3_algebra
                        ${CMAKE_WORKSPACE_NAME}::core)
@@ -59,7 +60,8 @@ set(TESTS_NAMES
     "r1cs_gg_ppzksnark_primary_input"
     "r1cs_gg_ppzksnark_proof"
     "r1cs_gg_ppzksnark_verification_key"
-    "r1cs_gg_ppzksnark")
+    "r1cs_gg_ppzksnark"
+    "lpc_commitment")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_marshalling_test(${TEST_NAME})

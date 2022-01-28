@@ -31,6 +31,7 @@
 #include <boost/random/uniform_int.hpp>
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
@@ -40,6 +41,7 @@
 #include <nil/crypto3/multiprecision/number.hpp>
 
 #include <nil/crypto3/hash/sha2.hpp>
+#include <nil/crypto3/hash/keccak.hpp>
 
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
 
@@ -83,7 +85,7 @@ void test_merkle_proof(std::size_t tree_depth) {
     using merkle_proof_marshalling_type =
         types::merkle_proof<nil::marshalling::field_type<Endianness>, merkle_proof_type>;
 
-    std::size_t leafs_number = 1 << tree_depth;
+    std::size_t leafs_number = std::pow(Arity, tree_depth);
     auto data = generate_random_data<std::uint8_t, 32>(leafs_number);
     merkle_tree_type tree(data);
     std::size_t proof_idx = std::rand() % leafs_number;
@@ -107,8 +109,24 @@ void test_merkle_proof(std::size_t tree_depth) {
 
 BOOST_AUTO_TEST_SUITE(marshalling_merkle_proof_test_suite)
 
-BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_test) {
+BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_2_test) {
     test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 2>(5);
+    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 2>(5);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_3_test) {
+    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 3>(5);
+    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 3>(5);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_4_test) {
+    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 4>(5);
+    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 4>(5);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_5_test) {
+    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 5>(5);
+    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 5>(5);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
