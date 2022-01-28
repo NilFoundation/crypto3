@@ -61,7 +61,8 @@ set(TESTS_NAMES
     "r1cs_gg_ppzksnark_proof"
     "r1cs_gg_ppzksnark_verification_key"
     "r1cs_gg_ppzksnark"
-    "lpc_commitment")
+    "lpc_commitment"
+    "redshift_proof")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_marshalling_test(${TEST_NAME})
