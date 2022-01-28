@@ -11,6 +11,7 @@
 #ifndef BOOST_MULTIPRECISION_MODULAR_FUNCTIONS_FIXED_PRECISION_HPP
 #define BOOST_MULTIPRECISION_MODULAR_FUNCTIONS_FIXED_PRECISION_HPP
 
+#include <nil/crypto3/multiprecision/modular/asm_functions.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_policy_fixed.hpp>
 
 #include <boost/mpl/if.hpp>
@@ -196,6 +197,7 @@ namespace nil {
                     typedef typename policy_type::number_type number_type;
                     typedef typename policy_type::dbl_lmb_number_type dbl_lmb_number_type;
 
+                    constexpr static auto limbs_count = policy_type::limbs_count;
                     constexpr static auto limb_bits = policy_type::limb_bits;
 
                     constexpr void initialize_modulus(const number_type &m) {
@@ -442,26 +444,26 @@ namespace nil {
                         // TODO: maybe reduce input parameters
                         /// input parameters should be lesser than modulus
                         // BOOST_ASSERT(eval_lt(x, m_mod.backend()) && eval_lt(y, m_mod.backend()));
-
-                        using T = typename policy_type::Backend_padded_limbs_u;
-                        T tmp(result), modulus(m_mod.backend());
-                        eval_add(tmp, y);
-                        if (!eval_lt(tmp, modulus)) {
-                            eval_subtract(tmp, modulus);
+                        if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && (limbs_count >= 2)) {
+                            add_mod(limbs_count, result, y, m_mod);
+                            result.resize(limbs_count, limbs_count);
+                            result.normalize();
+                        } else {
+                            using T = typename policy_type::Backend_padded_limbs_u;
+                            T tmp(result), modulus(m_mod.backend());
+                            eval_add(tmp, y);
+                            if (!eval_lt(tmp, modulus)) {
+                                eval_subtract(tmp, modulus);
+                            }
+                            result = tmp;
                         }
-                        result = tmp;
                     }
 
-                    template<typename Backend1, typename Backend2>
-                    constexpr void regular_mul(Backend1 &result, const Backend2 &y) const {
-                        regular_mul(result, result, y);
-                    }
-
-                    template<typename Backend1, typename Backend2, typename Backend3,
+                    template<typename Backend1, typename Backend2,
                              /// result should fit in the output parameter
                              typename = typename boost::enable_if_c<max_precision<Backend1>::value >=
                                                                     max_precision<Backend>::value>::type>
-                    constexpr void regular_mul(Backend1 &result, const Backend2 &x, const Backend3 &y) const {
+                    constexpr void regular_mul(Backend1 &result, const Backend2 &y) const {
                         using default_ops::eval_lt;
                         using default_ops::eval_multiply;
 
@@ -469,24 +471,24 @@ namespace nil {
                         /// input parameters should be lesser than modulus
                         // BOOST_ASSERT(eval_lt(x, m_mod.backend()) && eval_lt(y, m_mod.backend()));
 
-                        Backend_doubled_limbs tmp(x);
+                        Backend_doubled_limbs tmp(result);
                         eval_multiply(tmp, y);
                         barrett_reduce(result, tmp);
                     }
 
-                    template<typename Backend1, typename Backend2>
-                    constexpr void montgomery_mul(Backend1 &result, const Backend2 &y) const {
-                        montgomery_mul(result, result, y);
-                    }
+//                    template<typename Backend1, typename Backend2>
+//                    constexpr void montgomery_mul(Backend1 &result, const Backend2 &y) const {
+//                        montgomery_mul(result, result, y);
+//                    }
 
                     //
                     // WARNING: could be errors here due to trivial backend -- more tests needed
                     //
-                    template<typename Backend1, typename Backend2, typename Backend3,
+                    template<typename Backend1, typename Backend2,
                              /// result should fit in the output parameter
                              typename = typename boost::enable_if_c<max_precision<Backend1>::value >=
                                                                     max_precision<Backend>::value>::type>
-                    constexpr void montgomery_mul(Backend1 &result, const Backend2 &x, const Backend3 &y) const {
+                    constexpr void montgomery_mul(Backend1 &result, const Backend2 &y) const {
                         using default_ops::eval_bitwise_and;
                         using default_ops::eval_lt;
                         using default_ops::eval_subtract;
@@ -501,7 +503,7 @@ namespace nil {
                         auto y_last_limb = get_limb_value(y, 0);
 
                         for (auto i = 0; i < mod_size; i++) {
-                            auto x_i = get_limb_value(x, i);
+                            auto x_i = get_limb_value(result, i);
                             auto A_0 = A.limbs()[0];
                             internal_limb_type u_i = (A_0 + x_i * y_last_limb) * m_montgomery_p_dash;
 

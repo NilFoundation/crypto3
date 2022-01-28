@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2019 Alexey Moskvin
+// Copyright (c) 2019-2021 Aleksei Moskvin <alalmoskvin@nil.foundation>
 // Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -17,6 +17,7 @@
 #include <nil/crypto3/multiprecision/detail/digits.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
 
+#include <nil/crypto3/multiprecision/modular/asm_defines.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_params.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_adaptor_fixed.hpp>
 
@@ -221,9 +222,17 @@ namespace nil {
                     BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
                     using default_ops::eval_lt;
-                    eval_subtract(result.base_data(), o.base_data());
-                    if (eval_lt(result.base_data(), ui_type(0u))) {
-                        eval_add(result.base_data(), result.mod_data().get_mod().backend());
+
+                    auto limbs_count = get_limbs_count<Backend>();
+                    if (!BOOST_MP_IS_CONST_EVALUATED(result.base_data().limbs()) && (limbs_count >= 2)) {
+                        sub_mod(limbs_count, result.base_data(), o.base_data(), result.mod_data().get_mod());
+                        result.base_data().resize(limbs_count, limbs_count);
+                        result.base_data().normalize();
+                    } else {
+                        eval_subtract(result.base_data(), o.base_data());
+                        if (eval_lt(result.base_data(), ui_type(0u))) {
+                            eval_add(result.base_data(), result.mod_data().get_mod().backend());
+                        }
                     }
                 }
 

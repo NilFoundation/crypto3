@@ -132,9 +132,9 @@ namespace nil {
                 template<typename Backend1, typename Backend2>
                 constexpr void mod_mul(Backend1& result, const Backend2& y) {
                     if (is_odd_mod) {
-                        m_mod_obj.montgomery_mul(result, result, y);
+                        m_mod_obj.montgomery_mul(result, y);
                     } else {
-                        m_mod_obj.regular_mul(result, result, y);
+                        m_mod_obj.regular_mul(result, y);
                     }
                 }
 
