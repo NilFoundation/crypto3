@@ -61,17 +61,17 @@ namespace nil {
                     constexpr static const std::size_t value_bits = node_type::value_bits;
                     typedef typename node_type::value_type value_type;
 
-                    merkle_proof_impl() : li(0) {};
+                    merkle_proof_impl() : _li(0) {};
 
                     merkle_proof_impl(merkle_tree<hash_type, arity> tree, std::size_t leaf_idx) {
-                        root = tree.root();
-                        path.resize(tree.row_count() - 1);
+                        _root = tree.root();
+                        _path.resize(tree.row_count() - 1);
 
-                        li = leaf_idx;
+                        _li = leaf_idx;
 
                         std::size_t cur_leaf = leaf_idx, cur_row = 0;
 
-                        while (cur_leaf != tree.size() - 1) {    // while it's not root
+                        while (cur_leaf != tree.size() - 1) {    // while it's not _root
                             std::size_t parent = tree.parent(cur_leaf);
                             std::array<std::size_t, arity> children = tree.children(parent);
                             std::size_t cur_leaf_pos = cur_leaf % arity;
@@ -82,7 +82,7 @@ namespace nil {
                                     if (save_position > cur_leaf_pos) {
                                         --save_position;
                                     }
-                                    path[cur_row][save_position] =
+                                    _path[cur_row][save_position] =
                                         path_element_type(tree[current_child], current_child % arity);
                                 }
                             }
@@ -95,17 +95,17 @@ namespace nil {
                     bool validate(Hashable a) {
                         value_type d = crypto3::hash<hash_type>(a);
 
-                        for (size_t cur_row = 0; cur_row < path.size(); ++cur_row) {
+                        for (size_t cur_row = 0; cur_row < _path.size(); ++cur_row) {
 
                             accumulator_set<hash_type> acc;
                             bool was_missing = false;    // If every previous index was fine - missing the last one.
 
                             for (size_t i = 0; i < arity - 1; ++i) {
-                                if (path[cur_row][i].position != i && !was_missing) {
+                                if (_path[cur_row][i]._position != i && !was_missing) {
                                     crypto3::hash<hash_type>(d.begin(), d.end(), acc);
                                     was_missing = true;
                                 }
-                                crypto3::hash<hash_type>(path[cur_row][i].hash.begin(), path[cur_row][i].hash.end(),
+                                crypto3::hash<hash_type>(_path[cur_row][i]._hash.begin(), _path[cur_row][i]._hash.end(),
                                                          acc);
                             }
                             if (!was_missing) {
@@ -113,62 +113,63 @@ namespace nil {
                             }
                             d = accumulators::extract::hash<hash_type>(acc);
                         }
-                        return (d == root);
+                        return (d == _root);
                     }
 
                     std::size_t leaf_index() const {
-                        return li;
+                        return _li;
                     }
 
                     bool operator==(const merkle_proof_impl &rhs) const {
-                        return li == rhs.li && root == rhs.root && path == rhs.path;
+                        return _li == rhs._li && _root == rhs._root && _path == rhs._path;
                     }
                     bool operator!=(const merkle_proof_impl &rhs) const {
                         return !(rhs == *this);
                     }
 
                     struct path_element_type {
-                        path_element_type(value_type x, size_t pos) : hash(x), position(pos) {
+                        path_element_type(value_type x, size_t pos) : _hash(x), _position(pos) {
                         }
                         path_element_type() {
                         }
 
                         bool operator==(const path_element_type &rhs) const {
-                            return hash == rhs.hash && position == rhs.position;
+                            return _hash == rhs._hash && _position == rhs._position;
                         }
                         bool operator!=(const path_element_type &rhs) const {
                             return !(rhs == *this);
                         }
 
-                        const value_type &get_hash() const {
-                            return hash;
+                        const value_type &hash() const {
+                            return _hash;
                         }
 
-                        std::size_t get_position() const {
-                            return position;
+                        std::size_t position() const {
+                            return _position;
                         }
 
-                        value_type hash;
-                        std::size_t position;
+                        value_type _hash;
+                        std::size_t _position;
 
                         template<typename, typename>
                         friend class nil::crypto3::marshalling::types::merkle_proof_marshalling;
                     };
 
-                    typedef std::vector<std::array<path_element_type, Arity - 1>> path_type;
+                    typedef std::array<path_element_type, Arity - 1> layer_type;
+                    typedef std::vector<layer_type> path_type;
 
-                    const value_type &get_root() const {
-                        return root;
+                    const value_type &root() const {
+                        return _root;
                     }
 
-                    const path_type &get_path() const {
-                        return path;
+                    const path_type &path() const {
+                        return _path;
                     }
 
                 private:
-                    std::size_t li;
-                    value_type root;
-                    path_type path;
+                    std::size_t _li;
+                    value_type _root;
+                    path_type _path;
 
                     template<typename, typename, std::size_t>
                     friend class nil::crypto3::zk::components::merkle_proof;
