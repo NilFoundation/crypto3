@@ -33,6 +33,7 @@ namespace nil {
 
                 template<typename CommitmentSchemeType>
                 struct redshift_proof {
+                    typedef CommitmentSchemeType commitment_scheme_type;
 
                     redshift_proof() {
                     }

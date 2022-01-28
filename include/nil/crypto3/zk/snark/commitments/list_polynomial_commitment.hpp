@@ -54,12 +54,17 @@ namespace nil {
                  */
                 template<typename FieldType,
                          typename Hash,
-                         std::size_t lambda = 40,
-                         std::size_t k = 1,
-                         std::size_t r = 1,
-                         std::size_t m = 2>
-                class list_polynomial_commitment_scheme {
+                         std::size_t _lambda = 40,
+                         std::size_t _k = 1,
+                         std::size_t _r = 1,
+                         std::size_t _m = 2>
+                struct list_polynomial_commitment_scheme {
+                    static constexpr std::size_t lambda = _lambda;
+                    static constexpr std::size_t k = _k;
+                    static constexpr std::size_t r = _r;
+                    static constexpr std::size_t m = _m;
 
+                    typedef FieldType field_type;
                     typedef Hash transcript_hash_type;
 
                     typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
@@ -72,7 +77,6 @@ namespace nil {
                         enum challenges_ids { x, y };
                     };
 
-                public:
                     using openning_type = merkle_proof_type;
                     using commitment_type = typename merkle_tree_type::value_type;
 
