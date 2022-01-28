@@ -51,6 +51,16 @@ namespace nil {
                     typename CommitmentSchemeType::proof_type Q_lpc_proof;
 
                     std::vector<typename CommitmentSchemeType::proof_type> T_lpc_proofs;
+
+                    bool operator==(const redshift_proof &rhs) const {
+                        return f_commitments == rhs.f_commitments && P_commitment == rhs.P_commitment &&
+                               Q_commitment == rhs.Q_commitment && T_commitments == rhs.T_commitments &&
+                               f_lpc_proofs == rhs.f_lpc_proofs && P_lpc_proof == rhs.P_lpc_proof &&
+                               Q_lpc_proof == rhs.Q_lpc_proof && T_lpc_proofs == rhs.T_lpc_proofs;
+                    }
+                    bool operator!=(const redshift_proof &rhs) const {
+                        return !(rhs == *this);
+                    }
                 };
             }    // namespace snark
         }        // namespace zk
