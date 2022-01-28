@@ -100,26 +100,26 @@ namespace nil {
                                                                                  MerkleProof::arity>>::value>::type>
                 struct merkle_proof_marshalling {
                     static void set_leaf_index(MerkleProof &mp, const std::size_t li) {
-                        mp.li = li;
+                        mp._li = li;
                     }
 
                     static void set_root(MerkleProof &mp, const typename MerkleProof::value_type &root) {
-                        mp.root = root;
+                        mp._root = root;
                     }
 
                     static void set_layer_element_hash(typename MerkleProof::path_element_type &element,
                                                        const typename MerkleProof::value_type &element_hash) {
-                        element.hash = element_hash;
+                        element._hash = element_hash;
                     }
 
                     static void set_layer_element_position(typename MerkleProof::path_element_type &element,
                                                            std::size_t position) {
-                        element.position = position;
+                        element._position = position;
                     }
 
                     static void append_path(MerkleProof &mp,
                                             const typename MerkleProof::path_type::value_type &path_layer) {
-                        mp.path.emplace_back(path_layer);
+                        mp._path.emplace_back(path_layer);
                     }
                 };
 
@@ -152,20 +152,20 @@ namespace nil {
 
                     digest_marshalling_type filled_root;
                     auto &filled_root_val = filled_root.value();
-                    for (const auto c : mp.get_root()) {
+                    for (const auto c : mp.root()) {
                         filled_root_val.push_back(octet_marshalling_type(c));
                     }
 
                     path_marshalling_type filled_path;
-                    for (const auto &layer : mp.get_path()) {
+                    for (const auto &layer : mp.path()) {
                         layer_marshalling_type filled_layer;
                         for (const auto &el : layer) {
                             digest_marshalling_type filled_layer_element_hash;
-                            for (const auto c : el.get_hash()) {
+                            for (const auto c : el.hash()) {
                                 filled_layer_element_hash.value().push_back(octet_marshalling_type(c));
                             }
-                            filled_layer.value().push_back(layer_element_marshalling_type(std::make_tuple(
-                                filled_layer_element_hash, size_t_marshalling_type(el.get_position()))));
+                            filled_layer.value().push_back(layer_element_marshalling_type(
+                                std::make_tuple(filled_layer_element_hash, size_t_marshalling_type(el.position()))));
                         }
                         filled_path.value().push_back(filled_layer);
                     }
