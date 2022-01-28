@@ -31,6 +31,8 @@
 #include <nil/crypto3/algebra/curves/forms.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/element_g1.hpp>
 
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_minus_3/element_g1.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
