@@ -145,6 +145,15 @@ namespace nil {
                         return *this;
                     }
 
+                    bool compare_eq(const modular_adaptor& o) const {
+                        return !m_mod.compare(o.mod_data()) && !base_data().compare(o.base_data());
+                    }
+
+                    template<class T>
+                    int compare_eq(const T& val) const {
+                        return !base_data().compare(val);
+                    }
+
                     // TODO: maybe change behaviour to check a congruence relation
                     int compare(const modular_adaptor& o) const {
                         // They are either equal or not:<
@@ -222,13 +231,15 @@ namespace nil {
                     BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
                     using default_ops::eval_lt;
-
+#if BOOST_ARCH_X86_64
                     auto limbs_count = get_limbs_count<Backend>();
                     if (!BOOST_MP_IS_CONST_EVALUATED(result.base_data().limbs()) && (limbs_count >= 2)) {
                         sub_mod(limbs_count, result.base_data(), o.base_data(), result.mod_data().get_mod());
                         result.base_data().resize(limbs_count, limbs_count);
                         result.base_data().normalize();
-                    } else {
+                    } else
+#endif
+                    {
                         eval_subtract(result.base_data(), o.base_data());
                         if (eval_lt(result.base_data(), ui_type(0u))) {
                             eval_add(result.base_data(), result.mod_data().get_mod().backend());

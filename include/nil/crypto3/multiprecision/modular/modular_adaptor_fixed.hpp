@@ -119,6 +119,15 @@ namespace nil {
                         return *this;
                     }
 
+                    constexpr bool compare_eq(const modular_adaptor& o) const {
+                        return !m_mod.compare(o.mod_data()) && !base_data().compare(o.base_data());
+                    }
+
+                    template<class T>
+                    constexpr int compare_eq(const T& val) const {
+                        return !base_data().compare(val);
+                    }
+
                     constexpr int compare(const modular_adaptor &o) const {
                         //
                         // modulus values should be the same

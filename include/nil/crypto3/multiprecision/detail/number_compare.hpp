@@ -24,9 +24,17 @@ namespace nil {
                 // under strange and hard to reproduce circumstances.
                 //
                 template<class B>
-                inline BOOST_MP_CXX14_CONSTEXPR bool eval_eq(const B& a, const B& b) {
+                inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_modular, bool>::type
+                    eval_eq(const B& a, const B& b) {
+                    return a.compare_eq(b);
+                }
+
+                template<class B>
+                inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value != number_kind_modular, bool>::type
+                    eval_eq(const B& a, const B& b) {
                     return a.compare(b) == 0;
                 }
+
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR bool eval_eq_imp(const T& a, const U& b,
                                                                  const std::integral_constant<bool, true>&) {
