@@ -79,8 +79,20 @@ namespace nil {
                     using openning_type = merkle_proof_type;
                     using commitment_type = typename merkle_tree_type::value_type;
 
+                    struct round_proof_type {
+                        std::array<typename FieldType::value_type, m> y;
+                        std::array<typename FieldType::value_type, m> p;
+
+                        merkle_tree_type T;
+
+                        typename FieldType::value_type colinear_value;
+                        merkle_proof_type colinear_path;
+                    };
+
                     struct proof_type {
-                        
+                        // 0..r-2
+                        std::vector<round_proof_type> round_proofs;
+                        math::polynomial::polynomial<typename FieldType::value_type> final_polynomial;
                     };
 
                     // The result of this function is not commitment_type (as it would expected),
@@ -135,10 +147,10 @@ namespace nil {
                             s[0] = x;
                             s[1] = -x;
 
-                            std::arraytypename FieldType::value_type, m> y;
+                            std::array<typename FieldType::value_type, m> y;
 
                             for (std::size_t j = 0; j < m; j++) {
-                                y[j] = f(s[j]);
+                                y[j] = f.evaluate(s[j]);
                             }
 
                             std::array<typename FieldType::value_type, m> p;
@@ -149,26 +161,29 @@ namespace nil {
 
                                     typename FieldType::value_type leaf = f.evaluate(s[j]);
                                     std::size_t leaf_index = std::find(D.begin(), D.end(), leaf) - D.begin();
-                                    p[j] = T_0.hash_path(leaf_index);
+                                    p[j] = T.hash_path(leaf_index);
                                 }
                             } else {
                                 for (std::size_t j = 0; j < m; j++) {
 
                                     std::size_t leaf_index = std::find(D.begin(), D.end(), y[j]) - D.begin();
-                                    p[j] = T_i.hash_path(leaf_index);
+                                    p[j] = T.hash_path(leaf_index);
                                 }
                             }
 
-                            typename FieldType::value_type f_y_i = f_round.evaluate(y_challenges[i]);
-                            std::size_t leaf_index = std::find(D.begin(), D.end(), y_challenges[i]) - D.begin();
-                            f_y_openings[i] = merkle_proof_type(f_round_tree, leaf_index);
-
                             if (i < r - 1) {
-                                f_round_tree = commit(f_round, D);
+                                T = commit(f_round, D);
                                 f_commitments[i] = f_round_tree.root();
                                 transcript(f_commitments[i]);
+
+                                typename FieldType::value_type colinear_value = f_next.evaluate(x_next);
+
+                                std::size_t leaf_index = std::find(D.begin(), D.end(), colinear_value) - D.begin();
+                                typename FieldType::value_type colinear_path = T.hash_path(leaf_index);
+
+                                round_proof(y, p, T, colinear_value, colinear_path);
                             } else {
-                                f_ip1_coefficients = f_round;
+                                
                             }
 
                             x = x_next;
