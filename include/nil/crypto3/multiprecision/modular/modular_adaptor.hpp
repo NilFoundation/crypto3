@@ -154,7 +154,6 @@ namespace nil {
                         return !base_data().compare(val);
                     }
 
-                    // TODO: maybe change behaviour to check a congruence relation
                     int compare(const modular_adaptor& o) const {
                         // They are either equal or not:<
                         if (m_mod.compare(o.mod_data()) != 0) {
@@ -167,7 +166,6 @@ namespace nil {
                         return tmp1.compare(tmp2);
                     }
 
-                    // TODO: maybe change behaviour to check a congruence relation
                     template<class T>
                     int compare(const T& val) const {
                         using default_ops::eval_lt;
@@ -233,8 +231,8 @@ namespace nil {
                     using default_ops::eval_lt;
 #if BOOST_ARCH_X86_64
                     auto limbs_count = get_limbs_count<Backend>();
-                    if (!BOOST_MP_IS_CONST_EVALUATED(result.base_data().limbs()) && (limbs_count >= 2)) {
-                        sub_mod(limbs_count, result.base_data(), o.base_data(), result.mod_data().get_mod());
+                    if ((limbs_count >= 2)) {
+                        sub_mod(limbs_count, result.base_data().limbs(), o.base_data().limbs(), result.mod_data().get_mod().backend().limbs());
                         result.base_data().resize(limbs_count, limbs_count);
                         result.base_data().normalize();
                     } else

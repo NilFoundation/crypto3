@@ -201,7 +201,7 @@ namespace nil {
                     constexpr static auto limb_bits = policy_type::limb_bits;
 
                     constexpr void initialize_modulus(const number_type &m) {
-                    BOOST_ASSERT(check_modulus_constraints(m.backend()));
+                        BOOST_ASSERT(check_modulus_constraints(m.backend()));
 
                         m_mod = m;
                     }
@@ -220,7 +220,7 @@ namespace nil {
                     constexpr void initialize_montgomery_params() {
                         if (check_montgomery_constraints(m_mod.backend())) {
                             find_const_variables();
-                            find_modulus_mask();
+//                            find_modulus_mask();
                         }
                     }
 
@@ -258,16 +258,9 @@ namespace nil {
 
                         Backend_doubled_padded_limbs r;
                         eval_bit_set(r, 2 * m_mod.backend().size() * limb_bits);
-                        //                        eval_multiply(r, r); // Using x2 upper
                         barrett_reduce(r);
 
                         m_montgomery_r2 = static_cast<Backend>(r);
-                    }
-
-                    constexpr void find_modulus_mask() {
-                        m_modulus_mask = static_cast<internal_limb_type>(1u);
-                        eval_left_shift(m_modulus_mask, m_mod.backend().size() * limb_bits);
-                        eval_subtract(m_modulus_mask, decltype(m_modulus_mask)(static_cast<internal_limb_type>(1u)));
                     }
 
                     constexpr void initialize(const number_type &m) {
@@ -289,9 +282,6 @@ namespace nil {
                     constexpr auto &get_p_dash() {
                         return m_montgomery_p_dash;
                     }
-                    constexpr auto &get_modulus_mask() {
-                        return m_modulus_mask;
-                    }
 
                     constexpr const auto &get_mod() const {
                         return m_mod;
@@ -304,9 +294,6 @@ namespace nil {
                     }
                     constexpr auto get_p_dash() const {
                         return m_montgomery_p_dash;
-                    }
-                    constexpr const auto &get_modulus_mask() const {
-                        return m_modulus_mask;
                     }
 
                     constexpr modular_functions_fixed() {
@@ -321,7 +308,6 @@ namespace nil {
                         m_barrett_mu = o.get_mu();
                         m_montgomery_r2 = o.get_r2();
                         m_montgomery_p_dash = o.get_p_dash();
-                        m_modulus_mask = o.get_modulus_mask();
                     }
 
                     template<typename Backend1>
@@ -412,24 +398,44 @@ namespace nil {
 
                         Backend_doubled_padded_limbs accum(result);
                         Backend_doubled_padded_limbs prod;
-
-                        for (auto i = 0; i < m_mod.backend().size(); ++i) {
-                            eval_multiply(
-                                prod, m_mod.backend(),
-                                static_cast<internal_limb_type>(custom_get_limb_value<internal_limb_type>(accum, i) *
-                                                                /// to prevent overflow error in constexpr
-                                                                static_cast<double_limb_type>(m_montgomery_p_dash)));
-                            eval_left_shift(prod, i * limb_bits);
-                            eval_add(accum, prod);
+#if BOOST_ARCH_X86_64
+                        if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && m_mod.backend().size() >= 2) {
+                            for (size_t i = 0; i < m_mod.backend().size(); ++i) {
+                                reduce_help(m_mod.backend().size(), i, accum.limbs(), m_mod.backend().limbs(),
+                                                    static_cast<double_limb_type>(m_montgomery_p_dash));
+                            }
+                            if (cmp_asm(m_mod.backend().size(), accum.limbs() + m_mod.backend().size(), m_mod.backend().limbs()) >= 0) {
+                                sub_mod(m_mod.backend().size(), accum.limbs() + m_mod.backend().size(), m_mod.backend().limbs(), m_mod.backend().limbs());
+                            }
+                            // Now result in first m_mod.backend().size() limbs, so we can do
+                            // eval_bitwise_and(accum, m_modulus_mask);
+                            // or just copy n limbs to result
+                            for (size_t i = 0; i <  m_mod.backend().size(); ++i) {
+                                result.limbs()[i] = accum.limbs()[i + m_mod.backend().size()];
+                            }
+                            result.resize(m_mod.backend().size(), m_mod.backend().size());
+                            result.normalize();
+                        } else
+#endif
+                        {
+                            for (auto i = 0; i < m_mod.backend().size(); ++i) {
+                                eval_multiply(prod, m_mod.backend(),
+                                              static_cast<internal_limb_type>(
+                                                  custom_get_limb_value<internal_limb_type>(accum, i) *
+                                                  /// to prevent overflow error in constexpr
+                                                  static_cast<double_limb_type>(m_montgomery_p_dash)));
+                                eval_left_shift(prod, i * limb_bits);
+                                eval_add(accum, prod);
+                            }
+                            custom_right_shift(accum, m_mod.backend().size() * limb_bits);
+                            if (!eval_lt(accum, m_mod.backend())) {
+                                eval_subtract(accum, m_mod.backend());
+                            }
+                            if (m_mod.backend().size() < accum.size()) {
+                                accum.resize(m_mod.backend().size(), m_mod.backend().size());
+                            }
+                            result = accum;
                         }
-
-                        custom_right_shift(accum, m_mod.backend().size() * limb_bits);
-
-                        if (!eval_lt(accum, m_mod.backend())) {
-                            eval_subtract(accum, m_mod.backend());
-                        }
-                        eval_bitwise_and(accum, m_modulus_mask);
-                        result = accum;
                     }
 
                     template<typename Backend1, typename Backend2,
@@ -444,11 +450,14 @@ namespace nil {
                         // TODO: maybe reduce input parameters
                         /// input parameters should be lesser than modulus
                         // BOOST_ASSERT(eval_lt(x, m_mod.backend()) && eval_lt(y, m_mod.backend()));
+#if BOOST_ARCH_X86_64
                         if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && (limbs_count >= 2)) {
                             add_mod(limbs_count, result, y, m_mod);
                             result.resize(limbs_count, limbs_count);
                             result.normalize();
-                        } else {
+                        } else
+#endif
+                        {
                             using T = typename policy_type::Backend_padded_limbs_u;
                             T tmp(result), modulus(m_mod.backend());
                             eval_add(tmp, y);
@@ -475,12 +484,6 @@ namespace nil {
                         eval_multiply(tmp, y);
                         barrett_reduce(result, tmp);
                     }
-
-//                    template<typename Backend1, typename Backend2>
-//                    constexpr void montgomery_mul(Backend1 &result, const Backend2 &y) const {
-//                        montgomery_mul(result, result, y);
-//                    }
-
                     //
                     // WARNING: could be errors here due to trivial backend -- more tests needed
                     //
@@ -654,8 +657,6 @@ namespace nil {
                         auto tmp_p_dash = m_montgomery_p_dash;
                         m_montgomery_p_dash = o.get_p_dash();
                         o.get_p_dash() = tmp_p_dash;
-
-                        m_modulus_mask.swap(o.get_modulus_mask());
                     }
 
                     constexpr modular_functions_fixed &operator=(const modular_functions_fixed &o) {
@@ -677,7 +678,6 @@ namespace nil {
                     Backend_doubled_1 m_barrett_mu;
                     Backend m_montgomery_r2;
                     internal_limb_type m_montgomery_p_dash = 0;
-                    Backend_padded_limbs m_modulus_mask;
                 };
 
             }    // namespace backends
