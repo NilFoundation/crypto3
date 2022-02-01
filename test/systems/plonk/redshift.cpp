@@ -54,4 +54,34 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
     zk::snark::redshift_prover<typename curve_type::base_field_type, 5, 2, 2, 2> prove;
 }
 
+BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
+
+    using curve_type = algebra::curves::bls12<381>;
+
+    zk::snark::redshift_preprocessor<typename curve_type::base_field_type, 5, 2> preprocess;
+
+    // auto preprocessed_data = preprocess::process(cs, assignments);
+    zk::snark::redshift_prover<typename curve_type::base_field_type, 5, 2, 2, 2> prove;
+}
+
+BOOST_AUTO_TEST_CASE(redshift_lookup_argument_test) {
+
+    using curve_type = algebra::curves::bls12<381>;
+
+    zk::snark::redshift_preprocessor<typename curve_type::base_field_type, 5, 2> preprocess;
+
+    // auto preprocessed_data = preprocess::process(cs, assignments);
+    zk::snark::redshift_prover<typename curve_type::base_field_type, 5, 2, 2, 2> prove;
+}
+
+BOOST_AUTO_TEST_CASE(redshift_witness_argument_test) {
+
+    using curve_type = algebra::curves::bls12<381>;
+
+    zk::snark::redshift_preprocessor<typename curve_type::base_field_type, 5, 2> preprocess;
+
+    // auto preprocessed_data = preprocess::process(cs, assignments);
+    zk::snark::redshift_prover<typename curve_type::base_field_type, 5, 2, 2, 2> prove;
+}
+
 BOOST_AUTO_TEST_SUITE_END()

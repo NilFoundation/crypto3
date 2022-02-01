@@ -48,6 +48,7 @@ endmacro()
 
 set(TESTS_NAMES
     "commitment/lpc"
+    "commitment/fri"
 
     "routing_algorithms/test_routing_algorithms"
 
