@@ -57,6 +57,8 @@
 // #include <nil/crypto3/algebra/curves/x962_p.hpp>
 #include <nil/crypto3/algebra/curves/curve25519.hpp>
 
+#include <nil/crypto3/algebra/curves/vesta.hpp>
+#include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/fp2.hpp>
 #include <nil/crypto3/algebra/fields/fp3.hpp>
 
@@ -420,6 +422,7 @@ void curve_operation_test_montgomery(const TestSet &test_set,
 }
 
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
+/**/
 
 BOOST_DATA_TEST_CASE(curve_operation_test_jubjub_g1, string_data("curve_operation_test_jubjub_g1"), data_set) {
     using policy_type = curves::jubjub::g1_type<>;
@@ -596,6 +599,19 @@ BOOST_DATA_TEST_CASE(curve_operation_test_edwards25519, string_data("curve_opera
 
     curve_operation_test_twisted_edwards<policy_type>(data_set,
                                                       fp_extended_curve_twisted_edwards_test_init<policy_type>);
+}
+/**/
+BOOST_DATA_TEST_CASE(curve_operation_test_pallas, string_data("curve_operation_test_pallas"), data_set) {
+    using policy_type = curves::pallas::g1_type<>;
+
+    curve_operation_test<policy_type>(data_set,
+                                                      fp_curve_test_init<policy_type>);
+}
+BOOST_DATA_TEST_CASE(curve_operation_test_vesta, string_data("curve_operation_test_vesta"), data_set) {
+    using policy_type = curves::vesta::g1_type<>;
+
+    curve_operation_test<policy_type>(data_set,
+                                                      fp_curve_test_init<policy_type>);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

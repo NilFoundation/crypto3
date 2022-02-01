@@ -38,6 +38,11 @@
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
+//#include <nil/crypto3/algebra/curves/wei25519.hpp>
+#include <nil/crypto3/algebra/curves/secp_k1.hpp>
+#include <nil/crypto3/algebra/curves/pallas.hpp>
+#include <nil/crypto3/algebra/curves/secp_r1.hpp>
+
 using namespace nil::crypto3::algebra;
 
 template<typename FpCurveGroupElement>
@@ -91,6 +96,8 @@ void fp_curve_group_basic_math_examples() {
     // std::cout << "c1 normalized value: ";
     // print_fp_curve_group_element(cn);
 }
+
+
 
 template<typename Fp2CurveGroup>
 void fp2_curve_group_basic_math_examples() {
@@ -233,6 +240,11 @@ int main() {
     fp3_curve_group_basic_math_examples<curves::mnt6<298>::g2_type<>>();
 
     std::cout << "----------------------------" << std::endl;
+
+    std::cout << "Pallas curve g1 group basic math:" << std::endl;
+    fp_curve_group_basic_math_examples<curves::pallas::g1_type<>>();
+    
+     std::cout << "----------------------------" << std::endl;
 
     return 0;
 }
