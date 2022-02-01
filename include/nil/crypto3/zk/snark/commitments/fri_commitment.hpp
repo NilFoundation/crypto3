@@ -184,10 +184,7 @@ namespace nil {
 
                                 round_proofs.emplace_back(y, p, T, colinear_value, colinear_path);
                             } else {
-                                math::polynomial::polynomial<typename FieldType::value_type> final_polynomial(
-                                    f_next.begin(), f_next.end() + Q.size());
-
-                                return proof_type(round_proofs, final_polynomial);
+                                return proof_type(round_proofs, f_next);
                             }
 
                             x = x_next;
