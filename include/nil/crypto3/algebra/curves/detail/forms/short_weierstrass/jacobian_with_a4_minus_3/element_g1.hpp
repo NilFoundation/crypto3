@@ -208,7 +208,7 @@ namespace nil {
                                 return result_type::zero();
                             }
 
-                            return result_type(X / Z.squared(), Y / (Z * Z.squared()), Z);    //  x=X/Z^2, y=Y/Z^3
+                            return result_type(X / Z.squared(), Y / (Z * Z.squared()));    //  x=X/Z^2, y=Y/Z^3
                         }
 
                         /** @brief
