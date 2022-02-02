@@ -155,7 +155,7 @@ namespace nil {
                     BOOST_STATIC_ASSERT(algebra::is_field<FieldType>::value);
                     BOOST_STATIC_ASSERT(std::is_same<typename FieldType::value_type, value_type>::value);
 
-                    const std::size_t n = detail::get_power_of_two(a.size() + b.size() - 1);
+                    const std::size_t n = detail::power_of_two(a.size() + b.size() - 1);
                     value_type omega = unity_root<FieldType>(n);
 
                     Range u(a);

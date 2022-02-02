@@ -48,7 +48,7 @@ namespace nil {
                     return r;
                 }
 
-                constexpr std::size_t get_power_of_two(std::size_t n) {
+                constexpr std::size_t power_of_two(std::size_t n) {
                     n--;
                     n |= n >> 1;
                     n |= n >> 2;
