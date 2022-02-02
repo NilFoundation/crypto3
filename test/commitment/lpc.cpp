@@ -72,7 +72,7 @@ namespace boost {
 template<typename FieldType, typename NumberType>
 std::vector<math::polynomial::polynomial<typename FieldType::value_type>> generate(NumberType degree) {
     typedef boost::random::independent_bits_engine<boost::random::mt19937, FieldType::modulus_bits,
-                                                   typename FieldType::value_type::data_type>
+                                                   typename FieldType::value_type::integral_type>
         random_polynomial_generator_type;
 
     std::vector<math::polynomial::polynomial<typename FieldType::value_type>> res;
@@ -82,13 +82,13 @@ std::vector<math::polynomial::polynomial<typename FieldType::value_type>> genera
     boost::random::uniform_int_distribution<> distrib(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
 
     random_polynomial_generator_type polynomial_element_gen;
-    std::size_t height = distrib(gen);
+    std::size_t height = 1;
     res.reserve(height);
 
     for (int i = 0; i < height; i++) {
         math::polynomial::polynomial<typename FieldType::value_type> poly;
         for (int j = 0; j < degree; j++) {
-            //            poly.push_back(typename FieldType::value_type(polynomial_element_gen()));
+            poly.push_back(typename FieldType::value_type(polynomial_element_gen()));
         }
         res.push_back(poly);
     }
@@ -98,10 +98,10 @@ std::vector<math::polynomial::polynomial<typename FieldType::value_type>> genera
 
 BOOST_AUTO_TEST_SUITE(lpc_test_suite)
 
-BOOST_DATA_TEST_CASE(lpc_performance_test,
-                     ::boost::unit_test::data::make(generate<typename algebra::curves::bls12<381>::base_field_type>(
-                         multiprecision::pow(multiprecision::cpp_int(2), 24))),
-                     p) {
+BOOST_DATA_TEST_CASE(
+    lpc_performance_test,
+    ::boost::unit_test::data::make(generate<typename algebra::curves::bls12<381>::base_field_type>(1 << 24)),
+    poly) {
     typedef algebra::curves::bls12<381> curve_type;
     typedef typename curve_type::base_field_type field_type;
 
@@ -128,7 +128,7 @@ BOOST_DATA_TEST_CASE(lpc_performance_test,
         D_0.emplace_back(omega.pow(power));
     }
 
-    merkle_tree_type tree = lpc_type::commit(p, D_0);
+    merkle_tree_type tree = lpc_type::commit(poly, D_0);
 
     std::array<typename field_type::value_type, 1> evaluation_points = {algebra::random_element<field_type>()};
 
@@ -136,7 +136,7 @@ BOOST_DATA_TEST_CASE(lpc_performance_test,
     zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
 
     BOOST_CHECK(lpc_type::verify_eval(evaluation_points, tree.root(),
-                                      lpc_type::proof_eval(evaluation_points, tree, p, transcript), D_0));
+                                      lpc_type::proof_eval(evaluation_points, tree, poly, transcript), D_0));
 }
 
 BOOST_AUTO_TEST_CASE(lpc_basic_test) {
