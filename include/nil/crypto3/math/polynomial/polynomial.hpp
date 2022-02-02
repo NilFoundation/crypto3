@@ -334,12 +334,11 @@ namespace nil {
                     }
 
                     FieldValueType evaluate(const FieldValueType& value) const {
-
                         FieldValueType result = 0;
-                        for (std::size_t i = 0; i < this->size(); i++) {
-                            result += (*this)[i] * value.pow(i);
+                        auto end = this->end();
+                        while (end != this->begin()) {
+                            result = result * value + *--end;
                         }
-
                         return result;
                     }
 
