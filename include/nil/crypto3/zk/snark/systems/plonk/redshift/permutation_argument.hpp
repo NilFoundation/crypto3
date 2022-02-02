@@ -117,13 +117,12 @@ namespace nil {
                             h = h * (f[i] + beta * S_sigma[i] + gamma);
                         }
 
-                        /*math::polynomial::polynomial<typename FieldType::value_type> one_polynomial = {1};
+                        math::polynomial::polynomial<typename FieldType::value_type> one_polynomial = {1};
                         std::array<math::polynomial::polynomial<typename FieldType::value_type>, 3> F;
                         F[0] = lagrange_1 * (one_polynomial - V_P);
                         F[1] = (one_polynomial - (q_last + q_blind)) * ((domain[0] * V_P) * h - V_P * g);
-                        F[2] = q_last * (V_P * V_P - V_P);*/
+                        F[2] = q_last * (V_P * V_P - V_P);
                         
-                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, 3> F;
                         return F;
                     }
 
