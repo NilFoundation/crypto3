@@ -205,7 +205,9 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     // create domain D_0
 
     std::vector<std::vector<typename FieldType::value_type>> D;
-    for (std::size_t i = 0; i < d; i++) {
+    constexpr static const std::size_t d_extended = d * 16;
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    for (std::size_t i = 0; i < r; i++) {
         std::vector<typename FieldType::value_type> domain = prepare_domain<FieldType>(d - i);
         D.push_back(domain);
     }
@@ -214,10 +216,7 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     params.D = D;
     params.q = f;
 
-    //merkle_tree_type T(y_data);
-    
-    std::array<std::uint8_t, 96> x_data;
-    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
+    merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
     // std::array<typename FieldType::value_type, 1> evaluation_points = {omega.pow(5)};
 
     //proof_type proof = fri_type::proof_eval(f, f, T, transcript, params);
