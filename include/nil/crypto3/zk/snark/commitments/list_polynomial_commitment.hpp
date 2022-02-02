@@ -175,7 +175,7 @@ namespace nil {
                     static bool verify_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
                                             const commitment_type &root,
                                             const proof_type &proof,
-                                            const std::vector<typename FieldType::value_type> &D) {
+                                            const std::vector<typename FieldType::value_type> &d) {
                         return true;
                     }
                 };
