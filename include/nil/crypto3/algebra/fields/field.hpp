@@ -29,6 +29,7 @@
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
+#include <nil/crypto3/multiprecision/modular/modular_params_fixed.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -59,12 +60,17 @@ namespace nil {
                         extended_integral_type;
 
                     constexpr static const std::size_t number_bits = ModulusBits;
+                    typedef nil::crypto3::multiprecision::backends::cpp_int_backend<
+                        modulus_bits, modulus_bits, nil::crypto3::multiprecision::signed_magnitude,
+                        nil::crypto3::multiprecision::unchecked, void>
+                        modular_backend;
+
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<
-                            nil::crypto3::multiprecision::backends::cpp_int_backend<
-                                modulus_bits, modulus_bits, nil::crypto3::multiprecision::signed_magnitude,
-                                nil::crypto3::multiprecision::unchecked, void>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend>>
                         modular_type;
+
+//                    typedef nil::crypto3::multiprecision::modular_params<modular_backend>
+//                        modular_params_type;
                 };
 
             }    // namespace fields

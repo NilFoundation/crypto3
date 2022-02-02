@@ -48,6 +48,10 @@ namespace nil {
                         typedef typename suite_type::group_value_type group_value_type;
                         typedef typename suite_type::field_value_type field_value_type;
                         typedef typename suite_type::modular_type modular_type;
+                        typedef typename suite_type::modular_backend modular_backend;
+
+                        typedef nil::crypto3::multiprecision::modular_params<modular_backend> modular_params_type;
+
                         typedef typename suite_type::hash_type hash_type;
 
                         constexpr static std::size_t m = suite_type::m;
@@ -56,6 +60,7 @@ namespace nil {
 
                         typedef expand_message_xmd<k, hash_type> expand_message_ro;
                         // typedef expand_message_xof<k, hash_type> expand_message_nu;
+                        constexpr static const modular_params_type p_modulus_params = suite_type::p;
 
                         static_assert(m == 2, "underlying field has wrong extension");
 
@@ -87,7 +92,7 @@ namespace nil {
                                     auto elm_offset = L * (j + i * m);
                                     import_bits(e, uniform_bytes.begin() + elm_offset,
                                                 uniform_bytes.begin() + elm_offset + L);
-                                    coordinates[j] = modular_type(e, suite_type::p);
+                                    coordinates[j] = modular_type(e, p_modulus_params);
                                 }
                                 result[i] = field_value_type(coordinates[0], coordinates[1]);
                             }

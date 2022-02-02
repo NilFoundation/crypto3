@@ -51,6 +51,7 @@ namespace nil {
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
                     typedef typename policy_type::modular_type modular_type;
+                    typedef typename policy_type::modular_backend modular_backend;
 
                     constexpr static const integral_type modulus =
                         0xE7DB4EA6533AFA906673B0101343B00A6682093CCC81082D0970E5ED6F72CB7_cppui252;

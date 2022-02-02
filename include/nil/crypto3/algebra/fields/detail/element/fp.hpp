@@ -33,6 +33,7 @@
 #include <nil/crypto3/multiprecision/inverse.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 
 #include <boost/type_traits/is_integral.hpp>
 
@@ -52,14 +53,18 @@ namespace nil {
 
                         typedef typename policy_type::modular_type modular_type;
                         typedef typename policy_type::integral_type integral_type;
+                        typedef typename policy_type::modular_backend modular_backend;
+
+                        typedef nil::crypto3::multiprecision::modular_params<modular_backend> modular_params_type;
 
                         constexpr static const integral_type modulus = policy_type::modulus;
+                        constexpr static const modular_params_type modulus_params = modulus;
 
                         using data_type = modular_type;
 
                         data_type data;
 
-                        constexpr element_fp() : data(data_type(0, modulus)) {};
+                        constexpr element_fp() : data(data_type(0, modulus_params)) {};
 
                         constexpr element_fp(const data_type &data) : data(data) {};
 
@@ -68,7 +73,7 @@ namespace nil {
                                                           !multiprecision::is_modular_number<Number>::value) ||
                                                              std::is_integral<Number>::value,
                                                          bool>::type = true>
-                        constexpr element_fp(const Number &data) : data(data, modulus) {};
+                        constexpr element_fp(const Number &data) : data(data, modulus_params) {};
 
                         constexpr element_fp(const element_fp &B) {
                             data = B.data;
@@ -83,11 +88,11 @@ namespace nil {
                         }
 
                         constexpr bool is_zero() const {
-                            return data == data_type(0, modulus);
+                            return data == data_type(0, modulus_params);
                         }
 
                         constexpr bool is_one() const {
-                            return data == data_type(1, modulus);
+                            return data == data_type(1, modulus_params);
                         }
 
                         constexpr bool operator==(const element_fp &B) const {
@@ -166,7 +171,7 @@ namespace nil {
                         }
 
                         constexpr element_fp &operator++() {
-                            data = data + data_type(1, modulus);
+                            data = data + data_type(1, modulus_params);
                             return *this;
                         }
 
@@ -177,7 +182,7 @@ namespace nil {
                         }
 
                         constexpr element_fp &operator--() {
-                            data = data - data_type(1, modulus);
+                            data = data - data_type(1, modulus_params);
                             return *this;
                         }
 
@@ -228,6 +233,9 @@ namespace nil {
 
                     template<typename FieldParams>
                     constexpr typename element_fp<FieldParams>::integral_type const element_fp<FieldParams>::modulus;
+
+                    template<typename FieldParams>
+                    constexpr typename element_fp<FieldParams>::modular_params_type const element_fp<FieldParams>::modulus_params;
 
                 }    // namespace detail
             }        // namespace fields
