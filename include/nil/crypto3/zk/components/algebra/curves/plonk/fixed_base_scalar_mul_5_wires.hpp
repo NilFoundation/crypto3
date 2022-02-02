@@ -87,7 +87,7 @@ namespace nil {
                 private:
                     typename CurveType::template g1_type<>::value_type get_omega(std::size_t s, std::size_t i) {
 
-                        std::size_t coef = i * math::detail::get_power_of_two(3 * s);
+                        std::size_t coef = i * math::detail::power_of_two(3 * s);
 
                         return coef * B;
                     }
