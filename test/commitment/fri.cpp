@@ -41,6 +41,7 @@
 
 #include <nil/crypto3/merkle/tree.hpp> // until fri inclusion
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp> // until fri inclusion
+#include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
 
 using namespace nil::crypto3;
 

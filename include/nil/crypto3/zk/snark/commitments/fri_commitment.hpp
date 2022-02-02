@@ -113,23 +113,17 @@ namespace nil {
                         math::polynomial::polynomial<typename FieldType::value_type> f = Q;
 
                         typename FieldType::value_type x =
-                            transcript.template get_challenge<FieldType>();
+                            transcript.template challenge<FieldType>();
 
                         std::size_t r = fri_params.r;
 
-                        std::array<merkle_proof_type, m *r> &alpha_openings = proof.alpha_openings;
-                        std::array<merkle_proof_type, r> &f_y_openings = proof.f_y_openings;
-                        std::array<commitment_type, r - 1> &f_commitments = proof.f_commitments;
-                        math::polynomial::polynomial<typename FieldType::value_type> &f_ip1_coefficients =
-                            proof.f_ip1_coefficients;
-                        merkle_tree_type f_round_tree = T;
-
                         std::vector<round_proof_type> round_proofs;
+                        math::polynomial::polynomial<typename FieldType::value_type> final_polynomial;
 
                         for (std::size_t i = 0; i <= r - 1; i++) {
 
                             typename FieldType::value_type alpha =
-                                transcript.template get_challenge_from<FieldType>(fri_params.D_ip1);
+                                transcript.template challenge_from<FieldType>(fri_params.D[i+1]);
 
                             typename FieldType::value_type x_next = fri_params.q(x);
 
@@ -159,38 +153,42 @@ namespace nil {
                                 if (i == 0) {
 
                                         typename FieldType::value_type leaf = g.evaluate(s[j]);
-                                        std::size_t leaf_index = std::find(D.begin(), D.end(), leaf) - D.begin();
+                                        std::size_t leaf_index = std::find(
+                                            fri_params.D[i].begin(), fri_params.D[i].end(), leaf) - fri_params.D[i].begin();
                                         p[j] = T.hash_path(leaf_index);
-                                    }
                                 } else {
                                     for (std::size_t j = 0; j < m; j++) {
 
-                                        std::size_t leaf_index = std::find(D.begin(), D.end(), y[j]) - D.begin();
+                                        std::size_t leaf_index = std::find(
+                                            fri_params.D[i].begin(), fri_params.D[i].end(), y[j]) - fri_params.D[i].begin();
                                         p[j] = T.hash_path(leaf_index);
+                                    }
                                 }
                             }
 
+                            merkle_tree_type T_next;
+
                             if (i < r - 2) {
-                                merkle_tree_type T_next = commit(f_round, D);
-                                f_commitments = f_round_tree.root();
-                                transcript(f_commitments);
+                                T_next = commit(f_next, fri_params.D[i+1]);
+                                transcript(T_next.root());
                             }
 
                             if (i < r - 1) {
                                 typename FieldType::value_type colinear_value = f_next.evaluate(x_next);
 
-                                std::size_t leaf_index = std::find(D.begin(), D.end(), colinear_value) - D.begin();
+                                std::size_t leaf_index = std::find(fri_params.D[i+1].begin(), fri_params.D[i+1].end(), colinear_value) - fri_params.D[i+1].begin();
                                 typename FieldType::value_type colinear_path = T_next.hash_path(leaf_index);
 
                                 round_proofs.emplace_back(y, p, T, colinear_value, colinear_path);
                             } else {
-                                return proof_type(round_proofs, f_next);
+                                final_polynomial = f_next;
                             }
 
                             x = x_next;
                             f = f_next;
                             T = T_next;
                         }
+                        return proof_type(round_proofs, final_polynomial);
                     }
 
                     static bool verify_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
