@@ -31,6 +31,7 @@
 #include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/types.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -73,17 +74,8 @@ namespace nil {
                             transcript(proof.f_commitments[i]);
                         }
 
-                        typename transcript_hash_type::digest_type beta_bytes =
-                            transcript.get_challenge<transcript_manifest::challenges_ids::beta>();
-
-                        typename transcript_hash_type::digest_type gamma_bytes =
-                            transcript.get_challenge<transcript_manifest::challenges_ids::gamma>();
-
-                        typename FieldType::value_type beta = algebra::marshalling<FieldType>(beta_bytes);
-                        typename FieldType::value_type gamma = algebra::marshalling<FieldType>(gamma_bytes);
-
-                        transcript(proof.P_commitment);
-                        transcript(proof.Q_commitment);
+                        std::array<typename FieldType::value_type, 3> permutation_argument = 
+                            redshift_permutation_argument<typename FieldType>::verify_argument(transcript);
 
                         std::array<typename FieldType::value_type, 6> alphas;
                         for (std::size_t i = 0; i < 6; i++) {
@@ -126,9 +118,9 @@ namespace nil {
                         }
 
                         std::array<math::polynomial::polynom<typename FieldType::value_type>, 6> F;
-                        F[0] = verification_key.L_basis[1] * (P - 1);
-                        F[1] = verification_key.L_basis[1] * (Q - 1);
-                        F[2] = P * p_1 - (P << 1);
+                        F[0] = permutation_argument[0];
+                        F[1] = permutation_argument[1];
+                        F[2] = permutation_argument[2];
                         F[3] = Q * q_1 - (Q << 1);
                         F[4] = verification_key.L_basis[n] * ((P << 1) - (Q << 1));
                         F[5] = verification_key.PI;
