@@ -34,97 +34,102 @@
 
 #include <nil/crypto3/merkle/tree.hpp>
 
-#include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename FieldType>
+                template<typename FieldType
+                    >
                 class redshift_permutation_argument {
 
-                    static inline std::array<math::polynomial::polynomial<typename FieldType::value_type>, 3> 
-                        prove_argument(fiat_shamir_heuristic<transcript_manifest, transcript_hash_type> &transcript, ) {
-                        // 2. Get $\beta, \gamma \in \mathbb{F}$ from $hash(\text{transcript})$
+                    public:
+                    
+                    static inline std::array<math::polynomial::polynomial<typename FieldType::value_type>, 3> // TODO: fix fiat-shamir
+                        prove_argument(fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> &transcript, 
+                            std::size_t circuit_rows,
+                            std::size_t permutation_size,
+                            std::vector<typename FieldType::value_type> domain,
+                            const math::polynomial::polynomial<typename FieldType::value_type> &lagrange_1,
+                            const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &S_id,
+                            const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &S_sigma,
+                            const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &f,
+                            const math::polynomial::polynomial<typename FieldType::value_type> &q_last,
+                            const math::polynomial::polynomial<typename FieldType::value_type> &q_blind
+                            ) {
+                        // 1. $\beta_1, \gamma_1 = \challenge$
                         typename FieldType::value_type beta =
-                            transcript.template challenge<transcript_manifest::challenges_ids::beta, FieldType>();
+                            transcript.template challenge<FieldType>();
 
                         typename FieldType::value_type gamma =
-                            transcript.template challenge<transcript_manifest::challenges_ids::gamma, FieldType>();
+                            transcript.template challenge<FieldType>();
 
-                        // 4. For $1 < j \leq N_{\texttt{rows}}$ calculate $g_j, h_j$
-                        std::vector<typename FieldType::value_type> g_points(N_rows + 1);
-                        std::vector<typename FieldType::value_type> h_points(N_rows + 1);
+                        // 2. Calculate id_binding, sigma_binding for j from 1 to N_rows
+                        std::vector<typename FieldType::value_type> id_binding(circuit_rows);
+                        std::vector<typename FieldType::value_type> sigma_binding(circuit_rows);
 
-                        const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &S_sigma =
-                            preprocessed_data.permutations;
-                        const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &S_id =
-                            preprocessed_data.identity_permutations;
+                        for (std::size_t j = 0; j < circuit_rows; j++) {
+                            id_binding[j] = FieldType::value_type::one();
+                            sigma_binding[j] = FieldType::value_type::one();
+                            for (std::size_t i = 0; i < permutation_size; i++) {
 
-                        for (std::size_t j = 1; j <= N_rows; j++) {
-                            g_points[j] = FieldType::value_type::one();
-                            h_points[j] = FieldType::value_type::one();
-                            for (std::size_t i = 0; i < N_perm + N_PI; i++) {
-
-                                g_points[j] *= (f[j].evaluate(D_0[j]) + beta * S_id[j].evaluate(D_0[j]) + gamma);
-                                h_points[j] *= (f[j].evaluate(D_0[j]) + beta * S_sigma[j].evaluate(D_0[j]) + gamma);
+                                id_binding[j] *= (f[i].evaluate(domain[j]) + beta * S_id[i].evaluate(domain[j]) + gamma);
+                                sigma_binding[j] *= (f[i].evaluate(domain[j]) + beta * S_sigma[i].evaluate(domain[j]) + gamma);
                             }
                         }
 
-                        // 5. Calculate $V_P$
+                        // 3. Calculate $V_P$
                         std::vector<typename FieldType::value_type>
-                            V_P_interpolation_points(N_rows + 1);
+                            V_P_interpolation_points(circuit_rows);
 
-                        V_P_interpolation_points.push_back(FieldType::value_type::one());
-                        for (std::size_t j = 2; j < N_rows + 1; j++) {
-
+                        V_P_interpolation_points[0] = FieldType::value_type::one();
+                        for (std::size_t j = 1; j < circuit_rows; j++) {
                             typename FieldType::value_type tmp_mul_result = FieldType::value_type::one();
-                            for (std::size_t i = 1; i <= j - 1; i++) {
-                                tmp_mul_result *= g_points[i] / h_points[i];
+                            for (std::size_t i = 0; i <= j - 1; i++) {
+                                //TODO: use one division
+                                tmp_mul_result *= id_binding[i] / sigma_binding[i];
                             }
 
-                            V_P_interpolation_points.push_back(tmp_mul_result);
+                            V_P_interpolation_points[j] = tmp_mul_result;
                         }
-
-                        V_P_interpolation_points.push_back(FieldType::value_type::one());
 
                         const std::shared_ptr<math::evaluation_domain<FieldType>> V_P_domain =
-                            math::make_evaluation_domain<FieldType>(N_rows + 1);
+                            math::make_evaluation_domain<FieldType>(circuit_rows);
 
                         V_P_domain->inverse_fft(V_P_interpolation_points);
 
-                        math::polynomial::polynomial<typename FieldType::value_type> V_P = V_P_interpolation_points;
+                        math::polynomial::polynomial<typename FieldType::value_type> V_P(V_P_interpolation_points.begin(), V_P_interpolation_points.end());
 
-                        // 6. Compute and add commitment to $V_P$ to $\text{transcript}$.
-                        merkle_tree_type V_P_tree = lpc::commit(V_P, D_0);
-                        typename lpc::commitment_type V_P_commitment = V_P_tree.root();
-                        transcript(V_P_commitment);
+                        // 4. Compute and add commitment to $V_P$ to $\text{transcript}$.
+                        //TODO: include commitment
+                        //merkle_tree_type V_P_tree = fri::commit(V_P, D_0);
+                        //typename fri::commitment_type V_P_commitment = V_P_tree.root();
+                        //transcript(V_P_commitment);
 
 
-                        // 17. Denote g_1,2, h_1,2
-                        math::polynomial::polynomial<typename FieldType::value_type> g_1 = {1};                        
-                        math::polynomial::polynomial<typename FieldType::value_type> h_1 = {1};
+                        // 5. Calculate g_perm, h_perm
+                        math::polynomial::polynomial<typename FieldType::value_type> g = {1};                        
+                        math::polynomial::polynomial<typename FieldType::value_type> h = {1};
 
-                        for (std::size_t i = 0; i <= N_perm + N_PI - 1; i++) {
-                            g_1 = g_1 * (f[i] + beta * S_id[i] + gamma);
-                            h_1 = h_1 * (f[i] + beta * S_sigma[i] + gamma);
+                        for (std::size_t i = 0; i < permutation_size; i++) {
+                            g = g * (f[i] + beta * S_id[i] + gamma);
+                            h = h * (f[i] + beta * S_sigma[i] + gamma);
                         }
 
-                        const math::polynomial::polynomial<typename FieldType::value_type> q_last;
-                        const math::polynomial::polynomial<typename FieldType::value_type> q_blind;
-
+                        /*math::polynomial::polynomial<typename FieldType::value_type> one_polynomial = {1};
                         std::array<math::polynomial::polynomial<typename FieldType::value_type>, 3> F;
-                        F[0] = L1 * (1 - V_P);
-                        F[1] = (1 - (q_last + q_blind)) * (V_P_shifted * h_1 - V_P * g_1);
-                        F[2] = q_last * (V_P * V_P - V_P);
+                        F[0] = lagrange_1 * (one_polynomial - V_P);
+                        F[1] = (one_polynomial - (q_last + q_blind)) * ((domain[0] * V_P) * h - V_P * g);
+                        F[2] = q_last * (V_P * V_P - V_P);*/
                         
+                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, 3> F;
                         return F;
                     }
 
                     static inline std::array<typename FieldType::value_type, 3> 
-                        verify_argument(fiat_shamir_heuristic<transcript_manifest, transcript_hash_type> &transcript, ) {
-                        typename transcript_hash_type::digest_type beta_bytes =
+                        verify_argument() {
+                        /*typename transcript_hash_type::digest_type beta_bytes =
                             transcript.get_challenge<transcript_manifest::challenges_ids::beta>();
 
                         typename transcript_hash_type::digest_type gamma_bytes =
@@ -141,11 +146,12 @@ namespace nil {
 
                         F[0] = verification_key.L_basis[1] * (P - 1);
                         F[1] = verification_key.L_basis[1] * (Q - 1);
-                        F[2] = P * p_1 - (P << 1);
-                        
+                        F[2] = P * p_1 - (P << 1);*/
+                        std::array<typename FieldType::value_type, 3> F;
+
                         return F;
                     }
-                }
+                };
             } // namespace snark
         } // namespace zk
     } // namespace crypto3

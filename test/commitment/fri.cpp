@@ -113,7 +113,10 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
         std::make_pair(omega, f.evaluate(omega)),
         std::make_pair(-omega, f.evaluate(-omega)),
     };
-    math::polynomial::polynomial<typename FieldType::value_type> interpolant = math::polynomial::_lagrange_interpolation(points);
+    math::polynomial::polynomial<typename FieldType::value_type> interpolant = math::polynomial::lagrange_interpolation(points);
+    typename FieldType::value_type x1 = interpolant.evaluate(omega);
+    typename FieldType::value_type x2 = f.evaluate(omega);
+    BOOST_CHECK(x1 == x2);
     // BOOST_CHECK_EQUAL(interpolant.eval(alpha), f_next.eval(x_next))
 }
 
