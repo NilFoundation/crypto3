@@ -73,12 +73,12 @@ namespace nil {
 
                     struct round_proof_type {
                         std::array<typename FieldType::value_type, m> y;
-                        std::array<typename FieldType::value_type, m> p;
+                        std::array<std::vector<typename merkle_tree_type::value_type>, m> p;
 
                         typename merkle_tree_type::value_type T_root;
 
                         typename FieldType::value_type colinear_value;
-                        merkle_proof_type colinear_path;
+                        std::vector<typename merkle_tree_type::value_type> colinear_path;
                     };
 
                     struct proof_type {
@@ -144,7 +144,7 @@ namespace nil {
                                 y[j] = f.evaluate(s[j]);
                             }
 
-                            std::array<typename FieldType::value_type, m> p;
+                            std::array<std::vector<typename merkle_tree_type::value_type>, m> p;
 
                             for (std::size_t j = 0; j < m; j++) {
                                 if (i == 0) {
@@ -163,7 +163,8 @@ namespace nil {
                                 }
                             }
 
-                            merkle_tree_type T_next;
+                            std::vector<std::array<std::uint8_t, 96>> y_data;
+                            merkle_tree_type T_next(y_data);
 
                             if (i < r - 2) {
                                 T_next = commit(f_next, fri_params.D[i+1]);
@@ -173,8 +174,11 @@ namespace nil {
                             if (i < r - 1) {
                                 typename FieldType::value_type colinear_value = f_next.evaluate(x_next);
 
-                                std::size_t leaf_index = std::find(fri_params.D[i+1].begin(), fri_params.D[i+1].end(), colinear_value) - fri_params.D[i+1].begin();
-                                typename FieldType::value_type colinear_path = T_next.hash_path(leaf_index);
+                                std::size_t leaf_index = std::find(
+                                    fri_params.D[i+1].begin(), fri_params.D[i+1].end(), colinear_value) - 
+                                    fri_params.D[i+1].begin();
+                                std::vector<typename merkle_tree_type::value_type> colinear_path = 
+                                    T_next.hash_path(leaf_index);
 
                                 round_proofs.emplace_back(y, p, T.root(), colinear_value, colinear_path);
                             } else {
@@ -185,7 +189,7 @@ namespace nil {
                             f = f_next;
                             T = T_next;
                         }
-                        return proof_type(round_proofs, final_polynomial);
+                        return proof_type ({round_proofs, final_polynomial});
                     }
 
                     static bool verify_eval() {

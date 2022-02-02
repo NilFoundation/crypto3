@@ -93,7 +93,8 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     std::vector<std::array<std::uint8_t, 96>> y_data;
     merkle_tree_type T(y_data);
     
-    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(y_data);
+    std::array<std::uint8_t, 96> x_data;
+    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
     // std::array<typename FieldType::value_type, 1> evaluation_points = {omega.pow(5)};
 
     proof_type proof = fri_type::proof_eval(f, f, T, transcript, params);
