@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_ZK_FRI_COMMITMENT_SCHEME_HPP
 #define CRYPTO3_ZK_FRI_COMMITMENT_SCHEME_HPP
 
+#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
+
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 
@@ -54,12 +56,8 @@ namespace nil {
                  */
                 template<typename FieldType,
                          typename Hash,
-                         std::size_t _lambda = 40,
-                         std::size_t _k = 1,
                          std::size_t _m = 2>
                 struct fri_commitment_scheme {
-                    static constexpr std::size_t lambda = _lambda;
-                    static constexpr std::size_t k = _k;
                     static constexpr std::size_t m = _m;
 
                     typedef FieldType field_type;
@@ -68,21 +66,21 @@ namespace nil {
                     typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
                     typedef typename containers::merkle_proof<Hash, 2> merkle_proof_type;
 
-                    struct params {
+                    struct params_type {
+                        std::size_t r;
+                        std::vector<std::vector<typename FieldType::value_type>> D;
 
+                        math::polynomial::polynomial<typename FieldType::value_type> q;
                     };
-
-                    using openning_type = merkle_proof_type;
-                    using commitment_type = typename merkle_tree_type::value_type;
 
                     struct round_proof_type {
                         std::array<typename FieldType::value_type, m> y;
-                        std::array<typename FieldType::value_type, m> p;
+                        std::array<std::vector<typename merkle_tree_type::value_type>, m> p;
 
-                        merkle_tree_type T;
+                        typename merkle_tree_type::value_type T_root;
 
                         typename FieldType::value_type colinear_value;
-                        merkle_proof_type colinear_path;
+                        std::vector<typename merkle_tree_type::value_type> colinear_path;
                     };
 
                     struct proof_type {
@@ -100,38 +98,52 @@ namespace nil {
                     static merkle_tree_type
                         commit(const math::polynomial::polynomial<typename FieldType::value_type> &f,
                                const std::vector<typename FieldType::value_type> &D) {
+
+                        using Endianness = nil::marshalling::option::big_endian;
+                        using field_element_type = 
+                            nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>, FieldType>;
+
+                        std::vector<std::array<std::uint8_t, 96>> y_data;
+                        y_data.reserve(D.size());
+                        nil::marshalling::status_type status;
+
+                        for (std::size_t i = 0; i < D.size(); i++) {
+                            typename FieldType::value_type y = f.evaluate(D[i]);
+
+                            field_element_type y_val = 
+                                nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(y);
+                            auto write_iter = y_data[i].begin();
+                            y_val.write(write_iter, 96);
+                        }
+
+                        return merkle_tree_type(y_data);
                     }
 
                     static proof_type proof_eval(const math::polynomial::polynomial<typename FieldType::value_type> &Q,
                                                  const math::polynomial::polynomial<typename FieldType::value_type> &g,
-                                                 const merkle_tree_type &T,
-                                                 const fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
-                                                 const params &fri_params) {
+                                                 merkle_tree_type &T,
+                                                 fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
+                                                 params_type &fri_params) {
 
                         proof_type proof;
 
                         math::polynomial::polynomial<typename FieldType::value_type> f = Q;
 
                         typename FieldType::value_type x =
-                            transcript.template get_challenge<FieldType>();
+                            transcript.template challenge<FieldType>();
 
                         std::size_t r = fri_params.r;
 
-                        std::array<merkle_proof_type, m *r> &alpha_openings = proof.alpha_openings;
-                        std::array<merkle_proof_type, r> &f_y_openings = proof.f_y_openings;
-                        std::array<commitment_type, r - 1> &f_commitments = proof.f_commitments;
-                        math::polynomial::polynomial<typename FieldType::value_type> &f_ip1_coefficients =
-                            proof.f_ip1_coefficients;
-                        merkle_tree_type f_round_tree = T;
-
                         std::vector<round_proof_type> round_proofs;
+                        math::polynomial::polynomial<typename FieldType::value_type> final_polynomial;
 
                         for (std::size_t i = 0; i <= r - 1; i++) {
 
                             typename FieldType::value_type alpha =
-                                transcript.template get_challenge_from<FieldType>(fri_params.D_ip1);
+                                fri_params.D[i+1][0].pow(
+                                    transcript.template int_challenge<std::size_t>());
 
-                            typename FieldType::value_type x_next = fri_params.q(x);
+                            typename FieldType::value_type x_next = fri_params.q.evaluate(x);
 
                             std::size_t d = f.degree();
 
@@ -142,10 +154,13 @@ namespace nil {
                             }
 
                             // m = 2, so:
-                            assert(m == 2);
                             std::array<typename FieldType::value_type, m> s;
-                            s[0] = x;
-                            s[1] = -x;
+                            if constexpr (m == 2) {
+                                s[0] = x;
+                                s[1] = -x;
+                            } else {
+                                return {};
+                            }
 
                             std::array<typename FieldType::value_type, m> y;
 
@@ -153,50 +168,52 @@ namespace nil {
                                 y[j] = f.evaluate(s[j]);
                             }
 
-                            std::array<typename FieldType::value_type, m> p;
+                            std::array<std::vector<typename merkle_tree_type::value_type>, m> p;
 
                             for (std::size_t j = 0; j < m; j++) {
                                 if (i == 0) {
 
                                         typename FieldType::value_type leaf = g.evaluate(s[j]);
-                                        std::size_t leaf_index = std::find(D.begin(), D.end(), leaf) - D.begin();
+                                        std::size_t leaf_index = std::find(
+                                            fri_params.D[i].begin(), fri_params.D[i].end(), leaf) - fri_params.D[i].begin();
                                         p[j] = T.hash_path(leaf_index);
-                                    }
                                 } else {
                                     for (std::size_t j = 0; j < m; j++) {
 
-                                        std::size_t leaf_index = std::find(D.begin(), D.end(), y[j]) - D.begin();
+                                        std::size_t leaf_index = std::find(
+                                            fri_params.D[i].begin(), fri_params.D[i].end(), y[j]) - fri_params.D[i].begin();
                                         p[j] = T.hash_path(leaf_index);
+                                    }
                                 }
                             }
 
-                            if (i < r - 2) {
-                                merkle_tree_type T_next = commit(f_round, D);
-                                f_commitments = f_round_tree.root();
-                                transcript(f_commitments);
-                            }
-
                             if (i < r - 1) {
+                                merkle_tree_type T_next = commit(f_next, fri_params.D[i+1]);
+                                transcript(T_next.root());
+
                                 typename FieldType::value_type colinear_value = f_next.evaluate(x_next);
 
-                                std::size_t leaf_index = std::find(D.begin(), D.end(), colinear_value) - D.begin();
-                                typename FieldType::value_type colinear_path = T_next.hash_path(leaf_index);
+                                std::size_t leaf_index = std::find(
+                                    fri_params.D[i+1].begin(), fri_params.D[i+1].end(), colinear_value) - 
+                                    fri_params.D[i+1].begin();
+                                std::vector<typename merkle_tree_type::value_type> colinear_path = 
+                                    T_next.hash_path(leaf_index);
 
-                                round_proofs.emplace_back(y, p, T, colinear_value, colinear_path);
+                                round_proofs.push_back(round_proof_type({y, p, T.root(), colinear_value, colinear_path}));
+
+                                T = T_next;
                             } else {
-                                return proof_type(round_proofs, f_next);
+                                final_polynomial = f_next;
                             }
 
                             x = x_next;
                             f = f_next;
-                            T = T_next;
                         }
+                        return proof_type ({round_proofs, final_polynomial});
                     }
 
-                    static bool verify_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
-                                            const proof_type &proof,
-                                            const params &fri_params) {
-
+                    static bool verify_eval() {
+                        return true;
                     }
                 };
             }    // namespace snark
