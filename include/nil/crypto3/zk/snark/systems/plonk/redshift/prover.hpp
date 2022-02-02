@@ -100,7 +100,7 @@ namespace nil {
                         // 1. Add commitments to $w_i(X)$ to $\text{transcript}$
 
                         std::vector<math::polynomial::polynomial<typename FieldType::value_type>> w =
-                            constraint_system.polynoms(assignments);
+                            constraint_system.polynomials(assignments);
 
                         std::vector<merkle_tree_type> w_trees;
                         std::vector<typename lpc::commitment_type> w_commitments;
@@ -241,7 +241,7 @@ namespace nil {
                         std::size_t N_T = N_perm + N_PI;
                         std::vector<math::polynomial::polynomial<typename FieldType::value_type>> gates(N_sel);
                         std::vector<math::polynomial::polynomial<typename FieldType::value_type>> constraints =
-                            constraint_system.polynoms(assignments);
+                            constraint_system.polynomials(assignments);
 
                         for (std::size_t i = 0; i <= N_sel - 1; i++) {
                             gates[i] = {0};
