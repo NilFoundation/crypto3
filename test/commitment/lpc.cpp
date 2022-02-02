@@ -58,11 +58,11 @@ namespace boost {
     namespace test_tools {
         namespace tt_detail {
             template<>
-            struct print_log_value<std::vector<nil::crypto3::math::polynomial::polynomial<
-                typename algebra::curves::bls12<381>::base_field_type::value_type>>> {
+            struct print_log_value<nil::crypto3::math::polynomial::polynomial<
+                algebra::fields::detail::element_fp<algebra::fields::params<algebra::fields::bls12_base_field<381>>>>> {
                 void operator()(std::ostream &,
-                                std::vector<nil::crypto3::math::polynomial::polynomial<
-                                    typename algebra::curves::bls12<381>::base_field_type::value_type>> const &) {
+                                const nil::crypto3::math::polynomial::polynomial<algebra::fields::detail::element_fp<
+                                    algebra::fields::params<algebra::fields::bls12_base_field<381>>>> &) {
                 }
             };
         }    // namespace tt_detail

@@ -100,7 +100,7 @@ namespace nil {
                         for (std::size_t power = 1; power <= domain_size; power++) {
                             d.emplace_back(omega.pow(power));
                         }
-                        return D;
+                        return d;
                     }
 
                 public:
@@ -153,7 +153,7 @@ namespace nil {
                         // temporary definition, until polynomial is constexpr
                         const math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
-                        typename fri_type::params_type fri_params = {r, D, q};
+                        typename fri_type::params_type fri_params = {r, d, q};
 
                         std::array<typename fri_type::proof_type, lambda> fri_proof;
 
