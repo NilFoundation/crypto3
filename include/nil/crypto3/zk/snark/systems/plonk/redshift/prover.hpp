@@ -113,10 +113,10 @@ namespace nil {
 
                         // 2. Get $\beta, \gamma \in \mathbb{F}$ from $hash(\text{transcript})$
                         typename FieldType::value_type beta =
-                            transcript.template get_challenge<transcript_manifest::challenges_ids::beta, FieldType>();
+                            transcript.template challenge<transcript_manifest::challenges_ids::beta, FieldType>();
 
                         typename FieldType::value_type gamma =
-                            transcript.template get_challenge<transcript_manifest::challenges_ids::gamma, FieldType>();
+                            transcript.template challenge<transcript_manifest::challenges_ids::gamma, FieldType>();
 
                         // 3. Denote witness polynomials included in permutation argument and public input polynomials
                         // as $f_i$
@@ -174,7 +174,7 @@ namespace nil {
 
                         // 7. Get $\theta \in \mathbb{F}$ from $hash(\text{transcript})$
                         typename FieldType::value_type teta =
-                            transcript.template get_challenge<transcript_manifest::challenges_ids::teta, FieldType>();
+                            transcript.template challenge<transcript_manifest::challenges_ids::teta, FieldType>();
 
                         // 8. Get lookup_gate_i and table_value_i
 
@@ -230,12 +230,11 @@ namespace nil {
 
                         // 14. Get $\alpha_0, \dots, \alpha_8 \in \mathbb{F}$ from $hash(\text{transcript})$
                         std::array<typename FieldType::value_type, 9> alphas =
-                            transcript
-                                .template get_challenges<transcript_manifest::challenges_ids::alpha, 9, FieldType>();
+                            transcript.template challenges<transcript_manifest::challenges_ids::alpha, 9, FieldType>();
 
                         // 15. Get $\tau$ from $hash(\text{transcript})$
                         typename FieldType::value_type tau =
-                            transcript.template get_challenge<transcript_manifest::challenges_ids::tau, FieldType>();
+                            transcript.template challenge<transcript_manifest::challenges_ids::tau, FieldType>();
 
                         // 16. Computing gates
                         // And 20. Compute N_T
@@ -320,8 +319,7 @@ namespace nil {
 
                         // 23. Get $y \in \mathbb{F}/H$ from $hash|_{\mathbb{F}/H}(\text{transcript})$
                         typename FieldType::value_type upsilon =
-                            transcript
-                                .template get_challenge<transcript_manifest::challenges_ids::upsilon, FieldType>();
+                            transcript.template challenge<transcript_manifest::challenges_ids::upsilon, FieldType>();
 
                         std::array<typename FieldType::value_type, k> fT_evaluation_points = {upsilon};
                         std::vector<typename lpc::proof_type> f_lpc_proofs(N_wires);

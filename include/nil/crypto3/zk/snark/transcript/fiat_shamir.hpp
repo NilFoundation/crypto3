@@ -80,7 +80,7 @@ namespace nil {
                     }
 
                     template<typename TChallenges::challenges_ids ChallengeId, typename FieldType>
-                    typename FieldType::value_type get_challenge() {
+                    typename FieldType::value_type challenge() {
                         // acc(ChallengeId);
                         typename Hash::digest_type hash_res = accumulators::extract::hash<Hash>(acc);
 
@@ -88,7 +88,7 @@ namespace nil {
                     }
 
                     template<typename TChallenges::challenges_ids ChallengeId, std::size_t Index, typename FieldType>
-                    typename FieldType::value_type get_challenge() {
+                    typename FieldType::value_type challenge() {
                         // acc(ChallengeId + Index);
                         typename Hash::digest_type hash_res = accumulators::extract::hash<Hash>(acc);
 
@@ -97,7 +97,7 @@ namespace nil {
 
                     template<typename TChallenges::challenges_ids ChallengeId, std::size_t ChallengesAmount,
                              typename FieldType>
-                    std::array<typename FieldType::value_type, ChallengesAmount> get_challenges() {
+                    std::array<typename FieldType::value_type, ChallengesAmount> challenges() {
 
                         std::array<typename Hash::digest_type, ChallengesAmount> hash_results;
                         std::array<typename FieldType::value_type, ChallengesAmount> result;
@@ -142,7 +142,7 @@ namespace nil {
                     template<typename Field>
                     typename std::enable_if<(Hash::digest_bits >= Field::modulus_bits),
                                             typename Field::value_type>::type
-                        get_challenge() {
+                        challenge() {
 
                         state = hash<hash_type>(state);
                         nil::marshalling::status_type status;
@@ -154,11 +154,11 @@ namespace nil {
                     template<typename Field, std::size_t N>
                     typename std::enable_if<(Hash::digest_bits >= Field::modulus_bits),
                                             std::array<typename Field::value_type, N>>::type
-                        get_challenges() {
+                        challenges() {
 
                         std::array<typename Field::value_type, N> result;
                         for (auto &ch : result) {
-                            ch = get_challenge<Field>();
+                            ch = challenge<Field>();
                         }
 
                         return result;

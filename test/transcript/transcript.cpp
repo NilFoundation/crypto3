@@ -47,9 +47,9 @@ BOOST_AUTO_TEST_CASE(zk_transcript_manual_test) {
     using field_type = algebra::curves::alt_bn128_254::scalar_field_type;
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     fiat_shamir_heuristic_updated tr(init_blob);
-    auto ch1 = tr.get_challenge<field_type>();
-    auto ch2 = tr.get_challenge<field_type>();
-    auto ch_n = tr.get_challenges<field_type, 3>();
+    auto ch1 = tr.challenge<field_type>();
+    auto ch2 = tr.challenge<field_type>();
+    auto ch_n = tr.challenges<field_type, 3>();
 
     std::cout << ch1.data << std::endl;
     std::cout << ch2.data << std::endl;
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(zk_transcript_manual_test) {
     std::vector<std::uint8_t> updated_blob {0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
     tr(updated_blob);
 
-    ch_n = tr.get_challenges<field_type, 3>();
+    ch_n = tr.challenges<field_type, 3>();
     for (const auto &ch : ch_n) {
         std::cout << ch.data << std::endl;
     }
