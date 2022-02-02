@@ -140,9 +140,9 @@ namespace nil {
                     }
 
                     template<typename Field>
-                    typename std::enable_if<(Hash::digest_bits >= Field::modulus_bits),
-                                            typename Field::value_type>::type
-                        challenge() {
+                    // typename std::enable_if<(Hash::digest_bits >= Field::modulus_bits),
+                    //                         typename Field::value_type>::type
+                    typename Field::value_type challenge() {
 
                         state = hash<hash_type>(state);
                         nil::marshalling::status_type status;
@@ -151,10 +151,20 @@ namespace nil {
                         return raw_result;
                     }
 
+                    template<typename Integral>
+                    Integral int_challenge() {
+
+                        state = hash<hash_type>(state);
+                        nil::marshalling::status_type status;
+                        Integral raw_result = nil::marshalling::pack(state, status);
+
+                        return raw_result;
+                    }
+
                     template<typename Field, std::size_t N>
-                    typename std::enable_if<(Hash::digest_bits >= Field::modulus_bits),
-                                            std::array<typename Field::value_type, N>>::type
-                        challenges() {
+                    // typename std::enable_if<(Hash::digest_bits >= Field::modulus_bits),
+                    //                         std::array<typename Field::value_type, N>>::type
+                    std::array<typename Field::value_type, N> challenges() {
 
                         std::array<typename Field::value_type, N> result;
                         for (auto &ch : result) {

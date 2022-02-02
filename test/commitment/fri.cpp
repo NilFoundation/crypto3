@@ -40,7 +40,8 @@
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 
 #include <nil/crypto3/merkle/tree.hpp> // until fri inclusion
-#include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp> // until fri inclusion
+
+#include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
 
 using namespace nil::crypto3;
@@ -68,26 +69,35 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
 
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
-    constexpr static const std::size_t lambda = 40;
-    constexpr static const std::size_t k = 1;
-
     constexpr static const std::size_t d = 4;
 
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
 
-    // typedef fri_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> fri_type;
-    // typedef typename fri_type::proof_type proof_type;
+    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, m> fri_type;
+    typedef typename fri_type::proof_type proof_type;
+    typedef typename fri_type::params_type params_type;
 
+    params_type params;
     math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 25};
 
     // create domain D_0
     std::vector<typename FieldType::value_type> D_0 = prepare_domain<FieldType>(d);
-    // merkle_tree_type T = fri_type::commit(f, D_0);
 
+    std::vector<std::vector<typename FieldType::value_type>> D = {D_0, D_0};
+
+    params.r = r;
+    params.D = D;
+    params.q = f;
+
+    std::vector<std::array<std::uint8_t, 96>> y_data;
+    merkle_tree_type T(y_data);
+    
+    std::array<std::uint8_t, 96> x_data;
+    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
     // std::array<typename FieldType::value_type, 1> evaluation_points = {omega.pow(5)};
 
-    // proof_type proof = fri_type::proof_eval(evaluation_points, T, f, D_0)
+    proof_type proof = fri_type::proof_eval(f, f, T, transcript, params);
     // BOOST_CHECK(fry_type::verify_eval(evaluation_points, T, proof, D_0))
 }
 
