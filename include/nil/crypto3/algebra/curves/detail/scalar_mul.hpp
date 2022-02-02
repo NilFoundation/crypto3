@@ -30,6 +30,7 @@
 #include <nil/crypto3/algebra/type_traits.hpp>
 
 #include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 
 #include <cstdint>
 
@@ -62,6 +63,16 @@ namespace nil {
                         }
 
                         return result;
+                    }
+
+                    template<typename GroupValueType,
+                             typename Backend,
+                             multiprecision::expression_template_option ExpressionTemplates>
+                    constexpr GroupValueType
+                        operator*(const GroupValueType &left,
+                                  const multiprecision::number<nil::crypto3::multiprecision::backends::modular_adaptor<Backend>, ExpressionTemplates> &right) {
+                        multiprecision::number<Backend, ExpressionTemplates> tmp = right.template convert_to<multiprecision::number<Backend, ExpressionTemplates>>();
+                        return scalar_mul(left, right);
                     }
 
                     template<typename GroupValueType,
@@ -126,15 +137,13 @@ namespace nil {
                     }
 
                     template<typename GroupValueType>
-                    constexpr GroupValueType operator*(const GroupValueType &left,
-                        const std::size_t &right) {
+                    constexpr GroupValueType operator*(const GroupValueType &left, const std::size_t &right) {
 
                         return scalar_mul(left, typename GroupValueType::field_type::integral_type::value_type(right));
                     }
 
                     template<typename GroupValueType>
-                    constexpr GroupValueType operator*(const std::size_t &left,
-                        const GroupValueType &right) {
+                    constexpr GroupValueType operator*(const std::size_t &left, const GroupValueType &right) {
 
                         return right * left;
                     }
