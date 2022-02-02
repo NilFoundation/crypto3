@@ -155,16 +155,15 @@ namespace nil {
                             Q = Q / denominator_polynom;
                         }
 
-                        std::vector<std::vector<typename FieldType::value_type>> D;
-                        std::size_t d = D;
+                        std::vector<std::vector<typename FieldType::value_type>> d;
                         for (std::size_t j = 0; j <= r - 1; j++) {
-                            D[j] = prepare_domain(d / 2);
+                            d[j] = prepare_domain(D / 2);
                         }
 
                         // temporary definition, until polynomial is constexpr
                         const math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
-                        fri_type::params_type fri_params = {r, D, q};
+                        typename fri_type::params_type fri_params = {r, D, q};
 
                         for (std::size_t round_id = 0; round_id < lambda; round_id++) {
                         }
