@@ -101,7 +101,8 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(pair_map_t)
 BOOST_AUTO_TEST_SUITE(lpc_test_suite)
 
 BOOST_DATA_TEST_CASE(test2,
-                     ::boost::unit_test::data::make(generate<typename algebra::curves::bls12<381>::base_field_type>()),
+                     ::boost::unit_test::data::make(
+                         generate<typename algebra::curves::bls12<381>::base_field_type>(multiprecision::pow(2, 24))),
                      array_element) {
     std::cout << "test 2: \"" << array_element.first << "\", " << array_element.second << std::endl;
     BOOST_TEST(array_element.second <= 13);

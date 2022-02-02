@@ -70,9 +70,10 @@ namespace nil {
                     typedef Hash transcript_hash_type;
 
                     typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
+                    typedef typename merkle_tree_type::hash_type merkle_hash_type;
                     typedef std::vector<typename merkle_tree_type::value_type> merkle_proof_type;
 
-                    typedef fri_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> fri_type;
+                    typedef fri_commitment_scheme<FieldType, merkle_hash_type, m> fri_type;
 
                     struct transcript_round_manifest {
                         enum challenges_ids { x, y };
@@ -100,18 +101,17 @@ namespace nil {
                     };
 
                 private:
-
                     std::vector<typename FieldType::value_type> prepare_domain(const std::size_t domain_size) {
-                        typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::get_power_of_two(domain_size));
-                        std::vector<typename FieldType::value_type> D(domain_size);
+                        typename FieldType::value_type omega =
+                            math::unity_root<FieldType>(math::detail::get_power_of_two(domain_size));
+                        std::vector<typename FieldType::value_type> d(domain_size);
                         for (std::size_t power = 1; power <= domain_size; power++) {
-                            D.emplace_back(omega.pow(power));
+                            d.emplace_back(omega.pow(power));
                         }
-                        return D;
+                        return d;
                     }
 
                 public:
-
                     // The result of this function is not commitment_type (as it would expected),
                     // but the built Merkle tree. This is done so, because we often need to reuse
                     // the built Merkle tree
@@ -120,9 +120,9 @@ namespace nil {
                     // should be called
                     static merkle_tree_type
                         commit(const math::polynomial::polynomial<typename FieldType::value_type> &f,
-                               const std::vector<typename FieldType::value_type> &D) {
+                               const std::vector<typename FieldType::value_type> &d) {
 
-                        return fri_type::commit(f, D);
+                        return fri_type::commit(f, d);
                     }
 
                     static proof_type proof_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
@@ -157,18 +157,16 @@ namespace nil {
 
                         std::vector<std::vector<typename FieldType::value_type>> D;
                         std::size_t d = D;
-                        for (std::size_t j = 0; j <= r-1; j++) {
-                            D[j] = prepare_domain(d/2);
+                        for (std::size_t j = 0; j <= r - 1; j++) {
+                            D[j] = prepare_domain(d / 2);
                         }
 
                         // temporary definition, until polynomial is constexpr
                         const math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
-                        
+
                         fri_type::params_type fri_params = {r, D, q};
 
                         for (std::size_t round_id = 0; round_id < lambda; round_id++) {
-                            
-                            
                         }
 
                         return proof;
