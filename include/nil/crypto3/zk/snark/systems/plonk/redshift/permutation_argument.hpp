@@ -42,9 +42,8 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename FieldType>
-                class redshift_permutation_argument {
-
-                    static inline std::array<math::polynomial::polynomial<typename FieldType::value_type>, 3> 
+                struct redshift_permutation_argument {
+                    static inline std::array<math::polynomial::polynomial<typename FieldType::value_type>, 3>
                         prove_argument(fiat_shamir_heuristic<transcript_manifest, transcript_hash_type> &transcript, ) {
                         // 2. Get $\beta, \gamma \in \mathbb{F}$ from $hash(\text{transcript})$
                         typename FieldType::value_type beta =
@@ -145,7 +144,7 @@ namespace nil {
                         
                         return F;
                     }
-                }
+                };
             } // namespace snark
         } // namespace zk
     } // namespace crypto3

@@ -118,8 +118,8 @@ namespace nil {
 
                         std::copy(w.begin(), w.end(), f.begin());
 
-                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, 3> permutation_argument = 
-                            redshift_permutation_argument<typename FieldType>::prove_argument(transcript);
+                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, 3>
+                            permutation_argument = redshift_permutation_argument<FieldType>::prove_argument(transcript);
                         // std::copy(PI.begin(), PI.end(), f.begin() + N_perm);
 
                         // 7. Get $\theta \in \mathbb{F}$ from $hash(\text{transcript})$
@@ -208,7 +208,7 @@ namespace nil {
                         }
 
                         // 17. Denote g_1,2, h_1,2
-                        
+
                         math::polynomial::polynomial<typename FieldType::value_type> g_2;
                         math::polynomial::polynomial<typename FieldType::value_type> h_1 = {1};
                         math::polynomial::polynomial<typename FieldType::value_type> h_2;
