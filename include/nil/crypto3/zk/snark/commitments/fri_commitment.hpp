@@ -56,15 +56,15 @@ namespace nil {
                  */
                 template<typename FieldType,
                          typename Hash,
-                         std::size_t _m = 2>
+                         std::size_t M = 2>
                 struct fri_commitment_scheme {
-                    static constexpr std::size_t m = _m;
+                    static constexpr std::size_t m = M;
 
                     typedef FieldType field_type;
                     typedef Hash transcript_hash_type;
 
                     typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
-                    typedef typename containers::merkle_proof<Hash, 2> merkle_proof_type;
+                    typedef std::vector<typename merkle_tree_type::value_type> merkle_proof_type;
 
                     struct params_type {
                         std::size_t r;
@@ -75,7 +75,7 @@ namespace nil {
 
                     struct round_proof_type {
                         std::array<typename FieldType::value_type, m> y;
-                        std::array<std::vector<typename merkle_tree_type::value_type>, m> p;
+                        std::array<merkle_proof_type, m> p;
 
                         typename merkle_tree_type::value_type T_root;
 
@@ -168,7 +168,7 @@ namespace nil {
                                 y[j] = f.evaluate(s[j]);
                             }
 
-                            std::array<std::vector<typename merkle_tree_type::value_type>, m> p;
+                            std::array<merkle_proof_type, m> p;
 
                             for (std::size_t j = 0; j < m; j++) {
                                 if (i == 0) {
