@@ -262,8 +262,8 @@ namespace nil {
                         val.push_back(_x);
                     }
 
-                    template<class... _Args>
-                    reference emplace_back(_Args&&... _args) {
+                    template<class... Args>
+                    reference emplace_back(Args&&... _args) {
                         return val.template emplace_back(_args...);
                     }
 
@@ -278,8 +278,8 @@ namespace nil {
                     iterator insert(const_iterator _position, value_type&& _x) {
                         return val.insert(_position, _x);
                     }
-                    template<class... _Args>
-                    iterator emplace(const_iterator _position, _Args&&... _args) {
+                    template<class... Args>
+                    iterator emplace(const_iterator _position, Args&&... _args) {
                         return val.template emplace(_position, _args...);
                     }
 
@@ -287,8 +287,8 @@ namespace nil {
                         return val.insert(_position, _n, _x);
                     }
 
-                    template<class _InputIterator>
-                    iterator insert(const_iterator _position, _InputIterator _first, _InputIterator _last) {
+                    template<class InputIterator>
+                    iterator insert(const_iterator _position, InputIterator _first, InputIterator _last) {
                         return val.insert(_position, _first, _last);
                     }
 
