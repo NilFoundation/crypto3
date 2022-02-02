@@ -200,6 +200,10 @@ namespace nil {
                         return val.size();
                     }
 
+                    size_type degree() const BOOST_NOEXCEPT {
+                        return size() - 1;
+                    }
+
                     size_type capacity() const BOOST_NOEXCEPT {
                         return val.capacity();
                     }
