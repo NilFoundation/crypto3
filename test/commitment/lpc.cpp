@@ -71,8 +71,7 @@ namespace boost {
 
 template<typename FieldType, typename NumberType>
 std::vector<math::polynomial::polynomial<typename FieldType::value_type>> generate(NumberType degree) {
-    typedef boost::random::independent_bits_engine<boost::random::mt19937,
-                                                   FieldType::modulus_bits,
+    typedef boost::random::independent_bits_engine<boost::random::mt19937, FieldType::modulus_bits,
                                                    typename FieldType::value_type::data_type>
         random_polynomial_generator_type;
 
@@ -129,14 +128,15 @@ BOOST_DATA_TEST_CASE(lpc_performance_test,
         D_0.emplace_back(omega.pow(power));
     }
 
-    merkle_tree_type T = lpc_type::commit(p, D_0);
+    merkle_tree_type tree = lpc_type::commit(p, D_0);
 
     std::array<typename field_type::value_type, 1> evaluation_points = {algebra::random_element<field_type>()};
 
     std::array<std::uint8_t, 96> x_data {};
     zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
 
-    BOOST_CHECK(lpc_type::proof_eval(evaluation_points, T, p, transcript) != proof_type());
+    BOOST_CHECK(lpc_type::verify_eval(evaluation_points, tree.root(),
+                                      lpc_type::proof_eval(evaluation_points, tree, p, transcript), D_0));
 }
 
 BOOST_AUTO_TEST_CASE(lpc_basic_test) {
@@ -164,14 +164,15 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     std::vector<typename FieldType::value_type> D_0 = prepare_domain<FieldType>(d);
 
-    merkle_tree_type T = lpc_type::commit(f, D_0);
+    merkle_tree_type tree = lpc_type::commit(f, D_0);
 
     std::array<typename FieldType::value_type, 1> evaluation_points = {algebra::random_element<FieldType>()};
 
     std::array<std::uint8_t, 96> x_data {};
     zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
 
-    lpc_type::proof_eval(evaluation_points, T, f, transcript);
+    BOOST_CHECK(lpc_type::verify_eval(evaluation_points, tree.root(),
+                                      lpc_type::proof_eval(evaluation_points, tree, f, transcript), D_0));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
