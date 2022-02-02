@@ -48,7 +48,7 @@ using namespace nil::crypto3;
 
 template<typename FieldType> 
 std::vector<typename FieldType::value_type> prepare_domain(const std::size_t d) {
-    typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::get_power_of_two(d));
+    typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::power_of_two(d));
     std::vector<typename FieldType::value_type> D_0(d);
     for (std::size_t power = 1; power <= d; power++) {
         D_0.emplace_back(omega.pow(power));

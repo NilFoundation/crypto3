@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     typedef list_polynomial_commitment_scheme<field_type, merkle_hash_type, lambda, k, r, m> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
 
-    typename field_type::value_type omega = math::unity_root<field_type>(math::detail::get_power_of_two(k));
+    typename field_type::value_type omega = math::unity_root<field_type>(math::detail::power_of_two(k));
 
     std::vector<typename field_type::value_type> D_0(10);
     for (std::size_t power = 1; power <= 10; power++) {

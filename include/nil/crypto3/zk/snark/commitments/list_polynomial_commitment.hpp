@@ -103,7 +103,7 @@ namespace nil {
                 private:
                     std::vector<typename FieldType::value_type> prepare_domain(const std::size_t domain_size) {
                         typename FieldType::value_type omega =
-                            math::unity_root<FieldType>(math::detail::get_power_of_two(domain_size));
+                            math::unity_root<FieldType>(math::detail::power_of_two(domain_size));
                         std::vector<typename FieldType::value_type> d(domain_size);
                         for (std::size_t power = 1; power <= domain_size; power++) {
                             d.emplace_back(omega.pow(power));

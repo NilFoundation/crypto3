@@ -47,7 +47,7 @@ namespace nil {
 
                         typename types_policy::template preprocessed_data_type<k> data;
 
-                        data.omega = math::unity_root<FieldType>(math::detail::get_power_of_two(k));
+                        data.omega = math::unity_root<FieldType>(math::detail::power_of_two(k));
                         data.Z = {1};
                         // data.selectors = constraint_system.selectors();
                         // ... copy_constraints = constraint_system.copy_constraints();
