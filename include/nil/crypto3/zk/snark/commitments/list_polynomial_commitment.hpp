@@ -59,7 +59,7 @@ namespace nil {
                          std::size_t K = 1,
                          std::size_t R = 1,
                          std::size_t M = 2,
-                         std::size_t _d = 16>
+                         std::size_t D = 16>
                 struct list_polynomial_commitment_scheme {
                     constexpr static const std::size_t lambda = Lambda;
                     constexpr static const std::size_t k = K;
@@ -96,9 +96,9 @@ namespace nil {
                     static std::vector<typename FieldType::value_type> prepare_domain(const std::size_t domain_size) {
                         typename FieldType::value_type omega =
                             math::unity_root<FieldType>(math::detail::power_of_two(domain_size));
-                        std::vector<typename FieldType::value_type> D(domain_size);
+                        std::vector<typename FieldType::value_type> d(domain_size);
                         for (std::size_t power = 1; power <= domain_size; power++) {
-                            D.emplace_back(omega.pow(power));
+                            d.emplace_back(omega.pow(power));
                         }
                         return D;
                     }
@@ -122,11 +122,9 @@ namespace nil {
                                                  const math::polynomial::polynomial<typename FieldType::value_type> &g,
                                                  fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
 
-                        std::vector<std::vector<typename FieldType::value_type>> D;
-                        D.reserve(r - 1);
-                        std::size_t d = _d;
+                        std::vector<std::vector<typename FieldType::value_type>> d;
                         for (std::size_t j = 0; j <= r - 1; j++) {
-                            D[j] = prepare_domain(d / 2);
+                            d.emplace_back(prepare_domain(D / 2));
                         }
 
                         std::array<typename FieldType::value_type, k> z;
@@ -137,7 +135,7 @@ namespace nil {
                         for (std::size_t j = 0; j < k; j++) {
                             z[j] = g.evaluate(evaluation_points[j]);
                             std::size_t leaf_index =
-                                std::find(D[0].begin(), D[0].end(), evaluation_points[j]) - D[0].begin();
+                                std::find(d[0].begin(), d[0].end(), evaluation_points[j]) - d[0].begin();
                             p[j] = T.hash_path(leaf_index);
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], z[j]);
                         }
