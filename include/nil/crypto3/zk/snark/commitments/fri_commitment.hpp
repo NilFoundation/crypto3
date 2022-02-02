@@ -154,10 +154,13 @@ namespace nil {
                             }
 
                             // m = 2, so:
-                            assert(m == 2);
                             std::array<typename FieldType::value_type, m> s;
-                            s[0] = x;
-                            s[1] = -x;
+                            if constexpr (m == 2) {
+                                s[0] = x;
+                                s[1] = -x;
+                            } else {
+                                return {};
+                            }
 
                             std::array<typename FieldType::value_type, m> y;
 
