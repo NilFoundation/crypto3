@@ -180,7 +180,7 @@ namespace nil {
                                 std::vector<typename merkle_tree_type::value_type> colinear_path = 
                                     T_next.hash_path(leaf_index);
 
-                                round_proofs.emplace_back(y, p, T.root(), colinear_value, colinear_path);
+                                round_proofs.push_back(round_proof_type({y, p, T.root(), colinear_value, colinear_path}));
                             } else {
                                 final_polynomial = f_next;
                             }
