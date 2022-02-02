@@ -44,15 +44,30 @@
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
 
-template<typename FieldType> 
+template<typename FieldType>
 std::vector<typename FieldType::value_type> prepare_domain(const std::size_t d) {
-    typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::get_power_of_two(d));
+    typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::power_of_two(d));
     std::vector<typename FieldType::value_type> D_0(d);
     for (std::size_t power = 1; power <= d; power++) {
         D_0.emplace_back(omega.pow(power));
     }
     return D_0;
 }
+
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            template<>
+            struct print_log_value<nil::crypto3::math::polynomial::polynomial<
+                algebra::fields::detail::element_fp<algebra::fields::params<algebra::fields::bls12_base_field<381>>>>> {
+                void operator()(std::ostream &,
+                                const nil::crypto3::math::polynomial::polynomial<algebra::fields::detail::element_fp<
+                                    algebra::fields::params<algebra::fields::bls12_base_field<381>>>> &) {
+                }
+            };
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}    // namespace boost
 
 template<typename FieldType, typename NumberType>
 std::vector<math::polynomial::polynomial<typename FieldType::value_type>> generate(NumberType degree) {
@@ -74,7 +89,7 @@ std::vector<math::polynomial::polynomial<typename FieldType::value_type>> genera
     for (int i = 0; i < height; i++) {
         math::polynomial::polynomial<typename FieldType::value_type> poly;
         for (int j = 0; j < degree; j++) {
-            poly.push_back(typename FieldType::value_type(polynomial_element_gen()));
+            //            poly.push_back(typename FieldType::value_type(polynomial_element_gen()));
         }
         res.push_back(poly);
     }
@@ -90,7 +105,9 @@ BOOST_DATA_TEST_CASE(lpc_performance_test,
                      p) {
     typedef algebra::curves::bls12<381> curve_type;
     typedef typename curve_type::base_field_type field_type;
+
     typedef hashes::sha2<256> merkle_hash_type;
+    typedef hashes::sha2<256> transcript_hash_type;
 
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
@@ -105,7 +122,7 @@ BOOST_DATA_TEST_CASE(lpc_performance_test,
     typedef list_polynomial_commitment_scheme<field_type, merkle_hash_type, lambda, k, r, m> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
 
-    typename field_type::value_type omega = math::unity_root<field_type>(math::detail::get_power_of_two(k));
+    typename field_type::value_type omega = math::unity_root<field_type>(math::detail::power_of_two(k));
 
     std::vector<typename field_type::value_type> D_0(10);
     for (std::size_t power = 1; power <= 10; power++) {
@@ -116,15 +133,18 @@ BOOST_DATA_TEST_CASE(lpc_performance_test,
 
     std::array<typename field_type::value_type, 1> evaluation_points = {algebra::random_element<field_type>()};
 
-    BOOST_CHECK(lpc_type::proof_eval(evaluation_points, T, p, D_0) != proof_type());
+    std::array<std::uint8_t, 96> x_data {};
+    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
+
+    BOOST_CHECK(lpc_type::proof_eval(evaluation_points, T, p, transcript) != proof_type());
 }
 
 BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     typedef algebra::curves::bls12<381> curve_type;
     typedef typename curve_type::base_field_type FieldType;
-    typedef hashes::sha2<256> merkle_hash_type;
 
+    typedef hashes::sha2<256> merkle_hash_type;
     typedef hashes::sha2<256> transcript_hash_type;
 
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
@@ -148,7 +168,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     std::array<typename FieldType::value_type, 1> evaluation_points = {algebra::random_element<FieldType>()};
 
-    std::array<std::uint8_t, 96> x_data;
+    std::array<std::uint8_t, 96> x_data {};
     zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
 
     lpc_type::proof_eval(evaluation_points, T, f, transcript);

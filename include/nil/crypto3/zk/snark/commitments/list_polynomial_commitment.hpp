@@ -59,7 +59,7 @@ namespace nil {
                          std::size_t K = 1,
                          std::size_t R = 1,
                          std::size_t M = 2,
-                         std::size_t _d = 16>
+                         std::size_t D = 16>
                 struct list_polynomial_commitment_scheme {
                     constexpr static const std::size_t lambda = Lambda;
                     constexpr static const std::size_t k = K;
@@ -79,8 +79,7 @@ namespace nil {
 
                     struct proof_type {
                         bool operator==(const proof_type &rhs) const {
-                            return z == rhs.z && p == rhs.p &&
-                                   fri_proof == rhs.fri_proof;
+                            return z == rhs.z && p == rhs.p && fri_proof == rhs.fri_proof;
                         }
                         bool operator!=(const proof_type &rhs) const {
                             return !(rhs == *this);
@@ -94,14 +93,14 @@ namespace nil {
                     };
 
                 private:
-
                     static std::vector<typename FieldType::value_type> prepare_domain(const std::size_t domain_size) {
-                        typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::get_power_of_two(domain_size));
-                        std::vector<typename FieldType::value_type> D(domain_size);
+                        typename FieldType::value_type omega =
+                            math::unity_root<FieldType>(math::detail::power_of_two(domain_size));
+                        std::vector<typename FieldType::value_type> d(domain_size);
                         for (std::size_t power = 1; power <= domain_size; power++) {
-                            D.emplace_back(omega.pow(power));
+                            d.emplace_back(omega.pow(power));
                         }
-                        return D;
+                        return d;
                     }
 
                 public:
@@ -123,10 +122,9 @@ namespace nil {
                                                  const math::polynomial::polynomial<typename FieldType::value_type> &g,
                                                  fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
 
-                        std::vector<std::vector<typename FieldType::value_type>> D;
-                        std::size_t d = _d;
-                        for (std::size_t j = 0; j <= r-1; j++) {
-                            D[j] = prepare_domain(d/2);
+                        std::vector<std::vector<typename FieldType::value_type>> d;
+                        for (std::size_t j = 0; j <= r - 1; j++) {
+                            d.emplace_back(prepare_domain(D / 2));
                         }
 
                         std::array<typename FieldType::value_type, k> z;
@@ -136,7 +134,8 @@ namespace nil {
 
                         for (std::size_t j = 0; j < k; j++) {
                             z[j] = g.evaluate(evaluation_points[j]);
-                            std::size_t leaf_index = std::find(D[0].begin(), D[0].end(), evaluation_points[j]) - D[0].begin();
+                            std::size_t leaf_index =
+                                std::find(d[0].begin(), d[0].end(), evaluation_points[j]) - d[0].begin();
                             p[j] = T.hash_path(leaf_index);
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], z[j]);
                         }
@@ -154,11 +153,11 @@ namespace nil {
                         // temporary definition, until polynomial is constexpr
                         const math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
-                        typename fri_type::params_type fri_params = {r, D, q};
+                        typename fri_type::params_type fri_params = {r, d, q};
 
                         std::array<typename fri_type::proof_type, lambda> fri_proof;
 
-                        for (std::size_t round_id = 0; round_id <= lambda-1; round_id++) {
+                        for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {
                             fri_proof[round_id] = fri_type::proof_eval(Q, g, T, transcript, fri_params);
                         }
 
