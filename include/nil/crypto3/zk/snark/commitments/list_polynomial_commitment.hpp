@@ -54,15 +54,15 @@ namespace nil {
                  */
                 template<typename FieldType,
                          typename Hash,
-                         std::size_t _lambda = 40,
-                         std::size_t _k = 1,
-                         std::size_t _r = 1,
-                         std::size_t _m = 2>
+                         std::size_t Lambda = 40,
+                         std::size_t K = 1,
+                         std::size_t R = 1,
+                         std::size_t M = 2>
                 struct list_polynomial_commitment_scheme {
-                    static constexpr std::size_t lambda = _lambda;
-                    static constexpr std::size_t k = _k;
-                    static constexpr std::size_t r = _r;
-                    static constexpr std::size_t m = _m;
+                    constexpr static const std::size_t lambda = Lambda;
+                    constexpr static const std::size_t k = K;
+                    constexpr static const std::size_t r = R;
+                    constexpr static const std::size_t m = M;
 
                     typedef FieldType field_type;
                     typedef Hash transcript_hash_type;
@@ -183,8 +183,12 @@ namespace nil {
 
                                 // m = 2, so:
                                 std::array<typename FieldType::value_type, m> s;
-                                s[0] = y_i.sqrt();
-                                s[1] = -s[0];
+                                if constexpr (m == 2) {
+                                    s[0] = y_i.sqrt();
+                                    s[1] = -s[0];
+                                } else {
+                                    return {};
+                                }
 
                                 std::array<std::pair<typename FieldType::value_type, typename FieldType::value_type>, m>
                                     p_y_i_interpolation_points;
