@@ -32,6 +32,7 @@ namespace nil {
                 typedef typename policy_type::internal_limb_type internal_limb_type;
                 typedef typename policy_type::Backend_doubled_limbs Backend_doubled_limbs;
                 typedef typename policy_type::number_type number_type;
+                typedef typename policy_type::number_type_u number_type_u;
 
                 constexpr auto& get_mod_obj() {
                     return m_mod_obj;
@@ -47,6 +48,9 @@ namespace nil {
 
                 // TODO: add universal ref constructor
                 constexpr modular_params() {
+                }
+
+                constexpr modular_params(const number_type_u& m) : m_mod_obj(m) {
                 }
 
                 constexpr modular_params(const number_type& m) : m_mod_obj(m) {

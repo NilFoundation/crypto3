@@ -197,6 +197,7 @@ namespace nil {
                     typedef typename policy_type::Backend_doubled_padded_limbs Backend_doubled_padded_limbs;
 
                     typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::number_type_u number_type_u;
                     typedef typename policy_type::dbl_lmb_number_type dbl_lmb_number_type;
 
                     constexpr static auto limb_bits = policy_type::limb_bits;
@@ -316,6 +317,10 @@ namespace nil {
                     }
 
                     constexpr modular_functions_fixed() {
+                    }
+
+                    constexpr modular_functions_fixed(const number_type_u &m) {
+                        initialize(m);
                     }
 
                     constexpr modular_functions_fixed(const number_type& m) {
