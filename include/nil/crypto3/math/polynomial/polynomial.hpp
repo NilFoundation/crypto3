@@ -548,7 +548,7 @@ namespace nil {
                 polynomial<FieldValueType, Allocator> operator+(const polynomial<FieldValueType, Allocator>& A,
                                                                 const FieldValueType& B) {
 
-                    return A + B;
+                    return A + polynomial<FieldValueType>(B);
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
@@ -556,7 +556,7 @@ namespace nil {
                 polynomial<FieldValueType, Allocator> operator+(const FieldValueType& A,
                                                                 const polynomial<FieldValueType, Allocator>& B) {
 
-                    return A + B;
+                    return polynomial<FieldValueType>(A) + B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
@@ -564,7 +564,7 @@ namespace nil {
                 polynomial<FieldValueType, Allocator> operator-(const polynomial<FieldValueType, Allocator>& A,
                                                                 const FieldValueType& B) {
 
-                    return A - B;
+                    return A - polynomial<FieldValueType>(B);
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
@@ -572,7 +572,7 @@ namespace nil {
                 polynomial<FieldValueType, Allocator> operator-(const FieldValueType& A,
                                                                 const polynomial<FieldValueType, Allocator>& B) {
 
-                    return A - B;
+                    return polynomial<FieldValueType>(A) - B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
@@ -580,7 +580,7 @@ namespace nil {
                 polynomial<FieldValueType, Allocator> operator*(const polynomial<FieldValueType, Allocator>& A,
                                                                 const FieldValueType& B) {
 
-                    return A * B;
+                    return A * polynomial<FieldValueType>(B);
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
@@ -588,7 +588,7 @@ namespace nil {
                 polynomial<FieldValueType, Allocator> operator*(const FieldValueType& A,
                                                                 const polynomial<FieldValueType, Allocator>& B) {
 
-                    return A * B;
+                    return polynomial<FieldValueType>(A) * B;
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
@@ -596,7 +596,7 @@ namespace nil {
                 polynomial<FieldValueType, Allocator> operator/(const polynomial<FieldValueType, Allocator>& A,
                                                                 const FieldValueType& B) {
 
-                    return A / B;
+                    return A / polynomial<FieldValueType>(B);
                 }
 
                 template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
@@ -604,7 +604,7 @@ namespace nil {
                 polynomial<FieldValueType, Allocator> operator/(const FieldValueType& A,
                                                                 const polynomial<FieldValueType, Allocator>& B) {
 
-                    return A / B;
+                    return polynomial<FieldValueType>(A) / B;
                 }
             }    // namespace polynomial
         }        // namespace math
