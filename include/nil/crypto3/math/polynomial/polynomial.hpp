@@ -543,28 +543,32 @@ namespace nil {
                     }
                 };
 
-                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
+                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                         typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
                 polynomial<FieldValueType, Allocator> operator+(const polynomial<FieldValueType, Allocator>& A,
                                                                 const FieldValueType& B) {
 
                     return A + B;
                 }
 
-                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
+                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                         typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
                 polynomial<FieldValueType, Allocator> operator+(const FieldValueType& A,
                                                                 const polynomial<FieldValueType, Allocator>& B) {
 
                     return A + B;
                 }
 
-                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
+                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                         typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
                 polynomial<FieldValueType, Allocator> operator-(const polynomial<FieldValueType, Allocator>& A,
                                                                 const FieldValueType& B) {
 
                     return A - B;
                 }
 
-                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
+                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                         typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
                 polynomial<FieldValueType, Allocator> operator-(const FieldValueType& A,
                                                                 const polynomial<FieldValueType, Allocator>& B) {
 
@@ -587,14 +591,16 @@ namespace nil {
                     return A * B;
                 }
 
-                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
+                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                         typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
                 polynomial<FieldValueType, Allocator> operator/(const polynomial<FieldValueType, Allocator>& A,
                                                                 const FieldValueType& B) {
 
                     return A / B;
                 }
 
-                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>>
+                template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                         typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
                 polynomial<FieldValueType, Allocator> operator/(const FieldValueType& A,
                                                                 const polynomial<FieldValueType, Allocator>& B) {
 
