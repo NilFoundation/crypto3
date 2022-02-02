@@ -51,9 +51,6 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     using curve_type = algebra::curves::bls12<381>;
     using FieldType = typename curve_type::base_field_type;
 
-    typedef hashes::sha2<256> merkle_hash_type;
-    typedef hashes::sha2<256> transcript_hash_type;
-
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
     constexpr static const std::size_t lambda = 40;
