@@ -105,6 +105,8 @@ namespace nil {
 
                         std::vector<merkle_tree_type> w_trees;
                         std::vector<typename lpc::commitment_type> w_commitments;
+                        w_commitments.reserve(N_wires);
+                        w_trees.reserve(N_wires);
 
                         for (std::size_t i = 0; i < N_wires; i++) {
                             w_trees.push_back(lpc::commit(w[i], D_0));
