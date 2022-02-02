@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
         std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> 
             interpolation_points;
         for (std::size_t j = 0; j < circuit_rows; j++) {
-            interpolation_points.push_back(std::make_pair(omega.pow(j), delta.pow(i) * omega.pow(j)));
+            interpolation_points.emplace_back(omega.pow(j), delta.pow(i) * omega.pow(j));
         }
 
         S_id[i] = math::polynomial::lagrange_interpolation(interpolation_points);
@@ -120,14 +120,11 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
             interpolation_points;
         for (std::size_t j = 0; j < circuit_rows; j++) {
             if (i == 1 && j == 1) {
-                interpolation_points.push_back(
-                    std::make_pair(omega.pow(j), delta.pow(2) * omega.pow(2)));
+                interpolation_points.emplace_back(omega.pow(j), delta.pow(2) * omega.pow(2));
             } else if (i == 2 && j == 2) {
-                interpolation_points.push_back(
-                    std::make_pair(omega.pow(j), delta.pow(1) * omega.pow(1)));
+                interpolation_points.emplace_back(omega.pow(j), delta.pow(1) * omega.pow(1));
             } else {
-                interpolation_points.push_back(
-                    std::make_pair(omega.pow(j), delta.pow(i) * omega.pow(j)));
+                interpolation_points.emplace_back(omega.pow(j), delta.pow(i) * omega.pow(j));
             }
             
         }
@@ -142,11 +139,9 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
             interpolation_points;
         for (std::size_t j = 0; j < circuit_rows; j++) {
             if (i == 2 && j == 2) {
-                interpolation_points.push_back(
-                    std::make_pair(omega.pow(j), interpolation_points[1].second));
+                interpolation_points.emplace_back(omega.pow(j), interpolation_points[1].second);
             } else {
-                interpolation_points.push_back(
-                    std::make_pair(omega.pow(j), algebra::random_element<FieldType>()));
+                interpolation_points.emplace_back(omega.pow(j), algebra::random_element<FieldType>());
             }
             
         }
@@ -163,15 +158,11 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
         interpolation_points_blind;
     for (std::size_t j = 0; j < circuit_rows; j++) {
         if (j == circuit_rows - 1) {
-            interpolation_points_last.push_back(
-                std::make_pair(omega.pow(j), FieldType::value_type::one()));
-            interpolation_points_blind.push_back(
-                std::make_pair(omega.pow(j), FieldType::value_type::zero()));
+            interpolation_points_last.emplace_back(omega.pow(j), FieldType::value_type::one());
+            interpolation_points_blind.emplace_back(omega.pow(j), FieldType::value_type::zero());
         } else {
-            interpolation_points_last.push_back(
-                std::make_pair(omega.pow(j), FieldType::value_type::zero()));
-            interpolation_points_blind.push_back(
-                std::make_pair(omega.pow(j), FieldType::value_type::zero()));
+            interpolation_points_last.emplace_back(omega.pow(j), FieldType::value_type::zero());
+            interpolation_points_blind.emplace_back(omega.pow(j), FieldType::value_type::zero());
         }
         
     }
