@@ -163,15 +163,10 @@ namespace nil {
                                 }
                             }
 
-                            std::vector<std::array<std::uint8_t, 96>> y_data;
-                            merkle_tree_type T_next(y_data);
-
-                            if (i < r - 2) {
-                                T_next = commit(f_next, fri_params.D[i+1]);
-                                transcript(T_next.root());
-                            }
-
                             if (i < r - 1) {
+                                merkle_tree_type T_next = commit(f_next, fri_params.D[i+1]);
+                                transcript(T_next.root());
+
                                 typename FieldType::value_type colinear_value = f_next.evaluate(x_next);
 
                                 std::size_t leaf_index = std::find(
@@ -181,13 +176,14 @@ namespace nil {
                                     T_next.hash_path(leaf_index);
 
                                 round_proofs.push_back(round_proof_type({y, p, T.root(), colinear_value, colinear_path}));
+
+                                T = T_next;
                             } else {
                                 final_polynomial = f_next;
                             }
 
                             x = x_next;
                             f = f_next;
-                            T = T_next;
                         }
                         return proof_type ({round_proofs, final_polynomial});
                     }
