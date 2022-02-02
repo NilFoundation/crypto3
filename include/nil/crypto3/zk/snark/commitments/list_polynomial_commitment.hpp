@@ -59,7 +59,7 @@ namespace nil {
                          std::size_t K = 1,
                          std::size_t R = 1,
                          std::size_t M = 2,
-                         std::size_t D = 16>
+                         std::size_t _d = 16>
                 struct list_polynomial_commitment_scheme {
                     constexpr static const std::size_t lambda = Lambda;
                     constexpr static const std::size_t k = K;
@@ -72,36 +72,29 @@ namespace nil {
                     typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
                     typedef std::vector<typename merkle_tree_type::value_type> merkle_proof_type;
 
-                    typedef fri_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> fri_type;
+                    typedef fri_commitment_scheme<FieldType, Hash, m> fri_type;
 
-                    struct transcript_round_manifest {
-                        enum challenges_ids { x, y };
-                    };
-
-                    using openning_type = merkle_proof_type;
                     using commitment_type = typename merkle_tree_type::value_type;
 
                     struct proof_type {
                         bool operator==(const proof_type &rhs) const {
-                            return z_openings == rhs.z_openings && alpha_openings == rhs.alpha_openings &&
-                                   f_y_openings == rhs.f_y_openings && f_commitments == rhs.f_commitments &&
-                                   f_ip1_coefficients == rhs.f_ip1_coefficients;
+                            return z == rhs.z && p == rhs.p &&
+                                   fri_proof == rhs.fri_proof;
                         }
                         bool operator!=(const proof_type &rhs) const {
                             return !(rhs == *this);
                         }
 
-                        std::array<merkle_proof_type, k> z_openings;
+                        std::array<typename FieldType::value_type, k> z;
 
-                        std::array<std::array<commitment_type, r - 1>, lambda> f_commitments;
+                        std::array<merkle_proof_type, k> p;
 
-                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, lambda>
-                            f_ip1_coefficients;
+                        std::array<typename fri_type::proof_type, lambda> fri_proof;
                     };
 
                 private:
 
-                    std::vector<typename FieldType::value_type> prepare_domain(const std::size_t domain_size) {
+                    static std::vector<typename FieldType::value_type> prepare_domain(const std::size_t domain_size) {
                         typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::get_power_of_two(domain_size));
                         std::vector<typename FieldType::value_type> D(domain_size);
                         for (std::size_t power = 1; power <= domain_size; power++) {
@@ -126,23 +119,26 @@ namespace nil {
                     }
 
                     static proof_type proof_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
-                                                 const merkle_tree_type &T,
+                                                 merkle_tree_type &T,
                                                  const math::polynomial::polynomial<typename FieldType::value_type> &g,
                                                  fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
 
-                        proof_type proof;
+                        std::vector<std::vector<typename FieldType::value_type>> D;
+                        std::size_t d = _d;
+                        for (std::size_t j = 0; j <= r-1; j++) {
+                            D[j] = prepare_domain(d/2);
+                        }
 
-                        fiat_shamir_heuristic<transcript_round_manifest, transcript_hash_type> transcript;
-
-                        std::array<merkle_proof_type, k> &z_openings = proof.z_openings;
+                        std::array<typename FieldType::value_type, k> z;
+                        std::array<merkle_proof_type, k> p;
                         std::array<std::pair<typename FieldType::value_type, typename FieldType::value_type>, k>
                             U_interpolation_points;
 
                         for (std::size_t j = 0; j < k; j++) {
-                            typename FieldType::value_type z_j = g.evaluate(evaluation_points[j]);
-                            std::size_t leaf_index = std::find(D.begin(), D.end(), evaluation_points[j]) - D.begin();
-                            z_openings[j] = merkle_proof_type(T, leaf_index);
-                            U_interpolation_points[j] = std::make_pair(evaluation_points[j], z_j);
+                            z[j] = g.evaluate(evaluation_points[j]);
+                            std::size_t leaf_index = std::find(D[0].begin(), D[0].end(), evaluation_points[j]) - D[0].begin();
+                            p[j] = T.hash_path(leaf_index);
+                            U_interpolation_points[j] = std::make_pair(evaluation_points[j], z[j]);
                         }
 
                         math::polynomial::polynomial<typename FieldType::value_type> U =
@@ -155,23 +151,19 @@ namespace nil {
                             Q = Q / denominator_polynom;
                         }
 
-                        std::vector<std::vector<typename FieldType::value_type>> D;
-                        std::size_t d = D;
-                        for (std::size_t j = 0; j <= r-1; j++) {
-                            D[j] = prepare_domain(d/2);
-                        }
-
                         // temporary definition, until polynomial is constexpr
                         const math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
-                        
-                        fri_type::params_type fri_params = {r, D, q};
 
-                        for (std::size_t round_id = 0; round_id < lambda; round_id++) {
-                            
+                        typename fri_type::params_type fri_params = {r, D, q};
+
+                        std::array<typename fri_type::proof_type, lambda> fri_proof;
+
+                        for (std::size_t round_id = 0; round_id <= lambda-1; round_id++) {
+                            fri_proof[round_id] = fri_type::proof_eval(Q, g, T, transcript, fri_params);
                             
                         }
 
-                        return proof;
+                        return proof_type({z, p, fri_proof});
                     }
 
                     static bool verify_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,

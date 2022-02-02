@@ -44,13 +44,25 @@
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
 
+template<typename FieldType> 
+std::vector<typename FieldType::value_type> prepare_domain(const std::size_t d) {
+    typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::get_power_of_two(d));
+    std::vector<typename FieldType::value_type> D_0(d);
+    for (std::size_t power = 1; power <= d; power++) {
+        D_0.emplace_back(omega.pow(power));
+    }
+    return D_0;
+}
+
 BOOST_AUTO_TEST_SUITE(lpc_test_suite)
 
 BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     typedef algebra::curves::bls12<381> curve_type;
-    typedef typename curve_type::base_field_type field_type;
+    typedef typename curve_type::base_field_type FieldType;
     typedef hashes::sha2<256> merkle_hash_type;
+
+    typedef hashes::sha2<256> transcript_hash_type;
 
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
@@ -62,23 +74,21 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef list_polynomial_commitment_scheme<field_type, merkle_hash_type, lambda, k, r, m> lpc_type;
+    typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
 
-    typename field_type::value_type omega = math::unity_root<field_type>(math::detail::get_power_of_two(k));
+    const math::polynomial::polynomial<typename FieldType::value_type> f = {0, 0, 1};
 
-    std::vector<typename field_type::value_type> D_0(10);
-    for (std::size_t power = 1; power <= 10; power++) {
-        D_0.emplace_back(omega.pow(power));
-    }
-
-    const math::polynomial::polynomial<typename field_type::value_type> f = {0, 0, 1};
+    std::vector<typename FieldType::value_type> D_0 = prepare_domain<FieldType>(d);
 
     merkle_tree_type T = lpc_type::commit(f, D_0);
 
-    std::array<typename field_type::value_type, 1> evaluation_points = {algebra::random_element<field_type>()};
+    std::array<typename FieldType::value_type, 1> evaluation_points = {algebra::random_element<FieldType>()};
 
-    BOOST_CHECK(lpc_type::proof_eval(evaluation_points, T, f, D_0) != proof_type());
+    std::array<std::uint8_t, 96> x_data;
+    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
+
+    lpc_type::proof_eval(evaluation_points, T, f, transcript);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
