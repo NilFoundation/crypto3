@@ -56,6 +56,7 @@ namespace nil {
                         typedef typename group_type::value_type group_value_type;
                         typedef typename group_type::field_type::integral_type integral_type;
                         typedef typename group_type::field_type::modular_type modular_type;
+                        typedef typename group_type::field_type::modular_backend modular_backend;
                         typedef typename group_type::field_type::value_type field_value_type;
 
                         // BLS12381G1_XMD:SHA-256_SSWU_RO_
@@ -84,6 +85,7 @@ namespace nil {
                         typedef typename group_type::value_type group_value_type;
                         typedef typename group_type::field_type::integral_type integral_type;
                         typedef typename group_type::field_type::modular_type modular_type;
+                        typedef typename group_type::field_type::modular_backend modular_backend;
                         typedef typename group_type::field_type::value_type field_value_type;
 
                         // BLS12381G2_XMD:SHA-256_SSWU_RO_
