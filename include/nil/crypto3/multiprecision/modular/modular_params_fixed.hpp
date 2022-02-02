@@ -34,6 +34,7 @@ namespace nil {
                 typedef typename policy_type::internal_limb_type internal_limb_type;
                 typedef typename policy_type::Backend_doubled_limbs Backend_doubled_limbs;
                 typedef typename policy_type::number_type number_type;
+                typedef typename policy_type::number_type_u number_type_u;
 
                 constexpr auto& get_mod_obj() {
                     return m_mod_obj;
@@ -56,6 +57,10 @@ namespace nil {
 
                 // TODO: add universal ref constructor
                 constexpr modular_params() {
+                }
+
+                constexpr modular_params(const number_type_u& m) : m_mod_obj(m) {
+                    is_odd_mod = eval_bit_test(m.backend(), 0);
                 }
 
                 constexpr modular_params(const number_type& m) : m_mod_obj(m) {
@@ -123,11 +128,6 @@ namespace nil {
                         m_mod_obj.regular_exp(result, a, exp);
                     }
                 }
-
-//                template<typename Backend1, typename Backend2>
-//                constexpr void mod_mul(Backend1& result, const Backend2& y) {
-//                    mod_mul(result, result, y);
-//                }
 
                 template<typename Backend1, typename Backend2>
                 constexpr void mod_mul(Backend1& result, const Backend2& y) {

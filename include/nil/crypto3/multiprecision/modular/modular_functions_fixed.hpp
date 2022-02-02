@@ -195,6 +195,7 @@ namespace nil {
                     typedef typename policy_type::Backend_doubled_padded_limbs Backend_doubled_padded_limbs;
 
                     typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::number_type_u number_type_u;
                     typedef typename policy_type::dbl_lmb_number_type dbl_lmb_number_type;
 
                     constexpr static auto limbs_count = policy_type::limbs_count;
@@ -299,6 +300,10 @@ namespace nil {
                     constexpr modular_functions_fixed() {
                     }
 
+                    constexpr modular_functions_fixed(const number_type_u &m) {
+                        initialize(m);
+                    }
+
                     constexpr modular_functions_fixed(const number_type &m) {
                         initialize(m);
                     }
@@ -400,12 +405,14 @@ namespace nil {
                         Backend_doubled_padded_limbs prod;
 #if BOOST_ARCH_X86_64
                         if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && m_mod.backend().size() >= 2) {
+                            bool carry = false;
                             for (size_t i = 0; i < m_mod.backend().size(); ++i) {
-                                reduce_help(m_mod.backend().size(), i, accum.limbs(), m_mod.backend().limbs(),
+                                carry = reduce_help(m_mod.backend().size(), i, accum.limbs(), m_mod.backend().limbs(),
                                                     static_cast<double_limb_type>(m_montgomery_p_dash));
                             }
-                            if (cmp_asm(m_mod.backend().size(), accum.limbs() + m_mod.backend().size(), m_mod.backend().limbs()) >= 0) {
-                                sub_mod(m_mod.backend().size(), accum.limbs() + m_mod.backend().size(), m_mod.backend().limbs(), m_mod.backend().limbs());
+                            if (carry || cmp_asm(m_mod.backend().size(), accum.limbs() + m_mod.backend().size(),
+                                                 m_mod.backend().limbs()) >= 0) {
+                                sub_only(m_mod.backend().size(), accum.limbs() + m_mod.backend().size(), m_mod.backend().limbs());
                             }
                             // Now result in first m_mod.backend().size() limbs, so we can do
                             // eval_bitwise_and(accum, m_modulus_mask);
@@ -451,7 +458,7 @@ namespace nil {
                         /// input parameters should be lesser than modulus
                         // BOOST_ASSERT(eval_lt(x, m_mod.backend()) && eval_lt(y, m_mod.backend()));
 #if BOOST_ARCH_X86_64
-                        if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && (limbs_count >= 2)) {
+                        if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && (result.size() >= 2) && (y.size() >= 2)) {
                             add_mod(limbs_count, result, y, m_mod);
                             result.resize(limbs_count, limbs_count);
                             result.normalize();

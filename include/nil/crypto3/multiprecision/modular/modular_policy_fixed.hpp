@@ -53,6 +53,7 @@ namespace nil {
                 template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
                 struct modular_policy<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>> {
                     typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> Backend;
+                    typedef modular_fixed_cpp_int_backend<MinBits,  cpp_integer_type::unsigned_magnitude, Checked> Backend_u;
 
                     static_assert(MinBits, "number of bits should be defined");
                     static_assert(is_fixed_precision<Backend>::value, "fixed precision backend should be used");
@@ -97,6 +98,7 @@ namespace nil {
                         Backend_doubled_padded_limbs;
 
                     typedef number<Backend> number_type;
+                    typedef number<Backend_u> number_type_u;
                     typedef number<Backend_doubled> dbl_number_type;
                     typedef number<Backend_doubled_limbs> dbl_lmb_number_type;
                 };
