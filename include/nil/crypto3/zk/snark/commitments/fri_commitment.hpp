@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_ZK_FRI_COMMITMENT_SCHEME_HPP
 #define CRYPTO3_ZK_FRI_COMMITMENT_SCHEME_HPP
 
+#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
+
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 
@@ -96,6 +98,25 @@ namespace nil {
                     static merkle_tree_type
                         commit(const math::polynomial::polynomial<typename FieldType::value_type> &f,
                                const std::vector<typename FieldType::value_type> &D) {
+
+                        using Endianness = nil::marshalling::option::big_endian;
+                        using field_element_type = 
+                            nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>, FieldType>;
+
+                        std::vector<std::array<std::uint8_t, 96>> y_data;
+                        y_data.reserve(D.size());
+                        nil::marshalling::status_type status;
+
+                        for (std::size_t i = 0; i < D.size(); i++) {
+                            typename FieldType::value_type y = f.evaluate(D[i]);
+
+                            field_element_type y_val = 
+                                nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(y);
+                            auto write_iter = y_data[i].begin();
+                            y_val.write(write_iter, 96);
+                        }
+
+                        return merkle_tree_type(y_data);
                     }
 
                     static proof_type proof_eval(const math::polynomial::polynomial<typename FieldType::value_type> &Q,
