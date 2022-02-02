@@ -72,6 +72,13 @@ namespace nil {
                     };
 
                     struct round_proof_type {
+                        bool operator==(const round_proof_type &rhs) const {
+                            return y == rhs.y && p == rhs.p && T_root == rhs.T_root &&
+                                   colinear_value == rhs.colinear_value && colinear_path == rhs.colinear_path;
+                        }
+                        bool operator!=(const round_proof_type &rhs) const {
+                            return !(rhs == *this);
+                        }
                         std::array<typename FieldType::value_type, m> y;
                         std::array<merkle_proof_type, m> p;
 
@@ -82,6 +89,13 @@ namespace nil {
                     };
 
                     struct proof_type {
+                        bool operator==(const proof_type &rhs) const {
+                            return round_proofs == rhs.round_proofs && final_polynomial == rhs.final_polynomial;
+                        }
+                        bool operator!=(const proof_type &rhs) const {
+                            return !(rhs == *this);
+                        }
+
                         std::vector<round_proof_type> round_proofs;    // 0..r-2
 
                         math::polynomial::polynomial<typename FieldType::value_type> final_polynomial;

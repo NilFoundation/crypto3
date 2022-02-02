@@ -79,8 +79,7 @@ namespace nil {
 
                     struct proof_type {
                         bool operator==(const proof_type &rhs) const {
-                            return z == rhs.z && p == rhs.p &&
-                                   fri_proof == rhs.fri_proof;
+                            return z == rhs.z && p == rhs.p && fri_proof == rhs.fri_proof;
                         }
                         bool operator!=(const proof_type &rhs) const {
                             return !(rhs == *this);
@@ -94,9 +93,9 @@ namespace nil {
                     };
 
                 private:
-
                     static std::vector<typename FieldType::value_type> prepare_domain(const std::size_t domain_size) {
-                        typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::get_power_of_two(domain_size));
+                        typename FieldType::value_type omega =
+                            math::unity_root<FieldType>(math::detail::power_of_two(domain_size));
                         std::vector<typename FieldType::value_type> D(domain_size);
                         for (std::size_t power = 1; power <= domain_size; power++) {
                             D.emplace_back(omega.pow(power));
@@ -124,9 +123,10 @@ namespace nil {
                                                  fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
 
                         std::vector<std::vector<typename FieldType::value_type>> D;
+                        D.reserve(r - 1);
                         std::size_t d = _d;
-                        for (std::size_t j = 0; j <= r-1; j++) {
-                            D[j] = prepare_domain(d/2);
+                        for (std::size_t j = 0; j <= r - 1; j++) {
+                            D[j] = prepare_domain(d / 2);
                         }
 
                         std::array<typename FieldType::value_type, k> z;
@@ -136,7 +136,8 @@ namespace nil {
 
                         for (std::size_t j = 0; j < k; j++) {
                             z[j] = g.evaluate(evaluation_points[j]);
-                            std::size_t leaf_index = std::find(D[0].begin(), D[0].end(), evaluation_points[j]) - D[0].begin();
+                            std::size_t leaf_index =
+                                std::find(D[0].begin(), D[0].end(), evaluation_points[j]) - D[0].begin();
                             p[j] = T.hash_path(leaf_index);
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], z[j]);
                         }
@@ -158,7 +159,7 @@ namespace nil {
 
                         std::array<typename fri_type::proof_type, lambda> fri_proof;
 
-                        for (std::size_t round_id = 0; round_id <= lambda-1; round_id++) {
+                        for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {
                             fri_proof[round_id] = fri_type::proof_eval(Q, g, T, transcript, fri_params);
                         }
 
