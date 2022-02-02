@@ -119,6 +119,20 @@ namespace nil {
                         return merkle_tree_type(y_data);
                     }
 
+                    static inline math::polynomial::polynomial<typename FieldType::value_type> 
+                    fold_polynomial(math::polynomial::polynomial<typename FieldType::value_type> &f,
+                            typename FieldType::value_type alpha) {
+                        std::size_t d = f.degree();
+
+                        math::polynomial::polynomial<typename FieldType::value_type> f_folded((d + 1)/2 - 1);
+
+                        for (std::size_t index = 0; index < f_folded.size(); index++){
+                            f_folded[index] = f[2*index] + alpha * f[2*index + 1];
+                        }
+
+                        return f_folded;
+                    }
+
                     static proof_type proof_eval(const math::polynomial::polynomial<typename FieldType::value_type> &Q,
                                                  const math::polynomial::polynomial<typename FieldType::value_type> &g,
                                                  merkle_tree_type &T,
@@ -145,13 +159,8 @@ namespace nil {
 
                             typename FieldType::value_type x_next = fri_params.q.evaluate(x);
 
-                            std::size_t d = f.degree();
-
-                            math::polynomial::polynomial<typename FieldType::value_type> f_next((d + 1)/2 - 1);
-
-                            for (std::size_t index = 0; index < f_next.size(); index++){
-                                f_next[index] = f[2*index] + alpha * f[2*index + 1];
-                            }
+                            math::polynomial::polynomial<typename FieldType::value_type> f_next = 
+                                fold_polynomial(f, alpha);
 
                             // m = 2, so:
                             std::array<typename FieldType::value_type, m> s;

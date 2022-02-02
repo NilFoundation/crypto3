@@ -91,13 +91,13 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     params.q = f;
 
     std::vector<std::array<std::uint8_t, 96>> y_data;
-    merkle_tree_type T(y_data);
+    //merkle_tree_type T(y_data);
     
     std::array<std::uint8_t, 96> x_data;
     zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
     // std::array<typename FieldType::value_type, 1> evaluation_points = {omega.pow(5)};
 
-    proof_type proof = fri_type::proof_eval(f, f, T, transcript, params);
+    //proof_type proof = fri_type::proof_eval(f, f, T, transcript, params);
     // BOOST_CHECK(fry_type::verify_eval(evaluation_points, T, proof, D_0))
 }
 
@@ -107,26 +107,49 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
     using curve_type = algebra::curves::mnt4<298>;
     using FieldType = typename curve_type::base_field_type;
 
+    typedef hashes::sha2<256> merkle_hash_type;
+    typedef hashes::sha2<256> transcript_hash_type;
+
+    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
+
     constexpr static const std::size_t d = 4;
+    constexpr static const std::size_t r = boost::static_log2<d>::value;
+    constexpr static const std::size_t m = 2;
 
-    // typedef fri_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> fri_type;
+    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, m> fri_type;
+    typedef typename fri_type::proof_type proof_type;
+    typedef typename fri_type::params_type params_type;
 
-    math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 25};
+    params_type params;
+    math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
-    std::vector<typename FieldType::value_type> D_0 = prepare_domain<FieldType>(d);
-    typename FieldType::value_type omega = D_0[0];
+    std::vector<typename FieldType::value_type> domain = prepare_domain<FieldType>(d);
+    std::vector<std::vector<typename FieldType::value_type>> D = {domain};
 
-    // x_next = fri_type::params.q(x)
-    typename FieldType::value_type alpha = algebra::random_element<FieldType>();
-    // math::polynomial::polynomial<typename FieldType::value_type> f_next = fri_type::fold_polynomial(f, alpha)
+
+    params.r = r;
+    params.D = D;
+    params.q = q;
+
+    math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 3};
+
+    typename FieldType::value_type omega = domain[0];
+
+    typename FieldType::value_type x_next = params.q.evaluate(omega);
+    //typename FieldType::value_type alpha = algebra::random_element<FieldType>();
+    typename FieldType::value_type alpha = FieldType::value_type(2);
+    math::polynomial::polynomial<typename FieldType::value_type> f_next = 
+        fri_type::fold_polynomial(f, alpha);
 
     std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> points {
         std::make_pair(omega, f.evaluate(omega)),
         std::make_pair(-omega, f.evaluate(-omega)),
     };
-    math::polynomial::polynomial<typename FieldType::value_type> interpolant = math::polynomial::lagrange_interpolation(points);
-    typename FieldType::value_type x1 = interpolant.evaluate(omega);
-    typename FieldType::value_type x2 = f.evaluate(omega);
+
+    // TODO: Fix it with a proper interpolation
+    math::polynomial::polynomial<typename FieldType::value_type> interpolant = {f[0] + f[2] * x_next, f[1] + f[3] * x_next};
+    typename FieldType::value_type x1 = interpolant.evaluate(alpha);
+    typename FieldType::value_type x2 = f_next.evaluate(x_next);
     BOOST_CHECK(x1 == x2);
     // BOOST_CHECK_EQUAL(interpolant.eval(alpha), f_next.eval(x_next))
 }
@@ -164,24 +187,40 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
 
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
-    constexpr static const std::size_t lambda = 40;
-    constexpr static const std::size_t k = 1;
-
-    constexpr static const std::size_t d = 4;
+    constexpr static const std::size_t d = 16;
 
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
 
-    // typedef fri_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> fri_type;
-    // typedef typename fri_type::proof_type proof_type;
+    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, m> fri_type;
+    typedef typename fri_type::proof_type proof_type;
+    typedef typename fri_type::params_type params_type;
 
-    math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 25};
+    params_type params;
+    math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1,
+                                                                        5, 6, 7, 2,
+                                                                        8, 7, 5, 6,
+                                                                        1, 2, 1, 1};
 
-    std::vector<typename FieldType::value_type> D_0 = prepare_domain<FieldType>(d);
+    // create domain D_0
 
-    // merkle_tree_type T = fri_type::commit(f, D_0);
+    std::vector<std::vector<typename FieldType::value_type>> D;
+    for (std::size_t i = 0; i < d; i++) {
+        std::vector<typename FieldType::value_type> domain = prepare_domain<FieldType>(d - i);
+        D.push_back(domain);
+    }
 
-    // std::array<typename FieldType::value_type, 1> evaluation_points = {omega.pow(algebra::random_element<FieldType>())};
+    params.r = r + 1;
+    params.D = D;
+    params.q = f;
+
+    //merkle_tree_type T(y_data);
+    
+    std::array<std::uint8_t, 96> x_data;
+    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
+    // std::array<typename FieldType::value_type, 1> evaluation_points = {omega.pow(5)};
+
+    //proof_type proof = fri_type::proof_eval(f, f, T, transcript, params);
 
     // proof_type proof = fri_type::proof_eval(evaluation_points, T, f, D_0)
     // math::polynomial::polynomial<typename FieldType::value_type> f_res = proof.last_round.f
