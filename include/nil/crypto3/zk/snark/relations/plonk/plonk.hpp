@@ -99,7 +99,7 @@ namespace nil {
                     }
 
                     std::vector<math::polynomial::polynomial<typename FieldType::value_type>>
-                        polynoms(plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment) const {
+                        polynomials(plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment) const {
 
                         std::vector<math::polynomial::polynomial<typename FieldType::value_type>> result(
                             constraints.size());
@@ -116,7 +116,8 @@ namespace nil {
 
                             for (auto &term : constraints[constraint_index].terms) {
 
-                                math::polynomial::polynomial<typename FieldType::value_type> term_polynom = {term.coeff};
+                                math::polynomial::polynomial<typename FieldType::value_type> term_polynom = {
+                                    term.coeff};
 
                                 // TODO: Rotation isn't taken into consideration
                                 for (auto &var : term.vars) {

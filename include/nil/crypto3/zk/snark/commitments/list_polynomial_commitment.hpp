@@ -159,7 +159,7 @@ namespace nil {
 
                             typename FieldType::value_type x_0 =
                                 transcript
-                                    .template get_challenge<transcript_round_manifest::challenges_ids::x, FieldType>();
+                                    .template challenge<transcript_round_manifest::challenges_ids::x, FieldType>();
 
                             typename FieldType::value_type x_round = x_0;
 
@@ -171,9 +171,8 @@ namespace nil {
                             merkle_tree_type f_round_tree = T;
 
                             std::array<typename FieldType::value_type, r> y_challenges =
-                                transcript.template get_challenges<transcript_round_manifest::challenges_ids::y,
-                                                                   r,
-                                                                   FieldType>();
+                                transcript
+                                    .template challenges<transcript_round_manifest::challenges_ids::y, r, FieldType>();
 
                             for (std::size_t i = 0; i <= r - 1; i++) {
 
@@ -260,7 +259,7 @@ namespace nil {
 
                             typename FieldType::value_type x_round =
                                 transcript
-                                    .template get_challenge<transcript_round_manifest::challenges_ids::x, FieldType>();
+                                    .template challenge<transcript_round_manifest::challenges_ids::x, FieldType>();
 
                             std::array<merkle_proof_type, m *r> &alpha_openings = proof.alpha_openings[round_id];
                             std::array<merkle_proof_type, r> &f_y_openings = proof.f_y_openings[round_id];
@@ -271,9 +270,8 @@ namespace nil {
                             commitment_type &f_i_tree_root = root;
 
                             auto y_arr =
-                                transcript.template get_challenges<transcript_round_manifest::challenges_ids::y,
-                                                                   r,
-                                                                   FieldType>();
+                                transcript
+                                    .template challenges<transcript_round_manifest::challenges_ids::y, r, FieldType>();
 
                             for (std::size_t i = 0; i <= r - 1; i++) {
 
