@@ -212,8 +212,64 @@ namespace nil {
                         return proof_type({round_proofs, final_polynomial});
                     }
 
-                    static bool verify_eval() {
-                        return true;
+                    static bool verify_eval(proof_type &proof,
+                                        fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
+                                        params_type &fri_params,
+                                        const math::polynomial::polynomial<typename FieldType::value_type> &U,
+                                        const math::polynomial::polynomial<typename FieldType::value_type> &V) {
+
+                        typename FieldType::value_type x = transcript.template challenge<FieldType>();
+                        std::size_t r = fri_params.r;
+
+                        for (std::size_t i = 0; i <= r - 2; i++) {
+
+                            typename FieldType::value_type alpha =
+                                fri_params.D[i + 1][0].pow(transcript.template int_challenge<std::size_t>());
+
+                            typename FieldType::value_type x_next = fri_params.q.evaluate(x);
+
+                            // m = 2, so:
+                            std::array<typename FieldType::value_type, m> s;
+                            if constexpr (m == 2) {
+                                s[0] = x;
+                                s[1] = -x;
+                            } else {
+                                return false;
+                            }
+
+                            for (std::size_t j = 0; j < m; j++) {
+                                if (!proof.round_proofs[i].p[j].validate(proof.round_proofs[i].T_root))
+                                    return false;
+                            }
+
+                            std::array<typename FieldType::value_type, m> y;
+
+                            for (std::size_t j = 0; j < m; j++) {
+                                if (i == 0){
+                                    y[j] = (proof.round_proofs[i].y[j] - U.evaluate(s[j]))/V.evaluate(s[j]);
+                                } else {
+                                    y[j] = proof.round_proofs[i].y[j];
+                                }
+                            }
+
+                            if (i < r - 2){
+                                transcript(proof.round_proofs[i + 1].T_root);
+                            }
+
+                            math::polynomial::polynomial<typename FieldType::value_type> interpolant;
+
+                            if (!proof.round_proofs[i].colinear_path.validate(proof.round_proofs[i].T_root))
+                                return false;
+                            if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value)
+                                return false;
+
+                            x = x_next;
+
+                        }
+
+                        // proof.final_polynomial.degree() == ...
+
+                        
                     }
                 };
             }    // namespace snark
