@@ -54,11 +54,9 @@ namespace nil {
                  * Matter Labs,
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
-                template<typename FieldType,
-                         typename Hash,
-                         std::size_t M = 2>
+                template<typename FieldType, typename Hash, std::size_t M = 2>
                 struct fri_commitment_scheme {
-                    static constexpr std::size_t m = M;
+                    constexpr static const std::size_t m = M;
 
                     typedef FieldType field_type;
                     typedef Hash transcript_hash_type;
@@ -84,7 +82,7 @@ namespace nil {
                     };
 
                     struct proof_type {
-                        std::vector<round_proof_type> round_proofs; // 0..r-2
+                        std::vector<round_proof_type> round_proofs;    // 0..r-2
 
                         math::polynomial::polynomial<typename FieldType::value_type> final_polynomial;
                     };
@@ -100,8 +98,9 @@ namespace nil {
                                const std::vector<typename FieldType::value_type> &D) {
 
                         using Endianness = nil::marshalling::option::big_endian;
-                        using field_element_type = 
-                            nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>, FieldType>;
+                        using field_element_type =
+                            nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
+                                                                            FieldType>;
 
                         std::vector<std::array<std::uint8_t, 96>> y_data;
                         y_data.reserve(D.size());
@@ -110,7 +109,7 @@ namespace nil {
                         for (std::size_t i = 0; i < D.size(); i++) {
                             typename FieldType::value_type y = f.evaluate(D[i]);
 
-                            field_element_type y_val = 
+                            field_element_type y_val =
                                 nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(y);
                             auto write_iter = y_data[i].begin();
                             y_val.write(write_iter, 96);
@@ -129,8 +128,7 @@ namespace nil {
 
                         math::polynomial::polynomial<typename FieldType::value_type> f = Q;
 
-                        typename FieldType::value_type x =
-                            transcript.template challenge<FieldType>();
+                        typename FieldType::value_type x = transcript.template challenge<FieldType>();
 
                         std::size_t r = fri_params.r;
 
@@ -140,17 +138,16 @@ namespace nil {
                         for (std::size_t i = 0; i <= r - 1; i++) {
 
                             typename FieldType::value_type alpha =
-                                fri_params.D[i+1][0].pow(
-                                    transcript.template int_challenge<std::size_t>());
+                                fri_params.D[i + 1][0].pow(transcript.template int_challenge<std::size_t>());
 
                             typename FieldType::value_type x_next = fri_params.q.evaluate(x);
 
                             std::size_t d = f.degree();
 
-                            math::polynomial::polynomial<typename FieldType::value_type> f_next((d + 1)/2 - 1);
+                            math::polynomial::polynomial<typename FieldType::value_type> f_next((d + 1) / 2 - 1);
 
-                            for (std::size_t index = 0; index < f_next.size(); index++){
-                                f_next[index] = f[2*index] + alpha * f[2*index + 1];
+                            for (std::size_t index = 0; index < f_next.size(); index++) {
+                                f_next[index] = f[2 * index] + alpha * f[2 * index + 1];
                             }
 
                             // m = 2, so:
@@ -173,33 +170,36 @@ namespace nil {
                             for (std::size_t j = 0; j < m; j++) {
                                 if (i == 0) {
 
-                                        typename FieldType::value_type leaf = g.evaluate(s[j]);
-                                        std::size_t leaf_index = std::find(
-                                            fri_params.D[i].begin(), fri_params.D[i].end(), leaf) - fri_params.D[i].begin();
-                                        p[j] = T.hash_path(leaf_index);
+                                    typename FieldType::value_type leaf = g.evaluate(s[j]);
+                                    std::size_t leaf_index =
+                                        std::find(fri_params.D[i].begin(), fri_params.D[i].end(), leaf) -
+                                        fri_params.D[i].begin();
+                                    p[j] = T.hash_path(leaf_index);
                                 } else {
                                     for (std::size_t j = 0; j < m; j++) {
 
-                                        std::size_t leaf_index = std::find(
-                                            fri_params.D[i].begin(), fri_params.D[i].end(), y[j]) - fri_params.D[i].begin();
+                                        std::size_t leaf_index =
+                                            std::find(fri_params.D[i].begin(), fri_params.D[i].end(), y[j]) -
+                                            fri_params.D[i].begin();
                                         p[j] = T.hash_path(leaf_index);
                                     }
                                 }
                             }
 
                             if (i < r - 1) {
-                                merkle_tree_type T_next = commit(f_next, fri_params.D[i+1]);
+                                merkle_tree_type T_next = commit(f_next, fri_params.D[i + 1]);
                                 transcript(T_next.root());
 
                                 typename FieldType::value_type colinear_value = f_next.evaluate(x_next);
 
-                                std::size_t leaf_index = std::find(
-                                    fri_params.D[i+1].begin(), fri_params.D[i+1].end(), colinear_value) - 
-                                    fri_params.D[i+1].begin();
-                                std::vector<typename merkle_tree_type::value_type> colinear_path = 
+                                std::size_t leaf_index =
+                                    std::find(fri_params.D[i + 1].begin(), fri_params.D[i + 1].end(), colinear_value) -
+                                    fri_params.D[i + 1].begin();
+                                std::vector<typename merkle_tree_type::value_type> colinear_path =
                                     T_next.hash_path(leaf_index);
 
-                                round_proofs.push_back(round_proof_type({y, p, T.root(), colinear_value, colinear_path}));
+                                round_proofs.push_back(
+                                    round_proof_type({y, p, T.root(), colinear_value, colinear_path}));
 
                                 T = T_next;
                             } else {
@@ -209,7 +209,7 @@ namespace nil {
                             x = x_next;
                             f = f_next;
                         }
-                        return proof_type ({round_proofs, final_polynomial});
+                        return proof_type({round_proofs, final_polynomial});
                     }
 
                     static bool verify_eval() {

@@ -70,6 +70,7 @@ namespace nil {
                     typedef Hash transcript_hash_type;
 
                     typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
+                    typedef typename merkle_tree_type::hash_type merkle_hash_type;
                     typedef std::vector<typename merkle_tree_type::value_type> merkle_proof_type;
 
                     typedef fri_commitment_scheme<FieldType, Hash, m> fri_type;
@@ -104,7 +105,6 @@ namespace nil {
                     }
 
                 public:
-
                     // The result of this function is not commitment_type (as it would expected),
                     // but the built Merkle tree. This is done so, because we often need to reuse
                     // the built Merkle tree
@@ -113,9 +113,9 @@ namespace nil {
                     // should be called
                     static merkle_tree_type
                         commit(const math::polynomial::polynomial<typename FieldType::value_type> &f,
-                               const std::vector<typename FieldType::value_type> &D) {
+                               const std::vector<typename FieldType::value_type> &d) {
 
-                        return fri_type::commit(f, D);
+                        return fri_type::commit(f, d);
                     }
 
                     static proof_type proof_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
@@ -160,7 +160,6 @@ namespace nil {
 
                         for (std::size_t round_id = 0; round_id <= lambda-1; round_id++) {
                             fri_proof[round_id] = fri_type::proof_eval(Q, g, T, transcript, fri_params);
-                            
                         }
 
                         return proof_type({z, p, fri_proof});
@@ -169,7 +168,7 @@ namespace nil {
                     static bool verify_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
                                             const commitment_type &root,
                                             const proof_type &proof,
-                                            const std::vector<typename FieldType::value_type> &D) {
+                                            const std::vector<typename FieldType::value_type> &d) {
                         return true;
                     }
                 };
