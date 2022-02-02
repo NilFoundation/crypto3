@@ -44,7 +44,68 @@
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
 
+// Generates a Fibonacci sequence
+std::vector<float> fibonacci() {
+    std::vector<float> ret(8);
+    ret[0] = 0;
+    ret[1] = 1;
+
+    for (std::size_t s(2); s < ret.size(); s++) {
+        ret[s] = ret[s - 1] + ret[s - 2];
+    }
+    return ret;
+}
+
+template<typename FieldValueType, typename NumberType>
+std::vector<math::polynomial::polynomial<FieldValueType>> generate(NumberType degree) {
+    typedef boost::random::independent_bits_engine<boost::random::mt19937,
+                                                   FieldValueType::modulus_bits,
+                                                   typename FieldValueType::value_type::data_type>
+        random_polynomial_generator_type;
+
+    std::vector<math::polynomial::polynomial<FieldValueType>> res;
+
+    boost::random::random_device rd;     // Will be used to obtain a seed for the random number engine
+    boost::random::mt19937 gen(rd());    // Standard mersenne_twister_engine seeded with rd()
+    boost::random::uniform_int_distribution<> distrib(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+
+    random_polynomial_generator_type polynomial_element_gen;
+    std::size_t height = distrib(gen);
+    res.reserve(height);
+
+    for (int i = 0; i < height; i++) {
+        math::polynomial::polynomial<FieldValueType> poly;
+        for (int j = 0; j < degree; j++) {
+            poly.push_back(polynomial_element_gen());
+        }
+        res.push_back(poly);
+    }
+
+    return res;
+}
+
+// Generates a map from a vector
+std::map<std::string, float> vect_2_str(const std::vector<float> &v) {
+    std::map<std::string, float> out;
+    for (float s : v) {
+        std::ostringstream o;
+        o << s;
+        out[o.str()] = s;
+    }
+    return out;
+}
+
+typedef std::pair<const std::string, float> pair_map_t;
+BOOST_TEST_DONT_PRINT_LOG_VALUE(pair_map_t)
+
 BOOST_AUTO_TEST_SUITE(lpc_test_suite)
+
+BOOST_DATA_TEST_CASE(test2,
+                     ::boost::unit_test::data::make(generate<typename algebra::curves::bls12<381>::base_field_type>()),
+                     array_element) {
+    std::cout << "test 2: \"" << array_element.first << "\", " << array_element.second << std::endl;
+    BOOST_TEST(array_element.second <= 13);
+}
 
 BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
