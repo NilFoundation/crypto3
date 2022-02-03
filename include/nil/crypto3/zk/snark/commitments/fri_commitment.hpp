@@ -64,7 +64,7 @@ namespace nil {
                     typedef Hash transcript_hash_type;
 
                     typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
-                    typedef std::vector<typename merkle_tree_type::value_type> merkle_proof_type;
+                    typedef typename containers::merkle_proof<Hash, 2> merkle_proof_type;
 
                     struct params_type {
                         std::size_t r;
@@ -202,7 +202,7 @@ namespace nil {
                                         if (fri_params.D[i]->get_domain_element(leaf_index) == leaf)
                                             break;
                                     }
-                                    p[j] = T.hash_path(leaf_index);
+                                    p[j] = merkle_proof_type(T, leaf_index);
                                 } else {
                                     for (std::size_t j = 0; j < m; j++) {
 
@@ -211,7 +211,7 @@ namespace nil {
                                             if (fri_params.D[i]->get_domain_element(leaf_index) == y[j])
                                                 break;
                                         }
-                                        p[j] = T.hash_path(leaf_index);
+                                        p[j] = merkle_proof_type(T, leaf_index);
                                     }
                                 }
                             }
@@ -228,7 +228,7 @@ namespace nil {
                                         break;
                                 }
 
-                                merkle_proof_type colinear_path = T_next.hash_path(leaf_index);
+                                merkle_proof_type colinear_path = merkle_proof_type(T_next, leaf_index);
 
                                 round_proofs.push_back(
                                     round_proof_type({y, p, T.root(), colinear_value, colinear_path}));

@@ -71,7 +71,7 @@ namespace nil {
 
                     typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
                     typedef typename merkle_tree_type::hash_type merkle_hash_type;
-                    typedef std::vector<typename merkle_tree_type::value_type> merkle_proof_type;
+                    typedef typename containers::merkle_proof<Hash, 2> merkle_proof_type;
 
                     typedef fri_commitment_scheme<FieldType, Hash, m> fri_type;
 
@@ -136,7 +136,7 @@ namespace nil {
                                 if (d[0]->get_domain_element(leaf_index) == evaluation_points[j])
                                     break;
                             }
-                            p[j] = T.hash_path(leaf_index);
+                            p[j] = merkle_proof_type(T, leaf_index);
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], z[j]);
                         }
 
