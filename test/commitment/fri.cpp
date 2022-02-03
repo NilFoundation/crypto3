@@ -103,6 +103,9 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript(init_blob);
 
     proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
+
+    zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(init_blob);
+    //fri_type::verify_eval(proof, transcript_verifier, params, f, f);
     // BOOST_CHECK(fry_type::verify_eval(evaluation_points, T, proof, D_0))
 }
 
