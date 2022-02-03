@@ -293,7 +293,14 @@ namespace nil {
 
                         }
 
-                        // proof.final_polynomial.degree() == ...
+                        if (proof.final_polynomial.degree() > 
+                            std::pow(2, std::log2(fri_params.d) - r)) {
+                                return false;
+                        }
+
+                        if (proof.final_polynomial.evaluate(x) != proof.round_proofs[r - 2].colinear_value) {
+                            return false;
+                        }
 
                         return true;                        
                     }
