@@ -68,6 +68,7 @@ namespace nil {
 
                     struct params_type {
                         std::size_t r;
+                        std::size_t max_degree;
                         std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
 
                         math::polynomial::polynomial<typename FieldType::value_type> q;
@@ -157,7 +158,8 @@ namespace nil {
 
                         math::polynomial::polynomial<typename FieldType::value_type> f = Q;
 
-                        typename FieldType::value_type x = transcript.template challenge<FieldType>();
+                        //typename FieldType::value_type x = transcript.template challenge<FieldType>();
+                        typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1);
 
                         std::size_t r = fri_params.r;
 
@@ -191,25 +193,34 @@ namespace nil {
                             std::array<merkle_proof_type, m> p;
 
                             for (std::size_t j = 0; j < m; j++) {
+                                std::vector<typename FieldType::value_type> tmp(f.begin(), f.end());
+                                fri_params.D[i]->fft(tmp);
                                 if (i == 0) {
 
                                     typename FieldType::value_type leaf = g.evaluate(s[j]);
+                                    std::cout<<leaf.data<<std::endl;
                                     
                                     std::size_t leaf_index = 0;
-                                    for (; leaf_index < fri_params.D[i]->m; leaf_index++){
-                                        if (fri_params.D[i]->get_domain_element(leaf_index) == leaf)
+                                    for (; leaf_index < tmp.size(); leaf_index++){
+                                        if (tmp[leaf_index] == leaf)
                                             break;
                                     }
                                     p[j] = merkle_proof_type(T, leaf_index);
+                                    if (!p[j].validate(T.root())) {
+                                        std::printf("s merkle generation failed: %ld\n", i);
+                                    }
                                 } else {
                                     for (std::size_t j = 0; j < m; j++) {
 
                                         std::size_t leaf_index = 0;
                                         for (; leaf_index < fri_params.D[i]->m; leaf_index++){
-                                            if (fri_params.D[i]->get_domain_element(leaf_index) == y[j])
+                                            if (tmp[leaf_index] == y[j])
                                                 break;
                                         }
                                         p[j] = merkle_proof_type(T, leaf_index);
+                                        if (!p[j].validate(T.root())) {
+                                        std::printf("s merkle generation failed: %ld\n", i);
+                                    }
                                     }
                                 }
                             }
@@ -248,10 +259,14 @@ namespace nil {
                                         const math::polynomial::polynomial<typename FieldType::value_type> &U,
                                         const math::polynomial::polynomial<typename FieldType::value_type> &V) {
 
-                        typename FieldType::value_type x = transcript.template challenge<FieldType>();
+                        //typename FieldType::value_type x = transcript.template challenge<FieldType>();
+                        typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1);
+
                         std::size_t r = fri_params.r;
 
                         for (std::size_t i = 0; i <= r - 2; i++) {
+
+                            std::printf("r: %ld\n", i);
 
                             typename FieldType::value_type alpha =
                                 transcript.template challenge<FieldType>();
@@ -268,8 +283,10 @@ namespace nil {
                             }
 
                             for (std::size_t j = 0; j < m; j++) {
-                                if (!proof.round_proofs[i].p[j].validate(proof.round_proofs[i].T_root))
+                                if (!proof.round_proofs[i].p[j].validate(proof.round_proofs[i].T_root)) {
+                                    std::printf("s merkle verification failed: %ld\n", i);
                                     return false;
+                                }
                             }
 
                             std::array<typename FieldType::value_type, m> y;
@@ -286,11 +303,19 @@ namespace nil {
                                 transcript(proof.round_proofs[i + 1].T_root);
                             }
 
-                            math::polynomial::polynomial<typename FieldType::value_type> interpolant;
+                            std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points {
+                                std::make_pair(s[0], y[0]),
+                                std::make_pair(s[1], y[1]),
+                            };
+
+                            math::polynomial::polynomial<typename FieldType::value_type> interpolant = 
+                                math::polynomial::_lagrange_interpolation(interpolation_points);
 
                             if (!proof.round_proofs[i].colinear_path.validate(proof.round_proofs[i].T_root))
+                                std::printf("colinear merkle verification failed: %ld", i);
                                 return false;
                             if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value)
+                                std::printf("colinear check failed: %ld", i);
                                 return false;
 
                             x = x_next;
@@ -298,7 +323,7 @@ namespace nil {
                         }
 
                         if (proof.final_polynomial.degree() > 
-                            std::pow(2, std::log2(fri_params.d) - r)) {
+                            std::pow(2, std::log2(fri_params.max_degree) - r)) {
                                 return false;
                         }
 

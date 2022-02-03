@@ -94,6 +94,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     params.r = r;
     params.D = D;
     params.q = f;
+    params.max_degree = d;
 
     BOOST_CHECK(D[1]->m == D[0]->m/2);
     merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
@@ -105,8 +106,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
 
     zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(init_blob);
-    //fri_type::verify_eval(proof, transcript_verifier, params, f, f);
-    // BOOST_CHECK(fry_type::verify_eval(evaluation_points, T, proof, D_0))
+    BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, f, f));
 }
 
 BOOST_AUTO_TEST_CASE(fri_fold_test) {
