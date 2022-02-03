@@ -124,65 +124,10 @@ namespace nil {
                             permutation_argument = redshift_permutation_argument<FieldType>::prove_argument(transcript);
                         // std::copy(PI.begin(), PI.end(), f.begin() + N_perm);
 
-                        // 7. Get $\theta \in \mathbb{F}$ from $hash(\text{transcript})$
-                        typename FieldType::value_type teta =
-                            transcript.template challenge<transcript_manifest::challenges_ids::teta, FieldType>();
-
-                        // 8. Get lookup_gate_i and table_value_i
-
-                        // 9. Construct the input lookup compression and table compression.
-                        math::polynomial::polynomial<typename FieldType::value_type> A_compr;
-                        math::polynomial::polynomial<typename FieldType::value_type> S_compr;
-
-                        // 10. Produce the permutation polynomials $S_{\texttt{perm}}(X)$ and $A_{\texttt{perm}}(X)$
-                        math::polynomial::polynomial<typename FieldType::value_type> A_perm;
-                        math::polynomial::polynomial<typename FieldType::value_type> S_perm;
-
-                        // 11. Compute and add commitments to $A_{\texttt{perm}}$ and $S_{\texttt{perm}}$ to
-                        // $\text{transcript}$
-
-                        merkle_tree_type A_perm_tree = lpc::commit(A_perm, D_0);
-                        typename lpc::commitment_type A_perm_commitment = A_perm_tree.root();
-                        transcript(A_perm_commitment);
-
-                        merkle_tree_type S_perm_tree = lpc::commit(S_perm, D_0);
-                        typename lpc::commitment_type S_perm_commitment = S_perm_tree.root();
-                        transcript(S_perm_commitment);
-
-                        // 12. Compute $V_L(X)$
-                        std::vector<typename FieldType::value_type> V_L_interpolation_points(N_rows + 1);
-
-                        V_L_interpolation_points.push_back(FieldType::value_type::one());
-                        for (std::size_t j = 2; j < N_rows + 1; j++) {
-
-                            typename FieldType::value_type tmp_mul_result = FieldType::value_type::one();
-                            for (std::size_t i = 1; i <= j - 1; i++) {
-                                tmp_mul_result *= ((A_compr.evaluate(omega_powers[i]) + beta) *
-                                                   (S_compr.evaluate(omega_powers[i]) + gamma)) /
-                                                  ((A_perm.evaluate(omega_powers[i]) + beta) *
-                                                   (S_perm.evaluate(omega_powers[i]) + gamma));
-                            }
-
-                            V_L_interpolation_points.push_back(tmp_mul_result);
-                        }
-
-                        V_L_interpolation_points.push_back(FieldType::value_type::one());
-
-                        const std::shared_ptr<math::evaluation_domain<FieldType>> V_L_domain =
-                            math::make_evaluation_domain<FieldType>(N_rows + 1);
-
-                        V_L_domain->inverse_fft(V_L_interpolation_points);
-
-                        math::polynomial::polynomial<typename FieldType::value_type> V_L = V_L_interpolation_points;
-
-                        // 13. Compute and add commitments to $V_L$ to $\text{transcript}$
-                        merkle_tree_type V_L_tree = lpc::commit(V_L, D_0);
-                        typename lpc::commitment_type V_L_commitment = V_L_tree.root();
-                        transcript(V_L_commitment);
-
                         // 14. Get $\alpha_0, \dots, \alpha_8 \in \mathbb{F}$ from $hash(\text{transcript})$
-                        std::array<typename FieldType::value_type, 9> alphas =
-                            transcript.template challenges<transcript_manifest::challenges_ids::alpha, 9, FieldType>();
+                        constexpr const std::size_t f_parts = 4;
+                        std::array<typename FieldType::value_type, f_parts> alphas =
+                            transcript.template challenges<transcript_manifest::challenges_ids::alpha, f_parts, FieldType>();
 
                         // 15. Get $\tau$ from $hash(\text{transcript})$
                         typename FieldType::value_type tau =
@@ -209,20 +154,11 @@ namespace nil {
                             N_T = std::max(N_T, gates[i].size() - 1);
                         }
 
-                        // 17. Denote g_1,2, h_1,2
-
-                        math::polynomial::polynomial<typename FieldType::value_type> g_2;
-                        math::polynomial::polynomial<typename FieldType::value_type> h_1 = {1};
-                        math::polynomial::polynomial<typename FieldType::value_type> h_2;
-
-                        g_2 = (A_compr + beta) * (S_compr + gamma);
-                        h_2 = (A_perm + beta) * (S_perm + gamma);
-
                         // 18. Define F polynomials
                         const math::polynomial::polynomial<typename FieldType::value_type> L1 =
                             preprocessed_data.Lagrange_basis[1];
 
-                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, 9> F;
+                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, f_parts> F;
 
                         F[0] = permutation_argument[0];
                         F[1] = permutation_argument[1];
@@ -232,15 +168,9 @@ namespace nil {
                             F[3] = F[3] + gates[i];
                         }
 
-                        F[4] = L1 * (1 - V_L);
-                        F[5] = V_L_shifted * h_2 - V_L * g2;
-                        F[6] = q_last * (V_L * V_L - V_L);
-                        F[7] = L1 * (A_perm - S_perm);
-                        F[8] = (1 - (q_last + q_blind)) * (A_perm - S_perm) * (A_perm - A_perm_shifted);
-
                         // 19. Compute F_consolidated
                         math::polynomial::polynomial<typename FieldType::value_type> F_consolidated = {0};
-                        for (std::size_t i = 0; i < 8; i++) {
+                        for (std::size_t i = 0; i < f_parts; i++) {
                             F_consolidated = F_consolidated + alphas[i] * F[i];
                         }
 

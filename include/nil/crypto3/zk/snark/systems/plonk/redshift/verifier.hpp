@@ -77,8 +77,9 @@ namespace nil {
                         std::array<typename FieldType::value_type, 3> permutation_argument = 
                             redshift_permutation_argument<typename FieldType>::verify_argument(transcript);
 
-                        std::array<typename FieldType::value_type, 6> alphas;
-                        for (std::size_t i = 0; i < 6; i++) {
+                        constexpr const std::size_t f_parts = 4;
+                        std::array<typename FieldType::value_type, f_parts> alphas;
+                        for (std::size_t i = 0; i < f_parts; i++) {
                             typename transcript_hash_type::digest_type alpha_bytes =
                                 transcript.get_challenge<transcript_manifest::challenges_ids::alpha, i>();
                             alphas[i] = (algebra::marshalling<FieldType>(alpha_bytes));
@@ -117,27 +118,25 @@ namespace nil {
                             }
                         }
 
-                        std::array<math::polynomial::polynom<typename FieldType::value_type>, 6> F;
+                        std::array<math::polynomial::polynom<typename FieldType::value_type>, f_parts> F;
                         F[0] = permutation_argument[0];
                         F[1] = permutation_argument[1];
                         F[2] = permutation_argument[2];
-                        F[3] = Q * q_1 - (Q << 1);
-                        F[4] = verification_key.L_basis[n] * ((P << 1) - (Q << 1));
-                        F[5] = verification_key.PI;
+                        F[3] = 0;
 
                         for (std::size_t i = 0; i < N_sel; i++) {
-                            F[5] += q[i] * ....gate[i];
+                            F[3] += q[i] * ....gate[i];
                         }
 
                         for (std::size_t i = 0; i < N_const; i++) {
-                            F[5] += verification_key.f_c[i];
+                            F[3] += verification_key.f_c[i];
                         }
 
                         math::polynomial::polynom<typename FieldType::value_type> T_consolidate;
                         T_consolidate = consolidate_T(T);
 
                         math::polynomial::polynom<typename FieldType::value_type> F_consolidated = 0;
-                        for (std::size_t i = 0; i < 6; i++) {
+                        for (std::size_t i = 0; i < f_parts; i++) {
                             F_consolidated += a[i] * F[i];
                         }
 
