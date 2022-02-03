@@ -117,7 +117,7 @@ namespace nil {
                                                                             FieldType>;
 
                         std::vector<std::array<std::uint8_t, 96>> y_data;
-                        y_data.reserve(D.size());
+                        y_data.resize(D.size());
                         nil::marshalling::status_type status;
 
                         for (std::size_t i = 0; i < D.size(); i++) {
