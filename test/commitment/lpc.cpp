@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     constexpr static const std::size_t k = 1;
 
     constexpr static const std::size_t d_power_two = 5;
-    constexpr static const std::size_t d = 1 << d_power_two;
+    constexpr static const std::size_t d = 1 << d_power_two -1;
 
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;

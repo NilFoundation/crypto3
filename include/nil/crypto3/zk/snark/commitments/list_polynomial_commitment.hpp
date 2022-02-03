@@ -141,7 +141,7 @@ namespace nil {
                         }
 
                         math::polynomial::polynomial<typename FieldType::value_type> U =
-                            math::polynomial::lagrange_interpolation(U_interpolation_points);
+                            math::polynomial::_lagrange_interpolation(U_interpolation_points);
 
                         math::polynomial::polynomial<typename FieldType::value_type> Q = (g - U);
                         for (std::size_t j = 0; j < k; j++) {
@@ -182,7 +182,7 @@ namespace nil {
                         }
 
                         math::polynomial::polynomial<typename FieldType::value_type> U =
-                            math::polynomial::lagrange_interpolation(U_interpolation_points);
+                            math::polynomial::_lagrange_interpolation(U_interpolation_points);
 
                         math::polynomial::polynomial<typename FieldType::value_type> V = {1};
 
