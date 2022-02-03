@@ -134,20 +134,26 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
 
     math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 3};
 
-    typename FieldType::value_type omega = domain->get_domain_element(0);
+    //typename FieldType::value_type omega = domain->get_domain_element(0);
+    typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::power_of_two(d));
 
     typename FieldType::value_type x_next = params.q.evaluate(omega);
     typename FieldType::value_type alpha = algebra::random_element<FieldType>();
-    math::polynomial::polynomial<typename FieldType::value_type> f_next = 
+    //typename FieldType::value_type alpha = FieldType::value_type(2);
+    math::polynomial::polynomial<typename FieldType::value_type> f_next =
+        //{f[0] + alpha * f[1], f[2] + alpha * f[3]};
         fri_type::fold_polynomial(f, alpha);
 
-    std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> points {
-        std::make_pair(omega, f.evaluate(omega)),
-        std::make_pair(-omega, f.evaluate(-omega)),
+    BOOST_CHECK_EQUAL(f_next.degree(), 1);
+    std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points {
+        std::make_pair(f.evaluate(omega), omega),
+        std::make_pair(f.evaluate(-omega), -omega),
     };
 
     // TODO: Fix it with a proper interpolation
-    math::polynomial::polynomial<typename FieldType::value_type> interpolant = {f[0] + f[2] * x_next, f[1] + f[3] * x_next};
+    //math::polynomial::polynomial<typename FieldType::value_type> interpolant = {f[0] + f[2] * x_next, f[1] + f[3] * x_next};
+    math::polynomial::polynomial<typename FieldType::value_type> interpolant =
+        math::polynomial::_lagrange_interpolation(interpolation_points);
     typename FieldType::value_type x1 = interpolant.evaluate(alpha);
     typename FieldType::value_type x2 = f_next.evaluate(x_next);
     BOOST_CHECK(x1 == x2);
