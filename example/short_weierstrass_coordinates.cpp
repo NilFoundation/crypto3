@@ -70,5 +70,11 @@ int main() {
     coordinates_examples<curves::secp_r1<256>::g1_type< curves::coordinates::jacobian_with_a4_minus_3,  curves::forms::short_weierstrass>>();//<coordinates::jacobian_with_a4_minus_3>>()//()_g1_params<160, forms::short_weierstrass>
 
     std::cout << "----------------------------" << std::endl;
+
+    std::cout << "Secp256r1 Jacobian coordinates" << std::endl;
+
+    coordinates_examples<curves::secp_r1<256>::g1_type< curves::coordinates::jacobian,  curves::forms::short_weierstrass>>();//<coordinates::jacobian_with_a4_minus_3>>()//()_g1_params<160, forms::short_weierstrass>
+
+    std::cout << "----------------------------" << std::endl;
     return 0;
 }

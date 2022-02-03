@@ -1,0 +1,81 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+//
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//---------------------------------------------------------------------------//
+
+#ifndef CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_JACOBIAN_DBL_2007_BL_HPP
+#define CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_JACOBIAN_DBL_2007_BL_HPP
+
+namespace nil {
+    namespace crypto3 {
+        namespace algebra {
+            namespace curves {
+                namespace detail {
+
+                    /** @brief A struct representing element doubling from the group G1 of short Weierstrass curve
+                     *  for jacobian_ coordinates representation.
+                     *  NOTE: does not handle O and pts of order 2,4
+                     *  http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian.html#doubling-dbl-2007-bl
+                     */
+                    struct short_weierstrass_element_g1_jacobian_dbl_2007_bl {
+
+                        template<typename ElementType>
+                        constexpr static inline ElementType process(const ElementType &first) {
+
+                            using field_value_type = typename ElementType::field_type::value_type;
+
+                            // handle point at infinity
+                            if (first.is_zero()) {
+                                return (first);
+                            }
+
+                            field_value_type XX = (first.X).squared();              // XX = X1^2
+                            field_value_type YY = (first.Y).squared();              // YY = Y1^2
+                            field_value_type YYYY = YY.squared();                   // YYYY = B^2
+                            field_value_type ZZ = (first.Z).squared();              // ZZ = Z1^2
+                            field_value_type S = (first.X + YY).squared()
+                                - XX - YYYY;
+
+                            S = S + S;                                              // S = 2 * ((X1 + YY)^2 - XX - YYYY)
+
+                            field_value_type M = XX + XX + XX + 
+                                ElementType::params_type::a*(ZZ.squared());         // M = 3XX + a*ZZ^2
+
+                            field_value_type T = M.squared() - S - S;               // T = M^2 - 2S
+                            field_value_type X3 = T;                                // X3 = T
+                           
+                            field_value_type Y3 = M * (S - T)
+                                -YYYY.doubled().doubled().doubled();                // Y3 = M * (S - T) - 8 * YYYY
+                            field_value_type Z3 = (first.Y + first.Z).squared()     // Z3 = (Y1 + Z1)^2 
+                                - YY - ZZ;                                          // - YY - ZZ
+
+                            return ElementType(X3, Y3, Z3);
+                        }
+                    };
+
+                }    // namespace detail
+            }        // namespace curves
+        }            // namespace algebra
+    }                // namespace crypto3
+}    // namespace nil
+#endif    // CRYPTO3_ALGEBRA_CURVES_SHORT_WEIERSTRASS_G1_ELEMENT_JACOBIAN_DBL_2007_BL_HPP

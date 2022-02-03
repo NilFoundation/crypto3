@@ -60,7 +60,8 @@ void print_curve_point(std::ostream &os,
 }
 
 template<typename CurveParams, typename Form, typename Coordinates>
-typename std::enable_if<std::is_same<Coordinates, curves::coordinates::jacobian_with_a4_minus_3>::value>::type
+typename std::enable_if<std::is_same<Coordinates, curves::coordinates::jacobian_with_a4_minus_3>::value||
+                        std::is_same<Coordinates, curves::coordinates::jacobian>::value>::type
     print_curve_point(std::ostream &os, const curves::detail::curve_element<CurveParams, Form, Coordinates> &p) {
     os << "( X: [";
     print_field_element(os, p.X);
@@ -174,6 +175,12 @@ BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 
 BOOST_DATA_TEST_CASE(curve_operation_test_jacobian_minus_3, string_data("curve_operation_test_jacobian_minus_3"), data_set) {
     using policy_type = curves::secp_r1<256>::g1_type< curves::coordinates::jacobian_with_a4_minus_3,  curves::forms::short_weierstrass>;
+
+    curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
+}
+
+BOOST_DATA_TEST_CASE(curve_operation_test_jacobian, string_data("curve_operation_test_jacobian"), data_set) {
+    using policy_type = curves::secp_r1<256>::g1_type< curves::coordinates::jacobian,  curves::forms::short_weierstrass>;
 
     curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
 }
