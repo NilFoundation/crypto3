@@ -198,7 +198,6 @@ namespace nil {
                                 if (i == 0) {
 
                                     typename FieldType::value_type leaf = g.evaluate(s[j]);
-                                    std::cout<<leaf.data<<std::endl;
                                     
                                     std::size_t leaf_index = 0;
                                     for (; leaf_index < tmp.size(); leaf_index++){
@@ -213,10 +212,6 @@ namespace nil {
                                         nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(leaf);
                                     auto write_iter = leaf_data.begin();
                                     leaf_val.write(write_iter, field_element_type::length());
-
-                                    if (!p[j].validate(leaf_data)) {
-                                        std::printf("s merkle generation failed: %ld\n", i);
-                                    }
                                 } else {
                                     for (std::size_t j = 0; j < m; j++) {
 
@@ -235,10 +230,6 @@ namespace nil {
                                             nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(leaf);
                                         auto write_iter = leaf_data.begin();
                                         leaf_val.write(write_iter, field_element_type::length());
-
-                                        if (!p[j].validate(leaf_data)) {
-                                            std::printf("s merkle generation failed: %ld\n", i);
-                                        }
                                     }
                                 }
                             }
@@ -284,8 +275,6 @@ namespace nil {
 
                         for (std::size_t i = 0; i <= r - 2; i++) {
 
-                            std::printf("r: %ld\n", i);
-
                             typename FieldType::value_type alpha =
                                 transcript.template challenge<FieldType>();
 
@@ -311,7 +300,6 @@ namespace nil {
                                 leaf_val.write(write_iter, field_element_type::length());
 
                                 if (!proof.round_proofs[i].p[j].validate(leaf_data)) {
-                                    std::printf("s merkle verification failed: %ld\n", i);
                                     return false;
                                 }
                             }
@@ -348,11 +336,9 @@ namespace nil {
                             leaf_val.write(write_iter, field_element_type::length());
 
                             if (!proof.round_proofs[i].colinear_path.validate(leaf_data)){
-                                std::printf("colinear merkle verification failed: %ld", i);
                                 return false;
                             }
                             if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value){
-                                std::printf("colinear check failed: %ld", i);
                                 return false;
                             }
 

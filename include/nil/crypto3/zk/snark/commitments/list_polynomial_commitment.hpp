@@ -107,7 +107,7 @@ namespace nil {
                     // result.root();
                     // should be called
                     static merkle_tree_type
-                        commit(const math::polynomial::polynomial<typename FieldType::value_type> &f,
+                        commit(math::polynomial::polynomial<typename FieldType::value_type> &f,
                                const std::shared_ptr<math::evaluation_domain<FieldType>> &d) {
 
                         return fri_type::commit(f, d);
@@ -153,7 +153,7 @@ namespace nil {
                         // temporary definition, until polynomial is constexpr
                         const math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
-                        typename fri_type::params_type fri_params = {r, d, q};
+                        typename fri_type::params_type fri_params = {r, r, d, q};
 
                         std::array<typename fri_type::proof_type, lambda> fri_proof;
 
@@ -166,7 +166,8 @@ namespace nil {
 
                     static bool verify_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
                                             const proof_type &proof,
-                                            fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
+                                            fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
+                                            typename fri_type::params_type fri_params) {
 
                         for (std::size_t j = 0; j < k; j++) {
                             if (!proof.p[j].validate(proof.T_root))
@@ -190,7 +191,7 @@ namespace nil {
                         }
 
                         for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {
-                            if (!fri_type::verify_eval(P.fri_proof[round_id], transcript, fri_params, U, V))
+                            if (!fri_type::verify_eval(proof.fri_proof[round_id], transcript, fri_params, U, V))
                                 return false;
                         }
 
