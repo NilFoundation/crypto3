@@ -66,6 +66,11 @@ namespace nil {
                     typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
                     typedef typename containers::merkle_proof<Hash, 2> merkle_proof_type;
 
+                    using Endianness = nil::marshalling::option::big_endian;
+                    using field_element_type =
+                            nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
+                                                                            FieldType>;
+
                     struct params_type {
                         std::size_t r;
                         std::size_t max_degree;
@@ -113,11 +118,6 @@ namespace nil {
                     static merkle_tree_type
                         commit(math::polynomial::polynomial<typename FieldType::value_type> &f,
                                const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
-
-                        using Endianness = nil::marshalling::option::big_endian;
-                        using field_element_type =
-                            nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
-                                                                            FieldType>;
 
                         std::vector<std::array<std::uint8_t, 96>> y_data;
                         y_data.resize(D->m);
@@ -214,21 +214,31 @@ namespace nil {
                                     auto write_iter = leaf_data.begin();
                                     leaf_val.write(write_iter, 96);
 
-                                    if (!p[j].validate(leaf_val)) {
+                                    if (!p[j].validate(leaf_data)) {
                                         std::printf("s merkle generation failed: %ld\n", i);
                                     }
                                 } else {
                                     for (std::size_t j = 0; j < m; j++) {
 
+                                        typename FieldType::value_type leaf = y[j];
+
                                         std::size_t leaf_index = 0;
                                         for (; leaf_index < fri_params.D[i]->m; leaf_index++){
-                                            if (tmp[leaf_index] == y[j])
+                                            if (tmp[leaf_index] == leaf)
                                                 break;
                                         }
                                         p[j] = merkle_proof_type(T, leaf_index);
-                                        if (!p[j].validate(T.root())) {
-                                        std::printf("s merkle generation failed: %ld\n", i);
-                                    }
+
+                                        std::array<std::uint8_t, 96> leaf_data;
+
+                                        field_element_type leaf_val =
+                                            nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(leaf);
+                                        auto write_iter = leaf_data.begin();
+                                        leaf_val.write(write_iter, 96);
+
+                                        if (!p[j].validate(leaf_data)) {
+                                            std::printf("s merkle generation failed: %ld\n", i);
+                                        }
                                     }
                                 }
                             }
