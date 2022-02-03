@@ -84,17 +84,18 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     // create domain D_0
 
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
-    constexpr static const std::size_t d_extended = d * 16;
+    constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     for (std::size_t i = 0; i < r; i++) {
-        std::shared_ptr<math::evaluation_domain<FieldType>> domain = prepare_domain<FieldType>(d - i);
+        std::shared_ptr<math::evaluation_domain<FieldType>> domain = prepare_domain<FieldType>(std::pow(2, extended_log - i));
         D.push_back(domain);
     }
 
-    params.r = r + 1;
+    params.r = r;
     params.D = D;
     params.q = f;
 
+    BOOST_CHECK(D[1]->m == D[0]->m/2);
     merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
     std::array<typename FieldType::value_type, 1> evaluation_points = {D[0]->get_domain_element(1).pow(5)};
 
@@ -212,7 +213,7 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     // create domain D_0
 
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
-    constexpr static const std::size_t d_extended = d * 16;
+    constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     for (std::size_t i = 0; i < r; i++) {
         std::shared_ptr<math::evaluation_domain<FieldType>> domain = prepare_domain<FieldType>(d - i);
@@ -223,13 +224,13 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     params.D = D;
     params.q = f;
 
-    merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
+    /*merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
+    std::array<typename FieldType::value_type, 1> evaluation_points = {D[0]->get_domain_element(1).pow(5)};
 
-    // std::array<typename FieldType::value_type, 1> evaluation_points = {omega.pow(5)};
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript(init_blob);
 
-    //proof_type proof = fri_type::proof_eval(f, f, T, transcript, params);
-
-    // proof_type proof = fri_type::proof_eval(evaluation_points, T, f, D_0)
+    proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);*/
     // math::polynomial::polynomial<typename FieldType::value_type> f_res = proof.last_round.f
 
     // int expected_deg = def(f) - 2^r

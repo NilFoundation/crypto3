@@ -87,7 +87,7 @@ namespace nil {
                         typename merkle_tree_type::value_type T_root;
 
                         typename FieldType::value_type colinear_value;
-                        std::vector<typename merkle_tree_type::value_type> colinear_path;
+                        merkle_proof_type colinear_path;
                     };
 
                     struct proof_type {
@@ -120,7 +120,6 @@ namespace nil {
 
                         std::vector<std::array<std::uint8_t, 96>> y_data;
                         y_data.resize(D->m);
-                        nil::marshalling::status_type status;
                         std::vector<typename FieldType::value_type> tmp(f.begin(), f.end());
                         D->fft(tmp);
 
@@ -130,8 +129,6 @@ namespace nil {
                             auto write_iter = y_data[i].begin();
                             y_val.write(write_iter, 96);
                         }
-
-                        D->inverse_fft(tmp); //TODO: maybe we don't need this
 
                         return merkle_tree_type(y_data);
                     }
@@ -168,7 +165,7 @@ namespace nil {
                         math::polynomial::polynomial<typename FieldType::value_type> final_polynomial;
 
                         for (std::size_t i = 0; i <= r - 1; i++) {
-
+                            
                             typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
                             typename FieldType::value_type x_next = fri_params.q.evaluate(x);
@@ -197,16 +194,21 @@ namespace nil {
                                 if (i == 0) {
 
                                     typename FieldType::value_type leaf = g.evaluate(s[j]);
-                                    std::size_t leaf_index =
-                                        std::find(fri_params.D[i].begin(), fri_params.D[i].end(), leaf) -
-                                        fri_params.D[i].begin();
+                                    
+                                    std::size_t leaf_index = 0;
+                                    for (; leaf_index < fri_params.D[i]->m; leaf_index++){
+                                        if (fri_params.D[i]->get_domain_element(leaf_index) == leaf)
+                                            break;
+                                    }
                                     p[j] = T.hash_path(leaf_index);
                                 } else {
                                     for (std::size_t j = 0; j < m; j++) {
 
-                                        std::size_t leaf_index =
-                                            std::find(fri_params.D[i].begin(), fri_params.D[i].end(), y[j]) -
-                                            fri_params.D[i].begin();
+                                        std::size_t leaf_index = 0;
+                                        for (; leaf_index < fri_params.D[i]->m; leaf_index++){
+                                            if (fri_params.D[i]->get_domain_element(leaf_index) == y[j])
+                                                break;
+                                        }
                                         p[j] = T.hash_path(leaf_index);
                                     }
                                 }
@@ -218,11 +220,13 @@ namespace nil {
 
                                 typename FieldType::value_type colinear_value = f_next.evaluate(x_next);
 
-                                std::size_t leaf_index =
-                                    std::find(fri_params.D[i + 1].begin(), fri_params.D[i + 1].end(), colinear_value) -
-                                    fri_params.D[i + 1].begin();
-                                std::vector<typename merkle_tree_type::value_type> colinear_path =
-                                    T_next.hash_path(leaf_index);
+                                std::size_t leaf_index = 0;
+                                for (; leaf_index < fri_params.D[i + 1]->m; leaf_index++){
+                                    if (fri_params.D[i + 1]->get_domain_element(leaf_index) == colinear_value)
+                                        break;
+                                }
+
+                                merkle_proof_type colinear_path = T_next.hash_path(leaf_index);
 
                                 round_proofs.push_back(
                                     round_proof_type({y, p, T.root(), colinear_value, colinear_path}));

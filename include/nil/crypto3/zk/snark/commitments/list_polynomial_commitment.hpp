@@ -130,8 +130,12 @@ namespace nil {
 
                         for (std::size_t j = 0; j < k; j++) {
                             z[j] = g.evaluate(evaluation_points[j]);
-                            std::size_t leaf_index =
-                                std::find(d[0].begin(), d[0].end(), evaluation_points[j]) - d[0].begin();
+
+                            std::size_t leaf_index = 0;
+                            for (; leaf_index < d[0]->m; leaf_index++){
+                                if (d[0]->get_domain_element(leaf_index) == evaluation_points[j])
+                                    break;
+                            }
                             p[j] = T.hash_path(leaf_index);
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], z[j]);
                         }
