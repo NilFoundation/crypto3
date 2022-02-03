@@ -98,10 +98,7 @@ std::vector<math::polynomial::polynomial<typename FieldType::value_type>> genera
 
 BOOST_AUTO_TEST_SUITE(lpc_test_suite)
 
-BOOST_DATA_TEST_CASE(
-    lpc_performance_test,
-    ::boost::unit_test::data::make(generate<typename algebra::curves::bls12<381>::base_field_type>(1 << 24)),
-    poly) {
+BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     typedef algebra::curves::bls12<381> curve_type;
     typedef typename curve_type::base_field_type field_type;
 
@@ -128,15 +125,35 @@ BOOST_DATA_TEST_CASE(
         D_0.emplace_back(omega.pow(power));
     }
 
-    merkle_tree_type tree = lpc_type::commit(poly, D_0);
+    typedef boost::random::independent_bits_engine<boost::random::mt19937, field_type::modulus_bits,
+                                                   typename field_type::value_type::integral_type>
+        random_polynomial_generator_type;
 
-    std::array<typename field_type::value_type, 1> evaluation_points = {algebra::random_element<field_type>()};
+    std::vector<math::polynomial::polynomial<typename field_type::value_type>> res;
 
-    std::array<std::uint8_t, 96> x_data {};
-    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
+    boost::random::random_device rd;     // Will be used to obtain a seed for the random number engine
+    boost::random::mt19937 gen(rd());    // Standard mersenne_twister_engine seeded with rd()
+    boost::random::uniform_int_distribution<> distrib(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
 
-    BOOST_CHECK(lpc_type::verify_eval(evaluation_points, tree.root(),
-                                      lpc_type::proof_eval(evaluation_points, tree, poly, transcript), D_0));
+    random_polynomial_generator_type polynomial_element_gen;
+    std::size_t height = 1;
+    res.reserve(height);
+
+    for (int i = 0; i < height; i++) {
+        math::polynomial::polynomial<typename field_type::value_type> poly;
+        for (int j = 0; j < (1 << 24); j++) {
+            poly.push_back(typename field_type::value_type(polynomial_element_gen()));
+        }
+        merkle_tree_type tree = lpc_type::commit(poly, D_0);
+
+        std::array<typename field_type::value_type, 1> evaluation_points = {algebra::random_element<field_type>()};
+
+        std::array<std::uint8_t, 96> x_data {};
+        zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
+
+        BOOST_CHECK(lpc_type::verify_eval(evaluation_points, tree.root(),
+                                          lpc_type::proof_eval(evaluation_points, tree, poly, transcript), D_0));
+    }
 }
 
 BOOST_AUTO_TEST_CASE(lpc_basic_test) {
