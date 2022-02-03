@@ -89,6 +89,8 @@ namespace nil {
 
                         std::array<merkle_proof_type, k> p;
 
+                        typename merkle_tree_type::value_type T_root;
+
                         std::array<typename fri_type::proof_type, lambda> fri_proof;
                     };
 
@@ -161,14 +163,38 @@ namespace nil {
                             fri_proof[round_id] = fri_type::proof_eval(Q, g, T, transcript, fri_params);
                         }
 
-                        return proof_type({z, p, fri_proof});
+                        return proof_type({z, p, T.root(), fri_proof});
                     }
 
                     static bool verify_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
-                                            const commitment_type &root,
                                             const proof_type &proof,
-                                            const std::vector<typename FieldType::value_type> &d) {
+                                            fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
+
+                        for (std::size_t j = 0; j < k; j++) {
+                            if (!proof.p[j].validate(proof.T_root))
+                                    return false;
+                        }
+
+                        for (std::size_t j = 0; j < k; j++) {
+                            U_interpolation_points[j] = std::make_pair(evaluation_points[j], proof.z[j]);
+                        }
+
+                        math::polynomial::polynomial<typename FieldType::value_type> U =
+                            math::polynomial::lagrange_interpolation(U_interpolation_points);
+
+                        math::polynomial::polynomial<typename FieldType::value_type> V = {1};
+
+                        for (std::size_t j = 0; j < k; j++) {
+                            V = V * (math::polynomial::polynomial<typename FieldType::value_type>({1, -evaluation_points[j]}));
+                        }
+
+                        for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {
+                            if (!fri_type::verify_eval(P.fri_proof[round_id], transcript, fri_params, U, V))
+                                return false;
+                        }
+
                         return true;
+
                     }
                 };
             }    // namespace snark

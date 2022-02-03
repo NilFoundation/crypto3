@@ -292,7 +292,7 @@ namespace nil {
 
                         // proof.final_polynomial.degree() == ...
 
-                        
+                        return true;                        
                     }
                 };
             }    // namespace snark
