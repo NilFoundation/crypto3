@@ -96,9 +96,12 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     params.q = f;
 
     merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
-    // std::array<typename FieldType::value_type, 1> evaluation_points = {omega.pow(5)};
+    std::array<typename FieldType::value_type, 1> evaluation_points = {D[0]->get_domain_element(1).pow(5)};
 
-    //proof_type proof = fri_type::proof_eval(f, f, T, transcript, params);
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript(init_blob);
+
+    proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
     // BOOST_CHECK(fry_type::verify_eval(evaluation_points, T, proof, D_0))
 }
 
@@ -134,20 +137,18 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
 
     math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 3};
 
-    //typename FieldType::value_type omega = domain->get_domain_element(0);
-    typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::power_of_two(d));
+    typename FieldType::value_type omega = domain->get_domain_element(1);
 
     typename FieldType::value_type x_next = params.q.evaluate(omega);
     typename FieldType::value_type alpha = algebra::random_element<FieldType>();
-    //typename FieldType::value_type alpha = FieldType::value_type(2);
+
     math::polynomial::polynomial<typename FieldType::value_type> f_next =
-        //{f[0] + alpha * f[1], f[2] + alpha * f[3]};
         fri_type::fold_polynomial(f, alpha);
 
     BOOST_CHECK_EQUAL(f_next.degree(), 1);
     std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points {
-        std::make_pair(f.evaluate(omega), omega),
-        std::make_pair(f.evaluate(-omega), -omega),
+        std::make_pair(omega, f.evaluate(omega)),
+        std::make_pair(-omega, f.evaluate(-omega)),
     };
 
     // TODO: Fix it with a proper interpolation
