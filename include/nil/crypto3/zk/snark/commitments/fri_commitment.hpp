@@ -206,7 +206,15 @@ namespace nil {
                                             break;
                                     }
                                     p[j] = merkle_proof_type(T, leaf_index);
-                                    if (!p[j].validate(T.root())) {
+
+                                    std::array<std::uint8_t, 96> leaf_data;
+
+                                    field_element_type leaf_val =
+                                        nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(leaf);
+                                    auto write_iter = leaf_data.begin();
+                                    leaf_val.write(write_iter, 96);
+
+                                    if (!p[j].validate(leaf_val)) {
                                         std::printf("s merkle generation failed: %ld\n", i);
                                     }
                                 } else {
