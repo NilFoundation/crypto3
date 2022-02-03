@@ -121,17 +121,17 @@ namespace nil {
                         std::vector<std::array<std::uint8_t, 96>> y_data;
                         y_data.resize(D->m);
                         nil::marshalling::status_type status;
-
-                        D->fft(f);
+                        std::vector<typename FieldType::value_type> tmp(f.begin(), f.end());
+                        D->fft(tmp);
 
                         for (std::size_t i = 0; i < D->m; i++) {
                             field_element_type y_val =
-                                nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(f[i]);
+                                nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(tmp[i]);
                             auto write_iter = y_data[i].begin();
                             y_val.write(write_iter, 96);
                         }
 
-                        D->inverse_fft(f); //TODO: maybe we don't need this
+                        D->inverse_fft(tmp); //TODO: maybe we don't need this
 
                         return merkle_tree_type(y_data);
                     }
