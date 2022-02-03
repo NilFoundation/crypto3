@@ -186,7 +186,7 @@ namespace nil {
                         math::polynomial::polynomial<typename FieldType::value_type> V = {1};
 
                         for (std::size_t j = 0; j < k; j++) {
-                            V = V * (math::polynomial::polynomial<typename FieldType::value_type>({1, -evaluation_points[j]}));
+                            V = V * (math::polynomial::polynomial<typename FieldType::value_type>({-evaluation_points[j], 1}));
                         }
 
                         for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {

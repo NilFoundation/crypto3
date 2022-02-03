@@ -130,8 +130,6 @@ namespace nil {
                             y_val.write(write_iter, 96);
                         }
 
-                        D->inverse_fft(tmp); //TODO: maybe we don't need this
-
                         return merkle_tree_type(y_data);
                     }
 
@@ -167,7 +165,7 @@ namespace nil {
                         math::polynomial::polynomial<typename FieldType::value_type> final_polynomial;
 
                         for (std::size_t i = 0; i <= r - 1; i++) {
-
+                            
                             typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
                             typename FieldType::value_type x_next = fri_params.q.evaluate(x);
