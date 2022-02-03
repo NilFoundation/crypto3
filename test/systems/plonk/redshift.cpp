@@ -47,22 +47,17 @@
 using namespace nil::crypto3;
 
 template<typename FieldType>
-std::vector<typename FieldType::value_type> prepare_domain(const std::size_t d) {
-    typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::power_of_two(d));
-    std::vector<typename FieldType::value_type> D_0(d);
-    for (std::size_t power = 1; power <= d; power++) {
-        D_0.emplace_back(omega.pow(power));
-    }
-    return D_0;
+std::shared_ptr<math::evaluation_domain<FieldType>> prepare_domain(const std::size_t d) {
+    return math::make_evaluation_domain<FieldType>(d);
 }
 
 template<typename FieldType>
 math::polynomial::polynomial<typename FieldType::value_type>
-    lagrange_polynomial(std::vector<typename FieldType::value_type> domain, std::size_t number) {
+    lagrange_polynomial(std::shared_ptr<math::evaluation_domain<FieldType>> domain, std::size_t number) {
     std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> evaluation_points;
-    for (std::size_t i = 0; i < domain.size(); i++) {
+    for (std::size_t i = 0; i < domain->m; i++) {
         evaluation_points.push_back(
-            std::make_pair(domain[i], (i != number) ? FieldType::value_type::zero() : FieldType::value_type::one()));
+            std::make_pair(domain->get_domain_element(i), (i != number) ? FieldType::value_type::zero() : FieldType::value_type::one()));
     }
     math::polynomial::polynomial<typename FieldType::value_type> f =
         math::polynomial::lagrange_interpolation(evaluation_points);
@@ -89,14 +84,14 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     const std::size_t circuit_rows = 4;
     const std::size_t permutation_size = 2;
 
-    std::vector<typename FieldType::value_type> domain = prepare_domain<FieldType>(circuit_rows);
+    std::shared_ptr<math::evaluation_domain<FieldType>> domain = prepare_domain<FieldType>(circuit_rows);
     math::polynomial::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial<FieldType>(domain, 0);
 
     // TODO: implement it in a proper way in generator.hpp
     std::vector<math::polynomial::polynomial<typename FieldType::value_type>> S_id(permutation_size);
     std::vector<math::polynomial::polynomial<typename FieldType::value_type>> S_sigma(permutation_size);
 
-    typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::power_of_two(circuit_rows));
+    typename FieldType::value_type omega = domain->get_domain_element(0);
 
     typename FieldType::value_type delta = algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
 

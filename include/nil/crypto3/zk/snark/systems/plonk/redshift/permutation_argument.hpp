@@ -43,15 +43,16 @@ namespace nil {
                 template<typename FieldType>
                 class redshift_permutation_argument {
 
+                static constexpr std::size_t argument_size = 3;
+
                 public:
                     static inline std::array<math::polynomial::polynomial<typename FieldType::value_type>,
-                                             3>    // TODO: fix fiat-shamir
+                                             argument_size>    // TODO: fix fiat-shamir
                         prove_argument(
                             fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> &transcript,
                             std::size_t circuit_rows,
                             std::size_t permutation_size,
-                            std::vector<typename FieldType::value_type>
-                                domain,
+                            std::shared_ptr<math::evaluation_domain<FieldType>> domain,
                             const math::polynomial::polynomial<typename FieldType::value_type> &lagrange_1,
                             const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &S_id,
                             const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &S_sigma,
@@ -73,9 +74,9 @@ namespace nil {
                             for (std::size_t i = 0; i < permutation_size; i++) {
 
                                 id_binding[j] *=
-                                    (f[i].evaluate(domain[j]) + beta * S_id[i].evaluate(domain[j]) + gamma);
+                                    (f[i].evaluate(domain->get_domain_element(j)) + beta * S_id[i].evaluate(domain->get_domain_element(j)) + gamma);
                                 sigma_binding[j] *=
-                                    (f[i].evaluate(domain[j]) + beta * S_sigma[i].evaluate(domain[j]) + gamma);
+                                    (f[i].evaluate(domain->get_domain_element(j)) + beta * S_sigma[i].evaluate(domain->get_domain_element(j)) + gamma);
                             }
                         }
 
@@ -117,15 +118,15 @@ namespace nil {
                         }
 
                         math::polynomial::polynomial<typename FieldType::value_type> one_polynomial = {1};
-                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, 3> F;
+                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, argument_size> F;
                         F[0] = lagrange_1 * (one_polynomial - V_P);
-                        F[1] = (one_polynomial - (q_last + q_blind)) * ((domain[0] * V_P) * h - V_P * g);
+                        F[1] = (one_polynomial - (q_last + q_blind)) * ((domain->get_domain_element(0) * V_P) * h - V_P * g);
                         F[2] = q_last * (V_P * V_P - V_P);
                         
                         return F;
                     }
 
-                    static inline std::array<typename FieldType::value_type, 3> verify_argument() {
+                    static inline std::array<typename FieldType::value_type, argument_size> verify_argument() {
                         /*typename transcript_hash_type::digest_type beta_bytes =
                             transcript.get_challenge<transcript_manifest::challenges_ids::beta>();
 
@@ -144,7 +145,7 @@ namespace nil {
                         F[0] = verification_key.L_basis[1] * (P - 1);
                         F[1] = verification_key.L_basis[1] * (Q - 1);
                         F[2] = P * p_1 - (P << 1);*/
-                        std::array<typename FieldType::value_type, 3> F;
+                        std::array<typename FieldType::value_type, argument_size> F;
 
                         return F;
                     }
