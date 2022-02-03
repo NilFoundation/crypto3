@@ -38,6 +38,8 @@
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/merkle/tree.hpp> // until fri inclusion
 
@@ -47,13 +49,8 @@
 using namespace nil::crypto3;
 
 template<typename FieldType> 
-std::vector<typename FieldType::value_type> prepare_domain(const std::size_t d) {
-    typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::get_power_of_two(d));
-    std::vector<typename FieldType::value_type> D_0(d);
-    for (std::size_t power = 1; power <= d; power++) {
-        D_0.emplace_back(omega.pow(power));
-    }
-    return D_0;
+std::shared_ptr<math::evaluation_domain<FieldType>> prepare_domain(const std::size_t d) {
+    return math::make_evaluation_domain<FieldType>(d);                        
 }
 
 BOOST_AUTO_TEST_SUITE(fri_test_suite)
@@ -69,7 +66,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
 
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
-    constexpr static const std::size_t d = 4;
+    constexpr static const std::size_t d = 16;
 
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
@@ -79,22 +76,26 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     typedef typename fri_type::params_type params_type;
 
     params_type params;
-    math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 25};
+    math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1,
+                                                                        5, 6, 7, 2,
+                                                                        8, 7, 5, 6,
+                                                                        1, 2, 1, 1};
 
     // create domain D_0
-    std::vector<typename FieldType::value_type> D_0 = prepare_domain<FieldType>(d);
 
-    std::vector<std::vector<typename FieldType::value_type>> D = {D_0, D_0};
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
+    constexpr static const std::size_t d_extended = d * 16;
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    for (std::size_t i = 0; i < r; i++) {
+        std::shared_ptr<math::evaluation_domain<FieldType>> domain = prepare_domain<FieldType>(d - i);
+        D.push_back(domain);
+    }
 
-    params.r = r;
+    params.r = r + 1;
     params.D = D;
     params.q = f;
 
-    std::vector<std::array<std::uint8_t, 96>> y_data;
-    //merkle_tree_type T(y_data);
-    
-    std::array<std::uint8_t, 96> x_data{};
-    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
+    merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
     // std::array<typename FieldType::value_type, 1> evaluation_points = {omega.pow(5)};
 
     //proof_type proof = fri_type::proof_eval(f, f, T, transcript, params);
@@ -123,8 +124,8 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
     params_type params;
     math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
-    std::vector<typename FieldType::value_type> domain = prepare_domain<FieldType>(d);
-    std::vector<std::vector<typename FieldType::value_type>> D = {domain};
+    std::shared_ptr<math::evaluation_domain<FieldType>> domain = prepare_domain<FieldType>(d);
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = {domain};
 
 
     params.r = r;
@@ -133,11 +134,10 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
 
     math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 3};
 
-    typename FieldType::value_type omega = domain[0];
+    typename FieldType::value_type omega = domain->get_domain_element(0);
 
     typename FieldType::value_type x_next = params.q.evaluate(omega);
-    //typename FieldType::value_type alpha = algebra::random_element<FieldType>();
-    typename FieldType::value_type alpha = FieldType::value_type(2);
+    typename FieldType::value_type alpha = algebra::random_element<FieldType>();
     math::polynomial::polynomial<typename FieldType::value_type> f_next = 
         fri_type::fold_polynomial(f, alpha);
 
@@ -204,11 +204,11 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
 
     // create domain D_0
 
-    std::vector<std::vector<typename FieldType::value_type>> D;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
     constexpr static const std::size_t d_extended = d * 16;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     for (std::size_t i = 0; i < r; i++) {
-        std::vector<typename FieldType::value_type> domain = prepare_domain<FieldType>(d - i);
+        std::shared_ptr<math::evaluation_domain<FieldType>> domain = prepare_domain<FieldType>(d - i);
         D.push_back(domain);
     }
 
@@ -217,6 +217,7 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     params.q = f;
 
     merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
+
     // std::array<typename FieldType::value_type, 1> evaluation_points = {omega.pow(5)};
 
     //proof_type proof = fri_type::proof_eval(f, f, T, transcript, params);

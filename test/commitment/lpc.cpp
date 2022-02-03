@@ -38,20 +38,17 @@
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
 
-template<typename FieldType>
-std::vector<typename FieldType::value_type> prepare_domain(const std::size_t d) {
-    typename FieldType::value_type omega = math::unity_root<FieldType>(math::detail::power_of_two(d));
-    std::vector<typename FieldType::value_type> D_0(d);
-    for (std::size_t power = 1; power <= d; power++) {
-        D_0.emplace_back(omega.pow(power));
-    }
-    return D_0;
+template<typename FieldType> 
+std::shared_ptr<math::evaluation_domain<FieldType>> prepare_domain(const std::size_t d) {
+    return math::make_evaluation_domain<FieldType>(d);                        
 }
 
 namespace boost {
@@ -118,12 +115,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     typedef list_polynomial_commitment_scheme<field_type, merkle_hash_type, lambda, k, r, m> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
 
-    typename field_type::value_type omega = math::unity_root<field_type>(math::detail::power_of_two(k));
-
-    std::vector<typename field_type::value_type> D_0(10);
-    for (std::size_t power = 1; power <= 10; power++) {
-        D_0.emplace_back(omega.pow(power));
-    }
+    std::shared_ptr<math::evaluation_domain<field_type>> D_0 = prepare_domain<field_type>(10);
 
     typedef boost::random::independent_bits_engine<boost::random::mt19937, field_type::modulus_bits,
                                                    typename field_type::value_type::integral_type>
@@ -141,7 +133,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
 
     for (int i = 0; i < height; i++) {
         math::polynomial::polynomial<typename field_type::value_type> poly;
-        for (int j = 0; j < (1 << 24); j++) {
+        for (int j = 0; j < (1 << 2); j++) {
             poly.push_back(typename field_type::value_type(polynomial_element_gen()));
         }
         merkle_tree_type tree = lpc_type::commit(poly, D_0);
@@ -179,7 +171,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     const math::polynomial::polynomial<typename FieldType::value_type> f = {0, 0, 1};
 
-    std::vector<typename FieldType::value_type> D_0 = prepare_domain<FieldType>(d);
+    std::shared_ptr<math::evaluation_domain<FieldType>> D_0 = prepare_domain<FieldType>(d);
 
     merkle_tree_type tree = lpc_type::commit(f, D_0);
 

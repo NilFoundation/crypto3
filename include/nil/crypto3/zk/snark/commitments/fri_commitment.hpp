@@ -30,6 +30,8 @@
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/merkle/tree.hpp>
 #include <nil/crypto3/merkle/proof.hpp>
@@ -66,7 +68,7 @@ namespace nil {
 
                     struct params_type {
                         std::size_t r;
-                        std::vector<std::vector<typename FieldType::value_type>> D;
+                        std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
 
                         math::polynomial::polynomial<typename FieldType::value_type> q;
                     };
@@ -108,8 +110,8 @@ namespace nil {
                     // result.root();
                     // should be called
                     static merkle_tree_type
-                        commit(const math::polynomial::polynomial<typename FieldType::value_type> &f,
-                               const std::vector<typename FieldType::value_type> &D) {
+                        commit(math::polynomial::polynomial<typename FieldType::value_type> &f,
+                               const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
                         using Endianness = nil::marshalling::option::big_endian;
                         using field_element_type =
@@ -117,17 +119,19 @@ namespace nil {
                                                                             FieldType>;
 
                         std::vector<std::array<std::uint8_t, 96>> y_data;
-                        y_data.resize(D.size());
+                        y_data.resize(D->m);
                         nil::marshalling::status_type status;
 
-                        for (std::size_t i = 0; i < D.size(); i++) {
-                            typename FieldType::value_type y = f.evaluate(D[i]);
+                        D->fft(f);
 
+                        for (std::size_t i = 0; i < D->m; i++) {
                             field_element_type y_val =
-                                nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(y);
+                                nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(f[i]);
                             auto write_iter = y_data[i].begin();
                             y_val.write(write_iter, 96);
                         }
+
+                        D->inverse_fft(f); //TODO: maybe we don't need this
 
                         return merkle_tree_type(y_data);
                     }
@@ -165,8 +169,7 @@ namespace nil {
 
                         for (std::size_t i = 0; i <= r - 1; i++) {
 
-                            typename FieldType::value_type alpha =
-                                fri_params.D[i + 1][0].pow(transcript.template int_challenge<std::size_t>());
+                            typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
                             typename FieldType::value_type x_next = fri_params.q.evaluate(x);
 
@@ -247,7 +250,7 @@ namespace nil {
                         for (std::size_t i = 0; i <= r - 2; i++) {
 
                             typename FieldType::value_type alpha =
-                                fri_params.D[i + 1][0].pow(transcript.template int_challenge<std::size_t>());
+                                transcript.template challenge<FieldType>();
 
                             typename FieldType::value_type x_next = fri_params.q.evaluate(x);
 

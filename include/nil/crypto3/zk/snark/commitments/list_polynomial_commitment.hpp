@@ -95,14 +95,8 @@ namespace nil {
                     };
 
                 private:
-                    static std::vector<typename FieldType::value_type> prepare_domain(const std::size_t domain_size) {
-                        typename FieldType::value_type omega =
-                            math::unity_root<FieldType>(math::detail::power_of_two(domain_size));
-                        std::vector<typename FieldType::value_type> d(domain_size);
-                        for (std::size_t power = 1; power <= domain_size; power++) {
-                            d.emplace_back(omega.pow(power));
-                        }
-                        return d;
+                    static std::shared_ptr<math::evaluation_domain<FieldType>> prepare_domain(const std::size_t domain_size) {
+                        return math::make_evaluation_domain<FieldType>(domain_size);
                     }
 
                 public:
@@ -114,7 +108,7 @@ namespace nil {
                     // should be called
                     static merkle_tree_type
                         commit(const math::polynomial::polynomial<typename FieldType::value_type> &f,
-                               const std::vector<typename FieldType::value_type> &d) {
+                               const std::shared_ptr<math::evaluation_domain<FieldType>> &d) {
 
                         return fri_type::commit(f, d);
                     }
@@ -124,7 +118,7 @@ namespace nil {
                                                  const math::polynomial::polynomial<typename FieldType::value_type> &g,
                                                  fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
 
-                        std::vector<std::vector<typename FieldType::value_type>> d;
+                        std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> d;
                         for (std::size_t j = 0; j <= r - 1; j++) {
                             d.emplace_back(prepare_domain(D / 2));
                         }
@@ -174,6 +168,9 @@ namespace nil {
                             if (!proof.p[j].validate(proof.T_root))
                                     return false;
                         }
+
+                        std::array<std::pair<typename FieldType::value_type, typename FieldType::value_type>, k>
+                            U_interpolation_points;
 
                         for (std::size_t j = 0; j < k; j++) {
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], proof.z[j]);
