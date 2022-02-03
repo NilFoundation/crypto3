@@ -119,7 +119,7 @@ namespace nil {
                         commit(math::polynomial::polynomial<typename FieldType::value_type> &f,
                                const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
-                        std::vector<std::array<std::uint8_t, 96>> y_data;
+                        std::vector<std::array<std::uint8_t, field_element_type::length()>> y_data;
                         y_data.resize(D->m);
                         std::vector<typename FieldType::value_type> tmp(f.begin(), f.end());
                         D->fft(tmp);
@@ -128,7 +128,7 @@ namespace nil {
                             field_element_type y_val =
                                 nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(tmp[i]);
                             auto write_iter = y_data[i].begin();
-                            y_val.write(write_iter, 96);
+                            y_val.write(write_iter, field_element_type::length());
                         }
 
                         return merkle_tree_type(y_data);
@@ -207,12 +207,12 @@ namespace nil {
                                     }
                                     p[j] = merkle_proof_type(T, leaf_index);
 
-                                    std::array<std::uint8_t, 96> leaf_data;
+                                    std::array<std::uint8_t, field_element_type::length()> leaf_data;
 
                                     field_element_type leaf_val =
                                         nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(leaf);
                                     auto write_iter = leaf_data.begin();
-                                    leaf_val.write(write_iter, 96);
+                                    leaf_val.write(write_iter, field_element_type::length());
 
                                     if (!p[j].validate(leaf_data)) {
                                         std::printf("s merkle generation failed: %ld\n", i);
@@ -229,12 +229,12 @@ namespace nil {
                                         }
                                         p[j] = merkle_proof_type(T, leaf_index);
 
-                                        std::array<std::uint8_t, 96> leaf_data;
+                                        std::array<std::uint8_t, field_element_type::length()> leaf_data;
 
                                         field_element_type leaf_val =
                                             nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(leaf);
                                         auto write_iter = leaf_data.begin();
-                                        leaf_val.write(write_iter, 96);
+                                        leaf_val.write(write_iter, field_element_type::length());
 
                                         if (!p[j].validate(leaf_data)) {
                                             std::printf("s merkle generation failed: %ld\n", i);
