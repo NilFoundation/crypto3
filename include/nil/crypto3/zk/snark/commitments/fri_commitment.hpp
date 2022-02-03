@@ -301,7 +301,16 @@ namespace nil {
                             }
 
                             for (std::size_t j = 0; j < m; j++) {
-                                if (!proof.round_proofs[i].p[j].validate(proof.round_proofs[i].T_root)) {
+                                typename FieldType::value_type leaf = proof.round_proofs[i].y[j];
+
+                                std::array<std::uint8_t, field_element_type::length()> leaf_data;
+
+                                field_element_type leaf_val =
+                                    nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(leaf);
+                                auto write_iter = leaf_data.begin();
+                                leaf_val.write(write_iter, field_element_type::length());
+
+                                if (!proof.round_proofs[i].p[j].validate(leaf_data)) {
                                     std::printf("s merkle verification failed: %ld\n", i);
                                     return false;
                                 }
@@ -329,12 +338,23 @@ namespace nil {
                             math::polynomial::polynomial<typename FieldType::value_type> interpolant = 
                                 math::polynomial::_lagrange_interpolation(interpolation_points);
 
-                            if (!proof.round_proofs[i].colinear_path.validate(proof.round_proofs[i].T_root))
+                            typename FieldType::value_type leaf = proof.round_proofs[i].colinear_value;
+
+                            std::array<std::uint8_t, field_element_type::length()> leaf_data;
+
+                            field_element_type leaf_val =
+                                nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(leaf);
+                            auto write_iter = leaf_data.begin();
+                            leaf_val.write(write_iter, field_element_type::length());
+
+                            if (!proof.round_proofs[i].colinear_path.validate(leaf_data)){
                                 std::printf("colinear merkle verification failed: %ld", i);
                                 return false;
-                            if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value)
+                            }
+                            if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value){
                                 std::printf("colinear check failed: %ld", i);
                                 return false;
+                            }
 
                             x = x_next;
 
