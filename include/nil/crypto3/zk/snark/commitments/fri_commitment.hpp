@@ -324,7 +324,7 @@ namespace nil {
                             };
 
                             math::polynomial::polynomial<typename FieldType::value_type> interpolant = 
-                                math::polynomial::_lagrange_interpolation(interpolation_points);
+                                math::polynomial::lagrange_interpolation(interpolation_points);
 
                             typename FieldType::value_type leaf = proof.round_proofs[i].colinear_value;
 

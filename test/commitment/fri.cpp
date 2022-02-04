@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
     };
 
     math::polynomial::polynomial<typename FieldType::value_type> interpolant =
-        math::polynomial::_lagrange_interpolation(interpolation_points);
+        math::polynomial::lagrange_interpolation(interpolation_points);
     typename FieldType::value_type x1 = interpolant.evaluate(alpha);
     typename FieldType::value_type x2 = f_next.evaluate(x_next);
     BOOST_CHECK(x1 == x2);
