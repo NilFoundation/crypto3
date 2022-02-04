@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
 
     zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(init_blob);
-    BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, f, f));
+    //BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, f, f));
 }
 
 BOOST_AUTO_TEST_CASE(fri_fold_test) {
@@ -149,42 +149,17 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
     math::polynomial::polynomial<typename FieldType::value_type> f_next =
         fri_type::fold_polynomial(f, alpha);
 
-    BOOST_CHECK_EQUAL(f_next.degree(), 1);
+    BOOST_CHECK_EQUAL(f_next.degree(), f.degree()/2);
     std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points {
         std::make_pair(omega, f.evaluate(omega)),
         std::make_pair(-omega, f.evaluate(-omega)),
     };
 
-    // TODO: Fix it with a proper interpolation
-    //math::polynomial::polynomial<typename FieldType::value_type> interpolant = {f[0] + f[2] * x_next, f[1] + f[3] * x_next};
     math::polynomial::polynomial<typename FieldType::value_type> interpolant =
         math::polynomial::_lagrange_interpolation(interpolation_points);
     typename FieldType::value_type x1 = interpolant.evaluate(alpha);
     typename FieldType::value_type x2 = f_next.evaluate(x_next);
     BOOST_CHECK(x1 == x2);
-    // BOOST_CHECK_EQUAL(interpolant.eval(alpha), f_next.eval(x_next))
-}
-
-BOOST_AUTO_TEST_CASE(fri_coset_test) {
-
-    // fri params
-    using curve_type = algebra::curves::mnt4<298>;
-    using FieldType = typename curve_type::base_field_type;
-
-    // typedef fri_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> fri_type;
-
-    math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 25};
-
-    // create domain D_0
-    // Get omega from D_0
-
-    // delegate q = fry_type::q()
-    // x_next = q(omega)
-
-    // vector s = fri_type::get_coset(x_next)
-    //for (std::size_t i = 0; i < s.size(); i++) {
-    //    BOOST_CHECK_EQUAL(x_next, s[i]^2);
-    //}
 }
 
 BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
@@ -219,26 +194,26 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     for (std::size_t i = 0; i < r; i++) {
-        std::shared_ptr<math::evaluation_domain<FieldType>> domain = prepare_domain<FieldType>(d - i);
+        std::shared_ptr<math::evaluation_domain<FieldType>> domain = prepare_domain<FieldType>(std::pow(2, extended_log - i));
         D.push_back(domain);
     }
 
-    params.r = r + 1;
+    params.r = r;
     params.D = D;
     params.q = f;
+    params.max_degree = d - 1;
 
-    /*merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
+    BOOST_CHECK(D[1]->m == D[0]->m/2);
+    merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
     std::array<typename FieldType::value_type, 1> evaluation_points = {D[0]->get_domain_element(1).pow(5)};
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript(init_blob);
 
-    proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);*/
-    // math::polynomial::polynomial<typename FieldType::value_type> f_res = proof.last_round.f
+    proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
 
-    // int expected_deg = def(f) - 2^r
-
-    // BOOST_CHECK_EQUAL(f_res.deg(), expected_deg)
+    math::polynomial::polynomial<typename FieldType::value_type> final_polynomial = proof.final_polynomial;
+    BOOST_CHECK_EQUAL(proof.final_polynomial.degree(), std::pow(2, std::log2(params.max_degree + 1) - r) - 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
