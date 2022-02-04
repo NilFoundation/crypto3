@@ -213,12 +213,10 @@ namespace nil {
                                     auto write_iter = leaf_data.begin();
                                     leaf_val.write(write_iter, field_element_type::length());
                                 } else {
-                                    for (std::size_t j = 0; j < m; j++) {
-
                                         typename FieldType::value_type leaf = y[j];
 
                                         std::size_t leaf_index = 0;
-                                        for (; leaf_index < fri_params.D[i]->m; leaf_index++){
+                                        for (; leaf_index < tmp.size(); leaf_index++){
                                             if (tmp[leaf_index] == leaf)
                                                 break;
                                         }
@@ -230,7 +228,6 @@ namespace nil {
                                             nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(leaf);
                                         auto write_iter = leaf_data.begin();
                                         leaf_val.write(write_iter, field_element_type::length());
-                                    }
                                 }
                             }
 

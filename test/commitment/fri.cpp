@@ -81,8 +81,6 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
                                                                         8, 7, 5, 6,
                                                                         1, 2, 1, 1};
 
-    // create domain D_0
-
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
@@ -91,12 +89,15 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
         D.push_back(domain);
     }
 
+    math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
     params.r = r;
     params.D = D;
-    params.q = f;
+    params.q = q;
     params.max_degree = d;
 
     BOOST_CHECK(D[1]->m == D[0]->m/2);
+    BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
+    BOOST_CHECK(params.q.evaluate(D[0]->get_domain_element(1)) == D[0]->get_domain_element(1).squared());
     merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
     std::array<typename FieldType::value_type, 1> evaluation_points = {D[0]->get_domain_element(1).pow(5)};
 
@@ -106,7 +107,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
 
     zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(init_blob);
-    //BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, f, f));
+    BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, f, f));
 }
 
 BOOST_AUTO_TEST_CASE(fri_fold_test) {
@@ -162,7 +163,7 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
     BOOST_CHECK(x1 == x2);
 }
 
-BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
+/*BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
 
     // fri params
     using curve_type = algebra::curves::mnt4<298>;
@@ -188,8 +189,6 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
                                                                         8, 7, 5, 6,
                                                                         1, 2, 1, 1};
 
-    // create domain D_0
-
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
@@ -214,6 +213,6 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
 
     math::polynomial::polynomial<typename FieldType::value_type> final_polynomial = proof.final_polynomial;
     BOOST_CHECK_EQUAL(proof.final_polynomial.degree(), std::pow(2, std::log2(params.max_degree + 1) - r) - 1);
-}
+}*/
 
 BOOST_AUTO_TEST_SUITE_END()
