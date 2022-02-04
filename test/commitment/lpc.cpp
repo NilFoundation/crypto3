@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
 
     for (int i = 0; i < height; i++) {
         math::polynomial::polynomial<typename field_type::value_type> poly;
-        for (int j = 0; j < (1 << d_power_two) - 1; j++) {
+        for (int j = 0; j < (1 << d_power_two); j++) {
             poly.push_back(typename field_type::value_type(polynomial_element_gen()));
         }
         merkle_tree_type tree = lpc_type::commit(poly, D_0);
