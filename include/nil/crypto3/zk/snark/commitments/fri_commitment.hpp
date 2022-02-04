@@ -164,6 +164,8 @@ namespace nil {
 
                         std::vector<round_proof_type> round_proofs;
                         math::polynomial::polynomial<typename FieldType::value_type> final_polynomial;
+                        std::unique_ptr<merkle_tree_type> p_tree = std::make_unique<merkle_tree_type>(T);
+                        merkle_tree_type T_next;
 
                         for (std::size_t i = 0; i <= r - 1; i++) {
                             
@@ -202,7 +204,7 @@ namespace nil {
                                         if (tmp[leaf_index] == leaf)
                                             break;
                                     }
-                                    p[j] = merkle_proof_type(T, leaf_index);
+                                    p[j] = merkle_proof_type(*p_tree, leaf_index);
                                 } else {
                                         typename FieldType::value_type leaf = y[j];
 
@@ -211,12 +213,12 @@ namespace nil {
                                             if (tmp[leaf_index] == leaf)
                                                 break;
                                         }
-                                        p[j] = merkle_proof_type(T, leaf_index);
+                                        p[j] = merkle_proof_type(*p_tree, leaf_index);
                                 }
                             }
 
                             if (i < r - 1) {
-                                merkle_tree_type T_next = commit(f_next, fri_params.D[i + 1]);
+                                T_next = commit(f_next, fri_params.D[i + 1]);
                                 transcript(T_next.root());
 
                                 typename FieldType::value_type colinear_value = f_next.evaluate(x_next);
@@ -233,9 +235,9 @@ namespace nil {
                                 merkle_proof_type colinear_path = merkle_proof_type(T_next, leaf_index);
 
                                 round_proofs.push_back(
-                                    round_proof_type({y, p, T.root(), colinear_value, colinear_path}));
+                                    round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
 
-                                T = T_next;
+                                p_tree = std::make_unique<merkle_tree_type>(T_next);
                             } else {
                                 final_polynomial = f_next;
                             }
