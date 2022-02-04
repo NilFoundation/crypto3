@@ -412,7 +412,8 @@ namespace nil {
                             }
                             if (carry || cmp_asm(m_mod.backend().size(), accum.limbs() + m_mod.backend().size(),
                                                  m_mod.backend().limbs()) >= 0) {
-                                sub_only(m_mod.backend().size(), accum.limbs() + m_mod.backend().size(), m_mod.backend().limbs());
+                                sub_asm(m_mod.backend().size(), accum.limbs() + m_mod.backend().size(),
+                                        m_mod.backend().limbs());
                             }
                             // Now result in first m_mod.backend().size() limbs, so we can do
                             // eval_bitwise_and(accum, m_modulus_mask);
