@@ -407,7 +407,8 @@ namespace nil {
                         if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && m_mod.backend().size() >= 2) {
                             bool carry = false;
                             for (size_t i = 0; i < m_mod.backend().size(); ++i) {
-                                carry = reduce_help(m_mod.backend().size(), i, accum.limbs(), m_mod.backend().limbs(),
+                                carry =
+                                    reduce_limb_asm(m_mod.backend().size(), i, accum.limbs(), m_mod.backend().limbs(),
                                                     static_cast<double_limb_type>(m_montgomery_p_dash));
                             }
                             if (carry || cmp_asm(m_mod.backend().size(), accum.limbs() + m_mod.backend().size(),
@@ -460,7 +461,7 @@ namespace nil {
                         // BOOST_ASSERT(eval_lt(x, m_mod.backend()) && eval_lt(y, m_mod.backend()));
 #if BOOST_ARCH_X86_64
                         if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && (result.size() >= 2) && (y.size() >= 2)) {
-                            add_mod(limbs_count, result, y, m_mod);
+                            add_mod_asm(limbs_count, result.limbs(), y.limbs(), m_mod.backend().limbs());
                             result.resize(limbs_count, limbs_count);
                             result.normalize();
                         } else

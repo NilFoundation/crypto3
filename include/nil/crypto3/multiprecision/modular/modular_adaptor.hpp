@@ -17,7 +17,6 @@
 #include <nil/crypto3/multiprecision/detail/digits.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
 
-#include <nil/crypto3/multiprecision/modular/asm_defines.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_params.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_adaptor_fixed.hpp>
 
@@ -232,7 +231,8 @@ namespace nil {
 #if BOOST_ARCH_X86_64
                     auto limbs_count = get_limbs_count<Backend>();
                     if (!BOOST_MP_IS_CONST_EVALUATED(result.base_data().limbs()) && (limbs_count >= 2)) {
-                        sub_mod(limbs_count, result.base_data().limbs(), o.base_data().limbs(), result.mod_data().get_mod().backend().limbs());
+                        sub_mod_asm(limbs_count, result.base_data().limbs(), o.base_data().limbs(),
+                                    result.mod_data().get_mod().backend().limbs());
                         result.base_data().resize(limbs_count, limbs_count);
                         result.base_data().normalize();
                     } else

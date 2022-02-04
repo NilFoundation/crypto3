@@ -164,8 +164,6 @@ namespace nil {
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
                     constexpr modular_adaptor &operator=(modular_adaptor &&o) BOOST_NOEXCEPT {
-                        //                        modular_adaptor tmp(o);
-                        //                        swap(tmp);
                         m_base = o.base_data();
                         m_mod = o.mod_data();
 

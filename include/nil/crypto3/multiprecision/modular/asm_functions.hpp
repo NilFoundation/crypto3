@@ -25,8 +25,8 @@ namespace nil {
                     // Loop for sub
                     "4:                                  \n\t"
                         "popf                            \n\t"
-                        "movq    (%[y], %%rbx, 8), %%rax \n\t"
-                        "sbbq    %%rax, (%[x], %%rbx, 8) \n\t"
+                        "movq (%[y], %%rbx, 8), %%rax    \n\t"
+                        "sbbq %%rax, (%[x], %%rbx, 8)    \n\t"
                         "pushf                           \n\t"
                         "inc %%rbx                       \n\t"
                         "cmp %%rbx, %[limbs]             \n\t"
@@ -38,7 +38,7 @@ namespace nil {
                 }
 
                 template<typename Limb1, typename Limb2, typename Limb3>
-                bool reduce_help(size_t n, size_t shift, Limb1 *res, const Limb2 *x, Limb3 inv) {
+                bool reduce_limb_asm(size_t n, size_t shift, Limb1 *res, const Limb2 *x, Limb3 inv) {
                     Limb1 k, tmp1, tmp2, tmp3;
                     bool carry = false;
                     __asm__(
@@ -113,11 +113,9 @@ namespace nil {
                 }
 
                 template<typename Limb1, typename Limb2, typename Limb3>
-                void sub_mod(size_t n, Limb1 *x, const Limb2 *y, const Limb3 *mod) {
+                void sub_mod_asm(size_t n, Limb1 *x, const Limb2 *y, const Limb3 *mod) {
                     __asm__(
-                        "movq    %[limbs], %%rcx        \n\t"
                         "movq    $1, %%rbx              \n\t"
-
                         "movq    (%[y]), %%rax          \n\t"
                         "subq    %%rax, (%[x])          \n\t"
                         "pushf                          \n\t"
@@ -128,7 +126,7 @@ namespace nil {
                         "sbbq %%rax, (%[x], %%rbx, 8)   \n\t"
                         "pushf                          \n\t"
                         "inc %%rbx                      \n\t"
-                        "cmp %%rbx, %%rcx               \n\t"
+                        "cmp %%rbx, %[limbs]            \n\t"
                         "jne 1b                         \n\t"
                         "popf                           \n\t"
                         // If it's more than zero (no carry bit) just go to end
@@ -144,7 +142,7 @@ namespace nil {
                         "adcq %%rax, (%[x], %%rbx, 8)   \n\t"
                         "pushf                          \n\t"
                         "inc %%rbx                      \n\t"
-                        "cmp %%rbx, %%rcx               \n\t"
+                        "cmp %%rbx, %[limbs]            \n\t"
                         "jne 2b                         \n\t"
                         "popf                           \n\t"
                     "4:                                 \n\t"
@@ -153,12 +151,11 @@ namespace nil {
                         : "cc", "memory", "%rax", "%rcx", "%rbx");
                 }
 
-                template<typename Backend1, typename Backend2, typename Number>
-                void add_mod(size_t n, Backend1 &x, Backend2 y, Number mod) {
+                template<typename Limb1, typename Limb2, typename Limb3>
+                void add_mod_asm(size_t n, Limb1 *x, const Limb2 *y, const Limb3 *mod) {
                     __asm__(
                         "movq    (%[y]), %%rax              \n\t"
                         "addq    %%rax, (%[x])              \n\t"
-                        "movq    %[limbs], %%rcx            \n\t"
                         "movq    $1, %%rbx                  \n\t"
                         "pushf                              \n\t"
                         // Start circle add from 1st limb
@@ -168,7 +165,7 @@ namespace nil {
                         "adcq    %%rax, (%[x], %%rbx, 8)    \n\t"
                         "pushf                              \n\t"
                         "inc %%rbx                          \n\t"
-                        "cmp %%rbx, %%rcx                   \n\t"
+                        "cmp %%rbx, %[limbs]                \n\t"
                         "jne 1b                             \n\t"
                         "popf                               \n\t"
                         // If was carry, we always need sub mod
@@ -183,8 +180,7 @@ namespace nil {
                         "jb  5f                             \n\t"
                         "ja  3f                             \n\t"
                         "dec %%rbx                          \n\t"
-                        "cmp $0, %%rbx                      \n\t"
-                        "jl 2b                              \n\t"
+                        "jz 2b                              \n\t"
                         // Start sub
                     "3:                                     \n\t"
                         "movq    (%[mod]), %%rax            \n\t"
@@ -198,12 +194,12 @@ namespace nil {
                         "sbbq    %%rax, (%[x], %%rbx, 8)    \n\t"
                         "pushf                              \n\t"
                         "inc %%rbx                          \n\t"
-                        "cmp %%rbx, %%rcx                   \n\t"
+                        "cmp %%rbx, %[limbs]                \n\t"
                         "jne 4b                             \n\t"
                         "popf                               \n\t"
                     "5:                                     \n\t"
                         :
-                        : [limbs] "r"(n), [x] "r"(x.limbs()), [y] "r"(y.limbs()), [mod] "r"(mod.backend().limbs())
+                        : [limbs] "r"(n), [x] "r"(x), [y] "r"(y), [mod] "r"(mod)
                         : "cc", "memory", "%rax", "%rcx", "%rbx");
                 }
 #endif
