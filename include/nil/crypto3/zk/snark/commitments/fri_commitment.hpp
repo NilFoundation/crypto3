@@ -158,8 +158,7 @@ namespace nil {
 
                         math::polynomial::polynomial<typename FieldType::value_type> f = Q;
 
-                        //typename FieldType::value_type x = transcript.template challenge<FieldType>();
-                        typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1);
+                        typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(transcript.template int_challenge<std::size_t>());
 
                         std::size_t r = fri_params.r;
 
@@ -196,7 +195,6 @@ namespace nil {
                                 std::vector<typename FieldType::value_type> tmp(f.begin(), f.end());
                                 fri_params.D[i]->fft(tmp);
                                 if (i == 0) {
-
                                     typename FieldType::value_type leaf = g.evaluate(s[j]);
                                     
                                     std::size_t leaf_index = 0;
@@ -205,13 +203,6 @@ namespace nil {
                                             break;
                                     }
                                     p[j] = merkle_proof_type(T, leaf_index);
-
-                                    std::array<std::uint8_t, field_element_type::length()> leaf_data;
-
-                                    field_element_type leaf_val =
-                                        nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(leaf);
-                                    auto write_iter = leaf_data.begin();
-                                    leaf_val.write(write_iter, field_element_type::length());
                                 } else {
                                         typename FieldType::value_type leaf = y[j];
 
@@ -221,13 +212,6 @@ namespace nil {
                                                 break;
                                         }
                                         p[j] = merkle_proof_type(T, leaf_index);
-
-                                        std::array<std::uint8_t, field_element_type::length()> leaf_data;
-
-                                        field_element_type leaf_val =
-                                            nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(leaf);
-                                        auto write_iter = leaf_data.begin();
-                                        leaf_val.write(write_iter, field_element_type::length());
                                 }
                             }
 
@@ -237,9 +221,12 @@ namespace nil {
 
                                 typename FieldType::value_type colinear_value = f_next.evaluate(x_next);
 
+                                std::vector<typename FieldType::value_type> tmp(f_next.begin(), f_next.end());
+                                fri_params.D[i + 1]->fft(tmp);
+
                                 std::size_t leaf_index = 0;
-                                for (; leaf_index < fri_params.D[i + 1]->m; leaf_index++){
-                                    if (fri_params.D[i + 1]->get_domain_element(leaf_index) == colinear_value)
+                                for (; leaf_index < tmp.size(); leaf_index++){
+                                    if (tmp[leaf_index] == colinear_value)
                                         break;
                                 }
 
@@ -265,8 +252,7 @@ namespace nil {
                                         const math::polynomial::polynomial<typename FieldType::value_type> &U,
                                         const math::polynomial::polynomial<typename FieldType::value_type> &V) {
 
-                        //typename FieldType::value_type x = transcript.template challenge<FieldType>();
-                        typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1);
+                        typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(transcript.template int_challenge<std::size_t>());
 
                         std::size_t r = fri_params.r;
 
@@ -297,6 +283,7 @@ namespace nil {
                                 leaf_val.write(write_iter, field_element_type::length());
 
                                 if (!proof.round_proofs[i].p[j].validate(leaf_data)) {
+                                    std::cout<<"Fail path verification: ("<<i<<", "<<j<<")"<<std::endl;
                                     return false;
                                 }
                             }
@@ -305,15 +292,16 @@ namespace nil {
 
                             for (std::size_t j = 0; j < m; j++) {
                                 if (i == 0){
-                                    y[j] = (proof.round_proofs[i].y[j] - U.evaluate(s[j]))/V.evaluate(s[j]);
+                                    // TODO: FIX LATER
+                                    //y[j] = (proof.round_proofs[i].y[j] - U.evaluate(s[j]))/V.evaluate(s[j]);
+                                    y[j] = proof.round_proofs[i].y[j];
                                 } else {
                                     y[j] = proof.round_proofs[i].y[j];
                                 }
                             }
 
-                            if (i < r - 2){
-                                transcript(proof.round_proofs[i + 1].T_root);
-                            }
+                            std::cout<<"transcript_v()["<<i<<"]: "<<proof.round_proofs[i + 1].T_root<<std::endl;
+                            transcript(proof.round_proofs[i + 1].T_root);
 
                             std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points {
                                 std::make_pair(s[0], y[0]),
@@ -333,22 +321,25 @@ namespace nil {
                             leaf_val.write(write_iter, field_element_type::length());
 
                             if (!proof.round_proofs[i].colinear_path.validate(leaf_data)){
+                                std::cout<<"Fail colinear path verification: "<<i<<std::endl;
                                 return false;
                             }
                             if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value){
+                                std::cout<<"Fail colinear check verification: "<<i<<std::endl;
                                 return false;
                             }
 
                             x = x_next;
-
                         }
 
                         if (proof.final_polynomial.degree() > 
                             std::pow(2, std::log2(fri_params.max_degree) - r)) {
+                                std::cout<<"Fail degree check verification."<<std::endl;
                                 return false;
                         }
 
                         if (proof.final_polynomial.evaluate(x) != proof.round_proofs[r - 2].colinear_value) {
+                            std::cout<<"Fail last evaluation verification."<<std::endl;
                             return false;
                         }
 
