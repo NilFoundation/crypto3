@@ -193,6 +193,8 @@ namespace nil {
                     typedef typename boost::property_map<graph_type, vertex_hash_t>::type vertex_name_map_type;
 
                 public:
+                    merkle_tree_impl (): _leafs(0), _size(0), rc(0) {};
+
                     template<
                         typename LeafRange,
                         typename Hashable = typename std::iterator_traits<typename LeafRange::iterator>::value_type>
@@ -228,6 +230,18 @@ namespace nil {
                             start_layer_element += layer_elements;
                             layer_elements /= Arity;
                         }
+                    }
+
+                    merkle_tree_impl operator=(const merkle_tree_impl &other) {
+                        _t = std::move(other._t);
+                        hash_map = get(vertex_hash, _t);
+                        _leafs = other._leafs;
+                        _size = other._size;
+                        rc = other.rc;
+                        for (auto i = 0; i < _size; ++i) {
+                            hash_map[i] = other.hash_map[i];
+                        }
+                        return *this;
                     }
 
                     std::array<size_t, Arity> children(size_t leaf_index) {
