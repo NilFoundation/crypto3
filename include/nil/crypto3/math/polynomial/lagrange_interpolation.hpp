@@ -35,57 +35,9 @@ namespace nil {
     namespace crypto3 {
         namespace math {
             namespace polynomial {
-                /*!
-                 * @brief Perform polynomial Lagrange interpolation from points.
-                 */
-                template<typename FieldValueType>
-                polynomial<FieldValueType>
-                    lagrange_interpolation(const std::vector<std::pair<FieldValueType, FieldValueType>> &points) {
-
-                    std::size_t n = points.size();
-
-                    std::vector<FieldValueType> interpolation_points(n);
-
-                    for (std::size_t i = 0; i < n; i++) {
-                        interpolation_points[i] = std::get<1>(points[i]);
-                    }
-
-                    // temporary implementation for zk PLONK purposes
-                    const std::shared_ptr<math::evaluation_domain<typename FieldValueType::field_type>> domain =
-                        math::make_evaluation_domain<typename FieldValueType::field_type>(n);
-
-                    domain->inverse_fft(interpolation_points);
-
-                    return polynomial<FieldValueType>(interpolation_points.begin(), interpolation_points.end());
-                }
-
-                template<typename FieldValueType, std::size_t ContainerSize>
-                polynomial<FieldValueType> lagrange_interpolation(
-                    const std::array<std::pair<FieldValueType, FieldValueType>, ContainerSize> &points) {
-
-                    std::size_t n = points.size();
-
-                    std::vector<FieldValueType> interpolation_points(n);
-
-                    for (std::size_t i = 0; i < n; i++) {
-                        interpolation_points[i] = std::get<1>(points[i]);
-                    }
-
-                    // temporary implementation for zk PLONK purposes
-                    const std::shared_ptr<math::evaluation_domain<typename FieldValueType::field_type>> domain =
-                        math::make_evaluation_domain<typename FieldValueType::field_type>(n);
-
-                    domain->inverse_fft(interpolation_points);
-
-                    return polynomial<FieldValueType>(interpolation_points.begin(), interpolation_points.end());
-                }
-
-                template<typename FieldValueType>
-                polynomial<FieldValueType> lagrange_interpolation(const std::vector<FieldValueType> &points) {
-
-                    return polynomial<FieldValueType>();
-                }
-
+                
+                // Default implementation according to Wikipedia
+                // https://en.wikipedia.org/wiki/Lagrange_polynomial
                 template<typename InputRange,
                          typename FieldValueType =
                              typename std::iterator_traits<typename InputRange::iterator>::value_type::first_type>
@@ -93,12 +45,14 @@ namespace nil {
                     std::is_same<std::pair<FieldValueType, FieldValueType>,
                                  typename std::iterator_traits<typename InputRange::iterator>::value_type>::value,
                     polynomial<FieldValueType>>::type
-                    _lagrange_interpolation(const InputRange &points) {
+                    lagrange_interpolation(const InputRange &points) {
+
+                    std::size_t k = std::size(points);
 
                     polynomial<FieldValueType> result;
-                    for (std::size_t j = 0; j < std::size(points); ++j) {
+                    for (std::size_t j = 0; j < k; ++j) {
                         polynomial<FieldValueType> term({points[j].second});
-                        for (std::size_t m = 0; m < std::size(points); ++m) {
+                        for (std::size_t m = 0; m < k; ++m) {
                             if (m != j) {
                                 term = term * (polynomial<FieldValueType>({-points[m].first, FieldValueType::one()}) /
                                                polynomial<FieldValueType>({points[j].first - points[m].first}));
