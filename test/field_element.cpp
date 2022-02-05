@@ -63,7 +63,7 @@ void test_field_element(typename FieldType::value_type val) {
     using unit_type = unsigned char;
     using field_element_type = types::field_element<nil::marshalling::field_type<Endianness>, FieldType>;
 
-    field_element_type test_val = types::fill_field_element<FieldType, Endianness>(val);
+    field_element_type test_val(val);
 
     std::size_t unitblob_size = test_val.length();
 
@@ -79,7 +79,7 @@ void test_field_element(typename FieldType::value_type val) {
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
 
-    typename FieldType::value_type read_val = types::make_field_element<FieldType, Endianness>(test_val_read);
+    typename FieldType::value_type read_val = test_val_read.value();
 
     BOOST_CHECK(val == read_val);
 }
