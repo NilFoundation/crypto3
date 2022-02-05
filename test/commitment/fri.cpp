@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
     BOOST_CHECK(x1 == x2);
 }
 
-/*BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
+BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
 
     // fri params
     using curve_type = algebra::curves::mnt4<298>;
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
         D.push_back(domain);
     }
 
-    params.r = r;
+    params.r = r - 1;
     params.D = D;
     params.q = f;
     params.max_degree = d - 1;
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
     proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
 
     math::polynomial::polynomial<typename FieldType::value_type> final_polynomial = proof.final_polynomial;
-    BOOST_CHECK_EQUAL(proof.final_polynomial.degree(), std::pow(2, std::log2(params.max_degree + 1) - r) - 1);
-}*/
+    BOOST_CHECK_EQUAL(proof.final_polynomial.degree(), 1);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
