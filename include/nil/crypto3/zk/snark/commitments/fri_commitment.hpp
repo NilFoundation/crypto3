@@ -125,8 +125,7 @@ namespace nil {
                         D->fft(tmp);
 
                         for (std::size_t i = 0; i < D->m; i++) {
-                            field_element_type y_val =
-                                nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(tmp[i]);
+                            field_element_type y_val(tmp[i]);
                             auto write_iter = y_data[i].begin();
                             y_val.write(write_iter, field_element_type::length());
                         }
@@ -276,8 +275,7 @@ namespace nil {
 
                                 std::array<std::uint8_t, field_element_type::length()> leaf_data;
 
-                                field_element_type leaf_val =
-                                    nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(leaf);
+                                field_element_type leaf_val(leaf);
                                 auto write_iter = leaf_data.begin();
                                 leaf_val.write(write_iter, field_element_type::length());
 
@@ -309,8 +307,7 @@ namespace nil {
                             typename FieldType::value_type leaf = proof.round_proofs[i].colinear_value;
 
                             std::array<std::uint8_t, field_element_type::length()> leaf_data;
-                            field_element_type leaf_val =
-                                nil::crypto3::marshalling::types::fill_field_element<FieldType, Endianness>(leaf);
+                            field_element_type leaf_val(leaf);
                             auto write_iter = leaf_data.begin();
                             leaf_val.write(write_iter, field_element_type::length());
 
