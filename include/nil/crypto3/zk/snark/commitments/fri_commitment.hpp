@@ -288,9 +288,7 @@ namespace nil {
 
                             for (std::size_t j = 0; j < m; j++) {
                                 if (i == 0){
-                                    // TODO: FIX LATER
-                                    //y[j] = (proof.round_proofs[i].y[j] - U.evaluate(s[j]))/V.evaluate(s[j]);
-                                    y[j] = proof.round_proofs[i].y[j];
+                                    y[j] = (proof.round_proofs[i].y[j] - U.evaluate(s[j]))/V.evaluate(s[j]);
                                 } else {
                                     y[j] = proof.round_proofs[i].y[j];
                                 }

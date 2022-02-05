@@ -98,16 +98,22 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     BOOST_CHECK(D[1]->m == D[0]->m/2);
     BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
     BOOST_CHECK(params.q.evaluate(D[0]->get_domain_element(1)) == D[0]->get_domain_element(1).squared());
+
     merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
     std::array<typename FieldType::value_type, 1> evaluation_points = {D[0]->get_domain_element(1).pow(5)};
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript(init_blob);
 
+    // LPC-related logic, here we "nulify" it via U = 0, V - 1
+    // TODO: Make FRI independent from LPC input
+    math::polynomial::polynomial<typename FieldType::value_type> U = {0}; 
+    math::polynomial::polynomial<typename FieldType::value_type> V = {1};
+
     proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
 
     zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(init_blob);
-    BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, f, f));
+    BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, U, V));
 }
 
 BOOST_AUTO_TEST_CASE(fri_fold_test) {
