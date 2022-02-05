@@ -188,33 +188,28 @@ namespace nil {
                             std::array<typename FieldType::value_type, m> y;
 
                             for (std::size_t j = 0; j < m; j++) {
-                                y[j] = f.evaluate(s[j]);
+                                y[j] = i == 0 ? g.evaluate(s[j]) : f.evaluate(s[j]);
                             }
 
                             std::array<merkle_proof_type, m> p;
 
-                            for (std::size_t j = 0; j < m; j++) {
-                                std::vector<typename FieldType::value_type> tmp(f.begin(), f.end());
-                                fri_params.D[i]->fft(tmp);
-                                if (i == 0) {
-                                    typename FieldType::value_type leaf = g.evaluate(s[j]);
-                                    
-                                    std::size_t leaf_index = 0;
-                                    for (; leaf_index < tmp.size(); leaf_index++){
-                                        if (tmp[leaf_index] == leaf)
-                                            break;
-                                    }
-                                    p[j] = merkle_proof_type(*p_tree, leaf_index);
-                                } else {
-                                        typename FieldType::value_type leaf = y[j];
+                            std::vector<typename FieldType::value_type> tmp;
+                            if (i == 0) {
+                                std::copy(g.begin(), g.end(), std::back_inserter(tmp));
+                            } else {
+                                std::copy(f.begin(), f.end(), std::back_inserter(tmp));
+                            }
 
-                                        std::size_t leaf_index = 0;
-                                        for (; leaf_index < tmp.size(); leaf_index++){
-                                            if (tmp[leaf_index] == leaf)
-                                                break;
-                                        }
-                                        p[j] = merkle_proof_type(*p_tree, leaf_index);
+                            fri_params.D[i]->fft(tmp);
+                            for (std::size_t j = 0; j < m; j++) {
+                                typename FieldType::value_type leaf = y[j];
+
+                                std::size_t leaf_index = 0;
+                                for (; leaf_index < tmp.size(); leaf_index++){
+                                    if (tmp[leaf_index] == leaf)
+                                        break;
                                 }
+                                p[j] = merkle_proof_type(*p_tree, leaf_index);
                             }
 
                             typename FieldType::value_type colinear_value = f_next.evaluate(x_next);
