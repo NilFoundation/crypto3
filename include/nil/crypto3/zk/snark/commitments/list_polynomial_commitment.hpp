@@ -116,12 +116,8 @@ namespace nil {
                     static proof_type proof_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
                                                  merkle_tree_type &T,
                                                  const math::polynomial::polynomial<typename FieldType::value_type> &g,
-                                                 fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
-
-                        std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> d;
-                        for (std::size_t j = 0; j <= r - 1; j++) {
-                            d.emplace_back(prepare_domain(D / 2));
-                        }
+                                                 fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
+                                                 typename fri_type::params_type &fri_params) {
 
                         std::array<typename FieldType::value_type, k> z;
                         std::array<merkle_proof_type, k> p;
@@ -132,8 +128,8 @@ namespace nil {
                             z[j] = g.evaluate(evaluation_points[j]);
 
                             std::size_t leaf_index = 0;
-                            for (; leaf_index < d[0]->m; leaf_index++){
-                                if (d[0]->get_domain_element(leaf_index) == evaluation_points[j])
+                            for (; leaf_index < fri_params.D[0]->m; leaf_index++){
+                                if (fri_params.D[0]->get_domain_element(leaf_index) == evaluation_points[j])
                                     break;
                             }
                             p[j] = merkle_proof_type(T, leaf_index);
@@ -152,8 +148,6 @@ namespace nil {
 
                         // temporary definition, until polynomial is constexpr
                         const math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
-
-                        typename fri_type::params_type fri_params = {r, r, d, q};
 
                         std::array<typename fri_type::proof_type, lambda> fri_proof;
 

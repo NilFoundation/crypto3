@@ -134,10 +134,13 @@ namespace nil {
                     }
 
                     static inline math::polynomial::polynomial<typename FieldType::value_type> 
-                    fold_polynomial(const math::polynomial::polynomial<typename FieldType::value_type> &f,
+                    fold_polynomial(math::polynomial::polynomial<typename FieldType::value_type> &f,
                             typename FieldType::value_type alpha) {
+
                         std::size_t d = f.degree();
-                        BOOST_ASSERT_MSG(d % 2 != 0, "wrong using: fold_polynomial accepts only polynomials of odd degree");
+                        if (d % 2 == 0) {
+                            f.push_back(0);
+                        }
                         math::polynomial::polynomial<typename FieldType::value_type> f_folded(d/2 + 1);
 
                         for (std::size_t index = 0; index <= f_folded.degree(); index++){

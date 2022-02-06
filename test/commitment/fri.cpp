@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_SUITE(fri_test_suite)
 
 BOOST_AUTO_TEST_CASE(fri_basic_test) {
 
-    // fri params
+    // setup
     using curve_type = algebra::curves::mnt4<298>;
     using FieldType = typename curve_type::base_field_type;
 
@@ -76,10 +76,6 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     typedef typename fri_type::params_type params_type;
 
     params_type params;
-    math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1,
-                                                                        5, 6, 7, 2,
-                                                                        8, 7, 5, 6,
-                                                                        1, 2, 1, 1};
 
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
     constexpr static const std::size_t d_extended = d;
@@ -99,9 +95,16 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
     BOOST_CHECK(params.q.evaluate(D[0]->get_domain_element(1)) == D[0]->get_domain_element(1).squared());
 
+    // commit
+    math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1,
+                                                                        5, 6, 7, 2,
+                                                                        8, 7, 5, 6,
+                                                                        1, 2, 1, 1};
+
     merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
     std::array<typename FieldType::value_type, 1> evaluation_points = {D[0]->get_domain_element(1).pow(5)};
 
+    // eval
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript(init_blob);
 
@@ -113,6 +116,8 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
 
     zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(init_blob);
+
+    //verify
     BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, U, V));
 }
 

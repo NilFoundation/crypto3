@@ -42,6 +42,7 @@
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
@@ -95,7 +96,7 @@ std::vector<math::polynomial::polynomial<typename FieldType::value_type>> genera
 
 BOOST_AUTO_TEST_SUITE(lpc_test_suite)
 
-BOOST_AUTO_TEST_CASE(lpc_performance_test) {
+/*BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     typedef algebra::curves::bls12<381> curve_type;
     typedef typename curve_type::scalar_field_type field_type;
 
@@ -146,12 +147,13 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
 
         auto proof = lpc_type::proof_eval(evaluation_points, tree, poly, transcript);
     }
-}
+}*/
 
 BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
-    /*typedef algebra::curves::bls12<381> curve_type;
-    typedef typename curve_type::base_field_type FieldType;
+    // setup
+    typedef algebra::curves::bls12<381> curve_type;
+    typedef typename curve_type::scalar_field_type FieldType;
 
     typedef hashes::sha2<256> merkle_hash_type;
     typedef hashes::sha2<256> transcript_hash_type;
@@ -161,26 +163,51 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
 
-    constexpr static const std::size_t d = 5;
+    constexpr static const std::size_t d = 16;
 
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
+    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, m> fri_type;
     typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
 
-    math::polynomial::polynomial<typename FieldType::value_type> f = {0, 0, 1};
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
+    constexpr static const std::size_t d_extended = d;
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    for (std::size_t i = 0; i < r; i++) {
+        std::shared_ptr<math::evaluation_domain<FieldType>> domain = prepare_domain<FieldType>(std::pow(2, extended_log - i));
+        D.push_back(domain);
+    }
 
-    std::shared_ptr<math::evaluation_domain<FieldType>> D_0 = prepare_domain<FieldType>(d);
+    typename fri_type::params_type fri_params;
 
-    merkle_tree_type tree = lpc_type::commit(f, D_0);
+    math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+    fri_params.r = r;
+    fri_params.D = D;
+    fri_params.q = q;
+    fri_params.max_degree = d;
+    
+
+    // commit
+
+    math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1,
+                                                                        5, 6, 7, 2,
+                                                                        8, 7, 5, 6,
+                                                                        1, 2, 1, 1};
+
+    merkle_tree_type tree = lpc_type::commit(f, D[0]);
+
+    // eval
 
     std::array<typename FieldType::value_type, 1> evaluation_points = {algebra::random_element<FieldType>()};
 
     std::array<std::uint8_t, 96> x_data {};
     zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
 
-    auto proof = lpc_type::proof_eval(evaluation_points, tree, f, transcript);*/
+    auto proof = lpc_type::proof_eval(evaluation_points, tree, f, transcript, fri_params);
+
+    // verify
 }
 
 BOOST_AUTO_TEST_SUITE_END()
