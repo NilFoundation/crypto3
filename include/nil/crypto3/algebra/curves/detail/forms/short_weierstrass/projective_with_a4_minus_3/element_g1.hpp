@@ -51,7 +51,7 @@ namespace nil {
 
                     /** @brief A struct representing an element from the group G1 of short Weierstrass curve of
                      *  projective_with_a4_minus_3 coordinates representation.
-                     *  Description: http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective-with-a4-sminus-3.html
+                     *  Description: http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective-3.html
                      *
                      */
                     template<typename CurveParams>
