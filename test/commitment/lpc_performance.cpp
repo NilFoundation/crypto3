@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_SUITE(lpc_performance_test_suite)
 
 BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     typedef algebra::curves::bls12<381> curve_type;
-    typedef typename curve_type::scalar_field_type field_type;
+    typedef typename curve_type::scalar_field_type FieldType;
 
     typedef hashes::sha2<256> merkle_hash_type;
     typedef hashes::sha2<256> transcript_hash_type;
@@ -103,30 +103,33 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
 
-    constexpr static const std::size_t d_power_two = 5;
-    constexpr static const std::size_t d = 1 << d_power_two -1;
+    constexpr static const std::size_t d_power_two = 4;
+    constexpr static const std::size_t d = 1 << d_power_two;
 
-    constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
+    constexpr static const std::size_t r = d_power_two - 1;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::snark::fri_commitment_scheme<field_type, merkle_hash_type, m> fri_type;
-    typedef list_polynomial_commitment_scheme<field_type, merkle_hash_type, lambda, k, r, m> lpc_type;
+    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, m> fri_type;
+    typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
+
+    constexpr static const std::size_t d_extended = d;
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = fri_type::calculate_domain_set(extended_log, r);
 
     typename fri_type::params_type fri_params;
 
-    math::polynomial::polynomial<typename field_type::value_type> q = {0, 0, 1};
-    std::vector<std::shared_ptr<math::evaluation_domain<field_type>>> D = fri_type::calculate_domain_set(d, r);
+    math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
     fri_params.r = r;
     fri_params.D = D;
     fri_params.q = q;
     fri_params.max_degree = d;
 
-    typedef boost::random::independent_bits_engine<boost::random::mt19937, field_type::modulus_bits,
-                                                   typename field_type::value_type::integral_type>
+    typedef boost::random::independent_bits_engine<boost::random::mt19937, FieldType::modulus_bits,
+                                                   typename FieldType::value_type::integral_type>
         random_polynomial_generator_type;
 
-    std::vector<math::polynomial::polynomial<typename field_type::value_type>> res;
+    std::vector<math::polynomial::polynomial<typename FieldType::value_type>> res;
 
     boost::random::random_device rd;     // Will be used to obtain a seed for the random number engine
     boost::random::mt19937 gen(rd());    // Standard mersenne_twister_engine seeded with rd()
@@ -137,18 +140,21 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     res.reserve(height);
 
     for (int i = 0; i < height; i++) {
-        math::polynomial::polynomial<typename field_type::value_type> poly;
-        for (int j = 0; j < (1 << d_power_two); j++) {
-            poly.push_back(typename field_type::value_type(polynomial_element_gen()));
+        math::polynomial::polynomial<typename FieldType::value_type> poly;
+        for (int j = 0; j < (1 << d_power_two) - 1; j++) {
+            poly.push_back(typename FieldType::value_type(polynomial_element_gen()));
         }
         merkle_tree_type tree = lpc_type::commit(poly, D[0]);
 
-        std::array<typename field_type::value_type, 1> evaluation_points = {algebra::random_element<field_type>()};
+        std::array<typename FieldType::value_type, 1> evaluation_points = {algebra::random_element<FieldType>()};
 
         std::array<std::uint8_t, 96> x_data {};
         zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
 
         auto proof = lpc_type::proof_eval(evaluation_points, tree, poly, transcript, fri_params);
+
+        zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(x_data);
+        BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, transcript_verifier, fri_params));
     }
 }
 
