@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     typedef algebra::curves::bls12<381> curve_type;
     typedef typename curve_type::scalar_field_type FieldType;
 
-    typedef hashes::sha2<256> merkle_hash_type;
+    typedef hashes::keccak_1600<256> merkle_hash_type;
     typedef hashes::sha2<256> transcript_hash_type;
 
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
