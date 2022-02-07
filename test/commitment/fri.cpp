@@ -48,11 +48,6 @@
 
 using namespace nil::crypto3;
 
-template<typename FieldType> 
-std::shared_ptr<math::evaluation_domain<FieldType>> prepare_domain(const std::size_t d) {
-    return math::make_evaluation_domain<FieldType>(d);                        
-}
-
 BOOST_AUTO_TEST_SUITE(fri_test_suite)
 
 BOOST_AUTO_TEST_CASE(fri_basic_test) {
@@ -77,13 +72,9 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
 
     params_type params;
 
-    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
-    for (std::size_t i = 0; i < r; i++) {
-        std::shared_ptr<math::evaluation_domain<FieldType>> domain = prepare_domain<FieldType>(std::pow(2, extended_log - i));
-        D.push_back(domain);
-    }
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = fri_type::calculate_domain_set(extended_log, r);
 
     math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
     params.r = r;
@@ -115,9 +106,9 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
 
     proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
 
+    //verify
     zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(init_blob);
 
-    //verify
     BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, U, V));
 }
 
@@ -143,8 +134,8 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
     params_type params;
     math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
-    std::shared_ptr<math::evaluation_domain<FieldType>> domain = prepare_domain<FieldType>(d);
-    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = {domain};
+    std::size_t d_log = boost::static_log2<d>::value;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = fri_type::calculate_domain_set(d_log, 1);
 
 
     params.r = r;
@@ -153,7 +144,7 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
 
     math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 3};
 
-    typename FieldType::value_type omega = domain->get_domain_element(1);
+    typename FieldType::value_type omega = D[0]->get_domain_element(1);
 
     typename FieldType::value_type x_next = params.q.evaluate(omega);
     typename FieldType::value_type alpha = algebra::random_element<FieldType>();
@@ -200,13 +191,10 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
                                                                         8, 7, 5, 6,
                                                                         1, 2, 1, 1};
 
-    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
+
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
-    for (std::size_t i = 0; i < r; i++) {
-        std::shared_ptr<math::evaluation_domain<FieldType>> domain = prepare_domain<FieldType>(std::pow(2, extended_log - i));
-        D.push_back(domain);
-    }
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = fri_type::calculate_domain_set(extended_log, r);
 
     params.r = r - 1;
     params.D = D;

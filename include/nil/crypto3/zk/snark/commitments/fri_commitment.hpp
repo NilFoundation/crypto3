@@ -109,6 +109,17 @@ namespace nil {
                         math::polynomial::polynomial<typename FieldType::value_type> final_polynomial;
                     };
 
+                    static std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>>
+                        calculate_domain_set(const std::size_t max_domain_degree, const std::size_t set_size) {
+                            std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set(set_size);
+                            for (std::size_t i = 0; i < set_size; i++) {
+                                const std::size_t domain_size = std::pow(2, max_domain_degree - i);
+                                std::shared_ptr<math::evaluation_domain<FieldType>> domain = math::make_evaluation_domain<FieldType>(domain_size);
+                                domain_set[i] = domain;
+                            }
+                            return domain_set;                        
+                    }
+
                     // The result of this function is not commitment_type (as it would expected),
                     // but the built Merkle tree. This is done so, because we often need to reuse
                     // the built Merkle tree
