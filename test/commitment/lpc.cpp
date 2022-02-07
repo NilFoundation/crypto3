@@ -95,9 +95,8 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     merkle_tree_type tree = lpc_type::commit(f, D[0]);
 
-    // eval
-
-    std::array<typename FieldType::value_type, 1> evaluation_points = {algebra::random_element<FieldType>()};
+    // TODO: take a point outside of the basic domain
+    std::array<typename FieldType::value_type, 1> evaluation_points  = {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
 
     std::array<std::uint8_t, 96> x_data {};
     zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
@@ -105,7 +104,9 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     auto proof = lpc_type::proof_eval(evaluation_points, tree, f, transcript, fri_params);
 
     // verify
-    //BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, U, V));
+    zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(x_data);
+
+    BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, transcript_verifier, fri_params));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

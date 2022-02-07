@@ -61,6 +61,11 @@ namespace nil {
                          std::size_t M = 2,
                          std::size_t D = 16>
                 struct list_polynomial_commitment_scheme {
+                    using Endianness = nil::marshalling::option::big_endian;
+                    using field_element_type =
+                            nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
+                                                                            FieldType>;
+
                     constexpr static const std::size_t lambda = Lambda;
                     constexpr static const std::size_t k = K;
                     constexpr static const std::size_t r = R;
@@ -79,15 +84,13 @@ namespace nil {
 
                     struct proof_type {
                         bool operator==(const proof_type &rhs) const {
-                            return z == rhs.z && p == rhs.p && fri_proof == rhs.fri_proof;
+                            return z == rhs.z && fri_proof == rhs.fri_proof;
                         }
                         bool operator!=(const proof_type &rhs) const {
                             return !(rhs == *this);
                         }
 
                         std::array<typename FieldType::value_type, k> z;
-
-                        std::array<merkle_proof_type, k> p;
 
                         typename merkle_tree_type::value_type T_root;
 
@@ -126,13 +129,6 @@ namespace nil {
 
                         for (std::size_t j = 0; j < k; j++) {
                             z[j] = g.evaluate(evaluation_points[j]);
-
-                            std::size_t leaf_index = 0;
-                            for (; leaf_index < fri_params.D[0]->m; leaf_index++){
-                                if (fri_params.D[0]->get_domain_element(leaf_index) == evaluation_points[j])
-                                    break;
-                            }
-                            p[j] = merkle_proof_type(T, leaf_index);
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], z[j]);
                         }
 
@@ -155,19 +151,13 @@ namespace nil {
                             fri_proof[round_id] = fri_type::proof_eval(Q, g, T, transcript, fri_params);
                         }
 
-                        return proof_type({z, p, T.root(), fri_proof});
+                        return proof_type({z, T.root(), fri_proof});
                     }
 
                     static bool verify_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
-                                            const proof_type &proof,
+                                            proof_type &proof,
                                             fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
                                             typename fri_type::params_type fri_params) {
-
-                        for (std::size_t j = 0; j < k; j++) {
-                            if (!proof.p[j].validate(proof.T_root))
-                                    return false;
-                        }
-
                         std::array<std::pair<typename FieldType::value_type, typename FieldType::value_type>, k>
                             U_interpolation_points;
 
@@ -185,8 +175,9 @@ namespace nil {
                         }
 
                         for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {
-                            if (!fri_type::verify_eval(proof.fri_proof[round_id], transcript, fri_params, U, V))
+                            if (!fri_type::verify_eval(proof.fri_proof[round_id], transcript, fri_params, U, V)) {
                                 return false;
+                            }
                         }
 
                         return true;

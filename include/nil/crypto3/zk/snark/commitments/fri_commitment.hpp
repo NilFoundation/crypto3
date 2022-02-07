@@ -151,6 +151,7 @@ namespace nil {
                         std::size_t d = f.degree();
                         if (d % 2 == 0) {
                             f.push_back(0);
+                            d++;
                         }
                         math::polynomial::polynomial<typename FieldType::value_type> f_folded(d/2 + 1);
 
@@ -265,7 +266,8 @@ namespace nil {
                                         const math::polynomial::polynomial<typename FieldType::value_type> &U,
                                         const math::polynomial::polynomial<typename FieldType::value_type> &V) {
 
-                        typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(transcript.template int_challenge<std::size_t>());
+                        std::size_t idx = transcript.template int_challenge<std::size_t>();
+                        typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(idx);
 
                         std::size_t r = fri_params.r;
 
@@ -323,7 +325,7 @@ namespace nil {
                             auto write_iter = leaf_data.begin();
                             leaf_val.write(write_iter, field_element_type::length());
 
-                            if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value){
+                            if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value) {
                                 return false;
                             }
                             if (i < r - 1) {
