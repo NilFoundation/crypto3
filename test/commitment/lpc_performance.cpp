@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
 
-    constexpr static const std::size_t d = 16;
+    constexpr static const std::size_t d = 1 << 24;
 
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     fri_params.r = r;
     fri_params.D = D;
     fri_params.q = q;
-    fri_params.max_degree = 1 << 24;
+    fri_params.max_degree = d;
 
     typedef boost::random::independent_bits_engine<boost::random::mt19937,
                                                    FieldType::modulus_bits,
