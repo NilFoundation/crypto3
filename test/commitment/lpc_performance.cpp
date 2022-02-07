@@ -64,7 +64,8 @@ namespace boost {
 
 template<typename FieldType, typename NumberType>
 std::vector<math::polynomial::polynomial<typename FieldType::value_type>> generate(NumberType degree) {
-    typedef boost::random::independent_bits_engine<boost::random::mt19937, FieldType::modulus_bits,
+    typedef boost::random::independent_bits_engine<boost::random::mt19937,
+                                                   FieldType::modulus_bits,
                                                    typename FieldType::value_type::integral_type>
         random_polynomial_generator_type;
 
@@ -103,10 +104,9 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
 
-    constexpr static const std::size_t d_power_two = 4;
-    constexpr static const std::size_t d = 1 << d_power_two;
+    constexpr static const std::size_t d = 16;
 
-    constexpr static const std::size_t r = d_power_two - 1;
+    constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
     typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, m> fri_type;
@@ -115,7 +115,8 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
 
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
-    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = fri_type::calculate_domain_set(extended_log, r);
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        fri_type::calculate_domain_set(extended_log, r);
 
     typename fri_type::params_type fri_params;
 
@@ -123,9 +124,10 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     fri_params.r = r;
     fri_params.D = D;
     fri_params.q = q;
-    fri_params.max_degree = d;
+    fri_params.max_degree = 1 << 24;
 
-    typedef boost::random::independent_bits_engine<boost::random::mt19937, FieldType::modulus_bits,
+    typedef boost::random::independent_bits_engine<boost::random::mt19937,
+                                                   FieldType::modulus_bits,
                                                    typename FieldType::value_type::integral_type>
         random_polynomial_generator_type;
 
@@ -141,19 +143,23 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
 
     for (int i = 0; i < height; i++) {
         math::polynomial::polynomial<typename FieldType::value_type> poly;
-        for (int j = 0; j < (1 << d_power_two) - 1; j++) {
+        for (int j = 0; j < fri_params.max_degree; j++) {
             poly.push_back(typename FieldType::value_type(polynomial_element_gen()));
         }
         merkle_tree_type tree = lpc_type::commit(poly, D[0]);
 
-        std::array<typename FieldType::value_type, 1> evaluation_points = {algebra::random_element<FieldType>()};
+        // TODO: take a point outside of the basic domain
+        std::array<typename FieldType::value_type, 1> evaluation_points = {
+            algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
 
         std::array<std::uint8_t, 96> x_data {};
         zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
 
         auto proof = lpc_type::proof_eval(evaluation_points, tree, poly, transcript, fri_params);
 
+        // verify
         zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(x_data);
+
         BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, transcript_verifier, fri_params));
     }
 }
