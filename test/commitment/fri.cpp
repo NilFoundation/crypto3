@@ -110,6 +110,10 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(init_blob);
 
     BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, U, V));
+
+    typename FieldType::value_type verifier_next_challenge = transcript_verifier.template challenge<FieldType>();
+    typename FieldType::value_type prover_next_challenge = transcript.template challenge<FieldType>();
+    BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
 }
 
 BOOST_AUTO_TEST_CASE(fri_fold_test) {

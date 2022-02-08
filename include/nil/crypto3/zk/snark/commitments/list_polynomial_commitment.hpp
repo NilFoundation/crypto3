@@ -72,7 +72,7 @@ namespace nil {
                     constexpr static const std::size_t m = M;
 
                     typedef FieldType field_type;
-                    typedef Hash transcript_hash_type;
+                    typedef Hash transcript_hash_type; //TODO: separate transcript and merkle hashes
 
                     typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
                     typedef typename merkle_tree_type::hash_type merkle_hash_type;

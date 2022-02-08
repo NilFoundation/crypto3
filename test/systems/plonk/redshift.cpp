@@ -31,8 +31,8 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/crypto3/algebra/curves/mnt4.hpp>
-#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
 //#include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
@@ -40,16 +40,13 @@
 #include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
 
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 
 using namespace nil::crypto3;
-
-template<typename FieldType>
-std::shared_ptr<math::evaluation_domain<FieldType>> prepare_domain(const std::size_t d) {
-    return math::make_evaluation_domain<FieldType>(d);
-}
+using namespace nil::crypto3::zk::snark;
 
 template<typename FieldType>
 math::polynomial::polynomial<typename FieldType::value_type>
@@ -64,11 +61,37 @@ math::polynomial::polynomial<typename FieldType::value_type>
     return f;
 }
 
+template<typename fri_type, typename FieldType> 
+typename fri_type::params_type create_fri_params(std::size_t degree_log) {
+    typename fri_type::params_type params;
+    math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set = fri_type::calculate_domain_set(degree_log, degree_log - 1);
+
+    params.r = degree_log - 1;
+    params.D = domain_set;
+    params.q = q;
+    params.max_degree = 1 << degree_log;
+
+    return params;
+}
+
+
+
 BOOST_AUTO_TEST_SUITE(redshift_prover_test_suite)
 
-BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
+using curve_type = algebra::curves::bls12<381>;
+using FieldType = typename curve_type::scalar_field_type;
+typedef hashes::sha2<256> merkle_hash_type;
+typedef hashes::sha2<256> transcript_hash_type;
 
-    using curve_type = algebra::curves::mnt4<298>;
+constexpr std::size_t m = 2;
+
+typedef fri_commitment_scheme<FieldType, merkle_hash_type, m> fri_type;
+
+constexpr std::size_t argument_size = 3;
+
+BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 
     // zk::snark::redshift_preprocessor<typename curve_type::base_field_type, 5, 2> preprocess;
 
@@ -77,21 +100,24 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 }
 
 BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
-
-    using curve_type = algebra::curves::mnt4<298>;
-    using FieldType = typename curve_type::base_field_type;
-
-    const std::size_t circuit_rows = 4;
+    const std::size_t circuit_log = 2;
+    const std::size_t circuit_rows = 1 << circuit_log;
     const std::size_t permutation_size = 2;
 
-    std::shared_ptr<math::evaluation_domain<FieldType>> domain = prepare_domain<FieldType>(circuit_rows);
+    constexpr static const std::size_t lambda = 40;
+    constexpr static const std::size_t k = 1;
+    typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, lambda, k, circuit_log - 1, m> lpc_type;
+
+
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(circuit_log);
+    std::shared_ptr<math::evaluation_domain<FieldType>> domain = fri_params.D[0];
     math::polynomial::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial<FieldType>(domain, 0);
 
     // TODO: implement it in a proper way in generator.hpp
     std::vector<math::polynomial::polynomial<typename FieldType::value_type>> S_id(permutation_size);
     std::vector<math::polynomial::polynomial<typename FieldType::value_type>> S_sigma(permutation_size);
 
-    typename FieldType::value_type omega = domain->get_domain_element(0);
+    typename FieldType::value_type omega = domain->get_domain_element(1);
 
     typename FieldType::value_type delta = algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
 
@@ -152,29 +178,43 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     q_blind = math::polynomial::lagrange_interpolation(interpolation_points_blind);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    zk::snark::fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> transcript(init_blob);
+    fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> prover_transcript(init_blob);
+    fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> verifier_transcript(init_blob);
+    
+    typename redshift_permutation_argument<FieldType, lpc_type>::prover_result_type prover_res =
+        redshift_permutation_argument<FieldType, lpc_type>::prove_eval(
+            prover_transcript, circuit_rows, permutation_size, 
+            domain, lagrange_0, S_id, S_sigma, f, q_last, q_blind,
+            fri_params);
 
-    std::array<math::polynomial::polynomial<typename FieldType::value_type>, 3> prove_res =
-        zk::snark::redshift_permutation_argument<FieldType>::prove_argument(
-            transcript, circuit_rows, permutation_size, domain, lagrange_0, S_id, S_sigma, f, q_last, q_blind);
+    // Challenge phase
+    //typename FieldType::value_type y = algebra::random_element<FieldType>();
+    typename FieldType::value_type y(2);
+    std::vector<typename FieldType::value_type> f_at_y(permutation_size); 
+    for (int i = 0; i < permutation_size; i++) {
+        f_at_y[i] = f[i].evaluate(y);
+    }
 
-    std::size_t size = 0;
+    typename FieldType::value_type v_p_at_y = prover_res.permutation_polynomial.evaluate(y);
+    typename FieldType::value_type v_p_at_y_shifted = prover_res.permutation_polynomial.evaluate(omega * y);
 
-    BOOST_CHECK(
-        std::accumulate(prove_res.begin(), prove_res.end(), size,
-                        [&](std::size_t acc, const math::polynomial::polynomial<typename FieldType::value_type> &val) {
-                            return acc + val.degree();
-                        }) > 0);
+    std::array<typename FieldType::value_type, 3> verifier_res =
+        redshift_permutation_argument<FieldType, lpc_type>::verify_eval(
+            verifier_transcript, circuit_rows, permutation_size, domain,
+            y, f_at_y, v_p_at_y, v_p_at_y_shifted, 
+            lagrange_0, S_id, S_sigma, q_last, q_blind,
+            prover_res.permutation_poly_commitment.root());
 
-    // zk::snark::redshift_preprocessor<typename curve_type::base_field_type, 5, 2> preprocess;
+    typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
+    typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();
+    BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
 
-    // auto preprocessed_data = preprocess::process(cs, assignments);
-    // zk::snark::redshift_prover<typename curve_type::base_field_type, 5, 2, 2, 2> prove;
+    for (int i = 0; i < argument_size; i++) {
+        BOOST_CHECK(prover_res.F[i].evaluate(y) == verifier_res[i]);
+    }
 }
 
 BOOST_AUTO_TEST_CASE(redshift_lookup_argument_test) {
-
-    using curve_type = algebra::curves::mnt4<298>;
 
     // zk::snark::redshift_preprocessor<typename curve_type::base_field_type, 5, 2> preprocess;
 
@@ -183,8 +223,6 @@ BOOST_AUTO_TEST_CASE(redshift_lookup_argument_test) {
 }
 
 BOOST_AUTO_TEST_CASE(redshift_witness_argument_test) {
-
-    using curve_type = algebra::curves::mnt4<298>;
 
     // zk::snark::redshift_preprocessor<typename curve_type::base_field_type, 5, 2> preprocess;
 

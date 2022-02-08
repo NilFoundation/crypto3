@@ -35,20 +35,44 @@
 #include <nil/crypto3/merkle/tree.hpp>
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename FieldType>
+                template<typename FieldType, typename lpc_type>
                 class redshift_permutation_argument {
+
+                typedef typename lpc_type::fri_type fri_type;
 
                 static constexpr std::size_t argument_size = 3;
 
+                static inline math::polynomial::polynomial<typename FieldType::value_type>
+                    polynomial_shift(math::polynomial::polynomial<typename FieldType::value_type> f, typename FieldType::value_type x) {
+                        math::polynomial::polynomial<typename FieldType::value_type> f_shifted(f);
+                        typename FieldType::value_type x_power = x;
+                        for (int i = 1; i < f.size(); i++) {
+                            f_shifted[i] = f_shifted[i] * x_power;
+                            x_power = x_power * x;
+                        }
+
+                        return f_shifted;
+                    }
+
                 public:
-                    static inline std::array<math::polynomial::polynomial<typename FieldType::value_type>,
-                                             argument_size>    // TODO: fix fiat-shamir
-                        prove_argument(
+
+                    struct prover_result_type {
+                        std::array<math::polynomial::polynomial<typename FieldType::value_type>,
+                                             argument_size> F;
+
+                        math::polynomial::polynomial<typename FieldType::value_type> permutation_polynomial;
+
+                        typename lpc_type::merkle_tree_type permutation_poly_commitment;
+                    };
+
+                    static inline prover_result_type    // TODO: fix fiat-shamir
+                        prove_eval(
                             fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> &transcript,
                             std::size_t circuit_rows,
                             std::size_t permutation_size,
@@ -58,7 +82,8 @@ namespace nil {
                             const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &S_sigma,
                             const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &f,
                             const math::polynomial::polynomial<typename FieldType::value_type> &q_last,
-                            const math::polynomial::polynomial<typename FieldType::value_type> &q_blind) {
+                            const math::polynomial::polynomial<typename FieldType::value_type> &q_blind,
+                            typename fri_type::params_type fri_params) {
                         // 1. $\beta_1, \gamma_1 = \challenge$
                         typename FieldType::value_type beta = transcript.template challenge<FieldType>();
 
@@ -103,10 +128,9 @@ namespace nil {
                             V_P_interpolation_points.begin(), V_P_interpolation_points.end());
 
                         // 4. Compute and add commitment to $V_P$ to $\text{transcript}$.
-                        // TODO: include commitment
-                        // merkle_tree_type V_P_tree = fri::commit(V_P, D_0);
-                        // typename fri::commitment_type V_P_commitment = V_P_tree.root();
-                        // transcript(V_P_commitment);
+                        typename lpc_type::merkle_tree_type V_P_tree = lpc_type::commit(V_P, fri_params.D[0]);
+                        typename lpc_type::commitment_type V_P_commitment = V_P_tree.root();
+                        transcript(V_P_commitment);
 
                         // 5. Calculate g_perm, h_perm
                         math::polynomial::polynomial<typename FieldType::value_type> g = {1};
@@ -119,33 +143,56 @@ namespace nil {
 
                         math::polynomial::polynomial<typename FieldType::value_type> one_polynomial = {1};
                         std::array<math::polynomial::polynomial<typename FieldType::value_type>, argument_size> F;
-                        F[0] = lagrange_1 * (one_polynomial - V_P);
-                        F[1] = (one_polynomial - (q_last + q_blind)) * ((domain->get_domain_element(0) * V_P) * h - V_P * g);
-                        F[2] = q_last * (V_P * V_P - V_P);
                         
-                        return F;
+                        math::polynomial::polynomial<typename FieldType::value_type> V_P_shifted = polynomial_shift(V_P, domain->get_domain_element(1));
+
+                        F[0] = lagrange_1 * (one_polynomial - V_P);
+                        F[1] = (one_polynomial - (q_last + q_blind)) * (V_P_shifted * h - V_P * g);
+                        F[2] = q_last * (V_P * V_P - V_P);
+
+                        prover_result_type res = {F, V_P, V_P_tree};
+                        
+                        return res;
                     }
 
-                    static inline std::array<typename FieldType::value_type, argument_size> verify_argument() {
-                        /*typename transcript_hash_type::digest_type beta_bytes =
-                            transcript.get_challenge<transcript_manifest::challenges_ids::beta>();
+                    static inline std::array<typename FieldType::value_type, argument_size> verify_eval(
+                            fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> &transcript,
+                            std::size_t circuit_rows,
+                            std::size_t permutation_size,
+                            std::shared_ptr<math::evaluation_domain<FieldType>> domain,
+                            typename FieldType::value_type challenge, // y
+                            std::vector<typename FieldType::value_type> column_polynomials, // f(y)
+                            typename FieldType::value_type perm_polynomial, // V_P(y)
+                            typename FieldType::value_type perm_polynomial_shifted, // V_P(omega * y)
+                            //TODO: commitment
+                            const math::polynomial::polynomial<typename FieldType::value_type> &lagrange_1,
+                            const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &S_id,
+                            const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &S_sigma,
+                            const math::polynomial::polynomial<typename FieldType::value_type> &q_last,
+                            const math::polynomial::polynomial<typename FieldType::value_type> &q_blind,
+                            typename lpc_type::commitment_type V_P_commitment) {
 
-                        typename transcript_hash_type::digest_type gamma_bytes =
-                            transcript.get_challenge<transcript_manifest::challenges_ids::gamma>();
+                        // 1. Get beta, gamma 
+                        typename FieldType::value_type beta = transcript.template challenge<FieldType>();
+                        typename FieldType::value_type gamma = transcript.template challenge<FieldType>();
 
-                        typename FieldType::value_type beta = algebra::marshalling<FieldType>(beta_bytes);
-                        typename FieldType::value_type gamma = algebra::marshalling<FieldType>(gamma_bytes);
+                        // 2. Add commitment to V_P to transcript
+                        transcript(V_P_commitment);
 
-                        transcript(proof.P_commitment);
-                        transcript(proof.Q_commitment);
+                        // 3. Calculate h_perm, g_perm at challenge point
+                        typename FieldType::value_type g = FieldType::value_type::one();
+                        typename FieldType::value_type h = FieldType::value_type::one();
 
-                        const math::polynomial::polynomial<typename FieldType::value_type> q_last;
-                        const math::polynomial::polynomial<typename FieldType::value_type> q_blind;
+                        for (std::size_t i = 0; i < column_polynomials.size(); i++) {
+                            g = g * (column_polynomials[i] + beta * S_id[i].evaluate(challenge) + gamma);
+                            h = h * (column_polynomials[i] + beta * S_sigma[i].evaluate(challenge) + gamma);
+                        }
 
-                        F[0] = verification_key.L_basis[1] * (P - 1);
-                        F[1] = verification_key.L_basis[1] * (Q - 1);
-                        F[2] = P * p_1 - (P << 1);*/
                         std::array<typename FieldType::value_type, argument_size> F;
+                        typename FieldType::value_type one =  FieldType::value_type::one();
+                        F[0] = lagrange_1.evaluate(challenge) * (one - perm_polynomial);
+                        F[1] = (one - q_last.evaluate(challenge) - q_blind.evaluate(challenge)) * (perm_polynomial_shifted * h - perm_polynomial * g);
+                        F[2] = q_last.evaluate(challenge) * (perm_polynomial.squared() - perm_polynomial);
 
                         return F;
                     }
