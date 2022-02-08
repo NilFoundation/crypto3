@@ -19,6 +19,7 @@ endmacro()
 
 set(EXAMPLES_NAMES
     "multiexp"
+    "short_weierstrass_coordinates"
     "curves"
     "fields"
     "pairing"

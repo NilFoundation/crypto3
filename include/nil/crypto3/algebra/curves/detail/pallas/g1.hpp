@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -23,38 +24,29 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_SECP_R1_G1_HPP
-#define CRYPTO3_ALGEBRA_CURVES_SECP_R1_G1_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_PALLAS_G1_HPP
+#define CRYPTO3_ALGEBRA_CURVES_PALLAS_G1_HPP
 
-#include <nil/crypto3/algebra/curves/detail/secp_r1/256/short_weierstrass_params.hpp>
-
-#include <nil/crypto3/algebra/curves/forms.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/element_g1.hpp>
-
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_minus_3/element_g1.hpp>
-
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective_with_a4_minus_3/element_g1.hpp>
-
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian/element_g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/pallas/params.hpp>
+// #include <nil/crypto3/algebra/curves/detail/forms/montgomery/xz/element_g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_0/element_g1.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                template<std::size_t Version>
-                struct secp_r1;
+                struct pallas;
 
                 namespace detail {
-                    /** @brief A struct representing a group G1 of SECP curves.
+                    /** @brief A struct representing a group G1 of pallas curve.
                      *    @tparam Version version of the curve
                      *
                      */
-                    template<std::size_t Version, typename Form, typename Coordinates>
-                    struct secp_r1_g1 {
+                    template<typename Form, typename Coordinates>
+                    struct pallas_g1 {
+                        using params_type = pallas_g1_params<Form>;
 
-                        using params_type = secp_r1_g1_params<Version, Form>;
-
-                        using curve_type = secp_r1<Version>;
+                        using curve_type = pallas;
 
                         using field_type = typename params_type::field_type;
 
@@ -69,4 +61,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_SECP_R1_G1_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_PALLAS_G1_HPP

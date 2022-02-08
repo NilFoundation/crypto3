@@ -23,45 +23,39 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_SECP_R1_G1_HPP
-#define CRYPTO3_ALGEBRA_CURVES_SECP_R1_G1_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_VESTA_TYPES_HPP
+#define CRYPTO3_ALGEBRA_CURVES_VESTA_TYPES_HPP
 
-#include <nil/crypto3/algebra/curves/detail/secp_r1/256/short_weierstrass_params.hpp>
-
-#include <nil/crypto3/algebra/curves/forms.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective/element_g1.hpp>
-
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_minus_3/element_g1.hpp>
-
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/projective_with_a4_minus_3/element_g1.hpp>
-
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian/element_g1.hpp>
+#include <nil/crypto3/algebra/fields/vesta/base_field.hpp>
+#include <nil/crypto3/algebra/fields/vesta/scalar_field.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                template<std::size_t Version>
-                struct secp_r1;
-
                 namespace detail {
-                    /** @brief A struct representing a group G1 of SECP curves.
-                     *    @tparam Version version of the curve
-                     *
+
+                    template<typename Form, typename Coordinates>
+                    struct vesta_g1;
+
+                    template<typename Form>
+                    struct vesta_params;
+
+                    template<typename Form>
+                    struct vesta_g1_params;
+
+                    /** @brief A struct representing details about base and scalar fields.
                      */
-                    template<std::size_t Version, typename Form, typename Coordinates>
-                    struct secp_r1_g1 {
+                    struct vesta_types {
+                        using base_field_type = fields::vesta_base_field;
+                        using scalar_field_type = fields::vesta_scalar_field;
 
-                        using params_type = secp_r1_g1_params<Version, Form>;
+                        using g1_field_type = base_field_type;
 
-                        using curve_type = secp_r1<Version>;
+                        using integral_type = typename base_field_type::integral_type;
 
-                        using field_type = typename params_type::field_type;
-
-                        constexpr static const std::size_t value_bits =
-                            field_type::value_bits + 1;    ///< size of the base field in bits
-
-                        using value_type = curve_element<params_type, Form, Coordinates>;
+                        template<typename Form, typename Coordinates>
+                        using g1_type = vesta_g1<Form, Coordinates>;
                     };
 
                 }    // namespace detail
@@ -69,4 +63,5 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_SECP_R1_G1_HPP
+
+#endif    // CRYPTO3_ALGEBRA_CURVES_VESTA_TYPES_HPP

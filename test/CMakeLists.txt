@@ -66,6 +66,7 @@ endmacro()
 
 set(RUNTIME_TESTS_NAMES
     "curves"
+    "short_weierstrass_coordinates"
     "curves_static"
     "fields"
     "fields_static"
