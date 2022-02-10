@@ -35,6 +35,7 @@
 #include <nil/crypto3/merkle/tree.hpp>
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/polynomial_shift.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -89,4 +90,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_PROVER_HPP
+#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_GATES_ARGUMENT_HPP

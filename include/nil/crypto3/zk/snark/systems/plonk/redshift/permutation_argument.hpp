@@ -36,6 +36,7 @@
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/polynomial_shift.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -47,18 +48,6 @@ namespace nil {
                 typedef typename lpc_type::fri_type fri_type;
 
                 static constexpr std::size_t argument_size = 3;
-
-                static inline math::polynomial::polynomial<typename FieldType::value_type>
-                    polynomial_shift(math::polynomial::polynomial<typename FieldType::value_type> f, typename FieldType::value_type x) {
-                        math::polynomial::polynomial<typename FieldType::value_type> f_shifted(f);
-                        typename FieldType::value_type x_power = x;
-                        for (int i = 1; i < f.size(); i++) {
-                            f_shifted[i] = f_shifted[i] * x_power;
-                            x_power = x_power * x;
-                        }
-
-                        return f_shifted;
-                    }
 
                 public:
 
@@ -144,7 +133,7 @@ namespace nil {
                         math::polynomial::polynomial<typename FieldType::value_type> one_polynomial = {1};
                         std::array<math::polynomial::polynomial<typename FieldType::value_type>, argument_size> F;
                         
-                        math::polynomial::polynomial<typename FieldType::value_type> V_P_shifted = polynomial_shift(V_P, domain->get_domain_element(1));
+                        math::polynomial::polynomial<typename FieldType::value_type> V_P_shifted = detail::polynomial_shift(V_P, domain->get_domain_element(1));
 
                         F[0] = lagrange_1 * (one_polynomial - V_P);
                         F[1] = (one_polynomial - (q_last + q_blind)) * (V_P_shifted * h - V_P * g);
@@ -202,4 +191,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_PROVER_HPP
+#endif    // #ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PERMUTATION_ARGUMENT_HPP

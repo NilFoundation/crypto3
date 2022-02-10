@@ -107,8 +107,19 @@ namespace nil {
                         std::array<math::polynomial::polynomial<typename FieldType::value_type>, WiresAmount>
                             wire_polynomials;
                         for (std::size_t wire_index = 0; wire_index < WiresAmount; wire_index++) {
+                            const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
+                                math::make_evaluation_domain<FieldType>(full_variable_assignment[wire_index].size());
+
+                            std::vector<typename FieldType::value_type> interpolation_points(
+                                full_variable_assignment[wire_index].size());
+
+                            std::copy(full_variable_assignment[wire_index].begin(), full_variable_assignment.end(), 
+                                interpolation_points.begin());
+
+                            domain->inverse_fft(interpolation_points);
+
                             wire_polynomials[wire_index] =
-                                math::polynomial::lagrange_interpolation(full_variable_assignment[wire_index]);
+                                math::polynomial::polynomial<typename FieldType::value_type>(interpolation_points);
                         }
 
                         for (std::size_t constraint_index = 0; constraint_index < constraints.size();
@@ -119,9 +130,9 @@ namespace nil {
                                 math::polynomial::polynomial<typename FieldType::value_type> term_polynom = {
                                     term.coeff};
 
-                                // TODO: Rotation isn't taken into consideration
                                 for (auto &var : term.vars) {
-                                    term_polynom = term_polynom * wire_polynomials[var.wire_index];
+                                    term_polynom = term_polynom * detail::polynomial_shift(wire_polynomials[var.wire_index], 
+                                        domain->get_domain_element(var.rotation));
                                 }
 
                                 result[constraint_index] = result[constraint_index] + term_polynom;
