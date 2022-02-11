@@ -140,19 +140,25 @@ namespace nil {
                         std::vector<math::polynomial::polynomial<typename FieldType::value_type>> constraints =
                             constraint_system.polynomials(assignments);
 
+                        std::size_t nu = 0;
+
                         for (std::size_t i = 0; i <= N_sel - 1; i++) {
                             gates[i] = {0};
-                            std::size_t n_i;
-#error Uninitialized n_i
-                            for (std::size_t j = 0; j < n_i; j++) {
-                                std::size_t d_i_j;
-                                gates[i] = gates[i] + preprocessed_data.constraints[j] * tau.pow(d_i_j);
+
+                            for (std::size_t j = 0; j < constraints.size(); j++) {
+                                gates[i] = gates[i] + preprocessed_data.constraints[j] * tau.pow(nu);
+                                nu++;
                             }
 
                             // gates[i] *= preprocessed_data.selectors[i];
 
-                            N_T = std::max(N_T, gates[i].size() - 1);
                         }
+
+                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> constraints =
+                            constraint_system.polynomials(assignments);
+
+                        gates_argument::prove(constraint_system.polynomials(assignments), transcript, N_sel);
+                        std::size_t N_T = std::max(N_perm + N_PI, F[8].degree() - 1);
 
                         // 18. Define F polynomials
                         const math::polynomial::polynomial<typename FieldType::value_type> L1 =

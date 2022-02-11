@@ -41,27 +41,45 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename FieldType>
+                template<typename FieldType, typename TranscriptHashType = hashes::keccak_1600<512>, 
+                    std::size_t ArgumentSize = 1>
                 class redshift_gates_argument {
 
-                static constexpr std::size_t argument_size = 1;
+                    static constexpr std::size_t argument_size = 1;
 
                 public:
                     static inline std::array<math::polynomial::polynomial<typename FieldType::value_type>,
-                                             argument_size>    // TODO: fix fiat-shamir
-                        prove_argument(
-                            fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> &transcript,
-                            std::size_t circuit_rows,
-                            std::size_t permutation_size,
-                            std::shared_ptr<math::evaluation_domain<FieldType>> domain,
-                            const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> w) {
+                                             argument_size>
+                        prove_eval(
+                            const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &&constraints,
+                            fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
+                            std::size_t N_sel) {
                         
-                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, argument_size> F;
-                        
+                        typename FieldType::value_type teta = transcript.template challenge<FieldType>();
+
+                        std::array<math::polynomial::polynomial<typename FieldType::value_type>,
+                                             argument_size> F;
+                        // std::vector<math::polynomial::polynomial<typename FieldType::value_type>> gates(N_sel);
+
+                        std::size_t nu = 0;
+
+                        for (std::size_t i = 0; i <= N_sel - 1; i++) {
+                            math::polynomial::polynomial<typename FieldType::value_type> gate = {0};
+
+                            for (std::size_t j = 0; j < constraints.size(); j++) {
+                                gate = gate + preprocessed_data.constraints[j] * teta.pow(nu);
+                                nu++;
+                            }
+
+                            // gate *= preprocessed_data.selectors[i];
+
+                            F[0] += gate;
+                        }
+
                         return F;
                     }
 
-                    static inline std::array<typename FieldType::value_type, argument_size> verify_argument() {
+                    static inline std::array<typename FieldType::value_type, argument_size> verify_eval() {
                         /*typename transcript_hash_type::digest_type beta_bytes =
                             transcript.get_challenge<transcript_manifest::challenges_ids::beta>();
 
