@@ -132,7 +132,7 @@ namespace nil {
                 using field_type = FieldType;
 
                 std::pair<bool, typename field_type::value_type> processed =
-                    field_bincode<field_type>::field_element_from_bytes(read_iter_begin, read_iter_end);
+                    bincode::field<field_type>::field_element_from_bytes(read_iter_begin, read_iter_end);
 
                 if (!std::get<0>(processed)) {
                     processingStatus = status_type::invalid_msg_data;
@@ -156,7 +156,7 @@ namespace nil {
                 using field_type = FieldType;
 
                 std::pair<bool, typename field_type::value_type> processed =
-                    field_bincode<field_type>::field_element_from_bytes(read_iter_begin, read_iter_end);
+                    bincode::field<field_type>::field_element_from_bytes(read_iter_begin, read_iter_end);
 
                 if (!std::get<0>(processed)) {
                     processingStatus = status_type::invalid_msg_data;

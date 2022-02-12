@@ -72,18 +72,18 @@ namespace nil {
 
                             typename FieldType::value_type omega;
 
-                            std::vector<math::polynomial::polynomial<typename FieldType::value_type>> selectors;
+                            std::vector<math::polynomial<typename FieldType::value_type>> selectors;
                             // S_sigma
-                            std::vector<math::polynomial::polynomial<typename FieldType::value_type>> permutations;
+                            std::vector<math::polynomial<typename FieldType::value_type>> permutations;
                             // S_id
-                            std::vector<math::polynomial::polynomial<typename FieldType::value_type>>
+                            std::vector<math::polynomial<typename FieldType::value_type>>
                                 identity_permutations;
                             // c
-                            std::vector<math::polynomial::polynomial<typename FieldType::value_type>> constraints;
+                            std::vector<math::polynomial<typename FieldType::value_type>> constraints;
 
-                            std::vector<math::polynomial::polynomial<typename FieldType::value_type>> Lagrange_basis;
+                            std::vector<math::polynomial<typename FieldType::value_type>> Lagrange_basis;
 
-                            math::polynomial::polynomial<typename FieldType::value_type> Z;
+                            math::polynomial<typename FieldType::value_type> Z;
                         };
 
                         template<std::size_t AlphasAmount>

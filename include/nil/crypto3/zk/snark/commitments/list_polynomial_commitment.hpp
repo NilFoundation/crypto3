@@ -63,8 +63,8 @@ namespace nil {
                 struct list_polynomial_commitment_scheme {
                     using Endianness = nil::marshalling::option::big_endian;
                     using field_element_type =
-                            nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
-                                                                            FieldType>;
+                        nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
+                                                                        FieldType>;
 
                     constexpr static const std::size_t lambda = Lambda;
                     constexpr static const std::size_t k = K;
@@ -72,7 +72,7 @@ namespace nil {
                     constexpr static const std::size_t m = M;
 
                     typedef FieldType field_type;
-                    typedef Hash transcript_hash_type; //TODO: separate transcript and merkle hashes
+                    typedef Hash transcript_hash_type;    // TODO: separate transcript and merkle hashes
 
                     typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
                     typedef typename merkle_tree_type::hash_type merkle_hash_type;
@@ -98,7 +98,8 @@ namespace nil {
                     };
 
                 private:
-                    static std::shared_ptr<math::evaluation_domain<FieldType>> prepare_domain(const std::size_t domain_size) {
+                    static std::shared_ptr<math::evaluation_domain<FieldType>>
+                        prepare_domain(const std::size_t domain_size) {
                         return math::make_evaluation_domain<FieldType>(domain_size);
                     }
 
@@ -109,16 +110,15 @@ namespace nil {
                     // After this function
                     // result.root();
                     // should be called
-                    static merkle_tree_type
-                        commit(math::polynomial::polynomial<typename FieldType::value_type> &f,
-                               const std::shared_ptr<math::evaluation_domain<FieldType>> &d) {
+                    static merkle_tree_type commit(math::polynomial<typename FieldType::value_type> &f,
+                                                   const std::shared_ptr<math::evaluation_domain<FieldType>> &d) {
 
                         return fri_type::commit(f, d);
                     }
 
                     static proof_type proof_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
                                                  merkle_tree_type &T,
-                                                 const math::polynomial::polynomial<typename FieldType::value_type> &g,
+                                                 const math::polynomial<typename FieldType::value_type> &g,
                                                  fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
                                                  typename fri_type::params_type &fri_params) {
 
@@ -132,18 +132,18 @@ namespace nil {
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], z[j]);
                         }
 
-                        math::polynomial::polynomial<typename FieldType::value_type> U =
-                            math::polynomial::lagrange_interpolation(U_interpolation_points);
+                        math::polynomial<typename FieldType::value_type> U =
+                            math::lagrange_interpolation(U_interpolation_points);
 
-                        math::polynomial::polynomial<typename FieldType::value_type> Q = (g - U);
+                        math::polynomial<typename FieldType::value_type> Q = (g - U);
                         for (std::size_t j = 0; j < k; j++) {
-                            math::polynomial::polynomial<typename FieldType::value_type> denominator_polynom = {
+                            math::polynomial<typename FieldType::value_type> denominator_polynom = {
                                 -evaluation_points[j], 1};
                             Q = Q / denominator_polynom;
                         }
 
                         // temporary definition, until polynomial is constexpr
-                        const math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+                        const math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
                         std::array<typename fri_type::proof_type, lambda> fri_proof;
 
@@ -165,13 +165,13 @@ namespace nil {
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], proof.z[j]);
                         }
 
-                        math::polynomial::polynomial<typename FieldType::value_type> U =
-                            math::polynomial::lagrange_interpolation(U_interpolation_points);
+                        math::polynomial<typename FieldType::value_type> U =
+                            math::lagrange_interpolation(U_interpolation_points);
 
-                        math::polynomial::polynomial<typename FieldType::value_type> V = {1};
+                        math::polynomial<typename FieldType::value_type> V = {1};
 
                         for (std::size_t j = 0; j < k; j++) {
-                            V = V * (math::polynomial::polynomial<typename FieldType::value_type>({-evaluation_points[j], 1}));
+                            V = V * (math::polynomial<typename FieldType::value_type>({-evaluation_points[j], 1}));
                         }
 
                         for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {
@@ -181,7 +181,6 @@ namespace nil {
                         }
 
                         return true;
-
                     }
                 };
             }    // namespace snark

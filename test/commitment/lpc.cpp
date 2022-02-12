@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     typename fri_type::params_type fri_params;
 
-    math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
     fri_params.r = r;
     fri_params.D = D;
     fri_params.q = q;
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     // commit
 
-    math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1,
+    math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1,
                                                                         5, 6, 7, 2,
                                                                         8, 7, 5, 6,
                                                                         1, 2, 1, 1};

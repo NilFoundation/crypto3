@@ -47,7 +47,7 @@ namespace nil {
                     typedef CurveType curve_type;
                     typedef Hash hash_type;
 
-                    typedef marshalling::curve_bincode<curve_type> bincode;
+                    typedef marshalling::bincode::curve<curve_type> bincode;
 
                     std::vector<std::uint8_t> buffer;
                     ::nil::crypto3::accumulator_set<Hash> hasher_acc;
@@ -102,7 +102,7 @@ namespace nil {
                         std::is_same<std::uint8_t,
                                      typename std::iterator_traits<InputIterator>::value_type>::value>::type
                         write(InputIterator first, InputIterator last) {
-                        std::array<std::uint8_t, sizeof(std::uint64_t)> len_bytes;
+                        std::array<std::uint8_t, sizeof(std::uint64_t)> len_bytes{};
                         nil::crypto3::detail::pack<stream_endian::little_byte_big_bit,
                                                    stream_endian::big_byte_big_bit,
                                                    sizeof(std::uint64_t) * 8,
@@ -120,7 +120,7 @@ namespace nil {
                     inline typename curve_type::scalar_field_type::value_type read_challenge() {
                         auto hasher_state = hasher_acc;
                         std::size_t counter_nonce = 0;
-                        std::array<std::uint8_t, sizeof(std::size_t)> counter_nonce_bytes;
+                        std::array<std::uint8_t, sizeof(std::size_t)> counter_nonce_bytes{};
                         while (true) {
                             ++counter_nonce;
                             nil::crypto3::detail::pack<stream_endian::big_byte_big_bit,

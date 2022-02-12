@@ -71,11 +71,11 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace detail {
-                    template<typename CurveType, ProvingMode mode = ProvingMode::Basic>
+                    template<typename CurveType, proving_mode mode = proving_mode::basic>
                     struct r1cs_gg_ppzksnark_basic_policy;
 
                     template<typename CurveType>
-                    struct r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> {
+                    struct r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> {
                         typedef CurveType curve_type;
 
                         /******************************** Params ********************************/
@@ -136,7 +136,7 @@ namespace nil {
                     };
 
                     template<typename CurveType>
-                    struct r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> {
+                    struct r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::aggregate> {
                         typedef CurveType curve_type;
 
                         /******************************** Params ********************************/

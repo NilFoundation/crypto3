@@ -118,7 +118,7 @@ namespace nil {
                             }
                         }
 
-                        std::array<math::polynomial::polynom<typename FieldType::value_type>, f_parts> F;
+                        std::array<math::polynomial<typename FieldType::value_type>, f_parts> F;
                         F[0] = permutation_argument[0];
                         F[1] = permutation_argument[1];
                         F[2] = permutation_argument[2];
@@ -132,10 +132,10 @@ namespace nil {
                             F[3] += verification_key.f_c[i];
                         }
 
-                        math::polynomial::polynom<typename FieldType::value_type> T_consolidate;
+                        math::polynomial<typename FieldType::value_type> T_consolidate;
                         T_consolidate = consolidate_T(T);
 
-                        math::polynomial::polynom<typename FieldType::value_type> F_consolidated = 0;
+                        math::polynomial<typename FieldType::value_type> F_consolidated = 0;
                         for (std::size_t i = 0; i < f_parts; i++) {
                             F_consolidated += a[i] * F[i];
                         }

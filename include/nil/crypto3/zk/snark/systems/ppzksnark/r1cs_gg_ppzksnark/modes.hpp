@@ -30,10 +30,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                enum class ProvingMode {
-                    Basic,
-                    Aggregate,
-                };
+                enum class proving_mode { basic, aggregate };
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

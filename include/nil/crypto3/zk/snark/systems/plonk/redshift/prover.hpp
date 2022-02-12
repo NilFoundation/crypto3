@@ -100,7 +100,7 @@ namespace nil {
 
                         // 1. Add commitments to $w_i(X)$ to $\text{transcript}$
 
-                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> w =
+                        std::vector<math::polynomial<typename FieldType::value_type>> w =
                             constraint_system.polynomials(assignments);
 
                         std::vector<merkle_tree_type> w_trees;
@@ -116,11 +116,11 @@ namespace nil {
 
                         // 3. Denote witness polynomials included in permutation argument and public input polynomials
                         // as $f_i$
-                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> f(N_perm + N_PI);
+                        std::vector<math::polynomial<typename FieldType::value_type>> f(N_perm + N_PI);
 
                         std::copy(w.begin(), w.end(), f.begin());
 
-                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, 3>
+                        std::array<math::polynomial<typename FieldType::value_type>, 3>
                             permutation_argument = redshift_permutation_argument<FieldType>::prove_argument(transcript);
                         // std::copy(PI.begin(), PI.end(), f.begin() + N_perm);
 
@@ -136,8 +136,8 @@ namespace nil {
                         // 16. Computing gates
                         // And 20. Compute N_T
                         std::size_t N_T = N_perm + N_PI;
-                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> gates(N_sel);
-                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> constraints =
+                        std::vector<math::polynomial<typename FieldType::value_type>> gates(N_sel);
+                        std::vector<math::polynomial<typename FieldType::value_type>> constraints =
                             constraint_system.polynomials(assignments);
 
                         std::size_t nu = 0;
@@ -154,17 +154,17 @@ namespace nil {
 
                         }
 
-                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> constraints =
+                        std::vector<math::polynomial<typename FieldType::value_type>> constraints =
                             constraint_system.polynomials(assignments);
 
                         gates_argument::prove(constraint_system.polynomials(assignments), transcript, N_sel);
                         std::size_t N_T = std::max(N_perm + N_PI, F[8].degree() - 1);
 
                         // 18. Define F polynomials
-                        const math::polynomial::polynomial<typename FieldType::value_type> L1 =
+                        const math::polynomial<typename FieldType::value_type> L1 =
                             preprocessed_data.Lagrange_basis[1];
 
-                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, f_parts> F;
+                        std::array<math::polynomial<typename FieldType::value_type>, f_parts> F;
 
                         F[0] = permutation_argument[0];
                         F[1] = permutation_argument[1];
@@ -175,16 +175,16 @@ namespace nil {
                         }
 
                         // 19. Compute F_consolidated
-                        math::polynomial::polynomial<typename FieldType::value_type> F_consolidated = {0};
+                        math::polynomial<typename FieldType::value_type> F_consolidated = {0};
                         for (std::size_t i = 0; i < f_parts; i++) {
                             F_consolidated = F_consolidated + alphas[i] * F[i];
                         }
 
-                        math::polynomial::polynomial<typename FieldType::value_type> T_consolidated =
+                        math::polynomial<typename FieldType::value_type> T_consolidated =
                             F_consolidated / preprocessed_data.Z;
 
                         // 21. Split $T(X)$ into separate polynomials $T_0(X), ..., T_{N_T - 1}(X)$
-                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> T(N_T);
+                        std::vector<math::polynomial<typename FieldType::value_type>> T(N_T);
                         // T = separate_T(T_consolidated);
 
                         // 22. Add commitments to $T_0(X), ..., T_{N_T - 1}(X)$ to $\text{transcript}$
