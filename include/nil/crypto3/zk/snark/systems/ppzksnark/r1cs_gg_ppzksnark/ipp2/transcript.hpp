@@ -80,7 +80,7 @@ namespace nil {
                         std::is_same<typename curve_type::scalar_field_type, FieldType>::value ||
                         std::is_same<typename curve_type::gt_type, FieldType>::value>::type
                         write(const typename FieldType::value_type &x) {
-                        buffer.resize(bincode::template get_element_size<FieldType>());
+                        buffer.resize(bincode::template element_size<FieldType>());
                         bincode::template field_element_to_bytes<FieldType>(x, buffer.begin(), buffer.end());
                         hash<hash_type>(buffer, hasher_acc);
                         buffer.clear();
@@ -91,7 +91,7 @@ namespace nil {
                         std::is_same<typename curve_type::template g1_type<>, GroupType>::value ||
                         std::is_same<typename curve_type::template g2_type<>, GroupType>::value>::type
                         write(const typename GroupType::value_type &x) {
-                        buffer.resize(bincode::template get_element_size<GroupType>());
+                        buffer.resize(bincode::template element_size<GroupType>());
                         bincode::template point_to_bytes<GroupType>(x, buffer.begin(), buffer.end());
                         hash<hash_type>(buffer, hasher_acc);
                         buffer.clear();
