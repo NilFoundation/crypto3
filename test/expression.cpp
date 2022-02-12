@@ -61,21 +61,21 @@ BOOST_AUTO_TEST_SUITE(expression_test_suite)
 
 BOOST_AUTO_TEST_CASE(expression_polynom_evaluation) {
 
-    // expressions::lazy_expression< polynomial::polynom<typename FieldType::value_type> > v0, v1;
+    // expressions::lazy_expression< polynomial<typename FieldType::value_type> > v0, v1;
 
-    // using expr_type = typename boost::proto::terminal<polynomial::polynom<typename FieldType::value_type>>::type;
+    // using expr_type = typename boost::proto::terminal<polynomial<typename FieldType::value_type>>::type;
 
-    // expressions::lazy_expression< polynomial::polynom<typename FieldType::value_type> >  expr = 
-    //     expressions::lazy_expression< polynomial::polynom<typename FieldType::value_type> > (v1 + v0);
+    // expressions::lazy_expression< polynomial<typename FieldType::value_type> >  expr =
+    //     expressions::lazy_expression< polynomial<typename FieldType::value_type> > (v1 + v0);
 
     // boost::proto::display_expr(expr);
 
     // v0.assign({1, 3, 4, 25, 6, 7, 7, 2});
     // v1.assign({9, 3, 11, 14, 7, 1, 5, 8});
 
-    // polynomial::polynom<typename FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 8, 12, 10};
+    // polynomial<typename FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 8, 12, 10};
 
-    // polynomial::polynom<typename FieldType::value_type> d = expr.evaluate();
+    // polynomial<typename FieldType::value_type> d = expr.evaluate();
 
     // for (std::size_t i = 0; i < c_ans.size(); ++i) {
     //     BOOST_CHECK_EQUAL(c_ans[i].data, d[i].data);

@@ -108,7 +108,7 @@ namespace nil {
                         g[i] = geometric_triangular_sequence[i] * a[i];
                     }
 
-                    polynomial::multiplication(a, g, T);
+                    multiplication(a, g, T);
                     a.resize(this->m);
 
 #ifdef MULTICORE
@@ -142,7 +142,7 @@ namespace nil {
                             T[i] = -T[i];
                     }
 
-                    polynomial::multiplication(a, W, T);
+                    multiplication(a, W, T);
                     a.resize(this->m);
 
 #ifdef MULTICORE
@@ -249,7 +249,7 @@ namespace nil {
                         t[0] = -geometric_sequence[i];
                         t[1] = value_type::one();
 
-                        polynomial::multiplication(x, x, t);
+                        multiplication(x, x, t);
                     }
 
 #ifdef MULTICORE

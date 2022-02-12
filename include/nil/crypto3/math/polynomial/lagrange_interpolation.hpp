@@ -34,37 +34,34 @@
 namespace nil {
     namespace crypto3 {
         namespace math {
-            namespace polynomial {
-                
-                // Default implementation according to Wikipedia
-                // https://en.wikipedia.org/wiki/Lagrange_polynomial
-                template<typename InputRange,
-                         typename FieldValueType =
-                             typename std::iterator_traits<typename InputRange::iterator>::value_type::first_type>
-                typename std::enable_if<
-                    std::is_same<std::pair<FieldValueType, FieldValueType>,
-                                 typename std::iterator_traits<typename InputRange::iterator>::value_type>::value,
-                    polynomial<FieldValueType>>::type
-                    lagrange_interpolation(const InputRange &points) {
+            // Default implementation according to Wikipedia
+            // https://en.wikipedia.org/wiki/Lagrange_polynomial
+            template<typename InputRange,
+                     typename FieldValueType =
+                         typename std::iterator_traits<typename InputRange::iterator>::value_type::first_type>
+            typename std::enable_if<
+                std::is_same<std::pair<FieldValueType, FieldValueType>,
+                             typename std::iterator_traits<typename InputRange::iterator>::value_type>::value,
+                polynomial<FieldValueType>>::type
+                lagrange_interpolation(const InputRange &points) {
 
-                    std::size_t k = std::size(points);
+                std::size_t k = std::size(points);
 
-                    polynomial<FieldValueType> result;
-                    for (std::size_t j = 0; j < k; ++j) {
-                        polynomial<FieldValueType> term({points[j].second});
-                        for (std::size_t m = 0; m < k; ++m) {
-                            if (m != j) {
-                                term = term * (polynomial<FieldValueType>({-points[m].first, FieldValueType::one()}) /
-                                               polynomial<FieldValueType>({points[j].first - points[m].first}));
-                            }
+                polynomial<FieldValueType> result;
+                for (std::size_t j = 0; j < k; ++j) {
+                    polynomial<FieldValueType> term({points[j].second});
+                    for (std::size_t m = 0; m < k; ++m) {
+                        if (m != j) {
+                            term = term * (polynomial<FieldValueType>({-points[m].first, FieldValueType::one()}) /
+                                           polynomial<FieldValueType>({points[j].first - points[m].first}));
                         }
-                        result = result + term;
                     }
-                    return result;
+                    result = result + term;
                 }
-            }    // namespace polynomial
-        }        // namespace math
-    }            // namespace crypto3
+                return result;
+            }
+        }    // namespace math
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_MATH_LAGRANGE_INTERPOLATION_HPP

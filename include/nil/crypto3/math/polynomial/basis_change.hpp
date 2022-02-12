@@ -77,7 +77,7 @@ namespace nil {
                         b = T[i - 1][index];
                         index++;
 
-                        polynomial::multiplication(T[i][j], a, b);
+                        multiplication(T[i][j], a, b);
                     }
                     index = 0;
                 }
@@ -103,7 +103,7 @@ namespace nil {
 
                 /* MonomialToNewton */
                 std::vector<value_type> I(T[m][0]);
-                polynomial::reverse(I, n);
+                reverse(I, n);
 
                 std::vector<value_type> mod(n + 1, value_type::zero());
                 mod[n] = value_type::one();
@@ -112,8 +112,8 @@ namespace nil {
 
                 I.resize(n);
 
-                std::vector<value_type> Q(polynomial::multiplication_transpose(n - 1, I, a));
-                polynomial::reverse(Q, n);
+                std::vector<value_type> Q(transpose_multiplication(n - 1, I, a));
+                reverse(Q, n);
 
                 /* TNewtonToMonomial */
                 std::vector<std::vector<value_type>> c(n);
@@ -129,8 +129,7 @@ namespace nil {
 
                     /* NB: unsigned reverse iteration */
                     for (std::size_t j = (1u << (m - i - 1)) - 1; j < (1u << (m - i - 1)); j--) {
-                        c[2 * j + 1] = polynomial::multiplication_transpose(
-                            (1u << i) - 1, T[i][row_length - 2 * j], c[j]);
+                        c[2 * j + 1] = transpose_multiplication((1u << i) - 1, T[i][row_length - 2 * j], c[j]);
                         c[2 * j] = c[j];
                         c[2 * j].resize(c_vec);
                     }
@@ -171,8 +170,8 @@ namespace nil {
                 std::vector<value_type> temp(1, value_type::zero());
                 for (std::size_t i = 0; i < m; i++) {
                     for (std::size_t j = 0; j < (1u << (m - i - 1)); j++) {
-                        polynomial::multiplication(temp, T[i][2 * j], f[2 * j + 1]);
-                        polynomial::addition(f[j], f[2 * j], temp);
+                        multiplication(temp, T[i][2 * j], f[2 * j + 1]);
+                        addition(f[j], f[2 * j], temp);
                     }
                 }
 
@@ -213,7 +212,7 @@ namespace nil {
                     }
                 }
 
-                w = polynomial::multiplication_transpose(n - 1, z, f);
+                w = transpose_multiplication(n - 1, z, f);
 
 #ifdef MULTICORE
 #pragma omp parallel for
@@ -258,7 +257,7 @@ namespace nil {
                         z[i] = -z[i];
                 }
 
-                w = polynomial::multiplication_transpose(n - 1, u, w);
+                w = transpose_multiplication(n - 1, u, w);
 
 #ifdef MULTICORE
 #pragma omp parallel for

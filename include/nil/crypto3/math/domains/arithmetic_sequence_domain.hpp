@@ -104,7 +104,7 @@ namespace nil {
                         S[i] = (factorial * arithmetic_generator).inversed();
                     }
 
-                    polynomial::multiplication(a, a, S);
+                    multiplication(a, a, S);
                     a.resize(this->m);
 
 #ifdef MULTICORE
@@ -138,7 +138,7 @@ namespace nil {
                             S[i] = -S[i];
                     }
 
-                    polynomial::multiplication(a, W, S);
+                    multiplication(a, W, S);
                     a.resize(this->m);
 
                     /* Newton to Monomial */
@@ -228,7 +228,7 @@ namespace nil {
                         t[0] = -this->arithmetic_sequence[i];
                         t[1] = value_type::one();
 
-                        polynomial::multiplication(x, x, t);
+                        multiplication(x, x, t);
                     }
 
 #ifdef MULTICORE
