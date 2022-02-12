@@ -901,7 +901,7 @@ void pairing_operation_test(const TestSet &test_set) {
                                        G2_prec_elements);
 }
 
-BOOST_AUTO_TEST_SUITE(curves_manual_tests)
+BOOST_AUTO_TEST_SUITE(pairing_manual_tests)
 
 // TODO: fix pair_reduceding
 BOOST_DATA_TEST_CASE(pairing_operation_test_bls12_381, string_data("pairing_operation_test_bls12_381"), data_set) {

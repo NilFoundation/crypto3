@@ -60,7 +60,9 @@ namespace nil {
                         constexpr static const integral_type modulus = policy_type::modulus;
                         constexpr static const modular_params_type modulus_params = modulus;
 
-                        using data_type = modular_type;
+                        typedef nil::crypto3::multiprecision::number<
+                            nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_static_save<modular_backend, modulus_params>>>
+                            data_type;
 
                         data_type data;
 
