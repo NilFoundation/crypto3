@@ -134,7 +134,7 @@ namespace nil {
                         std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
 
                         math::polynomial<typename FieldType::value_type> V_P_shifted =
-                            math::polynomial_shift(V_P, domain->get_domain_element(1));
+                            math::polynomial_shift<FieldType>(V_P, domain->get_domain_element(1));
 
                         F[0] = lagrange_1 * (one_polynomial - V_P);
                         F[1] = (one_polynomial - (q_last + q_blind)) * (V_P_shifted * h - V_P * g);
