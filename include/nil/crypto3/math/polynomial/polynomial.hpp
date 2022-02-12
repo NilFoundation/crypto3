@@ -94,7 +94,15 @@ namespace nil {
                 }
 
                 polynomial(const FieldValueType& value, std::size_t power = 0) : val(power + 1, FieldValueType(0)) {
-                    (*this)[power] = value;
+                    this->operator[](power) = value;
+                }
+
+                polynomial(const container_type &c) : val(c) {
+
+                }
+
+                polynomial(container_type &&c) : val(c) {
+
                 }
 
                 polynomial& operator=(const polynomial& x) {
