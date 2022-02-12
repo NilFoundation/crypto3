@@ -83,7 +83,7 @@ namespace nil {
                 }
 
                 inline result_type operator()() {
-                    using bincode = ::nil::marshalling::field_bincode<typename result_type::field_type>;
+                    using bincode = marshalling::bincode::field<typename result_type::field_type>;
 
                     if (cached) {
                         return cache;
