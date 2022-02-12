@@ -109,7 +109,7 @@ namespace nil {
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
                         // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
-                        // std::array<math::polynomial::polynomial<typename FieldType::value_type>, lambda>
+                        // std::array<math::polynomial<typename FieldType::value_type>, lambda>
                         //  f_ip1_coefficients
                         nil::marshalling::types::array_list<
                             TTypeBase,
@@ -202,7 +202,7 @@ namespace nil {
                         filled_f_commitments.value().push_back(filled_commitments);
                     }
 
-                    // std::array<math::polynomial::polynomial<typename FieldType::value_type>, lambda>
+                    // std::array<math::polynomial<typename FieldType::value_type>, lambda>
                     //  f_ip1_coefficients
                     field_poly_vector_marshalling_type filled_f_ip1_coefficients;
                     for (const auto &poly : lpc_prf.f_ip1_coefficients) {
@@ -285,7 +285,7 @@ namespace nil {
                         }
                     }
 
-                    // std::array<math::polynomial::polynomial<typename FieldType::value_type>, lambda>
+                    // std::array<math::polynomial<typename FieldType::value_type>, lambda>
                     //  f_ip1_coefficients
                     assert(lpc_prf.f_ip1_coefficients.size() == std::get<4>(filled_lpc_prf.value()).value().size());
                     for (std::size_t i = 0; i < std::get<4>(filled_lpc_prf.value()).value().size(); ++i) {
