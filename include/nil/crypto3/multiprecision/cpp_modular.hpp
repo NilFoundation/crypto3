@@ -55,42 +55,42 @@ namespace nil {
                 checked_mod_params1024_t;
 
             // mod_paramsular_adapter
-            typedef number<modular_adaptor<cpp_int_backend<>>> cpp_mod;
+            typedef number<modular_adaptor<cpp_int_backend<>, backends::modular_params_value_save<cpp_int_backend<>>>> cpp_mod;
 
             // Fixed precision unsigned types:
-            typedef number<modular_adaptor<cpp_int_backend<128, 128, unsigned_magnitude, unchecked, void>>> umod128_t;
-            typedef number<modular_adaptor<cpp_int_backend<256, 256, unsigned_magnitude, unchecked, void>>> umod256_t;
-            typedef number<modular_adaptor<cpp_int_backend<512, 512, unsigned_magnitude, unchecked, void>>> umod512_t;
-            typedef number<modular_adaptor<cpp_int_backend<1024, 1024, unsigned_magnitude, unchecked, void>>>
+            typedef number<modular_adaptor<cpp_int_backend<128, 128, unsigned_magnitude, unchecked, void>, backends::modular_params_value_save<cpp_int_backend<>>>> umod128_t;
+            typedef number<modular_adaptor<cpp_int_backend<256, 256, unsigned_magnitude, unchecked, void>, backends::modular_params_value_save<cpp_int_backend<>>>> umod256_t;
+            typedef number<modular_adaptor<cpp_int_backend<512, 512, unsigned_magnitude, unchecked, void>, backends::modular_params_value_save<cpp_int_backend<>>>> umod512_t;
+            typedef number<modular_adaptor<cpp_int_backend<1024, 1024, unsigned_magnitude, unchecked, void>, backends::modular_params_value_save<cpp_int_backend<>>>>
                 umod1024_t;
 
             // Fixed precision signed types:
-            typedef number<modular_adaptor<cpp_int_backend<128, 128, signed_magnitude, unchecked, void>>> mod128_t;
-            typedef number<modular_adaptor<cpp_int_backend<256, 256, signed_magnitude, unchecked, void>>> mod256_t;
-            typedef number<modular_adaptor<cpp_int_backend<512, 512, signed_magnitude, unchecked, void>>> mod512_t;
-            typedef number<modular_adaptor<cpp_int_backend<1024, 1024, signed_magnitude, unchecked, void>>> mod1024_t;
+            typedef number<modular_adaptor<cpp_int_backend<128, 128, signed_magnitude, unchecked, void>, backends::modular_params_value_save<cpp_int_backend<>>>> mod128_t;
+            typedef number<modular_adaptor<cpp_int_backend<256, 256, signed_magnitude, unchecked, void>, backends::modular_params_value_save<cpp_int_backend<>>>> mod256_t;
+            typedef number<modular_adaptor<cpp_int_backend<512, 512, signed_magnitude, unchecked, void>, backends::modular_params_value_save<cpp_int_backend<>>>> mod512_t;
+            typedef number<modular_adaptor<cpp_int_backend<1024, 1024, signed_magnitude, unchecked, void>, backends::modular_params_value_save<cpp_int_backend<>>>> mod1024_t;
 
             // Over again, but with checking enabled this time:
-            typedef number<modular_adaptor<cpp_int_backend<0, 0, signed_magnitude, checked>>> checked_cpp_mod;
+            typedef number<modular_adaptor<cpp_int_backend<0, 0, signed_magnitude, checked>, backends::modular_params_value_save<cpp_int_backend<>>>> checked_cpp_mod;
 
             // Fixed precision unsigned types:
-            typedef number<modular_adaptor<cpp_int_backend<128, 128, unsigned_magnitude, checked, void>>>
+            typedef number<modular_adaptor<cpp_int_backend<128, 128, unsigned_magnitude, checked, void>, backends::modular_params_value_save<cpp_int_backend<>>>>
                 checked_umod128_t;
-            typedef number<modular_adaptor<cpp_int_backend<256, 256, unsigned_magnitude, checked, void>>>
+            typedef number<modular_adaptor<cpp_int_backend<256, 256, unsigned_magnitude, checked, void>, backends::modular_params_value_save<cpp_int_backend<>>>>
                 checked_umod256_t;
-            typedef number<modular_adaptor<cpp_int_backend<512, 512, unsigned_magnitude, checked, void>>>
+            typedef number<modular_adaptor<cpp_int_backend<512, 512, unsigned_magnitude, checked, void>, backends::modular_params_value_save<cpp_int_backend<>>>>
                 checked_umod512_t;
-            typedef number<modular_adaptor<cpp_int_backend<1024, 1024, unsigned_magnitude, checked, void>>>
+            typedef number<modular_adaptor<cpp_int_backend<1024, 1024, unsigned_magnitude, checked, void>, backends::modular_params_value_save<cpp_int_backend<>>>>
                 checked_umod1024_t;
 
             // Fixed precision signed types:
-            typedef number<modular_adaptor<cpp_int_backend<128, 128, signed_magnitude, checked, void>>>
+            typedef number<modular_adaptor<cpp_int_backend<128, 128, signed_magnitude, checked, void>, backends::modular_params_value_save<cpp_int_backend<>>>>
                 checked_mod128_t;
-            typedef number<modular_adaptor<cpp_int_backend<256, 256, signed_magnitude, checked, void>>>
+            typedef number<modular_adaptor<cpp_int_backend<256, 256, signed_magnitude, checked, void>, backends::modular_params_value_save<cpp_int_backend<>>>>
                 checked_mod256_t;
-            typedef number<modular_adaptor<cpp_int_backend<512, 512, signed_magnitude, checked, void>>>
+            typedef number<modular_adaptor<cpp_int_backend<512, 512, signed_magnitude, checked, void>, backends::modular_params_value_save<cpp_int_backend<>>>>
                 checked_mod512_t;
-            typedef number<modular_adaptor<cpp_int_backend<1024, 1024, signed_magnitude, checked, void>>>
+            typedef number<modular_adaptor<cpp_int_backend<1024, 1024, signed_magnitude, checked, void>, backends::modular_params_value_save<cpp_int_backend<>>>>
                 checked_mod1024_t;
 
         }    // namespace multiprecision

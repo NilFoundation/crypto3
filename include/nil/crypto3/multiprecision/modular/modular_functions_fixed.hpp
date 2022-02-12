@@ -221,7 +221,6 @@ namespace nil {
                     constexpr void initialize_montgomery_params() {
                         if (check_montgomery_constraints(m_mod.backend())) {
                             find_const_variables();
-//                            find_modulus_mask();
                         }
                     }
 
@@ -230,7 +229,7 @@ namespace nil {
                      * is even. If input is odd, then input and 2^n are relatively prime
                      * and an inverse exists.
                      */
-                    constexpr internal_limb_type monty_inverse(internal_limb_type a) {
+                    constexpr internal_limb_type monty_inverse(const internal_limb_type &a) {
 
                         internal_limb_type b = 1;
                         internal_limb_type r = 0;
@@ -419,7 +418,7 @@ namespace nil {
                             // Now result in first m_mod.backend().size() limbs, so we can do
                             // eval_bitwise_and(accum, m_modulus_mask);
                             // or just copy n limbs to result
-                            for (size_t i = 0; i <  m_mod.backend().size(); ++i) {
+                            for (size_t i = 0; i < m_mod.backend().size(); ++i) {
                                 result.limbs()[i] = accum.limbs()[i + m_mod.backend().size()];
                             }
                             result.resize(m_mod.backend().size(), m_mod.backend().size());

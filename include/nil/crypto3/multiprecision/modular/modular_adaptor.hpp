@@ -31,7 +31,7 @@ namespace nil {
         namespace multiprecision {
             namespace backends {
 
-                template<typename Backend>
+                template<typename Backend, typename SafeType>
                 struct modular_adaptor {
                     typedef modular_params<Backend> modulus_type;
                     typedef Backend backend_type;
@@ -194,15 +194,15 @@ namespace nil {
                     }
                 };
 
-                template<class Result, class Backend>
-                constexpr void eval_convert_to(Result* result, const modular_adaptor<Backend>& val) {
+                template<class Result, class Backend, typename SafeType>
+                constexpr void eval_convert_to(Result* result, const modular_adaptor<Backend, SafeType>& val) {
                     using default_ops::eval_convert_to;
                     eval_convert_to(result, val.base_data());
                 }
 
-                template<class Backend, class T>
+                template<class Backend, typename SafeType, class T>
                 constexpr typename boost::enable_if<boost::is_arithmetic<T>, bool>::type
-                    eval_eq(const modular_adaptor<Backend>& a, const T& b) {
+                    eval_eq(const modular_adaptor<Backend, SafeType>& a, const T& b) {
                     return a.compare(b) == 0;
                 }
 
@@ -212,8 +212,8 @@ namespace nil {
                     eval_modulus(result, mod.get_mod().backend());
                 }
 
-                template<class Backend>
-                constexpr void eval_add(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o) {
+                template<class Backend, typename SafeType>
+                constexpr void eval_add(modular_adaptor<Backend, SafeType>& result, const modular_adaptor<Backend, SafeType>& o) {
                     BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
                     using default_ops::eval_lt;
 
@@ -223,8 +223,8 @@ namespace nil {
                     }
                 }
 
-                template<class Backend>
-                constexpr void eval_subtract(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o) {
+                template<class Backend, typename SafeType>
+                constexpr void eval_subtract(modular_adaptor<Backend, SafeType>& result, const modular_adaptor<Backend, SafeType>& o) {
                     BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
                     using default_ops::eval_lt;
@@ -245,15 +245,15 @@ namespace nil {
                     }
                 }
 
-                template<class Backend>
-                constexpr void eval_multiply(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o) {
+                template<class Backend, typename SafeType>
+                constexpr void eval_multiply(modular_adaptor<Backend, SafeType>& result, const modular_adaptor<Backend, SafeType>& o) {
                     BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
                     eval_multiply(result.base_data(), o.base_data());
                     eval_redc(result.base_data(), result.mod_data());
                 }
 
-                template<class Backend>
-                constexpr void eval_divide(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o) {
+                template<class Backend, typename SafeType>
+                constexpr void eval_divide(modular_adaptor<Backend, SafeType>& result, const modular_adaptor<Backend, SafeType>& o) {
                     BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
                     Backend tmp1, tmp2;
                     result.mod_data().adjust_regular(tmp1, result.base_data());
@@ -264,8 +264,8 @@ namespace nil {
                     result.mod_data().adjust_regular(tmp2, result.base_data());
                 }
 
-                template<class Backend>
-                constexpr void eval_modulus(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o) {
+                template<class Backend, typename SafeType>
+                constexpr void eval_modulus(modular_adaptor<Backend, SafeType>& result, const modular_adaptor<Backend, SafeType>& o) {
                     BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
                     Backend tmp1, tmp2;
                     result.mod_data().adjust_regular(tmp1, result.base_data());
@@ -276,8 +276,8 @@ namespace nil {
                     result.mod_data().adjust_regular(tmp2, result.base_data());
                 }
 
-                template<class Backend>
-                constexpr bool eval_is_zero(const modular_adaptor<Backend>& val)
+                template<class Backend, typename SafeType>
+                constexpr bool eval_is_zero(const modular_adaptor<Backend, SafeType>& val)
 
                     BOOST_NOEXCEPT {
                     using default_ops::eval_is_zero;
@@ -285,34 +285,34 @@ namespace nil {
                 }
 
                 // TODO: check returned value
-                template<class Backend>
-                constexpr int eval_get_sign(const modular_adaptor<Backend>&) {
+                template<class Backend, typename SafeType>
+                constexpr int eval_get_sign(const modular_adaptor<Backend, SafeType>&) {
                     return 1;
                 }
 
                 // TODO: is the function required
                 // template <class Result, class Backend>
                 // constexpr typename boost::disable_if_c<boost::is_complex<Result>::value>::type
-                // eval_convert_to(Result* result, const modular_adaptor<Backend>& val)
+                // eval_convert_to(Result* result, const modular_adaptor<Backend, SafeType>& val)
                 // {
                 //    using default_ops::eval_convert_to;
                 //    eval_convert_to(result, val.base_data());
                 // }
 
-                template<class Backend, class T, class V>
-                constexpr void assign_components(modular_adaptor<Backend>& result, const T& a, const V& b) {
+                template<class Backend, typename SafeType, class T, class V>
+                constexpr void assign_components(modular_adaptor<Backend, SafeType>& result, const T& a, const V& b) {
                     result.base_data() = a;
                     result.mod_data() = b;
                     result.mod_data().adjust_modular(result.base_data());
                 }
 
-                template<class Backend>
-                constexpr void eval_sqrt(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& val) {
+                template<class Backend, typename SafeType>
+                constexpr void eval_sqrt(modular_adaptor<Backend, SafeType>& result, const modular_adaptor<Backend, SafeType>& val) {
                     eval_sqrt(result.base_data(), val.base_data());
                 }
 
-                template<class Backend>
-                constexpr void eval_abs(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& val) {
+                template<class Backend, typename SafeType>
+                constexpr void eval_abs(modular_adaptor<Backend, SafeType>& result, const modular_adaptor<Backend, SafeType>& val) {
                     result = val;
                 }
 
@@ -332,16 +332,16 @@ namespace nil {
                     return window_bits;
                 };
 
-                template<class Backend>
-                inline void find_modular_pow(modular_adaptor<Backend>& result,
-                                             const modular_adaptor<Backend>& b,
+                template<class Backend, typename SafeType>
+                inline void find_modular_pow(modular_adaptor<Backend, SafeType>& result,
+                                             const modular_adaptor<Backend, SafeType>& b,
                                              const Backend& exp) {
                     using default_ops::eval_bit_set;
                     using default_ops::eval_convert_to;
                     using default_ops::eval_decrement;
                     using default_ops::eval_multiply;
 
-                    typedef number<modular_adaptor<Backend>> modular_type;
+                    typedef number<modular_adaptor<Backend, SafeType>> modular_type;
                     modular_params<Backend> mod = b.mod_data();
                     size_t m_window_bits;
                     unsigned long cur_exp_index;
@@ -386,36 +386,36 @@ namespace nil {
                     result = x.backend();
                 }
 
-                template<class Backend, typename T>
-                constexpr void eval_pow(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& b,
+                template<class Backend, typename SafeType, typename T>
+                constexpr void eval_pow(modular_adaptor<Backend, SafeType>& result, const modular_adaptor<Backend, SafeType>& b,
                                         const T& e) {
                     find_modular_pow(result, b, e);
                 }
 
-                template<class Backend>
-                constexpr void eval_pow(modular_adaptor<Backend>& result,
-                                        const modular_adaptor<Backend>& b,
-                                        const modular_adaptor<Backend>& e) {
+                template<class Backend, typename SafeType>
+                constexpr void eval_pow(modular_adaptor<Backend, SafeType>& result,
+                                        const modular_adaptor<Backend, SafeType>& b,
+                                        const modular_adaptor<Backend, SafeType>& e) {
                     Backend exp;
                     e.mod_data().adjust_regular(exp, e.base_data());
                     find_modular_pow(result, b, exp);
                 }
 
-                template<typename Backend1, typename Backend2, typename T>
-                constexpr void eval_powm(modular_adaptor<Backend1>& result, const modular_adaptor<Backend2>& b,
+                template<typename Backend1, typename Backend2, typename T, typename SafeType>
+                constexpr void eval_powm(modular_adaptor<Backend1, SafeType>& result, const modular_adaptor<Backend2, SafeType>& b,
                                          const T& e) {
                     eval_pow(result, b, e);
                 }
 
-                template<typename Backend1, typename Backend2, typename Backend3>
-                constexpr void eval_powm(modular_adaptor<Backend1>& result,
-                                         const modular_adaptor<Backend2>& b,
-                                         const modular_adaptor<Backend3>& e) {
+                template<typename Backend1, typename Backend2, typename Backend3, typename SafeType>
+                constexpr void eval_powm(modular_adaptor<Backend1, SafeType>& result,
+                                         const modular_adaptor<Backend2, SafeType>& b,
+                                         const modular_adaptor<Backend3, SafeType>& e) {
                     eval_pow(result, b, e);
                 }
 
-                template<class Backend, class UI>
-                constexpr void eval_left_shift(modular_adaptor<Backend>& t, UI i) {
+                template<class Backend, typename SafeType, class UI>
+                constexpr void eval_left_shift(modular_adaptor<Backend, SafeType>& t, UI i) {
                     using default_ops::eval_left_shift;
                     Backend tmp;
                     t.mod_data().adjust_regular(tmp, t.base_data());
@@ -424,8 +424,8 @@ namespace nil {
                     t.mod_data().adjust_modular(t.base_data());
                 }
 
-                template<class Backend, class UI>
-                constexpr void eval_right_shift(modular_adaptor<Backend>& t, UI i) {
+                template<class Backend, typename SafeType, class UI>
+                constexpr void eval_right_shift(modular_adaptor<Backend, SafeType>& t, UI i) {
                     using default_ops::eval_right_shift;
                     Backend tmp;
                     t.mod_data().adjust_regular(tmp, t.base_data());
@@ -434,8 +434,8 @@ namespace nil {
                     t.mod_data().adjust_modular(t.base_data());
                 }
 
-                template<class Backend, class UI>
-                constexpr void eval_left_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i) {
+                template<class Backend, typename SafeType, class UI>
+                constexpr void eval_left_shift(modular_adaptor<Backend, SafeType>& t, const modular_adaptor<Backend, SafeType>& v, UI i) {
                     using default_ops::eval_left_shift;
                     Backend tmp1, tmp2;
                     t.mod_data().adjust_regular(tmp1, t.base_data());
@@ -445,8 +445,8 @@ namespace nil {
                     t.mod_data().adjust_modular(t.base_data());
                 }
 
-                template<class Backend, class UI>
-                constexpr void eval_right_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i) {
+                template<class Backend, typename SafeType, class UI>
+                constexpr void eval_right_shift(modular_adaptor<Backend, SafeType>& t, const modular_adaptor<Backend, SafeType>& v, UI i) {
                     using default_ops::eval_right_shift;
                     Backend tmp1, tmp2;
                     t.mod_data().adjust_regular(tmp1, t.base_data());
@@ -456,8 +456,8 @@ namespace nil {
                     t.mod_data().adjust_modular(t.base_data());
                 }
 
-                template<class Backend>
-                constexpr void eval_bitwise_and(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v) {
+                template<class Backend, typename SafeType>
+                constexpr void eval_bitwise_and(modular_adaptor<Backend, SafeType>& result, const modular_adaptor<Backend, SafeType>& v) {
                     using default_ops::eval_bitwise_and;
                     BOOST_ASSERT(result.mod_data().get_mod() == v.mod_data().get_mod());
 
@@ -469,8 +469,8 @@ namespace nil {
                     result.mod_data().adjust_modular(result.base_data());
                 }
 
-                template<class Backend>
-                constexpr void eval_bitwise_or(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v) {
+                template<class Backend, typename SafeType>
+                constexpr void eval_bitwise_or(modular_adaptor<Backend, SafeType>& result, const modular_adaptor<Backend, SafeType>& v) {
                     using default_ops::eval_bitwise_or;
                     BOOST_ASSERT(result.mod_data().get_mod() == v.mod_data().get_mod());
 
@@ -482,8 +482,8 @@ namespace nil {
                     result.mod_data().adjust_modular(result.base_data());
                 }
 
-                template<class Backend>
-                constexpr void eval_bitwise_xor(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v) {
+                template<class Backend, typename SafeType>
+                constexpr void eval_bitwise_xor(modular_adaptor<Backend, SafeType>& result, const modular_adaptor<Backend, SafeType>& v) {
                     using default_ops::eval_bitwise_xor;
                     BOOST_ASSERT(result.mod_data().get_mod() == v.mod_data().get_mod());
 
@@ -495,32 +495,32 @@ namespace nil {
                     result.mod_data().adjust_modular(result.base_data());
                 }
 
-                template<typename Backend>
-                constexpr int eval_msb(const modular_adaptor<Backend>& m) {
+                template<typename Backend, typename SafeType>
+                constexpr int eval_msb(const modular_adaptor<Backend, SafeType>& m) {
                     using default_ops::eval_msb;
                     Backend tmp;
                     m.mod_data().adjust_regular(tmp, m.base_data());
                     return eval_msb(tmp);
                 }
 
-                template<typename Backend>
-                constexpr unsigned eval_lsb(const modular_adaptor<Backend>& m) {
+                template<typename Backend, typename SafeType>
+                constexpr unsigned eval_lsb(const modular_adaptor<Backend, SafeType>& m) {
                     using default_ops::eval_lsb;
                     Backend tmp;
                     m.mod_data().adjust_regular(tmp, m.base_data());
                     return eval_lsb(tmp);
                 }
 
-                template<typename Backend>
-                constexpr bool eval_bit_test(const modular_adaptor<Backend>& m, unsigned index) {
+                template<typename Backend, typename SafeType>
+                constexpr bool eval_bit_test(const modular_adaptor<Backend, SafeType>& m, unsigned index) {
                     using default_ops::eval_bit_test;
                     Backend tmp;
                     m.mod_data().adjust_regular(tmp, m.base_data());
                     return eval_bit_test(tmp, index);
                 }
 
-                template<typename Backend>
-                constexpr void eval_bit_set(modular_adaptor<Backend>& result, unsigned index) {
+                template<typename Backend, typename SafeType>
+                constexpr void eval_bit_set(modular_adaptor<Backend, SafeType>& result, unsigned index) {
                     using default_ops::eval_bit_set;
                     Backend tmp;
                     result.mod_data().adjust_regular(tmp, result.base_data());
@@ -528,8 +528,8 @@ namespace nil {
                     result.mod_data().adjust_modular(result.base_data(), tmp);
                 }
 
-                template<typename Backend>
-                constexpr void eval_bit_unset(modular_adaptor<Backend>& result, unsigned index) {
+                template<typename Backend, typename SafeType>
+                constexpr void eval_bit_unset(modular_adaptor<Backend, SafeType>& result, unsigned index) {
                     using default_ops::eval_bit_unset;
                     Backend tmp;
                     result.mod_data().adjust_regular(tmp, result.base_data());
@@ -537,8 +537,8 @@ namespace nil {
                     result.mod_data().adjust_modular(result.base_data(), tmp);
                 }
 
-                template<typename Backend>
-                constexpr void eval_bit_flip(modular_adaptor<Backend>& result, unsigned index) {
+                template<typename Backend, typename SafeType>
+                constexpr void eval_bit_flip(modular_adaptor<Backend, SafeType>& result, unsigned index) {
                     using default_ops::eval_bit_flip;
                     Backend tmp;
                     result.mod_data().adjust_regular(tmp, result.base_data());
@@ -546,11 +546,11 @@ namespace nil {
                     result.mod_data().adjust_modular(result.base_data(), tmp);
                 }
 
-                template<typename Backend>
-                constexpr modular_adaptor<Backend> eval_ressol(const modular_adaptor<Backend>& input) {
+                template<typename Backend, typename SafeType>
+                constexpr modular_adaptor<Backend, SafeType> eval_ressol(const modular_adaptor<Backend, SafeType>& input) {
 
                     number<Backend> new_base, res;
-                    number<modular_adaptor<Backend>> res_mod;
+                    number<modular_adaptor<Backend, SafeType>> res_mod;
 
                     input.mod_data().adjust_regular(new_base.backend(), input.base_data());
                     res = eval_ressol(new_base.backend(), input.mod_data().get_mod().backend());
@@ -559,8 +559,8 @@ namespace nil {
                     return res_mod.backend();
                 }
 
-                template<typename Backend>
-                constexpr void eval_inverse_mod(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& input) {
+                template<typename Backend, typename SafeType>
+                constexpr void eval_inverse_mod(modular_adaptor<Backend, SafeType>& result, const modular_adaptor<Backend, SafeType>& input) {
                     Backend new_base, res;
 
                     input.mod_data().adjust_regular(new_base, input.base_data());
@@ -571,20 +571,20 @@ namespace nil {
 
             using nil::crypto3::multiprecision::backends::modular_adaptor;
 
-            template<class Backend>
-            struct number_category<modular_adaptor<Backend>>
+            template<class Backend, typename SafeType>
+            struct number_category<modular_adaptor<Backend, SafeType>>
                 : public std::integral_constant<int, nil::crypto3::multiprecision::number_kind_modular> { };
 
-            template<class Backend, expression_template_option ExpressionTemplates>
-            struct component_type<number<modular_adaptor<Backend>, ExpressionTemplates>> {
+            template<class Backend, typename SafeType, expression_template_option ExpressionTemplates>
+            struct component_type<number<modular_adaptor<Backend, SafeType>, ExpressionTemplates>> {
                 typedef number<Backend, ExpressionTemplates> type;
             };
 
             template<class T>
             struct is_modular_number : public std::integral_constant<bool, false> { };
 
-            template<class Backend, expression_template_option ExpressionTemplates>
-            struct is_modular_number<number<backends::modular_adaptor<Backend>, ExpressionTemplates>> : public std::integral_constant<bool, true> { };
+            template<class Backend, typename SafeType, expression_template_option ExpressionTemplates>
+            struct is_modular_number<number<backends::modular_adaptor<Backend, SafeType>, ExpressionTemplates>> : public std::integral_constant<bool, true> { };
         }    // namespace multiprecision
     }        // namespace crypto3
 }    // namespace nil

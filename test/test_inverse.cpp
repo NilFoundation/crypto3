@@ -233,24 +233,24 @@ void test_cpp_int_backend() {
     using namespace nil::crypto3::multiprecision;
     number<T> res;
 
-    number<backends::modular_adaptor<T>> modular;
+    number<backends::modular_adaptor<T, backends::modular_params_value_save<T>>> modular;
 
-    modular = number<backends::modular_adaptor<T>>(10, 37);
+    modular = number<backends::modular_adaptor<T, backends::modular_params_value_save<T>>>(10, 37);
     modular.backend().mod_data().adjust_regular(res.backend(),
                                                 inverse_extended_euclidean_algorithm(modular).backend().base_data());
     BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(26));
 
-    modular = number<backends::modular_adaptor<T>>(3, 8);
+    modular = number<backends::modular_adaptor<T, backends::modular_params_value_save<T>>>(3, 8);
     modular.backend().mod_data().adjust_regular(res.backend(),
                                                 inverse_extended_euclidean_algorithm(modular).backend().base_data());
     BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(3));
 
-    modular = number<backends::modular_adaptor<T>>(3, 16);
+    modular = number<backends::modular_adaptor<T, backends::modular_params_value_save<T>>>(3, 16);
     modular.backend().mod_data().adjust_regular(res.backend(),
                                                 inverse_extended_euclidean_algorithm(modular).backend().base_data());
     BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(11));
 
-    modular = number<backends::modular_adaptor<T>>(
+    modular = number<backends::modular_adaptor<T, backends::modular_params_value_save<T>>>(
         65279,
         "0x100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         "000000000000000000000000000000000000000");
@@ -261,7 +261,7 @@ void test_cpp_int_backend() {
         number<T>("213619145373424147135528719170299435747091040785995944781696278333282055845071463670570381706987102536"
                 "77755075362127788711957331760388539866898398399344480664991941861081743615"));
 
-    modular = number<backends::modular_adaptor<T>>(
+    modular = number<backends::modular_adaptor<T, backends::modular_params_value_save<T>>>(
         "33292237061710524632068664083551908521453088535512228553742065532915836412003628111698671675220667324272594410"
         "69045458590915570173077273266668323626418910290729833115917608762612451607036836604560196526748133295229482315"
         "43216086195698566172041500850281737658912236916916850305170057553436136073435791550700526779126605616484319711"
@@ -288,8 +288,13 @@ void test_cpp_int_backend() {
                 "650367370131035732951388159175971890099247228360312965057735541872892978783707133028552644759681714224"
                 "704381891573964406129272600659255700500824412025869294370532513154961039220948194823131817745018177622"
                 "2904306153521050324221361215524333142914455291939319"));
-
-    modular = number<backends::modular_adaptor<T>>(43000466091, 0x10000000000);
+    number<cpp_int_backend<255, 255>> t1("46183318524466423714385242700212935662232011232920767824642233133732825160423");
+    number<cpp_int_backend<255, 255>> t2("52435875175126190479447740508185965837690552500527637822603658699938581184513");
+    std::cout << "res1=" << inverse_mod(t1, t2) << std::endl;
+    std::cout << std::endl;
+    std::cout << "res1=" << inverse_mod(number<backends::modular_adaptor<T, backends::modular_params_value_save<T>>>(t1, t2)) << std::endl;
+//5340958855958624790350191648327454295961274282628640357656781123563169745534
+    modular = number<backends::modular_adaptor<T, backends::modular_params_value_save<T>>>(43000466091, 0x10000000000);
     modular.backend().mod_data().adjust_regular(res.backend(),
                                                 inverse_extended_euclidean_algorithm(modular).backend().base_data());
     BOOST_CHECK_EQUAL(number<T>(res.backend()), number<T>(140404367363));
@@ -317,7 +322,7 @@ BOOST_AUTO_TEST_SUITE(static_tests)
 
 BOOST_AUTO_TEST_CASE(cpp_int_fixed_test) {
     using Backend = cpp_int_backend<585, 585>;
-    using Backend_modular = modular_adaptor<Backend>;
+    using Backend_modular = modular_adaptor<Backend, backends::modular_params_value_save<Backend>>;
     using modular_number = number<Backend_modular>;
 
     constexpr auto mod =

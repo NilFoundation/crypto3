@@ -32,11 +32,11 @@ namespace nil {
                 return result;
             }
 
-            template<typename Backend, expression_template_option ExpressionTemplates>
-            constexpr number<modular_adaptor<Backend>, ExpressionTemplates> inverse_extended_euclidean_algorithm(
-                const number<modular_adaptor<Backend>, ExpressionTemplates>& modular) {
+            template<typename Backend, typename SafeType, expression_template_option ExpressionTemplates>
+            constexpr number<modular_adaptor<Backend, SafeType>, ExpressionTemplates> inverse_extended_euclidean_algorithm(
+                const number<modular_adaptor<Backend, SafeType>, ExpressionTemplates>& modular) {
                 number<Backend, ExpressionTemplates> new_base, res;
-                number<modular_adaptor<Backend>, ExpressionTemplates> res_mod;
+                number<modular_adaptor<Backend, SafeType>, ExpressionTemplates> res_mod;
 
                 modular.backend().mod_data().adjust_regular(new_base.backend(), modular.backend().base_data());
                 backends::eval_inverse_extended_euclidean_algorithm(res.backend(), new_base.backend(), modular.backend().mod_data().get_mod().backend());
@@ -64,10 +64,10 @@ namespace nil {
                 return res;
             }
 
-            template<typename Backend, expression_template_option ExpressionTemplates>
-            constexpr number<modular_adaptor<Backend>, ExpressionTemplates>
-            inverse_mod(const number<modular_adaptor<Backend>, ExpressionTemplates>& modular) {
-                number<modular_adaptor<Backend>, ExpressionTemplates> res;
+            template<typename Backend, typename SafeType, expression_template_option ExpressionTemplates>
+            constexpr number<modular_adaptor<Backend, SafeType>, ExpressionTemplates>
+            inverse_mod(const number<modular_adaptor<Backend, SafeType>, ExpressionTemplates>& modular) {
+                number<modular_adaptor<Backend, SafeType>, ExpressionTemplates> res;
                 backends::eval_inverse_mod(res.backend(), modular.backend());
                 return res;
             }

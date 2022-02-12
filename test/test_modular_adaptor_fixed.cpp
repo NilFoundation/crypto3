@@ -12,7 +12,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
-
+#include <chrono>
 #include <iostream>
 #include <vector>
 
@@ -60,7 +60,8 @@ constexpr void pow_test(const number<Backend, ExpressionTemplates>& a,
                         const number<Backend, ExpressionTemplates>& m) {
     typedef number<Backend, ExpressionTemplates> standard_number;
     typedef modular_params<Backend> params_number;
-    typedef number<modular_adaptor<Backend>> modular_number;
+    using params_safe_type = nil::crypto3::multiprecision::backends::modular_params_value_save<Backend>;
+    typedef number<modular_adaptor<Backend, params_safe_type>> modular_number;
 
     params_number mod_p(m);
     // modular_params constructor
@@ -91,7 +92,8 @@ template<typename Number>
 constexpr bool base_operations_test(std::array<Number, test_set_len> test_set) {
     typedef typename Number::backend_type Backend;
     typedef typename default_ops::double_precision_type<Backend>::type Backend_doubled;
-    typedef number<modular_adaptor<Backend>> modular_number;
+    using params_safe_type = nil::crypto3::multiprecision::backends::modular_params_value_save<Backend>;
+    typedef number<modular_adaptor<Backend, params_safe_type>> modular_number;
     typedef modular_params<Backend> params_number;
     typedef Number standard_number;
     typedef number<Backend_doubled> dbl_standard_number;
@@ -182,8 +184,8 @@ constexpr bool base_operations_test(std::array<Number, test_set_len> test_set) {
 }
 
 template<typename Number, std::size_t N, std::size_t enum_len>
-constexpr bool base_operations_test(const std::array<std::array<Number, enum_len>, N>& test_data) {
-    for (const auto& test_set : test_data) {
+constexpr bool base_operations_test(const std::array<std::array<Number, enum_len>, N> &test_data) {
+    for (const auto &test_set : test_data) {
         base_operations_test(test_set);
     }
     return true;
@@ -195,8 +197,9 @@ bool base_operations_test_mixed(const std::array<Number, test_set_len>& test_set
     typedef typename Number::backend_type Backend;
     typedef typename cpp_int::backend_type Backend_dynamic;
     typedef typename default_ops::double_precision_type<Backend>::type Backend_doubled;
-    typedef number<modular_adaptor<Backend>> modular_number;
-    typedef number<modular_adaptor<Backend_dynamic>> dynamic_modular_number;
+    using params_safe_type = nil::crypto3::multiprecision::backends::modular_params_value_save<Backend>;
+    typedef number<modular_adaptor<Backend, params_safe_type>> modular_number;
+    typedef number<modular_adaptor<Backend_dynamic, params_safe_type>> dynamic_modular_number;
     typedef modular_params<Backend> params_number;
     typedef modular_params<Backend_dynamic> dynamic_params_number;
     typedef Number standard_number;
@@ -540,7 +543,8 @@ BOOST_AUTO_TEST_SUITE(runtime_tests)
 BOOST_AUTO_TEST_CASE(secp256k1_incorrect_multiplication) {
     using Backend = cpp_int_backend<256, 256>;
     using standart_number = number<Backend>;
-    using modular_number = number<modular_adaptor<Backend>>;
+    using params_safe_type = nil::crypto3::multiprecision::backends::modular_params_value_save<Backend>;
+    using modular_number = number<modular_adaptor<Backend, params_safe_type>>;
     constexpr standart_number modulus = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F_cppui256;
     constexpr modular_number x(0xb5d724ce6f44c3c587867bbcb417e9eb6fa05e7e2ef029166568f14eb3161387_cppui256, modulus);
     constexpr modular_number res(0xad6e1fcc680392abfb075838eafa513811112f14c593e0efacb6e9d0d7770b4_cppui256, modulus);
