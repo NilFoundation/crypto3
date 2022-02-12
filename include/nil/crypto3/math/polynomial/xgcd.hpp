@@ -50,7 +50,7 @@ namespace nil {
                 typedef
                     typename std::iterator_traits<decltype(std::begin(std::declval<Range1>()))>::value_type value_type;
 
-                if (polynomial::is_zero(b)) {
+                if (is_zero(b)) {
                     g = a;
                     u = std::vector<value_type>(1, value_type::one());
                     v = std::vector<value_type>(1, value_type::zero());
@@ -66,10 +66,10 @@ namespace nil {
                 std::vector<value_type> R(1, value_type::zero());
                 std::vector<value_type> T(1, value_type::zero());
 
-                while (!polynomial::is_zero(V3)) {
-                    polynomial::division(Q, R, G, V3);
-                    polynomial::multiplication(G, V1, Q);
-                    polynomial::subtraction(T, U, G);
+                while (!is_zero(V3)) {
+                    division(Q, R, G, V3);
+                    multiplication(G, V1, Q);
+                    subtraction(T, U, G);
 
                     U = V1;
                     G = V3;
@@ -77,9 +77,9 @@ namespace nil {
                     V3 = R;
                 }
 
-                polynomial::multiplication(V3, a, U);
-                polynomial::subtraction(V3, G, V3);
-                polynomial::division(V1, R, V3, b);
+                multiplication(V3, a, U);
+                subtraction(V3, G, V3);
+                division(V1, R, V3, b);
 
                 value_type lead_coeff = G.back().inversed();
                 std::transform(G.begin(), G.end(), G.begin(),
