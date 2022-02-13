@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     typedef typename curve_type::scalar_field_type FieldType;
 
     typedef hashes::keccak_1600<256> merkle_hash_type;
-    typedef hashes::sha2<256> transcript_hash_type;
+    typedef hashes::keccak_1600<256> transcript_hash_type;
 
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
         auto proof = lpc_type::proof_eval(evaluation_points, tree, poly, transcript, fri_params);
 
         // verify
-        zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(x_data);
+        zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript_verifier(x_data);
 
         BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, transcript_verifier, fri_params));
     }
