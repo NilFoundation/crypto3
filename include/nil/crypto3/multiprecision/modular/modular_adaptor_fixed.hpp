@@ -25,10 +25,14 @@ namespace nil {
                 public:
                     typedef modular_params<Backend> modular_type;
 
-                    constexpr modular_params_ct() {}
+                    constexpr modular_params_ct() {
+                    }
 
-                    template <typename T>
-                    constexpr modular_params_ct(const T &input) {}
+                    constexpr modular_params_ct(modular_type &input) {
+                    }
+
+                    constexpr void set_modular_params(const modular_type &input) {
+                    }
 
                     template <typename T>
                     constexpr void set_modular_params(const T &input) {}
@@ -49,8 +53,7 @@ namespace nil {
                     constexpr modular_params_rt() {
                     }
 
-                    template <typename T>
-                    constexpr modular_params_rt(const T &input) {
+                    constexpr modular_params_rt(modular_type input) {
                         m_mod = input;
                     }
 
@@ -74,9 +77,9 @@ namespace nil {
                 };
 
                 // fixed precision modular backend which supports compile-time execution
-                template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked, typename SafeType>
-                class modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>, SafeType>
-                    : public SafeType {
+                template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked, typename StateType>
+                class modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>, StateType>
+                    : public StateType {
                 protected:
                     typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> Backend;
 
@@ -115,18 +118,18 @@ namespace nil {
 #endif
 
                     template<typename Backend1, typename Backend2>
-                    constexpr modular_adaptor(const Backend1 &b, const Backend2 &m) : SafeType(m) {
+                    constexpr modular_adaptor(const Backend1 &b, const Backend2 &m) : StateType(m) {
                         this->mod_data().adjust_modular(m_base, b);
                     }
 
                     constexpr explicit modular_adaptor(const Backend &m) :
                         m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u)),
-                        SafeType(number_type(m)) {
+                        StateType(number_type(m)) {
                         this->mod_data().adjust_modular(m_base);
                     }
 
                     constexpr explicit modular_adaptor(const number_type &m) :
-                        m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u)), SafeType(m) {
+                        m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u)), StateType(m) {
                         this->mod_data().adjust_modular(m_base);
                     }
 

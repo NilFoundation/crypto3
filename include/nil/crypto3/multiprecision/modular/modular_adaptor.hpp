@@ -293,7 +293,7 @@ namespace nil {
                 // TODO: is the function required
                 // template <class Result, class Backend>
                 // constexpr typename boost::disable_if_c<boost::is_complex<Result>::value>::type
-                // eval_convert_to(Result* result, const modular_adaptor<Backend, SafeType>& val)
+                // eval_convert_to(Result* result, const modular_adaptor<Backend, StateType>& val)
                 // {
                 //    using default_ops::eval_convert_to;
                 //    eval_convert_to(result, val.base_data());
