@@ -65,7 +65,7 @@ namespace nil {
                         return negone;
                     }
 
-                    modular_adaptor<Backend, modular_params_value_save<Backend>> a_mod, res_mod;
+                    modular_adaptor<Backend, modular_params_rt<Backend>> a_mod, res_mod;
 
                     assign_components(a_mod, a, p);
 
@@ -90,7 +90,7 @@ namespace nil {
                     eval_subtract(q, posone);
                     eval_right_shift(q, 1);
 
-                    modular_adaptor<Backend, modular_params_value_save<Backend>> r_mod, n_mod = a_mod, r_sq_mod;
+                    modular_adaptor<Backend, modular_params_rt<Backend>> r_mod, n_mod = a_mod, r_sq_mod;
 
                     eval_pow(r_mod, a_mod, q);
                     eval_pow(r_sq_mod, r_mod, two);
@@ -114,7 +114,7 @@ namespace nil {
                     eval_left_shift(q, 1);
                     eval_add(q, posone);
 
-                    modular_adaptor<Backend, modular_params_value_save<Backend>> z_mod, c_mod, q_mod;
+                    modular_adaptor<Backend, modular_params_rt<Backend>> z_mod, c_mod, q_mod;
 
                     assign_components(z_mod, z, p);
                     eval_pow(c_mod, z_mod, q);
@@ -204,7 +204,7 @@ namespace nil {
                         return negone;
                     }
 
-                    modular_adaptor<Backend, modular_params_value_save<Backend>> a_mod, res_mod;
+                    modular_adaptor<Backend, modular_params_rt<Backend>> a_mod, res_mod;
 
                     assign_components(a_mod, a, p);
 
@@ -228,7 +228,7 @@ namespace nil {
                     eval_subtract(q, posone);
                     eval_right_shift(q, 1);
 
-                    modular_adaptor<Backend, modular_params_value_save<Backend>> r_mod, n_mod = a_mod, r_sq_mod;
+                    modular_adaptor<Backend, modular_params_rt<Backend>> r_mod, n_mod = a_mod, r_sq_mod;
 
                     eval_pow(r_mod, a_mod, q);
                     eval_pow(r_sq_mod, r_mod, two);
@@ -253,7 +253,7 @@ namespace nil {
                     eval_left_shift(q, 1);
                     eval_add(q, posone);
 
-                    modular_adaptor<Backend, modular_params_value_save<Backend>> z_mod, c_mod, q_mod;
+                    modular_adaptor<Backend, modular_params_rt<Backend>> z_mod, c_mod, q_mod;
 
                     assign_components(z_mod, z, p);
                     eval_pow(c_mod, z_mod, q);

@@ -21,41 +21,40 @@ namespace nil {
                 class modular_adaptor;
 
                 template<typename Backend, const nil::crypto3::multiprecision::modular_params<Backend> &Modulus>
-                class modular_params_static_save {
+                class modular_params_ct {
                 public:
-                    typedef modular_params<Backend> modulus_type;
+                    typedef modular_params<Backend> modular_type;
 
-                    constexpr modular_params_static_save() {
-                    }
+                    constexpr modular_params_ct() {}
 
-                    constexpr modular_params_static_save(modulus_type &input) {}
+                    template <typename T>
+                    constexpr modular_params_ct(const T &input) {}
 
-                    constexpr void set_modular_params(const modulus_type &input) {}
+                    template <typename T>
+                    constexpr void set_modular_params(const T &input) {}
 
-                    constexpr void set_modular_params(const number<Backend> &input) {
-                    }
-
-                    constexpr const modulus_type &mod_data() const {
+                    constexpr const modular_type &mod_data() const {
                         return m_mod;
                     }
 
                 protected:
-                    constexpr static const modulus_type m_mod = Modulus;
+                    constexpr static const modular_type m_mod = Modulus;
                 };
 
                 template<typename Backend>
-                class modular_params_value_save {
+                class modular_params_rt {
                 public:
-                    typedef modular_params<Backend> modulus_type;
+                    typedef modular_params<Backend> modular_type;
 
-                    constexpr modular_params_value_save() {
+                    constexpr modular_params_rt() {
                     }
 
-                    constexpr modular_params_value_save(modulus_type input) {
+                    template <typename T>
+                    constexpr modular_params_rt(const T &input) {
                         m_mod = input;
                     }
 
-                    constexpr void set_modular_params(const modulus_type &input) {
+                    constexpr void set_modular_params(const modular_type &input) {
                         m_mod = input;
                     }
 
@@ -63,16 +62,15 @@ namespace nil {
                         m_mod = input;
                     }
 
-
-                    constexpr modulus_type &mod_data() {
+                    constexpr modular_type &mod_data() {
                         return m_mod;
                     }
-                    constexpr const modulus_type &mod_data() const {
+                    constexpr const modular_type &mod_data() const {
                         return m_mod;
                     }
 
                 public:
-                    modulus_type m_mod;
+                    modular_type m_mod;
                 };
 
                 // fixed precision modular backend which supports compile-time execution
@@ -83,11 +81,11 @@ namespace nil {
                     typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> Backend;
 
                 public:
-                    typedef modular_params<Backend> modulus_type;
+                    typedef modular_params<Backend> modular_type;
                     typedef Backend backend_type;
 
                 protected:
-                    typedef typename modulus_type::policy_type policy_type;
+                    typedef typename modular_type::policy_type policy_type;
                     typedef typename policy_type::Backend_padded_limbs Backend_padded_limbs;
                     typedef typename policy_type::Backend_doubled_limbs Backend_doubled_limbs;
                     typedef typename policy_type::number_type number_type;
@@ -159,12 +157,12 @@ namespace nil {
                             } else
                                 part.erase();
                             if (!part.empty())
-                                this->mod_data() = part.c_str();
+                                this->set_modular_params(part.c_str());
                             else
-                                this->mod_data() = zero;
+                                this->set_modular_params(zero);
                         } else {
                             m_base = s;
-                            this->mod_data() = zero;
+                            this->set_modular_params(zero);
                         }
                         return *this;
                     }
@@ -201,8 +199,11 @@ namespace nil {
 
                     constexpr void swap(modular_adaptor &o) {
                         m_base.swap(o.base_data());
-                        // TODO: add swap to modulus_type
-                        this->mod_data().swap(o.mod_data());
+                        // TODO: add swap to modular_type
+//                        this->mod_data().swap(o.mod_data());
+                        auto t = this->mod_data();
+                        this->set_modular_params(o.mod_data());
+                        this->set_modular_params(t);
                     }
 
                     constexpr modular_adaptor &operator=(const modular_adaptor &o) {
@@ -215,7 +216,7 @@ namespace nil {
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
                     constexpr modular_adaptor &operator=(modular_adaptor &&o) BOOST_NOEXCEPT {
                         m_base = o.base_data();
-                        this->mod_data() = o.mod_data();
+                        this->set_modular_params(o.mod_data());
 
                         return *this;
                     }

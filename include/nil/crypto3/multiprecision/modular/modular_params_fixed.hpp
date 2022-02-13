@@ -82,7 +82,7 @@ namespace nil {
 
                 template<typename Backend1>
                 constexpr typename boost::enable_if_c<boost::is_same<Backend1, Backend>::value>::type
-                    adjust_modular(Backend1 &result) {
+                    adjust_modular(Backend1 &result) const {
                     adjust_modular(result, result);
                 }
 

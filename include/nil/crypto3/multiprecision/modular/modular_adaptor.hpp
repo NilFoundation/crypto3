@@ -33,12 +33,12 @@ namespace nil {
 
                 template<typename Backend, typename SafeType>
                 struct modular_adaptor {
-                    typedef modular_params<Backend> modulus_type;
+                    typedef modular_params<Backend> modular_type;
                     typedef Backend backend_type;
 
                 protected:
                     Backend m_base;
-                    modulus_type m_mod;
+                    modular_type m_mod;
 
                 public:
                     inline Backend& base_data() {
@@ -47,10 +47,10 @@ namespace nil {
                     inline const Backend& base_data() const {
                         return m_base;
                     }
-                    inline modulus_type& mod_data() {
+                    inline modular_type& mod_data() {
                         return m_mod;
                     }
-                    inline const modulus_type& mod_data() const {
+                    inline const modular_type& mod_data() const {
                         return m_mod;
                     }
 

@@ -45,7 +45,7 @@ using namespace nil::crypto3::multiprecision;
 
 template<typename Backend>
 void base_operators() {
-    typedef number<modular_adaptor<Backend, backends::modular_params_value_save<Backend>>> modular_number;
+    typedef number<modular_adaptor<Backend, backends::modular_params_rt<Backend>>> modular_number;
     typedef modular_params<Backend> params_number;
     typedef number<Backend> standart_number;
 
@@ -96,7 +96,7 @@ void base_operators() {
 
 template<typename Backend>
 void comparsion_operators() {
-    typedef number<modular_adaptor<Backend, backends::modular_params_value_save<Backend>>> modular_number;
+    typedef number<modular_adaptor<Backend, backends::modular_params_rt<Backend>>> modular_number;
     typedef modular_params<Backend> params_number;
     typedef number<Backend> standart_number;
 
@@ -126,7 +126,7 @@ void comparsion_operators() {
 
 template<typename Backend>
 void bitwise_operators() {
-    typedef number<modular_adaptor<Backend, backends::modular_params_value_save<Backend>>> modular_number;
+    typedef number<modular_adaptor<Backend, backends::modular_params_rt<Backend>>> modular_number;
     typedef modular_params<Backend> params_number;
     typedef number<Backend> standart_number;
 
@@ -156,7 +156,7 @@ void bitwise_operators() {
 
 template<typename Backend>
 void pow_test() {
-    typedef number<modular_adaptor<Backend, backends::modular_params_value_save<Backend>>> modular_number;
+    typedef number<modular_adaptor<Backend, backends::modular_params_rt<Backend>>> modular_number;
     typedef modular_params<Backend> params_number;
     typedef number<Backend> standart_number;
 
