@@ -48,6 +48,7 @@ namespace nil {
                         typedef typename suite_type::group_value_type group_value_type;
                         typedef typename suite_type::field_value_type field_value_type;
                         typedef typename suite_type::modular_type modular_type;
+                        typedef typename suite_type::modular_backend modular_backend;
 
                         typedef nil::crypto3::multiprecision::modular_params<modular_backend> modular_params_type;
 
