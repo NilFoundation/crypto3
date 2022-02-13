@@ -60,7 +60,7 @@ constexpr void pow_test(const number<Backend, ExpressionTemplates>& a,
                         const number<Backend, ExpressionTemplates>& m) {
     typedef number<Backend, ExpressionTemplates> standard_number;
     typedef modular_params<Backend> params_number;
-    using params_safe_type = nil::crypto3::multiprecision::backends::modular_params_value_save<Backend>;
+    using params_safe_type = nil::crypto3::multiprecision::backends::modular_params_rt<Backend>;
     typedef number<modular_adaptor<Backend, params_safe_type>> modular_number;
 
     params_number mod_p(m);
@@ -92,7 +92,7 @@ template<typename Number>
 constexpr bool base_operations_test(std::array<Number, test_set_len> test_set) {
     typedef typename Number::backend_type Backend;
     typedef typename default_ops::double_precision_type<Backend>::type Backend_doubled;
-    using params_safe_type = nil::crypto3::multiprecision::backends::modular_params_value_save<Backend>;
+    using params_safe_type = nil::crypto3::multiprecision::backends::modular_params_rt<Backend>;
     typedef number<modular_adaptor<Backend, params_safe_type>> modular_number;
     typedef modular_params<Backend> params_number;
     typedef Number standard_number;
@@ -197,7 +197,7 @@ bool base_operations_test_mixed(const std::array<Number, test_set_len>& test_set
     typedef typename Number::backend_type Backend;
     typedef typename cpp_int::backend_type Backend_dynamic;
     typedef typename default_ops::double_precision_type<Backend>::type Backend_doubled;
-    using params_safe_type = nil::crypto3::multiprecision::backends::modular_params_value_save<Backend>;
+    using params_safe_type = nil::crypto3::multiprecision::backends::modular_params_rt<Backend>;
     typedef number<modular_adaptor<Backend, params_safe_type>> modular_number;
     typedef number<modular_adaptor<Backend_dynamic, params_safe_type>> dynamic_modular_number;
     typedef modular_params<Backend> params_number;
@@ -543,7 +543,7 @@ BOOST_AUTO_TEST_SUITE(runtime_tests)
 BOOST_AUTO_TEST_CASE(secp256k1_incorrect_multiplication) {
     using Backend = cpp_int_backend<256, 256>;
     using standart_number = number<Backend>;
-    using params_safe_type = nil::crypto3::multiprecision::backends::modular_params_value_save<Backend>;
+    using params_safe_type = nil::crypto3::multiprecision::backends::modular_params_rt<Backend>;
     using modular_number = number<modular_adaptor<Backend, params_safe_type>>;
     constexpr standart_number modulus = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F_cppui256;
     constexpr modular_number x(0xb5d724ce6f44c3c587867bbcb417e9eb6fa05e7e2ef029166568f14eb3161387_cppui256, modulus);

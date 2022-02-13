@@ -21,16 +21,18 @@ namespace nil {
                 class modular_adaptor;
 
                 template<typename Backend, const nil::crypto3::multiprecision::modular_params<Backend> &Modulus>
-                class modular_params_static_save {
+                class modular_params_ct {
                 public:
                     typedef modular_params<Backend> modulus_type;
 
-                    constexpr modular_params_static_save() {
+                    constexpr modular_params_ct() {
                     }
 
-                    constexpr modular_params_static_save(modulus_type &input) {}
+                    constexpr modular_params_ct(modulus_type &input) {
+                    }
 
-                    constexpr void set_modular_params(const modulus_type &input) {}
+                    constexpr void set_modular_params(const modulus_type &input) {
+                    }
 
                     constexpr void set_modular_params(const number<Backend> &input) {
                     }
@@ -44,14 +46,14 @@ namespace nil {
                 };
 
                 template<typename Backend>
-                class modular_params_value_save {
+                class modular_params_rt {
                 public:
                     typedef modular_params<Backend> modulus_type;
 
-                    constexpr modular_params_value_save() {
+                    constexpr modular_params_rt() {
                     }
 
-                    constexpr modular_params_value_save(modulus_type input) {
+                    constexpr modular_params_rt(modulus_type input) {
                         m_mod = input;
                     }
 
@@ -62,7 +64,6 @@ namespace nil {
                     constexpr void set_modular_params(const number<Backend> &input) {
                         m_mod = input;
                     }
-
 
                     constexpr modulus_type &mod_data() {
                         return m_mod;
@@ -76,9 +77,9 @@ namespace nil {
                 };
 
                 // fixed precision modular backend which supports compile-time execution
-                template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked, typename SafeType>
-                class modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>, SafeType>
-                    : public SafeType {
+                template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked, typename StateType>
+                class modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>, StateType>
+                    : public StateType {
                 protected:
                     typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> Backend;
 
@@ -117,18 +118,18 @@ namespace nil {
 #endif
 
                     template<typename Backend1, typename Backend2>
-                    constexpr modular_adaptor(const Backend1 &b, const Backend2 &m) : SafeType(m) {
+                    constexpr modular_adaptor(const Backend1 &b, const Backend2 &m) : StateType(m) {
                         this->mod_data().adjust_modular(m_base, b);
                     }
 
                     constexpr explicit modular_adaptor(const Backend &m) :
                         m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u)),
-                        SafeType(number_type(m)) {
+                        StateType(number_type(m)) {
                         this->mod_data().adjust_modular(m_base);
                     }
 
                     constexpr explicit modular_adaptor(const number_type &m) :
-                        m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u)), SafeType(m) {
+                        m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u)), StateType(m) {
                         this->mod_data().adjust_modular(m_base);
                     }
 
