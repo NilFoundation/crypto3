@@ -61,7 +61,7 @@ namespace nil {
                         constexpr static const modular_params_type modulus_params = modulus;
 
                         typedef nil::crypto3::multiprecision::number<
-                            nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_static_save<modular_backend, modulus_params>>>
+                            nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                             data_type;
 
                         data_type data;
