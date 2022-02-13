@@ -54,16 +54,12 @@ namespace nil {
                         typedef typename policy_type::modular_type modular_type;
                         typedef typename policy_type::integral_type integral_type;
                         typedef typename policy_type::modular_backend modular_backend;
+                        typedef typename policy_type::modular_params_type modular_params_type;
 
-                        typedef nil::crypto3::multiprecision::modular_params<modular_backend> modular_params_type;
-
+                        constexpr static const modular_params_type modulus_params = policy_type::modulus_params;
                         constexpr static const integral_type modulus = policy_type::modulus;
-                        constexpr static const modular_params_type modulus_params = modulus;
 
-                        typedef nil::crypto3::multiprecision::number<
-                            nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
-                            data_type;
-
+                        using data_type = modular_type;
                         data_type data;
 
                         constexpr element_fp() : data(data_type(0, modulus_params)) {};

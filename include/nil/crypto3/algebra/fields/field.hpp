@@ -68,6 +68,8 @@ namespace nil {
                     typedef nil::crypto3::multiprecision::number<
                         nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_rt<modular_backend>>>
                         modular_type;
+
+                    typedef nil::crypto3::multiprecision::modular_params<modular_backend> modular_params_type;
                 };
 
             }    // namespace fields
