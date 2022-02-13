@@ -14,7 +14,7 @@ namespace nil {
     namespace crypto3 {
         namespace multiprecision {
             namespace backends {
-#if BOOST_ARCH_X86_64
+#if (BOOST_ARCH_X86_64 & 0)
                 template<typename Limb1, typename Limb2>
                 void sub_asm(size_t n, Limb1 *x, const Limb2 *y) {
                     __asm__(
