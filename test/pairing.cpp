@@ -921,5 +921,4 @@ BOOST_DATA_TEST_CASE(pairing_operation_test_mnt6_298, string_data("pairing_opera
 
     pairing_operation_test<curve_type>(data_set);
 }
-
 BOOST_AUTO_TEST_SUITE_END()
