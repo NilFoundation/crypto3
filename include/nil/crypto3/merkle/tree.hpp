@@ -186,29 +186,25 @@ namespace nil {
                         BOOST_ASSERT_MSG(data.size() % Arity == 0, "Wrong leafs number");
                         hash_vector.resize(_size);
                         rc = detail::merkle_tree_row_count(_leafs, Arity);
-                        size_t prev_layer_element = 0, start_layer_element = 0, layer_elements = _leafs;
-                        for (size_t row_number = 0; row_number < rc; ++row_number) {
-                            for (size_t current_element = start_layer_element;
-                                 current_element < start_layer_element + layer_elements;
-                                 ++current_element) {
-                                if (row_number == 0) {
-                                    hash_vector[current_element] = (static_cast<typename hash_type::digest_type>(
-                                        crypto3::hash<hash_type>(data[current_element])));
-                                } else {
-                                    accumulator_set<hash_type> acc;
-                                    size_t children_index =
-                                        (current_element - start_layer_element) * Arity + prev_layer_element;
-                                    typename std::vector<value_type>::iterator it =
-                                        hash_vector.begin() + children_index;
-                                    for (size_t i = 0; i < Arity; ++i, ++it) {
-                                        crypto3::hash<hash_type>(it->begin(), it->end(), acc);
-                                    }
-                                    hash_vector[current_element] = (accumulators::extract::hash<hash_type>(acc));
+                        for (size_t i = 0; i < _leafs; ++i) {
+                            hash_vector[i] =
+                                (static_cast<typename hash_type::digest_type>(crypto3::hash<hash_type>(data[i])));
+                        }
+                        size_t prev_row_idx = 0, row_idx = _leafs, row_size = _leafs / Arity;
+
+                        for (size_t row_number = 1; row_number < rc; ++row_number) {
+                            for (size_t cur_element = row_idx; cur_element < row_idx + row_size; ++cur_element) {
+                                accumulator_set<hash_type> acc;
+                                size_t children_idx = (cur_element - row_idx) * Arity + prev_row_idx;
+                                typename std::vector<value_type>::iterator it = hash_vector.begin() + children_idx;
+                                for (size_t i = 0; i < Arity; ++i, ++it) {
+                                    crypto3::hash<hash_type>(it->begin(), it->end(), acc);
                                 }
+                                hash_vector[cur_element] = (accumulators::extract::hash<hash_type>(acc));
                             }
-                            prev_layer_element = start_layer_element;
-                            start_layer_element += layer_elements;
-                            layer_elements /= Arity;
+                            prev_row_idx = row_idx;
+                            row_idx += row_size;
+                            row_size /= Arity;
                         }
                     }
 
