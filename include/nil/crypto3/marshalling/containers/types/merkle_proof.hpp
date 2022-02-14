@@ -76,6 +76,8 @@ namespace nil {
                                 nil::marshalling::types::bundle<
                                     TTypeBase,
                                     std::tuple<
+                                        // position
+                                        nil::marshalling::types::integral<TTypeBase, std::size_t>,
                                         // TODO: use nil::marshalling::option::fixed_size_storage with
                                         //  hash_type::digest_size
                                         // TODO: review std::uint8_t type usage
@@ -84,9 +86,7 @@ namespace nil {
                                             TTypeBase,
                                             nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
                                             nil::marshalling::option::sequence_size_field_prefix<
-                                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
-                                        // position
-                                        nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>,
                                 // TODO: use nil::marshalling::option::fixed_size_storage<MerkleProof::arity - 1>
                                 nil::marshalling::option::sequence_size_field_prefix<
                                     nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
@@ -137,10 +137,10 @@ namespace nil {
                     using layer_element_marshalling_type =
                         nil::marshalling::types::bundle<TTypeBase,
                                                         std::tuple<
-                                                            // hash
-                                                            digest_marshalling_type,
                                                             // position
-                                                            size_t_marshalling_type>>;
+                                                            size_t_marshalling_type,
+                                                            // hash
+                                                            digest_marshalling_type>>;
                     using layer_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase,
                         layer_element_marshalling_type,
@@ -165,7 +165,7 @@ namespace nil {
                                 filled_layer_element_hash.value().push_back(octet_marshalling_type(c));
                             }
                             filled_layer.value().push_back(layer_element_marshalling_type(
-                                std::make_tuple(filled_layer_element_hash, size_t_marshalling_type(el.position()))));
+                                std::make_tuple(size_t_marshalling_type(el.position()), filled_layer_element_hash)));
                         }
                         filled_path.value().push_back(filled_layer);
                     }
@@ -197,11 +197,11 @@ namespace nil {
                             // TODO: fix for the case of non-static container
                             for (std::size_t j = 0; j < element_hash.size(); ++j) {
                                 element_hash.at(j) =
-                                    std::get<0>(filled_layer.value().at(i).value()).value().at(j).value();
+                                    std::get<1>(filled_layer.value().at(i).value()).value().at(j).value();
                             }
                             merkle_proof_marshalling<MerkleProof>::set_layer_element_hash(layer_element, element_hash);
                             merkle_proof_marshalling<MerkleProof>::set_layer_element_position(
-                                layer_element, std::get<1>(filled_layer.value().at(i).value()).value());
+                                layer_element, std::get<0>(filled_layer.value().at(i).value()).value());
                             path_layer.at(i) = layer_element;
                         }
                         merkle_proof_marshalling<MerkleProof>::append_path(mp, path_layer);
