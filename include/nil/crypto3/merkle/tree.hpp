@@ -31,21 +31,12 @@
 
 #include <boost/config.hpp>
 
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/graph_as_tree.hpp>
-
 #include <nil/crypto3/detail/static_digest.hpp>
 #include <nil/crypto3/detail/type_traits.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
 #include <nil/crypto3/merkle/node.hpp>
-
-enum vertex_hash_t { vertex_hash };
-
-namespace boost {
-    BOOST_INSTALL_PROPERTY(vertex, hash);
-}
 
 namespace nil {
     namespace crypto3 {
@@ -184,14 +175,6 @@ namespace nil {
                     typedef typename node_type::value_type value_type;
                     constexpr static const std::size_t value_bits = node_type::value_bits;
 
-                protected:
-                    typedef boost::adjacency_list<boost::vecS,
-                                                  boost::vecS,
-                                                  boost::bidirectionalS,
-                                                  boost::property<vertex_hash_t, value_type>>
-                        graph_type;
-                    typedef typename boost::property_map<graph_type, vertex_hash_t>::type vertex_hash_map_type;
-
                 public:
                     merkle_tree_impl (): _leafs(0), _size(0), rc(0) {};
 
@@ -201,30 +184,22 @@ namespace nil {
                     merkle_tree_impl(std::vector<LeafRange> data) :
                         _leafs(data.size()), _size(detail::merkle_tree_length(_leafs, Arity)) {
                         BOOST_ASSERT_MSG(data.size() % Arity == 0, "Wrong leafs number");
-
-                        vertex_hash_map_type property_hash_map = hash_map();
+                        hash_vector.resize(_size);
                         rc = detail::merkle_tree_row_count(_leafs, Arity);
-                        for (size_t i = 0; i < _size; ++i) {
-                            boost::add_vertex(_t);
-                        }
                         size_t prev_layer_element = 0, start_layer_element = 0, layer_elements = _leafs;
                         for (size_t row_number = 0; row_number < rc; ++row_number) {
                             for (size_t current_element = start_layer_element;
                                  current_element < start_layer_element + layer_elements;
                                  ++current_element) {
                                 if (row_number == 0) {
-                                    put(property_hash_map, current_element, static_cast<typename hash_type::digest_type>(
-                                                                                crypto3::hash<hash_type>(data[current_element])));
+                                    hash_vector[current_element] = (static_cast<typename hash_type::digest_type>(crypto3::hash<hash_type>(data[current_element])));
                                 } else {
                                     accumulator_set<hash_type> acc;
                                     for (size_t i = 0; i < Arity; ++i) {
-                                        size_t children_index =
-                                            (current_element - start_layer_element) * Arity + prev_layer_element + i;
-                                        crypto3::hash<hash_type>(
-                                            get(property_hash_map, children_index).begin(), get(hash_map(), children_index).end(), acc);
-                                        add_edge(children_index, current_element, _t);
+                                        size_t children_index = (current_element - start_layer_element) * Arity + prev_layer_element + i;
+                                        crypto3::hash<hash_type>(hash_vector[children_index].begin(), hash_vector[children_index].end(), acc);
                                     }
-                                    put(property_hash_map, current_element, accumulators::extract::hash<hash_type>(acc));
+                                    hash_vector[current_element] = (accumulators::extract::hash<hash_type>(acc));
                                 }
                             }
                             prev_layer_element = start_layer_element;
@@ -233,62 +208,12 @@ namespace nil {
                         }
                     }
 
-                    std::array<size_t, Arity> children(size_t leaf_index) const {
-                        std::array<size_t, Arity> res;
-
-                        typename boost::graph_traits<graph_type>::in_edge_iterator ein, edgein_end;
-
-                        std::size_t i = 0;
-
-                        for (boost::tie(ein, edgein_end) = in_edges(leaf_index, _t); ein != edgein_end; ++ein, ++i) {
-                            res[i] = source(*ein, _t);
-                        }
-                        return res;
-                    }
-
-                    size_t parent(size_t leaf_index) const  {
-                        typename boost::graph_traits<graph_type>::out_edge_iterator ei, edge_end;
-                        boost::tie(ei, edge_end) = out_edges(leaf_index, _t);
-                        return target(*ei, _t);
-                    }
-
                     value_type root() {
-                        return get(hash_map(), _size - 1);
-                    }
-
-                    std::vector<value_type> hash_path(size_t leaf_index) const {
-                        std::vector<value_type> res;
-                        res.push_back(get(hash_map(), leaf_index));
-                        typename boost::graph_traits<graph_type>::adjacency_iterator ai, a_end;
-                        boost::tie(ai, a_end) = adjacent_vertices(leaf_index, _t);
-                        while (ai != a_end) {    // while not the root
-                            res.push_back(get(hash_map(), *ai));
-                            boost::tie(ai, a_end) = adjacent_vertices(*ai, _t);
-                        }
-                        return res;
+                        return hash_vector[_size - 1];
                     }
 
                     value_type &operator[](std::size_t idx) {
-                        return get(hash_map(), idx);
-                    }
-
-                    friend std::ostream &operator<<(std::ostream &o, merkle_tree_impl const &a) {
-                        typename boost::graph_traits<graph_type>::vertex_iterator i, end;
-                        typename boost::graph_traits<graph_type>::in_edge_iterator ein, edgein_end;
-                        for (boost::tie(i, end) = vertices(a._t); i != end; ++i) {
-                            boost::tie(ein, edgein_end) = in_edges(*i, a._t);
-                            if (ein == edgein_end) {
-                                std::cout << "(" << *i << ", " << get(a.hash_map, *i) << ") --- leaf";
-                            } else {
-                                std::cout << "(" << *i << ", " << get(a.hash_map, *i) << ") <-- ";
-                            }
-                            for (; ein != edgein_end; ++ein) {
-                                size_t idx_vertex = source(*ein, a._t);
-                                std::cout << "(" << idx_vertex << ", " << get(a.hash_map, idx_vertex) << ")  ";
-                            }
-                            std::cout << std::endl;
-                        }
-                        return o;
+                        return hash_vector[idx];
                     }
 
                     size_t row_count() const {
@@ -304,11 +229,7 @@ namespace nil {
                     }
 
                 private:
-                    vertex_hash_map_type hash_map() {
-                        return get(vertex_hash, _t);
-                    }
-
-                    graph_type _t;
+                    std::vector<value_type> hash_vector;
 
                     size_t _leafs;
                     size_t _size;

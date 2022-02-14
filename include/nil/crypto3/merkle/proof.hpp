@@ -66,28 +66,27 @@ namespace nil {
                     merkle_proof_impl(merkle_tree<hash_type, arity> tree, std::size_t leaf_idx) {
                         _root = tree.root();
                         _path.resize(tree.row_count() - 1);
-
                         _li = leaf_idx;
 
-                        std::size_t cur_leaf = leaf_idx, cur_row = 0;
-
+                        typename std::vector<layer_type>::iterator v_itr = _path.begin();
+                        std::size_t cur_leaf = leaf_idx;
+                        std::size_t row_len = tree.leafs();
+                        std::size_t row_begin_idx = 0;
                         while (cur_leaf != tree.size() - 1) {    // while it's not _root
-                            std::size_t parent = tree.parent(cur_leaf);
-                            std::array<std::size_t, arity> children = tree.children(parent);
                             std::size_t cur_leaf_pos = cur_leaf % arity;
-                            for (size_t i = 0; i < arity; ++i) {
-                                std::size_t current_child = children[i];
-                                if (cur_leaf != current_child) {
-                                    std::size_t save_position = current_child % arity;
-                                    if (save_position > cur_leaf_pos) {
-                                        --save_position;
-                                    }
-                                    _path[cur_row][save_position] =
-                                        path_element_type(tree[current_child], current_child % arity);
-                                }
+                            std::size_t cur_leaf_arity_pos = (cur_leaf - row_begin_idx) / arity;
+                            std::size_t begin_this_arity = cur_leaf - cur_leaf_pos;
+                            typename layer_type::iterator a_itr = v_itr->begin();
+                            for (size_t i = 0; i < cur_leaf_pos; ++i,  ++begin_this_arity,  ++a_itr) {
+                                *a_itr = path_element_type(tree[begin_this_arity], i);
                             }
-                            cur_row++;
-                            cur_leaf = parent;
+                            for (size_t i = cur_leaf_pos + 1; i < arity; ++i,  ++begin_this_arity,  ++a_itr) {
+                                *a_itr = path_element_type(tree[begin_this_arity + 1], i);
+                            }
+                            v_itr++;
+                            cur_leaf = row_len + row_begin_idx + cur_leaf_arity_pos;
+                            row_begin_idx += row_len;
+                            row_len /= arity;
                         }
                     }
 
