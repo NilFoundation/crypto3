@@ -59,7 +59,6 @@ namespace nil {
 
                         std::array<math::polynomial::polynomial<typename FieldType::value_type>,
                                              argument_size> F;
-                        // std::vector<math::polynomial::polynomial<typename FieldType::value_type>> gates(N_sel);
 
                         std::size_t nu = 0;
 

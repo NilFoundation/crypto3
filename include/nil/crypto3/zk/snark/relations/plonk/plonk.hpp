@@ -40,6 +40,7 @@
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
 #include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/polynomial_shift.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -131,6 +132,10 @@ namespace nil {
                                     term.coeff};
 
                                 for (auto &var : term.vars) {
+
+                                    const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
+                                        math::make_evaluation_domain<FieldType>(full_variable_assignment[var.wire_index].size());
+
                                     term_polynom = term_polynom * detail::polynomial_shift(wire_polynomials[var.wire_index], 
                                         domain->get_domain_element(var.rotation));
                                 }
