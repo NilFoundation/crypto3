@@ -41,7 +41,7 @@
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
-#include <nil/crypto3/merkle/tree.hpp> // until fri inclusion
+#include <nil/crypto3/merkle/tree.hpp>    // until fri inclusion
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
@@ -74,23 +74,21 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
 
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
-    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = fri_type::calculate_domain_set(extended_log, r);
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        fri_type::calculate_domain_set(extended_log, r);
 
-    math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
     params.r = r;
     params.D = D;
     params.q = q;
     params.max_degree = d;
 
-    BOOST_CHECK(D[1]->m == D[0]->m/2);
+    BOOST_CHECK(D[1]->m == D[0]->m / 2);
     BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
     BOOST_CHECK(params.q.evaluate(D[0]->get_domain_element(1)) == D[0]->get_domain_element(1).squared());
 
     // commit
-    math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1,
-                                                                        5, 6, 7, 2,
-                                                                        8, 7, 5, 6,
-                                                                        1, 2, 1, 1};
+    math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
 
     merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
     std::array<typename FieldType::value_type, 1> evaluation_points = {D[0]->get_domain_element(1).pow(5)};
@@ -101,12 +99,12 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
 
     // LPC-related logic, here we "nulify" it via U = 0, V - 1
     // TODO: Make FRI independent from LPC input
-    math::polynomial::polynomial<typename FieldType::value_type> U = {0}; 
-    math::polynomial::polynomial<typename FieldType::value_type> V = {1};
+    math::polynomial<typename FieldType::value_type> U = {0};
+    math::polynomial<typename FieldType::value_type> V = {1};
 
     proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
 
-    //verify
+    // verify
     zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(init_blob);
 
     BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, U, V));
@@ -136,34 +134,31 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
     typedef typename fri_type::params_type params_type;
 
     params_type params;
-    math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
     std::size_t d_log = boost::static_log2<d>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = fri_type::calculate_domain_set(d_log, 1);
-
 
     params.r = r;
     params.D = D;
     params.q = q;
 
-    math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 3};
+    math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 3};
 
     typename FieldType::value_type omega = D[0]->get_domain_element(1);
 
     typename FieldType::value_type x_next = params.q.evaluate(omega);
     typename FieldType::value_type alpha = algebra::random_element<FieldType>();
 
-    math::polynomial::polynomial<typename FieldType::value_type> f_next =
-        fri_type::fold_polynomial(f, alpha);
+    math::polynomial<typename FieldType::value_type> f_next = fri_type::fold_polynomial(f, alpha);
 
-    BOOST_CHECK_EQUAL(f_next.degree(), f.degree()/2);
+    BOOST_CHECK_EQUAL(f_next.degree(), f.degree() / 2);
     std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points {
         std::make_pair(omega, f.evaluate(omega)),
         std::make_pair(-omega, f.evaluate(-omega)),
     };
 
-    math::polynomial::polynomial<typename FieldType::value_type> interpolant =
-        math::polynomial::lagrange_interpolation(interpolation_points);
+    math::polynomial<typename FieldType::value_type> interpolant = math::lagrange_interpolation(interpolation_points);
     typename FieldType::value_type x1 = interpolant.evaluate(alpha);
     typename FieldType::value_type x2 = f_next.evaluate(x_next);
     BOOST_CHECK(x1 == x2);
@@ -190,22 +185,19 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     typedef typename fri_type::params_type params_type;
 
     params_type params;
-    math::polynomial::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1,
-                                                                        5, 6, 7, 2,
-                                                                        8, 7, 5, 6,
-                                                                        1, 2, 1, 1};
-
+    math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
 
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
-    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = fri_type::calculate_domain_set(extended_log, r);
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        fri_type::calculate_domain_set(extended_log, r);
 
     params.r = r - 1;
     params.D = D;
     params.q = f;
     params.max_degree = d - 1;
 
-    BOOST_CHECK(D[1]->m == D[0]->m/2);
+    BOOST_CHECK(D[1]->m == D[0]->m / 2);
     merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
     std::array<typename FieldType::value_type, 1> evaluation_points = {D[0]->get_domain_element(1).pow(5)};
 
@@ -214,7 +206,7 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
 
     proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
 
-    math::polynomial::polynomial<typename FieldType::value_type> final_polynomial = proof.final_polynomial;
+    math::polynomial<typename FieldType::value_type> final_polynomial = proof.final_polynomial;
     BOOST_CHECK_EQUAL(proof.final_polynomial.degree(), 1);
 }
 

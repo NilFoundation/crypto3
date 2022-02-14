@@ -48,24 +48,26 @@ using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
 
 template<typename FieldType>
-math::polynomial::polynomial<typename FieldType::value_type>
+math::polynomial<typename FieldType::value_type>
     lagrange_polynomial(std::shared_ptr<math::evaluation_domain<FieldType>> domain, std::size_t number) {
     std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> evaluation_points;
     for (std::size_t i = 0; i < domain->m; i++) {
-        evaluation_points.push_back(
-            std::make_pair(domain->get_domain_element(i), (i != number) ? FieldType::value_type::zero() : FieldType::value_type::one()));
+        evaluation_points.push_back(std::make_pair(domain->get_domain_element(i), (i != number) ?
+                                                                                      FieldType::value_type::zero() :
+                                                                                      FieldType::value_type::one()));
     }
-    math::polynomial::polynomial<typename FieldType::value_type> f =
-        math::polynomial::lagrange_interpolation(evaluation_points);
+    math::polynomial<typename FieldType::value_type> f = math::lagrange_interpolation(evaluation_points);
+
     return f;
 }
 
-template<typename fri_type, typename FieldType> 
+template<typename fri_type, typename FieldType>
 typename fri_type::params_type create_fri_params(std::size_t degree_log) {
     typename fri_type::params_type params;
-    math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
-    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set = fri_type::calculate_domain_set(degree_log, degree_log - 1);
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
+        fri_type::calculate_domain_set(degree_log, degree_log - 1);
 
     params.r = degree_log - 1;
     params.D = domain_set;
@@ -74,8 +76,6 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log) {
 
     return params;
 }
-
-
 
 BOOST_AUTO_TEST_SUITE(redshift_prover_test_suite)
 
@@ -107,14 +107,13 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     constexpr static const std::size_t k = 1;
     typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, lambda, k, circuit_log - 1, m> lpc_type;
 
-
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(circuit_log);
     std::shared_ptr<math::evaluation_domain<FieldType>> domain = fri_params.D[0];
-    math::polynomial::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial<FieldType>(domain, 0);
+    math::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial<FieldType>(domain, 0);
 
     // TODO: implement it in a proper way in generator.hpp
-    std::vector<math::polynomial::polynomial<typename FieldType::value_type>> S_id(permutation_size);
-    std::vector<math::polynomial::polynomial<typename FieldType::value_type>> S_sigma(permutation_size);
+    std::vector<math::polynomial<typename FieldType::value_type>> S_id(permutation_size);
+    std::vector<math::polynomial<typename FieldType::value_type>> S_sigma(permutation_size);
 
     typename FieldType::value_type omega = domain->get_domain_element(1);
 
@@ -126,7 +125,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
             interpolation_points.emplace_back(omega.pow(j), delta.pow(i) * omega.pow(j));
         }
 
-        S_id[i] = math::polynomial::lagrange_interpolation(interpolation_points);
+        S_id[i] = math::lagrange_interpolation(interpolation_points);
     }
 
     for (std::size_t i = 0; i < permutation_size; i++) {
@@ -141,11 +140,11 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
             }
         }
 
-        S_sigma[i] = math::polynomial::lagrange_interpolation(interpolation_points);
+        S_sigma[i] = math::lagrange_interpolation(interpolation_points);
     }
 
     // construct circuit values
-    std::vector<math::polynomial::polynomial<typename FieldType::value_type>> f(permutation_size);
+    std::vector<math::polynomial<typename FieldType::value_type>> f(permutation_size);
     for (std::size_t i = 0; i < permutation_size; i++) {
         std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points;
         for (std::size_t j = 0; j < circuit_rows; j++) {
@@ -156,12 +155,12 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
             }
         }
 
-        f[i] = math::polynomial::lagrange_interpolation(interpolation_points);
+        f[i] = math::lagrange_interpolation(interpolation_points);
     }
 
     // construct q_last, q_blind
-    math::polynomial::polynomial<typename FieldType::value_type> q_last;
-    math::polynomial::polynomial<typename FieldType::value_type> q_blind;
+    math::polynomial<typename FieldType::value_type> q_last;
+    math::polynomial<typename FieldType::value_type> q_blind;
     std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points_last;
     std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points_blind;
     for (std::size_t j = 0; j < circuit_rows; j++) {
@@ -173,23 +172,22 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
             interpolation_points_blind.emplace_back(omega.pow(j), FieldType::value_type::zero());
         }
     }
-    q_last = math::polynomial::lagrange_interpolation(interpolation_points_last);
-    q_blind = math::polynomial::lagrange_interpolation(interpolation_points_blind);
+    q_last = math::lagrange_interpolation(interpolation_points_last);
+    q_blind = math::lagrange_interpolation(interpolation_points_blind);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> prover_transcript(init_blob);
     fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> verifier_transcript(init_blob);
-    
+
     typename redshift_permutation_argument<FieldType, lpc_type>::prover_result_type prover_res =
-        redshift_permutation_argument<FieldType, lpc_type>::prove_eval(
-            prover_transcript, circuit_rows, permutation_size, 
-            domain, lagrange_0, S_id, S_sigma, f, q_last, q_blind,
-            fri_params);
+        redshift_permutation_argument<FieldType, lpc_type>::prove_eval(prover_transcript, circuit_rows,
+                                                                       permutation_size, domain, lagrange_0, S_id,
+                                                                       S_sigma, f, q_last, q_blind, fri_params);
 
     // Challenge phase
-    //typename FieldType::value_type y = algebra::random_element<FieldType>();
+    // typename FieldType::value_type y = algebra::random_element<FieldType>();
     typename FieldType::value_type y(2);
-    std::vector<typename FieldType::value_type> f_at_y(permutation_size); 
+    std::vector<typename FieldType::value_type> f_at_y(permutation_size);
     for (int i = 0; i < permutation_size; i++) {
         f_at_y[i] = f[i].evaluate(y);
     }
@@ -199,10 +197,8 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
 
     std::array<typename FieldType::value_type, 3> verifier_res =
         redshift_permutation_argument<FieldType, lpc_type>::verify_eval(
-            verifier_transcript, circuit_rows, permutation_size, domain,
-            y, f_at_y, v_p_at_y, v_p_at_y_shifted, 
-            lagrange_0, S_id, S_sigma, q_last, q_blind,
-            prover_res.permutation_poly_commitment.root());
+            verifier_transcript, circuit_rows, permutation_size, domain, y, f_at_y, v_p_at_y, v_p_at_y_shifted,
+            lagrange_0, S_id, S_sigma, q_last, q_blind, prover_res.permutation_poly_commitment.root());
 
     typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();

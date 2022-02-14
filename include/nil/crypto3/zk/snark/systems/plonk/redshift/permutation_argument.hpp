@@ -27,6 +27,7 @@
 #define CRYPTO3_ZK_PLONK_REDSHIFT_PERMUTATION_ARGUMENT_HPP
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
+#include <nil/crypto3/math/polynomial/shift.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
@@ -36,43 +37,41 @@
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/polynomial_shift.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename FieldType, typename lpc_type>
+                template<typename FieldType, typename CommitmentSchemeType>
                 class redshift_permutation_argument {
 
-                typedef typename lpc_type::fri_type fri_type;
+                    typedef typename CommitmentSchemeType::fri_type fri_type;
 
-                static constexpr std::size_t argument_size = 3;
+                    static constexpr std::size_t argument_size = 3;
 
                 public:
-
                     struct prover_result_type {
-                        std::array<math::polynomial::polynomial<typename FieldType::value_type>,
-                                             argument_size> F;
+                        std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
 
-                        math::polynomial::polynomial<typename FieldType::value_type> permutation_polynomial;
+                        math::polynomial<typename FieldType::value_type> permutation_polynomial;
 
-                        typename lpc_type::merkle_tree_type permutation_poly_commitment;
+                        typename CommitmentSchemeType::merkle_tree_type permutation_poly_commitment;
                     };
 
+                    template<typename Hash = hashes::keccak_1600<512>>
                     static inline prover_result_type    // TODO: fix fiat-shamir
-                        prove_eval(
-                            fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> &transcript,
-                            std::size_t circuit_rows,
-                            std::size_t permutation_size,
-                            std::shared_ptr<math::evaluation_domain<FieldType>> domain,
-                            const math::polynomial::polynomial<typename FieldType::value_type> &lagrange_1,
-                            const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &S_id,
-                            const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &S_sigma,
-                            const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &f,
-                            const math::polynomial::polynomial<typename FieldType::value_type> &q_last,
-                            const math::polynomial::polynomial<typename FieldType::value_type> &q_blind,
-                            typename fri_type::params_type fri_params) {
+                        prove_eval(fiat_shamir_heuristic_updated<Hash> &transcript,
+                                   std::size_t circuit_rows,
+                                   std::size_t permutation_size,
+                                   std::shared_ptr<math::evaluation_domain<FieldType>>
+                                       domain,
+                                   const math::polynomial<typename FieldType::value_type> &lagrange_1,
+                                   const std::vector<math::polynomial<typename FieldType::value_type>> &S_id,
+                                   const std::vector<math::polynomial<typename FieldType::value_type>> &S_sigma,
+                                   const std::vector<math::polynomial<typename FieldType::value_type>> &f,
+                                   const math::polynomial<typename FieldType::value_type> &q_last,
+                                   const math::polynomial<typename FieldType::value_type> &q_blind,
+                                   typename fri_type::params_type fri_params) {
                         // 1. $\beta_1, \gamma_1 = \challenge$
                         typename FieldType::value_type beta = transcript.template challenge<FieldType>();
 
@@ -87,10 +86,10 @@ namespace nil {
                             sigma_binding[j] = FieldType::value_type::one();
                             for (std::size_t i = 0; i < permutation_size; i++) {
 
-                                id_binding[j] *=
-                                    (f[i].evaluate(domain->get_domain_element(j)) + beta * S_id[i].evaluate(domain->get_domain_element(j)) + gamma);
-                                sigma_binding[j] *=
-                                    (f[i].evaluate(domain->get_domain_element(j)) + beta * S_sigma[i].evaluate(domain->get_domain_element(j)) + gamma);
+                                id_binding[j] *= (f[i].evaluate(domain->get_domain_element(j)) +
+                                                  beta * S_id[i].evaluate(domain->get_domain_element(j)) + gamma);
+                                sigma_binding[j] *= (f[i].evaluate(domain->get_domain_element(j)) +
+                                                     beta * S_sigma[i].evaluate(domain->get_domain_element(j)) + gamma);
                             }
                         }
 
@@ -113,55 +112,60 @@ namespace nil {
 
                         V_P_domain->inverse_fft(V_P_interpolation_points);
 
-                        math::polynomial::polynomial<typename FieldType::value_type> V_P(
-                            V_P_interpolation_points.begin(), V_P_interpolation_points.end());
+                        math::polynomial<typename FieldType::value_type> V_P(V_P_interpolation_points.begin(),
+                                                                             V_P_interpolation_points.end());
 
                         // 4. Compute and add commitment to $V_P$ to $\text{transcript}$.
-                        typename lpc_type::merkle_tree_type V_P_tree = lpc_type::commit(V_P, fri_params.D[0]);
-                        typename lpc_type::commitment_type V_P_commitment = V_P_tree.root();
+                        typename CommitmentSchemeType::merkle_tree_type V_P_tree =
+                            CommitmentSchemeType::commit(V_P, fri_params.D[0]);
+                        typename CommitmentSchemeType::commitment_type V_P_commitment = V_P_tree.root();
                         transcript(V_P_commitment);
 
                         // 5. Calculate g_perm, h_perm
-                        math::polynomial::polynomial<typename FieldType::value_type> g = {1};
-                        math::polynomial::polynomial<typename FieldType::value_type> h = {1};
+                        math::polynomial<typename FieldType::value_type> g = {1};
+                        math::polynomial<typename FieldType::value_type> h = {1};
 
                         for (std::size_t i = 0; i < permutation_size; i++) {
                             g = g * (f[i] + beta * S_id[i] + gamma);
                             h = h * (f[i] + beta * S_sigma[i] + gamma);
                         }
 
-                        math::polynomial::polynomial<typename FieldType::value_type> one_polynomial = {1};
-                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, argument_size> F;
-                        
-                        math::polynomial::polynomial<typename FieldType::value_type> V_P_shifted = detail::polynomial_shift(V_P, domain->get_domain_element(1));
+                        math::polynomial<typename FieldType::value_type> one_polynomial = {1};
+                        std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
+
+                        math::polynomial<typename FieldType::value_type> V_P_shifted =
+                            math::polynomial_shift<FieldType>(V_P, domain->get_domain_element(1));
 
                         F[0] = lagrange_1 * (one_polynomial - V_P);
                         F[1] = (one_polynomial - (q_last + q_blind)) * (V_P_shifted * h - V_P * g);
                         F[2] = q_last * (V_P * V_P - V_P);
 
                         prover_result_type res = {F, V_P, V_P_tree};
-                        
+
                         return res;
                     }
 
-                    static inline std::array<typename FieldType::value_type, argument_size> verify_eval(
-                            fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> &transcript,
-                            std::size_t circuit_rows,
-                            std::size_t permutation_size,
-                            std::shared_ptr<math::evaluation_domain<FieldType>> domain,
-                            typename FieldType::value_type challenge, // y
-                            std::vector<typename FieldType::value_type> column_polynomials, // f(y)
-                            typename FieldType::value_type perm_polynomial, // V_P(y)
-                            typename FieldType::value_type perm_polynomial_shifted, // V_P(omega * y)
-                            //TODO: commitment
-                            const math::polynomial::polynomial<typename FieldType::value_type> &lagrange_1,
-                            const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &S_id,
-                            const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &S_sigma,
-                            const math::polynomial::polynomial<typename FieldType::value_type> &q_last,
-                            const math::polynomial::polynomial<typename FieldType::value_type> &q_blind,
-                            typename lpc_type::commitment_type V_P_commitment) {
+                    template<typename Hash = hashes::keccak_1600<512>>
+                    static inline std::array<typename FieldType::value_type, argument_size>
+                        verify_eval(fiat_shamir_heuristic_updated<Hash> &transcript,
+                                    std::size_t circuit_rows,
+                                    std::size_t permutation_size,
+                                    std::shared_ptr<math::evaluation_domain<FieldType>>
+                                        domain,
+                                    const typename FieldType::value_type &challenge,                          // y
+                                    const std::vector<typename FieldType::value_type> &column_polynomials,    // f(y)
+                                    const typename FieldType::value_type &perm_polynomial,                    //
+                                                                                                              // V_P(y)
+                                    const typename FieldType::value_type &perm_polynomial_shifted,    // V_P(omega * y)
+                                    // TODO: commitment
+                                    const math::polynomial<typename FieldType::value_type> &lagrange_1,
+                                    const std::vector<math::polynomial<typename FieldType::value_type>> &S_id,
+                                    const std::vector<math::polynomial<typename FieldType::value_type>> &S_sigma,
+                                    const math::polynomial<typename FieldType::value_type> &q_last,
+                                    const math::polynomial<typename FieldType::value_type> &q_blind,
+                                    const typename CommitmentSchemeType::commitment_type &V_P_commitment) {
 
-                        // 1. Get beta, gamma 
+                        // 1. Get beta, gamma
                         typename FieldType::value_type beta = transcript.template challenge<FieldType>();
                         typename FieldType::value_type gamma = transcript.template challenge<FieldType>();
 
@@ -178,9 +182,10 @@ namespace nil {
                         }
 
                         std::array<typename FieldType::value_type, argument_size> F;
-                        typename FieldType::value_type one =  FieldType::value_type::one();
+                        typename FieldType::value_type one = FieldType::value_type::one();
                         F[0] = lagrange_1.evaluate(challenge) * (one - perm_polynomial);
-                        F[1] = (one - q_last.evaluate(challenge) - q_blind.evaluate(challenge)) * (perm_polynomial_shifted * h - perm_polynomial * g);
+                        F[1] = (one - q_last.evaluate(challenge) - q_blind.evaluate(challenge)) *
+                               (perm_polynomial_shifted * h - perm_polynomial * g);
                         F[2] = q_last.evaluate(challenge) * (perm_polynomial.squared() - perm_polynomial);
 
                         return F;

@@ -36,6 +36,7 @@
 #include <cstdlib>
 #include <vector>
 
+#include <nil/crypto3/math/polynomial/shift.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
@@ -87,26 +88,24 @@ namespace nil {
                         return true;
                     }
 
-                    std::vector<math::polynomial::polynomial<typename FieldType::value_type>> copy_constraints() {
+                    std::vector<math::polynomial<typename FieldType::value_type>> copy_constraints() {
                         return {};
                     }
 
-                    std::vector<math::polynomial::polynomial<typename FieldType::value_type>> selectors() {
+                    std::vector<math::polynomial<typename FieldType::value_type>> selectors() {
                         return {};
                     }
 
-                    std::vector<math::polynomial::polynomial<typename FieldType::value_type>> lookups() {
+                    std::vector<math::polynomial<typename FieldType::value_type>> lookups() {
                         return {};
                     }
 
-                    std::vector<math::polynomial::polynomial<typename FieldType::value_type>>
+                    std::vector<math::polynomial<typename FieldType::value_type>>
                         polynomials(plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment) const {
 
-                        std::vector<math::polynomial::polynomial<typename FieldType::value_type>> result(
-                            constraints.size());
+                        std::vector<math::polynomial<typename FieldType::value_type>> result(constraints.size());
 
-                        std::array<math::polynomial::polynomial<typename FieldType::value_type>, WiresAmount>
-                            wire_polynomials;
+                        std::array<math::polynomial<typename FieldType::value_type>, WiresAmount> wire_polynomials;
                         for (std::size_t wire_index = 0; wire_index < WiresAmount; wire_index++) {
                             const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
                                 math::make_evaluation_domain<FieldType>(full_variable_assignment[wire_index].size());
@@ -114,13 +113,13 @@ namespace nil {
                             std::vector<typename FieldType::value_type> interpolation_points(
                                 full_variable_assignment[wire_index].size());
 
-                            std::copy(full_variable_assignment[wire_index].begin(), full_variable_assignment.end(), 
-                                interpolation_points.begin());
+                            std::copy(full_variable_assignment[wire_index].begin(),
+                                      full_variable_assignment[wire_index].end(), interpolation_points.begin());
 
                             domain->inverse_fft(interpolation_points);
 
                             wire_polynomials[wire_index] =
-                                math::polynomial::polynomial<typename FieldType::value_type>(interpolation_points);
+                                math::polynomial<typename FieldType::value_type>(interpolation_points);
                         }
 
                         for (std::size_t constraint_index = 0; constraint_index < constraints.size();
@@ -128,15 +127,14 @@ namespace nil {
 
                             for (auto &term : constraints[constraint_index].terms) {
 
-                                math::polynomial::polynomial<typename FieldType::value_type> term_polynom = {
-                                    term.coeff};
+                                math::polynomial<typename FieldType::value_type> term_polynom = {term.coeff};
 
                                 for (auto &var : term.vars) {
 
                                     const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
                                         math::make_evaluation_domain<FieldType>(full_variable_assignment[var.wire_index].size());
 
-                                    term_polynom = term_polynom * detail::polynomial_shift(wire_polynomials[var.wire_index], 
+                                    term_polynom = term_polynom * math::polynomial_shift(wire_polynomials[var.wire_index], 
                                         domain->get_domain_element(var.rotation));
                                 }
 

@@ -27,6 +27,7 @@
 #define CRYPTO3_ZK_PLONK_REDSHIFT_GATES_ARGUMENT_HPP
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
+#include <nil/crypto3/math/polynomial/shift.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
@@ -35,35 +36,31 @@
 #include <nil/crypto3/merkle/tree.hpp>
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/polynomial_shift.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename FieldType, typename TranscriptHashType = hashes::keccak_1600<512>, 
-                    std::size_t ArgumentSize = 1>
-                class redshift_gates_argument {
+                template<typename FieldType,
+                         typename TranscriptHashType = hashes::keccak_1600<512>,
+                         std::size_t ArgumentSize = 1>
+                struct redshift_gates_argument {
+                    constexpr static const std::size_t argument_size = ArgumentSize;
 
-                    static constexpr std::size_t argument_size = 1;
+                    static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
+                        prove_eval(const std::vector<math::polynomial<typename FieldType::value_type>> &constraints,
+                                   fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
+                                   std::size_t N_sel) {
 
-                public:
-                    static inline std::array<math::polynomial::polynomial<typename FieldType::value_type>,
-                                             argument_size>
-                        prove_eval(
-                            const std::vector<math::polynomial::polynomial<typename FieldType::value_type>> &&constraints,
-                            fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
-                            std::size_t N_sel) {
-                        
                         typename FieldType::value_type teta = transcript.template challenge<FieldType>();
 
-                        std::array<math::polynomial::polynomial<typename FieldType::value_type>,
+                        std::array<math::polynomial<typename FieldType::value_type>,
                                              argument_size> F;
 
                         std::size_t nu = 0;
 
                         for (std::size_t i = 0; i <= N_sel - 1; i++) {
-                            math::polynomial::polynomial<typename FieldType::value_type> gate = {0};
+                            math::polynomial<typename FieldType::value_type> gate = {0};
 
                             for (std::size_t j = 0; j < constraints.size(); j++) {
                                 gate = gate + preprocessed_data.constraints[j] * teta.pow(nu);
@@ -91,8 +88,8 @@ namespace nil {
                         transcript(proof.P_commitment);
                         transcript(proof.Q_commitment);
 
-                        const math::polynomial::polynomial<typename FieldType::value_type> q_last;
-                        const math::polynomial::polynomial<typename FieldType::value_type> q_blind;
+                        const math::polynomial<typename FieldType::value_type> q_last;
+                        const math::polynomial<typename FieldType::value_type> q_blind;
 
                         F[0] = verification_key.L_basis[1] * (P - 1);
                         F[1] = verification_key.L_basis[1] * (Q - 1);

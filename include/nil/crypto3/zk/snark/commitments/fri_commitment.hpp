@@ -68,15 +68,15 @@ namespace nil {
 
                     using Endianness = nil::marshalling::option::big_endian;
                     using field_element_type =
-                            nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
-                                                                            FieldType>;
+                        nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
+                                                                        FieldType>;
 
                     struct params_type {
                         std::size_t r;
                         std::size_t max_degree;
                         std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
 
-                        math::polynomial::polynomial<typename FieldType::value_type> q;
+                        math::polynomial<typename FieldType::value_type> q;
                     };
 
                     struct round_proof_type {
@@ -106,18 +106,19 @@ namespace nil {
 
                         std::vector<round_proof_type> round_proofs;    // 0..r-2
 
-                        math::polynomial::polynomial<typename FieldType::value_type> final_polynomial;
+                        math::polynomial<typename FieldType::value_type> final_polynomial;
                     };
 
                     static std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>>
                         calculate_domain_set(const std::size_t max_domain_degree, const std::size_t set_size) {
-                            std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set(set_size);
-                            for (std::size_t i = 0; i < set_size; i++) {
-                                const std::size_t domain_size = std::pow(2, max_domain_degree - i);
-                                std::shared_ptr<math::evaluation_domain<FieldType>> domain = math::make_evaluation_domain<FieldType>(domain_size);
-                                domain_set[i] = domain;
-                            }
-                            return domain_set;                        
+                        std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set(set_size);
+                        for (std::size_t i = 0; i < set_size; i++) {
+                            const std::size_t domain_size = std::pow(2, max_domain_degree - i);
+                            std::shared_ptr<math::evaluation_domain<FieldType>> domain =
+                                math::make_evaluation_domain<FieldType>(domain_size);
+                            domain_set[i] = domain;
+                        }
+                        return domain_set;
                     }
 
                     // The result of this function is not commitment_type (as it would expected),
@@ -126,9 +127,8 @@ namespace nil {
                     // After this function
                     // result.root();
                     // should be called
-                    static merkle_tree_type
-                        commit(math::polynomial::polynomial<typename FieldType::value_type> &f,
-                               const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
+                    static merkle_tree_type commit(math::polynomial<typename FieldType::value_type> &f,
+                                                   const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
                         std::vector<std::array<std::uint8_t, field_element_type::length()>> y_data;
                         y_data.resize(D->m);
@@ -144,51 +144,51 @@ namespace nil {
                         return merkle_tree_type(y_data);
                     }
 
-                    static inline math::polynomial::polynomial<typename FieldType::value_type> 
-                    fold_polynomial(math::polynomial::polynomial<typename FieldType::value_type> &f,
-                            typename FieldType::value_type alpha) {
+                    static inline math::polynomial<typename FieldType::value_type>
+                        fold_polynomial(math::polynomial<typename FieldType::value_type> &f,
+                                        typename FieldType::value_type alpha) {
 
                         std::size_t d = f.degree();
                         if (d % 2 == 0) {
                             f.push_back(0);
                             d++;
                         }
-                        math::polynomial::polynomial<typename FieldType::value_type> f_folded(d/2 + 1);
+                        math::polynomial<typename FieldType::value_type> f_folded(d / 2 + 1);
 
-                        for (std::size_t index = 0; index <= f_folded.degree(); index++){
-                            f_folded[index] = f[2*index] + alpha * f[2*index + 1];
+                        for (std::size_t index = 0; index <= f_folded.degree(); index++) {
+                            f_folded[index] = f[2 * index] + alpha * f[2 * index + 1];
                         }
 
                         return f_folded;
                     }
 
-                    static proof_type proof_eval(const math::polynomial::polynomial<typename FieldType::value_type> &Q,
-                                                 const math::polynomial::polynomial<typename FieldType::value_type> &g,
+                    static proof_type proof_eval(const math::polynomial<typename FieldType::value_type> &Q,
+                                                 const math::polynomial<typename FieldType::value_type> &g,
                                                  merkle_tree_type &T,
                                                  fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
                                                  params_type &fri_params) {
 
                         proof_type proof;
 
-                        math::polynomial::polynomial<typename FieldType::value_type> f = Q;
+                        math::polynomial<typename FieldType::value_type> f = Q;
 
-                        typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(transcript.template int_challenge<std::size_t>());
+                        typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(
+                            transcript.template int_challenge<std::size_t>());
 
                         std::size_t r = fri_params.r;
 
                         std::vector<round_proof_type> round_proofs;
-                        math::polynomial::polynomial<typename FieldType::value_type> final_polynomial;
+                        math::polynomial<typename FieldType::value_type> final_polynomial;
                         std::unique_ptr<merkle_tree_type> p_tree = std::make_unique<merkle_tree_type>(T);
                         merkle_tree_type T_next;
 
                         for (std::size_t i = 0; i < r; i++) {
-                            
+
                             typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
                             typename FieldType::value_type x_next = fri_params.q.evaluate(x);
 
-                            math::polynomial::polynomial<typename FieldType::value_type> f_next = 
-                                fold_polynomial(f, alpha);
+                            math::polynomial<typename FieldType::value_type> f_next = fold_polynomial(f, alpha);
 
                             // m = 2, so:
                             std::array<typename FieldType::value_type, m> s;
@@ -219,7 +219,7 @@ namespace nil {
                                 typename FieldType::value_type leaf = y[j];
 
                                 std::size_t leaf_index = 0;
-                                for (; leaf_index < tmp.size(); leaf_index++){
+                                for (; leaf_index < tmp.size(); leaf_index++) {
                                     if (tmp[leaf_index] == leaf)
                                         break;
                                 }
@@ -236,7 +236,7 @@ namespace nil {
                                 fri_params.D[i + 1]->fft(tmp);
 
                                 std::size_t leaf_index = 0;
-                                for (; leaf_index < tmp.size(); leaf_index++){
+                                for (; leaf_index < tmp.size(); leaf_index++) {
                                     if (tmp[leaf_index] == colinear_value)
                                         break;
                                 }
@@ -244,14 +244,14 @@ namespace nil {
                                 merkle_proof_type colinear_path = merkle_proof_type(T_next, leaf_index);
 
                                 round_proofs.push_back(
-                                round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
+                                    round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
 
                                 p_tree = std::make_unique<merkle_tree_type>(T_next);
                             } else {
                                 merkle_proof_type colinear_path;
 
                                 round_proofs.push_back(
-                                round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path})); 
+                                    round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
                             }
 
                             x = x_next;
@@ -261,10 +261,10 @@ namespace nil {
                     }
 
                     static bool verify_eval(proof_type &proof,
-                                        fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
-                                        params_type &fri_params,
-                                        const math::polynomial::polynomial<typename FieldType::value_type> &U,
-                                        const math::polynomial::polynomial<typename FieldType::value_type> &V) {
+                                            fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
+                                            params_type &fri_params,
+                                            const math::polynomial<typename FieldType::value_type> &U,
+                                            const math::polynomial<typename FieldType::value_type> &V) {
 
                         std::size_t idx = transcript.template int_challenge<std::size_t>();
                         typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(idx);
@@ -272,8 +272,7 @@ namespace nil {
                         std::size_t r = fri_params.r;
 
                         for (std::size_t i = 0; i < r; i++) {
-                            typename FieldType::value_type alpha =
-                                transcript.template challenge<FieldType>();
+                            typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
                             typename FieldType::value_type x_next = fri_params.q.evaluate(x);
 
@@ -303,20 +302,21 @@ namespace nil {
                             std::array<typename FieldType::value_type, m> y;
 
                             for (std::size_t j = 0; j < m; j++) {
-                                if (i == 0){
-                                    y[j] = (proof.round_proofs[i].y[j] - U.evaluate(s[j]))/V.evaluate(s[j]);
+                                if (i == 0) {
+                                    y[j] = (proof.round_proofs[i].y[j] - U.evaluate(s[j])) / V.evaluate(s[j]);
                                 } else {
                                     y[j] = proof.round_proofs[i].y[j];
                                 }
                             }
 
-                            std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points {
-                                std::make_pair(s[0], y[0]),
-                                std::make_pair(s[1], y[1]),
-                            };
+                            std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>>
+                                interpolation_points {
+                                    std::make_pair(s[0], y[0]),
+                                    std::make_pair(s[1], y[1]),
+                                };
 
-                            math::polynomial::polynomial<typename FieldType::value_type> interpolant = 
-                                math::polynomial::lagrange_interpolation(interpolation_points);
+                            math::polynomial<typename FieldType::value_type> interpolant =
+                                math::lagrange_interpolation(interpolation_points);
 
                             typename FieldType::value_type leaf = proof.round_proofs[i].colinear_value;
 
@@ -330,23 +330,21 @@ namespace nil {
                             }
                             if (i < r - 1) {
                                 transcript(proof.round_proofs[i + 1].T_root);
-                                if (!proof.round_proofs[i].colinear_path.validate(leaf_data)){
+                                if (!proof.round_proofs[i].colinear_path.validate(leaf_data)) {
                                     return false;
                                 }
                             }
                             x = x_next;
                         }
 
-                        
-                        if (proof.final_polynomial.degree() > 
-                            std::pow(2, std::log2(fri_params.max_degree) - r) - 1) {
-                                return false;
+                        if (proof.final_polynomial.degree() > std::pow(2, std::log2(fri_params.max_degree) - r) - 1) {
+                            return false;
                         }
                         if (proof.final_polynomial.evaluate(x) != proof.round_proofs[r - 1].colinear_value) {
                             return false;
                         }
 
-                        return true;                        
+                        return true;
                     }
                 };
             }    // namespace snark

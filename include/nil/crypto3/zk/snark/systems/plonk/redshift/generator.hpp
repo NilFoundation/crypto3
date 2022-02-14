@@ -56,19 +56,19 @@ namespace nil {
                 class redshift_generator {
                     typedef detail::redshift_types<TCurve> types_policy;
 
-                    // static inline math::polynomial::polynom<...> tau(
+                    // static inline math::polynomial<...> tau(
                     //     std::size_t input, std::size_t n, std::array<typename TCurve::scalar_field_type::value_type,
                     //     3> &k){
 
                     //     std::size_t i = input % n;
                     //     std::size_t j = (input - i)/n + 1;
 
-                    //     return (math::polynomial::polynom<...>(k[j]) << i);
+                    //     return (math::polynomial<...>(k[j]) << i);
 
                     // }
 
                     // static inline std::size_t tau_reverted(
-                    //     math::polynomial::polynom<...> k_jgi, std::size_t n, std::array<typename
+                    //     math::polynomial<...> k_jgi, std::size_t n, std::array<typename
                     //     TCurve::scalar_field_type::value_type, 3> &k){
 
                     //     std::size_t i = math::polynomial::get_index_of_non_zero_coeff(k_jgi);
@@ -84,8 +84,8 @@ namespace nil {
                     //     ...
                     // }
 
-                    // static inline math::polynomial::polynom<...> sigma_p2_permutation(
-                    //     math::polynomial::polynom<...> input, std::size_t n, std::array<typename
+                    // static inline math::polynomial<...> sigma_p2_permutation(
+                    //     math::polynomial<...> input, std::size_t n, std::array<typename
                     //     TCurve::scalar_field_type::value_type, 3> &k){
 
                     //     return (tau(sigma_p1_permutation(tau_reverted(input, n, k), n, k), n, k));
@@ -134,7 +134,7 @@ namespace nil {
                             S_sigma[i] = math::polynomial::lagrange_interpolation(interpolation_points);
                         }
 
-                        math::polynomial::polynom Z = polynom_by_zeros(H_star);
+                        math::polynomial Z = polynom_by_zeros(H_star);
 
                         typename types_policy::verification_key_type vk(S_id, S_sigma, q_selectors, L_basis, PI, Z);
 

@@ -51,10 +51,10 @@ namespace boost {
     namespace test_tools {
         namespace tt_detail {
             template<>
-            struct print_log_value<nil::crypto3::math::polynomial::polynomial<
+            struct print_log_value<nil::crypto3::math::polynomial<
                 algebra::fields::detail::element_fp<algebra::fields::params<algebra::fields::bls12_base_field<381>>>>> {
                 void operator()(std::ostream &,
-                                const nil::crypto3::math::polynomial::polynomial<algebra::fields::detail::element_fp<
+                                const nil::crypto3::math::polynomial<algebra::fields::detail::element_fp<
                                     algebra::fields::params<algebra::fields::bls12_base_field<381>>>> &) {
                 }
             };
@@ -63,13 +63,13 @@ namespace boost {
 }    // namespace boost
 
 template<typename FieldType, typename NumberType>
-std::vector<math::polynomial::polynomial<typename FieldType::value_type>> generate(NumberType degree) {
+std::vector<math::polynomial<typename FieldType::value_type>> generate(NumberType degree) {
     typedef boost::random::independent_bits_engine<boost::random::mt19937,
                                                    FieldType::modulus_bits,
                                                    typename FieldType::value_type::integral_type>
         random_polynomial_generator_type;
 
-    std::vector<math::polynomial::polynomial<typename FieldType::value_type>> res;
+    std::vector<math::polynomial<typename FieldType::value_type>> res;
 
     boost::random::random_device rd;     // Will be used to obtain a seed for the random number engine
     boost::random::mt19937 gen(rd());    // Standard mersenne_twister_engine seeded with rd()
@@ -80,7 +80,7 @@ std::vector<math::polynomial::polynomial<typename FieldType::value_type>> genera
     res.reserve(height);
 
     for (int i = 0; i < height; i++) {
-        math::polynomial::polynomial<typename FieldType::value_type> poly;
+        math::polynomial<typename FieldType::value_type> poly;
         for (int j = 0; j < degree; j++) {
             poly.push_back(typename FieldType::value_type(polynomial_element_gen()));
         }
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     typedef typename curve_type::scalar_field_type FieldType;
 
     typedef hashes::keccak_1600<256> merkle_hash_type;
-    typedef hashes::sha2<256> transcript_hash_type;
+    typedef hashes::keccak_1600<256> transcript_hash_type;
 
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
 
     typename fri_type::params_type fri_params;
 
-    math::polynomial::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
     fri_params.r = r;
     fri_params.D = D;
     fri_params.q = q;
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
                                                    typename FieldType::value_type::integral_type>
         random_polynomial_generator_type;
 
-    std::vector<math::polynomial::polynomial<typename FieldType::value_type>> res;
+    std::vector<math::polynomial<typename FieldType::value_type>> res;
 
     boost::random::random_device rd;     // Will be used to obtain a seed for the random number engine
     boost::random::mt19937 gen(rd());    // Standard mersenne_twister_engine seeded with rd()
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     res.reserve(height);
 
     for (int i = 0; i < height; i++) {
-        math::polynomial::polynomial<typename FieldType::value_type> poly;
+        math::polynomial<typename FieldType::value_type> poly;
         for (int j = 0; j < fri_params.max_degree; j++) {
             poly.push_back(typename FieldType::value_type(polynomial_element_gen()));
         }
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
         auto proof = lpc_type::proof_eval(evaluation_points, tree, poly, transcript, fri_params);
 
         // verify
-        zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(x_data);
+        zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript_verifier(x_data);
 
         BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, transcript_verifier, fri_params));
     }

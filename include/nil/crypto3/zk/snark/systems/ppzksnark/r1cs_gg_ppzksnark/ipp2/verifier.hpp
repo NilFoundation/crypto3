@@ -663,7 +663,7 @@ namespace nil {
 
                 template<typename CurveType, typename BasicVerifier>
                 class r1cs_gg_ppzksnark_aggregate_verifier {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::aggregate> policy_type;
 
                 public:
                     typedef BasicVerifier basic_verifier;
@@ -673,7 +673,7 @@ namespace nil {
                     typedef typename policy_type::proof_type proof_type;
                     typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
 
-                    // Aggregate verify
+                    // aggregate verify
                     template<typename DistributionType, typename GeneratorType, typename Hash,
                              typename InputPrimaryInputRange, typename InputIterator>
                     static inline typename std::enable_if<
