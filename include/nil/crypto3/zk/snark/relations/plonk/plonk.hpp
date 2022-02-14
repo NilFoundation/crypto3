@@ -41,7 +41,6 @@
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
 #include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/polynomial_shift.hpp>
 
 namespace nil {
     namespace crypto3 {
