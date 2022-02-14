@@ -235,7 +235,7 @@ namespace nil {
             GENERATE_HAS_MEMBER_TYPE(curve_type)
             GENERATE_HAS_MEMBER_TYPE(underlying_field_type)
             GENERATE_HAS_MEMBER_TYPE(value_type)
-            GENERATE_HAS_MEMBER_TYPE(modulus_type)
+            GENERATE_HAS_MEMBER_TYPE(integral_type)
             GENERATE_HAS_MEMBER_TYPE(base_field_type)
             GENERATE_HAS_MEMBER_TYPE(number_type)
             GENERATE_HAS_MEMBER_TYPE(scalar_field_type)
@@ -371,7 +371,7 @@ namespace nil {
             template<typename T>
             struct is_field {
                 static const bool value = has_value_type<T>::value && has_value_bits<T>::value &&
-                                          has_modulus_type<T>::value && has_modulus_bits<T>::value &&
+                                          has_integral_type<T>::value && has_modulus_bits<T>::value &&
                                           has_number_type<T>::value && has_arity<T>::value;
                 typedef T type;
             };
@@ -379,7 +379,7 @@ namespace nil {
             template<typename T>
             struct is_extended_field {
                 static const bool value = has_value_type<T>::value && has_value_bits<T>::value &&
-                                          has_modulus_type<T>::value && has_modulus_bits<T>::value &&
+                                          has_integral_type<T>::value && has_modulus_bits<T>::value &&
                                           has_number_type<T>::value && has_arity<T>::value &&
                                           has_extension_policy<T>::value;
                 typedef T type;
