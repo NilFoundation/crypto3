@@ -77,10 +77,10 @@ namespace nil {
                             std::size_t cur_leaf_arity_pos = (cur_leaf - row_begin_idx) / arity;
                             std::size_t begin_this_arity = cur_leaf - cur_leaf_pos;
                             typename layer_type::iterator a_itr = v_itr->begin();
-                            for (size_t i = 0; i < cur_leaf_pos; ++i,  ++begin_this_arity,  ++a_itr) {
+                            for (size_t i = 0; i < cur_leaf_pos; ++i, ++begin_this_arity, ++a_itr) {
                                 *a_itr = path_element_type(tree[begin_this_arity], i);
                             }
-                            for (size_t i = cur_leaf_pos + 1; i < arity; ++i,  ++begin_this_arity,  ++a_itr) {
+                            for (size_t i = cur_leaf_pos + 1; i < arity; ++i, ++begin_this_arity, ++a_itr) {
                                 *a_itr = path_element_type(tree[begin_this_arity + 1], i);
                             }
                             v_itr++;
@@ -93,22 +93,15 @@ namespace nil {
                     template<typename Hashable>
                     bool validate(Hashable a) {
                         value_type d = crypto3::hash<hash_type>(a);
-
-                        for (size_t cur_row = 0; cur_row < _path.size(); ++cur_row) {
-
+                        for (auto &it : _path) {
                             accumulator_set<hash_type> acc;
-                            bool was_missing = false;    // If every previous index was fine - missing the last one.
-
-                            for (size_t i = 0; i < arity - 1; ++i) {
-                                if (_path[cur_row][i]._position != i && !was_missing) {
-                                    crypto3::hash<hash_type>(d.begin(), d.end(), acc);
-                                    was_missing = true;
-                                }
-                                crypto3::hash<hash_type>(_path[cur_row][i]._hash.begin(), _path[cur_row][i]._hash.end(),
-                                                         acc);
+                            size_t i = 0;
+                            for (; (i < arity - 1) && i == it[i]._position; ++i) {
+                                crypto3::hash<hash_type>(it[i]._hash.begin(), it[i]._hash.end(), acc);
                             }
-                            if (!was_missing) {
-                                crypto3::hash<hash_type>(d.begin(), d.end(), acc);
+                            crypto3::hash<hash_type>(d.begin(), d.end(), acc);
+                            for (; i < arity - 1; ++i) {
+                                crypto3::hash<hash_type>(it[i]._hash.begin(), it[i]._hash.end(), acc);
                             }
                             d = accumulators::extract::hash<hash_type>(acc);
                         }

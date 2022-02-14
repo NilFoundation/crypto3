@@ -176,7 +176,7 @@ namespace nil {
                     constexpr static const std::size_t value_bits = node_type::value_bits;
 
                 public:
-                    merkle_tree_impl (): _leafs(0), _size(0), rc(0) {};
+                    merkle_tree_impl() : _leafs(0), _size(0), rc(0) {};
 
                     template<
                         typename LeafRange,
@@ -192,12 +192,16 @@ namespace nil {
                                  current_element < start_layer_element + layer_elements;
                                  ++current_element) {
                                 if (row_number == 0) {
-                                    hash_vector[current_element] = (static_cast<typename hash_type::digest_type>(crypto3::hash<hash_type>(data[current_element])));
+                                    hash_vector[current_element] = (static_cast<typename hash_type::digest_type>(
+                                        crypto3::hash<hash_type>(data[current_element])));
                                 } else {
                                     accumulator_set<hash_type> acc;
-                                    for (size_t i = 0; i < Arity; ++i) {
-                                        size_t children_index = (current_element - start_layer_element) * Arity + prev_layer_element + i;
-                                        crypto3::hash<hash_type>(hash_vector[children_index].begin(), hash_vector[children_index].end(), acc);
+                                    size_t children_index =
+                                        (current_element - start_layer_element) * Arity + prev_layer_element;
+                                    typename std::vector<value_type>::iterator it =
+                                        hash_vector.begin() + children_index;
+                                    for (size_t i = 0; i < Arity; ++i, ++it) {
+                                        crypto3::hash<hash_type>(it->begin(), it->end(), acc);
                                     }
                                     hash_vector[current_element] = (accumulators::extract::hash<hash_type>(acc));
                                 }
