@@ -28,8 +28,13 @@
 
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/detail/field_utils.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/types.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
+
+using namespace nil::crypto3;
 
 namespace nil {
     namespace crypto3 {
@@ -41,7 +46,79 @@ namespace nil {
                     using types_policy = detail::redshift_types_policy<FieldType, WiresAmount>;
 
                 public:
-                    static inline typename types_policy::template preprocessed_data_type<k>
+                    static inline std::vector<math::polynomial<typename FieldType::value_type>>
+                        identity_polynomials(std::size_t permutation_size, std::size_t table_size,
+                            typename FieldType::value_type omega, typename FieldType::value_type delta,
+                            const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
+                            
+                            std::vector<math::polynomial<typename FieldType::value_type>> S_id(permutation_size);
+
+                            for (std::size_t i = 0; i < permutation_size; i++) {
+                                std::vector<typename FieldType::value_type> tmp(table_size);
+                                for (std::size_t j = 0; j < table_size; j++) {
+                                    tmp[j] = delta.pow(i) * omega.pow(j);
+                                }
+
+                                domain->inverse_fft(tmp);
+                                S_id[i] = math::polynomial<typename FieldType::value_type>(tmp);
+                            }
+
+                            return S_id;
+                    }
+
+                    static inline std::vector<math::polynomial<typename FieldType::value_type>>
+                        permutation_polynomials(std::size_t permutation_size, std::size_t table_size,
+                            typename FieldType::value_type omega, typename FieldType::value_type delta,
+                            plonk_permutation permutation,
+                            const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
+                            
+                            std::vector<math::polynomial<typename FieldType::value_type>> S_perm(permutation_size);
+
+                            for (std::size_t i = 0; i < permutation_size; i++) {
+                                std::vector<typename FieldType::value_type> tmp(table_size);
+                                for (std::size_t j = 0; j < table_size; j++) {
+                                    auto key = std::make_pair(i, j);
+                                    tmp[j] = delta.pow(permutation[key].first) * omega.pow(permutation[key].second);
+                                }
+
+                                domain->inverse_fft(tmp);
+                                S_perm[i] = math::polynomial<typename FieldType::value_type>(tmp);
+                            }
+
+                            return S_perm;
+                    }
+
+                    static inline math::polynomial<typename FieldType::value_type>
+                        selector_blind(std::size_t table_size, std::size_t usable_rows,
+                            const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
+
+                            std::vector<typename FieldType::value_type> tmp(table_size);
+                            for (std::size_t j = 0; j < table_size; j++) {
+                                tmp[j] = j > usable_rows ?  FieldType::value_type::one() : FieldType::value_type::zero();
+                            }
+
+                            domain->inverse_fft(tmp);
+                            math::polynomial<typename FieldType::value_type> q_blind(tmp);
+
+                            return q_blind;
+                    }
+
+                    static inline math::polynomial<typename FieldType::value_type>
+                        selector_last(std::size_t table_size, std::size_t usable_rows,
+                            const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
+
+                            std::vector<typename FieldType::value_type> tmp(table_size);
+                            for (std::size_t j = 0; j < table_size; j++) {
+                                tmp[j] = j == usable_rows ?  FieldType::value_type::one() : FieldType::value_type::zero();
+                            }
+
+                            domain->inverse_fft(tmp);
+                            math::polynomial<typename FieldType::value_type> q_last(tmp);
+
+                            return q_last;
+                    }
+
+                    /*static inline typename types_policy::template preprocessed_data_type<k>
                         process(const typename types_policy::constraint_system_type &constraint_system,
                                 const typename types_policy::variable_assignment_type &assignments) {
 
@@ -58,7 +135,7 @@ namespace nil {
                         // data.Lagrange_basis = math::polynomial::Lagrange_basis(data.omega, ...(assignments).n);
 
                         return data;
-                    }
+                    }*/
                 };
             }    // namespace snark
         }        // namespace zk

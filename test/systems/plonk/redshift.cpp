@@ -37,8 +37,9 @@
 
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
-//#include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
 
@@ -78,6 +79,39 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log) {
     return params;
 }
 
+template<typename FieldType>
+std::vector<math::polynomial<typename FieldType::value_type>> 
+    create_random_table(const std::size_t table_rows, const std::size_t table_width, 
+        plonk_permutation permutation, const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
+        std::vector<math::polynomial<typename FieldType::value_type>> table(table_width);
+
+        std::vector<std::vector<typename FieldType::value_type>> tmp(table_width);
+
+        for (std::size_t i = 0; i < table_width; i++) {
+            tmp[i].resize(table_rows);
+            for (std::size_t j = 0; j < table_rows; j++) {
+                tmp[i][j] = algebra::random_element<FieldType>();
+            }
+        }
+
+        for (std::size_t i = 0; i < table_width; i++) {
+            for (std::size_t j = 0; j < table_rows; j++) {
+                auto key = std::make_pair(i, j);
+                auto ids = permutation[key];
+                if (ids.first != i || ids.second != j) {
+                    tmp[i][j] = tmp[ids.first][ids.second];
+                }
+            }
+        }
+
+        for (std::size_t i = 0; i < table_width; i++) {
+            domain->inverse_fft(tmp[i]);
+            table[i] = math::polynomial<typename FieldType::value_type>(tmp[i]);
+        }
+
+        return table;
+}
+
 BOOST_AUTO_TEST_SUITE(redshift_prover_test_suite)
 
 using curve_type = algebra::curves::bls12<381>;
@@ -103,6 +137,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     const std::size_t circuit_log = 2;
     const std::size_t circuit_rows = 1 << circuit_log;
     const std::size_t permutation_size = 2;
+    const std::size_t columns_amount = 2;
 
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
@@ -112,69 +147,26 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     std::shared_ptr<math::evaluation_domain<FieldType>> domain = fri_params.D[0];
     math::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial<FieldType>(domain, 0);
 
-    // TODO: implement it in a proper way in generator.hpp
-    std::vector<math::polynomial<typename FieldType::value_type>> S_id(permutation_size);
-    std::vector<math::polynomial<typename FieldType::value_type>> S_sigma(permutation_size);
-
     typename FieldType::value_type omega = domain->get_domain_element(1);
 
     typename FieldType::value_type delta = algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
 
-    for (std::size_t i = 0; i < permutation_size; i++) {
-        std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points;
-        for (std::size_t j = 0; j < circuit_rows; j++) {
-            interpolation_points.emplace_back(omega.pow(j), delta.pow(i) * omega.pow(j));
-        }
+    plonk_permutation permutation(columns_amount, circuit_rows);
+    permutation.cells_equal(std::make_pair(2, 2), std::make_pair(1, 1));
 
-        S_id[i] = math::lagrange_interpolation(interpolation_points);
-    }
-
-    for (std::size_t i = 0; i < permutation_size; i++) {
-        std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points;
-        for (std::size_t j = 0; j < circuit_rows; j++) {
-            if (i == 1 && j == 1) {
-                interpolation_points.emplace_back(omega.pow(j), delta.pow(2) * omega.pow(2));
-            } else if (i == 2 && j == 2) {
-                interpolation_points.emplace_back(omega.pow(j), delta.pow(1) * omega.pow(1));
-            } else {
-                interpolation_points.emplace_back(omega.pow(j), delta.pow(i) * omega.pow(j));
-            }
-        }
-
-        S_sigma[i] = math::lagrange_interpolation(interpolation_points);
-    }
+    std::vector<math::polynomial<typename FieldType::value_type>> S_id = redshift_preprocessor<FieldType, columns_amount, 1>::identity_polynomials(
+        permutation_size, circuit_rows, omega, delta, domain);
+    std::vector<math::polynomial<typename FieldType::value_type>> S_sigma = redshift_preprocessor<FieldType, columns_amount, 1>::permutation_polynomials(
+        permutation_size, circuit_rows, omega, delta, permutation, domain);
 
     // construct circuit values
-    std::vector<math::polynomial<typename FieldType::value_type>> f(permutation_size);
-    for (std::size_t i = 0; i < permutation_size; i++) {
-        std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points;
-        for (std::size_t j = 0; j < circuit_rows; j++) {
-            if (i == 2 && j == 2) {
-                interpolation_points.emplace_back(omega.pow(j), interpolation_points[1].second);
-            } else {
-                interpolation_points.emplace_back(omega.pow(j), algebra::random_element<FieldType>());
-            }
-        }
-
-        f[i] = math::lagrange_interpolation(interpolation_points);
-    }
+    std::vector<math::polynomial<typename FieldType::value_type>> f = create_random_table(circuit_rows, columns_amount, permutation, domain);
 
     // construct q_last, q_blind
-    math::polynomial<typename FieldType::value_type> q_last;
-    math::polynomial<typename FieldType::value_type> q_blind;
-    std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points_last;
-    std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points_blind;
-    for (std::size_t j = 0; j < circuit_rows; j++) {
-        if (j == circuit_rows - 1) {
-            interpolation_points_last.emplace_back(omega.pow(j), FieldType::value_type::one());
-            interpolation_points_blind.emplace_back(omega.pow(j), FieldType::value_type::zero());
-        } else {
-            interpolation_points_last.emplace_back(omega.pow(j), FieldType::value_type::zero());
-            interpolation_points_blind.emplace_back(omega.pow(j), FieldType::value_type::zero());
-        }
-    }
-    q_last = math::lagrange_interpolation(interpolation_points_last);
-    q_blind = math::lagrange_interpolation(interpolation_points_blind);
+    math::polynomial<typename FieldType::value_type> q_last = redshift_preprocessor<FieldType, columns_amount, 1>::selector_last(
+        circuit_rows, circuit_rows, domain);
+    math::polynomial<typename FieldType::value_type> q_blind = redshift_preprocessor<FieldType, columns_amount, 1>::selector_blind(
+        circuit_rows, circuit_rows, domain);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> prover_transcript(init_blob);
