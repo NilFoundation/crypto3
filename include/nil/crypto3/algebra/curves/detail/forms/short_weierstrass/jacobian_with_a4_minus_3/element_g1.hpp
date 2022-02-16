@@ -186,7 +186,7 @@ namespace nil {
                                 field_value_type Z3 = this->Z * Z2;
                                 field_value_type Z4 = Z2.squared();
                                 field_value_type Z6 = Z3.squared();
-                                field_value_type XXX = this->X.doubled() + this.X;
+                                field_value_type XXX = this->X.doubled() + this->X;
 
                                 return (Y2 == X3 - XXX* Z4 + params_type::b * Z6);
                             }
