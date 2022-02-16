@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2019 Alexey Moskvin
+// Copyright (c) 2019-2021 Alexey Moskvin
 // Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -22,7 +22,7 @@ namespace nil {
                  * https://en.wikipedia.org/wiki/Barrett_reduction
                  */
                 template<typename Backend>
-                class barrett_params : public base_params<Backend> {
+                class barrett_params : virtual public base_params<Backend> {
                     typedef number<Backend> number_type;
 
                 protected:
