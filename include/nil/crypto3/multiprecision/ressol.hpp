@@ -65,7 +65,7 @@ namespace nil {
                         return negone;
                     }
 
-                    modular_adaptor<Backend> a_mod, res_mod;
+                    modular_adaptor<Backend, modular_params_rt<Backend>> a_mod, res_mod;
 
                     assign_components(a_mod, a, p);
 
@@ -90,7 +90,7 @@ namespace nil {
                     eval_subtract(q, posone);
                     eval_right_shift(q, 1);
 
-                    modular_adaptor<Backend> r_mod, n_mod = a_mod, r_sq_mod;
+                    modular_adaptor<Backend, modular_params_rt<Backend>> r_mod, n_mod = a_mod, r_sq_mod;
 
                     eval_pow(r_mod, a_mod, q);
                     eval_pow(r_sq_mod, r_mod, two);
@@ -114,7 +114,7 @@ namespace nil {
                     eval_left_shift(q, 1);
                     eval_add(q, posone);
 
-                    modular_adaptor<Backend> z_mod, c_mod, q_mod;
+                    modular_adaptor<Backend, modular_params_rt<Backend>> z_mod, c_mod, q_mod;
 
                     assign_components(z_mod, z, p);
                     eval_pow(c_mod, z_mod, q);
@@ -204,7 +204,7 @@ namespace nil {
                         return negone;
                     }
 
-                    modular_adaptor<Backend> a_mod, res_mod;
+                    modular_adaptor<Backend, modular_params_rt<Backend>> a_mod, res_mod;
 
                     assign_components(a_mod, a, p);
 
@@ -228,7 +228,7 @@ namespace nil {
                     eval_subtract(q, posone);
                     eval_right_shift(q, 1);
 
-                    modular_adaptor<Backend> r_mod, n_mod = a_mod, r_sq_mod;
+                    modular_adaptor<Backend, modular_params_rt<Backend>> r_mod, n_mod = a_mod, r_sq_mod;
 
                     eval_pow(r_mod, a_mod, q);
                     eval_pow(r_sq_mod, r_mod, two);
@@ -253,7 +253,7 @@ namespace nil {
                     eval_left_shift(q, 1);
                     eval_add(q, posone);
 
-                    modular_adaptor<Backend> z_mod, c_mod, q_mod;
+                    modular_adaptor<Backend, modular_params_rt<Backend>> z_mod, c_mod, q_mod;
 
                     assign_components(z_mod, z, p);
                     eval_pow(c_mod, z_mod, q);
@@ -318,11 +318,11 @@ namespace nil {
              * @return y such that (y*y)%p == x, or p - 1 if no such integer
              */
 
-            template<typename Backend, expression_template_option ExpressionTemplates>
-            constexpr number<modular_adaptor<Backend>, ExpressionTemplates>
-                ressol(const number<modular_adaptor<Backend>, ExpressionTemplates>& modular) {
+            template<typename Backend, typename SafeType, expression_template_option ExpressionTemplates>
+            constexpr number<modular_adaptor<Backend, SafeType>, ExpressionTemplates>
+                ressol(const number<modular_adaptor<Backend, SafeType>, ExpressionTemplates>& modular) {
 
-                return number<modular_adaptor<Backend>, ExpressionTemplates>(backends::eval_ressol(modular.backend()));
+                return number<modular_adaptor<Backend, SafeType>, ExpressionTemplates>(backends::eval_ressol(modular.backend()));
             }
 
             /*

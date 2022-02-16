@@ -1878,5 +1878,4 @@ target_link_libraries(${CURRENT_PROJECT_NAME}_test_inverse_cpp_int no_eh_support
 add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_modular_cpp_int_tests ${CURRENT_PROJECT_NAME}_test_inverse_cpp_int)
 set_target_properties(${CURRENT_PROJECT_NAME}_test_inverse_cpp_int PROPERTIES CXX_STANDARD 17)
 
-
 include_directories(${CMAKE_WORKSPACE_SOURCES_DIR})

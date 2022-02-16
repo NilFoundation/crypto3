@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_SUITE(modular_adaptor_tests)
 
 BOOST_DATA_TEST_CASE(base_opeartions, numbers_size * (boost::unit_test::data::make(even_mod) + boost::unit_test::data::make(odd_mod)), num, exp)
 {
-    typedef number<modular_adaptor<Backend>> modular_number;
+    typedef number<modular_adaptor<Backend, backends::modular_params_rt<Backend>>> modular_number;
     typedef modular_params<Backend> params_number;
     typedef number<Backend> standart_number;
 
@@ -112,7 +112,7 @@ BOOST_DATA_TEST_CASE(base_opeartions, numbers_size * (boost::unit_test::data::ma
 }
 
 BOOST_DATA_TEST_CASE(comparsion_operators, numbers_size * (boost::unit_test::data::make(even_mod) + boost::unit_test::data::make(odd_mod)), num, exp) {
-    typedef number<modular_adaptor<Backend>> modular_number;
+    typedef number<modular_adaptor<Backend, backends::modular_params_rt<Backend>>> modular_number;
     typedef modular_params<Backend> params_number;
     typedef number<Backend> standart_number;
 
@@ -133,7 +133,7 @@ BOOST_DATA_TEST_CASE(comparsion_operators, numbers_size * (boost::unit_test::dat
 }
 
 BOOST_DATA_TEST_CASE(bitwise_operators, numbers_size * (boost::unit_test::data::make(even_mod) + boost::unit_test::data::make(odd_mod)), num, exp) {
-    typedef number<modular_adaptor<Backend>> modular_number;
+    typedef number<modular_adaptor<Backend, backends::modular_params_rt<Backend>>> modular_number;
     typedef modular_params<Backend> params_number;
     typedef number<Backend> standart_number;
 
@@ -154,7 +154,7 @@ BOOST_DATA_TEST_CASE(bitwise_operators, numbers_size * (boost::unit_test::data::
 }
 
 BOOST_DATA_TEST_CASE(pow_test, numbers_size * (boost::unit_test::data::make(even_mod) + boost::unit_test::data::make(odd_mod)), num, exp) {
-    typedef number<modular_adaptor<Backend>> modular_number;
+    typedef number<modular_adaptor<Backend, backends::modular_params_rt<Backend>>> modular_number;
     typedef modular_params<Backend> params_number;
     typedef number<Backend> standart_number;
 

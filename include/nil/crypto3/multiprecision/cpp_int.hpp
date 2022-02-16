@@ -744,7 +744,9 @@ namespace nil {
                     //~cpp_int_base() noexcept {}
 
                     void BOOST_MP_CXX14_CONSTEXPR assign(const cpp_int_base& o) noexcept {
+#ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
                         if (this != &o) {
+#endif
                             m_limbs = o.m_limbs;
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
                             if (BOOST_MP_IS_CONST_EVALUATED(m_limbs)) {
@@ -754,7 +756,9 @@ namespace nil {
 #endif
                                 std::memcpy(limbs(), o.limbs(), o.size() * sizeof(o.limbs()[0]));
                             m_sign = o.m_sign;
+#ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
                         }
+#endif
                     }
                     BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void negate() noexcept {
                         m_sign = !m_sign;
