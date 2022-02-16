@@ -35,16 +35,19 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
+#include <nil/crypto3/math/algorithms/unity_root.hpp>
+#include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
+
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
 
-#include <nil/crypto3/math/algorithms/unity_root.hpp>
-#include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
+#include "circuits.hpp"
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
@@ -134,6 +137,13 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 }
 
 BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
+    const std::size_t table_rows_log = 4;
+    const std::size_t table_rows = (1 << table_rows_log) - 1;
+    const std::size_t table_columns = 4;
+    const std::size_t permutation_size1 = 4;
+    const std::size_t usable_rows = (1 << table_rows_log) - 1;
+    circuit_description<FieldType, table_rows_log, table_columns, permutation_size1, usable_rows> circuit = circuit_test_1<FieldType>();
+
     const std::size_t circuit_log = 2;
     const std::size_t circuit_rows = 1 << circuit_log;
     const std::size_t permutation_size = 2;
@@ -210,12 +220,55 @@ BOOST_AUTO_TEST_CASE(redshift_lookup_argument_test) {
     // zk::snark::redshift_prover<typename curve_type::base_field_type, 5, 2, 2, 2> prove;
 }
 
-BOOST_AUTO_TEST_CASE(redshift_witness_argument_test) {
+BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
+    auto circuit = circuit_test_1<FieldType>();
 
-    // zk::snark::redshift_preprocessor<typename curve_type::base_field_type, 5, 2> preprocess;
+    const std::size_t circuit_log = 2;
+    const std::size_t circuit_rows = 1 << circuit_log;
+    const std::size_t permutation_size = 2;
+    const std::size_t columns_amount = 2;
 
-    // auto preprocessed_data = preprocess::process(cs, assignments);
-    // zk::snark::redshift_prover<typename curve_type::base_field_type, 5, 2, 2, 2> prove;
+    constexpr static const std::size_t lambda = 40;
+    constexpr static const std::size_t k = 1;
+    typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, lambda, k, circuit_log - 1, m> lpc_type;
+
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(circuit_log);
+    std::shared_ptr<math::evaluation_domain<FieldType>> domain = fri_params.D[0];
+    math::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial<FieldType>(domain, 0);
+    
+    typename FieldType::value_type omega = domain->get_domain_element(1);
+
+    typename FieldType::value_type delta = algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
+
+    plonk_permutation permutation(columns_amount, circuit_rows);
+    permutation.cells_equal(std::make_pair(2, 2), std::make_pair(1, 1));
+
+    std::vector<math::polynomial<typename FieldType::value_type>> S_id = redshift_preprocessor<FieldType, columns_amount, 1>::identity_polynomials(
+        permutation_size, circuit_rows, omega, delta, domain);
+    std::vector<math::polynomial<typename FieldType::value_type>> S_sigma = redshift_preprocessor<FieldType, columns_amount, 1>::permutation_polynomials(
+        permutation_size, circuit_rows, omega, delta, permutation, domain);
+
+    // construct circuit values
+    std::vector<math::polynomial<typename FieldType::value_type>> f = create_random_table(circuit_rows, columns_amount, permutation, domain);
+
+    std::vector<math::polynomial<typename FieldType::value_type>> constraints_1 = {f[0] * f[1], f[0] + f[0]};
+    std::vector<math::polynomial<typename FieldType::value_type>> constraints_2 = {f[1] - f[0]};
+
+
+    // construct q_last, q_blind
+    math::polynomial<typename FieldType::value_type> q_last = redshift_preprocessor<FieldType, columns_amount, 1>::selector_last(
+        circuit_rows, circuit_rows, domain);
+    math::polynomial<typename FieldType::value_type> q_blind = redshift_preprocessor<FieldType, columns_amount, 1>::selector_blind(
+        circuit_rows, circuit_rows, domain);
+
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> prover_transcript(init_blob);
+    fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> verifier_transcript(init_blob);
+
+    /*std::array<math::polynomial<typename FieldType::value_type>, 1> prover_res =
+        redshift_gates_argument<FieldType, lpc_type>::prove_eval(prover_transcript, circuit_rows,
+                                                                       permutation_size, domain, lagrange_0, S_id,
+                                                                       S_sigma, f, q_last, q_blind, fri_params);*/
 }
 
 BOOST_AUTO_TEST_SUITE_END()

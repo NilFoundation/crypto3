@@ -36,6 +36,7 @@
 #include <nil/crypto3/merkle/tree.hpp>
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,26 +49,25 @@ namespace nil {
                     constexpr static const std::size_t argument_size = ArgumentSize;
 
                     static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
-                        prove_eval(const std::vector<math::polynomial<typename FieldType::value_type>> &constraints,
-                                   fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
-                                   std::size_t N_sel) {
+                        prove_eval(const std::vector<plonk_gate<typename FieldType>> &gates,
+                                   fiat_shamir_heuristic_updated<TranscriptHashType> &transcript) {
 
-                        typename FieldType::value_type teta = transcript.template challenge<FieldType>();
+                        typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
                         std::array<math::polynomial<typename FieldType::value_type>,
                                              argument_size> F;
 
-                        std::size_t nu = 0;
+                        typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
                         for (std::size_t i = 0; i <= N_sel - 1; i++) {
                             math::polynomial<typename FieldType::value_type> gate = {0};
 
                             for (std::size_t j = 0; j < constraints.size(); j++) {
-                                gate = gate + preprocessed_data.constraints[j] * teta.pow(nu);
-                                nu++;
+                                gate = gate + gates[i].constraints[j] * theta_acc;
+                                theta_acc *= theta;
                             }
 
-                            // gate *= preprocessed_data.selectors[i];
+                            gate *= gate[i].selector;
 
                             F[0] += gate;
                         }
