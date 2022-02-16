@@ -118,19 +118,22 @@ namespace nil {
 #endif
 
                     template<typename Backend1, typename Backend2>
-                    constexpr modular_adaptor(const Backend1 &b, const Backend2 &m) : StateType(m) {
+                    constexpr modular_adaptor(const Backend1 &b, const Backend2 &m) {
                         this->mod_data().adjust_modular(m_base, b);
+                        this->set_modular_params(m);
+
                     }
 
                     constexpr explicit modular_adaptor(const Backend &m) :
-                        m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u)),
-                        StateType(number_type(m)) {
+                        m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u)) {
                         this->mod_data().adjust_modular(m_base);
+                        this->set_modular_params(number_type(m));
                     }
 
                     constexpr explicit modular_adaptor(const number_type &m) :
-                        m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u)), StateType(m) {
+                        m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u)) {
                         this->mod_data().adjust_modular(m_base);
+                        this->set_modular_params(m);
                     }
 
                     // TODO: check correctness of the method

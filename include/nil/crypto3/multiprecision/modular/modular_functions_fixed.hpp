@@ -402,7 +402,7 @@ namespace nil {
 
                         Backend_doubled_padded_limbs accum(result);
                         Backend_doubled_padded_limbs prod;
-#if (BOOST_ARCH_X86_64 & 0)
+#if BOOST_ARCH_X86_64
                         if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && m_mod.backend().size() >= 2) {
                             bool carry = false;
                             for (size_t i = 0; i < m_mod.backend().size(); ++i) {
@@ -458,7 +458,7 @@ namespace nil {
                         // TODO: maybe reduce input parameters
                         /// input parameters should be lesser than modulus
                         // BOOST_ASSERT(eval_lt(x, m_mod.backend()) && eval_lt(y, m_mod.backend()));
-#if (BOOST_ARCH_X86_64 & 0)
+#if BOOST_ARCH_X86_64
                         if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && (result.size() >= 2) && (y.size() >= 2)) {
                             add_mod_asm(limbs_count, result.limbs(), y.limbs(), m_mod.backend().limbs());
                             result.resize(limbs_count, limbs_count);

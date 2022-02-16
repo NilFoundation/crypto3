@@ -228,7 +228,7 @@ namespace nil {
                     BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
                     using default_ops::eval_lt;
-#if (BOOST_ARCH_X86_64 & 0)
+#if BOOST_ARCH_X86_64
                     auto limbs_count = get_limbs_count<Backend>();
                     if (!BOOST_MP_IS_CONST_EVALUATED(result.base_data().limbs()) && (limbs_count >= 2)) {
                         sub_mod_asm(limbs_count, result.base_data().limbs(), o.base_data().limbs(),

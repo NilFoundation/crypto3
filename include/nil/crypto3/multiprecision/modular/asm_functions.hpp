@@ -14,7 +14,7 @@ namespace nil {
     namespace crypto3 {
         namespace multiprecision {
             namespace backends {
-#if (BOOST_ARCH_X86_64 & 0)
+#if BOOST_ARCH_X86_64
                 template<typename Limb1, typename Limb2>
                 void sub_asm(size_t n, Limb1 *x, const Limb2 *y) {
                     __asm__(
@@ -73,11 +73,12 @@ namespace nil {
                         "mov %[shift], %%rbx                   \n\t"
                         "addq   %[tmp1], (%[res], %%rbx, 8)    \n\t"
                         "adcq   %[tmp2], 8(%[res], %%rbx, 8)   \n\t"
+                        "movb $0, %[carry]                     \n\t"
                         "jnc 2f                                \n\t"
                         "adcq   $0, 16(%[res], %%rbx, 8)       \n\t"
                         "movb $1, %[carry]                     \n\t"
                     "2:                                        \n\t"
-                        : [k] "=&r"(k), [tmp1] "=&r"(tmp1), [tmp2] "=&r"(tmp2), [carry] "=r" (carry)
+                        : [k] "=&r"(k), [tmp1] "=&r"(tmp1), [tmp2] "=&r"(tmp2), [carry] "=&r" (carry)
                         : [limbs] "r"(n), [shift] "r"(shift), [res] "r"(res), [x] "r"(x), [inv] "r"(inv)
                         : "cc", "memory", "%rax", "%rbx", "%rdx");
                     return carry;
@@ -86,6 +87,8 @@ namespace nil {
                 template<typename Limb1, typename Limb2>
                 int cmp_asm(size_t n, const Limb1 *x, const Limb2 *y) {
                     int result = 0;
+                    size_t step_count = 0;
+                    size_t step_count1 = 0;
                     __asm__(
                         // Else check result with mod
                         "mov $0, %[res]                  \n\t"
@@ -93,8 +96,10 @@ namespace nil {
                     "1:                                  \n\t"
                         "movq  -8(%[y], %%rbx, 8), %%rax \n\t"
                         "cmpq  %%rax, -8(%[x], %%rbx, 8) \n\t"
-                        "ja  3f                          \n\t"
+                        "movq  -8(%[x], %%rbx, 8), %[stp] \n\t"
+                        "movq  %%rax, %[stp1] \n\t"
                         "jb  2f                          \n\t"
+                        "ja  3f                          \n\t"
                         "dec %%rbx                       \n\t"
                         "cmp $0, %%rbx                   \n\t"
                         "jne 1b                          \n\t"
@@ -106,9 +111,10 @@ namespace nil {
                     "3:                                  \n\t"
                         "inc %[res]                      \n\t"
                     "4:                                  \n\t"
-                        : [res] "=r"(result)
+                        : [res] "=&r"(result), [stp] "=&r" (step_count), [stp1] "=&r" (step_count1)
                         : [limbs] "r"(n), [x] "r"(x), [y] "r"(y)
                         : "cc", "memory", "%rax", "%rcx", "%rbx");
+                    size_t k = step_count;
                     return result;
                 }
 
