@@ -307,10 +307,6 @@ namespace nil {
                         initialize(m);
                     }
 
-                    constexpr modular_functions_fixed(const number_type &m) {
-                        initialize(m);
-                    }
-
                     constexpr modular_functions_fixed(const modular_functions_fixed &o) {
                         m_mod = o.get_mod();
                         m_barrett_mu = o.get_mu();
