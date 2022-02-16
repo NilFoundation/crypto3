@@ -56,7 +56,7 @@ namespace nil {
 
                 void reduce(Backend& result) const {
                     if (get_mod() % 2 == 0) {
-                        this->barret_reduce(result);
+                        this->barrett_reduce(result);
                     } else {
                         this->montgomery_reduce(result);
                     }
@@ -68,7 +68,7 @@ namespace nil {
 
                              */
                 void adjust_modular(Backend& result) {
-                    this->barret_reduce(result);
+                    this->barrett_reduce(result);
                     if (get_mod() % 2 != 0) {
                         eval_multiply(result, this->r2().backend());
                         this->montgomery_reduce(result);
@@ -159,7 +159,7 @@ namespace nil {
             //
             //       if (get_mod() % 2 == 0)
             //       {
-            //          this->barret_reduce(result);
+            //          this->barrett_reduce(result);
             //       }
             //       else
             //       {
@@ -170,7 +170,7 @@ namespace nil {
             //    template<typename BackendT>
             //    constexpr void adjust_modular(BackendT& result)
             //    {
-            //       this->barret_reduce(result);
+            //       this->barrett_reduce(result);
             //       if (get_mod() % 2 != 0)
             //       {
             //          eval_multiply(result, this->r2().backend());
@@ -181,7 +181,7 @@ namespace nil {
             //    template<typename Backend1, typename Backend2>
             //    constexpr void adjust_modular(Backend1& result, Backend2 input)
             //    {
-            //       this->barret_reduce(input);
+            //       this->barrett_reduce(input);
             //       Backend_doubled_limbs tmp(input);
             //       if (get_mod() % 2 != 0)
             //       {
