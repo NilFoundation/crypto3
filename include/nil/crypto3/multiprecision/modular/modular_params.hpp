@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2019 Alexey Moskvin
+// Copyright (c) 2019-2021 Alexey Moskvin
 // Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -34,8 +34,7 @@ namespace nil {
                 }
 
                 modular_params& operator=(const modular_params<Backend>& v) {
-                    backends::montgomery_params<Backend>::m_mod = v.get_mod();
-                    backends::barrett_params<Backend>::m_mod = v.get_mod();
+                    this->m_mod = v.get_mod();
 
                     this->m_mu = v.mu();
 
@@ -87,7 +86,7 @@ namespace nil {
                 }
 
                 number_type get_mod() const {
-                    return backends::montgomery_params<Backend>::mod() | backends::barrett_params<Backend>::mod();
+                    return this->m_mod;
                 }
 
                 template<typename BackendT, expression_template_option ExpressionTemplates>
