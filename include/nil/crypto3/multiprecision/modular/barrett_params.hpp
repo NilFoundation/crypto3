@@ -18,7 +18,8 @@ namespace nil {
         namespace multiprecision {
             namespace backends {
                 /**
-                 * Parameters for Montgomery Reduction
+                 * Parameters for Barrett Reduction
+                 * https://en.wikipedia.org/wiki/Barrett_reduction
                  */
                 template<typename Backend>
                 class barrett_params : public base_params<Backend> {
