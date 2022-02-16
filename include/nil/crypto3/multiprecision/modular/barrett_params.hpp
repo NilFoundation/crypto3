@@ -58,7 +58,7 @@ namespace nil {
                         return *this;
                     }
 
-                    inline void barret_reduce(Backend& result) const {
+                    inline void barrett_reduce(Backend& result) const {
                         using default_ops::eval_add;
                         using default_ops::eval_bit_set;
                         using default_ops::eval_decrement;
