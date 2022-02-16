@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
         for (int j = 0; j < fri_params.max_degree; j++) {
             poly.push_back(typename FieldType::value_type(polynomial_element_gen()));
         }
-        merkle_tree_type tree = lpc_type::commit(poly, D[0]);
+        merkle_tree_type tree = lpc_type::commit(poly, D[0]); // phase_1: Commit
 
         // TODO: take a point outside of the basic domain
         std::array<typename FieldType::value_type, 1> evaluation_points = {
@@ -155,12 +155,12 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
         std::array<std::uint8_t, 96> x_data {};
         zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
 
-        auto proof = lpc_type::proof_eval(evaluation_points, tree, poly, transcript, fri_params);
+        auto proof = lpc_type::proof_eval(evaluation_points, tree, poly, transcript, fri_params); // phase_2: Prove
 
         // verify
         zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript_verifier(x_data);
 
-        BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, transcript_verifier, fri_params));
+        BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, transcript_verifier, fri_params)); // phase_3: Verify
     }
 }
 

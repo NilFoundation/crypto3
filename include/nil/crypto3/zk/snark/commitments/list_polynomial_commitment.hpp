@@ -126,20 +126,20 @@ namespace nil {
                         std::array<merkle_proof_type, k> p;
                         std::array<std::pair<typename FieldType::value_type, typename FieldType::value_type>, k>
                             U_interpolation_points;
-
+                        
                         for (std::size_t j = 0; j < k; j++) {
-                            z[j] = g.evaluate(evaluation_points[j]);
-                            U_interpolation_points[j] = std::make_pair(evaluation_points[j], z[j]);
+                            z[j] = g.evaluate(evaluation_points[j]); // transform to point-representation
+                            U_interpolation_points[j] = std::make_pair(evaluation_points[j], z[j]); // prepare points for interpolation
                         }
 
                         math::polynomial<typename FieldType::value_type> U =
-                            math::lagrange_interpolation(U_interpolation_points);
+                            math::lagrange_interpolation(U_interpolation_points); // k is small => iterpolation goes fast
 
                         math::polynomial<typename FieldType::value_type> Q = (g - U);
                         for (std::size_t j = 0; j < k; j++) {
                             math::polynomial<typename FieldType::value_type> denominator_polynom = {
                                 -evaluation_points[j], 1};
-                            Q = Q / denominator_polynom;
+                            Q = Q / denominator_polynom; // polynomial divison
                         }
 
                         // temporary definition, until polynomial is constexpr
@@ -148,7 +148,7 @@ namespace nil {
                         std::array<typename fri_type::proof_type, lambda> fri_proof;
 
                         for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {
-                            fri_proof[round_id] = fri_type::proof_eval(Q, g, T, transcript, fri_params);
+                            fri_proof[round_id] = fri_type::proof_eval(Q, g, T, transcript, fri_params); // fri_commitment.hpp
                         }
 
                         return proof_type({z, T.root(), fri_proof});

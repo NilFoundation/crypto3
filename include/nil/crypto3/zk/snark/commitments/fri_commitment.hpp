@@ -132,7 +132,7 @@ namespace nil {
 
                         std::vector<std::array<std::uint8_t, field_element_type::length()>> y_data;
                         y_data.resize(D->m);
-                        std::vector<typename FieldType::value_type> tmp(f.begin(), f.end());
+                        std::vector<typename FieldType::value_type> tmp(f.begin(), f.end()); // for FFT
                         D->fft(tmp);
 
                         for (std::size_t i = 0; i < D->m; i++) {
@@ -170,10 +170,11 @@ namespace nil {
 
                         proof_type proof;
 
-                        math::polynomial<typename FieldType::value_type> f = Q;
+                        math::polynomial<typename FieldType::value_type> f = Q; // copy? 
 
+                        // TODO: how to sample x?
                         typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(
-                            transcript.template int_challenge<std::size_t>());
+                            transcript.template int_challenge<std::size_t>()); // could be smth like fri_params.D[0]->get_domain_element(RANDOM % domain_size)
 
                         std::size_t r = fri_params.r;
 
@@ -186,9 +187,9 @@ namespace nil {
 
                             typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
-                            typename FieldType::value_type x_next = fri_params.q.evaluate(x);
+                            typename FieldType::value_type x_next = fri_params.q.evaluate(x); // == x^2
 
-                            math::polynomial<typename FieldType::value_type> f_next = fold_polynomial(f, alpha);
+                            math::polynomial<typename FieldType::value_type> f_next = fold_polynomial(f, alpha); // create polynomial of degree (degree(f) / 2)
 
                             // m = 2, so:
                             std::array<typename FieldType::value_type, m> s;
@@ -202,12 +203,12 @@ namespace nil {
                             std::array<typename FieldType::value_type, m> y;
 
                             for (std::size_t j = 0; j < m; j++) {
-                                y[j] = i == 0 ? g.evaluate(s[j]) : f.evaluate(s[j]);
+                                y[j] = i == 0 ? g.evaluate(s[j]) : f.evaluate(s[j]); // polynomial evaluation
                             }
 
                             std::array<merkle_proof_type, m> p;
 
-                            std::vector<typename FieldType::value_type> tmp;
+                            std::vector<typename FieldType::value_type> tmp; // we need it for FFT
                             if (i == 0) {
                                 std::copy(g.begin(), g.end(), std::back_inserter(tmp));
                             } else {
@@ -219,20 +220,20 @@ namespace nil {
                                 typename FieldType::value_type leaf = y[j];
 
                                 std::size_t leaf_index = 0;
-                                for (; leaf_index < tmp.size(); leaf_index++) {
+                                for (; leaf_index < tmp.size(); leaf_index++) { // search 2**24
                                     if (tmp[leaf_index] == leaf)
                                         break;
                                 }
                                 p[j] = merkle_proof_type(*p_tree, leaf_index);
                             }
 
-                            typename FieldType::value_type colinear_value = f_next.evaluate(x_next);
+                            typename FieldType::value_type colinear_value = f_next.evaluate(x_next); // polynomial evaluation
 
                             if (i < r - 1) {
-                                T_next = commit(f_next, fri_params.D[i + 1]);
+                                T_next = commit(f_next, fri_params.D[i + 1]); // new merkle tree
                                 transcript(T_next.root());
 
-                                std::vector<typename FieldType::value_type> tmp(f_next.begin(), f_next.end());
+                                std::vector<typename FieldType::value_type> tmp(f_next.begin(), f_next.end()); // for FFT
                                 fri_params.D[i + 1]->fft(tmp);
 
                                 std::size_t leaf_index = 0;
