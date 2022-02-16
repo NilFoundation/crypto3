@@ -55,10 +55,15 @@ namespace nil {
                     typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::modular_type modular_type;
 
                     constexpr static const integral_type modulus =
                         0x1A0111EA397FE69A4B1BA7B6434BACD764774B84F38512BF6730D2A0F6B0F6241EABFFFEB153FFFFB9FEFFFFFFFFAAAB_cppui381;
+
+                    typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
 
                     typedef typename detail::element_fp<params<bls12_base_field<381>>> value_type;
 
@@ -76,10 +81,16 @@ namespace nil {
                     typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::modular_type modular_type;
 
                     constexpr static const integral_type modulus =
                         0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508C00000000001_cppui377;
+
+                    typedef typename policy_type::modular_backend modular_backend;
+                    typedef nil::crypto3::multiprecision::modular_params<modular_backend> modular_params_type;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
 
                     typedef typename detail::element_fp<params<bls12_base_field<377>>> value_type;
 

@@ -45,6 +45,7 @@ namespace nil {
 
                 public:
                     typedef typename policy_type::modular_type modular_type;
+                    typedef typename policy_type::modular_backend modular_backend;
                     typedef typename policy_type::integral_type integral_type;
 
                     constexpr static const integral_type mul_generator =
@@ -62,6 +63,7 @@ namespace nil {
 
                 public:
                     typedef typename policy_type::modular_type modular_type;
+                    typedef typename policy_type::modular_backend modular_backend;
                     typedef typename policy_type::integral_type integral_type;
 
                     constexpr static const integral_type mul_generator =

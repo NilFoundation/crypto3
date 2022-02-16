@@ -46,6 +46,7 @@ namespace nil {
 
                 public:
                     typedef typename policy_type::modular_type modular_type;
+                    typedef typename policy_type::modular_backend modular_backend;
                     typedef typename policy_type::integral_type integral_type;
 
                     constexpr static const std::size_t s = 0x01;
@@ -78,6 +79,7 @@ namespace nil {
 
                 public:
                     typedef typename policy_type::modular_type modular_type;
+                    typedef typename policy_type::modular_backend modular_backend;
                     typedef typename policy_type::integral_type integral_type;
                     typedef typename policy_type::extended_integral_type extended_integral_type;
 
@@ -103,6 +105,7 @@ namespace nil {
 
                 public:
                     typedef typename policy_type::modular_type modular_type;
+                    typedef typename policy_type::modular_backend modular_backend;
                     typedef typename policy_type::integral_type integral_type;
 
                     constexpr static const std::size_t s = 0x1C;

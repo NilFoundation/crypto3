@@ -55,10 +55,15 @@ namespace nil {
                     typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::modular_type modular_type;
 
                     constexpr static const integral_type modulus =
                         0x91C48A4FDFBCF7C02AE95E7DA126122B5DD2864F559B87E8E74A286D52F59BD1DE68DFD645D0E00C60C080031891980374EEB594A532BFD67B9A09EAC4B8663A07910E68F39465FB7040D25DF13932EBAC4347A530ECBA61C854F9B880D3C0C3660080587C45566DADE26BD5A394BE093B4C0F24B5AFFEF8EC6C5B3E57FB89025A9BC16769932131E16D3C94EFCAB18D0DF061203CC53E6103BC72D5594BFD40CA65380F44A9A851DCB075495FC033A8A58071A1BD78FE052F66555648EB4B719D2AFE8B4880F8DAD6F15818BA178F89274C870BE9B96EB08C46C40040CC2EFE1DFB1B1868DD319DE3C34A32A63AB6EB1224209A419680CC7902D1728D4DF9E1_cppui2048;
+
+                    typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
 
                     typedef typename detail::element_fp<params<dsa_botan<modulus_bits>>> value_type;
 

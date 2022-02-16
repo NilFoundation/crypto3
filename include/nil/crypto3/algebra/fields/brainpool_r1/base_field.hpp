@@ -55,9 +55,14 @@ namespace nil {
                     typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::modular_type modular_type;
 
                     constexpr static const integral_type modulus = 0xE95E4A5F737059DC60DFC7AD95B3D8139515620F_cppui160;
+
+                    typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
 
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<160>>> value_type;
 

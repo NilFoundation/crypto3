@@ -35,6 +35,8 @@ namespace nil {
                 struct params {
                     typedef FieldType field_type;
                     typedef typename field_type::modular_type modular_type;
+                    typedef typename field_type::modular_backend modular_backend;
+                    typedef typename field_type::modular_params_type modular_params_type;
 
                     constexpr static const std::size_t modulus_bits = field_type::modulus_bits;
                     typedef typename field_type::integral_type integral_type;
@@ -42,6 +44,8 @@ namespace nil {
                     typedef typename field_type::extended_integral_type extended_integral_type;
 
                     constexpr static const integral_type modulus = field_type::modulus;
+
+                    constexpr static const modular_params_type modulus_params = field_type::modulus_params;
                 };
 
                 template<typename FieldType>
