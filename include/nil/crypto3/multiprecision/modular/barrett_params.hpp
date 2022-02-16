@@ -18,7 +18,8 @@ namespace nil {
         namespace multiprecision {
             namespace backends {
                 /**
-                 * Parameters for Montgomery Reduction
+                 * Parameters for Barrett Reduction
+                 * https://en.wikipedia.org/wiki/Barrett_reduction
                  */
                 template<typename Backend>
                 class barrett_params : public base_params<Backend> {
@@ -57,7 +58,7 @@ namespace nil {
                         return *this;
                     }
 
-                    inline void barret_reduce(Backend& result) const {
+                    inline void barrett_reduce(Backend& result) const {
                         using default_ops::eval_add;
                         using default_ops::eval_bit_set;
                         using default_ops::eval_decrement;
@@ -140,7 +141,7 @@ namespace nil {
                 //    }
                 //
                 //    template<typename BackendT>
-                //    constexpr void barret_reduce(BackendT& result) const
+                //    constexpr void barrett_reduce(BackendT& result) const
                 //    {
                 //       using default_ops::eval_add;
                 //       using default_ops::eval_bit_set;
@@ -224,7 +225,7 @@ namespace nil {
                 //      return *this;
                 //   }
                 //
-                //   inline void barret_reduce(Backend& result) const
+                //   inline void barrett_reduce(Backend& result) const
                 //   {
                 //      using default_ops::eval_add;
                 //      using default_ops::eval_bit_set;

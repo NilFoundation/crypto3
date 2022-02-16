@@ -95,7 +95,7 @@ namespace nil {
 
                         m_r2 = r * r;
                         barrett_params<Backend> barrettParams(this->m_mod);
-                        barrettParams.barret_reduce(m_r2.backend());
+                        barrettParams.barrett_reduce(m_r2.backend());
                     }
 
                 public:
@@ -271,7 +271,7 @@ namespace nil {
                 //
                 //       r = r * r;
                 //       barrett_params<Backend> barrettParams(this->m_mod);
-                //       barrettParams.barret_reduce(r.backend());
+                //       barrettParams.barrett_reduce(r.backend());
                 //       m_r2 = static_cast<Backend>(r.backend());
                 //    }
                 //
