@@ -50,7 +50,7 @@ namespace nil {
                         class circuit_description
                     {
                         public:
-                        const std::size_t table_rows = 1 << rows_log - 1;
+                        const std::size_t table_rows = 1 << rows_log;
 
                         std::shared_ptr<math::evaluation_domain<FieldType>> domain;
 
@@ -106,11 +106,11 @@ namespace nil {
                 // MUL: x * y = z, copy(p1, y)
                 //---------------------------------------------------------------------------//
                 template<typename FieldType>
-                 circuit_description<FieldType, 4, 4, 4, 15> circuit_test_1() {
+                 circuit_description<FieldType, 4, 4, 4, 16> circuit_test_1() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t table_columns = 4;
                     constexpr static const std::size_t permutation = 4;
-                    constexpr static const std::size_t usable = (1 << rows_log) - 1;
+                    constexpr static const std::size_t usable = 1 << rows_log;
 
                     circuit_description<FieldType, rows_log, table_columns, permutation, usable> test_circuit;
 
@@ -133,26 +133,26 @@ namespace nil {
 
                     // fill rows with ADD gate
                     for (std::size_t i = 1; i < test_circuit.table_rows - 2; i++) {
-                        table[i][0] = algebra::random_element<FieldType>();
-                        table[i][1] = table[i - 1][2];
-                        table[i][2] = table[i][0] + table[i][1];
-                        table[i][3] = FieldType::value_type::zero();
+                        table[0][i] = algebra::random_element<FieldType>();
+                        table[1][i] = table[2][i - 1];
+                        table[2][i] = table[0][i] + table[1][i];
+                        table[3][i] = FieldType::value_type::zero();
                         q_add[i] = FieldType::value_type::one();
                         q_mul[i] = FieldType::value_type::zero();
 
-                        test_circuit.permutation.cells_equal(i, 1, i - 1, 2);
+                        test_circuit.permutation.cells_equal(1, i, 2, i - 1);
                     }
 
                     // fill rows with MUL gate
                     for (std::size_t i = test_circuit.table_rows - 2; i < test_circuit.table_rows; i++) {
-                        table[i][0] = algebra::random_element<FieldType>();
-                        table[i][1] = table[0][3];
-                        table[i][2] = table[i][0] * table[i][1];
-                        table[i][3] = FieldType::value_type::zero();
+                        table[0][i] = algebra::random_element<FieldType>();
+                        table[1][i] = table[3][0];
+                        table[2][i] = table[0][i] * table[1][i];
+                        table[3][i] = FieldType::value_type::zero();
                         q_add[i] = FieldType::value_type::zero();
                         q_mul[i] = FieldType::value_type::one();
 
-                        test_circuit.permutation.cells_equal(i, 1, 0, 3);
+                        test_circuit.permutation.cells_equal(1, i, 3, 0);
                     }
 
                     for (std::size_t i = 0; i < table_columns; i++) {
