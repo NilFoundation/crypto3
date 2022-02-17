@@ -65,15 +65,25 @@ namespace nil {
                 }
 
                 void fft(std::vector<value_type> &a) {
-                    if (a.size() != this->m)
-                        throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
+                    if (a.size() != this->m){
+                        if (a.size() < this->m){
+                            a.resize(this->m, value_type(0));
+                        } else {
+                            throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
+                        }
+                    }
 
                     _basic_radix2_fft<FieldType>(a, omega);
                 }
 
                 void inverse_fft(std::vector<value_type> &a) {
-                    if (a.size() != this->m)
-                        throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
+                    if (a.size() != this->m){
+                        if (a.size() < this->m){
+                            a.resize(this->m, value_type(0));
+                        } else {
+                            throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
+                        }
+                    }
 
                     _basic_radix2_fft<FieldType>(a, omega.inversed());
 

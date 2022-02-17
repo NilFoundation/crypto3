@@ -69,8 +69,13 @@ namespace nil {
                 }
 
                 void fft(std::vector<value_type> &a) {
-                    if (a.size() != this->m)
-                        throw std::invalid_argument("step_radix2: expected a.size() == this->m");
+                    if (a.size() != this->m){
+                        if (a.size() < this->m){
+                            a.resize(this->m, value_type(0));
+                        } else {
+                            throw std::invalid_argument("step_radix2: expected a.size() == this->m");
+                        }
+                    }
 
                     std::vector<value_type> c(big_m, value_type::zero());
                     std::vector<value_type> d(big_m, value_type::zero());

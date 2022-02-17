@@ -83,8 +83,12 @@ namespace nil {
                 }
 
                 void fft(std::vector<value_type> &a) {
-                    if (a.size() != this->m) {
-                        throw std::invalid_argument("arithmetic: expected a.size() == this->m");
+                    if (a.size() != this->m){
+                        if (a.size() < this->m){
+                            a.resize(this->m, value_type(0));
+                        } else {
+                            throw std::invalid_argument("arithmetic: expected a.size() == this->m");
+                        }
                     }
 
                     if (!this->precomputation_sentinel) {
@@ -116,8 +120,13 @@ namespace nil {
                 }
 
                 void inverse_fft(std::vector<value_type> &a) {
-                    if (a.size() != this->m)
-                        throw std::invalid_argument("arithmetic: expected a.size() == this->m");
+                    if (a.size() != this->m){
+                        if (a.size() < this->m){
+                            a.resize(this->m, value_type(0));
+                        } else {
+                            throw std::invalid_argument("arithmetic: expected a.size() == this->m");
+                        }
+                    }
 
                     if (!this->precomputation_sentinel)
                         do_precomputation();
