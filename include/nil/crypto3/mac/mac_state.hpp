@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -30,15 +31,13 @@
 
 #include <nil/crypto3/mac/accumulators/mac.hpp>
 
-#include <nil/crypto3/detail/static_digest.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace mac {
-            template<typename MessageAuthenticationCode>
-            using accumulator_set = boost::accumulators::accumulator_set<
-                static_digest<MessageAuthenticationCode::input_block_bits>,
-                boost::accumulators::features<accumulators::tag::mac<MessageAuthenticationCode>>>;
+            template<typename ProcessingPolicy>
+            using computation_accumulator_set = boost::accumulators::accumulator_set<
+                typename ProcessingPolicy::result_type,
+                boost::accumulators::features<accumulators::tag::mac<ProcessingPolicy>>>;
         }    // namespace mac
     }        // namespace crypto3
 }    // namespace nil

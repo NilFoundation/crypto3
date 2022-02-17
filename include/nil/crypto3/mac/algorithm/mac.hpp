@@ -26,8 +26,24 @@
 #ifndef CRYPTO3_MAC_ALGORITHM_HPP
 #define CRYPTO3_MAC_ALGORITHM_HPP
 
+#include <cstdint>
+
 namespace nil {
     namespace crypto3 {
+        namespace mac {
+            /*!
+             * @brief
+             * @tparam Mac
+             */
+            template<typename Mac>
+            struct nop_padding {
+                typedef std::size_t size_type;
+
+                typedef Mac mac_type;
+
+                typedef typename mac_type::block_type block_type;
+            };
+        }    // namespace mac
         /*!
          * @defgroup mac Message Authentication Codes
          *
@@ -39,7 +55,7 @@ namespace nil {
          * @brief Algorithms are meant to provide message authentication codes computation
          * interface similar to STL algorithms' one.
          */
-    }
+    }    // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_MAC_HPP
