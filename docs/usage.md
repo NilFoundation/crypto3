@@ -23,8 +23,8 @@ using namespace nil::crypto3::multiprecision;
 
     using curve_type = curves::bls12_381;
     using hash_type = sha2<256>;
-    using bls_variant = bls_mps_ro_variant<curve_type, hash_type>;
-    using scheme_type = bls<bls_variant, bls_basic_scheme>;
+    using bls_version = bls_mps_ro_version<curve_type, hash_type>;
+    using scheme_type = bls<bls_default_public_params<>, bls_version, bls_basic_scheme, curve_type>;
 
     using privkey_type = private_key<scheme_type>;
     using pubkey_type = public_key<scheme_type>;
@@ -67,8 +67,8 @@ using namespace nil::crypto3::multiprecision;
 
     using curve_type = curves::bls12_381;
     using hash_type = sha2<256>;
-    using bls_variant = bls_mps_ro_variant<curve_type, hash_type>;
-    using scheme_type = bls<bls_variant, bls_basic_scheme>;
+    using bls_version = bls_mps_ro_version<curve_type, hash_type>;
+    using scheme_type = bls<bls_default_public_params<>, bls_version, bls_basic_scheme, curve_type>;
 
     using privkey_type = private_key<scheme_type>;
     using pubkey_type = public_key<scheme_type>;
