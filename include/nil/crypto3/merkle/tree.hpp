@@ -181,31 +181,35 @@ namespace nil {
                     template<
                         typename LeafRange,
                         typename Hashable = typename std::iterator_traits<typename LeafRange::iterator>::value_type>
-                    merkle_tree_impl(std::vector<LeafRange> data) :
+                    merkle_tree_impl(const std::vector<LeafRange> &data) :
                         _leafs(data.size()), _size(detail::merkle_tree_length(_leafs, Arity)) {
                         BOOST_ASSERT_MSG(data.size() % Arity == 0, "Wrong leafs number");
                         hash_vector.resize(_size);
                         rc = detail::merkle_tree_row_count(_leafs, Arity);
+
                         for (size_t i = 0; i < _leafs; ++i) {
                             hash_vector[i] =
                                 (static_cast<typename hash_type::digest_type>(crypto3::hash<hash_type>(data[i])));
                         }
-                        size_t prev_row_idx = 0, row_idx = _leafs, row_size = _leafs / Arity;
+
+                        size_t row_idx = _leafs, row_size = _leafs / Arity;
+                        typename std::vector<value_type>::iterator it = hash_vector.begin();
 
                         for (size_t row_number = 1; row_number < rc; ++row_number) {
                             for (size_t cur_element = row_idx; cur_element < row_idx + row_size; ++cur_element) {
                                 accumulator_set<hash_type> acc;
-                                size_t children_idx = (cur_element - row_idx) * Arity + prev_row_idx;
-                                typename std::vector<value_type>::iterator it = hash_vector.begin() + children_idx;
                                 for (size_t i = 0; i < Arity; ++i, ++it) {
                                     crypto3::hash<hash_type>(it->begin(), it->end(), acc);
                                 }
                                 hash_vector[cur_element] = (accumulators::extract::hash<hash_type>(acc));
                             }
-                            prev_row_idx = row_idx;
                             row_idx += row_size;
                             row_size /= Arity;
                         }
+                    }
+
+                    value_type root() const {
+                        return hash_vector[_size - 1];
                     }
 
                     value_type root() {
@@ -213,6 +217,10 @@ namespace nil {
                     }
 
                     value_type &operator[](std::size_t idx) {
+                        return hash_vector[idx];
+                    }
+
+                    value_type operator[](std::size_t idx) const {
                         return hash_vector[idx];
                     }
 

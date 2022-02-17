@@ -63,7 +63,7 @@ namespace nil {
 
                     merkle_proof_impl() : _li(0) {};
 
-                    merkle_proof_impl(merkle_tree<hash_type, arity> tree, std::size_t leaf_idx) {
+                    merkle_proof_impl(const merkle_tree<hash_type, arity> &tree, const std::size_t leaf_idx) {
                         _root = tree.root();
                         _path.resize(tree.row_count() - 1);
                         _li = leaf_idx;
@@ -91,7 +91,7 @@ namespace nil {
                     }
 
                     template<typename Hashable>
-                    bool validate(Hashable a) {
+                    bool validate(const Hashable &a) const {
                         value_type d = crypto3::hash<hash_type>(a);
                         for (auto &it : _path) {
                             accumulator_set<hash_type> acc;
