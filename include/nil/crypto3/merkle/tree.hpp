@@ -183,7 +183,7 @@ namespace nil {
                         _leaves(std::distance(first, last)), _size(detail::merkle_tree_length(_leaves, Arity)),
                         _rc(detail::merkle_tree_row_count(_leaves, Arity)) {
 
-                        BOOST_ASSERT_MSG(data.size() % Arity == 0, "Wrong leafs number");
+                        BOOST_ASSERT_MSG(_leaves % Arity == 0, "Wrong leafs number");
 
                         _hashes.reserve(_size);
 
