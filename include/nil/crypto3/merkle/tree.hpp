@@ -51,7 +51,7 @@ namespace nil {
                 size_t log2_pow2(size_t n) {
                     return next_pow2(n);
                 }
-                // Row_Count calculation given the number of _leafs in the tree and the branches.
+                // Row_Count calculation given the number of _leaves in the tree and the branches.
                 size_t merkle_tree_row_count(size_t leafs, size_t branches) {
                     // Optimization
                     if (branches == 2) {
@@ -61,7 +61,7 @@ namespace nil {
                     }
                 }
 
-                // Tree length calculation given the number of _leafs in the tree and the branches.
+                // Tree length calculation given the number of _leaves in the tree and the branches.
                 size_t merkle_tree_length(size_t leafs, size_t branches) {
                     // Optimization
                     size_t len = leafs;
@@ -77,15 +77,15 @@ namespace nil {
                     return len;
                 }
 
-                // Tree length calculation given the number of _leafs in the tree, the
+                // Tree length calculation given the number of _leaves in the tree, the
                 // rows_to_discard, and the branches.
                 size_t merkle_tree_cache_size(size_t leafs, size_t branches, size_t rows_to_discard) {
                     size_t shift = log2_pow2(branches);
                     size_t len = merkle_tree_length(leafs, branches);
                     size_t row_count = merkle_tree_row_count(leafs, branches);
 
-                    // 'rc - 1' means that we start discarding rows above the base
-                    // layer, which is included in the current rc.
+                    // '_rc - 1' means that we start discarding rows above the base
+                    // layer, which is included in the current _rc.
                     size_t cache_base = row_count - 1 - rows_to_discard;
 
                     size_t cache_size = len;
@@ -117,16 +117,16 @@ namespace nil {
                     return true;
                 }
 
-                // Given a tree of 'rc' with the specified number of 'branches',
-                // calculate the length of hashes required for the proof.
+                // Given a tree of '_rc' with the specified number of 'branches',
+                // calculate the length of _hashes required for the proof.
                 size_t merkle_proof_lemma_length(size_t row_count, size_t branches) {
                     return 2 + ((branches - 1) * (row_count - 1));
                 }
 
-                // This method returns the number of '_leafs' given a merkle tree
-                // length of 'len', where _leafs must be a power of 2, respecting the
+                // This method returns the number of '_leaves' given a merkle tree
+                // length of 'len', where _leaves must be a power of 2, respecting the
                 // number of branches.
-                size_t merkle_tree_leafs(size_t len, size_t branches) {
+                size_t merkle_tree_leaves(size_t len, size_t branches) {
                     size_t leafs = 0;
                     // Optimization:
                     if (branches == 2) {
@@ -136,7 +136,7 @@ namespace nil {
                         size_t cur = len;
                         size_t shift = log2_pow2(branches);
                         while (cur != 1) {
-                            leafs <<= shift;    // _leafs *= branches
+                            leafs <<= shift;    // _leaves *= branches
                             cur -= leafs;
                         }
                     };
@@ -145,7 +145,7 @@ namespace nil {
                 }
                 // Merkle Tree.
                 //
-                // All _leafs and nodes are stored in a BGL graph structure.
+                // All _leaves and nodes are stored in a BGL graph structure.
                 //
                 // A merkle tree is a tree in which every non-leaf node is the hash of its
                 // child nodes. A diagram for merkle_tree_impl arity = 2:
@@ -176,32 +176,33 @@ namespace nil {
                     constexpr static const std::size_t value_bits = node_type::value_bits;
 
                 public:
-                    merkle_tree_impl() : _leafs(0), _size(0), rc(0) {};
+                    merkle_tree_impl() : _leaves(0), _size(0), _rc(0) {};
 
-                    template<
-                        typename LeafRange,
-                        typename Hashable = typename std::iterator_traits<typename LeafRange::iterator>::value_type>
-                    merkle_tree_impl(const std::vector<LeafRange> &data) :
-                        _leafs(data.size()), _size(detail::merkle_tree_length(_leafs, Arity)) {
+                    template<typename LeafIterator>
+                    merkle_tree_impl(LeafIterator first, LeafIterator last) :
+                        _leaves(std::distance(first, last)), _size(detail::merkle_tree_length(_leaves, Arity)),
+                        _rc(detail::merkle_tree_row_count(_leaves, Arity)) {
+
                         BOOST_ASSERT_MSG(data.size() % Arity == 0, "Wrong leafs number");
-                        hash_vector.resize(_size);
-                        rc = detail::merkle_tree_row_count(_leafs, Arity);
 
-                        for (size_t i = 0; i < _leafs; ++i) {
-                            hash_vector[i] =
-                                (static_cast<typename hash_type::digest_type>(crypto3::hash<hash_type>(data[i])));
+                        _hashes.reserve(_size);
+
+                        while (first != last) {
+                            _hashes.template emplace_back(crypto3::hash<hash_type>(*first++));
                         }
 
-                        size_t row_idx = _leafs, row_size = _leafs / Arity;
-                        typename std::vector<value_type>::iterator it = hash_vector.begin();
+                        _hashes.resize(_size);
 
-                        for (size_t row_number = 1; row_number < rc; ++row_number) {
+                        std::size_t row_idx = _leaves, row_size = _leaves / Arity;
+                        typename std::vector<value_type>::iterator it = _hashes.begin();
+
+                        for (size_t row_number = 1; row_number < _rc; ++row_number) {
                             for (size_t cur_element = row_idx; cur_element < row_idx + row_size; ++cur_element) {
                                 accumulator_set<hash_type> acc;
-                                for (size_t i = 0; i < Arity; ++i, ++it) {
-                                    crypto3::hash<hash_type>(it->begin(), it->end(), acc);
+                                for (size_t i = 0; i < Arity; ++i) {
+                                    crypto3::hash<hash_type>(*it++, acc);
                                 }
-                                hash_vector[cur_element] = (accumulators::extract::hash<hash_type>(acc));
+                                _hashes[cur_element] = accumulators::extract::hash<hash_type>(acc);
                             }
                             row_idx += row_size;
                             row_size /= Arity;
@@ -209,23 +210,23 @@ namespace nil {
                     }
 
                     value_type root() const {
-                        return hash_vector[_size - 1];
+                        return _hashes[_size - 1];
                     }
 
                     value_type root() {
-                        return hash_vector[_size - 1];
+                        return _hashes[_size - 1];
                     }
 
                     value_type &operator[](std::size_t idx) {
-                        return hash_vector[idx];
+                        return _hashes[idx];
                     }
 
                     value_type operator[](std::size_t idx) const {
-                        return hash_vector[idx];
+                        return _hashes[idx];
                     }
 
                     size_t row_count() const {
-                        return rc;
+                        return _rc;
                     }
 
                     size_t size() const {
@@ -233,22 +234,22 @@ namespace nil {
                     }
 
                     size_t leafs() const {
-                        return _leafs;
+                        return _leaves;
                     }
 
                 private:
-                    std::vector<value_type> hash_vector;
+                    std::vector<value_type> _hashes;
 
-                    size_t _leafs;
+                    size_t _leaves;
                     size_t _size;
                     // Note: The former 'upstream' merkle_light project uses 'height'
                     // (with regards to the tree property) incorrectly, so we've
-                    // renamed it since it's actually a 'rc'.  For example, a
+                    // renamed it since it's actually a '_rc'.  For example, a
                     // tree with 2 leaf nodes and a single root node has a height of
-                    // 1, but a rc of 2.
+                    // 1, but a _rc of 2.
                     //
-                    // Internally, this code considers only the rc.
-                    size_t rc;
+                    // Internally, this code considers only the _rc.
+                    size_t _rc;
                 };
             }    // namespace detail
 

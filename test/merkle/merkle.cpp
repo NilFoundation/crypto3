@@ -63,7 +63,7 @@ template<typename Hash, size_t Arity, typename ValueType, std::size_t N>
 void testing_validate_template_random_data(std::size_t leaf_number) {
     std::array<ValueType, N> data_not_in_tree = {0};
     auto data = generate_random_data<ValueType, N>(leaf_number);
-    merkle_tree<Hash, Arity> tree(data);
+    merkle_tree<Hash, Arity> tree(data.begin(), data.end());
     std::size_t proof_idx = std::rand() % leaf_number;
     merkle_proof<Hash, Arity> proof(tree, proof_idx);
     bool good_validate = proof.validate(data[proof_idx]);
@@ -77,7 +77,7 @@ void testing_validate_template_random_data(std::size_t leaf_number) {
 template<typename Hash, size_t Arity, typename Element>
 void testing_validate_template(std::vector<Element> data) {
     std::array<uint8_t, 7> data_not_in_tree = {'\x6d', '\x65', '\x73', '\x73', '\x61', '\x67', '\x65'};
-    merkle_tree<Hash, Arity> tree(data);
+    merkle_tree<Hash, Arity> tree(data.begin(), data.end());
     merkle_proof<Hash, Arity> proof(tree, 0);
     bool good_validate = proof.validate(data[0]);
     bool wrong_leaf_validate = proof.validate(data[1]);
@@ -89,7 +89,7 @@ void testing_validate_template(std::vector<Element> data) {
 
 template<typename Hash, size_t Arity, typename Element>
 void testing_hash_template(std::vector<Element> data, std::string result) {
-    merkle_tree<Hash, Arity> tree(data);
+    merkle_tree<Hash, Arity> tree(data.begin(), data.end());
     std::cout << tree.root() << std::endl;
     BOOST_CHECK(result == std::to_string(tree.root()).data());
 }
