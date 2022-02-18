@@ -46,6 +46,8 @@ namespace nil {
                 typedef typename FieldType::value_type value_type;
 
             public:
+                typedef FieldType field_type;
+
                 std::size_t small_m;
                 value_type omega;
                 value_type shift;
@@ -69,8 +71,8 @@ namespace nil {
                 }
 
                 void fft(std::vector<value_type> &a) {
-                    if (a.size() != this->m){
-                        if (a.size() < this->m){
+                    if (a.size() != this->m) {
+                        if (a.size() < this->m) {
                             a.resize(this->m, value_type(0));
                         } else {
                             throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
@@ -100,8 +102,8 @@ namespace nil {
                 }
 
                 void inverse_fft(std::vector<value_type> &a) {
-                    if (a.size() != this->m){
-                        if (a.size() < this->m){
+                    if (a.size() != this->m) {
+                        if (a.size() < this->m) {
                             a.resize(this->m, value_type(0));
                         } else {
                             throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
@@ -117,8 +119,7 @@ namespace nil {
                     _basic_radix2_fft<FieldType>(a1, omega_inverse);
 
                     const value_type shift_to_small_m = shift.pow(small_m);
-                    const value_type sconst =
-                        (value_type(small_m) * (value_type::one() - shift_to_small_m)).inversed();
+                    const value_type sconst = (value_type(small_m) * (value_type::one() - shift_to_small_m)).inversed();
 
                     const value_type shift_inverse = shift.inversed();
                     value_type shift_inverse_i = value_type::one();
@@ -185,7 +186,7 @@ namespace nil {
                     const value_type Z0 =
                         (coset_to_small_m - value_type::one()) * (coset_to_small_m - shift_to_small_m);
                     const value_type Z1 = (coset_to_small_m * shift_to_small_m - value_type::one()) *
-                                                (coset_to_small_m * shift_to_small_m - shift_to_small_m);
+                                          (coset_to_small_m * shift_to_small_m - shift_to_small_m);
 
                     const value_type Z0_inverse = Z0.inversed();
                     const value_type Z1_inverse = Z1.inversed();

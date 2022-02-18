@@ -48,6 +48,8 @@ namespace nil {
                 typedef typename FieldType::value_type value_type;
 
             public:
+                typedef FieldType field_type;
+
                 value_type omega;
 
                 basic_radix2_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
@@ -65,8 +67,8 @@ namespace nil {
                 }
 
                 void fft(std::vector<value_type> &a) {
-                    if (a.size() != this->m){
-                        if (a.size() < this->m){
+                    if (a.size() != this->m) {
+                        if (a.size() < this->m) {
                             a.resize(this->m, value_type(0));
                         } else {
                             throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
@@ -77,8 +79,8 @@ namespace nil {
                 }
 
                 void inverse_fft(std::vector<value_type> &a) {
-                    if (a.size() != this->m){
-                        if (a.size() < this->m){
+                    if (a.size() != this->m) {
+                        if (a.size() < this->m) {
                             a.resize(this->m, value_type(0));
                         } else {
                             throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
@@ -121,7 +123,7 @@ namespace nil {
                     }
                 }
             };
-        }    // namespace fft
+        }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
 

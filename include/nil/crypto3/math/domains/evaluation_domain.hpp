@@ -43,6 +43,8 @@ namespace nil {
                 typedef typename FieldType::value_type value_type;
 
             public:
+                typedef FieldType field_type;
+
                 value_type root;
                 value_type root_inverse;
                 value_type domain;

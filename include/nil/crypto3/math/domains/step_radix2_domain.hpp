@@ -46,6 +46,8 @@ namespace nil {
                 typedef typename FieldType::value_type value_type;
 
             public:
+                typedef FieldType field_type;
+
                 std::size_t big_m;
                 std::size_t small_m;
                 value_type omega;
@@ -69,8 +71,8 @@ namespace nil {
                 }
 
                 void fft(std::vector<value_type> &a) {
-                    if (a.size() != this->m){
-                        if (a.size() < this->m){
+                    if (a.size() != this->m) {
+                        if (a.size() < this->m) {
                             a.resize(this->m, value_type(0));
                         } else {
                             throw std::invalid_argument("step_radix2: expected a.size() == this->m");
@@ -243,7 +245,7 @@ namespace nil {
                     }
                 }
             };
-        }    // namespace fft
+        }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
 
