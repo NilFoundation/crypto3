@@ -110,10 +110,21 @@ namespace nil {
                     // After this function
                     // result.root();
                     // should be called
-                    static merkle_tree_type commit(math::polynomial<typename FieldType::value_type> &f,
-                                                   const std::shared_ptr<math::evaluation_domain<FieldType>> &d) {
+                    static merkle_tree_type commit(math::polynomial<typename FieldType::value_type> &poly,
+                                                   const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
 
-                        return fri_type::commit(f, d);
+                        return fri_type::commit(poly, domain);
+                    }
+
+                    template <std::size_t list_size>
+                        static std::array<merkle_tree_type, list_size> 
+                            commit(std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
+                                    const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
+                                std::array<merkle_tree_type, list_size> commits;
+                                for (std::size_t i = 0; i < list_size; i++) {
+                                    commits[i] = fri_type::commit(poly[i], domain);
+                                }
+                                return commits;
                     }
 
                     static proof_type proof_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
