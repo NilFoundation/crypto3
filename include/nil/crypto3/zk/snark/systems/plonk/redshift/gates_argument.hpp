@@ -77,26 +77,30 @@ namespace nil {
                         return F;
                     }
 
-                    static inline std::array<typename FieldType::value_type, argument_size> verify_eval() {
-                        /*typename transcript_hash_type::digest_type beta_bytes =
-                            transcript.get_challenge<transcript_manifest::challenges_ids::beta>();
+                    template <std::size_t table_width>
+                        static inline std::array<typename FieldType::value_type, argument_size> 
+                        verify_eval(const std::vector<plonk_gate<FieldType>> &gates,
+                            const std::array<FieldType::value_type, table_width> &columns_values,
+                            fiat_shamir_heuristic_updated<TranscriptHashType> &transcript) {
+                        typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
-                        typename transcript_hash_type::digest_type gamma_bytes =
-                            transcript.get_challenge<transcript_manifest::challenges_ids::gamma>();
 
-                        typename FieldType::value_type beta = algebra::marshalling<FieldType>(beta_bytes);
-                        typename FieldType::value_type gamma = algebra::marshalling<FieldType>(gamma_bytes);
-
-                        transcript(proof.P_commitment);
-                        transcript(proof.Q_commitment);
-
-                        const math::polynomial<typename FieldType::value_type> q_last;
-                        const math::polynomial<typename FieldType::value_type> q_blind;
-
-                        F[0] = verification_key.L_basis[1] * (P - 1);
-                        F[1] = verification_key.L_basis[1] * (Q - 1);
-                        F[2] = P * p_1 - (P << 1);*/
                         std::array<typename FieldType::value_type, argument_size> F;
+
+                        typename FieldType::value_type theta_acc = FieldType::value_type::one();
+
+                        for (std::size_t i = 0; i < gates.size(); i++) {
+                            FieldType::value_type gate_result = {0};
+
+                            for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
+                                gate_result = gate_result + gates[i].constraints[j].evaluate(columns_values) * theta_acc;
+                                theta_acc *= theta;
+                            }
+
+                            gate_result = gate_result * gates[i].selector;
+
+                            F[0] = F[0] + gate_result;
+                        }
 
                         return F;
                     }
