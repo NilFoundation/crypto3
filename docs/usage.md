@@ -12,9 +12,9 @@ with BLS:
 #include <nil/crypto3/pubkey/algorithm/sign.hpp>
 #include <nil/crypto3/pubkey/algorithm/verify.hpp>
 #include <nil/crypto3/pubkey/algorithm/aggregate.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/pubkey/bls.hpp>
-#include <nil/crypto3/pubkey/detail/bls/serialization.hpp>
 
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::pubkey;
@@ -22,27 +22,25 @@ using namespace nil::crypto3::hashes;
 using namespace nil::crypto3::multiprecision;
 
     using curve_type = curves::bls12_381;
-    using hash_type = sha2<256>;
-    using bls_version = bls_mps_ro_version<curve_type, hash_type>;
-    using scheme_type = bls<bls_default_public_params<>, bls_version, bls_basic_scheme, curve_type>;
+    using scheme_type = bls<bls_default_public_params<>, bls_mps_ro_version, bls_basic_scheme, curve_type>;
 
     using privkey_type = private_key<scheme_type>;
     using pubkey_type = public_key<scheme_type>;
     using _privkey_type = typename privkey_type::private_key_type;
     using _pubkey_type = typename pubkey_type::public_key_type;
     using signature_type = typename pubkey_type::signature_type;
-    using modulus_type = typename _privkey_type::modulus_type;
 
-int main() {
-    std::string msg_str = "hello world";
+int main(int argc, const char * argv[]) {
+    std::string msg_str = "Hello, World!\n";
+
+    std::cout << msg_str;
+
     std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
     privkey_type sk = privkey_type(random_element<typename _privkey_type::field_type>());
 
     signature_type sig = ::nil::crypto3::sign(msg, sk);
     pubkey_type &pubkey = sk;
 
-    print_field_element(std::cout, sk.get_privkey);
-    print_curve_element(std::cout, pubkey.get_pubkey);
     return !(nil::crypto3::verify(msg, sig, pubkey));
 }
 ```
@@ -56,9 +54,9 @@ In case of public-key scheme source data accumulation necessity is present, foll
 #include <nil/crypto3/pubkey/algorithm/sign.hpp>
 #include <nil/crypto3/pubkey/algorithm/verify.hpp>
 #include <nil/crypto3/pubkey/algorithm/aggregate.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/pubkey/bls.hpp>
-#include <nil/crypto3/pubkey/detail/bls/serialization.hpp>
 
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::pubkey;
@@ -66,9 +64,7 @@ using namespace nil::crypto3::hashes;
 using namespace nil::crypto3::multiprecision;
 
     using curve_type = curves::bls12_381;
-    using hash_type = sha2<256>;
-    using bls_version = bls_mps_ro_version<curve_type, hash_type>;
-    using scheme_type = bls<bls_default_public_params<>, bls_version, bls_basic_scheme, curve_type>;
+    using scheme_type = bls<bls_default_public_params<>, bls_mps_ro_version, bls_basic_scheme, curve_type>;
 
     using privkey_type = private_key<scheme_type>;
     using pubkey_type = public_key<scheme_type>;
@@ -90,8 +86,11 @@ using namespace nil::crypto3::multiprecision;
     using signing_acc_set = signing_accumulator_set<signing_isomorphic_mode>;
     using signing_acc = typename boost::mpl::front<typename signing_acc_set::features_type>::type;  
 
-int main() {
-    std::string msg_str = "hello world";
+int main(int argc, const char * argv[]) {
+    std::string msg_str = "Hello, World!\n";
+
+    std::cout << msg_str;
+
     std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
     
     privkey_type sk = privkey_type(random_element<typename _privkey_type::field_type>());
