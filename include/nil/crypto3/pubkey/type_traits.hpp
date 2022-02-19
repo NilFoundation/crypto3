@@ -38,7 +38,6 @@ namespace nil {
             using namespace boost::mpl::placeholders;
 
             BOOST_TTI_HAS_STATIC_MEMBER_DATA(context)
-
             template<typename T>
             struct is_eddsa_params {
                 static constexpr bool value = has_static_member_data_context<T, const typename T::context_type>::value;
