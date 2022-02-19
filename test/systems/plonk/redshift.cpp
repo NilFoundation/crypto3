@@ -38,8 +38,9 @@
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
+//#include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/gates_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
@@ -119,8 +120,8 @@ BOOST_AUTO_TEST_SUITE(redshift_prover_test_suite)
 
 using curve_type = algebra::curves::bls12<381>;
 using FieldType = typename curve_type::scalar_field_type;
-typedef hashes::sha2<256> merkle_hash_type;
-typedef hashes::sha2<256> transcript_hash_type;
+typedef hashes::keccak_1600<512> merkle_hash_type;
+typedef hashes::keccak_1600<512> transcript_hash_type;
 
 constexpr std::size_t m = 2;
 
@@ -139,8 +140,8 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     const std::size_t table_rows_log = 4;
     const std::size_t table_rows = 1 << table_rows_log;
-    const std::size_t table_columns = 4;
-    const std::size_t permutation_size = 4;
+    const std::size_t table_columns = 3;
+    const std::size_t permutation_size = 3;
     const std::size_t usable_rows = 1 << table_rows_log;
     circuit_description<FieldType, table_rows_log, table_columns, permutation_size, usable_rows> circuit = circuit_test_1<FieldType>();
 
@@ -153,8 +154,8 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     math::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial<FieldType>(circuit.domain, 0);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> prover_transcript(init_blob);
-    fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> verifier_transcript(init_blob);
+    fiat_shamir_heuristic_updated<transcript_hash_type> prover_transcript(init_blob);
+    fiat_shamir_heuristic_updated<transcript_hash_type> verifier_transcript(init_blob);
 
     typename redshift_permutation_argument<FieldType, lpc_type>::prover_result_type prover_res =
         redshift_permutation_argument<FieldType, lpc_type>::prove_eval(prover_transcript, table_rows,
@@ -194,49 +195,27 @@ BOOST_AUTO_TEST_CASE(redshift_lookup_argument_test) {
 }
 
 BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
-    /*const std::size_t rows_log = 4;
-    const std::size_t table_rows = (1 << rows_log) - 1;
-    const std::size_t permutation_size = 4;
-    const std::size_t table_columns = 4;
-    const std::size_t usable_rows = (1 << rows_log) - 1;
-
-    circuit_description<FieldType, rows_log, table_columns, permutation_size, table_rows> circuit = circuit_test_1<FieldType>();
+    const std::size_t table_rows_log = 4;
+    const std::size_t table_rows = 1 << table_rows_log;
+    const std::size_t table_columns = 3;
+    const std::size_t permutation_size = 3;
+    const std::size_t usable_rows = 1 << table_rows_log;
+    circuit_description<FieldType, table_rows_log, table_columns, permutation_size, usable_rows> circuit = circuit_test_1<FieldType>();
 
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
-    constexpr static const std::size_t r = rows_log - 1;
+    constexpr static const std::size_t r = table_rows_log - 1;
     typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> lpc_type;
 
-    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(rows_log);
-    std::shared_ptr<math::evaluation_domain<FieldType>> domain = circuit.domain;
-    math::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial<FieldType>(domain, 0);
-    
-    typename FieldType::value_type omega = circuit.omega;
-
-    typename FieldType::value_type delta = circuit.delta;
-
-    std::vector<math::polynomial<typename FieldType::value_type>> S_id = circuit.S_id;
-    std::vector<math::polynomial<typename FieldType::value_type>> S_sigma = circuit.S_sigma;
-
-    // construct circuit values
-    std::vector<math::polynomial<typename FieldType::value_type>> f = circuit.column_polynomials;
-
-    std::vector<math::polynomial<typename FieldType::value_type>> constraints_1 = {f[0] * f[1], f[0] + f[0]};
-    std::vector<math::polynomial<typename FieldType::value_type>> constraints_2 = {f[1] - f[0]};
-
-
-    // construct q_last, q_blind
-    math::polynomial<typename FieldType::value_type> q_last = circuit.q_last;
-    math::polynomial<typename FieldType::value_type> q_blind = circuit.q_blind;
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
+    math::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial<FieldType>(circuit.domain, 0);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> prover_transcript(init_blob);
-    fiat_shamir_heuristic_updated<hashes::keccak_1600<512>> verifier_transcript(init_blob);*/
+    fiat_shamir_heuristic_updated<transcript_hash_type> prover_transcript(init_blob);
+    fiat_shamir_heuristic_updated<transcript_hash_type> verifier_transcript(init_blob);
 
-    /*std::array<math::polynomial<typename FieldType::value_type>, 1> prover_res =
-        redshift_gates_argument<FieldType, lpc_type>::prove_eval(prover_transcript, circuit_rows,
-                                                                       permutation_size, domain, lagrange_0, S_id,
-                                                                       S_sigma, f, q_last, q_blind, fri_params);*/
+    std::array<math::polynomial<typename FieldType::value_type>, 1> prover_res =
+        redshift_gates_argument<FieldType, transcript_hash_type>::prove_eval<table_columns>(circuit.gates, circuit.column_polynomials, prover_transcript);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

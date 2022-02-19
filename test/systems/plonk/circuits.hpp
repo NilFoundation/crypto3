@@ -34,6 +34,8 @@
 
 #include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
+#include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
+#include <nil/crypto3/zk/snark/relations/variable.hpp>
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
@@ -63,13 +65,13 @@ namespace nil {
                         std::vector<math::polynomial<typename FieldType::value_type>> S_sigma;
 
                         std::vector<std::vector<typename FieldType::value_type>> table;
-                        std::vector<math::polynomial<typename FieldType::value_type>> column_polynomials;
+                        std::array<math::polynomial<typename FieldType::value_type>, table_columns> column_polynomials;
 
                         // construct q_last, q_blind
                         math::polynomial<typename FieldType::value_type> q_last;
                         math::polynomial<typename FieldType::value_type> q_blind;
 
-                        //std::vector<plonk_gate<typename FieldType>> gates;
+                        std::vector<plonk_gate<FieldType>> gates;
 
                         circuit_description() {
                             domain = math::make_evaluation_domain<FieldType>(table_rows);
@@ -94,7 +96,99 @@ namespace nil {
                     };
 
                 //---------------------------------------------------------------------------//
-                // Test circuit
+                // Test circuit 1
+                //  i  | GATE | w_0 | w_1 | w_2 | q_add | q_mul |
+                //  0  |  --  |  x  |  y  |  z  |   0   |   0   |
+                //  1  | ADD  |  x  |  y  |  z  |   1   |   0   |
+                // ... | ADD  |  x  |  y  |  z  |   1   |   0   |
+                // k-2 | MUL  |  x  |  y  |  z  |   0   |   1   |
+                // k-1 | MUL  |  x  |  y  |  z  |   0   |   1   |
+                // 
+                // ADD: x + y = z
+                // MUL: x * y = z
+                //---------------------------------------------------------------------------//
+                template<typename FieldType>
+                 circuit_description<FieldType, 4, 3, 3, 16> circuit_test_1() {
+                    constexpr static const std::size_t rows_log = 4;
+                    constexpr static const std::size_t table_columns = 3;
+                    constexpr static const std::size_t permutation = 3;
+                    constexpr static const std::size_t usable = 1 << rows_log;
+
+                    circuit_description<FieldType, rows_log, table_columns, permutation, usable> test_circuit;
+
+                    std::vector<std::vector<typename FieldType::value_type>> table(table_columns);
+
+                    std::vector<typename FieldType::value_type> q_add(test_circuit.table_rows);
+                    std::vector<typename FieldType::value_type> q_mul(test_circuit.table_rows);
+                    for (std::size_t j = 0; j < table_columns; j++) {
+                        table[j].resize(test_circuit.table_rows);
+                    }
+
+                    // init values
+                    table[0][0] = algebra::random_element<FieldType>();
+                    table[0][1] = algebra::random_element<FieldType>();
+                    table[0][2] = algebra::random_element<FieldType>();
+                    q_add[0] = FieldType::value_type::zero();
+                    q_mul[0] = FieldType::value_type::zero();
+
+                    // fill rows with ADD gate
+                    for (std::size_t i = 1; i < test_circuit.table_rows - 2; i++) {
+                        table[0][i] = algebra::random_element<FieldType>();
+                        table[1][i] = algebra::random_element<FieldType>();
+                        table[2][i] = table[0][i] + table[1][i];
+                        q_add[i] = FieldType::value_type::one();
+                        q_mul[i] = FieldType::value_type::zero();
+                    }
+
+                    // fill rows with MUL gate
+                    for (std::size_t i = test_circuit.table_rows - 2; i < test_circuit.table_rows; i++) {
+                        table[0][i] = algebra::random_element<FieldType>();
+                        table[1][i] = algebra::random_element<FieldType>();
+                        table[2][i] = table[0][i] * table[1][i];
+                        q_add[i] = FieldType::value_type::zero();
+                        q_mul[i] = FieldType::value_type::one();
+                    }
+
+                    for (std::size_t i = 0; i < table_columns; i++) {
+                        test_circuit.domain->inverse_fft(table[i]);
+                        test_circuit.column_polynomials[i] = math::polynomial<typename FieldType::value_type>(table[i]);
+                    }
+
+                    
+                    test_circuit.table = table;
+                    test_circuit.init();
+
+                    
+                    variable<FieldType, true> w0(0, variable<FieldType, true>::rotation_type::current);
+                    variable<FieldType, true> w1(0, variable<FieldType, true>::rotation_type::current);
+                    variable<FieldType, true> w2(0, variable<FieldType, true>::rotation_type::current);
+                    
+                    non_linear_combination<FieldType, true> add_constraint;
+                    add_constraint.add_term(w0);
+                    add_constraint.add_term(w1);
+                    add_constraint.add_term(-w2);
+
+                    test_circuit.domain->inverse_fft(q_add);
+                    math::polynomial<typename FieldType::value_type> add_selector(q_add);
+                    std::vector<non_linear_combination<FieldType, true>> add_gate_costraints {add_constraint};
+                    plonk_gate<FieldType> add_gate {add_gate_costraints, add_selector};
+                    test_circuit.gates.push_back(add_gate);
+
+                    non_linear_combination<FieldType, true> mul_constraint;
+                    add_constraint.add_term(w0 * w1);
+                    add_constraint.add_term(-w2);
+
+                    test_circuit.domain->inverse_fft(q_mul);
+                    math::polynomial<typename FieldType::value_type> mul_selector(q_mul);
+                    std::vector<non_linear_combination<FieldType, true>> mul_gate_costraints {mul_constraint};
+                    plonk_gate<FieldType> mul_gate {mul_gate_costraints, mul_selector};
+                    test_circuit.gates.push_back(mul_gate);
+
+                    return test_circuit;
+                }
+
+                //---------------------------------------------------------------------------//
+                // Test circuit 2
                 //  i  | GATE | w_0 | w_1 | w_2 | public | q_add | q_mul |
                 //  0  |  --  |  x  |  y  |  z  |   p1   |   0   |   0   |
                 //  1  | ADD  |  x  |  y  |  z  |   0    |   1   |   0   |
@@ -106,7 +200,7 @@ namespace nil {
                 // MUL: x * y = z, copy(p1, y)
                 //---------------------------------------------------------------------------//
                 template<typename FieldType>
-                 circuit_description<FieldType, 4, 4, 4, 16> circuit_test_1() {
+                 circuit_description<FieldType, 4, 4, 4, 16> circuit_test_2() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t table_columns = 4;
                     constexpr static const std::size_t permutation = 4;
@@ -116,7 +210,6 @@ namespace nil {
 
                     std::vector<std::vector<typename FieldType::value_type>> table(table_columns);
 
-                    test_circuit.column_polynomials.resize(table_columns);
                     std::vector<typename FieldType::value_type> q_add(test_circuit.table_rows);
                     std::vector<typename FieldType::value_type> q_mul(test_circuit.table_rows);
                     for (std::size_t j = 0; j < table_columns; j++) {
@@ -160,9 +253,35 @@ namespace nil {
                         test_circuit.column_polynomials[i] = math::polynomial<typename FieldType::value_type>(table[i]);
                     }
 
-                    //std::vector<plonk_gate<typename FieldType>> gates(2);
+                    
                     test_circuit.table = table;
                     test_circuit.init();
+
+                    
+                    variable<FieldType, true> w0(0, variable<FieldType, true>::rotation_type::current);
+                    variable<FieldType, true> w1(0, variable<FieldType, true>::rotation_type::current);
+                    variable<FieldType, true> w2(0, variable<FieldType, true>::rotation_type::current);
+                    
+                    non_linear_combination<FieldType, true> add_constraint;
+                    add_constraint.add_term(w0);
+                    add_constraint.add_term(w1);
+                    add_constraint.add_term(-w2);
+
+                    test_circuit.domain->inverse_fft(q_add);
+                    math::polynomial<typename FieldType::value_type> add_selector(q_add);
+                    std::vector<non_linear_combination<FieldType, true>> add_gate_costraints {add_constraint};
+                    plonk_gate<FieldType> add_gate {add_gate_costraints, add_selector};
+                    test_circuit.gates.push_back(add_gate);
+
+                    non_linear_combination<FieldType, true> mul_constraint;
+                    add_constraint.add_term(w0 * w1);
+                    add_constraint.add_term(-w2);
+
+                    test_circuit.domain->inverse_fft(q_mul);
+                    math::polynomial<typename FieldType::value_type> mul_selector(q_mul);
+                    std::vector<non_linear_combination<FieldType, true>> mul_gate_costraints {mul_constraint};
+                    plonk_gate<FieldType> mul_gate {mul_gate_costraints, mul_selector};
+                    test_circuit.gates.push_back(mul_gate);
 
                     return test_circuit;
                 }

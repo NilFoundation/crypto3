@@ -48,8 +48,10 @@ namespace nil {
                 struct redshift_gates_argument {
                     constexpr static const std::size_t argument_size = ArgumentSize;
 
-                    static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
-                        prove_eval(const std::vector<plonk_gate<typename FieldType>> &gates,
+                    template <std::size_t table_width>
+                        static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
+                        prove_eval(const std::vector<plonk_gate<FieldType>> &gates,
+                                    const std::array<math::polynomial<typename FieldType::value_type>, table_width> &columns,
                                    fiat_shamir_heuristic_updated<TranscriptHashType> &transcript) {
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
@@ -59,17 +61,17 @@ namespace nil {
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
-                        for (std::size_t i = 0; i <= N_sel - 1; i++) {
-                            math::polynomial<typename FieldType::value_type> gate = {0};
+                        for (std::size_t i = 0; i < gates.size(); i++) {
+                            math::polynomial<typename FieldType::value_type> gate_result = {0};
 
-                            for (std::size_t j = 0; j < constraints.size(); j++) {
-                                gate = gate + gates[i].constraints[j] * theta_acc;
+                            for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
+                                gate_result = gate_result + gates[i].constraints[j].evaluate(columns) * theta_acc;
                                 theta_acc *= theta;
                             }
 
-                            gate *= gate[i].selector;
+                            gate_result = gate_result * gates[i].selector;
 
-                            F[0] += gate;
+                            F[0] = F[0] + gate_result;
                         }
 
                         return F;

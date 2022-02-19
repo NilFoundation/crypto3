@@ -58,7 +58,7 @@ namespace nil {
                         typename CommitmentSchemeType::merkle_tree_type permutation_poly_commitment;
                     };
 
-                    template<typename Hash = hashes::keccak_1600<512>>
+                    template<std::size_t table_width, typename Hash>
                     static inline prover_result_type    // TODO: fix fiat-shamir
                         prove_eval(fiat_shamir_heuristic_updated<Hash> &transcript,
                                    std::size_t circuit_rows,
@@ -68,7 +68,7 @@ namespace nil {
                                    const math::polynomial<typename FieldType::value_type> &lagrange_1,
                                    const std::vector<math::polynomial<typename FieldType::value_type>> &S_id,
                                    const std::vector<math::polynomial<typename FieldType::value_type>> &S_sigma,
-                                   const std::vector<math::polynomial<typename FieldType::value_type>> &f,
+                                   const std::array<math::polynomial<typename FieldType::value_type>, table_width> &columns,
                                    const math::polynomial<typename FieldType::value_type> &q_last,
                                    const math::polynomial<typename FieldType::value_type> &q_blind,
                                    typename fri_type::params_type fri_params) {
@@ -86,9 +86,9 @@ namespace nil {
                             sigma_binding[j] = FieldType::value_type::one();
                             for (std::size_t i = 0; i < permutation_size; i++) {
 
-                                id_binding[j] *= (f[i].evaluate(domain->get_domain_element(j)) +
+                                id_binding[j] *= (columns[i].evaluate(domain->get_domain_element(j)) +
                                                   beta * S_id[i].evaluate(domain->get_domain_element(j)) + gamma);
-                                sigma_binding[j] *= (f[i].evaluate(domain->get_domain_element(j)) +
+                                sigma_binding[j] *= (columns[i].evaluate(domain->get_domain_element(j)) +
                                                      beta * S_sigma[i].evaluate(domain->get_domain_element(j)) + gamma);
                             }
                         }
@@ -126,8 +126,8 @@ namespace nil {
                         math::polynomial<typename FieldType::value_type> h = {1};
 
                         for (std::size_t i = 0; i < permutation_size; i++) {
-                            g = g * (f[i] + beta * S_id[i] + gamma);
-                            h = h * (f[i] + beta * S_sigma[i] + gamma);
+                            g = g * (columns[i] + beta * S_id[i] + gamma);
+                            h = h * (columns[i] + beta * S_sigma[i] + gamma);
                         }
 
                         math::polynomial<typename FieldType::value_type> one_polynomial = {1};

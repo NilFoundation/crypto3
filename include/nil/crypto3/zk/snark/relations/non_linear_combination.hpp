@@ -216,7 +216,6 @@ namespace nil {
 
                     template<std::size_t WiresAmount>
                     math::polynomial<field_value_type> evaluate(
-                        std::size_t row_index,
                         const std::array<math::polynomial<field_value_type>, WiresAmount> &assignment) const {
                         math::polynomial<field_value_type> acc = {0};
                         for (non_linear_combination &nlt : terms) {
