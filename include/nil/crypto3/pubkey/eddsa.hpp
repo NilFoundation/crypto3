@@ -227,7 +227,7 @@ namespace nil {
                     // 2.
                     auto ph_m = padding::accumulators::extract::encode<padding::encoding_policy<padding_policy>>(acc);
                     accumulator_set<hash_type> hash_acc_2;
-                    hash<hash_type>(policy_type::get_dom(), hash_acc_2);
+                    hash<hash_type>(policy_type::domain(), hash_acc_2);
                     hash<hash_type>(
                         std::cbegin(signature),
                         std::cbegin(signature) + public_key_bits / std::numeric_limits<std::uint8_t>::digits +
@@ -355,7 +355,7 @@ namespace nil {
                     // 2.
                     auto ph_m = padding::accumulators::extract::encode<padding::encoding_policy<padding_policy>>(acc);
                     accumulator_set<hash_type> hash_acc_2;
-                    hash<hash_type>(policy_type::get_dom(), hash_acc_2);
+                    hash<hash_type>(policy_type::domain(), hash_acc_2);
                     hash<hash_type>(
                         std::cbegin(h_privkey) + private_key_bits / std::numeric_limits<std::uint8_t>::digits +
                             (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0),
@@ -386,7 +386,7 @@ namespace nil {
 
                     // 4.
                     accumulator_set<hash_type> hash_acc_4;
-                    hash<hash_type>(policy_type::get_dom(), hash_acc_4);
+                    hash<hash_type>(policy_type::domain(), hash_acc_4);
                     hash<hash_type>(
                         std::cbegin(signature),
                         std::cbegin(signature) + public_key_bits / std::numeric_limits<std::uint8_t>::digits +
