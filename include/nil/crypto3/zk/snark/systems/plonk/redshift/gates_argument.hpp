@@ -98,6 +98,7 @@ namespace nil {
                             typename FieldType::value_type gate_result = {0};
 
                             for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
+                                //TODO: rotation map
                                 gate_result = gate_result + gates[i].constraints[j].evaluate(columns_values) * theta_acc;
                                 theta_acc *= theta;
                             }

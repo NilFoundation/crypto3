@@ -140,10 +140,10 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     const std::size_t table_rows_log = 4;
     const std::size_t table_rows = 1 << table_rows_log;
-    const std::size_t table_columns = 3;
-    const std::size_t permutation_size = 3;
+    const std::size_t table_columns = 4;
+    const std::size_t permutation_size = 4;
     const std::size_t usable_rows = 1 << table_rows_log;
-    circuit_description<FieldType, table_rows_log, table_columns, permutation_size, usable_rows> circuit = circuit_test_1<FieldType>();
+    circuit_description<FieldType, table_rows_log, table_columns, permutation_size, usable_rows> circuit = circuit_test_2<FieldType>();
 
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
@@ -197,10 +197,10 @@ BOOST_AUTO_TEST_CASE(redshift_lookup_argument_test) {
 BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     const std::size_t table_rows_log = 4;
     const std::size_t table_rows = 1 << table_rows_log;
-    const std::size_t table_columns = 3;
-    const std::size_t permutation_size = 3;
+    const std::size_t table_columns = 4;
+    const std::size_t permutation_size = 4;
     const std::size_t usable_rows = 1 << table_rows_log;
-    circuit_description<FieldType, table_rows_log, table_columns, permutation_size, usable_rows> circuit = circuit_test_1<FieldType>();
+    circuit_description<FieldType, table_rows_log, table_columns, permutation_size, usable_rows> circuit = circuit_test_2<FieldType>();
 
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
@@ -225,8 +225,14 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
         columns_at_y[i] = circuit.column_polynomials[i].evaluate(y);
     }
 
-    /*std::array<typename FieldType::value_type, 1> verifier_res =
-        redshift_gates_argument<FieldType, transcript_hash_type>::verify_eval<table_columns>(circuit.gates, columns_at_y, verifier_transcript);*/
+    std::array<typename FieldType::value_type, 1> verifier_res =
+        redshift_gates_argument<FieldType, transcript_hash_type>::verify_eval<table_columns>(circuit.gates, columns_at_y, y, verifier_transcript);
+
+    typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
+    typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();
+    BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
+
+    BOOST_CHECK(prover_res[0].evaluate(y) == verifier_res[0]);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
