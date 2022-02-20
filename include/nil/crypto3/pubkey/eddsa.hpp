@@ -61,12 +61,12 @@ namespace nil {
             template<typename Params>
             struct eddsa_policy<eddsa_type::basic, Params> {
                 typedef Params params_type;
-                typedef std::vector<std::uint8_t> dom_type;
+                typedef std::vector<std::uint8_t> domain_type;
                 typedef hashes::sha2<512> hash_type;
                 typedef padding::emsa_raw<std::uint8_t> padding_policy;
 
-                static inline dom_type get_dom() {
-                    return dom_type {};
+                static inline domain_type domain() {
+                    return {};
                 }
             };
 
@@ -78,19 +78,19 @@ namespace nil {
                     std::is_same<std::uint8_t, typename std::iterator_traits<typename Params::context_type::iterator>::
                                                    value_type>::value>::type> {
                 typedef Params params_type;
-                typedef std::vector<std::uint8_t> dom_type;
+                typedef std::vector<std::uint8_t> domain_type;
                 typedef hashes::sha2<512> hash_type;
                 typedef padding::emsa_raw<std::uint8_t> padding_policy;
 
                 static constexpr std::uint8_t phflag = 0;
 
-                static inline dom_type get_dom() {
+                static inline domain_type domain() {
                     std::size_t context_len =
                         std::distance(std::cbegin(params_type::context), std::cend(params_type::context));
-                    assert(0 < context_len && context_len <= 255);
+                    BOOST_ASSERT(0 < context_len && context_len <= 255);
 
                     std::string dom_prefix = "SigEd25519 no Ed25519 collisions";
-                    dom_type dom(std::cbegin(dom_prefix), std::cend(dom_prefix));
+                    domain_type dom(std::cbegin(dom_prefix), std::cend(dom_prefix));
                     dom.push_back(phflag);
                     dom.push_back(static_cast<std::uint8_t>(context_len));
                     std::copy(std::cbegin(params_type::context), std::cend(params_type::context),
@@ -108,19 +108,19 @@ namespace nil {
                     std::is_same<std::uint8_t, typename std::iterator_traits<typename Params::context_type::iterator>::
                                                    value_type>::value>::type> {
                 typedef Params params_type;
-                typedef std::vector<std::uint8_t> dom_type;
+                typedef std::vector<std::uint8_t> domain_type;
                 typedef hashes::sha2<512> hash_type;
                 typedef padding::emsa1<typename hash_type::digest_type, hash_type> padding_policy;
 
                 static constexpr std::uint8_t phflag = 1;
 
-                static inline dom_type get_dom() {
+                static inline domain_type domain() {
                     std::size_t context_len =
                         std::distance(std::cbegin(params_type::context), std::cend(params_type::context));
-                    assert(0 <= context_len && context_len <= 255);
+                    BOOST_ASSERT(0 <= context_len && context_len <= 255);
 
                     std::string dom_prefix = "SigEd25519 no Ed25519 collisions";
-                    dom_type dom(std::cbegin(dom_prefix), std::cend(dom_prefix));
+                    domain_type dom(std::cbegin(dom_prefix), std::cend(dom_prefix));
                     dom.push_back(phflag);
                     dom.push_back(static_cast<std::uint8_t>(context_len));
                     std::copy(std::cbegin(params_type::context), std::cend(params_type::context),
@@ -207,18 +207,21 @@ namespace nil {
                     // 1.
                     marshalling_group_value_type marshalling_group_value_1;
                     auto R_iter_1 = std::cbegin(signature);
-                    // TODO: process status
-                    nil::marshalling::status_type status =
-                        marshalling_group_value_1.read(R_iter_1, marshalling_group_value_type::bit_length());
+                    if (marshalling_group_value_1.read(R_iter_1, marshalling_group_value_type::bit_length()) !=
+                        nil::marshalling::status_type::success) {
+                        return false;
+                    }
                     group_value_type R = marshalling_group_value_1.value();
 
                     marshalling_scalar_field_value_type marshalling_scalar_field_value_1;
                     auto S_iter_1 = std::cbegin(signature) +
                                     public_key_bits / std::numeric_limits<std::uint8_t>::digits +
                                     (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0);
-                    // TODO: process status
-                    status = marshalling_scalar_field_value_1.read(S_iter_1,
-                                                                   marshalling_scalar_field_value_type::bit_length());
+                    if (marshalling_scalar_field_value_1.read(S_iter_1,
+                                                              marshalling_scalar_field_value_type::bit_length()) !=
+                        nil::marshalling::status_type::success) {
+                        return false;
+                    }
                     scalar_field_value_type S = marshalling_scalar_field_value_1.value();
 
                     // 2.
@@ -236,9 +239,12 @@ namespace nil {
                         nil::crypto3::accumulators::extract::hash<hash_type>(hash_acc_2);
                     marshalling_uint512_t_type marshalling_uint512_t_2;
                     auto h_2_iter = std::cbegin(h_2);
-                    // TODO: process status
-                    status = marshalling_uint512_t_2.read(h_2_iter, hash_type::digest_bits);
-                    nil::crypto3::multiprecision::uint512_t k = marshalling_uint512_t_2.value();
+
+                    if (marshalling_uint512_t_2.read(h_2_iter, hash_type::digest_bits) !=
+                        nil::marshalling::status_type::success) {
+                        return false;
+                    }
+                    multiprecision::uint512_t k = marshalling_uint512_t_2.value();
                     scalar_field_value_type k_reduced(k);
 
                     // 3.
@@ -323,7 +329,10 @@ namespace nil {
                     public_key_type public_key;
                     auto write_iter = std::begin(public_key);
                     // TODO: process status
-                    nil::marshalling::status_type status = marshalling_group_value.write(write_iter, public_key_bits);
+                    if (marshalling_group_value.write(write_iter, public_key_bits) !=
+                        nil::marshalling::status_type::success) {
+                        return {};
+                    }
 
                     return public_key;
                 }
@@ -357,7 +366,10 @@ namespace nil {
                     marshalling_uint512_t_type marshalling_uint512_t_2;
                     auto h_2_it = std::cbegin(h_2);
                     // TODO: process status
-                    nil::marshalling::status_type status = marshalling_uint512_t_2.read(h_2_it, hash_type::digest_bits);
+                    if (marshalling_uint512_t_2.read(h_2_it, hash_type::digest_bits) !=
+                        nil::marshalling::status_type::success) {
+                        return {};
+                    }
                     nil::crypto3::multiprecision::uint512_t r = marshalling_uint512_t_2.value();
                     scalar_field_value_type r_reduced(r);
 
@@ -367,7 +379,10 @@ namespace nil {
                     signature_type signature;
                     auto sig_iter_3 = std::begin(signature);
                     // TODO: process status
-                    status = marshalling_group_value.write(sig_iter_3, public_key_bits);
+                    if (marshalling_group_value.write(sig_iter_3, public_key_bits) !=
+                        nil::marshalling::status_type::success) {
+                        return {};
+                    }
 
                     // 4.
                     accumulator_set<hash_type> hash_acc_4;
@@ -383,8 +398,10 @@ namespace nil {
                         nil::crypto3::accumulators::extract::hash<hash_type>(hash_acc_4);
                     marshalling_uint512_t_type marshalling_uint512_t_4;
                     auto h_4_it = std::cbegin(h_4);
-                    // TODO: process status
-                    status = marshalling_uint512_t_4.read(h_4_it, hash_type::digest_bits);
+                    if (marshalling_uint512_t_4.read(h_4_it, hash_type::digest_bits) !=
+                        nil::marshalling::status_type::success) {
+                        return {};
+                    }
                     nil::crypto3::multiprecision::uint512_t k = marshalling_uint512_t_4.value();
                     scalar_field_value_type k_reduced(k);
 
@@ -397,8 +414,10 @@ namespace nil {
                     auto sig_iter_6 =
                         std::begin(signature) + public_key_bits / std::numeric_limits<std::uint8_t>::digits +
                         (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0);
-                    // TODO: process status
-                    status = marshalling_scalar_field_value_6.write(sig_iter_6, private_key_bits);
+                    if (marshalling_scalar_field_value_6.write(sig_iter_6, private_key_bits) !=
+                        nil::marshalling::status_type::success) {
+                        return {};
+                    }
 
                     return signature;
                 }
@@ -424,7 +443,6 @@ namespace nil {
                 typename hash_type::digest_type h_privkey;
                 scalar_field_value_type s_reduced;
             };
-
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
