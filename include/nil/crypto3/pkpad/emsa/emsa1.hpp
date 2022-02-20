@@ -56,8 +56,8 @@ namespace nil {
                         typedef typename MsgReprType::field_type field_type;
                         typedef ::nil::marshalling::option::big_endian endianness;
                         typedef ::nil::crypto3::marshalling::types::field_element<
-                            ::nil::marshalling::field_type<::nil::marshalling::option::big_endian>, field_type>
-                            marshalling_field_element_type;
+                            ::nil::marshalling::field_type<endianness>, field_type>
+                            field_element_marshalling_type;
 
                         constexpr static std::size_t digest_bits = hash_type::digest_bits;
 
@@ -91,11 +91,10 @@ namespace nil {
                         static inline result_type process(internal_accumulator_type &acc) {
                             typename hash_type::digest_type digest =
                                 ::nil::crypto3::accumulators::extract::hash<hash_type>(acc);
-                            marshalling_field_element_type marshalling_field_element;
+                            field_element_marshalling_type field_element_marshalling;
                             auto it = digest.cbegin();
-                            marshalling_field_element.read(it, digest.size());
-                            return crypto3::marshalling::types::make_field_element<field_type, endianness>(
-                                marshalling_field_element);
+                            field_element_marshalling.read(it, digest.size());
+                            return field_element_marshalling.value();
                         }
 
                         template<std::size_t DigistBits = digest_bits, std::size_t ModulusBits = modulus_bits,
@@ -109,11 +108,10 @@ namespace nil {
                             modulus_octets_container_type modulus_octets_container;
                             modulus_octets_container.fill(0);
                             std::copy(std::crbegin(digest), std::crend(digest), std::rbegin(modulus_octets_container));
-                            marshalling_field_element_type marshalling_field_element;
+                            field_element_marshalling_type field_element_marshalling;
                             auto it = modulus_octets_container.cbegin();
-                            marshalling_field_element.read(it, modulus_octets_container.size());
-                            return crypto3::marshalling::types::make_field_element<field_type, endianness>(
-                                marshalling_field_element);
+                            field_element_marshalling.read(it, modulus_octets_container.size());
+                            return field_element_marshalling.value();
                         }
                     };
 
@@ -138,7 +136,7 @@ namespace nil {
                         typedef typename MsgReprType::field_type field_type;
                         typedef ::nil::crypto3::marshalling::types::field_element<
                             ::nil::marshalling::field_type<::nil::marshalling::option::big_endian>, field_type>
-                            marshalling_field_element_type;
+                            field_element_marshalling_type;
                         typedef emsa1_encoding_policy<MsgReprType, Hash> encoding_policy;
 
                     public:
