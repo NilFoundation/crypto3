@@ -48,7 +48,8 @@ namespace nil {
                 public:
                     static inline std::vector<math::polynomial<typename FieldType::value_type>>
                         identity_polynomials(std::size_t permutation_size, std::size_t table_size,
-                            typename FieldType::value_type omega, typename FieldType::value_type delta,
+                            const typename FieldType::value_type &omega, 
+                            const typename FieldType::value_type &delta,
                             const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
                             
                             std::vector<math::polynomial<typename FieldType::value_type>> S_id(permutation_size);
@@ -68,8 +69,9 @@ namespace nil {
 
                     static inline std::vector<math::polynomial<typename FieldType::value_type>>
                         permutation_polynomials(std::size_t permutation_size, std::size_t table_size,
-                            typename FieldType::value_type omega, typename FieldType::value_type delta,
-                            plonk_permutation permutation,
+                            const typename FieldType::value_type &omega, 
+                            const typename FieldType::value_type &delta,
+                            const plonk_permutation &permutation,
                             const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
                             
                             std::vector<math::polynomial<typename FieldType::value_type>> S_perm(permutation_size);
