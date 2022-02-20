@@ -87,8 +87,6 @@ namespace nil {
                 template<typename Limb1, typename Limb2>
                 int cmp_asm(size_t n, const Limb1 *x, const Limb2 *y) {
                     int result = 0;
-                    size_t step_count = 0;
-                    size_t step_count1 = 0;
                     __asm__(
                         // Else check result with mod
                         "mov $0, %[res]                  \n\t"
@@ -96,13 +94,10 @@ namespace nil {
                     "1:                                  \n\t"
                         "movq  -8(%[y], %%rbx, 8), %%rax \n\t"
                         "cmpq  %%rax, -8(%[x], %%rbx, 8) \n\t"
-                        "movq  -8(%[x], %%rbx, 8), %[stp] \n\t"
-                        "movq  %%rax, %[stp1] \n\t"
                         "jb  2f                          \n\t"
                         "ja  3f                          \n\t"
                         "dec %%rbx                       \n\t"
-                        "cmp $0, %%rbx                   \n\t"
-                        "jne 1b                          \n\t"
+                        "jnz 1b                          \n\t"
                         "jmp 4f                          \n\t"
                         // Start sub
                     "2:                                  \n\t"
@@ -111,10 +106,9 @@ namespace nil {
                     "3:                                  \n\t"
                         "inc %[res]                      \n\t"
                     "4:                                  \n\t"
-                        : [res] "=&r"(result), [stp] "=&r" (step_count), [stp1] "=&r" (step_count1)
+                        : [res] "=&r"(result)
                         : [limbs] "r"(n), [x] "r"(x), [y] "r"(y)
                         : "cc", "memory", "%rax", "%rcx", "%rbx");
-                    size_t k = step_count;
                     return result;
                 }
 
@@ -179,14 +173,13 @@ namespace nil {
 
                         // Else check result with mod
                         "movq %[limbs], %%rbx               \n\t"
-                        "dec %%rbx                          \n\t"
                     "2:                                     \n\t"
-                        "movq    (%[mod], %%rbx, 8), %%rax  \n\t"
-                        "cmpq    %%rax, (%[x], %%rbx, 8)    \n\t"
+                        "movq    -8(%[mod], %%rbx, 8), %%rax  \n\t"
+                        "cmpq    %%rax, -8(%[x], %%rbx, 8)    \n\t"
                         "jb  5f                             \n\t"
                         "ja  3f                             \n\t"
                         "dec %%rbx                          \n\t"
-                        "jz 2b                              \n\t"
+                        "jnz 2b                              \n\t"
                         // Start sub
                     "3:                                     \n\t"
                         "movq    (%[mod]), %%rax            \n\t"
