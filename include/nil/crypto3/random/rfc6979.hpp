@@ -105,10 +105,7 @@ namespace nil {
                 }
 
                 static inline modulus_octets_container_type int2octets(const field_value_type& x) {
-                    marshalling_field_element_be_type marshalling_field_element_be =
-                        ::nil::crypto3::marshalling::types::fill_field_element<field_type,
-                                                                               ::nil::marshalling::option::big_endian>(
-                            x);
+                    marshalling_field_element_be_type marshalling_field_element_be(x);
                     modulus_octets_container_type modulus_octet_container;
                     auto it = modulus_octet_container.begin();
                     marshalling_field_element_be.template write(it, modulus_octets);
