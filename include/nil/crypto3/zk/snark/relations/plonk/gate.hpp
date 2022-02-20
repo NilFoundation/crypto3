@@ -34,12 +34,13 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                    template <typename FieldType>
-                    struct plonk_gate
-                    {
-                        std::vector<plonk_constraint<FieldType>> constraints;
-                        math::polynomial<typename FieldType::value_type> selector;
-                    };
+
+                template <typename FieldType>
+                struct plonk_gate{
+                    std::vector<plonk_constraint<FieldType>> constraints;
+                    math::polynomial<typename FieldType::value_type> selector;
+                };
+                
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
