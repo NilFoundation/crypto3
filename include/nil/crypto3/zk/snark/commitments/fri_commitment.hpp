@@ -56,15 +56,17 @@ namespace nil {
                  * Matter Labs,
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
-                template<typename FieldType, typename Hash, std::size_t M = 2>
+                template<typename FieldType, 
+                         typename MerkleTreeHashType,
+                         typename TranscriptHashType,
+                         std::size_t M = 2>
                 struct fri_commitment_scheme {
                     constexpr static const std::size_t m = M;
 
                     typedef FieldType field_type;
-                    typedef Hash transcript_hash_type;
 
-                    typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
-                    typedef typename containers::merkle_proof<Hash, 2> merkle_proof_type;
+                    typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
+                    typedef typename containers::merkle_proof<MerkleTreeHashType, 2> merkle_proof_type;
 
                     using Endianness = nil::marshalling::option::big_endian;
                     using field_element_type =
@@ -165,7 +167,7 @@ namespace nil {
                     static proof_type proof_eval(const math::polynomial<typename FieldType::value_type> &Q,
                                                  const math::polynomial<typename FieldType::value_type> &g,
                                                  merkle_tree_type &T,
-                                                 fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
+                                                 fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
                                                  params_type &fri_params) {
 
                         proof_type proof;
@@ -268,7 +270,7 @@ namespace nil {
                     }
 
                     static bool verify_eval(proof_type &proof,
-                                            fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
+                                            fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
                                             params_type &fri_params,
                                             const math::polynomial<typename FieldType::value_type> &U,
                                             const math::polynomial<typename FieldType::value_type> &V) {

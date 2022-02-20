@@ -125,7 +125,7 @@ typedef hashes::keccak_1600<512> transcript_hash_type;
 
 constexpr std::size_t m = 2;
 
-typedef fri_commitment_scheme<FieldType, merkle_hash_type, m> fri_type;
+typedef fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
 
 constexpr std::size_t argument_size = 3;
 
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
     constexpr static const std::size_t r = table_rows_log - 1;
-    typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> lpc_type;
+    typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, lambda, k, r, m> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
     math::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial<FieldType>(circuit.domain, 0);
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
     constexpr static const std::size_t r = table_rows_log - 1;
-    typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> lpc_type;
+    typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, lambda, k, r, m> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
     math::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial<FieldType>(circuit.domain, 0);

@@ -38,21 +38,21 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, std::size_t lambda, std::size_t m = 2>
+                template<typename FieldType, 
+                         typename MerkleTreeHashType,
+                         typename TranscriptHashType,
+                         std::size_t lambda, std::size_t m = 2>
                 class redshift_verifier {
 
                     using types_policy = detail::redshift_types_policy<FieldType>;
                     using transcript_manifest = types_policy::prover_fiat_shamir_heuristic_manifest<6>;
-
-                    typedef hashes::sha2<256> merkle_hash_type;
-                    typedef hashes::sha2<256> transcript_hash_type;
 
                     constexpr static const std::size_t k = ...;
                     constexpr static const std::size_t r = ...;
 
                     constexpr static const typename FieldType::value_type omega =
                         algebra::get_root_of_unity<FieldType>() typedef list_polynomial_commitment_scheme<
-                            FieldType, merkle_hash_type, lambda, k, r, m>
+                            FieldType, MerkleTreeHashType, lambda, k, r, m>
                             lpc;
 
                 public:
@@ -60,15 +60,10 @@ namespace nil {
                                                const types_policy::primary_input_type &primary_input,
                                                const types_policy::proof_type<lpc> &proof) {
 
-                        std::size_t N_wires = ...;
-                        std::size_t N_perm = ...;
-                        std::size_t N_sel = ...;
-                        std::size_t N_const = ...;
+                        fiat_shamir_heuristic<transcript_manifest, TranscriptHashType> transcript;
 
-                        fiat_shamir_heuristic<transcript_manifest, hashes::sha2> transcript;
-
-                        ... setup_values = ...;
-                        transcript(setup_values);
+                        // 1. Add circuit definition to transctipt
+                        transcript(...);
 
                         for (std::size_t i = 0; i < N_wires; i++) {
                             transcript(proof.f_commitments[i]);
@@ -80,7 +75,7 @@ namespace nil {
                         constexpr const std::size_t f_parts = 4;
                         std::array<typename FieldType::value_type, f_parts> alphas;
                         for (std::size_t i = 0; i < f_parts; i++) {
-                            typename transcript_hash_type::digest_type alpha_bytes =
+                            typename TranscriptHashType::digest_type alpha_bytes =
                                 transcript.get_challenge<transcript_manifest::challenges_ids::alpha, i>();
                             alphas[i] = (algebra::marshalling<FieldType>(alpha_bytes));
                         }
@@ -89,7 +84,7 @@ namespace nil {
                             transcript(proof.T_commitments[i]);
                         }
 
-                        typename transcript_hash_type::digest_type upsilon_bytes =
+                        typename TranscriptHashType::digest_type upsilon_bytes =
                             transcript.get_challenge<transcript_manifest::challenges_ids::upsilon>();
 
                         typename FieldType::value_type upsilon = algebra::marshalling<FieldType>(upsilon_bytes);

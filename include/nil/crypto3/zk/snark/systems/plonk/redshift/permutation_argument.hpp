@@ -42,7 +42,8 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename FieldType, typename CommitmentSchemeType>
+                template<typename FieldType, typename CommitmentSchemeType, 
+                    typename TranscriptHashType = hashes::keccak_1600<512>>
                 class redshift_permutation_argument {
 
                     typedef typename CommitmentSchemeType::fri_type fri_type;
@@ -58,9 +59,9 @@ namespace nil {
                         typename CommitmentSchemeType::merkle_tree_type permutation_poly_commitment;
                     };
 
-                    template<std::size_t table_width, typename Hash>
+                    template<std::size_t table_width>
                     static inline prover_result_type    // TODO: fix fiat-shamir
-                        prove_eval(fiat_shamir_heuristic_updated<Hash> &transcript,
+                        prove_eval(fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
                                    std::size_t circuit_rows,
                                    std::size_t permutation_size,
                                    std::shared_ptr<math::evaluation_domain<FieldType>>
@@ -145,9 +146,8 @@ namespace nil {
                         return res;
                     }
 
-                    template<typename Hash = hashes::keccak_1600<512>>
                     static inline std::array<typename FieldType::value_type, argument_size>
-                        verify_eval(fiat_shamir_heuristic_updated<Hash> &transcript,
+                        verify_eval(fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
                                     std::size_t circuit_rows,
                                     std::size_t permutation_size,
                                     std::shared_ptr<math::evaluation_domain<FieldType>>
