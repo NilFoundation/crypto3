@@ -32,6 +32,8 @@
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/detail/field_utils.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/proof.hpp>
@@ -70,7 +72,7 @@ namespace nil {
                         template<std::size_t k>
                         struct preprocessed_data_type {
 
-                            typename FieldType::value_type omega;
+                            std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
                             std::vector<math::polynomial<typename FieldType::value_type>> selectors;
                             // S_sigma

@@ -118,13 +118,20 @@ namespace nil {
                             return q_last;
                     }
 
-                    /*static inline typename types_policy::template preprocessed_data_type<k>
+                    static inline typename types_policy::template preprocessed_data_type<k>
                         process(const typename types_policy::constraint_system_type &constraint_system,
                                 const typename types_policy::variable_assignment_type &assignments) {
 
                         typename types_policy::template preprocessed_data_type<k> data;
 
-                        data.omega = math::unity_root<FieldType>(math::detail::power_of_two(k));
+                        std::size_t N_rows = 0;
+                        for (auto &wire_assignments : assignments) {
+                            N_rows = std::max(N_rows, wire_assignments.size());
+                        }
+
+                        data.basic_domain = math::make_evaluation_domain<FieldType>(N_rows);
+
+                        /*data.omega = math::unity_root<FieldType>(math::detail::power_of_two(k));
                         data.Z = {1};
                         // data.selectors = constraint_system.selectors();
                         // ... copy_constraints = constraint_system.copy_constraints();
@@ -132,10 +139,10 @@ namespace nil {
                         // data.permutations = ...(copy_constraints);
                         // data.identity_permutations = ...(copy_constraints);
 
-                        // data.Lagrange_basis = math::polynomial::Lagrange_basis(data.omega, ...(assignments).n);
+                        // data.Lagrange_basis = math::polynomial::Lagrange_basis(data.omega, ...(assignments).n);*/
 
                         return data;
-                    }*/
+                    }
                 };
             }    // namespace snark
         }        // namespace zk

@@ -27,8 +27,6 @@
 #define CRYPTO3_ZK_PLONK_REDSHIFT_PROVER_HPP
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
-#include <nil/crypto3/math/domains/evaluation_domain.hpp>
-#include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/hash/sha2.hpp>
 
@@ -58,13 +56,13 @@ namespace nil {
 
                     typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
 
-                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, lambda, k, r, m> lpc;
+                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, k, r, m> lpc;
 
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
                     constexpr static const std::size_t f_parts = 9;
 
-                    static inline math::polynomial<typename FieldType::value_type> 
+                    /*static inline math::polynomial<typename FieldType::value_type> 
                         quotient_polynomial() {
                             // 7.1. Get $\alpha_0, \dots, \alpha_8 \in \mathbb{F}$ from $hash(\text{transcript})$
                             std::array<typename FieldType::value_type, f_parts> alphas =
@@ -78,11 +76,11 @@ namespace nil {
 
                             math::polynomial<typename FieldType::value_type> T_consolidated =
                                 F_consolidated / preprocessed_data.Z;
-                    }
+                    }*/
 
-                    static inline std::vector<lpc::proof_type> 
+                    /*static inline std::vector<typename lpc::proof_type> 
                         evaluation_proof(fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
-                            FieldType::value_type omega) {
+                            typename FieldType::value_type omega) {
                             typename FieldType::value_type y = transcript.template challenge<FieldType>(); //TODO: define challenge space
 
                             // witness polynomials (table columns)
@@ -106,26 +104,15 @@ namespace nil {
                             lpc::proof_type proof = lpc::proof_eval(evaluation_points_quotient, tree, f, transcript, fri_params);
 
                             return proof;
-                    }
+                    }*/
 
                 public:
                     static inline typename types_policy::template proof_type<lpc>
                         process(const typename types_policy::template preprocessed_data_type<k> preprocessed_data,
                                 const typename types_policy::constraint_system_type &constraint_system,
-                                const typename types_policy::variable_assignment_type &assignments,
-                                const typename types_policy::public_input_type &PI) {
-
-                        std::size_t N_rows = 0; // TODO: It should be in preprocessor
-                        for (auto &wire_assignments : assignments) {
-                            N_rows = std::max(N_rows, wire_assignments.size());
-                        }
-
-                        fiat_shamir_heuristic_updated<TranscriptHashType> transcript;
-                        // prepare a basic domain of the table size
-                        std::shared_ptr<math::evaluation_domain<FieldType>> domain =
-                                math::make_evaluation_domain<FieldType>(N_rows);
+                                const typename types_policy::variable_assignment_type &assignments) {
                         
-                        // 1. Add circuit definition to transctipt
+                        /*// 1. Add circuit definition to transctipt
                         transcript(...);
 
                         // 2. Commit witness columns
@@ -185,7 +172,7 @@ namespace nil {
 
                         // for (std::size_t i = 0; i < N_perm + 1; i++) {
                         //     T_lpc_proofs.push_back(lpc::proof_eval(fT_evaluation_points, T_trees[i], T[i], D_0));
-                        // }
+                        // }*/
 
                         typename types_policy::template proof_type<lpc> proof;
                             // = typename types_policy::proof_type(std::move(f_commitments), std::move(T_commitments),

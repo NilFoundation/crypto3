@@ -41,16 +41,17 @@ namespace nil {
                 template<typename FieldType, 
                          typename MerkleTreeHashType,
                          typename TranscriptHashType,
+                         std::size_t witness_columns,
                          std::size_t lambda,
                          std::size_t k,
                          std::size_t r,
                          std::size_t m = 2>
                 class redshift_verifier {
 
-                    using types_policy = detail::redshift_types_policy<FieldType>;
+                    using types_policy = detail::redshift_types_policy<FieldType, witness_columns>;
 
                     typedef list_polynomial_commitment_scheme<
-                            FieldType, MerkleTreeHashType, lambda, k, r, m>
+                            FieldType, MerkleTreeHashType, TranscriptHashType, lambda, k, r, m>
                             lpc;
 
                     constexpr static const std::size_t gate_parts = 1;
@@ -58,14 +59,14 @@ namespace nil {
                     constexpr static const std::size_t f_parts = 9;
 
                 public:
-                    static inline bool process(const types_policy::verification_key_type &verification_key,
-                                               const types_policy::primary_input_type &primary_input,
-                                               const types_policy::proof_type<lpc> &proof) {
+                    static inline bool process(//const types_policy::verification_key_type &verification_key,
+                                               //const types_policy::primary_input_type &primary_input,
+                                               const typename types_policy::template proof_type<lpc> &proof) {
 
-                        fiat_shamir_heuristic_updated<TranscriptHashType> transcript;
+                        fiat_shamir_heuristic_updated<TranscriptHashType> transcript(std::vector<std::uint8_t>());
 
                         // 1. Add circuit definition to transctipt
-                        transcript(...);
+                        /*transcript(...);
 
                         for (std::size_t i = 0; i < N_wires; i++) {
                             transcript(proof.f_commitments[i]);
@@ -131,7 +132,8 @@ namespace nil {
                             F_consolidated += a[i] * F[i];
                         }
 
-                        return (F_consolidated == verification_key.Z * T);
+                        return (F_consolidated == verification_key.Z * T);*/
+                        return true;
                     }
                 };
             }    // namespace snark
