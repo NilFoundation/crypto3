@@ -45,9 +45,10 @@
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/types.hpp>
 
-#include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
+#include <nil/crypto3/zk/snark/relations/variable.hpp>
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 
@@ -211,9 +212,10 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     // Challenge phase
     typename FieldType::value_type y = algebra::random_element<FieldType>();
 
-    std::array<typename FieldType::value_type, table_columns> columns_at_y;
+    typename plonk_constraint<FieldType>::evaluation_map columns_at_y;
     for (int i = 0; i < table_columns; i++) {
-        columns_at_y[i] = circuit.column_polynomials[i].evaluate(y);
+        auto key = std::make_pair(i, variable<FieldType, true>::rotation_type::current);
+        columns_at_y[key] = circuit.column_polynomials[i].evaluate(y);
     }
 
     std::array<typename FieldType::value_type, 1> verifier_res =

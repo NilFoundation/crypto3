@@ -37,6 +37,7 @@
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -82,10 +83,10 @@ namespace nil {
                         return F;
                     }
 
-                    template <std::size_t TableWidth>
+                    template <std::size_t table_width>
                         static inline std::array<typename FieldType::value_type, argument_size> 
                         verify_eval(const std::vector<plonk_gate<FieldType>> &gates,
-                            const std::array<typename FieldType::value_type, TableWidth> &columns_values,
+                            typename plonk_constraint<FieldType>::evaluation_map &evaluations,
                             typename FieldType::value_type challenge,
                             fiat_shamir_heuristic_updated<TranscriptHashType> &transcript) {
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
@@ -98,8 +99,7 @@ namespace nil {
                             typename FieldType::value_type gate_result = {0};
 
                             for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
-                                //TODO: rotation map
-                                gate_result = gate_result + gates[i].constraints[j].evaluate(columns_values) * theta_acc;
+                                gate_result = gate_result + gates[i].constraints[j].evaluate(evaluations) * theta_acc;
                                 theta_acc *= theta;
                             }
 

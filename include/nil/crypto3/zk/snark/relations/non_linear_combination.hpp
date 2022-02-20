@@ -158,6 +158,8 @@ namespace nil {
                     constexpr static const bool RotationSupport = true;
 
                 public:
+                    typedef std::map<std::pair<std::size_t, typename variable<FieldType, true>::rotation_type>, typename FieldType::value_type> evaluation_map;
+
                     std::vector<non_linear_term<FieldType, RotationSupport>> terms;
 
                     non_linear_combination() {};
@@ -229,16 +231,17 @@ namespace nil {
                         return acc;
                     }
 
-                    template<std::size_t WiresAmount>
                     field_value_type
                         evaluate(
-                                 const std::array<field_value_type, WiresAmount> &assignment) const {
+                                 evaluation_map &assignment) const {
                         field_value_type acc = field_value_type::zero();
                         for (const non_linear_term<FieldType, RotationSupport> &nlt : terms) {
                             field_value_type term_value = nlt.coeff;
 
                             for (const variable<FieldType, RotationSupport> &var : nlt.vars) {
-                                term_value = term_value * assignment[var.wire_index];
+                                std::pair<std::size_t, typename variable<FieldType, RotationSupport>::rotation_type> key
+                                    (var.wire_index, var.rotation);
+                                term_value = term_value * assignment[key];
                             }
                             acc = acc + term_value * nlt.coeff;
                         }
