@@ -28,15 +28,15 @@ struct round_constants_generator {
     constexpr static std::size_t state_bits = GRAIN_LFSR_STATE_LEN;
 
     typedef number<cpp_int_backend<modulus_bits, modulus_bits, cpp_integer_type::unsigned_magnitude, cpp_int_check_type::unchecked, void>>
-        modulus_type;
+        integral_type;
     typedef number<cpp_int_backend<state_bits, state_bits, cpp_integer_type::unsigned_magnitude, cpp_int_check_type::unchecked, void>>
         state_type;
 
-    constexpr static modulus_type mod = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui255;
+    constexpr static integral_type mod = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui255;
 
 
     constexpr void generate_round_constants() {
-        modulus_type constant = 0x0_cppui255;
+        integral_type constant = 0x0_cppui255;
         state_type lfsr_state = get_lfsr_init_state();
 
         for (std::size_t i = 0; i < (full_rounds + part_rounds) * t; i++) {
@@ -44,7 +44,7 @@ struct round_constants_generator {
                 constant = 0x0_cppui255;
                 for (std::size_t i = 0; i < modulus_bits; i++) {
                     lfsr_state = update_state(lfsr_state);
-                    constant = set_new_bit<modulus_type>(constant, get_state_bit(lfsr_state, state_bits - 1));
+                    constant = set_new_bit<integral_type>(constant, get_state_bit(lfsr_state, state_bits - 1));
                 }
                 if (constant < 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui255) {
                     constants[i] = constant;
@@ -55,7 +55,7 @@ struct round_constants_generator {
     }
 
     constexpr void generate_round_constants_unfolded() {
-        modulus_type constant = 0x0_cppui255;
+        integral_type constant = 0x0_cppui255;
         bool new_bit = false;
         state_type lfsr_state = get_lfsr_init_state();
 
@@ -100,8 +100,8 @@ struct round_constants_generator {
         }
     }
 
-    constexpr static modulus_type get_round_constant(std::size_t constant_number) {
-        modulus_type constant = 0x0_cppui255;
+    constexpr static integral_type get_round_constant(std::size_t constant_number) {
+        integral_type constant = 0x0_cppui255;
 
         state_type lfsr_state = get_lfsr_init_state();
 
@@ -112,7 +112,7 @@ struct round_constants_generator {
                 constant = 0x0_cppui255;
                 for (std::size_t i = 0; i < modulus_bits; i++) {
                     lfsr_state = update_state(lfsr_state);
-                    constant = set_new_bit<modulus_type>(constant, get_state_bit(lfsr_state, state_bits - 1));
+                    constant = set_new_bit<integral_type>(constant, get_state_bit(lfsr_state, state_bits - 1));
                 }
                 if (constant < 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui255)
                     break;
@@ -124,7 +124,7 @@ struct round_constants_generator {
             constant = 0x0_cppui255;
             for (std::size_t i = 0; i < modulus_bits; i++) {
                 lfsr_state = update_state(lfsr_state);
-                constant = set_new_bit<modulus_type>(constant, get_state_bit(lfsr_state, state_bits - 1));
+                constant = set_new_bit<integral_type>(constant, get_state_bit(lfsr_state, state_bits - 1));
             }
             if (constant < 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui255)
                 break;
@@ -190,7 +190,7 @@ struct round_constants_generator {
         
     }
 
-    modulus_type constants[(full_rounds + part_rounds) * t];
+    integral_type constants[(full_rounds + part_rounds) * t];
 
 };
 

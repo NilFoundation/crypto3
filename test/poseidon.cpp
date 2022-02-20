@@ -71,19 +71,19 @@ boost::property_tree::ptree string_data(const std::string &interface_type, const
 template<typename poseidon_functions_t, typename TestSet>
 void hash_test_data(const TestSet &test_set) {
     using element_type = typename poseidon_functions_t::element_type;
-    using modulus_type = typename poseidon_functions_t::element_type::modulus_type;
+    using integral_type = typename poseidon_functions_t::element_type::integral_type;
 
     typename poseidon_functions_t::state_type input;
     typename poseidon_functions_t::state_type input_optimized;
 
     auto i = 0;
     for (auto &input_value : test_set.second) {
-        input[i] = element_type(modulus_type(input_value.second.data()));
+        input[i] = element_type(integral_type(input_value.second.data()));
         input_optimized[i] = input[i];
         i++;
     }
 
-    auto result_hash = element_type(modulus_type(test_set.first.data()));
+    auto result_hash = element_type(integral_type(test_set.first.data()));
 
     poseidon_functions_t::permute(input);
     poseidon_functions_t::permute_optimized(input_optimized);

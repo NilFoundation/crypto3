@@ -27,8 +27,8 @@ namespace nil {
                     constexpr static const std::size_t part_rounds = policy_type::part_rounds;
 
                     typedef typename FieldType::value_type element_type;
-                    typedef typename FieldType::modulus_type modulus_type;
-                    constexpr static const modulus_type modulus = FieldType::modulus;
+                    typedef typename FieldType::integral_type integral_type;
+                    constexpr static const integral_type modulus = FieldType::modulus;
 
                     constexpr static const std::size_t lfsr_state_bits = 80;
                     typedef number<backends::cpp_int_backend<
@@ -40,7 +40,7 @@ namespace nil {
                     typedef algebra::vector<element_type, constants_number> round_constants_type;
 
                     constexpr void generate_round_constants() {
-                        modulus_type constant = 0;
+                        integral_type constant = 0;
                         lfsr_state_type lfsr_state = get_lfsr_init_state();
 
                         for (std::size_t i = 0; i < (full_rounds + part_rounds) * state_words; i++) {
@@ -48,7 +48,7 @@ namespace nil {
                                 constant = 0;
                                 for (std::size_t j = 0; j < word_bits; j++) {
                                     lfsr_state = update_lfsr_state(lfsr_state);
-                                    constant = set_new_bit<modulus_type>(
+                                    constant = set_new_bit<integral_type>(
                                         constant, get_lfsr_state_bit(lfsr_state, lfsr_state_bits - 1));
                                 }
                                 if (constant < modulus) {
