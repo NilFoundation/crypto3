@@ -216,6 +216,17 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
 
     std::array<math::polynomial<typename FieldType::value_type>, 1> prover_res =
         redshift_gates_argument<FieldType, transcript_hash_type>::prove_eval<table_columns>(circuit.gates, circuit.column_polynomials, prover_transcript);
+
+    // Challenge phase
+    typename FieldType::value_type y = algebra::random_element<FieldType>();
+
+    std::array<typename FieldType::value_type, table_columns> columns_at_y;
+    for (int i = 0; i < table_columns; i++) {
+        columns_at_y[i] = circuit.column_polynomials[i].evaluate(y);
+    }
+
+    /*std::array<typename FieldType::value_type, 1> verifier_res =
+        redshift_gates_argument<FieldType, transcript_hash_type>::verify_eval<table_columns>(circuit.gates, columns_at_y, verifier_transcript);*/
 }
 
 BOOST_AUTO_TEST_SUITE_END()

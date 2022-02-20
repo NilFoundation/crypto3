@@ -229,6 +229,22 @@ namespace nil {
                         return acc;
                     }
 
+                    template<std::size_t WiresAmount>
+                    field_value_type
+                        evaluate(
+                                 const std::array<field_value_type, WiresAmount> &assignment) const {
+                        field_value_type acc = field_value_type::zero();
+                        for (const non_linear_term<FieldType, RotationSupport> &nlt : terms) {
+                            field_value_type term_value = nlt.coeff;
+
+                            for (const variable<FieldType, RotationSupport> &var : nlt.vars) {
+                                term_value = term_value * assignment[var.wire_index];
+                            }
+                            acc = acc + term_value * nlt.coeff;
+                        }
+                        return acc;
+                    }
+
                     non_linear_combination operator*(const field_value_type &field_coeff) const {
                         non_linear_combination result;
                         result.terms.reserve(this->terms.size());

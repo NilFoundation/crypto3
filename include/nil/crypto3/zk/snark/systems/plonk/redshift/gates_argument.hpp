@@ -81,6 +81,7 @@ namespace nil {
                         static inline std::array<typename FieldType::value_type, argument_size> 
                         verify_eval(const std::vector<plonk_gate<FieldType>> &gates,
                             const std::array<typename FieldType::value_type, TableWidth> &columns_values,
+                            typename FieldType::value_type challenge,
                             fiat_shamir_heuristic_updated<TranscriptHashType> &transcript) {
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
@@ -96,7 +97,7 @@ namespace nil {
                                 theta_acc *= theta;
                             }
 
-                            gate_result = gate_result * gates[i].selector;
+                            gate_result = gate_result * gates[i].selector.evaluate(challenge);
 
                             F[0] = F[0] + gate_result;
                         }
