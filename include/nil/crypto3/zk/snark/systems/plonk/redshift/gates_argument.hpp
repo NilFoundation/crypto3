@@ -84,7 +84,6 @@ namespace nil {
                             fiat_shamir_heuristic_updated<TranscriptHashType> &transcript) {
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
-
                         std::array<typename FieldType::value_type, argument_size> F;
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();

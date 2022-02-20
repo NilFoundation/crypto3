@@ -79,6 +79,34 @@ namespace nil {
                                 F_consolidated / preprocessed_data.Z;
                     }
 
+                    static inline std::vector<lpc::proof_type> 
+                        evaluation_proof(fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
+                            FieldType::value_type omega) {
+                            typename FieldType::value_type y = transcript.template challenge<FieldType>(); //TODO: define challenge space
+
+                            // witness polynomials (table columns)
+                            std::vector<std::size_t> rotation_gates = {};
+                            std::vector<FieldType::value_type> evaluation_points_gates(rotation_gates.size());
+                            for (std::size_t i = 0; i < evaluation_points_gates.size(); i++) {
+                                evaluation_points_gates[i] = y * omega.pow(rotation_gates[i]);
+                            }
+
+                            lpc::proof_type proof = lpc::proof_eval(evaluation_points_gates, tree, f, transcript, fri_params);
+
+                            // permutation polynomials
+                            std::vector<FieldType::value_type> evaluation_points_permutation = {y, y * omega};
+
+                            lpc::proof_type proof = lpc::proof_eval(evaluation_points_permutation, tree, f, transcript, fri_params);
+
+                            // quotient polynomial
+                            std::vector<std::size_t> rotation_gates = {};
+                            std::vector<FieldType::value_type> evaluation_points_quotient = {y};
+
+                            lpc::proof_type proof = lpc::proof_eval(evaluation_points_quotient, tree, f, transcript, fri_params);
+
+                            return proof;
+                    }
+
                 public:
                     static inline typename types_policy::template proof_type<lpc>
                         process(const typename types_policy::template preprocessed_data_type<k> preprocessed_data,
@@ -138,7 +166,11 @@ namespace nil {
                         std::size_t N_T = std::max(N_perm + N_PI, F[8].degree() - 1);
                         std::array<math::polynomial<typename FieldType::value_type>, N_T> T_splitted = ;
                         auto T_commitments = lpc::commit<witness_columns>(T_splitted, fri_params.D[0]);
-                        transcript(T_commitments);                       
+                        transcript(T_commitments);    
+
+                        // 8. Run evaluation proofs
+                        lpc::proof_type lpc_proof_witnesses = evaluation_proof(transcript, omega);
+                        lpc::proof_type lpc_proof_witnesses = evaluation_proof(transcript, omega);       
 
                         // 8.1 Get $y \in \mathbb{F}/H$ from $hash|_{\mathbb{F}/H}(\text{transcript})$
                         // typename FieldType::value_type upsilon =
