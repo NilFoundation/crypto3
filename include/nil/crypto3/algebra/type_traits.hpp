@@ -108,7 +108,6 @@ namespace nil {
                                           has_type_integral_type<T>::value &&
                                           has_static_member_data_modulus_bits<T, const std::size_t>::value &&
                                           has_type_modular_type<T>::value &&
-                                          has_static_member_data_modulus_bits<T, const std::size_t>::value &&
                                           has_type_extension_policy<T>::value;
                 typedef T type;
             };
