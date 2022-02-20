@@ -69,8 +69,8 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, m> fri_type;
-    typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> lpc_type;
+    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+    typedef zk::snark::list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, lambda, k, r, m> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
 
     constexpr static const std::size_t d_extended = d;
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     auto proof = lpc_type::proof_eval(evaluation_points, tree, f, transcript, fri_params);
 
     // verify
-    zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(x_data);
+    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript_verifier(x_data);
 
     BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, transcript_verifier, fri_params));
 }

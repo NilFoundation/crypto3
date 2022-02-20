@@ -45,6 +45,8 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType,
+                         typename MerkleTreeHashType,
+                         typename TranscriptHashType,
                          std::size_t witness_columns,
                          std::size_t lambda,
                          std::size_t k,
@@ -56,12 +58,9 @@ namespace nil {
                     using transcript_manifest =
                         typename types_policy::template prover_fiat_shamir_heuristic_manifest<8>;
 
-                    typedef hashes::sha2<256> merkle_hash_type;
-                    typedef hashes::sha2<256> transcript_hash_type;
+                    typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
 
-                    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
-
-                    typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, lambda, k, r, m> lpc;
+                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, lambda, k, r, m> lpc;
 
                     static inline math::polynomial<typename FieldType::value_type> 
                         quotient_polynomial() {
@@ -119,7 +118,7 @@ namespace nil {
                             N_rows = std::max(N_rows, wire_assignments.size());
                         }
 
-                        fiat_shamir_heuristic<transcript_manifest, transcript_hash_type> transcript;
+                        fiat_shamir_heuristic<transcript_manifest, TranscriptHashType> transcript;
                         // prepare a basic domain of the table size
                         std::shared_ptr<math::evaluation_domain<FieldType>> domain =
                                 math::make_evaluation_domain<FieldType>(N_rows);

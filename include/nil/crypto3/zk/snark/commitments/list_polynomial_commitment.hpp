@@ -54,7 +54,8 @@ namespace nil {
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
                 template<typename FieldType,
-                         typename Hash,
+                         typename MerkleTreeHashType,
+                         typename TranscriptHashType,
                          std::size_t Lambda = 40,
                          std::size_t K = 1,
                          std::size_t R = 1,
@@ -72,13 +73,11 @@ namespace nil {
                     constexpr static const std::size_t m = M;
 
                     typedef FieldType field_type;
-                    typedef Hash transcript_hash_type;    // TODO: separate transcript and merkle hashes
 
-                    typedef typename containers::merkle_tree<Hash, 2> merkle_tree_type;
-                    typedef typename merkle_tree_type::hash_type merkle_hash_type;
-                    typedef typename containers::merkle_proof<Hash, 2> merkle_proof_type;
+                    typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
+                    typedef typename containers::merkle_proof<MerkleTreeHashType, 2> merkle_proof_type;
 
-                    typedef fri_commitment_scheme<FieldType, Hash, m> fri_type;
+                    typedef fri_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, m> fri_type;
 
                     using commitment_type = typename merkle_tree_type::value_type;
 
@@ -130,7 +129,7 @@ namespace nil {
                     static proof_type proof_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
                                                  merkle_tree_type &T,
                                                  const math::polynomial<typename FieldType::value_type> &g,
-                                                 fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
+                                                 fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
                                                  typename fri_type::params_type &fri_params) {
 
                         std::array<typename FieldType::value_type, k> z;
@@ -167,7 +166,7 @@ namespace nil {
 
                     static bool verify_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
                                             proof_type &proof,
-                                            fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
+                                            fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
                                             typename fri_type::params_type fri_params) {
                         std::array<std::pair<typename FieldType::value_type, typename FieldType::value_type>, k>
                             U_interpolation_points;

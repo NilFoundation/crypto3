@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, m> fri_type;
+    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
     typedef typename fri_type::proof_type proof_type;
     typedef typename fri_type::params_type params_type;
 
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
 
     // eval
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript(init_blob);
+    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(init_blob);
 
     // LPC-related logic, here we "nulify" it via U = 0, V - 1
     // TODO: Make FRI independent from LPC input
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
 
     // verify
-    zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript_verifier(init_blob);
+    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript_verifier(init_blob);
 
     BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, U, V));
 
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, m> fri_type;
+    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
     typedef typename fri_type::proof_type proof_type;
     typedef typename fri_type::params_type params_type;
 
@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, m> fri_type;
+    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
     typedef typename fri_type::proof_type proof_type;
     typedef typename fri_type::params_type params_type;
 
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     std::array<typename FieldType::value_type, 1> evaluation_points = {D[0]->get_domain_element(1).pow(5)};
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    zk::snark::fiat_shamir_heuristic_updated<hashes::sha2<256>> transcript(init_blob);
+    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(init_blob);
 
     proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
 
