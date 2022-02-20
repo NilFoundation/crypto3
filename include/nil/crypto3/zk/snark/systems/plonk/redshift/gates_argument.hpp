@@ -77,10 +77,10 @@ namespace nil {
                         return F;
                     }
 
-                    template <std::size_t table_width>
+                    template <std::size_t TableWidth>
                         static inline std::array<typename FieldType::value_type, argument_size> 
                         verify_eval(const std::vector<plonk_gate<FieldType>> &gates,
-                            const std::array<FieldType::value_type, table_width> &columns_values,
+                            const std::array<typename FieldType::value_type, TableWidth> &columns_values,
                             fiat_shamir_heuristic_updated<TranscriptHashType> &transcript) {
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
@@ -90,7 +90,7 @@ namespace nil {
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
                         for (std::size_t i = 0; i < gates.size(); i++) {
-                            FieldType::value_type gate_result = {0};
+                            typename FieldType::value_type gate_result = {0};
 
                             for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
                                 gate_result = gate_result + gates[i].constraints[j].evaluate(columns_values) * theta_acc;
