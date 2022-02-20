@@ -42,11 +42,16 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+
                 template<typename FieldType,
                          typename TranscriptHashType = hashes::keccak_1600<512>,
                          std::size_t ArgumentSize = 1>
-                struct redshift_gates_argument {
-                    constexpr static const std::size_t argument_size = ArgumentSize;
+                struct redshift_gates_argument;
+
+                template<typename FieldType,
+                         typename TranscriptHashType>
+                struct redshift_gates_argument<FieldType, TranscriptHashType, 1> {
+                    constexpr static const std::size_t argument_size = 1;
 
                     template <std::size_t table_width>
                         static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>

@@ -55,18 +55,20 @@ namespace nil {
                 class redshift_prover {
 
                     using types_policy = detail::redshift_types_policy<FieldType, witness_columns>;
-                    using transcript_manifest =
-                        typename types_policy::template prover_fiat_shamir_heuristic_manifest<8>;
 
                     typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
 
                     typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, lambda, k, r, m> lpc;
 
+                    constexpr static const std::size_t gate_parts = 1;
+                    constexpr static const std::size_t permutation_parts = 3;
+                    constexpr static const std::size_t f_parts = 9;
+
                     static inline math::polynomial<typename FieldType::value_type> 
                         quotient_polynomial() {
                             // 7.1. Get $\alpha_0, \dots, \alpha_8 \in \mathbb{F}$ from $hash(\text{transcript})$
                             std::array<typename FieldType::value_type, f_parts> alphas =
-                                transcript.template challenges<transcript_manifest::challenges_ids::alpha, f_parts, FieldType>();
+                                transcript.template challenges<FieldType, f_parts>();
 
                             // 7.2. Compute F_consolidated
                             math::polynomial<typename FieldType::value_type> F_consolidated = {0};
@@ -118,7 +120,7 @@ namespace nil {
                             N_rows = std::max(N_rows, wire_assignments.size());
                         }
 
-                        fiat_shamir_heuristic<transcript_manifest, TranscriptHashType> transcript;
+                        fiat_shamir_heuristic_updated<TranscriptHashType> transcript;
                         // prepare a basic domain of the table size
                         std::shared_ptr<math::evaluation_domain<FieldType>> domain =
                                 math::make_evaluation_domain<FieldType>(N_rows);
@@ -136,11 +138,9 @@ namespace nil {
                         std::copy(w.begin(), w.end(), f.begin());
 
                         // 4. permutation_argument
-                        constexpr const std::size_t permutation_parts = 3;
                         std::array<math::polynomial<typename FieldType::value_type>, permutation_parts>
                             permutation_argument = redshift_permutation_argument<FieldType>::prove_eval(transcript);
 
-                        constexpr const std::size_t f_parts = 9;
                         std::array<math::polynomial<typename FieldType::value_type>, f_parts> F;
 
                         F[0] = permutation_argument[0];
@@ -152,8 +152,7 @@ namespace nil {
                         //     lookup_argument = redshift_lookup_argument<FieldType>::prove_eval(transcript);
 
                         // 6. circuit-satisfability
-                        constexpr const std::size_t gate_parts = 1;
-                        std::array<math::polynomial<typename FieldType::value_type>, 1> prover_res =
+                        std::array<math::polynomial<typename FieldType::value_type>, gate_parts> prover_res =
                             redshift_gates_argument<FieldType, lpc_type>::prove_eval(prover_transcript, circuit_rows,
                                                                                         permutation_size, domain, lagrange_0, S_id,
                                                                                         S_sigma, f, q_last, q_blind, fri_params);
@@ -173,7 +172,7 @@ namespace nil {
 
                         // 8.1 Get $y \in \mathbb{F}/H$ from $hash|_{\mathbb{F}/H}(\text{transcript})$
                         // typename FieldType::value_type upsilon =
-                        //     transcript.template challenge<transcript_manifest::challenges_ids::upsilon, FieldType>();
+                        //     transcript.template challenge<FieldType>();
 
                         // std::array<typename FieldType::value_type, k> fT_evaluation_points = {upsilon};
                         // std::vector<typename lpc::proof_type> f_lpc_proofs(N_wires);

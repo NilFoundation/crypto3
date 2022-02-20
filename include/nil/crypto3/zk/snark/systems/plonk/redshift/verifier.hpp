@@ -41,26 +41,28 @@ namespace nil {
                 template<typename FieldType, 
                          typename MerkleTreeHashType,
                          typename TranscriptHashType,
-                         std::size_t lambda, std::size_t m = 2>
+                         std::size_t lambda,
+                         std::size_t k,
+                         std::size_t r,
+                         std::size_t m = 2>
                 class redshift_verifier {
 
                     using types_policy = detail::redshift_types_policy<FieldType>;
-                    using transcript_manifest = types_policy::prover_fiat_shamir_heuristic_manifest<6>;
 
-                    constexpr static const std::size_t k = ...;
-                    constexpr static const std::size_t r = ...;
-
-                    constexpr static const typename FieldType::value_type omega =
-                        algebra::get_root_of_unity<FieldType>() typedef list_polynomial_commitment_scheme<
+                    typedef list_polynomial_commitment_scheme<
                             FieldType, MerkleTreeHashType, lambda, k, r, m>
                             lpc;
+
+                    constexpr static const std::size_t gate_parts = 1;
+                    constexpr static const std::size_t permutation_parts = 3;
+                    constexpr static const std::size_t f_parts = 9;
 
                 public:
                     static inline bool process(const types_policy::verification_key_type &verification_key,
                                                const types_policy::primary_input_type &primary_input,
                                                const types_policy::proof_type<lpc> &proof) {
 
-                        fiat_shamir_heuristic<transcript_manifest, TranscriptHashType> transcript;
+                        fiat_shamir_heuristic_updated<TranscriptHashType> transcript;
 
                         // 1. Add circuit definition to transctipt
                         transcript(...);
@@ -69,25 +71,18 @@ namespace nil {
                             transcript(proof.f_commitments[i]);
                         }
 
-                        std::array<typename FieldType::value_type, 3> permutation_argument = 
-                            redshift_permutation_argument<typename FieldType>::verify_argument(transcript);
+                        std::array<typename FieldType::value_type, permutation_parts> permutation_argument = 
+                            redshift_permutation_argument<FieldType>::verify_eval(transcript);
 
-                        constexpr const std::size_t f_parts = 4;
-                        std::array<typename FieldType::value_type, f_parts> alphas;
-                        for (std::size_t i = 0; i < f_parts; i++) {
-                            typename TranscriptHashType::digest_type alpha_bytes =
-                                transcript.get_challenge<transcript_manifest::challenges_ids::alpha, i>();
-                            alphas[i] = (algebra::marshalling<FieldType>(alpha_bytes));
-                        }
+                        std::array<typename FieldType::value_type, f_parts> alphas =
+                                transcript.template challenges<FieldType, f_parts>();
 
                         for (std::size_t i = 0; i < N_perm + 2; i++) {
                             transcript(proof.T_commitments[i]);
                         }
 
-                        typename TranscriptHashType::digest_type upsilon_bytes =
-                            transcript.get_challenge<transcript_manifest::challenges_ids::upsilon>();
-
-                        typename FieldType::value_type upsilon = algebra::marshalling<FieldType>(upsilon_bytes);
+                        typename FieldType::value_type upsilon =
+                            transcript.template challenge<FieldType>();
 
                         std::array<typename FieldType::value_type, k> fT_evaluation_points = {upsilon};
 
@@ -98,6 +93,7 @@ namespace nil {
                             }
                         }
 
+                        const typename FieldType::value_type omega = algebra::get_root_of_unity<FieldType>();
                         std::array<typename FieldType::value_type, k> PQ_evaluation_points = {upsilon, upsilon * omega};
                         if (!lpc::verify_eval(PQ_evaluation_points, proof.P_commitment, proof.P_lpc_proof, ...)) {
                             return false;
