@@ -34,7 +34,7 @@
 
 #include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
-#include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
@@ -163,24 +163,24 @@ namespace nil {
                     variable<FieldType, true> w1(0, variable<FieldType, true>::rotation_type::current);
                     variable<FieldType, true> w2(0, variable<FieldType, true>::rotation_type::current);
                     
-                    non_linear_combination<FieldType, true> add_constraint;
+                    plonk_constraint<FieldType> add_constraint;
                     add_constraint.add_term(w0);
                     add_constraint.add_term(w1);
                     add_constraint.add_term(-w2);
 
                     test_circuit.domain->inverse_fft(q_add);
                     math::polynomial<typename FieldType::value_type> add_selector(q_add);
-                    std::vector<non_linear_combination<FieldType, true>> add_gate_costraints {add_constraint};
+                    std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
                     plonk_gate<FieldType> add_gate {add_gate_costraints, add_selector};
                     test_circuit.gates.push_back(add_gate);
 
-                    non_linear_combination<FieldType, true> mul_constraint;
+                    plonk_constraint<FieldType> mul_constraint;
                     add_constraint.add_term(w0 * w1);
                     add_constraint.add_term(-w2);
 
                     test_circuit.domain->inverse_fft(q_mul);
                     math::polynomial<typename FieldType::value_type> mul_selector(q_mul);
-                    std::vector<non_linear_combination<FieldType, true>> mul_gate_costraints {mul_constraint};
+                    std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
                     plonk_gate<FieldType> mul_gate {mul_gate_costraints, mul_selector};
                     test_circuit.gates.push_back(mul_gate);
 
@@ -262,24 +262,24 @@ namespace nil {
                     variable<FieldType, true> w1(0, variable<FieldType, true>::rotation_type::current);
                     variable<FieldType, true> w2(0, variable<FieldType, true>::rotation_type::current);
                     
-                    non_linear_combination<FieldType, true> add_constraint;
+                    plonk_constraint<FieldType> add_constraint;
                     add_constraint.add_term(w0);
                     add_constraint.add_term(w1);
                     add_constraint.add_term(-w2);
 
                     test_circuit.domain->inverse_fft(q_add);
                     math::polynomial<typename FieldType::value_type> add_selector(q_add);
-                    std::vector<non_linear_combination<FieldType, true>> add_gate_costraints {add_constraint};
+                    std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
                     plonk_gate<FieldType> add_gate {add_gate_costraints, add_selector};
                     test_circuit.gates.push_back(add_gate);
 
-                    non_linear_combination<FieldType, true> mul_constraint;
+                    plonk_constraint<FieldType> mul_constraint;
                     add_constraint.add_term(w0 * w1);
                     add_constraint.add_term(-w2);
 
                     test_circuit.domain->inverse_fft(q_mul);
                     math::polynomial<typename FieldType::value_type> mul_selector(q_mul);
-                    std::vector<non_linear_combination<FieldType, true>> mul_gate_costraints {mul_constraint};
+                    std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
                     plonk_gate<FieldType> mul_gate {mul_gate_costraints, mul_selector};
                     test_circuit.gates.push_back(mul_gate);
 

@@ -28,7 +28,7 @@
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
-#include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -37,7 +37,7 @@ namespace nil {
                     template <typename FieldType>
                     struct plonk_gate
                     {
-                        std::vector<non_linear_combination<FieldType, true>> constraints;
+                        std::vector<plonk_constraint<FieldType>> constraints;
                         math::polynomial<typename FieldType::value_type> selector;
                     };
             }    // namespace snark
