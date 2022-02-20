@@ -50,8 +50,8 @@ namespace nil {
 
                                 const field_value_type XX = (first.X).squared();    // XX  = X1^2
                                 const field_value_type ZZ = (first.Z).squared();    // ZZ  = Z1^2
-                                const field_value_type w =
-                                    ElementType::params_type::a * ZZ + (XX + XX + XX);    // w   = a*ZZ + 3*XX
+                                const field_value_type w = field_value_type(ElementType::params_type::a) * ZZ +
+                                                           (XX + XX + XX);    // w   = a*ZZ + 3*XX
                                 const field_value_type Y1Z1 = (first.Y) * (first.Z);
                                 const field_value_type s = Y1Z1 + Y1Z1;      // s   = 2*Y1*Z1
                                 const field_value_type ss = s.squared();     // ss  = s^2
