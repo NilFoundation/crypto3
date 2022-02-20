@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE ecdsa_test
+#define BOOST_TEST_MODULE pubkey_ecdsa_test
 
 #include <string>
 
@@ -57,17 +57,20 @@ void print_field_element(std::ostream &os, const typename algebra::fields::detai
 
 template<typename FpCurveGroupElement>
 void print_fp_curve_group_element(std::ostream &os, const FpCurveGroupElement &e) {
-    os << std::hex << "( " << e.X.data << " : " << e.Y.data << " : " << e.Z.data << " )" << std::endl;
+    os //<< std::hex
+       << "( " << e.X.data << " : " << e.Y.data << " : " << e.Z.data << " )" << std::endl;
 }
 
 template<typename FpCurveGroupElement>
 void print_fp_affine_curve_group_element(std::ostream &os, const FpCurveGroupElement &e) {
-    os << std::hex << "( " << e.X.data << " : " << e.Y.data << " )" << std::endl;
+    os //<< std::hex
+       << "( " << e.X.data << " : " << e.Y.data << " )" << std::endl;
 }
 
 template<typename Fp2CurveGroupElement>
 void print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroupElement &e) {
-    os << std::hex << "(" << e.X.data[0].data << " , " << e.X.data[1].data << ") : (" << e.Y.data[0].data << " , "
+    os //<< std::hex
+       << "(" << e.X.data[0].data << " , " << e.X.data[1].data << ") : (" << e.Y.data[0].data << " , "
        << e.Y.data[1].data << ") : (" << e.Z.data[0].data << " , " << e.Z.data[1].data << ")" << std::endl;
 }
 
@@ -151,7 +154,7 @@ void rfc6979_test_wo_pk_check(
 
 BOOST_AUTO_TEST_SUITE(ecdsa_manual_test_suite)
 
-BOOST_AUTO_TEST_CASE(ecdsa_conformity_test) {
+BOOST_AUTO_TEST_CASE(ecdsa_dummy_test) {
     using curve_type = algebra::curves::secp256r1;
     using scalar_field_type = typename curve_type::scalar_field_type;
     using scalar_field_value_type = typename scalar_field_type::value_type;

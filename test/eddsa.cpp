@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE eddsa_test
+#define BOOST_TEST_MODULE pubkey_eddsa_test
 
 #include <string>
 

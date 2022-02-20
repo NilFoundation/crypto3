@@ -409,12 +409,13 @@ namespace nil {
                     scalar_field_value_type S = r_reduced + k_reduced * s_reduced;
 
                     // 6.
-                    marshalling_scalar_field_value_type marshalling_scalar_field_value_6 =
-                        nil::crypto3::marshalling::types::fill_field_element<scalar_field_type, endianness>(S);
-                    auto sig_iter_6 =
-                        std::begin(signature) + public_key_bits / std::numeric_limits<std::uint8_t>::digits +
+                    marshalling_scalar_field_value_type marshalling_scalar_field_value_6(S);
+                    std::size_t offset_6 =
+                        public_key_bits / std::numeric_limits<std::uint8_t>::digits +
                         (base_field_type::modulus_bits % std::numeric_limits<std::uint8_t>::digits ? 1 : 0);
-                    if (marshalling_scalar_field_value_6.write(sig_iter_6, private_key_bits) !=
+                    auto sig_iter_6 = std::begin(signature) + offset_6;
+                    std::size_t remaining_bytes_6 = signature.size() - offset_6;
+                    if (marshalling_scalar_field_value_6.write(sig_iter_6, remaining_bytes_6) !=
                         nil::marshalling::status_type::success) {
                         return {};
                     }
