@@ -109,10 +109,10 @@ namespace nil {
 
                 public:
                     static inline typename types_policy::template proof_type<lpc>
-                        process(const typename types_policy::template preprocessed_data_type<k> preprocessed_data,
+                        process(const typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data,
                                 const typename types_policy::constraint_system_type &constraint_system,
                                 const typename types_policy::variable_assignment_type &assignments,
-                                const typename types_policy::template circuit_short_description<lpc> &short_description),
+                                const typename types_policy::template circuit_short_description<lpc> &short_description,
                                 const typename lpc::fri_type::params_type &fri_params) {
                         
                         typename types_policy::template proof_type<lpc> proof;
@@ -135,16 +135,15 @@ namespace nil {
                         proof.witness_commitments.resize(witness_columns);
                         for (std::size_t i = 0; i < witness_columns; i++) {
                             proof.witness_commitments[i] = witness_commitments[i].root();
-                            transcript(proof.witness_commitments[i]);
+                            //transcript(proof.witness_commitments[i]);
                         }
-                        //transcript(witness_commitments); //TODO: marshalling
 
-                        /*// 3. Prepare columns included into permuation argument
-                        std::vector<math::polynomial<typename FieldType::value_type>> f(N_perm + N_PI);
-                        std::copy(w.begin(), w.end(), f.begin());
+                        // 3. Prepare columns included into permuation argument
+                        //std::vector<math::polynomial<typename FieldType::value_type>> f(N_perm + N_PI);
+                        //std::copy(w.begin(), w.end(), f.begin());
 
                         // 4. permutation_argument
-                        std::array<math::polynomial<typename FieldType::value_type>, permutation_parts>
+                        /*std::array<math::polynomial<typename FieldType::value_type>, permutation_parts>
                             permutation_argument = redshift_permutation_argument<FieldType>::prove_eval(transcript);
 
                         std::array<math::polynomial<typename FieldType::value_type>, f_parts> F;

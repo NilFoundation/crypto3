@@ -45,6 +45,19 @@ namespace nil {
                 class redshift_preprocessor {
                     using types_policy = detail::redshift_types_policy<FieldType, WitnessColumns, PublicColumns>;
 
+                    static math::polynomial<typename FieldType::value_type>
+                        lagrange_polynomial(std::shared_ptr<math::evaluation_domain<FieldType>> domain, std::size_t number) {
+                        std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> evaluation_points;
+                        for (std::size_t i = 0; i < domain->m; i++) {
+                            evaluation_points.push_back(std::make_pair(domain->get_domain_element(i), (i != number) ?
+                                                                                                        FieldType::value_type::zero() :
+                                                                                                        FieldType::value_type::one()));
+                        }
+                        math::polynomial<typename FieldType::value_type> f = math::lagrange_interpolation(evaluation_points);
+
+                        return f;
+                    }
+
                 public:
                     static inline std::vector<math::polynomial<typename FieldType::value_type>>
                         identity_polynomials(std::size_t permutation_size, std::size_t table_size,
@@ -120,11 +133,13 @@ namespace nil {
                             return q_last;
                     }
 
-                    static inline typename types_policy::template preprocessed_data_type<k>
+                    template <typename lpc_type>
+                    static inline typename types_policy::template preprocessed_data_type<WitnessColumns>
                         process(const typename types_policy::constraint_system_type &constraint_system,
-                                const typename types_policy::variable_assignment_type &assignments) {
+                                const typename types_policy::variable_assignment_type &assignments,
+                                typename types_policy::template circuit_short_description<lpc_type> &short_description) {
 
-                        typename types_policy::template preprocessed_data_type<k> data;
+                        typename types_policy::template preprocessed_data_type<WitnessColumns> data;
 
                         std::size_t N_rows = 0;
                         for (auto &wire_assignments : assignments) {
@@ -132,6 +147,20 @@ namespace nil {
                         }
 
                         data.basic_domain = math::make_evaluation_domain<FieldType>(N_rows);
+
+
+                        data.permutation_polynomials = permutation_polynomials(short_description.columns_with_copy_constraints.size(), 
+                            short_description.table_rows, data.basic_domain->get_domain_element(1), short_description.delta, 
+                            short_description.permutation, data.basic_domain);
+
+                        data.identity_polynomials = identity_polynomials(short_description.columns_with_copy_constraints.size(), 
+                            short_description.table_rows, data.basic_domain->get_domain_element(1), 
+                            short_description.delta, data.basic_domain);
+
+                        data.lagrange_0 = lagrange_polynomial(data.basic_domain, 0);
+
+                        data.q_last = selector_last(short_description.table_rows, short_description.usable_rows, data.basic_domain);
+                        data.q_blind = selector_blind(short_description.table_rows, short_description.usable_rows, data.basic_domain);
 
                         /*data.omega = math::unity_root<FieldType>(math::detail::power_of_two(k));
                         data.Z = {1};

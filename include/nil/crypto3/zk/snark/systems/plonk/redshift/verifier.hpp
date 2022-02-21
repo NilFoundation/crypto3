@@ -68,13 +68,13 @@ namespace nil {
                         fiat_shamir_heuristic_updated<TranscriptHashType> transcript(std::vector<std::uint8_t>());
 
                         // 1. Add circuit definition to transctipt
-                        /*transcript(short_description);
+                        //transcript(short_description);
 
-                        for (std::size_t i = 0; i < N_wires; i++) {
-                            transcript(proof.f_commitments[i]);
+                        for (std::size_t i = 0; i < witness_columns; i++) {
+                            //transcript(proof.witness_commitments[i]);
                         }
 
-                        std::array<typename FieldType::value_type, permutation_parts> permutation_argument = 
+                        /*std::array<typename FieldType::value_type, permutation_parts> permutation_argument = 
                             redshift_permutation_argument<FieldType>::verify_eval(transcript);
 
                         std::array<typename FieldType::value_type, f_parts> alphas =

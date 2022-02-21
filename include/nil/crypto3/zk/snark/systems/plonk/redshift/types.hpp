@@ -36,6 +36,7 @@
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/proof.hpp>
 
 namespace nil {
@@ -69,21 +70,24 @@ namespace nil {
                         template<typename CommitmentSchemeType>
                         using proof_type = redshift_proof<CommitmentSchemeType>;
 
-                        template<std::size_t k>
+                        template<std::size_t witness_columns>
                         struct preprocessed_data_type {
 
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
                             std::vector<math::polynomial<typename FieldType::value_type>> selectors;
                             // S_sigma
-                            std::vector<math::polynomial<typename FieldType::value_type>> permutations;
+                            std::vector<math::polynomial<typename FieldType::value_type>> permutation_polynomials;
                             // S_id
                             std::vector<math::polynomial<typename FieldType::value_type>>
-                                identity_permutations;
+                                identity_polynomials;
                             // c
                             std::vector<math::polynomial<typename FieldType::value_type>> constraints;
 
-                            std::vector<math::polynomial<typename FieldType::value_type>> Lagrange_basis;
+                            math::polynomial<typename FieldType::value_type> lagrange_0;
+
+                            math::polynomial<typename FieldType::value_type> q_last;
+                            math::polynomial<typename FieldType::value_type> q_blind;
 
                             math::polynomial<typename FieldType::value_type> Z;
                         };
@@ -93,6 +97,14 @@ namespace nil {
                             std::vector<typename CommitmentSchemeType::commitment_type> selectors_commits;
                             std::vector<typename CommitmentSchemeType::commitment_type> id_polys_commits;
                             std::vector<typename CommitmentSchemeType::commitment_type> perm_polys_commits;
+
+                            std::vector<std::size_t> columns_with_copy_constraints;
+
+                            std::size_t table_rows;
+                            std::size_t usable_rows;
+
+                            typename FieldType::value_type delta;
+                            plonk_permutation permutation;
                             //TODO: Gates and field elements
                         };
 

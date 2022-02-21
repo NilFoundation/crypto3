@@ -121,9 +121,16 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
     typename types_policy::constraint_system_type constraint_system;
     typename types_policy::variable_assignment_type assigments = circuit.table;
+
     types_policy::circuit_short_description<lpc_type> short_description;
-    typename types_policy::template preprocessed_data_type<k> preprocessed_data = 
-        redshift_preprocessor<FieldType, witness_columns, public_columns, k>::process(constraint_system, assigments);
+    short_description.columns_with_copy_constraints = {0, 1, 2};
+    short_description.table_rows = table_rows;
+    short_description.usable_rows = usable_rows;
+    short_description.delta = circuit.delta;
+    short_description.permutation = circuit.permutation;
+
+    typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data = 
+        redshift_preprocessor<FieldType, witness_columns, public_columns, k>::process(constraint_system, assigments, short_description);
 
     typename types_policy::template proof_type<lpc_type> proof = redshift_prover<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, public_columns, lambda, k, r, m>::process(
         preprocessed_data, constraint_system, assigments, short_description, fri_params);
@@ -145,20 +152,34 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
 
     constexpr std::size_t argument_size = 3;
 
+    using types_policy = zk::snark::detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
+
     constexpr static const std::size_t r = table_rows_log - 1;
     typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, lambda, k, r, m> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
     math::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial<FieldType>(circuit.domain, 0);
 
+    typename types_policy::constraint_system_type constraint_system;
+    typename types_policy::variable_assignment_type assigments = circuit.table;
+
+    types_policy::circuit_short_description<lpc_type> short_description;
+    short_description.columns_with_copy_constraints = {0, 1, 2, 3};
+    short_description.table_rows = table_rows;
+    short_description.usable_rows = usable_rows;
+    short_description.delta = circuit.delta;
+    short_description.permutation = circuit.permutation;
+
+    typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data = 
+        redshift_preprocessor<FieldType, witness_columns, public_columns, k>::process(constraint_system, assigments, short_description);
+
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     fiat_shamir_heuristic_updated<transcript_hash_type> prover_transcript(init_blob);
     fiat_shamir_heuristic_updated<transcript_hash_type> verifier_transcript(init_blob);
 
-    typename redshift_permutation_argument<FieldType, lpc_type>::prover_result_type prover_res =
-        redshift_permutation_argument<FieldType, lpc_type>::prove_eval(prover_transcript, table_rows,
-                                                                       permutation_size, circuit.domain, lagrange_0, circuit.S_id,
-                                                                       circuit.S_sigma, circuit.column_polynomials, circuit.q_last, circuit.q_blind, fri_params);
+    typename redshift_permutation_argument<FieldType, lpc_type, witness_columns, public_columns>::prover_result_type prover_res =
+        redshift_permutation_argument<FieldType, lpc_type, witness_columns, public_columns>::prove_eval(prover_transcript, preprocessed_data, short_description,
+                                                                       circuit.column_polynomials, fri_params);
 
     // Challenge phase
     typename FieldType::value_type y = algebra::random_element<FieldType>();
@@ -171,9 +192,9 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     typename FieldType::value_type v_p_at_y_shifted = prover_res.permutation_polynomial.evaluate(circuit.omega * y);
 
     std::array<typename FieldType::value_type, 3> verifier_res =
-        redshift_permutation_argument<FieldType, lpc_type>::verify_eval(
-            verifier_transcript, table_rows, permutation_size, circuit.domain, y, f_at_y, v_p_at_y, v_p_at_y_shifted,
-            lagrange_0, circuit.S_id, circuit.S_sigma, circuit.q_last, circuit.q_blind, prover_res.permutation_poly_commitment.root());
+        redshift_permutation_argument<FieldType, lpc_type, witness_columns, public_columns>::verify_eval(
+            verifier_transcript, preprocessed_data, short_description, y, f_at_y, v_p_at_y, v_p_at_y_shifted,
+            prover_res.permutation_poly_commitment.root());
 
     typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();
