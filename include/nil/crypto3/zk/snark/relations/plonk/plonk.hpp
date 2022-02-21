@@ -139,7 +139,7 @@ namespace nil {
                         //     }
                         // }
 
-                        return result;
+                        return wires;
                     }
 
                     void add_gate(const plonk_gate_unprocessed<FieldType> &g) {
