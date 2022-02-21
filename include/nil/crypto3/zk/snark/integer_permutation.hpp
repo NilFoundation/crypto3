@@ -28,6 +28,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <random>
 #include <vector>
 #include <unordered_set>
 #include <numeric>
@@ -136,7 +137,7 @@ namespace nil {
                     }
 
                     void random_shuffle() {
-                        return std::random_shuffle(contents.begin(), contents.end());
+                        return std::shuffle(contents.begin(), contents.end(), std::mt19937(std::random_device()()));
                     }
                 };
             }    // namespace snark

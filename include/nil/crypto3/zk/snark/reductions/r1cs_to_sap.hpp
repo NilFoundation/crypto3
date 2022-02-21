@@ -50,7 +50,7 @@
 #define CRYPTO3_ZK_R1CS_TO_SAP_BASIC_POLICY_HPP
 
 #include <nil/crypto3/math/coset.hpp>
-#include <nil/crypto3/math/evaluation_domain.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/sap.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>

@@ -39,8 +39,8 @@
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/pcd/r1cs_pcd/compliance_predicate/compliance_predicate.hpp>
-#include <nil/crypto3/zk/snark/schemes/pcd/r1cs_pcd/compliance_predicate/cp_handler.hpp>
+#include <nil/crypto3/zk/snark/systems/pcd/r1cs_pcd/compliance_predicate/compliance_predicate.hpp>
+#include <nil/crypto3/zk/snark/systems/pcd/r1cs_pcd/compliance_predicate/cp_handler.hpp>
 
 namespace nil {
     namespace crypto3 {
