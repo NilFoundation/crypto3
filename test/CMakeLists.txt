@@ -23,6 +23,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        crypto3::pubkey
                        crypto3::hash
                        crypto3::random
+                       crypto3::math
                        ${CMAKE_WORKSPACE_NAME}::crypto3_multiprecision
                        ${CMAKE_WORKSPACE_NAME}::crypto3_algebra
                        ${CMAKE_WORKSPACE_NAME}::core)
@@ -61,6 +62,7 @@ set(TESTS_NAMES
     "r1cs_gg_ppzksnark_proof"
     "r1cs_gg_ppzksnark_verification_key"
     "r1cs_gg_ppzksnark"
+    "fri_commitment"
     "lpc_commitment"
     "redshift_proof")
 
