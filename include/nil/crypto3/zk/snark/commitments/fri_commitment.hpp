@@ -56,7 +56,7 @@ namespace nil {
                  * Matter Labs,
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
-                template<typename FieldType, 
+                template<typename FieldType,
                          typename MerkleTreeHashType,
                          typename TranscriptHashType,
                          std::size_t M = 2>
@@ -64,6 +64,8 @@ namespace nil {
                     constexpr static const std::size_t m = M;
 
                     typedef FieldType field_type;
+                    typedef MerkleTreeHashType merkle_tree_hash_type;
+                    typedef TranscriptHashType transcript_hash_type;
 
                     typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
                     typedef typename containers::merkle_proof<MerkleTreeHashType, 2> merkle_proof_type;
@@ -74,6 +76,13 @@ namespace nil {
                                                                         FieldType>;
 
                     struct params_type {
+                        bool operator==(const params_type &rhs) const {
+                            return r == rhs.r && max_degree == rhs.max_degree && D == rhs.D && q == rhs.q;
+                        }
+                        bool operator!=(const params_type &rhs) const {
+                            return !(rhs == *this);
+                        }
+
                         std::size_t r;
                         std::size_t max_degree;
                         std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
