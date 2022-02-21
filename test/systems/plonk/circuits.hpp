@@ -66,7 +66,7 @@ namespace nil {
                         std::vector<math::polynomial<typename FieldType::value_type>> S_sigma;
 
                         std::array<std::vector<typename FieldType::value_type>, witness_columns + public_columns> table;
-                        std::array<math::polynomial<typename FieldType::value_type>, witness_columns + public_columns> column_polynomials;
+                        std::vector<math::polynomial<typename FieldType::value_type>> column_polynomials;
 
                         // construct q_last, q_blind
                         math::polynomial<typename FieldType::value_type> q_last;
@@ -118,6 +118,7 @@ namespace nil {
                     constexpr static const std::size_t usable = 1 << rows_log;
 
                     circuit_description<FieldType, rows_log, witness_columns, public_columns, permutation, usable> test_circuit;
+                    test_circuit.column_polynomials.resize(witness_columns + public_columns);
 
                     std::array<std::vector<typename FieldType::value_type>, table_columns> table;
 
@@ -212,6 +213,7 @@ namespace nil {
                     constexpr static const std::size_t usable = 1 << rows_log;
 
                     circuit_description<FieldType, rows_log, witness_columns, public_columns, permutation, usable> test_circuit;
+                    test_circuit.column_polynomials.resize(witness_columns + public_columns);
 
                     std::array<std::vector<typename FieldType::value_type>, table_columns> table;
 

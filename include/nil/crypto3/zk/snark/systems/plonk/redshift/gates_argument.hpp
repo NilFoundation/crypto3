@@ -54,10 +54,9 @@ namespace nil {
                 struct redshift_gates_argument<FieldType, TranscriptHashType, 1> {
                     constexpr static const std::size_t argument_size = 1;
 
-                    template <std::size_t table_width>
-                        static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
+                    static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
                         prove_eval(const std::vector<plonk_gate<FieldType>> &gates,
-                                    const std::array<math::polynomial<typename FieldType::value_type>, table_width> &columns,
+                                    const std::vector<math::polynomial<typename FieldType::value_type>> &columns,
                                    fiat_shamir_heuristic_updated<TranscriptHashType> &transcript) {
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
@@ -83,8 +82,7 @@ namespace nil {
                         return F;
                     }
 
-                    template <std::size_t table_width>
-                        static inline std::array<typename FieldType::value_type, argument_size> 
+                    static inline std::array<typename FieldType::value_type, argument_size> 
                         verify_eval(const std::vector<plonk_gate<FieldType>> &gates,
                             typename plonk_constraint<FieldType>::evaluation_map &evaluations,
                             typename FieldType::value_type challenge,

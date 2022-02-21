@@ -216,9 +216,8 @@ namespace nil {
                         return acc;
                     }
 
-                    template<std::size_t WiresAmount>
                     math::polynomial<field_value_type> evaluate(
-                        const std::array<math::polynomial<field_value_type>, WiresAmount> &assignment) const {
+                        const std::vector<math::polynomial<field_value_type>> &assignment) const {
                         math::polynomial<field_value_type> acc = {0};
                         for (const non_linear_term<FieldType, RotationSupport> &nlt : this->terms) {
                             math::polynomial<field_value_type> term_value = {nlt.coeff};

@@ -68,7 +68,7 @@ namespace nil {
                          * about the structure for statistics purposes.
                          */
                         template<typename CommitmentSchemeType>
-                        using proof_type = redshift_proof<CommitmentSchemeType>;
+                        using proof_type = redshift_proof<FieldType, CommitmentSchemeType>;
 
                         template<std::size_t witness_columns>
                         struct preprocessed_data_type {

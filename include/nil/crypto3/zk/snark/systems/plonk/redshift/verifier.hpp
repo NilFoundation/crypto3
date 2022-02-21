@@ -75,7 +75,9 @@ namespace nil {
                         }
 
                         /*std::array<typename FieldType::value_type, permutation_parts> permutation_argument = 
-                            redshift_permutation_argument<FieldType>::verify_eval(transcript);
+                            redshift_permutation_argument<FieldType, lpc_type, witness_columns, public_columns>::verify_eval(
+                                verifier_transcript, preprocessed_data, short_description, y, proof.witness_evaluation, v_p_at_y, v_p_at_y_shifted,
+                                proof.v_perm_commitment);
 
                         std::array<typename FieldType::value_type, f_parts> alphas =
                                 transcript.template challenges<FieldType, f_parts>();

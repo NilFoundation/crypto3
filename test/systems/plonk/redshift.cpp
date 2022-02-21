@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     fiat_shamir_heuristic_updated<transcript_hash_type> verifier_transcript(init_blob);
 
     std::array<math::polynomial<typename FieldType::value_type>, 1> prover_res =
-        redshift_gates_argument<FieldType, transcript_hash_type>::prove_eval<table_columns>(circuit.gates, circuit.column_polynomials, prover_transcript);
+        redshift_gates_argument<FieldType, transcript_hash_type>::prove_eval(circuit.gates, circuit.column_polynomials, prover_transcript);
 
     // Challenge phase
     typename FieldType::value_type y = algebra::random_element<FieldType>();
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     }
 
     std::array<typename FieldType::value_type, 1> verifier_res =
-        redshift_gates_argument<FieldType, transcript_hash_type>::verify_eval<table_columns>(circuit.gates, columns_at_y, y, verifier_transcript);
+        redshift_gates_argument<FieldType, transcript_hash_type>::verify_eval(circuit.gates, columns_at_y, y, verifier_transcript);
 
     typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();

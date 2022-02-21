@@ -31,17 +31,22 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename CommitmentSchemeType>
+                template<typename FieldType, typename CommitmentSchemeType>
                 struct redshift_proof {
                     typedef CommitmentSchemeType commitment_scheme_type;
+
+                    struct evaluation_proof {
+                        typedef CommitmentSchemeType commitment_scheme_type;
+
+                        typename commitment_scheme_type::proof_type witness_proof;
+                    };
 
                     redshift_proof() {
                     }
 
                     std::vector<typename CommitmentSchemeType::commitment_type> witness_commitments;
 
-                    typename CommitmentSchemeType::commitment_type P_commitment;
-                    typename CommitmentSchemeType::commitment_type Q_commitment;
+                    typename CommitmentSchemeType::commitment_type v_perm_commitment;
 
                     std::vector<typename CommitmentSchemeType::commitment_type> T_commitments;
 
@@ -52,11 +57,16 @@ namespace nil {
 
                     std::vector<typename CommitmentSchemeType::proof_type> T_lpc_proofs;
 
+                    //std::vector<typename FieldType::value_type> witness_evaluation;
+
+                    evaluation_proof eval_proof;
+
                     bool operator==(const redshift_proof &rhs) const {
-                        return witness_commitments == rhs.witness_commitments && P_commitment == rhs.P_commitment &&
-                               Q_commitment == rhs.Q_commitment && T_commitments == rhs.T_commitments &&
+                        return witness_commitments == rhs.witness_commitments && T_commitments == rhs.T_commitments &&
                                f_lpc_proofs == rhs.f_lpc_proofs && P_lpc_proof == rhs.P_lpc_proof &&
-                               Q_lpc_proof == rhs.Q_lpc_proof && T_lpc_proofs == rhs.T_lpc_proofs;
+                               Q_lpc_proof == rhs.Q_lpc_proof && T_lpc_proofs == rhs.T_lpc_proofs &&
+                               v_perm_commitment == rhs.v_perm_commitment &&
+                               eval_proof = rhs.eval_proof;
                     }
                     bool operator!=(const redshift_proof &rhs) const {
                         return !(rhs == *this);

@@ -62,12 +62,11 @@ namespace nil {
                         typename CommitmentSchemeType::merkle_tree_type permutation_poly_commitment;
                     };
 
-                    template<std::size_t table_width>
                     static inline prover_result_type
                         prove_eval(fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
                                    const typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data,
                                    const typename types_policy::template circuit_short_description<CommitmentSchemeType> &short_description,
-                                   const std::array<math::polynomial<typename FieldType::value_type>, table_width> &columns,
+                                   const std::vector<math::polynomial<typename FieldType::value_type>> &columns,
                                    typename fri_type::params_type fri_params) {
 
                         const std::vector<math::polynomial<typename FieldType::value_type>> &S_sigma = preprocessed_data.permutation_polynomials;
