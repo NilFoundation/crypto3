@@ -59,7 +59,7 @@ namespace nil {
 
                 /************************* PLONK constraint system ****************************/
 
-                template<typename FieldType, std::size_t WiresAmount>
+                template<typename FieldType, std::size_t WitnessAmount, std::size_t PublicAmount>
                 struct plonk_constraint_system {
 
                     std::vector<plonk_constraint<FieldType>> constraints;
@@ -67,8 +67,12 @@ namespace nil {
                     plonk_constraint_system() {
                     }
 
-                    constexpr std::size_t num_wires() const {
-                        return WiresAmount;
+                    constexpr std::size_t num_witness() const {
+                        return WitnessAmount;
+                    }
+
+                    constexpr std::size_t num_public() const {
+                        return PublicAmount;
                     }
 
                     std::size_t num_constraints() const {
@@ -76,7 +80,7 @@ namespace nil {
                     }
 
                     bool
-                        is_satisfied(plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment) const {
+                        is_satisfied(plonk_variable_assignment<FieldType, WitnessAmount> full_variable_assignment) const {
 
                         for (std::size_t c = 0; c < constraints.size(); ++c) {
                             if (!constraints[c].a.evaluate(full_variable_assignment).is_zero()) {
@@ -100,12 +104,12 @@ namespace nil {
                     }
 
                     std::vector<math::polynomial<typename FieldType::value_type>>
-                        polynomials(plonk_variable_assignment<FieldType, WiresAmount> full_variable_assignment) const {
+                        polynomials(plonk_variable_assignment<FieldType, WitnessAmount> full_variable_assignment) const {
 
                         std::vector<math::polynomial<typename FieldType::value_type>> result(constraints.size());
 
-                        std::array<math::polynomial<typename FieldType::value_type>, WiresAmount> wire_polynomials;
-                        for (std::size_t wire_index = 0; wire_index < WiresAmount; wire_index++) {
+                        std::array<math::polynomial<typename FieldType::value_type>, WitnessAmount> wire_polynomials;
+                        for (std::size_t wire_index = 0; wire_index < WitnessAmount; wire_index++) {
                             const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
                                 math::make_evaluation_domain<FieldType>(full_variable_assignment[wire_index].size());
 

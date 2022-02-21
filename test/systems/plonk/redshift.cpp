@@ -106,13 +106,14 @@ typedef fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type,
 BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
     const std::size_t table_rows_log = 4;
     const std::size_t table_rows = 1 << table_rows_log;
-    const std::size_t table_columns = 3;
+    const std::size_t witness_columns = 3;
+    const std::size_t public_columns = 0;
+    const std::size_t table_columns = witness_columns + public_columns;
     const std::size_t permutation_size = 3;
     const std::size_t usable_rows = 1 << table_rows_log;
-    const std::size_t witness_columns = table_columns;
-    circuit_description<FieldType, table_rows_log, table_columns, permutation_size, usable_rows> circuit = circuit_test_1<FieldType>();
+    circuit_description<FieldType, table_rows_log, witness_columns, public_columns, permutation_size, usable_rows> circuit = circuit_test_1<FieldType>();
 
-    using types_policy = zk::snark::detail::redshift_types_policy<FieldType, witness_columns>;
+    using types_policy = zk::snark::detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
 
     constexpr static const std::size_t r = table_rows_log - 1;
     typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, lambda, k, r, m> lpc_type;
@@ -120,13 +121,14 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
     typename types_policy::constraint_system_type constraint_system;
     typename types_policy::variable_assignment_type assigments;
+    types_policy::circuit_short_description<lpc_type> short_description;
     typename types_policy::template preprocessed_data_type<k> preprocessed_data = 
-        redshift_preprocessor<FieldType, table_columns, k>::process(constraint_system, assigments);
+        redshift_preprocessor<FieldType, witness_columns, public_columns, k>::process(constraint_system, assigments);
 
-    typename types_policy::template proof_type<lpc_type> proof = redshift_prover<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, lambda, k, r, m>::process(
-        preprocessed_data, constraint_system, assigments);
+    typename types_policy::template proof_type<lpc_type> proof = redshift_prover<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, public_columns, lambda, k, r, m>::process(
+        preprocessed_data, constraint_system, assigments, short_description);
 
-    bool verifier_res = redshift_verifier<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, lambda, k, r, m>::process(
+    bool verifier_res = redshift_verifier<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, public_columns, lambda, k, r, m>::process(
         proof);
     BOOST_CHECK(verifier_res);
 }
@@ -134,10 +136,12 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     const std::size_t table_rows_log = 4;
     const std::size_t table_rows = 1 << table_rows_log;
-    const std::size_t table_columns = 4;
+    const std::size_t witness_columns = 3;
+    const std::size_t public_columns = 1;
+    const std::size_t table_columns = witness_columns + public_columns;
     const std::size_t permutation_size = 4;
     const std::size_t usable_rows = 1 << table_rows_log;
-    circuit_description<FieldType, table_rows_log, table_columns, permutation_size, usable_rows> circuit = circuit_test_2<FieldType>();
+    circuit_description<FieldType, table_rows_log, witness_columns, public_columns, permutation_size, usable_rows> circuit = circuit_test_2<FieldType>();
 
     constexpr std::size_t argument_size = 3;
 
@@ -191,10 +195,12 @@ BOOST_AUTO_TEST_CASE(redshift_lookup_argument_test) {
 BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     const std::size_t table_rows_log = 4;
     const std::size_t table_rows = 1 << table_rows_log;
-    const std::size_t table_columns = 4;
+    const std::size_t witness_columns = 3;
+    const std::size_t public_columns = 1;
+    const std::size_t table_columns = witness_columns + public_columns;
     const std::size_t permutation_size = 4;
     const std::size_t usable_rows = 1 << table_rows_log;
-    circuit_description<FieldType, table_rows_log, table_columns, permutation_size, usable_rows> circuit = circuit_test_2<FieldType>();
+    circuit_description<FieldType, table_rows_log, witness_columns, public_columns, permutation_size, usable_rows> circuit = circuit_test_2<FieldType>();
 
     constexpr static const std::size_t r = table_rows_log - 1;
     typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, lambda, k, r, m> lpc_type;

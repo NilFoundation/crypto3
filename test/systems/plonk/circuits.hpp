@@ -46,7 +46,8 @@ namespace nil {
             namespace snark {
                     template <typename FieldType, 
                         std::size_t rows_log, 
-                        std::size_t table_columns,
+                        std::size_t witness_columns,
+                        std::size_t public_columns,
                         std::size_t permutation_size,
                         std::size_t usable_rows>
                         class circuit_description
@@ -65,7 +66,7 @@ namespace nil {
                         std::vector<math::polynomial<typename FieldType::value_type>> S_sigma;
 
                         std::vector<std::vector<typename FieldType::value_type>> table;
-                        std::array<math::polynomial<typename FieldType::value_type>, table_columns> column_polynomials;
+                        std::array<math::polynomial<typename FieldType::value_type>, witness_columns + public_columns> column_polynomials;
 
                         // construct q_last, q_blind
                         math::polynomial<typename FieldType::value_type> q_last;
@@ -79,18 +80,18 @@ namespace nil {
                             omega = domain->get_domain_element(1);
                             delta = algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
 
-                            permutation = plonk_permutation(table_columns, table_rows);
+                            permutation = plonk_permutation(witness_columns + public_columns, table_rows);
                         }
 
                         void init() {
-                            S_id = redshift_preprocessor<FieldType, table_columns, 1>::identity_polynomials(
+                            S_id = redshift_preprocessor<FieldType, witness_columns, public_columns, 1>::identity_polynomials(
                             permutation_size, table_rows, omega, delta, domain);
-                            S_sigma = redshift_preprocessor<FieldType, table_columns, 1>::permutation_polynomials(
+                            S_sigma = redshift_preprocessor<FieldType, witness_columns, public_columns, 1>::permutation_polynomials(
                             permutation_size, table_rows, omega, delta, permutation, domain);
 
-                            q_last = redshift_preprocessor<FieldType, table_columns, 1>::selector_last(
+                            q_last = redshift_preprocessor<FieldType, witness_columns, public_columns, 1>::selector_last(
                             table_rows, usable_rows, domain);
-                            q_blind = redshift_preprocessor<FieldType, table_columns, 1>::selector_blind(
+                            q_blind = redshift_preprocessor<FieldType, witness_columns, public_columns, 1>::selector_blind(
                             table_rows, usable_rows, domain);
                         }
                     };
@@ -108,13 +109,15 @@ namespace nil {
                 // MUL: x * y = z
                 //---------------------------------------------------------------------------//
                 template<typename FieldType>
-                 circuit_description<FieldType, 4, 3, 3, 16> circuit_test_1() {
+                 circuit_description<FieldType, 4, 3, 0, 3, 16> circuit_test_1() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t table_columns = 3;
+                    constexpr static const std::size_t witness_columns = 3;
+                    constexpr static const std::size_t public_columns = 0;
                     constexpr static const std::size_t permutation = 3;
                     constexpr static const std::size_t usable = 1 << rows_log;
 
-                    circuit_description<FieldType, rows_log, table_columns, permutation, usable> test_circuit;
+                    circuit_description<FieldType, rows_log, witness_columns, public_columns, permutation, usable> test_circuit;
 
                     std::vector<std::vector<typename FieldType::value_type>> table(table_columns);
 
@@ -200,13 +203,15 @@ namespace nil {
                 // MUL: x * y = z, copy(p1, y)
                 //---------------------------------------------------------------------------//
                 template<typename FieldType>
-                 circuit_description<FieldType, 4, 4, 4, 16> circuit_test_2() {
+                 circuit_description<FieldType, 4, 3, 1, 4, 16> circuit_test_2() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t table_columns = 4;
+                    constexpr static const std::size_t witness_columns = 3;
+                    constexpr static const std::size_t public_columns = 1;
                     constexpr static const std::size_t permutation = 4;
                     constexpr static const std::size_t usable = 1 << rows_log;
 
-                    circuit_description<FieldType, rows_log, table_columns, permutation, usable> test_circuit;
+                    circuit_description<FieldType, rows_log, witness_columns, public_columns, permutation, usable> test_circuit;
 
                     std::vector<std::vector<typename FieldType::value_type>> table(table_columns);
 

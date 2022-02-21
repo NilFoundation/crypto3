@@ -44,7 +44,7 @@ namespace nil {
             namespace snark {
                 namespace detail {
 
-                    template<typename FieldType, std::size_t WiresAmount>
+                    template<typename FieldType, std::size_t WitnessAmount, std::size_t PublicAmount>
                     struct redshift_types_policy {
 
                         /******************************** Params ********************************/
@@ -53,9 +53,9 @@ namespace nil {
                          * Below are various template aliases (used for convenience).
                          */
 
-                        typedef plonk_constraint_system<FieldType, WiresAmount> constraint_system_type;
+                        typedef plonk_constraint_system<FieldType, WitnessAmount, PublicAmount> constraint_system_type;
 
-                        typedef plonk_variable_assignment<FieldType, WiresAmount> variable_assignment_type;
+                        typedef plonk_variable_assignment<FieldType, WitnessAmount> variable_assignment_type;
 
                         /*********************************** Proof ***********************************/
 
@@ -86,6 +86,14 @@ namespace nil {
                             std::vector<math::polynomial<typename FieldType::value_type>> Lagrange_basis;
 
                             math::polynomial<typename FieldType::value_type> Z;
+                        };
+
+                        template <typename CommitmentSchemeType>
+                        struct circuit_short_description {
+                            std::vector<typename CommitmentSchemeType::commitment_type> selectors_commits;
+                            std::vector<typename CommitmentSchemeType::commitment_type> id_polys_commits;
+                            std::vector<typename CommitmentSchemeType::commitment_type> perm_polys_commits;
+                            //TODO: Gates and field elements
                         };
 
                         template<std::size_t AlphasAmount>

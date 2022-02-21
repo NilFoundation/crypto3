@@ -46,13 +46,14 @@ namespace nil {
                          typename MerkleTreeHashType,
                          typename TranscriptHashType,
                          std::size_t witness_columns,
+                         std::size_t public_columns,
                          std::size_t lambda,
                          std::size_t k,
                          std::size_t r,
                          std::size_t m = 2>
                 class redshift_prover {
 
-                    using types_policy = detail::redshift_types_policy<FieldType, witness_columns>;
+                    using types_policy = detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
 
                     typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
 
@@ -110,17 +111,20 @@ namespace nil {
                     static inline typename types_policy::template proof_type<lpc>
                         process(const typename types_policy::template preprocessed_data_type<k> preprocessed_data,
                                 const typename types_policy::constraint_system_type &constraint_system,
-                                const typename types_policy::variable_assignment_type &assignments) {
+                                const typename types_policy::variable_assignment_type &assignments,
+                                const typename types_policy::circuit_short_description<lpc> &short_description) {
                         
-                        /*// 1. Add circuit definition to transctipt
-                        transcript(...);
+                        fiat_shamir_heuristic_updated<TranscriptHashType> transcript(std::vector<std::uint8_t>());
+
+                        // 1. Add circuit definition to transctipt
+                        //transcript(short_description); //TODO: circuit_short_description marshalling
 
                         // 2. Commit witness columns
-                        std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_poly = ;
+                        /*std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_poly = ;
                         auto witness_commitments = lpc::commit<witness_columns>(witness_poly, fri_params.D[0]);
-                        transcript(witness_commitments);
+                        transcript(witness_commitments);*/
 
-                        // 3. Prepare columns included into permuation argument
+                        /*// 3. Prepare columns included into permuation argument
                         std::vector<math::polynomial<typename FieldType::value_type>> f(N_perm + N_PI);
                         std::copy(w.begin(), w.end(), f.begin());
 

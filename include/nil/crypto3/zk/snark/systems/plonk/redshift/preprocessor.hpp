@@ -41,9 +41,9 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, std::size_t WiresAmount, std::size_t k>
+                template<typename FieldType, std::size_t WitnessColumns, std::size_t PublicColumns, std::size_t k>
                 class redshift_preprocessor {
-                    using types_policy = detail::redshift_types_policy<FieldType, WiresAmount>;
+                    using types_policy = detail::redshift_types_policy<FieldType, WitnessColumns, PublicColumns>;
 
                 public:
                     static inline std::vector<math::polynomial<typename FieldType::value_type>>

@@ -42,13 +42,14 @@ namespace nil {
                          typename MerkleTreeHashType,
                          typename TranscriptHashType,
                          std::size_t witness_columns,
+                         std::size_t public_columns,
                          std::size_t lambda,
                          std::size_t k,
                          std::size_t r,
                          std::size_t m = 2>
                 class redshift_verifier {
 
-                    using types_policy = detail::redshift_types_policy<FieldType, witness_columns>;
+                    using types_policy = detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
 
                     typedef list_polynomial_commitment_scheme<
                             FieldType, MerkleTreeHashType, TranscriptHashType, lambda, k, r, m>
