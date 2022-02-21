@@ -89,13 +89,13 @@ namespace nil {
              * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on page
              * 12 and 14.
              */
-            template<typename FieldType>
-            void
-                monomial_to_newton_basis(std::vector<typename FieldType::value_type> &a,
+            template<typename FieldType, typename Range>
+            void monomial_to_newton_basis(Range &a,
                                          const std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T,
                                          size_t n) {
 
                 typedef typename FieldType::value_type value_type;
+                static_assert(std::is_same<typename Range::value_type, value_type>::value);
 
                 std::size_t m = log2(n);
                 // if (T.size() != m + 1u)
@@ -149,13 +149,14 @@ namespace nil {
              * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on
              * page 11.
              */
-            template<typename FieldType>
+            template<typename FieldType, typename Range>
             void
-                newton_to_monomial_basis(std::vector<typename FieldType::value_type> &a,
+                newton_to_monomial_basis(Range &a,
                                          const std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T,
                                          size_t n) {
 
                 typedef typename FieldType::value_type value_type;
+                static_assert(std::is_same<typename Range::value_type, value_type>::value);
 
                 std::size_t m = log2(n);
                 // if (T.size() != m + 1u)
