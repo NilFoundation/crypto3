@@ -38,7 +38,7 @@ namespace nil {
                     redshift_proof() {
                     }
 
-                    std::vector<typename CommitmentSchemeType::commitment_type> f_commitments;
+                    std::vector<typename CommitmentSchemeType::commitment_type> witness_commitments;
 
                     typename CommitmentSchemeType::commitment_type P_commitment;
                     typename CommitmentSchemeType::commitment_type Q_commitment;
@@ -53,7 +53,7 @@ namespace nil {
                     std::vector<typename CommitmentSchemeType::proof_type> T_lpc_proofs;
 
                     bool operator==(const redshift_proof &rhs) const {
-                        return f_commitments == rhs.f_commitments && P_commitment == rhs.P_commitment &&
+                        return witness_commitments == rhs.witness_commitments && P_commitment == rhs.P_commitment &&
                                Q_commitment == rhs.Q_commitment && T_commitments == rhs.T_commitments &&
                                f_lpc_proofs == rhs.f_lpc_proofs && P_lpc_proof == rhs.P_lpc_proof &&
                                Q_lpc_proof == rhs.Q_lpc_proof && T_lpc_proofs == rhs.T_lpc_proofs;

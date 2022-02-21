@@ -65,7 +65,7 @@ namespace nil {
                         std::vector<math::polynomial<typename FieldType::value_type>> S_id;
                         std::vector<math::polynomial<typename FieldType::value_type>> S_sigma;
 
-                        std::vector<std::vector<typename FieldType::value_type>> table;
+                        std::array<std::vector<typename FieldType::value_type>, witness_columns + public_columns> table;
                         std::array<math::polynomial<typename FieldType::value_type>, witness_columns + public_columns> column_polynomials;
 
                         // construct q_last, q_blind
@@ -119,7 +119,7 @@ namespace nil {
 
                     circuit_description<FieldType, rows_log, witness_columns, public_columns, permutation, usable> test_circuit;
 
-                    std::vector<std::vector<typename FieldType::value_type>> table(table_columns);
+                    std::array<std::vector<typename FieldType::value_type>, table_columns> table;
 
                     std::vector<typename FieldType::value_type> q_add(test_circuit.table_rows);
                     std::vector<typename FieldType::value_type> q_mul(test_circuit.table_rows);
@@ -213,7 +213,7 @@ namespace nil {
 
                     circuit_description<FieldType, rows_log, witness_columns, public_columns, permutation, usable> test_circuit;
 
-                    std::vector<std::vector<typename FieldType::value_type>> table(table_columns);
+                    std::array<std::vector<typename FieldType::value_type>, table_columns> table;
 
                     std::vector<typename FieldType::value_type> q_add(test_circuit.table_rows);
                     std::vector<typename FieldType::value_type> q_mul(test_circuit.table_rows);

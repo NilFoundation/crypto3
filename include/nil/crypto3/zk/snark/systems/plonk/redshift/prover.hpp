@@ -112,17 +112,32 @@ namespace nil {
                         process(const typename types_policy::template preprocessed_data_type<k> preprocessed_data,
                                 const typename types_policy::constraint_system_type &constraint_system,
                                 const typename types_policy::variable_assignment_type &assignments,
-                                const typename types_policy::circuit_short_description<lpc> &short_description) {
+                                const typename types_policy::circuit_short_description<lpc> &short_description,
+                                const typename lpc::fri_type::params_type &fri_params) {
                         
+                        typename types_policy::template proof_type<lpc> proof;
                         fiat_shamir_heuristic_updated<TranscriptHashType> transcript(std::vector<std::uint8_t>());
 
                         // 1. Add circuit definition to transctipt
                         //transcript(short_description); //TODO: circuit_short_description marshalling
 
                         // 2. Commit witness columns
-                        /*std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_poly = ;
-                        auto witness_commitments = lpc::commit<witness_columns>(witness_poly, fri_params.D[0]);
-                        transcript(witness_commitments);*/
+                        std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_poly;
+                        for (std::size_t i = 0; i < witness_columns; i++) {
+                            std::vector<typename FieldType::value_type> tmp;
+                            std::copy(assignments[i].begin(), assignments[i].end(), std::back_inserter(tmp));
+                            preprocessed_data.basic_domain->inverse_fft(tmp);
+                            witness_poly[i] = tmp;
+                        }
+                        std::array<typename lpc::merkle_tree_type, witness_columns> witness_commitments =
+                            lpc::template commit<witness_columns>(witness_poly, fri_params.D[0]);
+
+                        proof.witness_commitments.resize(witness_columns);
+                        for (std::size_t i = 0; i < witness_columns; i++) {
+                            proof.witness_commitments[i] = witness_commitments[i].root();
+                            transcript(proof.witness_commitments[i]);
+                        }
+                        //transcript(witness_commitments); //TODO: marshalling
 
                         /*// 3. Prepare columns included into permuation argument
                         std::vector<math::polynomial<typename FieldType::value_type>> f(N_perm + N_PI);
@@ -178,7 +193,6 @@ namespace nil {
                         //     T_lpc_proofs.push_back(lpc::proof_eval(fT_evaluation_points, T_trees[i], T[i], D_0));
                         // }*/
 
-                        typename types_policy::template proof_type<lpc> proof;
                             // = typename types_policy::proof_type(std::move(f_commitments), std::move(T_commitments),
                             //                               std::move(f_lpc_proofs), std::move(T_lpc_proofs));
                         // proof.T_lpc_proofs = T_lpc_proofs;

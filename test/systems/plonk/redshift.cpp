@@ -120,16 +120,16 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
     typename types_policy::constraint_system_type constraint_system;
-    typename types_policy::variable_assignment_type assigments;
+    typename types_policy::variable_assignment_type assigments = circuit.table;
     types_policy::circuit_short_description<lpc_type> short_description;
     typename types_policy::template preprocessed_data_type<k> preprocessed_data = 
         redshift_preprocessor<FieldType, witness_columns, public_columns, k>::process(constraint_system, assigments);
 
     typename types_policy::template proof_type<lpc_type> proof = redshift_prover<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, public_columns, lambda, k, r, m>::process(
-        preprocessed_data, constraint_system, assigments, short_description);
+        preprocessed_data, constraint_system, assigments, short_description, fri_params);
 
     bool verifier_res = redshift_verifier<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, public_columns, lambda, k, r, m>::process(
-        proof);
+        proof, short_description);
     BOOST_CHECK(verifier_res);
 }
 

@@ -55,7 +55,7 @@ namespace nil {
 
                         typedef plonk_constraint_system<FieldType, WitnessAmount, PublicAmount> constraint_system_type;
 
-                        typedef plonk_variable_assignment<FieldType, WitnessAmount> variable_assignment_type;
+                        typedef plonk_variable_assignment<FieldType, WitnessAmount + PublicAmount> variable_assignment_type;
 
                         /*********************************** Proof ***********************************/
 
