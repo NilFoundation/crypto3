@@ -122,6 +122,14 @@ namespace nil {
                         P[i] *= Z_inverse_at_coset;
                     }
                 }
+
+                bool operator==(const basic_radix2_domain &rhs) const {
+                    return isEqual(rhs) && omega == rhs.omega;
+                }
+
+                bool operator!=(const basic_radix2_domain &rhs) const {
+                    return !(*this == rhs);
+                }
             };
         }    // namespace math
     }        // namespace crypto3
