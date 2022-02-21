@@ -104,7 +104,7 @@ namespace nil {
                  */
                 virtual void divide_by_z_on_coset(std::vector<value_type> &P) = 0;
 
-                bool isEqual(const evaluation_domain &rhs) const {
+                bool operator==(const evaluation_domain &rhs) const {
                     return root == rhs.root && root_inverse == rhs.root_inverse && domain == rhs.domain &&
                            domain_inverse == rhs.domain_inverse && generator == rhs.generator &&
                            generator_inverse == rhs.generator_inverse && m == rhs.m && log2_size == rhs.log2_size &&
