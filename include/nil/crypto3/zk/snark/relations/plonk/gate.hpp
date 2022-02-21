@@ -43,6 +43,34 @@ namespace nil {
                 /************************* PLONK gate ***********************************/
 
                 template <typename FieldType>
+                struct plonk_gate_unprocessed{
+                    std::vector<typename FieldType::value_type> selector;
+                    std::vector<plonk_constraint<FieldType>> constraints;
+
+                    plonk_gate_unprocessed(std::size_t row_index, const snark::plonk_constraint<FieldType> &constraint):
+                        constraints(std::vector<plonk_constraint<FieldType>> ({constraint})),
+                        selector(std::vector<typename FieldType::value_type> ({row_index})){
+                    }
+
+                    plonk_gate_unprocessed(std::size_t row_index,
+                                  const std::initializer_list<snark::plonk_constraint<FieldType>> &constraints): 
+                        constraints(constraints),
+                        selector(std::vector<typename FieldType::value_type> ({row_index})){
+                    }
+
+                    plonk_gate_unprocessed(std::initializer_list<std::size_t> row_indices,
+                                  const snark::plonk_constraint<FieldType> &constraint):
+                        constraints(std::vector<plonk_constraint<FieldType>> ({constraint})),
+                        selector(row_indices) {
+                    }
+
+                    plonk_gate_unprocessed(std::initializer_list<std::size_t> row_indices,
+                                  const std::initializer_list<snark::plonk_constraint<FieldType>> &constraints):
+                        constraints(constraints), selector(row_indices) {
+                    }
+                };
+
+                template <typename FieldType>
                 struct plonk_gate{
                     math::polynomial<typename FieldType::value_type> selector;
                     std::vector<plonk_constraint<FieldType>> constraints;
@@ -50,33 +78,6 @@ namespace nil {
                     plonk_gate(math::polynomial<typename FieldType::value_type> &selector,
                                   const std::vector<plonk_constraint<FieldType>> &constraints): 
                         constraints(constraints), selector(selector) {
-                    }
-
-                    plonk_gate(std::size_t row_index, const snark::plonk_constraint<FieldType> &constraint):
-                        constraints(std::vector<plonk_constraint<FieldType>> ({constraint})){
-
-                        selector = math::polynomial<typename FieldType::value_type>();
-                    }
-
-                    plonk_gate(std::size_t row_index,
-                                  const std::initializer_list<snark::plonk_constraint<FieldType>> &constraints): 
-                        constraints(constraints){
-
-                        selector = math::polynomial<typename FieldType::value_type>();
-                    }
-
-                    plonk_gate(std::initializer_list<std::size_t> row_indices,
-                                  const snark::plonk_constraint<FieldType> &constraint):
-                        constraints(std::vector<plonk_constraint<FieldType>> ({constraint})), selector() {
-
-                        selector = math::polynomial<typename FieldType::value_type>();
-                    }
-
-                    plonk_gate(std::initializer_list<std::size_t> row_indices,
-                                  const std::initializer_list<snark::plonk_constraint<FieldType>> &constraints):
-                        constraints(constraints), selector() {
-
-                        selector = math::polynomial<typename FieldType::value_type>();
                     }
                 };
 

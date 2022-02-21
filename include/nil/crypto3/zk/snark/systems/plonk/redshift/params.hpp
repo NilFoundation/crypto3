@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -33,7 +33,16 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark { }    // namespace snark
+            namespace snark {
+
+                struct redshift_params {
+                    constexpr static const std::size_t lambda = 0;
+                    constexpr static const std::size_t k = 0;
+                    constexpr static const std::size_t r = 0;
+                    constexpr static const std::size_t m = 2;
+                };
+
+            }    // namespace snark
         }                          // namespace zk
     }                              // namespace crypto3
 }    // namespace nil
