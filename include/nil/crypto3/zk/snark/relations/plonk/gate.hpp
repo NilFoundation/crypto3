@@ -35,12 +35,51 @@ namespace nil {
         namespace zk {
             namespace snark {
 
+                /************************* PLONK constraint ***********************************/
+
+                template<typename FieldType>
+                using plonk_constraint = non_linear_combination<FieldType, true>;
+
+                /************************* PLONK gate ***********************************/
+
                 template <typename FieldType>
                 struct plonk_gate{
-                    std::vector<plonk_constraint<FieldType>> constraints;
                     math::polynomial<typename FieldType::value_type> selector;
+                    std::vector<plonk_constraint<FieldType>> constraints;
+
+                    plonk_gate(math::polynomial<typename FieldType::value_type> &selector,
+                                  const std::vector<plonk_constraint<FieldType>> &constraints): 
+                        constraints(constraints), selector(selector) {
+                    }
+
+                    plonk_gate(std::size_t row_index, const snark::plonk_constraint<FieldType> &constraint):
+                        constraints(std::vector<plonk_constraint<FieldType>> ({constraint})){
+
+                        selector = math::polynomial<typename FieldType::value_type>();
+                    }
+
+                    plonk_gate(std::size_t row_index,
+                                  const std::initializer_list<snark::plonk_constraint<FieldType>> &constraints): 
+                        constraints(constraints){
+
+                        selector = math::polynomial<typename FieldType::value_type>();
+                    }
+
+                    plonk_gate(std::initializer_list<std::size_t> row_indices,
+                                  const snark::plonk_constraint<FieldType> &constraint):
+                        constraints(std::vector<plonk_constraint<FieldType>> ({constraint})), selector() {
+
+                        selector = math::polynomial<typename FieldType::value_type>();
+                    }
+
+                    plonk_gate(std::initializer_list<std::size_t> row_indices,
+                                  const std::initializer_list<snark::plonk_constraint<FieldType>> &constraints):
+                        constraints(constraints), selector() {
+
+                        selector = math::polynomial<typename FieldType::value_type>();
+                    }
                 };
-                
+
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

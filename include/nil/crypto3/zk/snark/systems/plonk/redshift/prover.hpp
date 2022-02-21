@@ -112,7 +112,7 @@ namespace nil {
                         process(const typename types_policy::template preprocessed_data_type<k> preprocessed_data,
                                 const typename types_policy::constraint_system_type &constraint_system,
                                 const typename types_policy::variable_assignment_type &assignments,
-                                const typename types_policy::circuit_short_description<lpc> &short_description) {
+                                const typename types_policy::template circuit_short_description<lpc> &short_description) {
                         
                         fiat_shamir_heuristic_updated<TranscriptHashType> transcript(std::vector<std::uint8_t>());
 
