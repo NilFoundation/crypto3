@@ -39,7 +39,8 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
 #include <nil/crypto3/hash/h2c.hpp>
-#include <nil/crypto3/hash/algorithm/to_curve.hpp>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+#include <nil/crypto3/hash/type_traits.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::multiprecision;
@@ -103,12 +104,22 @@ namespace boost {
     }        // namespace test_tools
 }    // namespace boost
 
-template<typename Group>
-void check_hash_to_curve(const std::string &msg_str, const typename Group::value_type &expected) {
-    using hash_type = hashes::h2c<Group>;
+template<typename Hash>
+typename std::enable_if<hashes::is_h2c<Hash>::value>::type
+    check_hash_to_curve(const std::string &msg_str, const typename Hash::digest_type &expected) {
+
     std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
-    typename Group::value_type result = to_curve<hash_type>(msg);
+    typename Hash::digest_type result = hash<Hash>(msg);
     BOOST_CHECK_EQUAL(result, expected);
+
+    if (msg.size() > 1) {
+        std::size_t offset = std::rand() % (msg.size() - 1) + 1;
+        auto acc_deducible = hash<Hash>(msg.cbegin(), msg.cbegin() + offset);
+        nil::crypto3::accumulator_set<Hash> &acc = acc_deducible;
+        hash<Hash>(msg.cbegin() + offset, msg.cend(), acc);
+        typename Hash::digest_type result1 = nil::crypto3::accumulators::extract::hash<Hash>(acc);
+        BOOST_CHECK_EQUAL(result1, expected);
+    }
 }
 
 BOOST_AUTO_TEST_SUITE(hash_h2c_manual_tests)
@@ -117,8 +128,8 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g1_h2c_sha256_test) {
     using curve_type = curves::bls12_381;
     using group_type = typename curve_type::g1_type<>;
     using group_value_type = typename group_type::value_type;
-    using field_value_type = typename group_type::field_type::value_type;
     using integral_type = typename group_type::field_type::integral_type;
+    using hash_type = hashes::h2c<group_type>;
 
     using samples_type = std::vector<std::tuple<std::string, group_value_type>>;
     samples_type samples {
@@ -169,7 +180,7 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g1_h2c_sha256_test) {
     };
 
     for (auto &s : samples) {
-        check_hash_to_curve<group_type>(std::get<0>(s), std::get<1>(s));
+        check_hash_to_curve<hash_type>(std::get<0>(s), std::get<1>(s));
     }
 }
 
@@ -180,6 +191,7 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g2_h2c_sha256_test) {
     using group_value_type = typename group_type::value_type;
     using field_value_type = typename group_type::field_type::value_type;
     using integral_type = typename group_type::field_type::integral_type;
+    using hash_type = hashes::h2c<group_type>;
 
     using samples_type = std::vector<std::tuple<std::string, group_value_type>>;
     samples_type samples {
@@ -253,7 +265,7 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g2_h2c_sha256_test) {
     };
 
     for (auto &s : samples) {
-        check_hash_to_curve<group_type>(std::get<0>(s), std::get<1>(s));
+        check_hash_to_curve<hash_type>(std::get<0>(s), std::get<1>(s));
     }
 }
 

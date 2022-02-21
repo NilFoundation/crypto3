@@ -36,20 +36,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/concept/assert.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/marshalling/endianness.hpp>
-#include <nil/marshalling/algorithms/pack.hpp>
-#include <nil/crypto3/marshalling/multiprecision/types/integral.hpp>
-
-#include <nil/crypto3/algebra/type_traits.hpp>
-
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-
-#include <nil/crypto3/detail/strxor.hpp>
-
-#include <nil/crypto3/hash/algorithm/hash.hpp>
-
-#include <nil/crypto3/hash/h2c_suites.hpp>
+#include <nil/crypto3/hash/detail/h2c/h2c_suites.hpp>
 #include <nil/crypto3/hash/detail/h2c/h2c_policy.hpp>
 
 namespace nil {
@@ -349,212 +336,20 @@ namespace nil {
                 struct map_to_curve<typename algebra::curves::bls12_381::g2_type<Coordinates, Form>>
                     : m2c_simple_swu_zeroAB<typename algebra::curves::bls12_381::g2_type<Coordinates, Form>> { };
 
-                template<std::size_t k,
-                         std::size_t len_in_bytes,
-                         typename Hash,
-                         typename PublicParams,
-                         /// Hash::digest_type is required to be uint8_t[]
-                         typename = typename std::enable_if<
-                             std::is_same<std::uint8_t, typename Hash::digest_type::value_type>::value>::type>
-                class expand_message_xmd {
-                    // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-5.4.1
-                    static_assert(Hash::block_bits % 8 == 0, "r_in_bytes is not a multiple of 8");
-                    static_assert(Hash::digest_bits % 8 == 0, "b_in_bytes is not a multiple of 8");
-                    static_assert(Hash::digest_bits >= 2 * k, "k-bit collision resistance is not fulfilled");
-                    static_assert(len_in_bytes < 0x10000, "len_in_bytes should be less than 0x10000");
+                template<typename GroupValue>
+                static inline GroupValue clear_cofactor(const GroupValue &R) {
+                    return R * h2c_suite<typename GroupValue::group_type>::h_eff;
+                }
 
-                    constexpr static std::size_t b_in_bytes = Hash::digest_bits / 8;
-                    constexpr static std::size_t r_in_bytes = Hash::block_bits / 8;
-                    constexpr static std::array<std::uint8_t, 2> l_i_b_str = {
-                        static_cast<std::uint8_t>(len_in_bytes >> 8u), static_cast<std::uint8_t>(len_in_bytes % 0x100)};
-                    constexpr static std::size_t ell = static_cast<std::size_t>(len_in_bytes / b_in_bytes) +
-                                                       static_cast<std::size_t>(len_in_bytes % b_in_bytes != 0);
-                    constexpr static const std::array<std::uint8_t, r_in_bytes> Z_pad {0};
+                template<typename Group, UniformityCount _uniformity_count, typename U>
+                static inline typename std::enable_if<(UniformityCount::uniform_count == _uniformity_count),
+                                                      typename Group::value_type>::type
+                    ep_map(const U &u) {
 
-                    // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-5.4.1
-                    static_assert(ell <= 255, "ell should be less than 256");
-
-                public:
-                    typedef std::array<std::uint8_t, len_in_bytes> result_type;
-                    typedef accumulator_set<Hash> internal_accumulator_type;
-
-                    static inline void init_accumulator(internal_accumulator_type &acc) {
-                        hash<Hash>(Z_pad, acc);
-                    }
-
-                    template<typename InputRange>
-                    static inline void update(internal_accumulator_type &acc, const InputRange &range) {
-                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<InputRange>));
-
-                        hash<Hash>(range, acc);
-                    }
-
-                    template<typename InputIterator>
-                    static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
-                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
-
-                        hash<Hash>(first, last, acc);
-                    }
-
-                    static inline result_type process(internal_accumulator_type &b0_acc) {
-                        auto dst_size = std::distance(std::cbegin(PublicParams::dst), std::cend(PublicParams::dst));
-                        assert(dst_size >= 16 && dst_size <= 255);
-
-                        hash<Hash>(l_i_b_str, b0_acc);
-                        hash<Hash>(std::array<std::uint8_t, 1> {0}, b0_acc);
-                        hash<Hash>(PublicParams::dst, b0_acc);
-                        hash<Hash>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(dst_size)}, b0_acc);
-                        typename Hash::digest_type b0 = ::nil::crypto3::accumulators::extract::hash<Hash>(b0_acc);
-
-                        result_type uniform_bytes;
-                        internal_accumulator_type bi_acc;
-                        hash<Hash>(b0, bi_acc);
-                        hash<Hash>(std::array<std::uint8_t, 1> {1}, bi_acc);
-                        hash<Hash>(PublicParams::dst, bi_acc);
-                        hash<Hash>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(dst_size)}, bi_acc);
-                        typename Hash::digest_type bi = ::nil::crypto3::accumulators::extract::hash<Hash>(bi_acc);
-                        std::copy(bi.begin(), bi.end(), uniform_bytes.begin());
-
-                        typename Hash::digest_type xored_b;
-                        for (std::size_t i = 2; i <= ell; i++) {
-                            internal_accumulator_type bi_acc;
-                            ::nil::crypto3::detail::strxor(b0, bi, xored_b.begin());
-                            hash<Hash>(xored_b, bi_acc);
-                            hash<Hash>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(i)}, bi_acc);
-                            hash<Hash>(PublicParams::dst, bi_acc);
-                            hash<Hash>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(dst_size)}, bi_acc);
-                            bi = ::nil::crypto3::accumulators::extract::hash<Hash>(bi_acc);
-                            std::copy(bi.begin(), bi.end(), uniform_bytes.begin() + (i - 1) * b_in_bytes);
-                        }
-
-                        return uniform_bytes;
-                    }
-                };
-
-                template<typename Group,
-                         typename PublicParams,
-                         UniformityCount uniformity_count,
-                         ExpandMsgVariant expand_msg_variant = ExpandMsgVariant::rfc_xmd,
-                         typename = void>
-                struct ep_map;
-
-                template<typename Group,
-                         typename PublicParams,
-                         UniformityCount uniformity_count,
-                         ExpandMsgVariant expand_msg_variant>
-                struct ep_map<Group,
-                              PublicParams,
-                              uniformity_count,
-                              expand_msg_variant,
-                              typename std::enable_if<    // algebra::is_group_element<typename
-                                                          // Group::value_type>::value &&
-                                  (ExpandMsgVariant::rfc_xmd == expand_msg_variant)>::type> {
-                    typedef h2c_suite<Group> suite_type;
-
-                    typedef typename suite_type::group_value_type group_value_type;
-                    typedef typename suite_type::field_type field_type;
-                    typedef typename suite_type::field_value_type field_value_type;
-                    typedef typename suite_type::modular_type modular_type;
-                    typedef typename suite_type::integral_type integral_type;
-                    typedef typename suite_type::hash_type hash_type;
-
-                    constexpr static std::size_t digest_bits = hash_type::digest_bits;
-                    constexpr static std::size_t modulus_bits = field_type::modulus_bits;
-
-                    constexpr static std::size_t m = suite_type::m;
-                    constexpr static std::size_t L = suite_type::L;
-                    constexpr static std::size_t k = suite_type::k;
-                    constexpr static std::size_t count = static_cast<std::size_t>(uniformity_count);
-
-                    static_assert(count == 1 || count == 2, "unavailable count value");
-
-                    constexpr static std::size_t len_in_bytes = count * m * L;
-
-                    typedef expand_message_xmd<k, len_in_bytes, hash_type, PublicParams> expand_message_type;
-                    typedef group_value_type result_type;
-                    typedef typename expand_message_type::internal_accumulator_type internal_accumulator_type;
-
-                    static inline void init_accumulator(internal_accumulator_type &acc) {
-                        expand_message_type::init_accumulator(acc);
-                    }
-
-                    template<typename InputRange>
-                    static inline void update(internal_accumulator_type &acc, const InputRange &range) {
-                        expand_message_type::update(acc, range);
-                    }
-
-                    template<typename InputIterator>
-                    static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
-                        expand_message_type::update(acc, first, last);
-                    }
-
-                    // TODO: use type deducing to element_fp instead of arity, make FieldParams public for this
-                    template<std::size_t arity = m, typename std::enable_if<1 == arity, bool>::type = true>
-                    static inline std::array<field_value_type, count> hash_to_field(internal_accumulator_type &acc) {
-                        typename expand_message_type::result_type uniform_bytes = expand_message_type::process(acc);
-
-                        std::array<modular_type, m> coordinates;
-                        std::array<field_value_type, count> result;
-                        for (std::size_t i = 0; i < count; i++) {
-                            for (std::size_t j = 0; j < m; j++) {
-                                auto elm_offset = L * (j + i * m);
-
-                                // TODO: creating copy of range is a bottleneck:
-                                //  extend marshaling interface by function supporting initialization from
-                                //  container which length is less than modulus_octets
-                                std::vector<std::uint8_t> imported_octets;
-                                std::copy(std::cbegin(uniform_bytes) + elm_offset,
-                                          std::cbegin(uniform_bytes) + elm_offset + L,
-                                          std::back_inserter(imported_octets));
-                                nil::marshalling::status_type status;
-                                multiprecision::cpp_int tmp = nil::marshalling::pack<nil::marshalling::option::big_endian>(imported_octets, status);
-                                coordinates[j] = modular_type(tmp, suite_type::p);
-                            }
-                            result[i] = coordinates[0];
-                        }
-
-                        return result;
-                    }
-
-                    // TODO: use type deducing to element_fp2 instead of arity, make FieldParams public for this
-                    template<std::size_t arity = m, typename std::enable_if<2 == arity, bool>::type = true>
-                    static inline std::array<field_value_type, count> hash_to_field(internal_accumulator_type &acc) {
-                        typename expand_message_type::result_type uniform_bytes = expand_message_type::process(acc);
-
-                        std::array<modular_type, m> coordinates;
-                        std::array<field_value_type, count> result;
-                        for (std::size_t i = 0; i < count; i++) {
-                            for (std::size_t j = 0; j < m; j++) {
-                                auto elm_offset = L * (j + i * m);
-
-                                // TODO: creating copy of range is a bottleneck:
-                                //  extend marshaling interface by function supporting initialization from
-                                //  container which length is less than modulus_octets
-                                std::vector<std::uint8_t> imported_octets;
-                                std::copy(std::cbegin(uniform_bytes) + elm_offset,
-                                          std::cbegin(uniform_bytes) + elm_offset + L,
-                                          std::back_inserter(imported_octets));
-                                nil::marshalling::status_type status;
-                                multiprecision::cpp_int tmp = nil::marshalling::pack<nil::marshalling::option::big_endian>(imported_octets, status);
-                                coordinates[j] = modular_type(tmp, suite_type::p);
-                            }
-                            result[i] = field_value_type(coordinates[0], coordinates[1]);
-                        }
-
-                        return result;
-                    }
-
-                    static inline group_value_type clear_cofactor(const group_value_type &R) {
-                        return R * suite_type::h_eff;
-                    }
-
-                    static inline result_type process(internal_accumulator_type &acc) {
-                        auto u = hash_to_field(acc);
-                        group_value_type Q0 = map_to_curve<Group>::process(u[0]);
-                        group_value_type Q1 = map_to_curve<Group>::process(u[1]);
-                        return clear_cofactor(Q0 + Q1);
-                    }
-                };
+                    typename Group::value_type Q0 = map_to_curve<Group>::process(u[0]);
+                    typename Group::value_type Q1 = map_to_curve<Group>::process(u[1]);
+                    return clear_cofactor(Q0 + Q1);
+                }
             }    // namespace detail
         }        // namespace hashes
     }            // namespace crypto3

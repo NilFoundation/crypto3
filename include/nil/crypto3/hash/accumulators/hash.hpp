@@ -46,6 +46,8 @@
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
 #include <nil/crypto3/hash/accumulators/parameters/iterator_last.hpp>
 
+#include <nil/crypto3/hash/type_traits.hpp>
+
 #include <boost/accumulators/statistics/count.hpp>
 
 namespace nil {
@@ -56,7 +58,7 @@ namespace nil {
         }
         namespace accumulators {
             namespace impl {
-                template<typename Hash>
+                template<typename Hash, typename = void>
                 struct hash_impl : boost::accumulators::accumulator_base {
                 protected:
                     typedef Hash hash_type;
@@ -226,11 +228,14 @@ namespace nil {
                     construction_type construction;
                 };
 
-                template<typename Params, typename BasePointGeneratorHash, typename Group>
-                struct hash_impl<nil::crypto3::hashes::pedersen<Params, BasePointGeneratorHash, Group>>
+                template<typename Hash>
+                struct hash_impl<Hash,
+                                 typename std::enable_if<nil::crypto3::hashes::is_pedersen<Hash>::value ||
+                                                         nil::crypto3::hashes::is_h2f<Hash>::value ||
+                                                         nil::crypto3::hashes::is_h2c<Hash>::value>::type>
                     : boost::accumulators::accumulator_base {
                 protected:
-                    typedef nil::crypto3::hashes::pedersen<Params, BasePointGeneratorHash, Group> hash_type;
+                    typedef Hash hash_type;
                     typedef typename hash_type::internal_accumulator_type internal_accumulator_type;
 
                 public:
