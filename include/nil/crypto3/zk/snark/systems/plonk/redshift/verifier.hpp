@@ -63,7 +63,7 @@ namespace nil {
                     static inline bool process(//const types_policy::verification_key_type &verification_key,
                                                //const types_policy::primary_input_type &primary_input,
                                                const typename types_policy::template proof_type<lpc> &proof, 
-                                               const typename types_policy::circuit_short_description<lpc> &short_description) {
+                                               const typename types_policy::template circuit_short_description<lpc> &short_description) {
 
                         fiat_shamir_heuristic_updated<TranscriptHashType> transcript(std::vector<std::uint8_t>());
 
