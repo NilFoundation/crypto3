@@ -40,17 +40,13 @@
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
-                /************************* PLONK constraint ***********************************/
-
-                template<typename FieldType>
-                using plonk_constraint = non_linear_combination<FieldType, true>;
 
                 /************************* PLONK variable assignment **************************/
 
@@ -62,7 +58,7 @@ namespace nil {
                 template<typename FieldType, std::size_t WitnessAmount, std::size_t PublicAmount>
                 struct plonk_constraint_system {
 
-                    std::vector<plonk_constraint<FieldType>> constraints;
+                    std::vector<plonk_gate<FieldType>> gates;
 
                     plonk_constraint_system() {
                     }
@@ -75,21 +71,21 @@ namespace nil {
                         return PublicAmount;
                     }
 
-                    std::size_t num_constraints() const {
-                        return constraints.size();
+                    std::size_t num_gates() const {
+                        return gates.size();
                     }
 
-                    bool
-                        is_satisfied(plonk_variable_assignment<FieldType, WitnessAmount> full_variable_assignment) const {
+                    // bool
+                    //     is_satisfied(plonk_variable_assignment<FieldType, WitnessAmount> full_variable_assignment) const {
 
-                        for (std::size_t c = 0; c < constraints.size(); ++c) {
-                            if (!constraints[c].a.evaluate(full_variable_assignment).is_zero()) {
-                                return false;
-                            }
-                        }
+                    //     for (std::size_t c = 0; c < constraints.size(); ++c) {
+                    //         if (!constraints[c].a.evaluate(full_variable_assignment).is_zero()) {
+                    //             return false;
+                    //         }
+                    //     }
 
-                        return true;
-                    }
+                    //     return true;
+                    // }
 
                     std::vector<math::polynomial<typename FieldType::value_type>> copy_constraints() {
                         return {};
@@ -103,57 +99,57 @@ namespace nil {
                         return {};
                     }
 
-                    std::vector<math::polynomial<typename FieldType::value_type>>
-                        polynomials(plonk_variable_assignment<FieldType, WitnessAmount> full_variable_assignment) const {
+                    // std::vector<math::polynomial<typename FieldType::value_type>>
+                    //     polynomials(plonk_variable_assignment<FieldType, WitnessAmount> full_variable_assignment) const {
 
-                        std::vector<math::polynomial<typename FieldType::value_type>> result(constraints.size());
+                    //     std::vector<math::polynomial<typename FieldType::value_type>> result(constraints.size());
 
-                        std::array<math::polynomial<typename FieldType::value_type>, WitnessAmount> wire_polynomials;
-                        for (std::size_t wire_index = 0; wire_index < WitnessAmount; wire_index++) {
-                            const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
-                                math::make_evaluation_domain<FieldType>(full_variable_assignment[wire_index].size());
+                    //     std::array<math::polynomial<typename FieldType::value_type>, WitnessAmount> wire_polynomials;
+                    //     for (std::size_t wire_index = 0; wire_index < WitnessAmount; wire_index++) {
+                    //         const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
+                    //             math::make_evaluation_domain<FieldType>(full_variable_assignment[wire_index].size());
 
-                            std::vector<typename FieldType::value_type> interpolation_points(
-                                full_variable_assignment[wire_index].size());
+                    //         std::vector<typename FieldType::value_type> interpolation_points(
+                    //             full_variable_assignment[wire_index].size());
 
-                            std::copy(full_variable_assignment[wire_index].begin(),
-                                      full_variable_assignment[wire_index].end(), interpolation_points.begin());
+                    //         std::copy(full_variable_assignment[wire_index].begin(),
+                    //                   full_variable_assignment[wire_index].end(), interpolation_points.begin());
 
-                            domain->inverse_fft(interpolation_points);
+                    //         domain->inverse_fft(interpolation_points);
 
-                            wire_polynomials[wire_index] =
-                                math::polynomial<typename FieldType::value_type>(interpolation_points);
-                        }
+                    //         wire_polynomials[wire_index] =
+                    //             math::polynomial<typename FieldType::value_type>(interpolation_points);
+                    //     }
 
-                        for (std::size_t constraint_index = 0; constraint_index < constraints.size();
-                             constraint_index++) {
+                    //     for (std::size_t constraint_index = 0; constraint_index < constraints.size();
+                    //          constraint_index++) {
 
-                            for (auto &term : constraints[constraint_index].terms) {
+                    //         for (auto &term : constraints[constraint_index].terms) {
 
-                                math::polynomial<typename FieldType::value_type> term_polynom = {term.coeff};
+                    //             math::polynomial<typename FieldType::value_type> term_polynom = {term.coeff};
 
-                                for (auto &var : term.vars) {
+                    //             for (auto &var : term.vars) {
 
-                                    const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
-                                        math::make_evaluation_domain<FieldType>(full_variable_assignment[var.wire_index].size());
+                    //                 const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
+                    //                     math::make_evaluation_domain<FieldType>(full_variable_assignment[var.wire_index].size());
 
-                                    term_polynom = term_polynom * math::polynomial_shift(wire_polynomials[var.wire_index], 
-                                        domain->get_domain_element(var.rotation));
-                                }
+                    //                 term_polynom = term_polynom * math::polynomial_shift(wire_polynomials[var.wire_index], 
+                    //                     domain->get_domain_element(var.rotation));
+                    //             }
 
-                                result[constraint_index] = result[constraint_index] + term_polynom;
-                            }
-                        }
+                    //             result[constraint_index] = result[constraint_index] + term_polynom;
+                    //         }
+                    //     }
 
-                        return result;
-                    }
+                    //     return result;
+                    // }
 
-                    void add_constraint(const plonk_constraint<FieldType> &c) {
-                        constraints.emplace_back(c);
+                    void add_gate(const plonk_gate<FieldType> &g) {
+                        gates.emplace_back(g);
                     }
 
                     bool operator==(const plonk_constraint_system &other) const {
-                        return (this->constraints == other.constraints);
+                        return (this->gates == other.gates);
                     }
                 };
             }    // namespace snark

@@ -174,7 +174,7 @@ namespace nil {
                     test_circuit.domain->inverse_fft(q_add);
                     math::polynomial<typename FieldType::value_type> add_selector(q_add);
                     std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
-                    plonk_gate<FieldType> add_gate {add_gate_costraints, add_selector};
+                    plonk_gate<FieldType> add_gate (add_selector, add_gate_costraints);
                     test_circuit.gates.push_back(add_gate);
 
                     plonk_constraint<FieldType> mul_constraint;
@@ -184,7 +184,7 @@ namespace nil {
                     test_circuit.domain->inverse_fft(q_mul);
                     math::polynomial<typename FieldType::value_type> mul_selector(q_mul);
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
-                    plonk_gate<FieldType> mul_gate {mul_gate_costraints, mul_selector};
+                    plonk_gate<FieldType> mul_gate (mul_selector, mul_gate_costraints);
                     test_circuit.gates.push_back(mul_gate);
 
                     return test_circuit;
@@ -275,7 +275,7 @@ namespace nil {
                     test_circuit.domain->inverse_fft(q_add);
                     math::polynomial<typename FieldType::value_type> add_selector(q_add);
                     std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
-                    plonk_gate<FieldType> add_gate {add_gate_costraints, add_selector};
+                    plonk_gate<FieldType> add_gate (add_selector, add_gate_costraints);
                     test_circuit.gates.push_back(add_gate);
 
                     plonk_constraint<FieldType> mul_constraint;
@@ -285,7 +285,7 @@ namespace nil {
                     test_circuit.domain->inverse_fft(q_mul);
                     math::polynomial<typename FieldType::value_type> mul_selector(q_mul);
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
-                    plonk_gate<FieldType> mul_gate {mul_gate_costraints, mul_selector};
+                    plonk_gate<FieldType> mul_gate (mul_selector, mul_gate_costraints);
                     test_circuit.gates.push_back(mul_gate);
 
                     return test_circuit;
