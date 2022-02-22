@@ -43,6 +43,7 @@ namespace nil {
             class keccak_1600_compressor {
             protected:
                 typedef detail::keccak_1600_functions<DigestBits> policy_type;
+                typedef typename policy_type::impl_type impl_type;
 
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -63,7 +64,7 @@ namespace nil {
                     for (std::size_t i = 0; i != state_words; ++i)
                         boost::endian::endian_reverse_inplace(state[i]);
 
-                    policy_type::permute(state);
+                    impl_type::permute(state);
 
                     for (std::size_t i = 0; i != state_words; ++i)
                         boost::endian::endian_reverse_inplace(state[i]);
