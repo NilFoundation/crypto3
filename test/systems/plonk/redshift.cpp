@@ -84,7 +84,7 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log) {
     params.r = degree_log - 1;
     params.D = domain_set;
     params.q = q;
-    params.max_degree = 1 << degree_log;
+    params.max_degree = (1 << degree_log) - 1;
 
     return params;
 }
@@ -107,11 +107,11 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
     const std::size_t table_rows_log = 4;
     const std::size_t table_rows = 1 << table_rows_log;
     const std::size_t witness_columns = 3;
-    const std::size_t public_columns = 0;
+    const std::size_t public_columns = 1;
     const std::size_t table_columns = witness_columns + public_columns;
-    const std::size_t permutation_size = 3;
+    const std::size_t permutation_size = 4;
     const std::size_t usable_rows = 1 << table_rows_log;
-    circuit_description<FieldType, table_rows_log, witness_columns, public_columns, permutation_size, usable_rows> circuit = circuit_test_1<FieldType>();
+    circuit_description<FieldType, table_rows_log, witness_columns, public_columns, permutation_size, usable_rows> circuit = circuit_test_2<FieldType>();
 
     using types_policy = zk::snark::detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
 
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
     typename types_policy::variable_assignment_type assigments = circuit.table;
 
     types_policy::circuit_short_description<lpc_type> short_description;
-    short_description.columns_with_copy_constraints = {0, 1, 2};
+    short_description.columns_with_copy_constraints = {0, 1, 2, 3};
     short_description.table_rows = table_rows;
     short_description.usable_rows = usable_rows;
     short_description.delta = circuit.delta;
@@ -158,7 +158,6 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, lambda, k, r, m> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
-    math::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial<FieldType>(circuit.domain, 0);
 
     typename types_policy::constraint_system_type constraint_system;
     typename types_policy::variable_assignment_type assigments = circuit.table;

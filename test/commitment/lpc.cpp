@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     fri_params.r = r;
     fri_params.D = D;
     fri_params.q = q;
-    fri_params.max_degree = d;
+    fri_params.max_degree = d - 1;
     
 
     // commit

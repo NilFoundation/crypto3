@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     params.r = r;
     params.D = D;
     params.q = q;
-    params.max_degree = d;
+    params.max_degree = d - 1;
 
     BOOST_CHECK(D[1]->m == D[0]->m / 2);
     BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());

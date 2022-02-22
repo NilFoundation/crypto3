@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     fri_params.r = r;
     fri_params.D = D;
     fri_params.q = q;
-    fri_params.max_degree = d;
+    fri_params.max_degree = d - 1;
 
     typedef boost::random::independent_bits_engine<boost::random::mt19937,
                                                    FieldType::modulus_bits,
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
 
     for (int i = 0; i < height; i++) {
         math::polynomial<typename FieldType::value_type> poly;
-        for (int j = 0; j < fri_params.max_degree; j++) {
+        for (int j = 0; j < fri_params.max_degree + 1; j++) {
             poly.push_back(typename FieldType::value_type(polynomial_element_gen()));
         }
         merkle_tree_type tree = lpc_type::commit(poly, D[0]); // phase_1: Commit

@@ -355,7 +355,7 @@ namespace nil {
                             x = x_next;
                         }
 
-                        if (proof.final_polynomial.degree() > std::pow(2, std::log2(fri_params.max_degree) - r) - 1) {
+                        if (proof.final_polynomial.degree() > std::pow(2, std::log2(fri_params.max_degree + 1) - r) - 1) {
                             return false;
                         }
                         if (proof.final_polynomial.evaluate(x) != proof.round_proofs[r - 1].colinear_value) {

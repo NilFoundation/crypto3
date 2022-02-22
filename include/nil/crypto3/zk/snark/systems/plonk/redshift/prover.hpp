@@ -84,6 +84,20 @@ namespace nil {
                             return T_consolidated;
                     }
 
+                    static inline std::vector<math::polynomial<typename FieldType::value_type>>
+                        split_polynomial(math::polynomial<typename FieldType::value_type> f,
+                            std::size_t max_degree) {
+                            std::size_t parts = ((f.size() - 1) / (max_degree + 1)) + 1;
+                            std::vector<math::polynomial<typename FieldType::value_type>> f_splitted(parts);
+
+                            std::size_t chunk_size = max_degree + 1; // polynomial contains max_degree + 1 coeffs
+                            for (std::size_t i = 0; i < parts - 1; i++) {
+                                std::copy(f.begin() + i * chunk_size, f.begin() + (i + 1) * chunk_size - 1, std::back_inserter(f_splitted[i]));
+                            }
+                            std::copy(f.begin() + (parts - 1) * chunk_size, f.end(), std::back_inserter(f_splitted[parts - 1]));
+                            return f_splitted;
+                    }
+
                     /*static inline std::vector<typename lpc::proof_type> 
                         evaluation_proof(typename FieldType::value_type challenge,
                             const typename types_policy::constraint_system_type &constraint_system
@@ -199,10 +213,13 @@ namespace nil {
 
                         // 7. Aggregate quotient polynomial
                         math::polynomial<typename FieldType::value_type> T = quotient_polynomial(preprocessed_data, F, transcript);
-                        /*std::size_t N_T = short_description.columns_with_copy_constraints.size();// std::max(short_description.columns_with_copy_constraints.size(), GATE_MAX_DEGREE);
-                        std::array<math::polynomial<typename FieldType::value_type>, N_T> T_splitted;
-                        auto T_commitments = lpc::commit<witness_columns>(T_splitted, fri_params.D[0]);
-                        transcript(T_commitments);
+                        std::vector<math::polynomial<typename FieldType::value_type>> T_splitted = split_polynomial(T, fri_params.max_degree);
+                        std::vector<typename lpc::merkle_tree_type> T_commitments(T_splitted.size());
+                        for (std::size_t i = 0; i < T_splitted.size(); i++) {
+                            T_commitments[i] = lpc::commit(T_splitted[i], fri_params.D[0]);
+                        }
+
+                        //transcript(T_commitments);
 
                         // 8. Run evaluation proofs
                         //typename FieldType::value_type challenge = transcript.template challenge<FieldType>();
