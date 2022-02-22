@@ -57,7 +57,19 @@ namespace nil {
 
                         typedef plonk_constraint_system<FieldType, WitnessAmount, PublicAmount> constraint_system_type;
 
-                        typedef plonk_variable_assignment<FieldType, WitnessAmount + PublicAmount> variable_assignment_type;
+                        /************************* PLONK variable assignment **************************/
+
+                        struct variable_assignment_type {
+
+                            struct private_assignment_type {
+                                std::array<std::vector<typename FieldType::value_type>, WiresAmount> witness;
+                            } private_assignment;
+
+                            struct public_assignment_type {
+                                std::vector<std::vector<typename FieldType::value_type>> selectors;
+                                std::vector<std::vector<typename FieldType::value_type>> public_input;
+                            } public_assignment;
+                        };
 
                         /*********************************** Proof ***********************************/
 
