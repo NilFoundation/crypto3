@@ -68,8 +68,10 @@ namespace nil {
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        template<typename CommitmentSchemeType>
-                        using proof_type = redshift_proof<FieldType, CommitmentSchemeType>;
+                        template<typename CommitmentSchemeTypeWitness,
+                            typename CommitmentSchemeTypePermutation,
+                            typename CommitmentSchemeTypeQuotient>
+                        using proof_type = redshift_proof<FieldType, CommitmentSchemeTypeWitness, CommitmentSchemeTypePermutation, CommitmentSchemeTypeQuotient>;
 
                         template<std::size_t witness_columns>
                         struct preprocessed_data_type {

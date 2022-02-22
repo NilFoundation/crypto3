@@ -43,14 +43,15 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename FieldType, typename CommitmentSchemeType,
+                template<typename FieldType, typename CommitmentSchemeTypePublic,
+                    typename CommitmentSchemeTypePermutation,
                     std::size_t witness_columns, std::size_t public_columns, 
                     typename TranscriptHashType = hashes::keccak_1600<512>>
                 class redshift_permutation_argument {
 
                     using types_policy = detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
 
-                    typedef typename CommitmentSchemeType::fri_type fri_type;
+                    typedef typename CommitmentSchemeTypePermutation::fri_type fri_type;
 
                     static constexpr std::size_t argument_size = 3;
 
@@ -60,13 +61,13 @@ namespace nil {
 
                         math::polynomial<typename FieldType::value_type> permutation_polynomial;
 
-                        typename CommitmentSchemeType::merkle_tree_type permutation_poly_commitment;
+                        typename CommitmentSchemeTypePermutation::merkle_tree_type permutation_poly_commitment;
                     };
 
                     static inline prover_result_type
                         prove_eval(fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
                                    const typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data,
-                                   const typename types_policy::template circuit_short_description<CommitmentSchemeType> &short_description,
+                                   const typename types_policy::template circuit_short_description<CommitmentSchemeTypePublic> &short_description,
                                    const std::vector<math::polynomial<typename FieldType::value_type>> &columns,
                                    typename fri_type::params_type fri_params) {
 
@@ -115,9 +116,9 @@ namespace nil {
                                                                              V_P_interpolation_points.end());
 
                         // 4. Compute and add commitment to $V_P$ to $\text{transcript}$.
-                        typename CommitmentSchemeType::merkle_tree_type V_P_tree =
-                            CommitmentSchemeType::commit(V_P, fri_params.D[0]);
-                        typename CommitmentSchemeType::commitment_type V_P_commitment = V_P_tree.root();
+                        typename CommitmentSchemeTypePermutation::merkle_tree_type V_P_tree =
+                            CommitmentSchemeTypePermutation::commit(V_P, fri_params.D[0]);
+                        typename CommitmentSchemeTypePermutation::commitment_type V_P_commitment = V_P_tree.root();
                         transcript(V_P_commitment);
 
                         // 5. Calculate g_perm, h_perm
@@ -147,13 +148,13 @@ namespace nil {
                     static inline std::array<typename FieldType::value_type, argument_size>
                         verify_eval(fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
                                     const typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data,
-                                    const typename types_policy::template circuit_short_description<CommitmentSchemeType> &short_description,
+                                    const typename types_policy::template circuit_short_description<CommitmentSchemeTypePublic> &short_description,
                                     const typename FieldType::value_type &challenge,                          // y
                                     const std::vector<typename FieldType::value_type> &column_polynomials,    // f(y)
                                     const typename FieldType::value_type &perm_polynomial,                    //
                                                                                                               // V_P(y)
                                     const typename FieldType::value_type &perm_polynomial_shifted,    // V_P(omega * y)
-                                    const typename CommitmentSchemeType::commitment_type &V_P_commitment) {
+                                    const typename CommitmentSchemeTypePermutation::commitment_type &V_P_commitment) {
 
                         const std::vector<math::polynomial<typename FieldType::value_type>> &S_sigma = preprocessed_data.permutation_polynomials;
                         const std::vector<math::polynomial<typename FieldType::value_type>> &S_id = preprocessed_data.identity_polynomials;

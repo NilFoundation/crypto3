@@ -32,40 +32,30 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, typename CommitmentSchemeType>
+                template<typename FieldType, typename CommitmentSchemeTypeWitness,
+                    typename CommitmentSchemeTypePermutation,
+                    typename CommitmentSchemeTypeQuotient>
                 struct redshift_proof {
-                    typedef CommitmentSchemeType commitment_scheme_type;
 
                     struct evaluation_proof {
-                        typedef CommitmentSchemeType commitment_scheme_type;
-
-                        typename commitment_scheme_type::proof_type witness_proof;
+                        typename CommitmentSchemeTypeWitness::proof_type witness;
+                        typename CommitmentSchemeTypePermutation::proof_type permutation;
+                        typename CommitmentSchemeTypeQuotient::proof_type quotient;
                     };
 
                     redshift_proof() {
                     }
 
-                    std::vector<typename CommitmentSchemeType::commitment_type> witness_commitments;
+                    std::vector<typename CommitmentSchemeTypeWitness::commitment_type> witness_commitments;
 
-                    typename CommitmentSchemeType::commitment_type v_perm_commitment;
+                    typename CommitmentSchemeTypePermutation::commitment_type v_perm_commitment;
 
-                    std::vector<typename CommitmentSchemeType::commitment_type> T_commitments;
-
-                    std::vector<typename CommitmentSchemeType::proof_type> f_lpc_proofs;
-
-                    typename CommitmentSchemeType::proof_type P_lpc_proof;
-                    typename CommitmentSchemeType::proof_type Q_lpc_proof;
-
-                    std::vector<typename CommitmentSchemeType::proof_type> T_lpc_proofs;
-
-                    //std::vector<typename FieldType::value_type> witness_evaluation;
+                    std::vector<typename CommitmentSchemeTypeQuotient::commitment_type> T_commitments;
 
                     evaluation_proof eval_proof;
 
                     bool operator==(const redshift_proof &rhs) const {
                         return witness_commitments == rhs.witness_commitments && T_commitments == rhs.T_commitments &&
-                               f_lpc_proofs == rhs.f_lpc_proofs && P_lpc_proof == rhs.P_lpc_proof &&
-                               Q_lpc_proof == rhs.Q_lpc_proof && T_lpc_proofs == rhs.T_lpc_proofs &&
                                v_perm_commitment == rhs.v_perm_commitment &&
                                eval_proof = rhs.eval_proof;
                     }

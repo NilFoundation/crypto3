@@ -50,7 +50,6 @@ namespace nil {
                          std::size_t witness_columns,
                          std::size_t public_columns,
                          std::size_t lambda,
-                         std::size_t k,
                          std::size_t r,
                          std::size_t m = 2>
                 class redshift_prover {
@@ -59,7 +58,15 @@ namespace nil {
 
                     typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
 
-                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, k, r, m> lpc;
+                    constexpr static const std::size_t opening_points_witness = 1;
+                    constexpr static const std::size_t opening_points_v_p = 2;
+                    constexpr static const std::size_t opening_points_t = 1;
+                    constexpr static const std::size_t opening_points_public = 1;
+
+                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, opening_points_witness, r, m> lpc_witness;
+                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, opening_points_v_p, r, m> lpc_permutation;
+                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, opening_points_t, r, m> lpc_quotient;
+                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, opening_points_public, r, m> lpc_public;
 
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
@@ -99,47 +106,15 @@ namespace nil {
                             return f_splitted;
                     }
 
-                    /*static inline std::vector<typename lpc::proof_type> 
-                        evaluation_proof(typename FieldType::value_type challenge,
-                            const typename types_policy::constraint_system_type &constraint_system
-                            std::vector<math::polynomial<typename FieldType::value_type>> polynomials,
-                            std::vector<merkle_tree_type> witness_commits,
-                            const typename lpc::fri_type::params_type &fri_params) {
-
-                            // witness polynomials (table columns)
-                            for (std::size_t i = 0; i < witness_commits.size(); i++) {
-                                std::vector<std::size_t> rotation_gates = {};
-                                std::vector<FieldType::value_type> evaluation_points_gates(rotation_gates.size());
-                                for (std::size_t i = 0; i < evaluation_points_gates.size(); i++) {
-                                    evaluation_points_gates[i] = y * omega.pow(rotation_gates[i]);
-                                }
-
-                                lpc::proof_type proof = lpc::proof_eval(evaluation_points_gates, witness_commits, f, transcript, fri_params);
-                            }
-
-                            // permutation polynomials
-                            std::vector<FieldType::value_type> evaluation_points_permutation = {y, y * omega};
-
-                            lpc::proof_type proof = lpc::proof_eval(evaluation_points_permutation, tree, f, transcript, fri_params);
-
-                            // quotient polynomial
-                            std::vector<std::size_t> rotation_gates = {};
-                            std::vector<FieldType::value_type> evaluation_points_quotient = {y};
-
-                            lpc::proof_type proof = lpc::proof_eval(evaluation_points_quotient, tree, f, transcript, fri_params);
-
-                            return proof;
-                    }*/
-
                 public:
-                    static inline typename types_policy::template proof_type<lpc>
+                    static inline typename types_policy::template proof_type<lpc_witness, lpc_permutation, lpc_quotient>
                         process(const typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data,
                                 typename types_policy::constraint_system_type &constraint_system,
                                 const typename types_policy::variable_assignment_type &assignments,
-                                const typename types_policy::template circuit_short_description<lpc> &short_description,
-                                const typename lpc::fri_type::params_type &fri_params) {
+                                const typename types_policy::template circuit_short_description<lpc_public> &short_description,
+                                const typename lpc_witness::fri_type::params_type &fri_params) { // TODO: fri_type are the same for each lpc_type here
                         
-                        typename types_policy::template proof_type<lpc> proof;
+                        typename types_policy::template proof_type<lpc_witness, lpc_permutation, lpc_quotient> proof;
                         std::vector<std::uint8_t> tanscript_init = {};
                         fiat_shamir_heuristic_updated<TranscriptHashType> transcript(tanscript_init);
 
@@ -154,8 +129,8 @@ namespace nil {
                             preprocessed_data.basic_domain->inverse_fft(tmp);
                             witness_poly[i] = tmp;
                         }
-                        std::array<typename lpc::merkle_tree_type, witness_columns> witness_commitments =
-                            lpc::template commit<witness_columns>(witness_poly, fri_params.D[0]);
+                        std::array<typename lpc_witness::merkle_tree_type, witness_columns> witness_commitments =
+                            lpc_witness::template commit<witness_columns>(witness_poly, fri_params.D[0]);
 
                         proof.witness_commitments.resize(witness_columns);
                         for (std::size_t i = 0; i < witness_columns; i++) {
@@ -178,7 +153,7 @@ namespace nil {
                         }
 
                         // 4. permutation_argument
-                        auto permutation_argument = redshift_permutation_argument<FieldType, lpc, witness_columns, public_columns>::prove_eval(
+                        auto permutation_argument = redshift_permutation_argument<FieldType, lpc_public, lpc_permutation, witness_columns, public_columns>::prove_eval(
                                 transcript, preprocessed_data, short_description, columns_for_permutation_argument, fri_params);
 
                         proof.v_perm_commitment = permutation_argument.permutation_poly_commitment.root();
@@ -215,9 +190,9 @@ namespace nil {
                         // 7. Aggregate quotient polynomial
                         math::polynomial<typename FieldType::value_type> T = quotient_polynomial(preprocessed_data, F, transcript);
                         std::vector<math::polynomial<typename FieldType::value_type>> T_splitted = split_polynomial(T, fri_params.max_degree);
-                        std::vector<typename lpc::merkle_tree_type> T_commitments(T_splitted.size());
+                        std::vector<typename lpc_quotient::merkle_tree_type> T_commitments(T_splitted.size());
                         for (std::size_t i = 0; i < T_splitted.size(); i++) {
-                            T_commitments[i] = lpc::commit(T_splitted[i], fri_params.D[0]);
+                            T_commitments[i] = lpc_quotient::commit(T_splitted[i], fri_params.D[0]);
                         }
 
                         //transcript(T_commitments);
@@ -225,9 +200,10 @@ namespace nil {
                         // 8. Run evaluation proofs
                         typename FieldType::value_type challenge = transcript.template challenge<FieldType>();
 
-                        // witness polynomials (table columns)
                         typename FieldType::value_type omega = preprocessed_data.basic_domain->get_domain_element(1);
-                        std::array<typename lpc::proof_type, witness_columns> witnesses_evaluation;
+
+                        // witness polynomials (table columns)
+                        std::array<typename lpc_witness::proof_type, witness_columns> witnesses_evaluation;
                         for (std::size_t i = 0; i < witness_commitments.size(); i++) {
                             std::vector<std::size_t> rotation_gates = {0}; //TODO: Rotation
                             std::array<typename FieldType::value_type, 1> evaluation_points_gates; //TODO: array size with rotation
@@ -235,10 +211,12 @@ namespace nil {
                                 evaluation_points_gates[i] = challenge * omega.pow(rotation_gates[i]);
                             }
 
-                            witnesses_evaluation[i] = lpc::proof_eval(evaluation_points_gates, witness_commitments[i], witness_poly[i], transcript, fri_params);
+                            witnesses_evaluation[i] = lpc_witness::proof_eval(evaluation_points_gates, witness_commitments[i], witness_poly[i], transcript, fri_params);
                         }
 
                         // permutation polynomial evaluation
+                        std::array<typename FieldType::value_type, 2> evaluation_points_v_p = {challenge, challenge * omega};
+                        typename lpc_permutation::proof_type v_p_evaluation = lpc_permutation::proof_eval(evaluation_points_v_p, permutation_argument.permutation_poly_commitment, permutation_argument.permutation_polynomial, transcript, fri_params);
                         //lpc::proof_type lpc_proof_witnesses = evaluation_proof(transcript, omega);
 
                         // std::array<typename FieldType::value_type, k> fT_evaluation_points = {upsilon};

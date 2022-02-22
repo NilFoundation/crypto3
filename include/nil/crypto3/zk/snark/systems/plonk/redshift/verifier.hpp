@@ -45,16 +45,19 @@ namespace nil {
                          std::size_t witness_columns,
                          std::size_t public_columns,
                          std::size_t lambda,
-                         std::size_t k,
                          std::size_t r,
                          std::size_t m = 2>
                 class redshift_verifier {
 
                     using types_policy = detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
 
-                    typedef list_polynomial_commitment_scheme<
-                            FieldType, MerkleTreeHashType, TranscriptHashType, lambda, k, r, m>
-                            lpc;
+                    constexpr static const std::size_t opening_points_witness = 1;
+                    constexpr static const std::size_t opening_points_v_p = 2;
+                    constexpr static const std::size_t opening_points_t = 1;
+
+                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, opening_points_witness, r, m> lpc_witness;
+                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, opening_points_v_p, r, m> lpc_permutation;
+                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, opening_points_t, r, m> lpc_quotient;
 
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
@@ -63,8 +66,8 @@ namespace nil {
                 public:
                     static inline bool process(//const types_policy::verification_key_type &verification_key,
                                                //const types_policy::primary_input_type &primary_input,
-                                               const typename types_policy::template proof_type<lpc> &proof, 
-                                               const typename types_policy::template circuit_short_description<lpc> &short_description) {
+                                               const typename types_policy::template proof_type<lpc_witness, lpc_permutation, lpc_quotient> &proof, 
+                                               const typename types_policy::template circuit_short_description<lpc_witness> &short_description) { //TODO: decsription commitment scheme
 
                         fiat_shamir_heuristic_updated<TranscriptHashType> transcript(std::vector<std::uint8_t>());
 

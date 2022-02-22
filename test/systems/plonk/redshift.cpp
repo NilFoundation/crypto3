@@ -133,10 +133,10 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
     typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data = 
         redshift_preprocessor<FieldType, witness_columns, public_columns, k>::process(constraint_system, assigments, short_description);
 
-    typename types_policy::template proof_type<lpc_type> proof = redshift_prover<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, public_columns, lambda, k, r, m>::process(
+    auto proof = redshift_prover<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, public_columns, lambda, r, m>::process(
         preprocessed_data, constraint_system, assigments, short_description, fri_params);
 
-    bool verifier_res = redshift_verifier<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, public_columns, lambda, k, r, m>::process(
+    bool verifier_res = redshift_verifier<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, public_columns, lambda, r, m>::process(
         proof, short_description);
     BOOST_CHECK(verifier_res);
 }
@@ -177,8 +177,8 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     fiat_shamir_heuristic_updated<transcript_hash_type> prover_transcript(init_blob);
     fiat_shamir_heuristic_updated<transcript_hash_type> verifier_transcript(init_blob);
 
-    typename redshift_permutation_argument<FieldType, lpc_type, witness_columns, public_columns>::prover_result_type prover_res =
-        redshift_permutation_argument<FieldType, lpc_type, witness_columns, public_columns>::prove_eval(prover_transcript, preprocessed_data, short_description,
+    typename redshift_permutation_argument<FieldType, lpc_type, lpc_type, witness_columns, public_columns>::prover_result_type prover_res =
+        redshift_permutation_argument<FieldType, lpc_type, lpc_type, witness_columns, public_columns>::prove_eval(prover_transcript, preprocessed_data, short_description,
                                                                        circuit.column_polynomials, fri_params);
 
     // Challenge phase
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     typename FieldType::value_type v_p_at_y_shifted = prover_res.permutation_polynomial.evaluate(circuit.omega * y);
 
     std::array<typename FieldType::value_type, 3> verifier_res =
-        redshift_permutation_argument<FieldType, lpc_type, witness_columns, public_columns>::verify_eval(
+        redshift_permutation_argument<FieldType, lpc_type, lpc_type, witness_columns, public_columns>::verify_eval(
             verifier_transcript, preprocessed_data, short_description, y, f_at_y, v_p_at_y, v_p_at_y_shifted,
             prover_res.permutation_poly_commitment.root());
 
