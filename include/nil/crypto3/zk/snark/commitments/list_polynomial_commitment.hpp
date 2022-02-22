@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 //
 // MIT License
 //
@@ -130,7 +131,7 @@ namespace nil {
                                                  merkle_tree_type &T,
                                                  const math::polynomial<typename FieldType::value_type> &g,
                                                  fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
-                                                 typename fri_type::params_type &fri_params) {
+                                                 const typename fri_type::params_type &fri_params) {
 
                         std::array<typename FieldType::value_type, k> z;
                         std::array<merkle_proof_type, k> p;

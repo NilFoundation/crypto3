@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 //
 // MIT License
 //
@@ -222,7 +223,22 @@ namespace nil {
                         //transcript(T_commitments);
 
                         // 8. Run evaluation proofs
-                        //typename FieldType::value_type challenge = transcript.template challenge<FieldType>();
+                        typename FieldType::value_type challenge = transcript.template challenge<FieldType>();
+
+                        // witness polynomials (table columns)
+                        typename FieldType::value_type omega = preprocessed_data.basic_domain->get_domain_element(1);
+                        std::array<typename lpc::proof_type, witness_columns> witnesses_evaluation;
+                        for (std::size_t i = 0; i < witness_commitments.size(); i++) {
+                            std::vector<std::size_t> rotation_gates = {0}; //TODO: Rotation
+                            std::array<typename FieldType::value_type, 1> evaluation_points_gates; //TODO: array size with rotation
+                            for (std::size_t i = 0; i < evaluation_points_gates.size(); i++) {
+                                evaluation_points_gates[i] = challenge * omega.pow(rotation_gates[i]);
+                            }
+
+                            witnesses_evaluation[i] = lpc::proof_eval(evaluation_points_gates, witness_commitments[i], witness_poly[i], transcript, fri_params);
+                        }
+
+                        // permutation polynomial evaluation
                         //lpc::proof_type lpc_proof_witnesses = evaluation_proof(transcript, omega);
 
                         // std::array<typename FieldType::value_type, k> fT_evaluation_points = {upsilon};

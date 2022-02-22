@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 //
 // MIT License
 //
@@ -177,7 +178,7 @@ namespace nil {
                                                  const math::polynomial<typename FieldType::value_type> &g,
                                                  merkle_tree_type &T,
                                                  fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
-                                                 params_type &fri_params) {
+                                                 const params_type &fri_params) {
 
                         proof_type proof;
 
