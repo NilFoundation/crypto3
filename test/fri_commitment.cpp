@@ -92,15 +92,30 @@ typename FRIScheme::round_proof_type generate_random_fri_round_proof(std::size_t
 
     auto data = generate_random_data<std::uint8_t, 32>(leafs_number);
     typename FRIScheme::merkle_tree_type tree(data.cbegin(), data.cend());
-    typename FRIScheme::merkle_proof_type mp(tree, rd() % leafs_number);
+    std::size_t idx = rd() % leafs_number;
+    typename FRIScheme::merkle_proof_type mp(tree, idx);
     proof.colinear_path = mp;
+    std::cout << "colinear_path_verifiable_data = hex\"";
+    for (const auto c : data[idx]) {
+        std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
+    }
+    std::cout << "\";" << std::endl;
 
+
+    std::cout << "p_verifiable_data" << " = [";
     for (std::size_t i = 0; i < proof.p.size(); ++i) {
         auto data = generate_random_data<std::uint8_t, 32>(leafs_number);
         typename FRIScheme::merkle_tree_type tree(data.cbegin(), data.cend());
-        typename FRIScheme::merkle_proof_type mp(tree, rd() % leafs_number);
+        idx = rd() % leafs_number;
+        typename FRIScheme::merkle_proof_type mp(tree, idx);
         proof.p.at(i) = mp;
+        std::cout << "hex\"";
+        for (const auto c : data[idx]) {
+            std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
+        }
+        std::cout << "\",";
     }
+    std::cout << "];" << std::endl;
 
     nil::crypto3::random::algebraic_random_device<typename FRIScheme::field_type> d;
     proof.colinear_value = d();
@@ -112,11 +127,27 @@ typename FRIScheme::round_proof_type generate_random_fri_round_proof(std::size_t
     proof.T_root =
         nil::crypto3::hash<typename FRIScheme::transcript_hash_type>(generate_random_data<std::uint8_t, 32>(1).at(0));
 
+    std::cout << "FRI round proof:" << std::endl;
+    std::cout << "y = [";
+    for (const auto &y_i : proof.y) {
+        std::cout << std::dec << "uint256(" << y_i.data << "), ";
+    }
+    std::cout << "];" << std::endl << std::endl;
+
+    std::cout << "colinear_value = uint256(" << proof.colinear_value.data << ");" << std::endl;
+
+    std::cout << "T_root = hex\"";
+    for (const auto c : proof.T_root) {
+        std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
+    }
+    std::cout << "\";" << std::endl;
+
     return proof;
 }
 
 template<typename FRIScheme>
-typename FRIScheme::proof_type generate_random_fri_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree) {
+typename FRIScheme::proof_type generate_random_fri_proof(std::size_t tree_depth, std::size_t round_proofs_n,
+                                                         std::size_t degree) {
     typename FRIScheme::proof_type proof;
 
     for (std::size_t i = 0; i < round_proofs_n; ++i) {
@@ -151,6 +182,11 @@ void test_fri_round_proof(std::size_t tree_depth) {
     cv.resize(filled_proof.length(), 0x00);
     auto write_iter = cv.begin();
     nil::marshalling::status_type status = filled_proof.write(write_iter, cv.size());
+    std::cout << "FRI round proof (" << cv.size() << " bytes): ";
+    for (auto c : cv) {
+        std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
+    }
+    std::cout << std::endl << std::endl;
 
     proof_marshalling_type test_val_read;
     auto read_iter = cv.begin();
@@ -165,8 +201,7 @@ void test_fri_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::siz
     using namespace nil::crypto3::marshalling;
 
     using commitment_scheme_type = nil::crypto3::zk::snark::fri_commitment_scheme<Field, Hash, Hash>;
-    using proof_marshalling_type =
-        types::fri_proof<nil::marshalling::field_type<Endianness>, commitment_scheme_type>;
+    using proof_marshalling_type = types::fri_proof<nil::marshalling::field_type<Endianness>, commitment_scheme_type>;
 
     typename commitment_scheme_type::proof_type proof =
         generate_random_fri_proof<commitment_scheme_type>(tree_depth, round_proofs_n, degree);
@@ -180,6 +215,11 @@ void test_fri_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::siz
     cv.resize(filled_proof.length(), 0x00);
     auto write_iter = cv.begin();
     nil::marshalling::status_type status = filled_proof.write(write_iter, cv.size());
+    std::cout << "FRI proof (" << cv.size() << " bytes): ";
+    for (auto c : cv) {
+        std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
+    }
+    std::cout << std::endl << std::endl;
 
     proof_marshalling_type test_val_read;
     auto read_iter = cv.begin();
@@ -192,6 +232,7 @@ void test_fri_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::siz
 BOOST_AUTO_TEST_SUITE(fri_test_suite)
 
 BOOST_AUTO_TEST_CASE(fri_round_proof_bls12_381_be) {
+    std::srand(std::time(0));
     using curve_type = nil::crypto3::algebra::curves::bls12<381>;
     using field_type = typename curve_type::scalar_field_type;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
