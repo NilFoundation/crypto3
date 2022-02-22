@@ -223,18 +223,33 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     const std::size_t usable_rows = 1 << table_rows_log;
     circuit_description<FieldType, table_rows_log, witness_columns, public_columns, permutation_size, usable_rows> circuit = circuit_test_2<FieldType>();
 
+    using types_policy = zk::snark::detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
+
     constexpr static const std::size_t r = table_rows_log - 1;
     typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, lambda, k, r, m> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
-    math::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial<FieldType>(circuit.domain, 0);
+    
+    typename types_policy::constraint_system_type constraint_system;
+    constraint_system.gates = circuit.gates;
+    typename types_policy::variable_assignment_type assigments = circuit.table;
+
+    types_policy::circuit_short_description<lpc_type> short_description;
+    short_description.columns_with_copy_constraints = {0, 1, 2, 3};
+    short_description.table_rows = table_rows;
+    short_description.usable_rows = usable_rows;
+    short_description.delta = circuit.delta;
+    short_description.permutation = circuit.permutation;
+
+    typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data = 
+        redshift_preprocessor<FieldType, witness_columns, public_columns, k>::process(constraint_system, assigments, short_description);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     fiat_shamir_heuristic_updated<transcript_hash_type> prover_transcript(init_blob);
     fiat_shamir_heuristic_updated<transcript_hash_type> verifier_transcript(init_blob);
 
     std::array<math::polynomial<typename FieldType::value_type>, 1> prover_res =
-        redshift_gates_argument<FieldType, transcript_hash_type>::prove_eval(circuit.gates, circuit.column_polynomials, prover_transcript);
+        redshift_gates_argument<FieldType, witness_columns, public_columns, transcript_hash_type>::prove_eval(constraint_system, circuit.column_polynomials, prover_transcript);
 
     // Challenge phase
     typename FieldType::value_type y = algebra::random_element<FieldType>();
@@ -246,7 +261,7 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     }
 
     std::array<typename FieldType::value_type, 1> verifier_res =
-        redshift_gates_argument<FieldType, transcript_hash_type>::verify_eval(circuit.gates, columns_at_y, y, verifier_transcript);
+        redshift_gates_argument<FieldType, witness_columns, public_columns, transcript_hash_type>::verify_eval(circuit.gates, columns_at_y, y, verifier_transcript);
 
     typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();

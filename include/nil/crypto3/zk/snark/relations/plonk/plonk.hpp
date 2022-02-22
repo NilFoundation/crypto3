@@ -62,6 +62,8 @@ namespace nil {
 
                 public:
 
+                    std::vector<plonk_gate<FieldType>> gates;
+
                     plonk_constraint_system() {
                     }
 

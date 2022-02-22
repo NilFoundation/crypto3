@@ -162,6 +162,14 @@ namespace nil {
                         data.q_last = selector_last(short_description.table_rows, short_description.usable_rows, data.basic_domain);
                         data.q_blind = selector_blind(short_description.table_rows, short_description.usable_rows, data.basic_domain);
 
+                        std::vector<typename FieldType::value_type> z_numenator(N_rows + 1);
+                        z_numenator[0] = -FieldType::value_type::one();
+                        z_numenator[N_rows] = FieldType::value_type::one();
+
+                        data.Z = z_numenator;
+                        math::polynomial<typename FieldType::value_type> z_denominator = {-FieldType::value_type::one(), FieldType::value_type::one()};
+                        data.Z = data.Z / z_denominator;
+
                         /*data.omega = math::unity_root<FieldType>(math::detail::power_of_two(k));
                         data.Z = {1};
                         // data.selectors = constraint_system.selectors();

@@ -45,17 +45,21 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType,
+                         std::size_t witness_columns, std::size_t public_columns,
                          typename TranscriptHashType = hashes::keccak_1600<512>,
                          std::size_t ArgumentSize = 1>
                 struct redshift_gates_argument;
 
                 template<typename FieldType,
+                         std::size_t witness_columns, std::size_t public_columns,
                          typename TranscriptHashType>
-                struct redshift_gates_argument<FieldType, TranscriptHashType, 1> {
+                struct redshift_gates_argument<FieldType, witness_columns, public_columns, TranscriptHashType, 1> {
+                    using types_policy = detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
+
                     constexpr static const std::size_t argument_size = 1;
 
                     static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
-                        prove_eval(const std::vector<plonk_gate<FieldType>> &gates,
+                        prove_eval(typename types_policy::constraint_system_type &constraint_system,
                                     const std::vector<math::polynomial<typename FieldType::value_type>> &columns,
                                    fiat_shamir_heuristic_updated<TranscriptHashType> &transcript) {
 
@@ -65,6 +69,8 @@ namespace nil {
                                              argument_size> F;
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
+
+                        std::vector<plonk_gate<FieldType>> &gates = constraint_system.gates;
 
                         for (std::size_t i = 0; i < gates.size(); i++) {
                             math::polynomial<typename FieldType::value_type> gate_result = {0};

@@ -36,6 +36,7 @@
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/types.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/gates_argument.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -63,8 +64,10 @@ namespace nil {
                     constexpr static const std::size_t permutation_parts = 3;
                     constexpr static const std::size_t f_parts = 9;
 
-                    /*static inline math::polynomial<typename FieldType::value_type> 
-                        quotient_polynomial() {
+                    static inline math::polynomial<typename FieldType::value_type> 
+                        quotient_polynomial(const typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data,
+                            std::array<math::polynomial<typename FieldType::value_type>, f_parts> F, 
+                            fiat_shamir_heuristic_updated<TranscriptHashType> transcript) {
                             // 7.1. Get $\alpha_0, \dots, \alpha_8 \in \mathbb{F}$ from $hash(\text{transcript})$
                             std::array<typename FieldType::value_type, f_parts> alphas =
                                 transcript.template challenges<FieldType, f_parts>();
@@ -77,7 +80,9 @@ namespace nil {
 
                             math::polynomial<typename FieldType::value_type> T_consolidated =
                                 F_consolidated / preprocessed_data.Z;
-                    }*/
+
+                            return T_consolidated;
+                    }
 
                     /*static inline std::vector<typename lpc::proof_type> 
                         evaluation_proof(typename FieldType::value_type challenge,
@@ -114,7 +119,7 @@ namespace nil {
                 public:
                     static inline typename types_policy::template proof_type<lpc>
                         process(const typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data,
-                                const typename types_policy::constraint_system_type &constraint_system,
+                                typename types_policy::constraint_system_type &constraint_system,
                                 const typename types_policy::variable_assignment_type &assignments,
                                 const typename types_policy::template circuit_short_description<lpc> &short_description,
                                 const typename lpc::fri_type::params_type &fri_params) {
@@ -148,7 +153,7 @@ namespace nil {
                         for (std::size_t i = 0; i < short_description.columns_with_copy_constraints.size(); i++) {
                             std::size_t column_index = short_description.columns_with_copy_constraints[i];
                             if (column_index < witness_columns) { //TODO: for now, we suppose that witnesses are placed to the first witness_columns of the table
-                                columns_for_permutation_argument[i] = witness_poly[i];
+                                columns_for_permutation_argument[i] = witness_poly[column_index];
                             } else {
                                 std::vector<typename FieldType::value_type> tmp;
                                 std::copy(assignments[column_index].begin(), assignments[column_index].end(), std::back_inserter(tmp));
@@ -174,19 +179,30 @@ namespace nil {
                         //     lookup_argument = redshift_lookup_argument<FieldType>::prove_eval(transcript);
 
                         // 6. circuit-satisfability
-                        /*std::array<math::polynomial<typename FieldType::value_type>, gate_parts> prover_res =
-                            redshift_gates_argument<FieldType, lpc_type>::prove_eval(prover_transcript, circuit_rows,
-                                                                                        permutation_size, domain, lagrange_0, S_id,
-                                                                                        S_sigma, f, q_last, q_blind, fri_params);
+                        std::vector<math::polynomial<typename FieldType::value_type>> columns_for_gate_argument(witness_columns + public_columns);
+                        for (std::size_t i = 0; i < columns_for_gate_argument.size(); i++) {
+                            if (i < witness_columns) { //TODO: for now, we suppose that witnesses are placed to the first witness_columns of the table
+                                columns_for_gate_argument[i] = witness_poly[i];
+                            } else {
+                                std::vector<typename FieldType::value_type> tmp;
+                                std::copy(assignments[i].begin(), assignments[i].end(), std::back_inserter(tmp));
+                                preprocessed_data.basic_domain->inverse_fft(tmp);
+                                columns_for_gate_argument[i] = tmp;
+                            }
+                        }
+
+                        std::array<math::polynomial<typename FieldType::value_type>, gate_parts> prover_res =
+                            redshift_gates_argument<FieldType, witness_columns, public_columns, TranscriptHashType>::prove_eval(
+                                constraint_system, columns_for_gate_argument, transcript);
 
                         F[3] = prover_res[0];
 
                         // 7. Aggregate quotient polynomial
-                        math::polynomial<typename FieldType::value_type> T = quotient_polynomial();
-                        std::size_t N_T = std::max(N_perm + N_PI, F[8].degree() - 1);
-                        std::array<math::polynomial<typename FieldType::value_type>, N_T> T_splitted = ;
+                        math::polynomial<typename FieldType::value_type> T = quotient_polynomial(preprocessed_data, F, transcript);
+                        /*std::size_t N_T = short_description.columns_with_copy_constraints.size();// std::max(short_description.columns_with_copy_constraints.size(), GATE_MAX_DEGREE);
+                        std::array<math::polynomial<typename FieldType::value_type>, N_T> T_splitted;
                         auto T_commitments = lpc::commit<witness_columns>(T_splitted, fri_params.D[0]);
-                        transcript(T_commitments);*/    
+                        transcript(T_commitments);
 
                         // 8. Run evaluation proofs
                         //typename FieldType::value_type challenge = transcript.template challenge<FieldType>();
