@@ -122,27 +122,19 @@ namespace nil {
 
                     static inline void permute(state_type &A) {
 
-                        __m256i A0 = _mm256_set_epi64x(A[0], A[0], A[0], A[0]);
-                        __m256i A1 = _mm256_set_epi64x(A[4], A[3], A[2], A[1]);
-                        __m256i A2 = _mm256_set_epi64x(A[15], A[5], A[20], A[10]);
-                        __m256i A3 = _mm256_set_epi64x(A[14], A[23], A[7], A[16]);
-                        __m256i A4 = _mm256_set_epi64x(A[19], A[8], A[22], A[11]);
-                        __m256i A5 = _mm256_set_epi64x(A[9], A[13], A[17], A[21]);
-                        __m256i A6 = _mm256_set_epi64x(A[24], A[18], A[12], A[6]);
+                        register __m256i A0 asm("ymm0") = _mm256_set_epi64x(A[0], A[0], A[0], A[0]);
+                        register __m256i A1 asm("ymm1") = _mm256_set_epi64x(A[4], A[3], A[2], A[1]);
+                        register __m256i A2 asm("ymm2") = _mm256_set_epi64x(A[15], A[5], A[20], A[10]);
+                        register __m256i A3 asm("ymm3") = _mm256_set_epi64x(A[14], A[23], A[7], A[16]);
+                        register __m256i A4 asm("ymm4") = _mm256_set_epi64x(A[19], A[8], A[22], A[11]);
+                        register __m256i A5 asm("ymm5") = _mm256_set_epi64x(A[9], A[13], A[17], A[21]);
+                        register __m256i A6 asm("ymm6") = _mm256_set_epi64x(A[24], A[18], A[12], A[6]);
 
                         __asm__(
-                            "vmovdqa %[A0], %%ymm0;"
-                            "vmovdqa %[A1], %%ymm1;"
-                            "vmovdqa %[A2], %%ymm2;"
-                            "vmovdqa %[A3], %%ymm3;"
-                            "vmovdqa %[A4], %%ymm4;"
-                            "vmovdqa %[A5], %%ymm5;"
-                            "vmovdqa %[A6], %%ymm6;"
-
                             "lea %[rho_l], %%r8;"
                             "lea %[rho_r], %%r9;"
                             "lea %[c], %%r10;"
-                            "mov %[rounds], %%eax;"
+                            "movq %[rounds], %%rbx;"
 
                             "1:"
                             // Calculate C
@@ -296,24 +288,17 @@ namespace nil {
                             "vpxor (%%r10), %%ymm0, %%ymm0;"
                             "lea 32(%%r10), %%r10;"
 
-                            "dec %%eax;"
+                            "dec %%rbx;"
                             "jnz 1b;"
 
-                            "vmovdqa %%ymm0, %[A0];"
-                            "vmovdqa %%ymm1, %[A1];"
-                            "vmovdqa %%ymm2, %[A2];"
-                            "vmovdqa %%ymm3, %[A3];"
-                            "vmovdqa %%ymm4, %[A4];"
-                            "vmovdqa %%ymm5, %[A5];"
-                            "vmovdqa %%ymm6, %[A6];"
-
-                            : [A0] "=m"(A0), [A1] "=m"(A1), [A2] "=m"(A2), [A3] "=m"(A3), [A4] "=m"(A4), [A5] "=m"(A5),
-                              [A6] "=m"(A6)
-                            : [rounds] "m" (round_constants_size), [rho_l] "m"(rho_l), [rho_r] "m"(rho_r), [c] "m"(round_constants_v)
-                            : "%ymm0", "%ymm1", "%ymm2", "%ymm3", "%ymm4", "%ymm5",
-                              "%ymm6",                                          // it's A0, A1, A2, A3, A4, A5, A6
-                              "%ymm7", "%ymm8", "%ymm9", "%ymm10", "%ymm11",    // tmp variables
-                              "%ymm12", "%ymm13", "%ymm14", "%ymm15"            // C, Czero, D, Dzero
+                            : [A0] "+v"(A0), [A1] "+v"(A1), [A2] "+v"(A2), [A3] "+v"(A3), [A4] "+v"(A4), [A5] "+v"(A5),
+                              [A6] "+v"(A6)
+                            : [rounds] "r"(round_constants_size), [rho_l] "o"(rho_l), [rho_r] "o"(rho_r),
+                              [c] "o"(round_constants_v)
+                            : "cc", "memory",                              // it's A0, A1, A2, A3, A4, A5, A6
+                              "ymm7", "ymm8", "ymm9", "ymm10", "ymm11",    // tmp variables
+                              "ymm12", "ymm13", "ymm14", "ymm15",          // C, Czero, D, Dzero
+                              "rbx"                                        // Circle
                         );
 
                         A[0] = A0[0];
