@@ -53,6 +53,8 @@ namespace nil {
                         std::size_t usable_rows>
                         class circuit_description
                     {
+                        using types_policy = zk::snark::detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
+
                         public:
                         const std::size_t table_rows = 1 << rows_log;
 
@@ -66,7 +68,7 @@ namespace nil {
                         std::vector<math::polynomial<typename FieldType::value_type>> S_id;
                         std::vector<math::polynomial<typename FieldType::value_type>> S_sigma;
 
-                        std::array<std::vector<typename FieldType::value_type>, witness_columns + public_columns> table;
+                        typename types_policy::variable_assignment_type table;
                         std::vector<math::polynomial<typename FieldType::value_type>> column_polynomials;
 
                         // construct q_last, q_blind
@@ -85,14 +87,14 @@ namespace nil {
                         }
 
                         void init() {
-                            S_id = redshift_preprocessor<FieldType, witness_columns, public_columns, 1>::identity_polynomials(
+                            S_id = redshift_public_preprocessor<FieldType, witness_columns, public_columns, 1>::identity_polynomials(
                             permutation_size, table_rows, omega, delta, domain);
-                            S_sigma = redshift_preprocessor<FieldType, witness_columns, public_columns, 1>::permutation_polynomials(
+                            S_sigma = redshift_public_preprocessor<FieldType, witness_columns, public_columns, 1>::permutation_polynomials(
                             permutation_size, table_rows, omega, delta, permutation, domain);
 
-                            q_last = redshift_preprocessor<FieldType, witness_columns, public_columns, 1>::selector_last(
+                            q_last = redshift_public_preprocessor<FieldType, witness_columns, public_columns, 1>::selector_last(
                             table_rows, usable_rows, domain);
-                            q_blind = redshift_preprocessor<FieldType, witness_columns, public_columns, 1>::selector_blind(
+                            q_blind = redshift_public_preprocessor<FieldType, witness_columns, public_columns, 1>::selector_blind(
                             table_rows, usable_rows, domain);
                         }
                     };
@@ -161,6 +163,16 @@ namespace nil {
 
                     
                     test_circuit.table = table;
+                    for (std::size_t i = 0; i < witness_columns; i++) {
+                        for (std::size_t j = 0; j < test_circuit.table_rows; j++) {
+                            test_circuit.table.private_assignment.witnesses[i][j] = table[i][j];
+                        }
+                    }
+                    for (std::size_t i = 0; i < public_columns; i++) {
+                        for (std::size_t j = 0; j < test_circuit.table_rows; j++) {
+                            test_circuit.table.public_assignment.public_input[i][j] = table[witness_columns + i][j];
+                        }
+                    }
                     test_circuit.init();
 
                     

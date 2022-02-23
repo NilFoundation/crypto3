@@ -60,16 +60,16 @@ namespace nil {
                         return interpolation_points;
                     }
 
-                    template<typename FieldType>
+                    template<typename FieldType, std::size_t witness_amount, std::size_t public_amount>
                     std::vector<math::polynomial<typename FieldType::value_type>>
                         column_range_polynomials(std::size_t table_size,
-                            const types_policy::variable_assignment_type::public_assignment_type::selectors_type &column_range_assignment,
+                            const typename detail::redshift_types_policy<FieldType, witness_amount, public_amount>::variable_assignment_type::public_assignment_type::selectors_type &column_range_assignment,
                             const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
 
                         std::size_t selectors_amount = column_range_assignment.size();
-                        std::vector<math::polynomial<typename FieldType::value_type>> columns (columns_amount);
+                        std::vector<math::polynomial<typename FieldType::value_type>> columns (witness_amount + public_amount);
 
-                        for (std::size_t selector_index = 0; selector_index < columns_amount; selector_index++) {
+                        for (std::size_t selector_index = 0; selector_index < witness_amount + public_amount; selector_index++) {
                             columns[selector_index] = column_polynomial<FieldType>(table_size, column_range_assignment[selector_index], domain);
                         }
 
@@ -171,14 +171,14 @@ namespace nil {
                     }
 
                     template <typename lpc_type>
-                    static inline typename types_policy::template preprocessed_public_data_type<WitnessColumns>
+                    static inline typename types_policy::preprocessed_public_data_type
                         process(const typename types_policy::constraint_system_type &constraint_system,
                                 const typename types_policy::variable_assignment_type::public_assignment_type &public_assignment,
                                 typename types_policy::template circuit_short_description<lpc_type> &short_description) {
 
                         typename types_policy::preprocessed_public_data_type data;
 
-                        std::size_t N_rows = constraint_system.rows_amount();
+                        std::size_t N_rows = constraint_system.rows_amount;
 
                         data.basic_domain = math::make_evaluation_domain<FieldType>(N_rows);
 
@@ -195,7 +195,7 @@ namespace nil {
                         data.q_last = selector_last(short_description.table_rows, short_description.usable_rows, data.basic_domain);
                         data.q_blind = selector_blind(short_description.table_rows, short_description.usable_rows, data.basic_domain);
 
-                        data.selectors = detail::column_range_polynomials<FieldType>(short_description.table_rows, public_assignment.selectors, data.basic_domain);
+                        data.selectors = detail::column_range_polynomials<FieldType, WitnessColumns, PublicColumns>(short_description.table_rows, public_assignment.selectors, data.basic_domain);
 
                         std::vector<typename FieldType::value_type> z_numenator(N_rows + 1);
                         z_numenator[0] = -FieldType::value_type::one();

@@ -73,7 +73,7 @@ namespace nil {
                     constexpr static const std::size_t f_parts = 9;
 
                     static inline math::polynomial<typename FieldType::value_type> 
-                        quotient_polynomial(const typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data,
+                        quotient_polynomial(const typename types_policy::preprocessed_public_data_type preprocessed_data,
                             std::array<math::polynomial<typename FieldType::value_type>, f_parts> F, 
                             fiat_shamir_heuristic_updated<TranscriptHashType> transcript) {
                             // 7.1. Get $\alpha_0, \dots, \alpha_8 \in \mathbb{F}$ from $hash(\text{transcript})$
@@ -108,7 +108,8 @@ namespace nil {
 
                 public:
                     static inline typename types_policy::template proof_type<lpc_witness, lpc_permutation, lpc_quotient>
-                        process(const typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data,
+                        process(const typename types_policy::preprocessed_public_data_type preprocessed_data_public,
+                                const typename types_policy::template preprocessed_private_data_type<witness_columns> preprocessed_data_private,
                                 typename types_policy::constraint_system_type &constraint_system,
                                 const typename types_policy::variable_assignment_type &assignments,
                                 const typename types_policy::template circuit_short_description<lpc_public> &short_description,
@@ -125,8 +126,8 @@ namespace nil {
                         std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_poly;
                         for (std::size_t i = 0; i < witness_columns; i++) {
                             std::vector<typename FieldType::value_type> tmp;
-                            std::copy(assignments[i].begin(), assignments[i].end(), std::back_inserter(tmp));
-                            preprocessed_data.basic_domain->inverse_fft(tmp);
+                            std::copy(assignments.private_assignment.witnesses[i].begin(), assignments.private_assignment.witnesses[i].end(), std::back_inserter(tmp));
+                            preprocessed_data_public.basic_domain->inverse_fft(tmp);
                             witness_poly[i] = tmp;
                         }
                         std::array<typename lpc_witness::merkle_tree_type, witness_columns> witness_commitments =
@@ -146,15 +147,15 @@ namespace nil {
                                 columns_for_permutation_argument[i] = witness_poly[column_index];
                             } else {
                                 std::vector<typename FieldType::value_type> tmp;
-                                std::copy(assignments[column_index].begin(), assignments[column_index].end(), std::back_inserter(tmp));
-                                preprocessed_data.basic_domain->inverse_fft(tmp);
+                                std::copy(assignments.public_assignment.public_input[column_index].begin(), assignments.public_assignment.public_input[column_index].end(), std::back_inserter(tmp));
+                                preprocessed_data_public.basic_domain->inverse_fft(tmp);
                                 columns_for_permutation_argument[i] = tmp;
                             }
                         }
 
                         // 4. permutation_argument
                         auto permutation_argument = redshift_permutation_argument<FieldType, lpc_public, lpc_permutation, witness_columns, public_columns>::prove_eval(
-                                transcript, preprocessed_data, short_description, columns_for_permutation_argument, fri_params);
+                                transcript, preprocessed_data_public, short_description, columns_for_permutation_argument, fri_params);
 
                         proof.v_perm_commitment = permutation_argument.permutation_poly_commitment.root();
 
@@ -175,8 +176,8 @@ namespace nil {
                                 columns_for_gate_argument[i] = witness_poly[i];
                             } else {
                                 std::vector<typename FieldType::value_type> tmp;
-                                std::copy(assignments[i].begin(), assignments[i].end(), std::back_inserter(tmp));
-                                preprocessed_data.basic_domain->inverse_fft(tmp);
+                                std::copy(assignments.public_assignment.public_input[i].begin(), assignments.public_assignment.public_input[i].end(), std::back_inserter(tmp));
+                                preprocessed_data_public.basic_domain->inverse_fft(tmp);
                                 columns_for_gate_argument[i] = tmp;
                             }
                         }
@@ -217,8 +218,13 @@ namespace nil {
                         // permutation polynomial evaluation
                         std::array<typename FieldType::value_type, 2> evaluation_points_v_p = {challenge, challenge * omega};
                         typename lpc_permutation::proof_type v_p_evaluation = lpc_permutation::proof_eval(evaluation_points_v_p, permutation_argument.permutation_poly_commitment, permutation_argument.permutation_polynomial, transcript, fri_params);
-                        //lpc::proof_type lpc_proof_witnesses = evaluation_proof(transcript, omega);
+                        
 
+                        std::array<typename FieldType::value_type, 1> evaluation_points_quotient = {challenge};
+                        std::vector<typename lpc_quotient::proof_type> quotient_evaluation(T_splitted.size());
+                        for (std::size_t i = 0; i < T_splitted.size(); i++) {
+                            quotient_evaluation[i] = lpc_quotient::proof_eval(evaluation_points_quotient, T_commitments[i], T_splitted[i], transcript, fri_params);
+                        }
                         // std::array<typename FieldType::value_type, k> fT_evaluation_points = {upsilon};
                         // std::vector<typename lpc::proof_type> f_lpc_proofs(N_wires);
 

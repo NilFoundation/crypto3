@@ -120,7 +120,10 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
     typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, lambda, k, r, m> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
+
     typename types_policy::constraint_system_type constraint_system;
+    constraint_system.rows_amount = table_rows;
+
     typename types_policy::variable_assignment_type assigments = circuit.table;
 
     types_policy::circuit_short_description<lpc_type> short_description;
@@ -130,11 +133,15 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
     short_description.delta = circuit.delta;
     short_description.permutation = circuit.permutation;
 
-    typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data = 
-        redshift_preprocessor<FieldType, witness_columns, public_columns, k>::process(constraint_system, assigments, short_description);
+    typename types_policy::preprocessed_public_data_type preprocessed_data_public = 
+        redshift_public_preprocessor<FieldType, witness_columns, public_columns, k>::process(constraint_system, assigments.public_assignment, short_description);
+
+    typename types_policy::template preprocessed_private_data_type<witness_columns> preprocessed_data_private = 
+        redshift_private_preprocessor<FieldType, witness_columns, public_columns, k>::process(constraint_system, assigments.private_assignment, short_description);
+
 
     auto proof = redshift_prover<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, public_columns, lambda, r, m>::process(
-        preprocessed_data, constraint_system, assigments, short_description, fri_params);
+        preprocessed_data_public, preprocessed_data_private, constraint_system, assigments, short_description, fri_params);
 
     bool verifier_res = redshift_verifier<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, public_columns, lambda, r, m>::process(
         proof, short_description);

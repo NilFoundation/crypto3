@@ -62,7 +62,7 @@ namespace nil {
                         struct variable_assignment_type {
 
                             struct private_assignment_type {
-                                std::array<std::vector<typename FieldType::value_type>, WiresAmount> witnesses;
+                                std::array<std::vector<typename FieldType::value_type>, WitnessAmount> witnesses;
                             } private_assignment;
 
                             struct public_assignment_type {

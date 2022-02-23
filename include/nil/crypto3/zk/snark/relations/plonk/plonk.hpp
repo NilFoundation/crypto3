@@ -59,6 +59,7 @@ namespace nil {
                 public:
 
                     std::vector<plonk_gate<FieldType>> gates;
+                    std::size_t rows_amount;
 
                     plonk_constraint_system() {
                     }
@@ -95,7 +96,7 @@ namespace nil {
                         return {};
                     }
 
-                    static std::vector<math::polynomial<typename FieldType::value_type>>
+                    /*static std::vector<math::polynomial<typename FieldType::value_type>>
                         wire_polynomials(const plonk_variable_assignment<FieldType, WitnessAmount> &full_variable_assignment) {
 
                         // std::vector<math::polynomial<typename FieldType::value_type>> result(gates_data.size());
@@ -138,7 +139,7 @@ namespace nil {
                         // }
 
                         return wires;
-                    }
+                    }*/
 
                     void add_gate(const plonk_gate_unprocessed<FieldType> &g) {
                         gates_data.emplace_back(g);
