@@ -55,7 +55,6 @@ namespace nil {
                         UINT64_C(0x8000000000008080), UINT64_C(0x0000000080000001), UINT64_C(0x8000000080008008)};
 
                     static inline void permute(state_type &A) {
-                        for (typename round_constants_type::value_type c : round_constants) {
                             std::array<word_type, 5> C;
                             std::array<word_type, 25> B;
                             //                            my @C = ("%rax","%rbx","%rcx","%rdx","%rbp");
@@ -65,6 +64,10 @@ namespace nil {
                             // C - %%rax, 8C - %%rbx, 16C - %%rcx, 24C - %%rdx, 32C - %%rbp
                             // D - %%r8, 8D - %%r9, 16D - %%r10, 24D - %%r11, 32D - %%r12
                             __asm__(
+                                "mov $24, %%rax \n\t"
+                                "lea %[c], %%r14\n\t"
+                                "1:\n\t"
+
                                 "mov (%[A]), %%r15\n\t"
                                 "xor 40(%[A]), %%r15\n\t"
                                 "xor 80(%[A]), %%r15\n\t"
@@ -106,24 +109,24 @@ namespace nil {
                                 "mov %%r15, %%r9 \n\t"
 
                                 "mov (%[C]), %%r15 \n\t"
-                                "rolq $1, %%r15\n\t"
-                                "xorq %%r15, %%r8\n\t"
+                                "rol $1, %%r15\n\t"
+                                "xor %%r15, %%r8\n\t"
 
                                 "mov 8(%[C]), %%r15 \n\t"
-                                "rolq $1, %%r15\n\t"
-                                "xorq %%r15, %%r9\n\t"
+                                "rol $1, %%r15\n\t"
+                                "xor %%r15, %%r9\n\t"
 
                                 "mov 16(%[C]), %%r15 \n\t"
-                                "rolq $1, %%r15\n\t"
-                                "xorq %%r15, %%r10\n\t"
+                                "rol $1, %%r15\n\t"
+                                "xor %%r15, %%r10\n\t"
 
                                 "mov 24(%[C]), %%r15 \n\t"
-                                "rolq $1, %%r15\n\t"
-                                "xorq %%r15, %%r11\n\t"
+                                "rol $1, %%r15\n\t"
+                                "xor %%r15, %%r11\n\t"
 
                                 "mov 32(%[C]), %%r15 \n\t"
-                                "rolq $1, %%r15\n\t"
-                                "xorq %%r15, %%r12\n\t"
+                                "rol $1, %%r15\n\t"
+                                "xor %%r15, %%r12\n\t"
                                 // stop calculating D, start B
 
                                 "mov (%[A]), %%r15 \n\t"
@@ -260,7 +263,7 @@ namespace nil {
                                 "not %%r15 \n\t"
                                 "and 16(%[B]), %%r15 \n\t"
                                 "xor (%[B]), %%r15 \n\t"
-                                "xor %[c], %%r15\n\t"
+                                "xor (%%r14), %%r15\n\t"
                                 "mov %%r15, (%[A]) \n\t"
 
                                 "mov 16(%[B]), %%r15 \n\t"
@@ -407,10 +410,13 @@ namespace nil {
                                 "xor 192(%[B]), %%r15 \n\t"
                                 "mov %%r15, 192(%[A]) \n\t"
                                 // a24
+
+                                "lea 8(%%r14), %%r14\n\t"
+                                "dec %%rax \n\t"
+                                "jnz 1b \n\t"
                                 :
-                                : [A] "r"(A.begin()), [C] "r"(C.begin()), [B] "r"(B.begin()), [c] "r" (c)
-                                : "cc", "memory", "%rax", "%rbx", "%rcx", "%rdx", "%rbp", "%r8", "%r9", "%r10", "%r11", "%r12", "%r15");
-                        }
+                                : [A] "r"(A.begin()), [C] "r"(C.begin()), [B] "r"(B.begin()), [c] "m" (round_constants)
+                                : "cc", "memory", "%rax", "%rbx", "%rcx", "%r8", "%r9", "%r10", "%r11", "%r12", "%r14", "%r15");
                     }
                 };
 
