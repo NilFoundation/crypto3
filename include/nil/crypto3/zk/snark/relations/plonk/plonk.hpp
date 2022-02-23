@@ -49,11 +49,6 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                /************************* PLONK variable assignment **************************/
-
-                template<typename FieldType, std::size_t WiresAmount>
-                using plonk_variable_assignment = std::array<std::vector<typename FieldType::value_type>, WiresAmount>;
-
                 /************************* PLONK constraint system ****************************/
 
                 template<typename FieldType, std::size_t WitnessAmount, std::size_t PublicAmount>

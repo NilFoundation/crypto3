@@ -62,12 +62,14 @@ namespace nil {
                         struct variable_assignment_type {
 
                             struct private_assignment_type {
-                                std::array<std::vector<typename FieldType::value_type>, WiresAmount> witness;
+                                std::array<std::vector<typename FieldType::value_type>, WiresAmount> witnesses;
                             } private_assignment;
 
                             struct public_assignment_type {
-                                std::vector<std::vector<typename FieldType::value_type>> selectors;
-                                std::vector<std::vector<typename FieldType::value_type>> public_input;
+                                using selectors_type = std::vector<std::vector<typename FieldType::value_type>>;
+                                using public_input_type = std::vector<std::vector<typename FieldType::value_type>>;
+                                selectors_type selectors;
+                                public_input_type public_input;
                             } public_assignment;
                         };
 
@@ -85,8 +87,7 @@ namespace nil {
                             typename CommitmentSchemeTypeQuotient>
                         using proof_type = redshift_proof<FieldType, CommitmentSchemeTypeWitness, CommitmentSchemeTypePermutation, CommitmentSchemeTypeQuotient>;
 
-                        template<std::size_t witness_columns>
-                        struct preprocessed_data_type {
+                        struct preprocessed_public_data_type {
 
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
@@ -105,6 +106,14 @@ namespace nil {
                             math::polynomial<typename FieldType::value_type> q_blind;
 
                             math::polynomial<typename FieldType::value_type> Z;
+                        };
+
+                        template<std::size_t WitnessColumns>
+                        struct preprocessed_private_data_type {
+
+                            std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
+
+                            std::array<math::polynomial<typename FieldType::value_type>, WitnessColumns> witnesses;
                         };
 
                         template <typename CommitmentSchemeType>
