@@ -60,20 +60,6 @@
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
 
-template<typename FieldType>
-math::polynomial<typename FieldType::value_type>
-    lagrange_polynomial(std::shared_ptr<math::evaluation_domain<FieldType>> domain, std::size_t number) {
-    std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> evaluation_points;
-    for (std::size_t i = 0; i < domain->m; i++) {
-        evaluation_points.push_back(std::make_pair(domain->get_domain_element(i), (i != number) ?
-                                                                                      FieldType::value_type::zero() :
-                                                                                      FieldType::value_type::one()));
-    }
-    math::polynomial<typename FieldType::value_type> f = math::lagrange_interpolation(evaluation_points);
-
-    return f;
-}
-
 template<typename fri_type, typename FieldType>
 typename fri_type::params_type create_fri_params(std::size_t degree_log) {
     typename fri_type::params_type params;

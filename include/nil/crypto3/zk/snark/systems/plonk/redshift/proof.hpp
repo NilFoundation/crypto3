@@ -38,9 +38,9 @@ namespace nil {
                 struct redshift_proof {
 
                     struct evaluation_proof {
-                        typename CommitmentSchemeTypeWitness::proof_type witness;
-                        typename CommitmentSchemeTypePermutation::proof_type permutation;
-                        typename CommitmentSchemeTypeQuotient::proof_type quotient;
+                        std::vector<typename CommitmentSchemeTypeWitness::proof_type> witness;
+                        std::vector<typename CommitmentSchemeTypePermutation::proof_type> permutation;
+                        std::vector<typename CommitmentSchemeTypeQuotient::proof_type> quotient;
                     };
 
                     redshift_proof() {

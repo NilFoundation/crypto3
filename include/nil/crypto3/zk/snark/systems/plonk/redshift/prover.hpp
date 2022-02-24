@@ -147,7 +147,7 @@ namespace nil {
                                 columns_for_permutation_argument[i] = witness_poly[column_index];
                             } else {
                                 std::vector<typename FieldType::value_type> tmp;
-                                std::copy(assignments.public_assignment.public_input[column_index].begin(), assignments.public_assignment.public_input[column_index].end(), std::back_inserter(tmp));
+                                std::copy(assignments.public_assignment.public_input[column_index - witness_columns].begin(), assignments.public_assignment.public_input[column_index - witness_columns].end(), std::back_inserter(tmp));
                                 preprocessed_public_data.basic_domain->inverse_fft(tmp);
                                 columns_for_permutation_argument[i] = tmp;
                             }
@@ -194,6 +194,7 @@ namespace nil {
                         std::vector<typename lpc_quotient::merkle_tree_type> T_commitments(T_splitted.size());
                         for (std::size_t i = 0; i < T_splitted.size(); i++) {
                             T_commitments[i] = lpc_quotient::commit(T_splitted[i], fri_params.D[0]);
+                            proof.T_commitments.push_back(T_commitments[i].root());
                         }
 
                         //transcript(T_commitments);
@@ -213,36 +214,20 @@ namespace nil {
                             }
 
                             witnesses_evaluation[i] = lpc_witness::proof_eval(evaluation_points_gates, witness_commitments[i], witness_poly[i], transcript, fri_params);
+                            proof.eval_proof.witness.push_back(witnesses_evaluation[i]);
                         }
 
                         // permutation polynomial evaluation
                         std::array<typename FieldType::value_type, 2> evaluation_points_v_p = {challenge, challenge * omega};
                         typename lpc_permutation::proof_type v_p_evaluation = lpc_permutation::proof_eval(evaluation_points_v_p, permutation_argument.permutation_poly_commitment, permutation_argument.permutation_polynomial, transcript, fri_params);
-                        
+                        proof.eval_proof.permutation.push_back(v_p_evaluation);
 
                         std::array<typename FieldType::value_type, 1> evaluation_points_quotient = {challenge};
                         std::vector<typename lpc_quotient::proof_type> quotient_evaluation(T_splitted.size());
                         for (std::size_t i = 0; i < T_splitted.size(); i++) {
                             quotient_evaluation[i] = lpc_quotient::proof_eval(evaluation_points_quotient, T_commitments[i], T_splitted[i], transcript, fri_params);
+                            proof.eval_proof.quotient.push_back(quotient_evaluation[i]);
                         }
-                        // std::array<typename FieldType::value_type, k> fT_evaluation_points = {upsilon};
-                        // std::vector<typename lpc::proof_type> f_lpc_proofs(N_wires);
-
-                        // for (std::size_t i = 0; i < N_wires; i++){
-                        //     f_lpc_proofs.push_back(lpc::proof_eval(fT_evaluation_points, f_trees[i], f[i], D_0));
-                        // }
-
-                        // std::vector<typename lpc::proof_type> T_lpc_proofs(N_perm + 1);
-
-                        // for (std::size_t i = 0; i < N_perm + 1; i++) {
-                        //     T_lpc_proofs.push_back(lpc::proof_eval(fT_evaluation_points, T_trees[i], T[i], D_0));
-                        // }*/
-
-                            // = typename types_policy::proof_type(std::move(f_commitments), std::move(T_commitments),
-                            //                               std::move(f_lpc_proofs), std::move(T_lpc_proofs));
-                        // proof.T_lpc_proofs = T_lpc_proofs;
-                        // proof.f_lpc_proofs = f_lpc_proofs;
-                        // proof.T_commitments = T_commitments;
 
                         return proof;
                     }
