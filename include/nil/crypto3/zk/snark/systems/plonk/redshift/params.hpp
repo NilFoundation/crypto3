@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2022 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 //
 // MIT License
 //
@@ -26,21 +27,20 @@
 #ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PARAMS_HPP
 #define CRYPTO3_ZK_PLONK_REDSHIFT_PARAMS_HPP
 
-#include <memory>
-
-#include <nil/crypto3/hash/keccak.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
                 struct redshift_params {
-                    constexpr static const std::size_t witness_amount = 15;
+                    using merkle_hash_type = hashes::keccak_1600<512>;
+                    using transcript_hash_type = hashes::keccak_1600<512>;
 
-                    constexpr static const std::size_t lambda = 0;
-                    constexpr static const std::size_t k = 0;
-                    constexpr static const std::size_t r = 0;
+                    constexpr static const std::size_t witness_columns = 15;
+                    constexpr static const std::size_t public_columns = 15;
+
+                    constexpr static const std::size_t lambda = 40;
+                    constexpr static const std::size_t r = 1;
                     constexpr static const std::size_t m = 2;
                 };
 

@@ -77,7 +77,7 @@ namespace nil {
                     }
 
                     template<typename FieldType, std::size_t columns_amount>
-                    std::vector<math::polynomial<typename FieldType::value_type>>
+                    std::array<math::polynomial<typename FieldType::value_type>, columns_amount>
                         column_range_polynomials(std::size_t table_size,
                             const std::array<std::vector<typename FieldType::value_type>, columns_amount> &column_range_assignment,
                             const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
@@ -93,9 +93,9 @@ namespace nil {
 
                 }    // namespace detail
 
-                template<typename FieldType, std::size_t WitnessColumns, std::size_t PublicColumns, std::size_t k>
+                template<typename FieldType, typename RedshiftParams, std::size_t k>
                 class redshift_public_preprocessor {
-                    using types_policy = detail::redshift_types_policy<FieldType, WitnessColumns, PublicColumns>;
+                    using types_policy = detail::redshift_types_policy<FieldType, RedshiftParams>;
 
                     static math::polynomial<typename FieldType::value_type>
                         lagrange_polynomial(std::shared_ptr<math::evaluation_domain<FieldType>> domain, std::size_t number) {
@@ -210,7 +210,7 @@ namespace nil {
                         data.q_last = selector_last(short_description.table_rows, short_description.usable_rows, data.basic_domain);
                         data.q_blind = selector_blind(short_description.table_rows, short_description.usable_rows, data.basic_domain);
 
-                        data.selectors = detail::column_range_polynomials<FieldType, WitnessColumns, PublicColumns>(short_description.table_rows, public_assignment.selectors, data.basic_domain);
+                        data.selectors = detail::column_range_polynomials<FieldType>(short_description.table_rows, public_assignment.selectors, data.basic_domain);
 
                         std::vector<typename FieldType::value_type> z_numenator(N_rows + 1);
                         z_numenator[0] = -FieldType::value_type::one();
@@ -234,19 +234,19 @@ namespace nil {
                     }
                 };
 
-                template<typename FieldType, std::size_t WitnessColumns, std::size_t PublicColumns, std::size_t k>
+                template<typename FieldType, typename RedshiftParams, std::size_t k>
                 class redshift_private_preprocessor {
-                    using types_policy = detail::redshift_types_policy<FieldType, WitnessColumns, PublicColumns>;
+                    using types_policy = detail::redshift_types_policy<FieldType, RedshiftParams>;
 
                 public:
 
                     template <typename lpc_type>
-                    static inline typename types_policy::template preprocessed_private_data_type<WitnessColumns>
+                    static inline typename types_policy::preprocessed_private_data_type
                         process(const typename types_policy::constraint_system_type &constraint_system,
                                 const typename types_policy::variable_assignment_type::private_assignment_type &private_assignment,
                                 typename types_policy::template circuit_short_description<lpc_type> &short_description) {
 
-                        typename types_policy::template preprocessed_private_data_type<WitnessColumns> data;
+                        typename types_policy::preprocessed_private_data_type data;
 
                         std::size_t N_rows = constraint_system.rows_amount();
 

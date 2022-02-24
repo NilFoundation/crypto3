@@ -33,31 +33,35 @@
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/types.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, 
-                         typename MerkleTreeHashType,
-                         typename TranscriptHashType,
-                         std::size_t witness_columns,
-                         std::size_t public_columns,
-                         std::size_t lambda,
-                         std::size_t r,
-                         std::size_t m = 2>
+                template<typename FieldType,
+                         typename RedshiftParams = redshift_params>
                 class redshift_verifier {
 
-                    using types_policy = detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
+                    constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
+                    constexpr static const std::size_t public_columns = RedshiftParams::public_columns;
+                    using merkle_hash_type = typename RedshiftParams::merkle_hash_type;
+                    using transcript_hash_type = typename RedshiftParams::transcript_hash_type;
+
+                    using types_policy = detail::redshift_types_policy<FieldType, RedshiftParams>;
+
+                    constexpr static const std::size_t lambda = RedshiftParams::lambda;
+                    constexpr static const std::size_t r = RedshiftParams::r;
+                    constexpr static const std::size_t m = RedshiftParams::m;
 
                     constexpr static const std::size_t opening_points_witness = 1;
                     constexpr static const std::size_t opening_points_v_p = 2;
                     constexpr static const std::size_t opening_points_t = 1;
 
-                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, opening_points_witness, r, m> lpc_witness;
-                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, opening_points_v_p, r, m> lpc_permutation;
-                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, opening_points_t, r, m> lpc_quotient;
+                    typedef list_polynomial_commitment_scheme<FieldType, RedshiftParams, opening_points_witness> lpc_witness;
+                    typedef list_polynomial_commitment_scheme<FieldType, RedshiftParams, opening_points_v_p> lpc_permutation;
+                    typedef list_polynomial_commitment_scheme<FieldType, RedshiftParams, opening_points_t> lpc_quotient;
 
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
@@ -69,7 +73,7 @@ namespace nil {
                                                const typename types_policy::template proof_type<lpc_witness, lpc_permutation, lpc_quotient> &proof, 
                                                const typename types_policy::template circuit_short_description<lpc_witness> &short_description) { //TODO: decsription commitment scheme
 
-                        fiat_shamir_heuristic_updated<TranscriptHashType> transcript(std::vector<std::uint8_t>());
+                        fiat_shamir_heuristic_updated<transcript_hash_type> transcript(std::vector<std::uint8_t>());
 
                         // 1. Add circuit definition to transctipt
                         //transcript(short_description);

@@ -38,6 +38,7 @@
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -45,11 +46,15 @@ namespace nil {
             namespace snark {
                 template<typename FieldType, typename CommitmentSchemeTypePublic,
                     typename CommitmentSchemeTypePermutation,
-                    std::size_t witness_columns, std::size_t public_columns, 
-                    typename TranscriptHashType = hashes::keccak_1600<512>>
+                    typename RedshiftParams = redshift_params>
                 class redshift_permutation_argument {
 
-                    using types_policy = detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
+                    constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
+                    constexpr static const std::size_t public_columns = RedshiftParams::public_columns;
+                    using merkle_hash_type = typename RedshiftParams::merkle_hash_type;
+                    using transcript_hash_type = typename RedshiftParams::transcript_hash_type;
+
+                    using types_policy = detail::redshift_types_policy<FieldType, RedshiftParams>;
 
                     typedef typename CommitmentSchemeTypePermutation::fri_type fri_type;
 
@@ -65,7 +70,7 @@ namespace nil {
                     };
 
                     static inline prover_result_type
-                        prove_eval(fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
+                        prove_eval(fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
                                    const typename types_policy::preprocessed_public_data_type preprocessed_data,
                                    const typename types_policy::template circuit_short_description<CommitmentSchemeTypePublic> &short_description,
                                    const std::vector<math::polynomial<typename FieldType::value_type>> &columns,
@@ -146,7 +151,7 @@ namespace nil {
                     }
 
                     static inline std::array<typename FieldType::value_type, argument_size>
-                        verify_eval(fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
+                        verify_eval(fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
                                     const typename types_policy::preprocessed_public_data_type preprocessed_data,
                                     const typename types_policy::template circuit_short_description<CommitmentSchemeTypePublic> &short_description,
                                     const typename FieldType::value_type &challenge,                          // y

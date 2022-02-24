@@ -44,6 +44,7 @@
 
 #include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
 #include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
@@ -71,7 +72,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     constexpr static const std::size_t m = 2;
 
     typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
-    typedef zk::snark::list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, lambda, k, r, m> lpc_type;
+    typedef zk::snark::list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, zk::snark::redshift_params, k> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
 
     constexpr static const std::size_t d_extended = d;

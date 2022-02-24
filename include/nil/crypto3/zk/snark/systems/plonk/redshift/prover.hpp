@@ -38,6 +38,7 @@
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/types.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/gates_argument.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -45,28 +46,31 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType,
-                         typename MerkleTreeHashType,
-                         typename TranscriptHashType,
-                         std::size_t witness_columns,
-                         std::size_t public_columns,
-                         std::size_t lambda,
-                         std::size_t r,
-                         std::size_t m = 2>
+                         typename RedshiftParams = redshift_params>
                 class redshift_prover {
 
-                    using types_policy = detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
+                    constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
+                    constexpr static const std::size_t public_columns = RedshiftParams::public_columns;
+                    using merkle_hash_type = typename RedshiftParams::merkle_hash_type;
+                    using transcript_hash_type = typename RedshiftParams::transcript_hash_type;
 
-                    typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
+                    using types_policy = detail::redshift_types_policy<FieldType, RedshiftParams>;
+
+                    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
+
+                    constexpr static const std::size_t lambda = RedshiftParams::lambda;
+                    constexpr static const std::size_t r = RedshiftParams::r;
+                    constexpr static const std::size_t m = RedshiftParams::m;
 
                     constexpr static const std::size_t opening_points_witness = 1;
                     constexpr static const std::size_t opening_points_v_p = 2;
                     constexpr static const std::size_t opening_points_t = 1;
                     constexpr static const std::size_t opening_points_public = 1;
 
-                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, opening_points_witness, r, m> lpc_witness;
-                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, opening_points_v_p, r, m> lpc_permutation;
-                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, opening_points_t, r, m> lpc_quotient;
-                    typedef list_polynomial_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, lambda, opening_points_public, r, m> lpc_public;
+                    typedef list_polynomial_commitment_scheme<FieldType, RedshiftParams, opening_points_witness> lpc_witness;
+                    typedef list_polynomial_commitment_scheme<FieldType, RedshiftParams, opening_points_v_p> lpc_permutation;
+                    typedef list_polynomial_commitment_scheme<FieldType, RedshiftParams, opening_points_t> lpc_quotient;
+                    typedef list_polynomial_commitment_scheme<FieldType, RedshiftParams, opening_points_public> lpc_public;
 
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
@@ -75,7 +79,7 @@ namespace nil {
                     static inline math::polynomial<typename FieldType::value_type> 
                         quotient_polynomial(const typename types_policy::preprocessed_public_data_type preprocessed_public_data,
                             std::array<math::polynomial<typename FieldType::value_type>, f_parts> F, 
-                            fiat_shamir_heuristic_updated<TranscriptHashType> transcript) {
+                            fiat_shamir_heuristic_updated<transcript_hash_type> transcript) {
                             // 7.1. Get $\alpha_0, \dots, \alpha_8 \in \mathbb{F}$ from $hash(\text{transcript})$
                             std::array<typename FieldType::value_type, f_parts> alphas =
                                 transcript.template challenges<FieldType, f_parts>();
@@ -109,7 +113,7 @@ namespace nil {
                 public:
                     static inline typename types_policy::template proof_type<lpc_witness, lpc_permutation, lpc_quotient>
                         process(const typename types_policy::preprocessed_public_data_type preprocessed_public_data,
-                                const typename types_policy::template preprocessed_private_data_type<witness_columns> preprocessed_private_data,
+                                const typename types_policy::preprocessed_private_data_type preprocessed_private_data,
                                 typename types_policy::constraint_system_type &constraint_system,
                                 const typename types_policy::variable_assignment_type &assignments,
                                 const typename types_policy::template circuit_short_description<lpc_public> &short_description,
@@ -117,7 +121,7 @@ namespace nil {
                         
                         typename types_policy::template proof_type<lpc_witness, lpc_permutation, lpc_quotient> proof;
                         std::vector<std::uint8_t> tanscript_init = {};
-                        fiat_shamir_heuristic_updated<TranscriptHashType> transcript(tanscript_init);
+                        fiat_shamir_heuristic_updated<transcript_hash_type> transcript(tanscript_init);
 
                         // 1. Add circuit definition to transctipt
                         //transcript(short_description); //TODO: circuit_short_description marshalling
@@ -150,7 +154,7 @@ namespace nil {
                         }
 
                         // 4. permutation_argument
-                        auto permutation_argument = redshift_permutation_argument<FieldType, lpc_public, lpc_permutation, witness_columns, public_columns>::prove_eval(
+                        auto permutation_argument = redshift_permutation_argument<FieldType, lpc_public, lpc_permutation, RedshiftParams>::prove_eval(
                                 transcript, preprocessed_public_data, short_description, columns_for_permutation_argument, fri_params);
 
                         proof.v_perm_commitment = permutation_argument.permutation_poly_commitment.root();
@@ -179,7 +183,7 @@ namespace nil {
                         }
 
                         std::array<math::polynomial<typename FieldType::value_type>, gate_parts> prover_res =
-                            redshift_gates_argument<FieldType, witness_columns, public_columns, TranscriptHashType>::prove_eval(
+                            redshift_gates_argument<FieldType, RedshiftParams>::prove_eval(
                                 constraint_system, columns_for_gate_argument, transcript);
 
                         F[3] = prover_res[0];

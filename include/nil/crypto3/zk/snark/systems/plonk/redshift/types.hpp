@@ -39,6 +39,7 @@
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -46,8 +47,12 @@ namespace nil {
             namespace snark {
                 namespace detail {
 
-                    template<typename FieldType, std::size_t WitnessAmount, std::size_t PublicAmount>
+                    template<typename FieldType,
+                             typename RedshiftParams = redshift_params>
                     struct redshift_types_policy {
+
+                        constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
+                        constexpr static const std::size_t public_columns = RedshiftParams::public_columns;
 
                         /******************************** Params ********************************/
 
@@ -55,14 +60,14 @@ namespace nil {
                          * Below are various template aliases (used for convenience).
                          */
 
-                        typedef plonk_constraint_system<FieldType, WitnessAmount, PublicAmount> constraint_system_type;
+                        typedef plonk_constraint_system<FieldType, witness_columns, public_columns> constraint_system_type;
 
                         /************************* PLONK variable assignment **************************/
 
                         struct variable_assignment_type {
 
                             struct private_assignment_type {
-                                std::array<std::vector<typename FieldType::value_type>, WitnessAmount> witnesses;
+                                std::array<std::vector<typename FieldType::value_type>, witness_columns> witnesses;
                             } private_assignment;
 
                             struct public_assignment_type {
@@ -108,12 +113,11 @@ namespace nil {
                             math::polynomial<typename FieldType::value_type> Z;
                         };
 
-                        template<std::size_t WitnessColumns>
                         struct preprocessed_private_data_type {
 
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
-                            std::array<math::polynomial<typename FieldType::value_type>, WitnessColumns> witnesses;
+                            std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witnesses;
                         };
 
                         template <typename CommitmentSchemeType>

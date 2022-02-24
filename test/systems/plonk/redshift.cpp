@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2022 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 //
 // MIT License
@@ -94,30 +94,40 @@ BOOST_AUTO_TEST_SUITE(redshift_prover_test_suite)
 
 using curve_type = algebra::curves::bls12<381>;
 using FieldType = typename curve_type::scalar_field_type;
-typedef hashes::keccak_1600<512> merkle_hash_type;
-typedef hashes::keccak_1600<512> transcript_hash_type;
 
 // lpc params
-constexpr std::size_t m = 2;
-constexpr static const std::size_t lambda = 40;
+constexpr static const std::size_t m = 2;
 constexpr static const std::size_t k = 1;
 
-typedef fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+constexpr static const std::size_t table_rows_log = 4;
+constexpr static const std::size_t table_rows = 1 << table_rows_log;
+constexpr static const std::size_t permutation_size = 4;
+constexpr static const std::size_t usable_rows = 1 << table_rows_log;
+
+struct redshift_test_params {
+    using merkle_hash_type = hashes::keccak_1600<512>;
+    using transcript_hash_type = hashes::keccak_1600<512>;
+
+    constexpr static const std::size_t witness_columns = 3;
+    constexpr static const std::size_t public_columns = 1;
+
+    constexpr static const std::size_t lambda = 40;
+    constexpr static const std::size_t r = table_rows_log - 1;
+    constexpr static const std::size_t m = 2;
+};
+
+constexpr static const  std::size_t table_columns = redshift_test_params::witness_columns + redshift_test_params::public_columns;
+
+typedef fri_commitment_scheme<FieldType, redshift_test_params::merkle_hash_type, redshift_test_params::transcript_hash_type, m> fri_type;
 
 BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
-    const std::size_t table_rows_log = 4;
-    const std::size_t table_rows = 1 << table_rows_log;
-    const std::size_t witness_columns = 3;
-    const std::size_t public_columns = 1;
-    const std::size_t table_columns = witness_columns + public_columns;
-    const std::size_t permutation_size = 4;
-    const std::size_t usable_rows = 1 << table_rows_log;
-    circuit_description<FieldType, table_rows_log, witness_columns, public_columns, permutation_size, usable_rows> circuit = circuit_test_2<FieldType>();
 
-    using types_policy = zk::snark::detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
+    circuit_description<FieldType, redshift_test_params, table_rows_log, 
+        permutation_size, usable_rows> circuit = circuit_test_2<FieldType>();
 
-    constexpr static const std::size_t r = table_rows_log - 1;
-    typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, lambda, k, r, m> lpc_type;
+    using types_policy = zk::snark::detail::redshift_types_policy<FieldType, redshift_test_params>;
+
+    typedef list_polynomial_commitment_scheme<FieldType, redshift_test_params, k> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -140,30 +150,25 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
         redshift_private_preprocessor<FieldType, witness_columns, public_columns, k>::process(constraint_system, assigments.private_assignment, short_description);
 
 
-    auto proof = redshift_prover<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, public_columns, lambda, r, m>::process(
+    auto proof = redshift_prover<FieldType, redshift_test_params>::process(
         preprocessed_data_public, preprocessed_data_private, constraint_system, assigments, short_description, fri_params);
 
-    bool verifier_res = redshift_verifier<FieldType, merkle_hash_type, transcript_hash_type, witness_columns, public_columns, lambda, r, m>::process(
+    bool verifier_res = redshift_verifier<FieldType, redshift_test_params>::process(
         proof, short_description);
     BOOST_CHECK(verifier_res);
 }
 
 BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
-    const std::size_t table_rows_log = 4;
-    const std::size_t table_rows = 1 << table_rows_log;
-    const std::size_t witness_columns = 3;
-    const std::size_t public_columns = 1;
-    const std::size_t table_columns = witness_columns + public_columns;
-    const std::size_t permutation_size = 4;
-    const std::size_t usable_rows = 1 << table_rows_log;
-    circuit_description<FieldType, table_rows_log, witness_columns, public_columns, permutation_size, usable_rows> circuit = circuit_test_2<FieldType>();
+
+    circuit_description<FieldType, redshift_test_params, table_rows_log,
+        permutation_size, usable_rows> circuit = circuit_test_2<FieldType>();
 
     constexpr std::size_t argument_size = 3;
 
-    using types_policy = zk::snark::detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
+    using types_policy = zk::snark::detail::redshift_types_policy<FieldType, redshift_test_params>;
 
     constexpr static const std::size_t r = table_rows_log - 1;
-    typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, lambda, k, r, m> lpc_type;
+    typedef list_polynomial_commitment_scheme<FieldType, redshift_test_params, k> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -221,19 +226,14 @@ BOOST_AUTO_TEST_CASE(redshift_lookup_argument_test) {
 }
 
 BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
-    const std::size_t table_rows_log = 4;
-    const std::size_t table_rows = 1 << table_rows_log;
-    const std::size_t witness_columns = 3;
-    const std::size_t public_columns = 1;
-    const std::size_t table_columns = witness_columns + public_columns;
-    const std::size_t permutation_size = 4;
-    const std::size_t usable_rows = 1 << table_rows_log;
-    circuit_description<FieldType, table_rows_log, witness_columns, public_columns, permutation_size, usable_rows> circuit = circuit_test_2<FieldType>();
 
-    using types_policy = zk::snark::detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
+    circuit_description<FieldType, redshift_test_params, table_rows_log,
+        permutation_size, usable_rows> circuit = circuit_test_2<FieldType>();
+
+    using types_policy = zk::snark::detail::redshift_types_policy<FieldType, redshift_test_params>;
 
     constexpr static const std::size_t r = table_rows_log - 1;
-    typedef list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, lambda, k, r, m> lpc_type;
+    typedef list_polynomial_commitment_scheme<FieldType, redshift_test_params, k> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
     

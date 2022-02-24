@@ -55,30 +55,30 @@ namespace nil {
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
                 template<typename FieldType,
-                         typename MerkleTreeHashType,
-                         typename TranscriptHashType,
-                         std::size_t Lambda = 40,
+                         typename RedshiftParams,
                          std::size_t K = 1,
-                         std::size_t R = 1,
-                         std::size_t M = 2,
                          std::size_t D = 16>
                 struct list_polynomial_commitment_scheme {
+
+                    using merkle_hash_type = typename RedshiftParams::merkle_hash_type;
+                    using transcript_hash_type = typename RedshiftParams::transcript_hash_type;
+
                     using Endianness = nil::marshalling::option::big_endian;
                     using field_element_type =
                         nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
                                                                         FieldType>;
 
-                    constexpr static const std::size_t lambda = Lambda;
+                    constexpr static const std::size_t lambda = RedshiftParams::lambda;
+                    constexpr static const std::size_t r = RedshiftParams::r;
+                    constexpr static const std::size_t m = RedshiftParams::m;
                     constexpr static const std::size_t k = K;
-                    constexpr static const std::size_t r = R;
-                    constexpr static const std::size_t m = M;
 
                     typedef FieldType field_type;
 
-                    typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
-                    typedef typename containers::merkle_proof<MerkleTreeHashType, 2> merkle_proof_type;
+                    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
+                    typedef typename containers::merkle_proof<merkle_hash_type, 2> merkle_proof_type;
 
-                    typedef fri_commitment_scheme<FieldType, MerkleTreeHashType, TranscriptHashType, m> fri_type;
+                    typedef fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
 
                     using commitment_type = typename merkle_tree_type::value_type;
 
@@ -130,7 +130,7 @@ namespace nil {
                     static proof_type proof_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
                                                  merkle_tree_type &T,
                                                  const math::polynomial<typename FieldType::value_type> &g,
-                                                 fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
+                                                 fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
                                                  const typename fri_type::params_type &fri_params) {
 
                         std::array<typename FieldType::value_type, k> z;
@@ -167,7 +167,7 @@ namespace nil {
 
                     static bool verify_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
                                             proof_type &proof,
-                                            fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
+                                            fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
                                             typename fri_type::params_type fri_params) {
                         std::array<std::pair<typename FieldType::value_type, typename FieldType::value_type>, k>
                             U_interpolation_points;

@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2022 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 //
 // MIT License
@@ -45,15 +45,18 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                    template <typename FieldType, 
-                        std::size_t rows_log, 
-                        std::size_t witness_columns,
-                        std::size_t public_columns,
+                    template <typename FieldType,
+                        typename RedshiftParams,
+                        std::size_t rows_log,
                         std::size_t permutation_size,
                         std::size_t usable_rows>
                         class circuit_description
                     {
-                        using types_policy = zk::snark::detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
+                        using types_policy = zk::snark::detail::redshift_types_policy<FieldType, RedshiftParams>;
+                        constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
+                        constexpr static const std::size_t public_columns = RedshiftParams::public_columns;
+                        using merkle_hash_type = typename RedshiftParams::merkle_hash_type;
+                        using transcript_hash_type = typename RedshiftParams::transcript_hash_type;
 
                         public:
                         const std::size_t table_rows = 1 << rows_log;
@@ -87,14 +90,14 @@ namespace nil {
                         }
 
                         void init() {
-                            S_id = redshift_public_preprocessor<FieldType, witness_columns, public_columns, 1>::identity_polynomials(
+                            S_id = redshift_public_preprocessor<FieldType, RedshiftParams, 1>::identity_polynomials(
                             permutation_size, table_rows, omega, delta, domain);
-                            S_sigma = redshift_public_preprocessor<FieldType, witness_columns, public_columns, 1>::permutation_polynomials(
+                            S_sigma = redshift_public_preprocessor<FieldType, RedshiftParams, 1>::permutation_polynomials(
                             permutation_size, table_rows, omega, delta, permutation, domain);
 
-                            q_last = redshift_public_preprocessor<FieldType, witness_columns, public_columns, 1>::selector_last(
+                            q_last = redshift_public_preprocessor<FieldType, RedshiftParams, 1>::selector_last(
                             table_rows, usable_rows, domain);
-                            q_blind = redshift_public_preprocessor<FieldType, witness_columns, public_columns, 1>::selector_blind(
+                            q_blind = redshift_public_preprocessor<FieldType, RedshiftParams, 1>::selector_blind(
                             table_rows, usable_rows, domain);
                         }
                     };

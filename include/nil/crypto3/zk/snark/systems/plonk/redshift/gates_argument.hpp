@@ -39,6 +39,7 @@
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -46,23 +47,27 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType,
-                         std::size_t witness_columns, std::size_t public_columns,
-                         typename TranscriptHashType = hashes::keccak_1600<512>,
+                         typename RedshiftParams = redshift_params,
                          std::size_t ArgumentSize = 1>
                 struct redshift_gates_argument;
 
                 template<typename FieldType,
-                         std::size_t witness_columns, std::size_t public_columns,
-                         typename TranscriptHashType>
-                struct redshift_gates_argument<FieldType, witness_columns, public_columns, TranscriptHashType, 1> {
-                    using types_policy = detail::redshift_types_policy<FieldType, witness_columns, public_columns>;
+                         typename RedshiftParams>
+                struct redshift_gates_argument<FieldType, RedshiftParams, 1> {
+
+                    constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
+                    constexpr static const std::size_t public_columns = RedshiftParams::public_columns;
+                    using merkle_hash_type = typename RedshiftParams::merkle_hash_type;
+                    using transcript_hash_type = typename RedshiftParams::transcript_hash_type;
+
+                    using types_policy = detail::redshift_types_policy<FieldType, RedshiftParams>;
 
                     constexpr static const std::size_t argument_size = 1;
 
                     static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
                         prove_eval(typename types_policy::constraint_system_type &constraint_system,
                                     const std::vector<math::polynomial<typename FieldType::value_type>> &columns,
-                                   fiat_shamir_heuristic_updated<TranscriptHashType> &transcript) {
+                                   fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
@@ -93,7 +98,7 @@ namespace nil {
                         verify_eval(const std::vector<plonk_gate<FieldType>> &gates,
                             typename plonk_constraint<FieldType>::evaluation_map &evaluations,
                             typename FieldType::value_type challenge,
-                            fiat_shamir_heuristic_updated<TranscriptHashType> &transcript) {
+                            fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
                         std::array<typename FieldType::value_type, argument_size> F;
