@@ -51,26 +51,26 @@ namespace nil {
 
                     constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
                     constexpr static const std::size_t public_columns = RedshiftParams::public_columns;
-                    using merkle_hash_type = typename RedshiftParams::merkle_hash_type;
-                    using transcript_hash_type = typename RedshiftParams::transcript_hash_type;
+                    using merkle_hash_type = typename RedshiftParams::lpc_params::merkle_hash_type;
+                    using transcript_hash_type = typename RedshiftParams::lpc_params::transcript_hash_type;
 
                     using types_policy = detail::redshift_types_policy<FieldType, RedshiftParams>;
 
                     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
-                    constexpr static const std::size_t lambda = RedshiftParams::lambda;
-                    constexpr static const std::size_t r = RedshiftParams::r;
-                    constexpr static const std::size_t m = RedshiftParams::m;
+                    constexpr static const std::size_t lambda = RedshiftParams::lpc_params::lambda;
+                    constexpr static const std::size_t r = RedshiftParams::lpc_params::r;
+                    constexpr static const std::size_t m = RedshiftParams::lpc_params::m;
 
                     constexpr static const std::size_t opening_points_witness = 1;
                     constexpr static const std::size_t opening_points_v_p = 2;
                     constexpr static const std::size_t opening_points_t = 1;
                     constexpr static const std::size_t opening_points_public = 1;
 
-                    typedef list_polynomial_commitment_scheme<FieldType, RedshiftParams, opening_points_witness> lpc_witness;
-                    typedef list_polynomial_commitment_scheme<FieldType, RedshiftParams, opening_points_v_p> lpc_permutation;
-                    typedef list_polynomial_commitment_scheme<FieldType, RedshiftParams, opening_points_t> lpc_quotient;
-                    typedef list_polynomial_commitment_scheme<FieldType, RedshiftParams, opening_points_public> lpc_public;
+                    typedef list_polynomial_commitment_scheme<FieldType, typename RedshiftParams::lpc_params, opening_points_witness> lpc_witness;
+                    typedef list_polynomial_commitment_scheme<FieldType, typename RedshiftParams::lpc_params, opening_points_v_p> lpc_permutation;
+                    typedef list_polynomial_commitment_scheme<FieldType, typename RedshiftParams::lpc_params, opening_points_t> lpc_quotient;
+                    typedef list_polynomial_commitment_scheme<FieldType, typename RedshiftParams::lpc_params, opening_points_public> lpc_public;
 
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;

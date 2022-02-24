@@ -27,21 +27,19 @@
 #ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PARAMS_HPP
 #define CRYPTO3_ZK_PLONK_REDSHIFT_PARAMS_HPP
 
+#include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
                 struct redshift_params {
-                    using merkle_hash_type = hashes::keccak_1600<512>;
-                    using transcript_hash_type = hashes::keccak_1600<512>;
 
                     constexpr static const std::size_t witness_columns = 15;
                     constexpr static const std::size_t public_columns = 15;
 
-                    constexpr static const std::size_t lambda = 40;
-                    constexpr static const std::size_t r = 1;
-                    constexpr static const std::size_t m = 2;
+                    using lpc_params = list_polynomial_commitment_params;
                 };
 
             }    // namespace snark

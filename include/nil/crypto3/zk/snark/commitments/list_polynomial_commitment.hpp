@@ -41,6 +41,15 @@ namespace nil {
         namespace zk {
             namespace snark {
 
+                struct list_polynomial_commitment_params {
+                    using merkle_hash_type = hashes::keccak_1600<512>;
+                    using transcript_hash_type = hashes::keccak_1600<512>;
+
+                    constexpr static const std::size_t lambda = 40;
+                    constexpr static const std::size_t r = 1;
+                    constexpr static const std::size_t m = 2;
+                };
+
                 /**
                  * @brief Based on the FRI Commitment description from \[ResShift].
                  * @tparam d ...
@@ -55,22 +64,22 @@ namespace nil {
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
                 template<typename FieldType,
-                         typename RedshiftParams,
+                         typename LPCParams,
                          std::size_t K = 1,
                          std::size_t D = 16>
                 struct list_polynomial_commitment_scheme {
 
-                    using merkle_hash_type = typename RedshiftParams::merkle_hash_type;
-                    using transcript_hash_type = typename RedshiftParams::transcript_hash_type;
+                    using merkle_hash_type = typename LPCParams::merkle_hash_type;
+                    using transcript_hash_type = typename LPCParams::transcript_hash_type;
 
                     using Endianness = nil::marshalling::option::big_endian;
                     using field_element_type =
                         nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
                                                                         FieldType>;
 
-                    constexpr static const std::size_t lambda = RedshiftParams::lambda;
-                    constexpr static const std::size_t r = RedshiftParams::r;
-                    constexpr static const std::size_t m = RedshiftParams::m;
+                    constexpr static const std::size_t lambda = LPCParams::lambda;
+                    constexpr static const std::size_t r = LPCParams::r;
+                    constexpr static const std::size_t m = LPCParams::m;
                     constexpr static const std::size_t k = K;
 
                     typedef FieldType field_type;
