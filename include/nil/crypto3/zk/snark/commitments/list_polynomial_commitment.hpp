@@ -41,13 +41,18 @@ namespace nil {
         namespace zk {
             namespace snark {
 
+                template <typename MerkleTreeHashType = hashes::keccak_1600<512>,
+                          typename TranscriptHashType = hashes::keccak_1600<512>,
+                          std::size_t Lambda = 40,
+                          std::size_t R = 1,
+                          std::size_t M = 2>
                 struct list_polynomial_commitment_params {
-                    using merkle_hash_type = hashes::keccak_1600<512>;
-                    using transcript_hash_type = hashes::keccak_1600<512>;
+                    using merkle_hash_type = MerkleTreeHashType;
+                    using transcript_hash_type = TranscriptHashType;
 
-                    constexpr static const std::size_t lambda = 40;
-                    constexpr static const std::size_t r = 1;
-                    constexpr static const std::size_t m = 2;
+                    constexpr static const std::size_t lambda = Lambda;
+                    constexpr static const std::size_t r = R;
+                    constexpr static const std::size_t m = M;
                 };
 
                 /**

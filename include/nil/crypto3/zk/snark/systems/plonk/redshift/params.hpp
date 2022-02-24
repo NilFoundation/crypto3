@@ -34,12 +34,19 @@ namespace nil {
         namespace zk {
             namespace snark {
 
+                template <std::size_t WitnessColumns = 15,
+                          std::size_t PublicColumns = 15,
+                          typename MerkleTreeHashType = hashes::keccak_1600<512>,
+                          typename TranscriptHashType = hashes::keccak_1600<512>,
+                          std::size_t Lambda = 40,
+                          std::size_t R = 1,
+                          std::size_t M = 2>
                 struct redshift_params {
 
-                    constexpr static const std::size_t witness_columns = 15;
-                    constexpr static const std::size_t public_columns = 15;
+                    constexpr static const std::size_t witness_columns = WitnessColumns;
+                    constexpr static const std::size_t public_columns = PublicColumns;
 
-                    using lpc_params = list_polynomial_commitment_params;
+                    using lpc_params = list_polynomial_commitment_params<MerkleTreeHashType, TranscriptHashType, Lambda, R, M>;
                 };
 
             }    // namespace snark
