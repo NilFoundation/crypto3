@@ -60,16 +60,31 @@ namespace nil {
                         return interpolation_points;
                     }
 
-                    template<typename FieldType, std::size_t witness_amount, std::size_t public_amount>
+                    template<typename FieldType>
                     std::vector<math::polynomial<typename FieldType::value_type>>
                         column_range_polynomials(std::size_t table_size,
-                            const typename detail::redshift_types_policy<FieldType, witness_amount, public_amount>::variable_assignment_type::public_assignment_type::selectors_type &column_range_assignment,
+                            const std::vector<std::vector<typename FieldType::value_type>> &column_range_assignment,
                             const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
 
-                        std::size_t selectors_amount = column_range_assignment.size();
-                        std::vector<math::polynomial<typename FieldType::value_type>> columns (witness_amount + public_amount);
+                        std::size_t columns_amount = column_range_assignment.size();
+                        std::vector<math::polynomial<typename FieldType::value_type>> columns (columns_amount);
 
-                        for (std::size_t selector_index = 0; selector_index < witness_amount + public_amount; selector_index++) {
+                        for (std::size_t selector_index = 0; selector_index < columns_amount; selector_index++) {
+                            columns[selector_index] = column_polynomial<FieldType>(table_size, column_range_assignment[selector_index], domain);
+                        }
+
+                        return columns;
+                    }
+
+                    template<typename FieldType, std::size_t columns_amount>
+                    std::vector<math::polynomial<typename FieldType::value_type>>
+                        column_range_polynomials(std::size_t table_size,
+                            const std::array<std::vector<typename FieldType::value_type>, columns_amount> &column_range_assignment,
+                            const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
+
+                        std::array<math::polynomial<typename FieldType::value_type>, columns_amount> columns;
+
+                        for (std::size_t selector_index = 0; selector_index < columns_amount; selector_index++) {
                             columns[selector_index] = column_polynomial<FieldType>(table_size, column_range_assignment[selector_index], domain);
                         }
 

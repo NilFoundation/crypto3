@@ -177,15 +177,15 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     short_description.delta = circuit.delta;
     short_description.permutation = circuit.permutation;
 
-    typename types_policy::template preprocessed_data_type<witness_columns> preprocessed_data = 
-        redshift_preprocessor<FieldType, witness_columns, public_columns, k>::process(constraint_system, assigments, short_description);
+    typename types_policy::preprocessed_public_data_type preprocessed_public_data = 
+        redshift_public_preprocessor<FieldType, witness_columns, public_columns, k>::process(constraint_system, assigments.public_assignment, short_description);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     fiat_shamir_heuristic_updated<transcript_hash_type> prover_transcript(init_blob);
     fiat_shamir_heuristic_updated<transcript_hash_type> verifier_transcript(init_blob);
 
     typename redshift_permutation_argument<FieldType, lpc_type, lpc_type, witness_columns, public_columns>::prover_result_type prover_res =
-        redshift_permutation_argument<FieldType, lpc_type, lpc_type, witness_columns, public_columns>::prove_eval(prover_transcript, preprocessed_data, short_description,
+        redshift_permutation_argument<FieldType, lpc_type, lpc_type, witness_columns, public_columns>::prove_eval(prover_transcript, preprocessed_public_data, short_description,
                                                                        circuit.column_polynomials, fri_params);
 
     // Challenge phase

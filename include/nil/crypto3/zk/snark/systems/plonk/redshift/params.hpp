@@ -36,6 +36,8 @@ namespace nil {
             namespace snark {
 
                 struct redshift_params {
+                    constexpr static const std::size_t witness_amount = 15;
+
                     constexpr static const std::size_t lambda = 0;
                     constexpr static const std::size_t k = 0;
                     constexpr static const std::size_t r = 0;

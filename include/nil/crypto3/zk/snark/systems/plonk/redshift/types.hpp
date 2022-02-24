@@ -69,7 +69,7 @@ namespace nil {
                                 using selectors_type = std::vector<std::vector<typename FieldType::value_type>>;
                                 using public_input_type = std::vector<std::vector<typename FieldType::value_type>>;
                                 selectors_type selectors;
-                                public_input_type public_input;
+                                // public_input_type public_input;
                             } public_assignment;
                         };
 

@@ -73,7 +73,7 @@ namespace nil {
                     constexpr static const std::size_t f_parts = 9;
 
                     static inline math::polynomial<typename FieldType::value_type> 
-                        quotient_polynomial(const typename types_policy::preprocessed_public_data_type preprocessed_data,
+                        quotient_polynomial(const typename types_policy::preprocessed_public_data_type preprocessed_public_data,
                             std::array<math::polynomial<typename FieldType::value_type>, f_parts> F, 
                             fiat_shamir_heuristic_updated<TranscriptHashType> transcript) {
                             // 7.1. Get $\alpha_0, \dots, \alpha_8 \in \mathbb{F}$ from $hash(\text{transcript})$
@@ -87,7 +87,7 @@ namespace nil {
                             }
 
                             math::polynomial<typename FieldType::value_type> T_consolidated =
-                                F_consolidated / preprocessed_data.Z;
+                                F_consolidated / preprocessed_public_data.Z;
 
                             return T_consolidated;
                     }
@@ -108,8 +108,8 @@ namespace nil {
 
                 public:
                     static inline typename types_policy::template proof_type<lpc_witness, lpc_permutation, lpc_quotient>
-                        process(const typename types_policy::preprocessed_public_data_type preprocessed_data_public,
-                                const typename types_policy::template preprocessed_private_data_type<witness_columns> preprocessed_data_private,
+                        process(const typename types_policy::preprocessed_public_data_type preprocessed_public_data,
+                                const typename types_policy::template preprocessed_private_data_type<witness_columns> preprocessed_private_data,
                                 typename types_policy::constraint_system_type &constraint_system,
                                 const typename types_policy::variable_assignment_type &assignments,
                                 const typename types_policy::template circuit_short_description<lpc_public> &short_description,
@@ -123,13 +123,9 @@ namespace nil {
                         //transcript(short_description); //TODO: circuit_short_description marshalling
 
                         // 2. Commit witness columns
-                        std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_poly;
-                        for (std::size_t i = 0; i < witness_columns; i++) {
-                            std::vector<typename FieldType::value_type> tmp;
-                            std::copy(assignments.private_assignment.witnesses[i].begin(), assignments.private_assignment.witnesses[i].end(), std::back_inserter(tmp));
-                            preprocessed_data_public.basic_domain->inverse_fft(tmp);
-                            witness_poly[i] = tmp;
-                        }
+                        std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_poly = 
+                            preprocessed_private_data.witnesses;
+                        
                         std::array<typename lpc_witness::merkle_tree_type, witness_columns> witness_commitments =
                             lpc_witness::template commit<witness_columns>(witness_poly, fri_params.D[0]);
 
@@ -148,14 +144,14 @@ namespace nil {
                             } else {
                                 std::vector<typename FieldType::value_type> tmp;
                                 std::copy(assignments.public_assignment.public_input[column_index].begin(), assignments.public_assignment.public_input[column_index].end(), std::back_inserter(tmp));
-                                preprocessed_data_public.basic_domain->inverse_fft(tmp);
+                                preprocessed_public_data.basic_domain->inverse_fft(tmp);
                                 columns_for_permutation_argument[i] = tmp;
                             }
                         }
 
                         // 4. permutation_argument
                         auto permutation_argument = redshift_permutation_argument<FieldType, lpc_public, lpc_permutation, witness_columns, public_columns>::prove_eval(
-                                transcript, preprocessed_data_public, short_description, columns_for_permutation_argument, fri_params);
+                                transcript, preprocessed_public_data, short_description, columns_for_permutation_argument, fri_params);
 
                         proof.v_perm_commitment = permutation_argument.permutation_poly_commitment.root();
 
@@ -177,7 +173,7 @@ namespace nil {
                             } else {
                                 std::vector<typename FieldType::value_type> tmp;
                                 std::copy(assignments.public_assignment.public_input[i].begin(), assignments.public_assignment.public_input[i].end(), std::back_inserter(tmp));
-                                preprocessed_data_public.basic_domain->inverse_fft(tmp);
+                                preprocessed_public_data.basic_domain->inverse_fft(tmp);
                                 columns_for_gate_argument[i] = tmp;
                             }
                         }
@@ -189,7 +185,7 @@ namespace nil {
                         F[3] = prover_res[0];
 
                         // 7. Aggregate quotient polynomial
-                        math::polynomial<typename FieldType::value_type> T = quotient_polynomial(preprocessed_data, F, transcript);
+                        math::polynomial<typename FieldType::value_type> T = quotient_polynomial(preprocessed_public_data, F, transcript);
                         std::vector<math::polynomial<typename FieldType::value_type>> T_splitted = split_polynomial(T, fri_params.max_degree);
                         std::vector<typename lpc_quotient::merkle_tree_type> T_commitments(T_splitted.size());
                         for (std::size_t i = 0; i < T_splitted.size(); i++) {
@@ -201,7 +197,7 @@ namespace nil {
                         // 8. Run evaluation proofs
                         typename FieldType::value_type challenge = transcript.template challenge<FieldType>();
 
-                        typename FieldType::value_type omega = preprocessed_data.basic_domain->get_domain_element(1);
+                        typename FieldType::value_type omega = preprocessed_public_data.basic_domain->get_domain_element(1);
 
                         // witness polynomials (table columns)
                         std::array<typename lpc_witness::proof_type, witness_columns> witnesses_evaluation;
