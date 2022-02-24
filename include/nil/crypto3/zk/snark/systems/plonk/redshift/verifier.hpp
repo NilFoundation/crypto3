@@ -41,7 +41,7 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType,
-                         typename RedshiftParams = redshift_params>
+                         typename RedshiftParams>
                 class redshift_verifier {
 
                     constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;

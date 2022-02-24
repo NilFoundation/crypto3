@@ -46,7 +46,7 @@ namespace nil {
             namespace snark {
                 template<typename FieldType, typename CommitmentSchemeTypePublic,
                     typename CommitmentSchemeTypePermutation,
-                    typename RedshiftParams = redshift_params>
+                    typename RedshiftParams>
                 class redshift_permutation_argument {
 
                     constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;

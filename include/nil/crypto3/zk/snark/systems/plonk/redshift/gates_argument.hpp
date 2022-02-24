@@ -47,7 +47,7 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType,
-                         typename RedshiftParams = redshift_params,
+                         typename RedshiftParams,
                          std::size_t ArgumentSize = 1>
                 struct redshift_gates_argument;
 

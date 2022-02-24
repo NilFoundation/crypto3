@@ -72,7 +72,9 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     constexpr static const std::size_t m = 2;
 
     typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
-    typedef zk::snark::list_polynomial_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, zk::snark::redshift_params, k> lpc_type;
+
+    typedef list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
+    typedef zk::snark::list_polynomial_commitment_scheme<FieldType, lpc_params_type, k> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
 
     constexpr static const std::size_t d_extended = d;

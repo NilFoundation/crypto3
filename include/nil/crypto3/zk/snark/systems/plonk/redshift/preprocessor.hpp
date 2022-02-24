@@ -248,7 +248,7 @@ namespace nil {
 
                         typename types_policy::preprocessed_private_data_type data;
 
-                        std::size_t N_rows = constraint_system.rows_amount();
+                        std::size_t N_rows = constraint_system.rows_amount;
 
                         data.basic_domain = math::make_evaluation_domain<FieldType>(N_rows);
 

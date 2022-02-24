@@ -48,7 +48,7 @@ namespace nil {
                 namespace detail {
 
                     template<typename FieldType,
-                             typename RedshiftParams = redshift_params>
+                             typename RedshiftParams>
                     struct redshift_types_policy {
 
                         constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
@@ -72,9 +72,9 @@ namespace nil {
 
                             struct public_assignment_type {
                                 using selectors_type = std::vector<std::vector<typename FieldType::value_type>>;
-                                using public_input_type = std::vector<std::vector<typename FieldType::value_type>>;
+                                using public_input_type = std::array<std::vector<typename FieldType::value_type>, public_columns>;
                                 selectors_type selectors;
-                                // public_input_type public_input;
+                                public_input_type public_input;
                             } public_assignment;
                         };
 

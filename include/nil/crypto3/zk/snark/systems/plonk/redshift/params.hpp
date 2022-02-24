@@ -43,6 +43,9 @@ namespace nil {
                           std::size_t M = 2>
                 struct redshift_params {
 
+                    typedef MerkleTreeHashType merkle_hash_type;
+                    typedef TranscriptHashType transcript_hash_type;
+
                     constexpr static const std::size_t witness_columns = WitnessColumns;
                     constexpr static const std::size_t public_columns = PublicColumns;
 

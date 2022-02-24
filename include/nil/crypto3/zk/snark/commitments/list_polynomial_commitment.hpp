@@ -70,8 +70,7 @@ namespace nil {
                  */
                 template<typename FieldType,
                          typename LPCParams,
-                         std::size_t K = 1,
-                         std::size_t D = 16>
+                         std::size_t K = 1>
                 struct list_polynomial_commitment_scheme {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;

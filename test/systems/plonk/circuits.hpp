@@ -40,6 +40,7 @@
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -114,8 +115,9 @@ namespace nil {
                 // ADD: x + y = z
                 // MUL: x * y = z
                 //---------------------------------------------------------------------------//
+                typedef redshift_params<3, 0> circuit_1_params; 
                 template<typename FieldType>
-                 circuit_description<FieldType, 4, 3, 0, 3, 16> circuit_test_1() {
+                 circuit_description<FieldType, circuit_1_params, 4, 3, 16> circuit_test_1() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t table_columns = 3;
                     constexpr static const std::size_t witness_columns = 3;
@@ -123,7 +125,7 @@ namespace nil {
                     constexpr static const std::size_t permutation = 3;
                     constexpr static const std::size_t usable = 1 << rows_log;
 
-                    circuit_description<FieldType, rows_log, witness_columns, public_columns, permutation, usable> test_circuit;
+                    circuit_description<FieldType, circuit_1_params, rows_log, permutation, usable> test_circuit;
                     test_circuit.column_polynomials.resize(witness_columns + public_columns);
 
                     std::array<std::vector<typename FieldType::value_type>, table_columns> table;
@@ -219,8 +221,9 @@ namespace nil {
                 // ADD: x + y = z, copy(prev(z), y)
                 // MUL: x * y = z, copy(p1, y)
                 //---------------------------------------------------------------------------//
+                typedef redshift_params<3, 1> circuit_2_params;
                 template<typename FieldType>
-                 circuit_description<FieldType, 4, 3, 1, 4, 16> circuit_test_2() {
+                 circuit_description<FieldType, circuit_2_params, 4, 4, 16> circuit_test_2() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t table_columns = 4;
                     constexpr static const std::size_t witness_columns = 3;
@@ -228,7 +231,7 @@ namespace nil {
                     constexpr static const std::size_t permutation = 4;
                     constexpr static const std::size_t usable = 1 << rows_log;
 
-                    circuit_description<FieldType, rows_log, witness_columns, public_columns, permutation, usable> test_circuit;
+                    circuit_description<FieldType, circuit_2_params, rows_log, permutation, usable> test_circuit;
                     test_circuit.column_polynomials.resize(witness_columns + public_columns);
 
                     std::array<std::vector<typename FieldType::value_type>, table_columns> table;
@@ -276,8 +279,13 @@ namespace nil {
                         test_circuit.column_polynomials[i] = math::polynomial<typename FieldType::value_type>(table[i]);
                     }
 
-                    
-                    test_circuit.table = table;
+                    for (std::size_t i = 0; i < witness_columns; i++) {
+                        test_circuit.table.private_assignment.witnesses[i] = table[i];
+                    }
+                    for (std::size_t i = 0; i < public_columns; i++) {
+                        test_circuit.table.public_assignment.public_input[i] = table[witness_columns + i];
+                    }
+
                     test_circuit.init();
 
                     
