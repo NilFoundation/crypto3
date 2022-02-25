@@ -42,8 +42,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_allocat_rows_test_case) {
 
 	using curve_type = algebra::curves::bls12<381>;
 	using TBlueprintField = typename curve_type::base_field_type;
-	constexpr std::size_t WiresAmount = 5;
-	using TArithmetization = zk::snark::plonk_constraint_system<TBlueprintField, WiresAmount>;
+	constexpr std::size_t WitnessColumns = 5;
+	using TArithmetization = zk::snark::plonk_constraint_system<TBlueprintField, WitnessColumns>;
 
 	zk::components::blueprint<TArithmetization> bp;
 

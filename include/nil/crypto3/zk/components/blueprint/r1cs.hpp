@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_R1CS_HPP
+#define CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_R1CS_HPP
 
 #include <algorithm>
 #include <cassert>
@@ -34,7 +34,6 @@
 #include <vector>
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 
 #include <nil/crypto3/zk/components/blueprint_variable.hpp>
 #include <nil/crypto3/zk/components/blueprint_linear_combination.hpp>
@@ -167,127 +166,8 @@ namespace nil {
                     }
                 };
 
-                template<typename TBlueprintField, std::size_t WiresAmount>
-                class blueprint<snark::plonk_constraint_system<TBlueprintField, WiresAmount>> {
-                    typedef snark::plonk_constraint_system<TBlueprintField, WiresAmount> TArithmetization;
-                public:
-                    using value_type = blueprint_variable<TArithmetization>;
-                private:
-
-                    snark::plonk_variable_assignment<TBlueprintField, WiresAmount> assignments;
-                    std::vector<std::vector<value_type>> copy_constraints;
-
-                    TArithmetization constraint_system;
-
-                public:
-
-                    blueprint() {
-                        copy_constraints.reserve(1);
-                        copy_constraints[0] = std::vector<value_type>();
-                    }
-
-                    void clear_assignments() {
-                        for (auto iter = assignments.begin(); iter != assignments.end(); iter++) {
-                            std::fill(iter->begin(), iter->end(), TBlueprintField::value_type::zero());
-                        }
-                    }
-
-                    typename TBlueprintField::value_type &assignment(const value_type &var, std::size_t row_index) {
-                        assert(var.wire_index < assignments.size());
-                        if (row_index >= assignments[var.wire_index].size()) {
-                            assignments[var.wire_index].resize(row_index + 1);
-                        }
-                        assert(row_index < assignments[var.wire_index].size());
-                        return (assignments[var.wire_index][row_index]);
-                    }
-
-                    typename TBlueprintField::value_type assignment(const value_type &var,
-                                                                    std::size_t row_index) const {
-                        assert(var.wire_index < assignments.size());
-                        assert(row_index < assignments[var.wire_index].size());
-                        return (assignments[var.index][row_index]);
-                    }
-
-                    std::size_t allocate_rows(std::size_t required_amount = 1) {
-                        static std::size_t next_row = 0;
-                        std::size_t result = next_row;
-                        next_row += required_amount;
-                        return result;
-                    }
-
-                    void add_gate(std::size_t row_index, const snark::plonk_constraint<TBlueprintField> &constraint) {
-                        assert(row_index < constraint_system.constraints.size());
-                        constraint_system.constraints[row_index] = constr;
-                    }
-
-                    void add_gate(std::size_t row_index,
-                                  const std::initializer_list<snark::plonk_constraint<TBlueprintField>> &constraints) {
-                        assert(row_index < constraint_system.constraints.size());
-                        constraint_system.constraints.emplace_back(constr);
-                    }
-
-                    void add_gate(std::initializer_list<std::size_t> row_indices,
-                                  const snark::plonk_constraint<TBlueprintField> &constraint) {
-                        constraint_system.constraints.emplace_back(constr);
-                    }
-
-                    void add_gate(std::initializer_list<std::size_t> row_indices,
-                                  const std::initializer_list<snark::plonk_constraint<TBlueprintField>> &constraints) {
-                        constraint_system.constraints.emplace_back(constr);
-                    }
-
-                    void add_copy_constraint(value_type &A, value_type &B) {
-                        if (A.copy_constraint_index == 0 && B.copy_constraint_index == 0){
-                            std::vector<value_type> copy_constraint = {A, B};
-                            copy_constraints.push_back(copy_constraint);
-                            A.copy_constraint_index = B.copy_constraint_index = copy_constraints.size() + 1;
-                        } else {
-
-                            if (A.copy_constraint_index != B.copy_constraint_index){
-                                value_type &left = A;
-                                value_type &right = B;
-                                if (copy_constraints[A.copy_constraint_index].size() < 
-                                    copy_constraints[B.copy_constraint_index].size()){
-                                    left = B;
-                                    right = A;
-                                }
-
-                                std::copy(copy_constraints[right.copy_constraint_index].begin(), 
-                                    copy_constraints[right.copy_constraint_index].end(),
-                                    copy_constraints[left.copy_constraint_index].end());
-                                for (value_type & var: copy_constraints[right.copy_constraint_index]){
-                                    var.copy_constraint_index = left.copy_constraint_index;
-                                }
-
-                                copy_constraints[right.copy_constraint_index].resize(0);
-                            }
-                        }
-                    }
-
-                    bool is_satisfied() const {
-                        return constraint_system.is_satisfied(assignments);
-                    }
-
-                    std::size_t num_constraints() const {
-                        return constraint_system.num_constraints();
-                    }
-
-                    constexpr std::size_t num_wires() {
-                        return WiresAmount;
-                    }
-
-                    snark::plonk_variable_assignment<TBlueprintField, WiresAmount> full_variable_assignment() const {
-                        return assignments;
-                    }
-
-                    TArithmetization get_constraint_system() const {
-                        return constraint_system;
-                    }
-
-                    friend class blueprint_variable<TBlueprintField>;
-                };
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_R1CS_HPP
