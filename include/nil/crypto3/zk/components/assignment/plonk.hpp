@@ -46,44 +46,73 @@ namespace nil {
                 class blueprint_assignment_table;
 
                 template<typename BlueprintFieldType, std::size_t WitnessColumns>
-                class blueprint_assignment_table<snark::plonk_constraint_system<BlueprintFieldType, WitnessColumns>> :
-                    public snark::plonk_table<BlueprintFieldType, WitnessColumns>> {
+                class blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType, WitnessColumns>> :
+                    public snark::plonk_public_table<BlueprintFieldType, WitnessColumns>> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, WitnessColumns> ArithmetizationType;
                 public:
                     
-                    blueprint_assignment_table() : snark::plonk_table<BlueprintFieldType, WitnessColumns>>(){
-                    }
-
-                    snark::plonk_column& witness(std::size_t index){
-                        if (index >= witness_variables.size()) {
-                            witness_variables.resize(index + 1);
-                        }
-                        return witness_variables[index];
+                    blueprint_assignment_table() : snark::plonk_public_table<BlueprintFieldType, WitnessColumns>>(){
                     }
 
                     snark::plonk_column& selector(std::size_t index){
-                        if (index >= selector_variables.size()) {
-                            selector_variables.resize(index + 1);
+                        if (index >= selector_columns.size()) {
+                            selector_columns.resize(index + 1);
                         }
-                        return selector_variables[index];
+                        return selector_columns[index];
+                    }
+
+                    std::size_t add_selector(std::size_t row_index){
+                        snark::plonk_column selector_column(row_index + 1, FieldType::value_type::zero());
+                        selector_column[row_index] = FieldType::value_type::one();
+                        selector_columns.push_back(selector_column);
+                        return selector_columns.size() - 1;
+                    }
+
+                    std::size_t add_selectors(const std::initializer_list<std::size_t> &&row_indices){
+                        std::size_t max_row_index = std::max(row_indices);
+                        snark::plonk_column selector_column(max_row_index + 1, FieldType::value_type::zero());
+                        for (std::size_t row_index : row_indices){
+                            selector_column[row_index] = FieldType::value_type::one();
+                        }
+                        selector_columns.push_back(selector_column);
+                        return selector_columns.size() - 1;
                     }
 
                     snark::plonk_column& public_input(std::size_t index){
-                        assert(index < public_input_variables.size());
-                        return public_input_variables[index];
+                        assert(index < public_input_columns.size());
+                        return public_input_columns[index];
                     }
 
                     snark::plonk_column& operator[](std::size_t index){
+                        if (index < selector_columns.size())
+                            return selector_columns[index];
+                        index -= selector_columns.size();
+                        // if (index < public_input_columns.size())
+                        //     return public_input_columns[index];
+                        // index -= public_input_columns.size();
+                    }
+                };
+
+                template<typename BlueprintFieldType, std::size_t WitnessColumns>
+                class blueprint_private_assignment_table<snark::plonk_constraint_system<BlueprintFieldType, WitnessColumns>> :
+                    public snark::plonk_private_table<BlueprintFieldType, WitnessColumns>> {
+
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, WitnessColumns> ArithmetizationType;
+                public:
+                    
+                    blueprint_assignment_table() : snark::plonk_private_table<BlueprintFieldType, WitnessColumns>>(){
+                    }
+
+                    snark::plonk_column witness(std::size_t index) {
+                        assert(index < RedshiftParams::witness_columns);
+                        return witness_columns[index];
+                    }
+
+                    snark::plonk_column operator[](std::size_t index) {
                         if (index < RedshiftParams::witness_columns)
-                            return witness_variables[index];
+                            return witness_columns[index];
                         index -= RedshiftParams::witness_columns;
-                        if (index < selector_variables.size())
-                            return selector_variables[index];
-                        index -= selector_variables.size();
-                        // if (index < public_input_variables.size())
-                        //     return public_input_variables[index];
-                        // index -= public_input_variables.size();
                     }
                 };
             }    // namespace components
