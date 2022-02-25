@@ -28,6 +28,7 @@
 
 #include <nil/crypto3/hash/detail/keccak/keccak_policy.hpp>
 #include <nil/crypto3/hash/detail/keccak/keccak_impl.hpp>
+
 #include <immintrin.h>
 
 namespace nil {
