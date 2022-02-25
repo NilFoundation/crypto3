@@ -44,7 +44,7 @@ namespace nil {
                 /************************* PLONK gate ***********************************/
 
                 template <typename FieldType>
-                struct plonk_gate_unprocessed{
+                struct plonk_gate{
                     std::size_t selector_index;
                     std::vector<plonk_constraint<FieldType>> constraints;
 
@@ -57,17 +57,6 @@ namespace nil {
                                   const std::initializer_list<snark::plonk_constraint<FieldType>> &constraints): 
                         constraints(constraints),
                         selector_index(selector_index){
-                    }
-                };
-
-                template <typename FieldType>
-                struct plonk_gate{
-                    math::polynomial<typename FieldType::value_type> selector;
-                    std::vector<plonk_constraint<FieldType>> constraints;
-
-                    plonk_gate(math::polynomial<typename FieldType::value_type> &selector,
-                                  const std::vector<plonk_constraint<FieldType>> &constraints): 
-                        constraints(constraints), selector(selector) {
                     }
                 };
 

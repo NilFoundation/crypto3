@@ -34,69 +34,44 @@ namespace nil {
         namespace zk {
             namespace snark {
 
+                using plonk_column = std::vector<typename FieldType::value_type>;
+
                 template<typename FieldType, 
                          typename RedshiftParams>
-                class redshift_table {
+                class plonk_table {
 
-                    using variable_type = variable<FieldType, true>;
-                    std::array<variable_type, RedshiftParams::witness_columns> witness_variables;
-                    std::vector<variable_type> selector_variables;
-                    // std::vector<variable_type> public_input_variables;
+                    using assignment_type = typename FieldType::value_type;
+                    std::array<plonk_column, RedshiftParams::witness_columns> witness_columns;
+                    std::vector<plonk_column> selector_columns;
+                    // std::vector<plonk_column> public_input_columns;
 
                 public:
 
-                    variable_type witness(std::size_t index) const{
+                    plonk_column witness(std::size_t index) const{
                         assert(index < RedshiftParams::witness_columns);
-                        return witness_variables[index];
+                        return witness_columns[index];
                     }
 
-                    variable_type& witness(std::size_t index){
-                        assert(index < RedshiftParams::witness_columns);
-                        return witness_variables[index];
+                    plonk_column selector(std::size_t index) const{
+                        assert(index < selector_columns.size());
+                        return selector_columns[index];
                     }
 
-                    variable_type selector(std::size_t index) const{
-                        assert(index < selector_variables.size());
-                        return selector_variables[index];
+                    plonk_column public_input(std::size_t index) const{
+                        assert(index < public_input_columns.size());
+                        return public_input_columns[index];
                     }
 
-                    variable_type& selector(std::size_t index){
-                        assert(index < selector_variables.size());
-                        return selector_variables[index];
-                    }
-
-                    // variable_type public_input(std::size_t index) const{
-                    //     assert(index < public_input_variables.size());
-                    //     return public_input_variables[index];
-                    // }
-
-                    // variable_type& public_input(std::size_t index){
-                    //     assert(index < public_input_variables.size());
-                    //     return public_input_variables[index];
-                    // }
-
-                    variable_type operator[](std::size_t index) const{
+                    plonk_column operator[](std::size_t index) const{
                         if (index < RedshiftParams::witness_columns)
-                            return witness_variables[index];
+                            return witness_columns[index];
                         index -= RedshiftParams::witness_columns;
-                        if (index < selector_variables.size())
-                            return selector_variables[index];
-                        index -= selector_variables.size();
-                        // if (index < public_input_variables.size())
-                        //     return public_input_variables[index];
-                        // index -= public_input_variables.size();
-                    }
-
-                    variable_type& operator[](std::size_t index){
-                        if (index < RedshiftParams::witness_columns)
-                            return witness_variables[index];
-                        index -= RedshiftParams::witness_columns;
-                        if (index < selector_variables.size())
-                            return selector_variables[index];
-                        index -= selector_variables.size();
-                        // if (index < public_input_variables.size())
-                        //     return public_input_variables[index];
-                        // index -= public_input_variables.size();
+                        if (index < selector_columns.size())
+                            return selector_columns[index];
+                        index -= selector_columns.size();
+                        // if (index < public_input_columns.size())
+                        //     return public_input_columns[index];
+                        // index -= public_input_columns.size();
                     }
 
                 };
