@@ -105,14 +105,14 @@ namespace nil {
                          {static_cast<long long>(round_constants[23]), static_cast<long long>(round_constants[23]),
                           static_cast<long long>(round_constants[23]), static_cast<long long>(round_constants[23])}}};
 
-                    constexpr static const std::array<__m256i, round_constants_size> rho_l = {{{3, 18, 36, 41},
+                    constexpr static const std::array<__m256i, 6> rho_l = {{{3, 18, 36, 41},
                                                                                                {1, 62, 28, 27},
                                                                                                {45, 6, 56, 39},
                                                                                                {10, 61, 55, 8},
                                                                                                {2, 15, 25, 20},
                                                                                                {44, 43, 21, 14}}};
 
-                    constexpr static const std::array<__m256i, round_constants_size> rho_r = {
+                    constexpr static const std::array<__m256i, 6> rho_r = {
                         {{word_bits - 3, word_bits - 18, word_bits - 36, word_bits - 41},
                          {word_bits - 1, word_bits - 62, word_bits - 28, word_bits - 27},
                          {word_bits - 45, word_bits - 6, word_bits - 56, word_bits - 39},

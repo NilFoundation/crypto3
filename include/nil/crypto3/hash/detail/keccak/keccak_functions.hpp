@@ -31,12 +31,18 @@
 #include <nil/crypto3/hash/detail/keccak/keccak_impl.hpp>
 
 #if defined(BOOST_ARCH_X86_64)
-#if defined(CRYPTO3_HAS_SSE2) || defined(CRYPTO3_HAS_SSSE3) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSSE3_VERSION
+#if defined(CRYPTO3_HAS_AVX2)
 #include <nil/crypto3/hash/detail/keccak/keccak_avx2_impl.hpp>
 #else
 #include <nil/crypto3/hash/detail/keccak/keccak_x86_64_impl.hpp>
 #endif
+#else
+#if defined(CRYPTO3_HAS_ARMV8)
+#include <nil/crypto3/hash/detail/keccak/keccak_armv8_impl.hpp>
 #endif
+#endif
+
+#include <nil/crypto3/hash/detail/keccak/keccak_x86_64_impl.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -51,17 +57,20 @@ namespace nil {
 
                     typedef typename policy_type::state_type state_type;
 
-                    typedef typename std::conditional<word_bits == 64,
-#if defined(BOOST_ARCH_X86_64)
-#if defined(CRYPTO3_HAS_SSE2) || defined(CRYPTO3_HAS_SSSE3) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSSE3_VERSION
-                                                      keccak_1600_avx2_impl<policy_type>,
-#else
-                                                      keccak_1600_x86_64_impl<policy_type>,
-#endif
-#else
-                                                      keccak_1600_impl<policy_type>,
-#endif
-                                                      keccak_1600_impl<policy_type>>::type impl_type;
+//                    typedef typename std::conditional<word_bits == 64,
+//#if defined(BOOST_ARCH_X86_64)
+//#if defined(CRYPTO3_HAS_AVX2)
+//                                                      keccak_1600_avx2_impl<policy_type>,
+//#else
+//                                                      keccak_1600_x86_64_impl<policy_type>,
+//#endif
+//#else
+//                                                      keccak_1600_impl<policy_type>,
+//#endif
+//                                                      keccak_1600_impl<policy_type>>::type impl_type;
+                    typedef typename std::conditional<word_bits == 64, keccak_1600_avx2_impl<policy_type>, keccak_1600_avx2_impl<policy_type>>::type impl_type;
+
+                    typedef keccak_1600_impl<policy_type> const_impl_type;
 
                     typedef typename impl_type::round_constants_type round_constants_type;
                     constexpr static const round_constants_type round_constants = impl_type::round_constants;

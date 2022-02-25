@@ -220,14 +220,10 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
 if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")
-    if(SSE2_FOUND)
+    if(CXX_AVX2_FOUND)
         target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_NI")
-        target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "-maes;-mpclmul;-mssse3")
-    elseif(SSSE3_FOUND)
-        target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SSSE3")
-        target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "-maes;-mpclmul;-mssse3")
+                "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_AVX2")
+        target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "-mavx2")
     endif()
 elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "armv8")
     target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE

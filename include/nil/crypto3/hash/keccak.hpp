@@ -44,6 +44,7 @@ namespace nil {
             protected:
                 typedef detail::keccak_1600_functions<DigestBits> policy_type;
                 typedef typename policy_type::impl_type impl_type;
+                typedef typename policy_type::const_impl_type const_impl_type;
 
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -64,7 +65,11 @@ namespace nil {
                     for (std::size_t i = 0; i != state_words; ++i)
                         boost::endian::endian_reverse_inplace(state[i]);
 
-                    impl_type::permute(state);
+                    if (!CRYPTO3_IS_CONST_EVALUATED(state)) {
+                        impl_type::permute(state);
+                    } else {
+                        const_impl_type::permute(state);
+                    }
 
                     for (std::size_t i = 0; i != state_words; ++i)
                         boost::endian::endian_reverse_inplace(state[i]);
