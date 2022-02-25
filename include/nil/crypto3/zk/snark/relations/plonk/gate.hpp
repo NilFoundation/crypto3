@@ -54,7 +54,7 @@ namespace nil {
                     }
 
                     plonk_gate_unprocessed(std::size_t selector_index,
-                                  const std::initializer_list<snark::plonk_constraint<FieldType>> &constraints): 
+                                  const std::initializer_list<snark::plonk_constraint<FieldType>> &&constraints): 
                         constraints(constraints),
                         selector_index(selector_index){
                     }
