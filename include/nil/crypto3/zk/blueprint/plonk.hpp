@@ -62,25 +62,13 @@ namespace nil {
                         return result;
                     }
 
-                    void add_gate(std::size_t row_index, const snark::plonk_constraint<TBlueprintField> &constraint) {
-                        assert(row_index < constraint_system.constraints.size());
-                        constraint_system.constraints[row_index] = constr;
+                    void add_gate(std::size_t selector_index, const snark::plonk_constraint<TBlueprintField> &constraint) {
+                        constraint_system.gates.emplace_back(selector_index, constraint);
                     }
 
-                    void add_gate(std::size_t row_index,
+                    void add_gate(std::size_t selector_index,
                                   const std::initializer_list<snark::plonk_constraint<TBlueprintField>> &constraints) {
-                        assert(row_index < constraint_system.constraints.size());
-                        constraint_system.constraints.emplace_back(constr);
-                    }
-
-                    void add_gate(std::initializer_list<std::size_t> row_indices,
-                                  const snark::plonk_constraint<TBlueprintField> &constraint) {
-                        constraint_system.constraints.emplace_back(constr);
-                    }
-
-                    void add_gate(std::initializer_list<std::size_t> row_indices,
-                                  const std::initializer_list<snark::plonk_constraint<TBlueprintField>> &constraints) {
-                        constraint_system.constraints.emplace_back(constr);
+                        constraint_system.gates.emplace_back(selector_index, constraints);
                     }
 
                     void add_copy_constraint(value_type &A, value_type &B) {

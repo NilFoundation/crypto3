@@ -41,7 +41,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TArithmetization,
+                template<typename ArithmetizationType,
                          typename CurveType,
                          std::size_t... WireIndexes>
                 class element_g1_fixed_base_scalar_mul;
@@ -72,8 +72,8 @@ namespace nil {
                           n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 9>, 
                           W0, W1, W2, W3, W4, W5, W6, W7, W8> {
 
-                    typedef snark::plonk_constraint_system<TBlueprintField, 9> TArithmetization;
-                    typedef blueprint<TArithmetization> blueprint_type;
+                    typedef snark::plonk_constraint_system<TBlueprintField, 9> ArithmetizationType;
+                    typedef blueprint<ArithmetizationType> blueprint_type;
 
                     std::size_t j;
                     typename CurveType::template g1_type<>::value_type B;
@@ -86,10 +86,20 @@ namespace nil {
                     enum indices { m2 = 0, m1, cur, p1, p2 };
 
                 public:
-                    element_g1_fixed_base_scalar_mul(blueprint_type &bp,
-                                                     typename CurveType::template g1_type<>::value_type B) :
+
+                    struct init_params {
+                        typename CurveType::template g1_type<>::value_type B;
+                    };
+
+                    struct assignment_params {
+                        typename CurveType::scalar_field_type::value_type a;
+                        typename CurveType::template g1_type<>::value_type P;
+                    };
+
+                    element_g1_fixed_base_scalar_mul(blueprint<ArithmetizationType> &bp,
+                                                     const init_params &params) :
                         n_wires_helper(bp),
-                        B(B) {
+                        B(params.B) {
 
                         j = this->bp.allocate_rows(85);
                     }
@@ -102,7 +112,7 @@ namespace nil {
                         return coef * B;
                     }
 
-                    void generate_phi1_gate(std::size_t row_index,
+                    void generate_phi1_gate(std::size_t selector_index,
                                             typename blueprint_type::value_type x_1,
                                             typename blueprint_type::value_type x_2,
                                             typename blueprint_type::value_type x_3,
@@ -110,7 +120,7 @@ namespace nil {
                                             std::array<typename CurveType::base_field_type::value_type, 8>
                                                 u) {
 
-                        this->bp.add_gate(row_index,
+                        this->bp.add_gate(selector_index,
                                           x_3 * (-u[0] * x_2 * x_1 + u[0] * x_1 + u[0] * x_2 - u[0] + u[2] * x_1 * x_2 -
                                                  u[2] * x_2 + u[4] * x_1 * x_2 - u[4] * x_2 - u[6] * x_1 * x_2 +
                                                  u[1] * x_2 * x_1 - u[1] * x_1 - u[1] * x_2 + u[1] - u[3] * x_1 * x_2 +
@@ -120,7 +130,7 @@ namespace nil {
                                                u[6] * x_1 * x_2));
                     }
 
-                    void generate_phi2_gate(std::size_t row_index,
+                    void generate_phi2_gate(std::size_t selector_index,
                                             typename blueprint_type::value_type x_1,
                                             typename blueprint_type::value_type x_2,
                                             typename blueprint_type::value_type x_3,
@@ -128,7 +138,7 @@ namespace nil {
                                             std::array<typename CurveType::base_field_type::value_type, 8>
                                                 v) {
 
-                        this->bp.add_gate(row_index,
+                        this->bp.add_gate(selector_index,
                                           x_3 * (-v[0] * x_2 * x_1 + v[0] * x_1 + v[0] * x_2 - v[0] + v[2] * x_1 * x_2 -
                                                  v[2] * x_2 + v[4] * x_1 * x_2 - v[4] * x_2 - v[6] * x_1 * x_2 +
                                                  v[1] * x_2 * x_1 - v[1] * x_1 - v[1] * x_2 + v[1] - v[3] * x_1 * x_2 +
@@ -138,7 +148,7 @@ namespace nil {
                                                v[6] * x_1 * x_2));
                     }
 
-                    void generate_phi3_gate(std::size_t row_index,
+                    void generate_phi3_gate(std::size_t selector_index,
                                             typename blueprint_type::value_type x_1,
                                             typename blueprint_type::value_type x_2,
                                             typename blueprint_type::value_type x_3,
@@ -146,12 +156,12 @@ namespace nil {
                                             typename blueprint_type::value_type x_5,
                                             typename blueprint_type::value_type x_6) {
                         this->bp.add_gate(
-                            row_index,
+                            selector_index,
                             x_1 * (1 + CurveType::template g1_type<>::params_type::b * x_3 * x_4 * x_5 * x_6) -
                                 (x_3 * x_6 + x_4 * x_5));
                     }
 
-                    void generate_phi4_gate(std::size_t row_index,
+                    void generate_phi4_gate(std::size_t selector_index,
                                             typename blueprint_type::value_type x_1,
                                             typename blueprint_type::value_type x_2,
                                             typename blueprint_type::value_type x_3,
@@ -159,13 +169,13 @@ namespace nil {
                                             typename blueprint_type::value_type x_5,
                                             typename blueprint_type::value_type x_6) {
                         this->bp.add_gate(
-                            row_index,
+                            selector_index,
                             x_2 * (1 - CurveType::template g1_type<>::params_type::b * x_3 * x_4 * x_5 * x_6) -
                                 (x_3 * x_5 + x_4 * x_6));
                     }
 
                 public:
-                    void generate_gates() {
+                    void generate_gates(blueprint_public_assignment_table<ArithmetizationType> &public_assignment) {
 
                         this->bp.add_gate({j, j + 2}, w[1][cur] * (w[1][cur] - 1));
                         this->bp.add_gate({j, j + 2}, w[2][cur] * (w[2][cur] - 1));
@@ -181,7 +191,9 @@ namespace nil {
                         // j+z, z=0 mod 5, z!=0
                         for (std::size_t z = 5; z <= 84; z += 5) {
 
-                            this->bp.add_gate(j + z,
+                            std::size_t selector_index = public_assignment.add_selector(j + z);
+
+                            this->bp.add_gate(selector_index,
                                               w[0][cur] - (w[1][cur] * 4 + w[2][cur] * 2 + w[3][cur] + w[0][m1] * 8));
 
                             std::array<typename CurveType::base_field_type::value_type, 8> u;
@@ -193,16 +205,18 @@ namespace nil {
                                 v[i] = omega.Y;
                             }
 
-                            generate_phi1_gate(j + z, w[1][cur], w[2][cur], w[3][cur], w[4][cur], u);
-                            generate_phi2_gate(j + z, w[1][cur], w[2][cur], w[3][cur], w[4][p1], v);
-                            generate_phi3_gate(j + z, w[1][p1], w[2][p1], w[1][m1], w[2][m1], w[4][p1], w[3][p2]);
-                            generate_phi4_gate(j + z, w[1][p1], w[2][p1], w[1][m1], w[2][m1], w[4][p1], w[3][p2]);
+                            generate_phi1_gate(selector_index, w[1][cur], w[2][cur], w[3][cur], w[4][cur], u);
+                            generate_phi2_gate(selector_index, w[1][cur], w[2][cur], w[3][cur], w[4][p1], v);
+                            generate_phi3_gate(selector_index, w[1][p1], w[2][p1], w[1][m1], w[2][m1], w[4][p1], w[3][p2]);
+                            generate_phi4_gate(selector_index, w[1][p1], w[2][p1], w[1][m1], w[2][m1], w[4][p1], w[3][p2]);
                         }
 
                         // j+z, z=2 mod 5
                         for (std::size_t z = 2; z <= 84; z += 5) {
 
-                            this->bp.add_gate(j + z,
+                            std::size_t selector_index = public_assignment.add_selector(j + z);
+
+                            this->bp.add_gate(selector_index,
                                               w[0][cur] - (w[1][cur] * 4 + w[2][cur] * 2 + w[3][m1] + w[0][m2] * 8));
 
                             std::array<typename CurveType::base_field_type::value_type, 8> u;
@@ -214,10 +228,10 @@ namespace nil {
                                 v[i] = omega.Y;
                             }
 
-                            generate_phi1_gate(j + z, w[1][cur], w[2][cur], w[3][m1], w[4][m1], u);
-                            generate_phi2_gate(j + z, w[1][cur], w[2][cur], w[3][m1], w[4][cur], v);
-                            generate_phi3_gate(j + z, w[1][p1], w[2][p1], w[1][m1], w[2][m1], w[0][p1], w[3][p2]);
-                            generate_phi4_gate(j + z, w[1][p1], w[2][p1], w[1][m1], w[2][m1], w[0][p1], w[3][p2]);
+                            generate_phi1_gate(selector_index, w[1][cur], w[2][cur], w[3][m1], w[4][m1], u);
+                            generate_phi2_gate(selector_index, w[1][cur], w[2][cur], w[3][m1], w[4][cur], v);
+                            generate_phi3_gate(selector_index, w[1][p1], w[2][p1], w[1][m1], w[2][m1], w[0][p1], w[3][p2]);
+                            generate_phi4_gate(selector_index, w[1][p1], w[2][p1], w[1][m1], w[2][m1], w[0][p1], w[3][p2]);
                         }
 
                         // j+z, z=3 mod 5
@@ -232,41 +246,43 @@ namespace nil {
                                 v[i] = omega.Y;
                             }
 
-                            generate_phi1_gate(j + z, w[4][m1], w[3][cur], w[4][cur], w[0][cur], u);
-                            generate_phi2_gate(j + z, w[4][m1], w[3][cur], w[4][cur], w[0][p1], v);
+                            std::size_t selector_index = public_assignment.add_selector(j + z);
+                            generate_phi1_gate(selector_index, w[4][m1], w[3][cur], w[4][cur], w[0][cur], u);
+                            generate_phi2_gate(selector_index, w[4][m1], w[3][cur], w[4][cur], w[0][p1], v);
                         }
 
                         // j+z, z=4 mod 5
                         for (std::size_t z = 4; z <= 84; z += 5) {
 
-                            this->bp.add_gate(j + z - 1,
+                            this->bp.add_gate(public_assignment.add_selector(j + z - 1),
                                               w[0][p1] - (w[4][m1] * 4 + w[3][m2] * 2 + w[4][m2] + w[0][m1] * 8));
 
-                            generate_phi3_gate(j + z, w[1][m2], w[2][cur], w[1][m1], w[2][m1], w[4][p1], w[0][p2]);
-                            generate_phi4_gate(j + z, w[1][m2], w[2][cur], w[1][m1], w[2][m1], w[4][p1], w[0][p2]);
+                            std::size_t selector_index = public_assignment.add_selector(j + z);
+                            generate_phi3_gate(selector_index, w[1][m2], w[2][cur], w[1][m1], w[2][m1], w[4][p1], w[0][p2]);
+                            generate_phi4_gate(selector_index, w[1][m2], w[2][cur], w[1][m1], w[2][m1], w[4][p1], w[0][p2]);
                         }
                     }
 
-                    void generate_assignments(const typename CurveType::scalar_field_type::value_type &a,
-                                              const typename CurveType::template g1_type<>::value_type &P) {
+                    void generate_assignments(blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
+                                              const assignment_params &params) {
 
                         std::array<bool, 9> b{};
-                        // = marshalling::unpack(a);
+                        // = marshalling::unpack(params.a);
 
-                        this->bp.assignment(W1, j) = b[0];
-                        this->bp.assignment(W2, j) = b[1];
-                        this->bp.assignment(W3, j) = b[2];
+                        private_assignment.witness(W1)[j] = b[0];
+                        private_assignment.witness(W2)[j] = b[1];
+                        private_assignment.witness(W3)[j] = b[2];
 
-                        this->bp.assignment(W1, j + 1) = P.X;
-                        this->bp.assignment(W2, j + 1) = P.Y;
-                        this->bp.assignment(W3, j + 1) = b[3];
+                        private_assignment.witness(W1)[j + 1] = params.P.X;
+                        private_assignment.witness(W2)[j + 1] = params.P.Y;
+                        private_assignment.witness(W3)[j + 1] = b[3];
 
-                        this->bp.assignment(W1, j + 2) = b[4];
-                        this->bp.assignment(W2, j + 2) = b[5];
-                        this->bp.assignment(W4, j + 2) = b[6];
+                        private_assignment.witness(W1)[j + 2] = b[4];
+                        private_assignment.witness(W2)[j + 2] = b[5];
+                        private_assignment.witness(W4)[j + 2] = b[6];
 
-                        this->bp.assignment(W3, j + 3) = b[7];
-                        this->bp.assignment(W4, j + 3) = b[8];
+                        private_assignment.witness(W3)[j + 3] = b[7];
+                        private_assignment.witness(W4)[j + 3] = b[8];
                     }
                 };
 
