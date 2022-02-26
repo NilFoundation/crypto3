@@ -36,7 +36,6 @@
 #include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
-#include <nil/crypto3/zk/snark/relations/variable.hpp>
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
@@ -181,9 +180,12 @@ namespace nil {
                     test_circuit.init();
 
                     
-                    variable<FieldType, true> w0(0, variable<FieldType, true>::rotation_type::current);
-                    variable<FieldType, true> w1(0, variable<FieldType, true>::rotation_type::current);
-                    variable<FieldType, true> w2(0, variable<FieldType, true>::rotation_type::current);
+                    plonk_variable<FieldType> w0(0, plonk_variable<FieldType>::rotation_type::current,
+                        plonk_variable<FieldType>::column_type::witness);
+                    plonk_variable<FieldType> w1(0, plonk_variable<FieldType>::rotation_type::current,
+                        plonk_variable<FieldType>::column_type::witness);
+                    plonk_variable<FieldType> w2(0, plonk_variable<FieldType>::rotation_type::current,
+                        plonk_variable<FieldType>::column_type::witness);
                     
                     plonk_constraint<FieldType> add_constraint;
                     add_constraint.add_term(w0);
@@ -289,9 +291,12 @@ namespace nil {
                     test_circuit.init();
 
                     
-                    variable<FieldType, true> w0(0, variable<FieldType, true>::rotation_type::current);
-                    variable<FieldType, true> w1(0, variable<FieldType, true>::rotation_type::current);
-                    variable<FieldType, true> w2(0, variable<FieldType, true>::rotation_type::current);
+                    plonk_variable<FieldType> w0(0, plonk_variable<FieldType>::rotation_type::current,
+                        plonk_variable<FieldType>::column_type::witness);
+                    plonk_variable<FieldType> w1(0, plonk_variable<FieldType>::rotation_type::current,
+                        plonk_variable<FieldType>::column_type::witness);
+                    plonk_variable<FieldType> w2(0, plonk_variable<FieldType>::rotation_type::current,
+                        plonk_variable<FieldType>::column_type::witness);
                     
                     plonk_constraint<FieldType> add_constraint;
                     add_constraint.add_term(w0);

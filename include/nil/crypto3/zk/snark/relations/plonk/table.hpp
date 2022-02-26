@@ -27,8 +27,6 @@
 #ifndef CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_HPP
 #define CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_HPP
 
-#include <nil/crypto3/zk/snark/relations/variable.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -72,12 +70,13 @@ namespace nil {
                 class plonk_public_table {
 
                     std::vector<ColumnType> selector_columns;
-                    // std::vector<ColumnType> public_input_columns;
+                    std::vector<ColumnType> public_input_columns;
 
                 public:
 
-                    plonk_public_table(std::vector<ColumnType> selector_columns):
-                        selector_columns(selector_columns){
+                    plonk_public_table(std::vector<ColumnType> selector_columns,
+                        std::vector<ColumnType> public_input_columns):
+                        selector_columns(selector_columns), public_input_columns(public_input_columns){
                     }
 
                     ColumnType selector(std::size_t index) const{
@@ -94,9 +93,9 @@ namespace nil {
                         if (index < selector_columns.size())
                             return selector_columns[index];
                         index -= selector_columns.size();
-                        // if (index < public_input_columns.size())
-                        //     return public_input_columns[index];
-                        // index -= public_input_columns.size();
+                        if (index < public_input_columns.size())
+                            return public_input_columns[index];
+                        index -= public_input_columns.size();
                     }
 
                     std::size_t size() const{
@@ -114,46 +113,46 @@ namespace nil {
 
                 private:
 
-                    private_table_type private_table;
-                    public_table_type public_table;
+                    private_table_type _private_table;
+                    public_table_type _public_table;
 
                 public:
 
                     plonk_table(private_table_type private_table, 
                         public_table_type public_table): 
-                        private_table(private_table), public_table(public_table){
+                        _private_table(private_table), _public_table(public_table){
                     }
 
                     ColumnType witness(std::size_t index) const{
-                        return private_table.witness(index);
+                        return _private_table.witness(index);
                     }
 
                     ColumnType selector(std::size_t index) const{
-                        return public_table.selector(index);
+                        return _public_table.selector(index);
                     }
 
                     ColumnType public_input(std::size_t index) const{
-                        return public_table.public_input(index);
+                        return _public_table.public_input(index);
                     }
 
                     ColumnType operator[](std::size_t index) const{
-                        if (index < private_table.size())
-                            return private_table[index];
-                        index -= private_table.size();
-                        if (index < public_table.size())
-                            return public_table[index];
+                        if (index < _private_table.size())
+                            return _private_table[index];
+                        index -= _private_table.size();
+                        if (index < _public_table.size())
+                            return _public_table[index];
                     }
 
                     private_table_type private_table() const{
-                        return private_table;
+                        return _private_table;
                     }
 
                     public_table_type public_table() const{
-                        return public_table;
+                        return _public_table;
                     }
 
                     std::size_t size() const{
-                        return private_table.size() + public_table.size();
+                        return _private_table.size() + _public_table.size();
                     }
 
                 };

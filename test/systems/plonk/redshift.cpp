@@ -49,7 +49,6 @@
 #include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
-#include <nil/crypto3/zk/snark/relations/variable.hpp>
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 
@@ -259,7 +258,8 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
 
     typename plonk_constraint<FieldType>::evaluation_map columns_at_y;
     for (int i = 0; i < table_columns; i++) {
-        auto key = std::make_pair(i, variable<FieldType, true>::rotation_type::current);
+        auto key = std::make_pair(i, plonk_variable<FieldType>::rotation_type::current, 
+            plonk_variable<FieldType>::column_type::witness);
         columns_at_y[key] = circuit.column_polynomials[i].evaluate(y);
     }
 

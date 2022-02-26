@@ -53,10 +53,10 @@ namespace nil {
                 struct non_linear_combination;
 
                 /**
-                 * A variable represents a formal expression of the form "w^{wire_index}_{rotation}".
+                 * A variable represents a formal expression of the form "w^{index}_{rotation}" and type type.
                  */
                 template<typename FieldType>
-                class plonk_variable<FieldType> {
+                class plonk_variable {
 
                 public:
 
@@ -69,8 +69,8 @@ namespace nil {
                     enum column_type { wire, selector, public_imput, constant } type;
                     std::size_t index;
 
-                    constexpr variable(const std::size_t wire_index, rotation_type rotation, column_type type) :
-                        wire_index(wire_index), rotation(rotation), type(type) {};
+                    constexpr plonk_variable(const std::size_t index, rotation_type rotation, column_type type) :
+                        index(index), rotation(rotation), type(type) {};
 
                     non_linear_term<plonk_variable<FieldType>> operator^(const std::size_t power) const {
                         return non_linear_term<plonk_variable<FieldType>>(*this) ^ power;
@@ -81,7 +81,7 @@ namespace nil {
                         return non_linear_term<plonk_variable<FieldType>>(*this) * field_coeff;
                     }
 
-                    non_linear_term<plonk_variable<FieldType>> operator*(const variable &other) const {
+                    non_linear_term<plonk_variable<FieldType>> operator*(const plonk_variable &other) const {
                         return non_linear_term<plonk_variable<FieldType>>(*this) * other;
                     }
 
@@ -108,13 +108,13 @@ namespace nil {
                         return non_linear_term<plonk_variable<FieldType>>(*this) * (-assignment_type::one());
                     }
 
-                    bool operator==(const variable &other) const {
-                        return ((this->wire_index == other.wire_index) && (this->rotation == other.rotation));
+                    bool operator==(const plonk_variable &other) const {
+                        return ((this->index == other.index) && (this->rotation == other.rotation));
                     }
 
-                    bool operator<(const variable &other) const {
-                        return ((this->wire_index < other.wire_index) ||
-                                ((this->wire_index == other.wire_index) && (this->rotation < other.rotation)));
+                    bool operator<(const plonk_variable &other) const {
+                        return ((this->index < other.index) ||
+                                ((this->index == other.index) && (this->rotation < other.rotation)));
                     }
                 };
 

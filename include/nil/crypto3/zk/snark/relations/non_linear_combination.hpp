@@ -183,7 +183,7 @@ namespace nil {
                         this->terms.emplace_back(non_linear_term<VariableType>(var));
                     }
                     void add_term(const VariableType &var,
-                                  const field_value_type &field_coeff) {
+                                  const typename VariableType::assignment_type &field_coeff) {
                         this->terms.emplace_back(non_linear_term<VariableType>(var) * field_coeff);
                     }
                     void add_term(const non_linear_term<VariableType> &nlt) {
@@ -211,7 +211,7 @@ namespace nil {
                         return (*this) + (-other);
                     }
                     non_linear_combination operator-() const {
-                        return (*this) * (-field_value_type::one());
+                        return (*this) * (-VariableType::assignment_type::one());
                     }
 
                     void sort() {
@@ -266,7 +266,7 @@ namespace nil {
                 non_linear_combination<VariableType>
                     operator*(const VariableType &var,
                               const non_linear_combination<VariableType> &A) {
-                    non_linear_combination<FieldType, RotationSupport> result;
+                    non_linear_combination<VariableType> result;
                     result.terms.reserve(A.terms.size());
 
                     for (const non_linear_term<VariableType> &this_nlt : A.terms) {

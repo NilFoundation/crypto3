@@ -37,12 +37,7 @@
 #include <cstdlib>
 #include <vector>
 
-#include <nil/crypto3/math/polynomial/shift.hpp>
-#include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
-
-#include <nil/crypto3/zk/snark/relations/variable.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
-#include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -54,15 +49,15 @@ namespace nil {
                 template<typename FieldType, std::size_t WitnessColumns, std::size_t PublicColumns>
                 class plonk_constraint_system {
 
-                    std::vector<plonk_gate<FieldType>> gates;
+                    std::vector<plonk_gate<FieldType>> _gates;
 
                 public:
 
-                    plonk_constraint_system(std::vector<plonk_gate<FieldType>> gates): gates(gates) {
+                    plonk_constraint_system(std::vector<plonk_gate<FieldType>> gates): _gates(gates) {
                     }
 
                     std::size_t num_gates() const {
-                        return gates.size();
+                        return _gates.size();
                     }
 
                     // bool
@@ -78,7 +73,7 @@ namespace nil {
                     // }
 
                     std::vector<plonk_gate<FieldType>> gates() const {
-                        return gates;
+                        return _gates;
                     }
 
                     std::vector<math::polynomial<typename FieldType::value_type>> copy_constraints() const {
