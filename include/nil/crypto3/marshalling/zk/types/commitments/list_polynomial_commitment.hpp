@@ -40,7 +40,7 @@
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
 
-#include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/lpc.hpp>
 
 namespace nil {
     namespace crypto3 {

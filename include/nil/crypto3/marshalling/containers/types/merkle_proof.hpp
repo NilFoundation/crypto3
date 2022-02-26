@@ -38,8 +38,8 @@
 #include <nil/marshalling/options.hpp>
 #include <nil/marshalling/field_type.hpp>
 
-#include <nil/crypto3/merkle/tree.hpp>
-#include <nil/crypto3/merkle/proof.hpp>
+#include <nil/crypto3/container/merkle/tree.hpp>
+#include <nil/crypto3/container/merkle/proof.hpp>
 
 namespace nil {
     namespace crypto3 {
