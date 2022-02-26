@@ -28,7 +28,7 @@
 #include <nil/crypto3/hash/blake2b.hpp>
 
 #include <nil/crypto3/container/merkle/tree.hpp>
-#include <nil/crypto3/merkle/proof.hpp>
+#include <nil/crypto3/container/merkle/proof.hpp>
 
 using namespace nil::crypto3;
 

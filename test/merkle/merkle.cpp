@@ -32,7 +32,7 @@
 #include <nil/crypto3/hash/pedersen.hpp>
 
 #include <nil/crypto3/container/merkle/tree.hpp>
-#include <nil/crypto3/merkle/proof.hpp>
+#include <nil/crypto3/container/merkle/proof.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
