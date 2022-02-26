@@ -58,11 +58,11 @@ namespace nil {
 
                 public:
 
-                    plonk_constraint_system() {
+                    plonk_constraint_system(std::vector<plonk_gate<FieldType>> gates): gates(gates) {
                     }
 
                     std::size_t num_gates() const {
-                        return gates_data.size();
+                        return gates.size();
                     }
 
                     // bool

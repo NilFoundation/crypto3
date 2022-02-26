@@ -27,21 +27,13 @@
 #ifndef CRYPTO3_ZK_PLONK_GATE_HPP
 #define CRYPTO3_ZK_PLONK_GATE_HPP
 
-#include <nil/crypto3/math/polynomial/polynomial.hpp>
-
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/constraint.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
-                /************************* PLONK constraint ***********************************/
-
-                template<typename FieldType>
-                using plonk_constraint = non_linear_combination<FieldType, true>;
-
-                /************************* PLONK gate ***********************************/
 
                 template <typename FieldType>
                 struct plonk_gate{
