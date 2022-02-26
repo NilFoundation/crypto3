@@ -45,8 +45,7 @@ namespace nil {
 
                     template<typename FieldType>
                     math::polynomial<typename FieldType::value_type>
-                        column_polynomial(std::size_t table_size,
-                            const std::vector<typename FieldType::value_type> &column_assignment,
+                        column_polynomial(const plonk_column<FieldType> &column_assignment,
                             const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
 
                         std::vector<typename FieldType::value_type> interpolation_points(
@@ -62,15 +61,14 @@ namespace nil {
 
                     template<typename FieldType>
                     std::vector<math::polynomial<typename FieldType::value_type>>
-                        column_range_polynomials(std::size_t table_size,
-                            const std::vector<std::vector<typename FieldType::value_type>> &column_range_assignment,
+                        column_range_polynomials(const std::vector<plonk_column<FieldType>> &column_range_assignment,
                             const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
 
                         std::size_t columns_amount = column_range_assignment.size();
                         std::vector<math::polynomial<typename FieldType::value_type>> columns (columns_amount);
 
                         for (std::size_t selector_index = 0; selector_index < columns_amount; selector_index++) {
-                            columns[selector_index] = column_polynomial<FieldType>(table_size, column_range_assignment[selector_index], domain);
+                            columns[selector_index] = column_polynomial<FieldType>(column_range_assignment[selector_index], domain);
                         }
 
                         return columns;
@@ -78,14 +76,13 @@ namespace nil {
 
                     template<typename FieldType, std::size_t columns_amount>
                     std::array<math::polynomial<typename FieldType::value_type>, columns_amount>
-                        column_range_polynomials(std::size_t table_size,
-                            const std::array<std::vector<typename FieldType::value_type>, columns_amount> &column_range_assignment,
+                        column_range_polynomials(const std::array<plonk_column<FieldType>, columns_amount> &column_range_assignment,
                             const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
 
                         std::array<math::polynomial<typename FieldType::value_type>, columns_amount> columns;
 
                         for (std::size_t selector_index = 0; selector_index < columns_amount; selector_index++) {
-                            columns[selector_index] = column_polynomial<FieldType>(table_size, column_range_assignment[selector_index], domain);
+                            columns[selector_index] = column_polynomial<FieldType>(column_range_assignment[selector_index], domain);
                         }
 
                         return columns;
@@ -188,7 +185,7 @@ namespace nil {
                     template <typename lpc_type>
                     static inline typename types_policy::preprocessed_public_data_type
                         process(const typename types_policy::constraint_system_type &constraint_system,
-                                const typename types_policy::variable_assignment_type::public_assignment_type &public_assignment,
+                                const typename types_policy::variable_assignment_type::public_table_type &public_assignment,
                                 typename types_policy::template circuit_short_description<lpc_type> &short_description) {
 
                         typename types_policy::preprocessed_public_data_type data;
@@ -210,7 +207,7 @@ namespace nil {
                         data.q_last = selector_last(short_description.table_rows, short_description.usable_rows, data.basic_domain);
                         data.q_blind = selector_blind(short_description.table_rows, short_description.usable_rows, data.basic_domain);
 
-                        data.selectors = detail::column_range_polynomials<FieldType>(short_description.table_rows, public_assignment.selectors, data.basic_domain);
+                        data.public_polynomial_table = detail::column_range_polynomials<FieldType>(short_description.table_rows, public_assignment.selectors(), data.basic_domain);
 
                         std::vector<typename FieldType::value_type> z_numenator(N_rows + 1);
                         z_numenator[0] = -FieldType::value_type::one();
@@ -243,7 +240,7 @@ namespace nil {
                     template <typename lpc_type>
                     static inline typename types_policy::preprocessed_private_data_type
                         process(const typename types_policy::constraint_system_type &constraint_system,
-                                const typename types_policy::variable_assignment_type::private_assignment_type &private_assignment,
+                                const typename types_policy::variable_assignment_type::private_table_type &private_assignment,
                                 typename types_policy::template circuit_short_description<lpc_type> &short_description) {
 
                         typename types_policy::preprocessed_private_data_type data;
@@ -252,7 +249,7 @@ namespace nil {
 
                         data.basic_domain = math::make_evaluation_domain<FieldType>(N_rows);
 
-                        data.witnesses = detail::column_range_polynomials<FieldType>(N_rows, private_assignment.witnesses, data.basic_domain);
+                        data.private_polynomial_table = detail::column_range_polynomials<FieldType>(N_rows, private_assignment.witnesses(), data.basic_domain);
 
                         return data;
                     }

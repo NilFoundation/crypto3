@@ -123,6 +123,11 @@ namespace nil {
                         std::vector<std::uint8_t> tanscript_init = {};
                         fiat_shamir_heuristic_updated<transcript_hash_type> transcript(tanscript_init);
 
+                        plonk_polynomial_table<FieldType, RedshiftParams> polynomial_table = 
+                            plonk_polynomial_table<FieldType, RedshiftParams>(
+                                preprocessed_private_data.private_polynomial_table,
+                                preprocessed_public_data.public_polynomial_table);
+
                         // 1. Add circuit definition to transctipt
                         //transcript(short_description); //TODO: circuit_short_description marshalling
 
@@ -139,23 +144,9 @@ namespace nil {
                             //transcript(proof.witness_commitments[i]);
                         }
 
-                        // 3. Prepare columns included into permuation argument
-                        std::vector<math::polynomial<typename FieldType::value_type>> columns_for_permutation_argument(short_description.columns_with_copy_constraints.size());
-                        for (std::size_t i = 0; i < short_description.columns_with_copy_constraints.size(); i++) {
-                            std::size_t column_index = short_description.columns_with_copy_constraints[i];
-                            if (column_index < witness_columns) { //TODO: for now, we suppose that witnesses are placed to the first witness_columns of the table
-                                columns_for_permutation_argument[i] = witness_poly[column_index];
-                            } else {
-                                std::vector<typename FieldType::value_type> tmp;
-                                std::copy(assignments.public_assignment.public_input[column_index - witness_columns].begin(), assignments.public_assignment.public_input[column_index - witness_columns].end(), std::back_inserter(tmp));
-                                preprocessed_public_data.basic_domain->inverse_fft(tmp);
-                                columns_for_permutation_argument[i] = tmp;
-                            }
-                        }
-
                         // 4. permutation_argument
                         auto permutation_argument = redshift_permutation_argument<FieldType, lpc_public, lpc_permutation, RedshiftParams>::prove_eval(
-                                transcript, preprocessed_public_data, short_description, columns_for_permutation_argument, fri_params);
+                                transcript, preprocessed_public_data, short_description, polynomial_table, fri_params);
 
                         proof.v_perm_commitment = permutation_argument.permutation_poly_commitment.root();
 
@@ -170,21 +161,9 @@ namespace nil {
                         //     lookup_argument = redshift_lookup_argument<FieldType>::prove_eval(transcript);
 
                         // 6. circuit-satisfability
-                        std::vector<math::polynomial<typename FieldType::value_type>> columns_for_gate_argument(witness_columns + public_columns);
-                        for (std::size_t i = 0; i < columns_for_gate_argument.size(); i++) {
-                            if (i < witness_columns) { //TODO: for now, we suppose that witnesses are placed to the first witness_columns of the table
-                                columns_for_gate_argument[i] = witness_poly[i];
-                            } else {
-                                std::vector<typename FieldType::value_type> tmp;
-                                std::copy(assignments.public_assignment.public_input[i].begin(), assignments.public_assignment.public_input[i].end(), std::back_inserter(tmp));
-                                preprocessed_public_data.basic_domain->inverse_fft(tmp);
-                                columns_for_gate_argument[i] = tmp;
-                            }
-                        }
-
                         std::array<math::polynomial<typename FieldType::value_type>, gate_parts> prover_res =
                             redshift_gates_argument<FieldType, RedshiftParams>::prove_eval(
-                                constraint_system, columns_for_gate_argument, transcript);
+                                constraint_system, polynomial_table, transcript);
 
                         F[3] = prover_res[0];
 

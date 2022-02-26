@@ -55,9 +55,6 @@ namespace nil {
                          typename RedshiftParams>
                 struct redshift_gates_argument<FieldType, RedshiftParams, 1> {
 
-                    constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
-                    constexpr static const std::size_t public_columns = RedshiftParams::public_columns;
-                    using merkle_hash_type = typename RedshiftParams::merkle_hash_type;
                     using transcript_hash_type = typename RedshiftParams::transcript_hash_type;
 
                     using types_policy = detail::redshift_types_policy<FieldType, RedshiftParams>;
@@ -66,7 +63,7 @@ namespace nil {
 
                     static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
                         prove_eval(typename types_policy::constraint_system_type &constraint_system,
-                                    const std::vector<math::polynomial<typename FieldType::value_type>> &columns,
+                                    const std::vector<math::polynomial<typename FieldType::value_type>> &column_polynomials,
                                    fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
@@ -82,7 +79,7 @@ namespace nil {
                             math::polynomial<typename FieldType::value_type> gate_result = {0};
 
                             for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
-                                gate_result = gate_result + gates[i].constraints[j].evaluate(columns) * theta_acc;
+                                gate_result = gate_result + gates[i].constraints[j].evaluate(column_polynomials) * theta_acc;
                                 theta_acc *= theta;
                             }
 

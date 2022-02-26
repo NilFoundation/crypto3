@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_HPP
-#define CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_HPP
+#ifndef CRYPTO3_ZK_PLONK_REDSHIFT_POLYNOMIAL_TABLE_HPP
+#define CRYPTO3_ZK_PLONK_REDSHIFT_POLYNOMIAL_TABLE_HPP
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
 
@@ -34,22 +34,23 @@ namespace nil {
         namespace zk {
             namespace snark {
 
+                template<typename FieldType>
                 using plonk_column = std::vector<typename FieldType::value_type>;
 
                 template<typename FieldType, 
                          typename RedshiftParams>
-                class plonk_private_table {
+                class plonk_private_assignment_table {
 
-                    std::array<plonk_column, RedshiftParams::witness_columns> witness_columns;
+                    std::array<plonk_column<FieldType>, RedshiftParams::witness_columns> witness_columns;
 
                 public:
 
-                    plonk_column witness(std::size_t index) const{
+                    plonk_column<FieldType> witness(std::size_t index) const{
                         assert(index < RedshiftParams::witness_columns);
                         return witness_columns[index];
                     }
 
-                    plonk_column operator[](std::size_t index) const{
+                    plonk_column<FieldType> operator[](std::size_t index) const{
                         if (index < RedshiftParams::witness_columns)
                             return witness_columns[index];
                         index -= RedshiftParams::witness_columns;
@@ -62,24 +63,24 @@ namespace nil {
 
                 template<typename FieldType, 
                          typename RedshiftParams>
-                class plonk_public_table {
+                class plonk_public_assignment_table {
 
-                    std::vector<plonk_column> selector_columns;
-                    // std::vector<plonk_column> public_input_columns;
+                    std::vector<plonk_column<FieldType>> selector_columns;
+                    // std::vector<plonk_column<FieldType>> public_input_columns;
 
                 public:
 
-                    plonk_column selector(std::size_t index) const{
+                    plonk_column<FieldType> selector(std::size_t index) const{
                         assert(index < selector_columns.size());
                         return selector_columns[index];
                     }
 
-                    plonk_column public_input(std::size_t index) const{
+                    plonk_column<FieldType> public_input(std::size_t index) const{
                         assert(index < public_input_columns.size());
                         return public_input_columns[index];
                     }
 
-                    plonk_column operator[](std::size_t index) const{
+                    plonk_column<FieldType> operator[](std::size_t index) const{
                         if (index < selector_columns.size())
                             return selector_columns[index];
                         index -= selector_columns.size();
@@ -95,48 +96,48 @@ namespace nil {
 
                 template<typename FieldType, 
                          typename RedshiftParams>
-                class plonk_table {
+                class plonk_assignment_table {
 
-                    plonk_private_table<FieldType, RedshiftParams> private_table;
-                    plonk_public_table<FieldType, RedshiftParams> public_table;
+                    plonk_private_assignment_table<FieldType, RedshiftParams> private_assignment_table;
+                    plonk_public_assignment_table<FieldType, RedshiftParams> public_assignment_table;
 
                 public:
 
-                    plonk_table(plonk_private_table<FieldType, RedshiftParams> private_table, 
-                        plonk_public_table<FieldType, RedshiftParams> public_table): 
-                        private_table(private_table), public_table(public_table){
+                    plonk_assignment_table(plonk_private_assignment_table<FieldType, RedshiftParams> private_assignment_table, 
+                        plonk_public_assignment_table<FieldType, RedshiftParams> public_assignment_table): 
+                        private_assignment_table(private_assignment_table), public_assignment_table(public_assignment_table){
                     }
 
-                    plonk_column witness(std::size_t index) const{
-                        return private_table.witness(index);
+                    plonk_column<FieldType> witness(std::size_t index) const{
+                        return private_assignment_table.witness(index);
                     }
 
-                    plonk_column selector(std::size_t index) const{
-                        return public_table.selector(index);
+                    plonk_column<FieldType> selector(std::size_t index) const{
+                        return public_assignment_table.selector(index);
                     }
 
-                    plonk_column public_input(std::size_t index) const{
-                        return public_table.public_input(index);
+                    plonk_column<FieldType> public_input(std::size_t index) const{
+                        return public_assignment_table.public_input(index);
                     }
 
-                    plonk_column operator[](std::size_t index) const{
-                        if (index < private_table.size())
-                            return private_table[index];
-                        index -= private_table.size();
-                        if (index < public_table.size())
-                            return public_table[index];
+                    plonk_column<FieldType> operator[](std::size_t index) const{
+                        if (index < private_assignment_table.size())
+                            return private_assignment_table[index];
+                        index -= private_assignment_table.size();
+                        if (index < public_assignment_table.size())
+                            return public_assignment_table[index];
                     }
 
-                    plonk_private_table<FieldType, RedshiftParams> private_table() const{
-                        return private_table;
+                    plonk_private_assignment_table<FieldType, RedshiftParams> private_assignment_table() const{
+                        return private_assignment_table;
                     }
 
-                    plonk_public_table<FieldType, RedshiftParams> public_table() const{
-                        return public_table;
+                    plonk_public_assignment_table<FieldType, RedshiftParams> public_assignment_table() const{
+                        return public_assignment_table;
                     }
 
                     std::size_t size() const{
-                        return private_table.size() + public_table.size();
+                        return private_assignment_table.size() + public_assignment_table.size();
                     }
 
                 };
@@ -145,4 +146,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_HPP
+#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_POLYNOMIAL_TABLE_HPP

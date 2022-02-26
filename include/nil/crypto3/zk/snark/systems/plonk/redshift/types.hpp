@@ -62,21 +62,7 @@ namespace nil {
 
                         typedef plonk_constraint_system<FieldType, witness_columns, public_columns> constraint_system_type;
 
-                        /************************* PLONK variable assignment **************************/
-
-                        struct variable_assignment_type {
-
-                            struct private_assignment_type {
-                                std::array<std::vector<typename FieldType::value_type>, witness_columns> witnesses;
-                            } private_assignment;
-
-                            struct public_assignment_type {
-                                using selectors_type = std::vector<std::vector<typename FieldType::value_type>>;
-                                using public_input_type = std::array<std::vector<typename FieldType::value_type>, public_columns>;
-                                selectors_type selectors;
-                                public_input_type public_input;
-                            } public_assignment;
-                        };
+                        typedef plonk_assignment_table<FieldType, RedshiftParams> variable_assignment_type;
 
                         /*********************************** Proof ***********************************/
 
@@ -96,14 +82,13 @@ namespace nil {
 
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
-                            std::vector<math::polynomial<typename FieldType::value_type>> selectors;
+                            plonk_public_polynomial_table<FieldType, RedshiftParams> public_polynomial_table;
+
                             // S_sigma
                             std::vector<math::polynomial<typename FieldType::value_type>> permutation_polynomials;
                             // S_id
                             std::vector<math::polynomial<typename FieldType::value_type>>
                                 identity_polynomials;
-                            // c
-                            std::vector<math::polynomial<typename FieldType::value_type>> constraints;
 
                             math::polynomial<typename FieldType::value_type> lagrange_0;
 
@@ -117,7 +102,7 @@ namespace nil {
 
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
-                            std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witnesses;
+                            plonk_private_polynomial_table<FieldType, RedshiftParams> private_polynomial_table;
                         };
 
                         template <typename CommitmentSchemeType>
