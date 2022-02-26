@@ -42,8 +42,8 @@
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
-#include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
-#include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/lpc.hpp>
+#include <nil/crypto3/zk/snark/commitments/fri.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
 using namespace nil::crypto3;
@@ -155,12 +155,12 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
             algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
 
         std::array<std::uint8_t, 96> x_data {};
-        zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(x_data);
+        zk::snark::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
         auto proof = lpc_type::proof_eval(evaluation_points, tree, poly, transcript, fri_params); // phase_2: Prove
 
         // verify
-        zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript_verifier(x_data);
+        zk::snark::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
         BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, transcript_verifier, fri_params)); // phase_3: Verify
     }

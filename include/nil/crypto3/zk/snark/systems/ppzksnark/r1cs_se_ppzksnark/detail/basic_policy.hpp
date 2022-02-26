@@ -79,7 +79,7 @@ namespace nil {
                 namespace detail {
 
                     template<typename CurveType>
-                    struct r1cs_se_ppzksnark_types_policy {
+                    struct r1cs_se_ppzksnark_policy {
 
                         /******************************** Params ********************************/
 

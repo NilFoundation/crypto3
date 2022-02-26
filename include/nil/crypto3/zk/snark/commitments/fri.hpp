@@ -34,8 +34,8 @@
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
-#include <nil/crypto3/merkle/tree.hpp>
-#include <nil/crypto3/merkle/proof.hpp>
+#include <nil/crypto3/container/merkle/tree.hpp>
+#include <nil/crypto3/container/merkle/proof.hpp>
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 
@@ -177,7 +177,7 @@ namespace nil {
                     static proof_type proof_eval(const math::polynomial<typename FieldType::value_type> &Q,
                                                  const math::polynomial<typename FieldType::value_type> &g,
                                                  merkle_tree_type &T,
-                                                 fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
+                                                 fiat_shamir_heuristic_sequential<TranscriptHashType> &transcript,
                                                  const params_type &fri_params) {
 
                         proof_type proof;
@@ -280,7 +280,7 @@ namespace nil {
                     }
 
                     static bool verify_eval(proof_type &proof,
-                                            fiat_shamir_heuristic_updated<TranscriptHashType> &transcript,
+                                            fiat_shamir_heuristic_sequential<TranscriptHashType> &transcript,
                                             params_type &fri_params,
                                             const math::polynomial<typename FieldType::value_type> &U,
                                             const math::polynomial<typename FieldType::value_type> &V) {
@@ -356,7 +356,8 @@ namespace nil {
                             x = x_next;
                         }
 
-                        if (proof.final_polynomial.degree() > std::pow(2, std::log2(fri_params.max_degree + 1) - r) - 1) {
+                        if (proof.final_polynomial.degree() >
+                            std::pow(2, std::log2(fri_params.max_degree + 1) - r) - 1) {
                             return false;
                         }
                         if (proof.final_polynomial.evaluate(x) != proof.round_proofs[r - 1].colinear_value) {

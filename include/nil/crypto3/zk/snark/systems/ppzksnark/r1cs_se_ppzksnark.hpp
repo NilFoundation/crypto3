@@ -71,7 +71,7 @@ namespace nil {
                          typename Prover = r1cs_se_ppzksnark_prover<CurveType>,
                          typename Verifier = r1cs_se_ppzksnark_verifier_strong_input_consistency<CurveType>>
                 class r1cs_se_ppzksnark {
-                    typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
+                    typedef detail::r1cs_se_ppzksnark_policy<CurveType> policy_type;
 
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;

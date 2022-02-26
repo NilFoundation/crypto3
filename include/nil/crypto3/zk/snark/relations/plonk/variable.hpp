@@ -59,7 +59,6 @@ namespace nil {
                 class plonk_variable {
 
                 public:
-
                     using assignment_type = typename FieldType::value_type;
 
                     /**
@@ -76,8 +75,7 @@ namespace nil {
                         return non_linear_term<plonk_variable<FieldType>>(*this) ^ power;
                     }
 
-                    non_linear_term<plonk_variable<FieldType>>
-                        operator*(const assignment_type &field_coeff) const {
+                    non_linear_term<plonk_variable<FieldType>> operator*(const assignment_type &field_coeff) const {
                         return non_linear_term<plonk_variable<FieldType>>(*this) * field_coeff;
                     }
 
@@ -120,19 +118,19 @@ namespace nil {
 
                 template<typename FieldType>
                 non_linear_term<plonk_variable<FieldType>> operator*(const typename FieldType::value_type &field_coeff,
-                                                           const plonk_variable<FieldType> &var) {
+                                                                     const plonk_variable<FieldType> &var) {
                     return var * field_coeff;
                 }
 
                 template<typename FieldType>
-                non_linear_combination<plonk_variable<FieldType>> operator+(const typename FieldType::value_type &field_val,
-                                                                  const plonk_variable<FieldType> &var) {
+                non_linear_combination<plonk_variable<FieldType>>
+                    operator+(const typename FieldType::value_type &field_val, const plonk_variable<FieldType> &var) {
                     return var + field_val;
                 }
 
                 template<typename FieldType>
-                non_linear_combination<plonk_variable<FieldType>> operator-(const typename FieldType::value_type &field_val,
-                                                                  const plonk_variable<FieldType> &var) {
+                non_linear_combination<plonk_variable<FieldType>>
+                    operator-(const typename FieldType::value_type &field_val, const plonk_variable<FieldType> &var) {
                     return (-var) + field_val;
                 }
 

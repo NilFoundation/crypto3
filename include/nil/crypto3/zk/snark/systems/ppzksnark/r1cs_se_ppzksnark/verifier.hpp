@@ -46,7 +46,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class r1cs_se_ppzksnark_process_verification_key {
-                    typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
+                    typedef detail::r1cs_se_ppzksnark_policy<CurveType> policy_type;
 
                 public:
                     typedef typename policy_type::verification_key_type verification_key_type;
@@ -90,7 +90,7 @@ namespace nil {
 
                 template<typename CurveType>
                 class r1cs_se_ppzksnark_verifier_weak_input_consistency {
-                    typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
+                    typedef detail::r1cs_se_ppzksnark_policy<CurveType> policy_type;
 
                 public:
                     typedef typename policy_type::primary_input_type primary_input_type;
@@ -181,7 +181,7 @@ namespace nil {
 
                 template<typename CurveType>
                 class r1cs_se_ppzksnark_verifier_strong_input_consistency {
-                    typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
+                    typedef detail::r1cs_se_ppzksnark_policy<CurveType> policy_type;
 
                 public:
                     typedef typename policy_type::primary_input_type primary_input_type;

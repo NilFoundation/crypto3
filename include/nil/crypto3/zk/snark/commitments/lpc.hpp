@@ -30,25 +30,24 @@
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 
-#include <nil/crypto3/merkle/tree.hpp>
-#include <nil/crypto3/merkle/proof.hpp>
+#include <nil/crypto3/container/merkle/tree.hpp>
+#include <nil/crypto3/container/merkle/proof.hpp>
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/fri.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
-                template <typename MerkleTreeHashType = hashes::keccak_1600<512>,
-                          typename TranscriptHashType = hashes::keccak_1600<512>,
-                          std::size_t Lambda = 40,
-                          std::size_t R = 1,
-                          std::size_t M = 2>
+                template<typename MerkleTreeHashType,
+                         typename TranscriptHashType,
+                         std::size_t Lambda = 40,
+                         std::size_t R = 1,
+                         std::size_t M = 2>
                 struct list_polynomial_commitment_params {
-                    using merkle_hash_type = MerkleTreeHashType;
-                    using transcript_hash_type = TranscriptHashType;
+                    typedef MerkleTreeHashType merkle_hash_type;
+                    typedef TranscriptHashType transcript_hash_type;
 
                     constexpr static const std::size_t lambda = Lambda;
                     constexpr static const std::size_t r = R;
@@ -68,9 +67,7 @@ namespace nil {
                  * Matter Labs,
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
-                template<typename FieldType,
-                         typename LPCParams,
-                         std::size_t K = 1>
+                template<typename FieldType, typename LPCParams, std::size_t K = 1>
                 struct list_polynomial_commitment_scheme {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
@@ -129,41 +126,42 @@ namespace nil {
                         return fri_type::commit(poly, domain);
                     }
 
-                    template <std::size_t list_size>
-                        static std::array<merkle_tree_type, list_size> 
-                            commit(std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
-                                    const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
-                                std::array<merkle_tree_type, list_size> commits;
-                                for (std::size_t i = 0; i < list_size; i++) {
-                                    commits[i] = fri_type::commit(poly[i], domain);
-                                }
-                                return commits;
+                    template<std::size_t list_size>
+                    static std::array<merkle_tree_type, list_size>
+                        commit(std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
+                               const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
+                        std::array<merkle_tree_type, list_size> commits;
+                        for (std::size_t i = 0; i < list_size; i++) {
+                            commits[i] = fri_type::commit(poly[i], domain);
+                        }
+                        return commits;
                     }
 
                     static proof_type proof_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
                                                  merkle_tree_type &T,
                                                  const math::polynomial<typename FieldType::value_type> &g,
-                                                 fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
+                                                 fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript,
                                                  const typename fri_type::params_type &fri_params) {
 
                         std::array<typename FieldType::value_type, k> z;
                         std::array<merkle_proof_type, k> p;
                         std::array<std::pair<typename FieldType::value_type, typename FieldType::value_type>, k>
                             U_interpolation_points;
-                        
+
                         for (std::size_t j = 0; j < k; j++) {
-                            z[j] = g.evaluate(evaluation_points[j]); // transform to point-representation
-                            U_interpolation_points[j] = std::make_pair(evaluation_points[j], z[j]); // prepare points for interpolation
+                            z[j] = g.evaluate(evaluation_points[j]);    // transform to point-representation
+                            U_interpolation_points[j] =
+                                std::make_pair(evaluation_points[j], z[j]);    // prepare points for interpolation
                         }
 
-                        math::polynomial<typename FieldType::value_type> U =
-                            math::lagrange_interpolation(U_interpolation_points); // k is small => iterpolation goes fast
+                        math::polynomial<typename FieldType::value_type> U = math::lagrange_interpolation(
+                            U_interpolation_points);    // k is small => iterpolation goes fast
 
                         math::polynomial<typename FieldType::value_type> Q = (g - U);
                         for (std::size_t j = 0; j < k; j++) {
                             math::polynomial<typename FieldType::value_type> denominator_polynom = {
                                 -evaluation_points[j], 1};
-                            Q = Q / denominator_polynom; // polynomial divison
+                            Q = Q / denominator_polynom;    // polynomial divison
                         }
 
                         // temporary definition, until polynomial is constexpr
@@ -172,7 +170,8 @@ namespace nil {
                         std::array<typename fri_type::proof_type, lambda> fri_proof;
 
                         for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {
-                            fri_proof[round_id] = fri_type::proof_eval(Q, g, T, transcript, fri_params); // fri_commitment.hpp
+                            fri_proof[round_id] =
+                                fri_type::proof_eval(Q, g, T, transcript, fri_params);    // fri_commitment_scheme.hpp
                         }
 
                         return proof_type({z, T.root(), fri_proof});
@@ -180,7 +179,7 @@ namespace nil {
 
                     static bool verify_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
                                             proof_type &proof,
-                                            fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
+                                            fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript,
                                             typename fri_type::params_type fri_params) {
                         std::array<std::pair<typename FieldType::value_type, typename FieldType::value_type>, k>
                             U_interpolation_points;

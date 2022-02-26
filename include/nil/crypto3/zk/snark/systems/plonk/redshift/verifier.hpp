@@ -29,9 +29,9 @@
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
-#include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/fri.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/types.hpp>
+#include "nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp"
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
@@ -40,52 +40,63 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType,
-                         typename RedshiftParams>
+                template<typename FieldType, typename ParamsType>
                 class redshift_verifier {
 
-                    constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
-                    constexpr static const std::size_t public_columns = RedshiftParams::public_columns;
-                    using merkle_hash_type = typename RedshiftParams::lpc_params::merkle_hash_type;
-                    using transcript_hash_type = typename RedshiftParams::lpc_params::transcript_hash_type;
+                    constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
+                    constexpr static const std::size_t public_columns = ParamsType::public_columns;
+                    using merkle_hash_type = typename ParamsType::commitment_params_type::merkle_hash_type;
+                    using transcript_hash_type = typename ParamsType::commitment_params_type::transcript_hash_type;
 
-                    using types_policy = detail::redshift_types_policy<FieldType, RedshiftParams>;
+                    using policy_type = detail::redshift_policy<FieldType, ParamsType>;
 
-                    constexpr static const std::size_t lambda = RedshiftParams::lpc_params::lambda;
-                    constexpr static const std::size_t r = RedshiftParams::lpc_params::r;
-                    constexpr static const std::size_t m = RedshiftParams::lpc_params::m;
+                    constexpr static const std::size_t lambda = ParamsType::commitment_params_type::lambda;
+                    constexpr static const std::size_t r = ParamsType::commitment_params_type::r;
+                    constexpr static const std::size_t m = ParamsType::commitment_params_type::m;
 
                     constexpr static const std::size_t opening_points_witness = 1;
                     constexpr static const std::size_t opening_points_v_p = 2;
                     constexpr static const std::size_t opening_points_t = 1;
 
-                    typedef list_polynomial_commitment_scheme<FieldType, typename RedshiftParams::lpc_params, opening_points_witness> lpc_witness;
-                    typedef list_polynomial_commitment_scheme<FieldType, typename RedshiftParams::lpc_params, opening_points_v_p> lpc_permutation;
-                    typedef list_polynomial_commitment_scheme<FieldType, typename RedshiftParams::lpc_params, opening_points_t> lpc_quotient;
+                    typedef list_polynomial_commitment_scheme<FieldType,
+                                                              typename ParamsType::commitment_params_type,
+                                                              opening_points_witness>
+                        commitment_scheme_witness_type;
+                    typedef list_polynomial_commitment_scheme<FieldType,
+                                                              typename ParamsType::commitment_params_type,
+                                                              opening_points_v_p>
+                        commitment_scheme_permutation_type;
+                    typedef list_polynomial_commitment_scheme<FieldType,
+                                                              typename ParamsType::commitment_params_type,
+                                                              opening_points_t>
+                        commitment_scheme_quotient_type;
 
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
                     constexpr static const std::size_t f_parts = 9;
 
                 public:
-                    static inline bool process(//const types_policy::verification_key_type &verification_key,
-                                               //const types_policy::primary_input_type &primary_input,
-                                               const typename types_policy::template proof_type<lpc_witness, lpc_permutation, lpc_quotient> &proof, 
-                                               const typename types_policy::template circuit_short_description<lpc_witness> &short_description) { //TODO: decsription commitment scheme
+                    static inline bool process(    // const policy_type::verification_key_type &verification_key,
+                                                   // const policy_type::primary_input_type &primary_input,
+                        const typename policy_type::template proof_type<commitment_scheme_witness_type,
+                                                                        commitment_scheme_permutation_type,
+                                                                        commitment_scheme_quotient_type> &proof,
+                        const typename policy_type::template circuit_short_description<commitment_scheme_witness_type>
+                            &short_description) {    // TODO: decsription commitment scheme
 
-                        fiat_shamir_heuristic_updated<transcript_hash_type> transcript(std::vector<std::uint8_t>());
+                        fiat_shamir_heuristic_sequential<transcript_hash_type> transcript;
 
-                        // 1. Add circuit definition to transctipt
-                        //transcript(short_description);
+                        // 1. Add circuit definition to transcript
+                        // transcript(short_description);
 
                         for (std::size_t i = 0; i < witness_columns; i++) {
-                            //transcript(proof.witness_commitments[i]);
+                            // transcript(proof.witness_commitments[i]);
                         }
 
-                        /*std::array<typename FieldType::value_type, permutation_parts> permutation_argument = 
-                            redshift_permutation_argument<FieldType, lpc_type, witness_columns, public_columns>::verify_eval(
-                                verifier_transcript, preprocessed_data, short_description, y, proof.witness_evaluation, v_p_at_y, v_p_at_y_shifted,
-                                proof.v_perm_commitment);
+                        /*std::array<typename FieldType::value_type, permutation_parts> permutation_argument =
+                            redshift_permutation_argument<FieldType, lpc_type, witness_columns,
+                        public_columns>::verify_eval( verifier_transcript, preprocessed_data, short_description, y,
+                        proof.witness_evaluation, v_p_at_y, v_p_at_y_shifted, proof.v_perm_commitment);
 
                         std::array<typename FieldType::value_type, f_parts> alphas =
                                 transcript.template challenges<FieldType, f_parts>();

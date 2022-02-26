@@ -27,20 +27,16 @@
 #ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PARAMS_HPP
 #define CRYPTO3_ZK_PLONK_REDSHIFT_PARAMS_HPP
 
-#include <nil/crypto3/zk/snark/commitments/list_polynomial_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/lpc.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
-                template <std::size_t WitnessColumns = 15,
-                          std::size_t PublicColumns = 15,
-                          typename MerkleTreeHashType = hashes::keccak_1600<512>,
-                          typename TranscriptHashType = hashes::keccak_1600<512>,
-                          std::size_t Lambda = 40,
-                          std::size_t R = 1,
-                          std::size_t M = 2>
+                template<std::size_t WitnessColumns = 15, std::size_t PublicColumns = 15,
+                         typename MerkleTreeHashType = hashes::keccak_1600<512>,
+                         typename TranscriptHashType = hashes::keccak_1600<512>, std::size_t Lambda = 40,
+                         std::size_t R = 1, std::size_t M = 2>
                 struct redshift_params {
 
                     typedef MerkleTreeHashType merkle_hash_type;
@@ -49,12 +45,12 @@ namespace nil {
                     constexpr static const std::size_t witness_columns = WitnessColumns;
                     constexpr static const std::size_t public_columns = PublicColumns;
 
-                    using lpc_params = list_polynomial_commitment_params<MerkleTreeHashType, TranscriptHashType, Lambda, R, M>;
+                    typedef list_polynomial_commitment_params<MerkleTreeHashType, TranscriptHashType, Lambda, R, M>
+                        commitment_params_type;
                 };
-
             }    // namespace snark
-        }                          // namespace zk
-    }                              // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_PLONK_REDSHIFT_PARAMS_HPP

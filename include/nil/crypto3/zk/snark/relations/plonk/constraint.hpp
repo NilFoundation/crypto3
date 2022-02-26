@@ -50,20 +50,23 @@ namespace nil {
 
                 template<typename FieldType, typename VariableType = plonk_variable<FieldType>>
                 class plonk_constraint : public non_linear_combination<VariableType> {
-
                 public:
-
                     plonk_constraint() : non_linear_combination<VariableType>() {};
-                    
-                    plonk_constraint(const VariableType &var) : non_linear_combination<VariableType>(var) {}
 
-                    plonk_constraint(const non_linear_term<VariableType> &nlt) : non_linear_combination<VariableType>(nlt) {}
+                    plonk_constraint(const VariableType &var) : non_linear_combination<VariableType>(var) {
+                    }
 
-                    plonk_constraint(const std::vector<non_linear_term<VariableType>> &terms) : 
-                        non_linear_combination<VariableType>(terms){}
+                    plonk_constraint(const non_linear_term<VariableType> &nlt) :
+                        non_linear_combination<VariableType>(nlt) {
+                    }
+
+                    plonk_constraint(const std::vector<non_linear_term<VariableType>> &terms) :
+                        non_linear_combination<VariableType>(terms) {
+                    }
 
                     template<typename PlonkParams>
-                    typename VariableType::assignment_type evaluate(std::size_t row_index,
+                    typename VariableType::assignment_type
+                        evaluate(std::size_t row_index,
                                  const plonk_assignment_table<FieldType, PlonkParams> &assignments) const {
                         typename VariableType::assignment_type acc = VariableType::assignment_type::zero();
                         for (const non_linear_term<VariableType> &nlt : this->terms) {
@@ -72,7 +75,7 @@ namespace nil {
                             for (const VariableType &var : nlt.vars) {
 
                                 typename VariableType::assignment_type assignment;
-                                switch (var.type){
+                                switch (var.type) {
                                     case VariableType::column_type::witness:
                                         assignment = assignments.witness(var.index)[row_index + var.rotation];
                                     case VariableType::column_type::selector:
@@ -90,9 +93,9 @@ namespace nil {
                         return acc;
                     }
 
-                    template <typename PlonkParams>
-                    math::polynomial<typename VariableType::assignment_type> evaluate(
-                        const plonk_polynomial_table<FieldType, PlonkParams> &assignments) const {
+                    template<typename PlonkParams>
+                    math::polynomial<typename VariableType::assignment_type>
+                        evaluate(const plonk_polynomial_table<FieldType, PlonkParams> &assignments) const {
                         math::polynomial<typename VariableType::assignment_type> acc = {0};
                         for (const non_linear_term<VariableType> &nlt : this->terms) {
                             math::polynomial<typename VariableType::assignment_type> term_value = {nlt.coeff};
@@ -100,7 +103,7 @@ namespace nil {
                             for (const VariableType &var : nlt.vars) {
 
                                 typename VariableType::assignment_type assignment;
-                                switch (var.type){
+                                switch (var.type) {
                                     case VariableType::column_type::witness:
                                         assignment = assignments.witness(var.index);
                                     case VariableType::column_type::selector:
@@ -124,9 +127,10 @@ namespace nil {
                             typename VariableType::assignment_type term_value = nlt.coeff;
 
                             for (const VariableType &var : nlt.vars) {
-                                std::tuple<std::size_t, typename VariableType::rotation_type, 
-                                    typename VariableType::column_type> key
-                                    = std::make_tuple(var.wire_index, var.rotation, var.type);
+                                std::tuple<std::size_t,
+                                           typename VariableType::rotation_type,
+                                           typename VariableType::column_type>
+                                    key = std::make_tuple(var.wire_index, var.rotation, var.type);
                                 term_value = term_value * assignments[key];
                             }
                             acc = acc + term_value * nlt.coeff;

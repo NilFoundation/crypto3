@@ -46,10 +46,8 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace detail {
-
-                    template<typename FieldType,
-                             typename RedshiftParams>
-                    struct redshift_types_policy {
+                    template<typename FieldType, typename RedshiftParams>
+                    struct redshift_policy {
 
                         constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
                         constexpr static const std::size_t public_columns = RedshiftParams::public_columns;
@@ -60,7 +58,8 @@ namespace nil {
                          * Below are various template aliases (used for convenience).
                          */
 
-                        typedef plonk_constraint_system<FieldType, witness_columns, public_columns> constraint_system_type;
+                        typedef plonk_constraint_system<FieldType, witness_columns, public_columns>
+                            constraint_system_type;
 
                         typedef plonk_assignment_table<FieldType, RedshiftParams> variable_assignment_type;
 
@@ -75,10 +74,11 @@ namespace nil {
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        template<typename CommitmentSchemeTypeWitness,
-                            typename CommitmentSchemeTypePermutation,
-                            typename CommitmentSchemeTypeQuotient>
-                        using proof_type = redshift_proof<FieldType, CommitmentSchemeTypeWitness, CommitmentSchemeTypePermutation, CommitmentSchemeTypeQuotient>;
+                        template<typename CommitmentSchemeTypeWitness, typename CommitmentSchemeTypePermutation,
+                                 typename CommitmentSchemeTypeQuotient>
+                        using proof_type =
+                            redshift_proof<FieldType, CommitmentSchemeTypeWitness, CommitmentSchemeTypePermutation,
+                                           CommitmentSchemeTypeQuotient>;
 
                         struct preprocessed_public_data_type {
 
@@ -89,8 +89,7 @@ namespace nil {
                             // S_sigma
                             std::vector<math::polynomial<typename FieldType::value_type>> permutation_polynomials;
                             // S_id
-                            std::vector<math::polynomial<typename FieldType::value_type>>
-                                identity_polynomials;
+                            std::vector<math::polynomial<typename FieldType::value_type>> identity_polynomials;
 
                             math::polynomial<typename FieldType::value_type> lagrange_0;
 
@@ -107,7 +106,7 @@ namespace nil {
                             plonk_private_polynomial_table<FieldType, RedshiftParams> private_polynomial_table;
                         };
 
-                        template <typename CommitmentSchemeType>
+                        template<typename CommitmentSchemeType>
                         struct circuit_short_description {
                             std::vector<typename CommitmentSchemeType::commitment_type> selectors_commits;
                             std::vector<typename CommitmentSchemeType::commitment_type> id_polys_commits;
@@ -120,12 +119,12 @@ namespace nil {
 
                             typename FieldType::value_type delta;
                             plonk_permutation permutation;
-                            //TODO: Gates and field elements
+                            // TODO: Gates and field elements
                         };
 
                         template<std::size_t AlphasAmount>
                         struct prover_fiat_shamir_heuristic_manifest {
-                            enum challenges_ids { beta, gamma, alpha, upsilon = alpha + AlphasAmount, tau , teta};
+                            enum challenges_ids { beta, gamma, alpha, upsilon = alpha + AlphasAmount, tau, teta };
                         };
                     };
                 }    // namespace detail

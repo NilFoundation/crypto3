@@ -32,6 +32,8 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_sap.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_se_ppzksnark/detail/basic_policy.hpp>
 
@@ -48,7 +50,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class r1cs_se_ppzksnark_generator {
-                    typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
+                    typedef detail::r1cs_se_ppzksnark_policy<CurveType> policy_type;
 
                     using g1_type = typename CurveType::template g1_type<>;
                     using g2_type = typename CurveType::template g2_type<>;

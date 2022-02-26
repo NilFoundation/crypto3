@@ -45,7 +45,7 @@
 #include <nil/crypto3/algebra/pairing/mnt6.hpp>
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/kzg.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/prover.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/verifier.hpp>
@@ -252,8 +252,7 @@ BOOST_AUTO_TEST_CASE(bls381_commitment_test) {
             fq_value_type::one()),
     };
 
-    typename r1cs_gg_ppzksnark_ipp2_commitment<curve_type>::output_type c1 =
-        r1cs_gg_ppzksnark_ipp2_commitment<curve_type>::single(vkey, a.begin(), a.end());
+    typename kzg_commitment<curve_type>::output_type c1 = kzg_commitment<curve_type>::single(vkey, a.begin(), a.end());
 
     fq12_value_type etalon_c1_first = fq12_value_type(
         fq6_value_type(
@@ -384,8 +383,8 @@ BOOST_AUTO_TEST_CASE(bls381_commitment_test) {
             fq2_value_type::one()),
     };
 
-    typename r1cs_gg_ppzksnark_ipp2_commitment<curve_type>::output_type c2 =
-        r1cs_gg_ppzksnark_ipp2_commitment<curve_type>::pair(vkey, wkey, a.begin(), a.end(), b.begin(), b.end());
+    typename kzg_commitment<curve_type>::output_type c2 =
+        kzg_commitment<curve_type>::pair(vkey, wkey, a.begin(), a.end(), b.begin(), b.end());
 
     fq12_value_type etalon_c2_first = fq12_value_type(
         fq6_value_type(
@@ -435,9 +434,9 @@ BOOST_AUTO_TEST_CASE(bls381_commitment_test) {
 
     scalar_field_value_type c(0x72629fcfc3205536b36d285f185f874593443f8ceab231d81ef8178d2958d4c3_cppui255);
     auto [vkey_left, vkey_right] = vkey.split(n / 2);
-    r1cs_gg_ppzksnark_ipp2_commitment_key<g2_type> vkey_compressed = vkey_left.compress(vkey_right, c);
+    kzg_commitment_key<g2_type> vkey_compressed = vkey_left.compress(vkey_right, c);
     auto [wkey_left, wkey_right] = wkey.split(n / 2);
-    r1cs_gg_ppzksnark_ipp2_commitment_key<g1_type> wkey_compressed = wkey_left.compress(wkey_right, c);
+    kzg_commitment_key<g1_type> wkey_compressed = wkey_left.compress(wkey_right, c);
 
     std::vector<G2_value_type> et_v1_compressed = {
         G2_value_type(

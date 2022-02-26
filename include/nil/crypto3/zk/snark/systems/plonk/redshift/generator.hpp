@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_GENERATOR_HPP
-#define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_GENERATOR_HPP
+#ifndef CRYPTO3_ZK_REDSHIFT_GENERATOR_HPP
+#define CRYPTO3_ZK_REDSHIFT_GENERATOR_HPP
 
 #ifdef MULTICORE
 #include <omp.h>
@@ -54,7 +54,7 @@ namespace nil {
                  */
                 template<typename TCurve>
                 class redshift_generator {
-                    typedef detail::redshift_types<TCurve> types_policy;
+                    typedef detail::redshift_policy<TCurve> policy_type;
 
                     // static inline math::polynomial<...> tau(
                     //     std::size_t input, std::size_t n, std::array<typename TCurve::scalar_field_type::value_type,
@@ -96,7 +96,7 @@ namespace nil {
                                  boost::random::uniform_int_distribution<typename scalar_field_type::integral_type>,
                              typename GeneratorType = boost::random::mt19937>
                     static inline keypair_type
-                        process(const typename types_policy::constraint_system_type &constraint_system) {
+                        process(const typename policy_type::constraint_system_type &constraint_system) {
 
                         std::array<typename TCurve::scalar_field_type::value_type, 3> k =
                             get_cosets_generators<typename TCurve::scalar_field_type>();
@@ -136,9 +136,9 @@ namespace nil {
 
                         math::polynomial Z = polynom_by_zeros(H_star);
 
-                        typename types_policy::verification_key_type vk(S_id, S_sigma, q_selectors, L_basis, PI, Z);
+                        typename policy_type::verification_key_type vk(S_id, S_sigma, q_selectors, L_basis, PI, Z);
 
-                        typename types_policy::proving_key_type pk(S_id, S_sigma, q_selectors, L_basis, f, Z);
+                        typename policy_type::proving_key_type pk(S_id, S_sigma, q_selectors, L_basis, f, Z);
 
                         return {std::move(pk), std::move(vk)};
                     }

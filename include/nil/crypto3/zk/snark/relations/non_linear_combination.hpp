@@ -70,8 +70,7 @@ namespace nil {
                     non_linear_term(const assignment_type &field_val) : coeff(field_val) {
                     }
 
-                    non_linear_term(std::vector<VariableType> vars) :
-                        vars(vars), coeff(assignment_type::one()) {
+                    non_linear_term(std::vector<VariableType> vars) : vars(vars), coeff(assignment_type::one()) {
                     }
 
                     non_linear_term operator*(const assignment_type &field_coeff) const {
@@ -104,9 +103,8 @@ namespace nil {
                 };
 
                 template<typename VariableType>
-                non_linear_term<VariableType>
-                    operator*(const typename VariableType::assignment_type &field_coeff,
-                              const non_linear_term<VariableType> &nlt) {
+                non_linear_term<VariableType> operator*(const typename VariableType::assignment_type &field_coeff,
+                                                        const non_linear_term<VariableType> &nlt) {
                     return nlt * field_coeff;
                 }
 
@@ -125,19 +123,15 @@ namespace nil {
                 }
 
                 template<typename VariableType>
-                non_linear_combination<VariableType>
-                    operator+(const non_linear_term<VariableType> &A,
-                              const non_linear_term<VariableType> &B) {
-                    return non_linear_combination<VariableType>(A) +
-                           non_linear_combination<VariableType>(B);
+                non_linear_combination<VariableType> operator+(const non_linear_term<VariableType> &A,
+                                                               const non_linear_term<VariableType> &B) {
+                    return non_linear_combination<VariableType>(A) + non_linear_combination<VariableType>(B);
                 }
 
                 template<typename VariableType>
-                non_linear_combination<VariableType>
-                    operator-(const non_linear_term<VariableType> &A,
-                              const non_linear_term<VariableType> &B) {
-                    return non_linear_combination<VariableType>(A) -
-                           non_linear_combination<VariableType>(B);
+                non_linear_combination<VariableType> operator-(const non_linear_term<VariableType> &A,
+                                                               const non_linear_term<VariableType> &B) {
+                    return non_linear_combination<VariableType>(A) - non_linear_combination<VariableType>(B);
                 }
 
                 /***************************** Linear combination ****************************/
@@ -151,7 +145,6 @@ namespace nil {
                     std::vector<non_linear_term<VariableType>> terms;
 
                 public:
-
                     non_linear_combination() {};
                     // non_linear_combination(const field_value_type &field_coeff) {
                     //     this->add_term(non_linear_term<VariableType>(field_coeff));
@@ -162,8 +155,7 @@ namespace nil {
                     non_linear_combination(const non_linear_term<VariableType> &nlt) {
                         this->add_term(nlt);
                     }
-                    non_linear_combination(const std::vector<non_linear_term<VariableType>> &terms) :
-                        terms(terms) {
+                    non_linear_combination(const std::vector<non_linear_term<VariableType>> &terms) : terms(terms) {
                     }
 
                     // non_linear_combination(const non_linear_combination &other):
@@ -182,8 +174,7 @@ namespace nil {
                     void add_term(const VariableType &var) {
                         this->terms.emplace_back(non_linear_term<VariableType>(var));
                     }
-                    void add_term(const VariableType &var,
-                                  const typename VariableType::assignment_type &field_coeff) {
+                    void add_term(const VariableType &var, const typename VariableType::assignment_type &field_coeff) {
                         this->terms.emplace_back(non_linear_term<VariableType>(var) * field_coeff);
                     }
                     void add_term(const non_linear_term<VariableType> &nlt) {
@@ -248,9 +239,8 @@ namespace nil {
                 }
 
                 template<typename VariableType>
-                non_linear_combination<VariableType>
-                    operator*(const non_linear_combination<VariableType> &A,
-                              const non_linear_combination<VariableType> &B) {
+                non_linear_combination<VariableType> operator*(const non_linear_combination<VariableType> &A,
+                                                               const non_linear_combination<VariableType> &B) {
                     non_linear_combination<VariableType> result;
                     result.terms.reserve(A.terms.size() * B.terms.size());
 
@@ -263,9 +253,8 @@ namespace nil {
                 }
 
                 template<typename VariableType>
-                non_linear_combination<VariableType>
-                    operator*(const VariableType &var,
-                              const non_linear_combination<VariableType> &A) {
+                non_linear_combination<VariableType> operator*(const VariableType &var,
+                                                               const non_linear_combination<VariableType> &A) {
                     non_linear_combination<VariableType> result;
                     result.terms.reserve(A.terms.size());
 

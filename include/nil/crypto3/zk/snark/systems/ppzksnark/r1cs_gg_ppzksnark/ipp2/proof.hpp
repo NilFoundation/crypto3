@@ -31,18 +31,13 @@
 #include <tuple>
 #include <cmath>
 
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/kzg.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                /// KZGOpening represents the KZG opening of a commitment key (which is a tuple
-                /// given commitment keys are a tuple).
-                template<typename GroupType>
-                using kzg_opening = std::pair<typename GroupType::value_type, typename GroupType::value_type>;
-
                 /// It contains all elements derived in the GIPA loop for both TIPP and MIPP at
                 /// the same time.
                 template<typename CurveType>

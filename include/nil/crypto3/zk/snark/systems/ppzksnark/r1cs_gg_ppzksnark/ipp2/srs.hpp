@@ -31,7 +31,7 @@
 #include <tuple>
 
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/keypair.hpp>
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
+#include "nil/crypto3/zk/snark/commitments/kzg.hpp"
 
 namespace nil {
     namespace crypto3 {
@@ -65,7 +65,7 @@ namespace nil {
                     typedef typename g1_type::value_type g1_value_type;
                     typedef typename g2_type::value_type g2_value_type;
 
-                    typedef r1cs_gg_ppzksnark_ipp2_commitment<CurveType> commitment_type;
+                    typedef kzg_commitment<CurveType> commitment_type;
                     typedef typename commitment_type::vkey_type vkey_type;
                     typedef typename commitment_type::wkey_type wkey_type;
 

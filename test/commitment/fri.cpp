@@ -42,10 +42,10 @@
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
-#include <nil/crypto3/merkle/tree.hpp>    // until fri inclusion
+#include <nil/crypto3/container/merkle/tree.hpp>    // until fri inclusion
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/fri.hpp>
 
 using namespace nil::crypto3;
 
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
 
     // eval
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(init_blob);
+    zk::snark::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
 
     // LPC-related logic, here we "nulify" it via U = 0, V - 1
     // TODO: Make FRI independent from LPC input
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
 
     // verify
-    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript_verifier(init_blob);
+    zk::snark::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(init_blob);
 
     BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, U, V));
 
@@ -203,7 +203,7 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     std::array<typename FieldType::value_type, 1> evaluation_points = {D[0]->get_domain_element(1).pow(5)};
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    zk::snark::fiat_shamir_heuristic_updated<transcript_hash_type> transcript(init_blob);
+    zk::snark::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
 
     proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
 

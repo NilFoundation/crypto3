@@ -30,7 +30,7 @@
 #include <tuple>
 #include <vector>
 
-#include <nil/crypto3/zk/snark/commitments/pickles.hpp>
+#include <nil/crypto3/zk/snark/commitments/pedersen.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -39,7 +39,7 @@ namespace nil {
 
                 template<typename CurveType, std::size_t WiresAmount>
                 class pickles_proof {
-                    typedef pickles_commitment_scheme<CurveType> commitment_scheme;
+                    typedef pedersen_commitment_scheme<CurveType> commitment_scheme;
 
                 public:
                     // Commitments:

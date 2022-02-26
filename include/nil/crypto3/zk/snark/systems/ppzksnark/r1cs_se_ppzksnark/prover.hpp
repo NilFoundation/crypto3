@@ -53,7 +53,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class r1cs_se_ppzksnark_prover {
-                    typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
+                    typedef detail::r1cs_se_ppzksnark_policy<CurveType> policy_type;
 
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;

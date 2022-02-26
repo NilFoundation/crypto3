@@ -33,8 +33,7 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType, typename CommitmentSchemeTypeWitness,
-                    typename CommitmentSchemeTypePermutation,
-                    typename CommitmentSchemeTypeQuotient>
+                         typename CommitmentSchemeTypePermutation, typename CommitmentSchemeTypeQuotient>
                 struct redshift_proof {
 
                     struct evaluation_proof {
@@ -56,8 +55,7 @@ namespace nil {
 
                     bool operator==(const redshift_proof &rhs) const {
                         return witness_commitments == rhs.witness_commitments && T_commitments == rhs.T_commitments &&
-                               v_perm_commitment == rhs.v_perm_commitment &&
-                               eval_proof = rhs.eval_proof;
+                                   v_perm_commitment == rhs.v_perm_commitment && eval_proof = rhs.eval_proof;
                     }
                     bool operator!=(const redshift_proof &rhs) const {
                         return !(rhs == *this);

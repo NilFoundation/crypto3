@@ -70,6 +70,11 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                /// KZGOpening represents the KZG opening of a commitment key (which is a tuple
+                /// given commitment keys are a tuple).
+                template<typename GroupType>
+                using kzg_opening = std::pair<typename GroupType::value_type, typename GroupType::value_type>;
+
                 /// Both commitment outputs a pair of $F_q^k$ element.
                 template<typename CurveType>
                 using r1cs_gg_ppzksnark_ipp2_commitment_output =
@@ -78,7 +83,7 @@ namespace nil {
                 /// Key is a generic commitment key that is instantiated with g and h as basis,
                 /// and a and b as powers.
                 template<typename GroupType>
-                struct r1cs_gg_ppzksnark_ipp2_commitment_key {
+                struct kzg_commitment_key {
                     typedef GroupType group_type;
                     typedef typename group_type::curve_type curve_type;
                     typedef typename curve_type::scalar_field_type field_type;
@@ -105,11 +110,11 @@ namespace nil {
                         typename InputIterator,
                         typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
                         typename std::enable_if<std::is_same<field_value_type, ValueType>::value, bool>::type = true>
-                    r1cs_gg_ppzksnark_ipp2_commitment_key<group_type> scale(InputIterator s_first,
+                    kzg_commitment_key<group_type> scale(InputIterator s_first,
                                                                             InputIterator s_last) const {
                         BOOST_ASSERT(has_correct_len(std::distance(s_first, s_last)));
 
-                        r1cs_gg_ppzksnark_ipp2_commitment_key<group_type> result;
+                        kzg_commitment_key<group_type> result;
                         std::for_each(boost::make_zip_iterator(boost::make_tuple(s_first, a.begin(), b.begin())),
                                       boost::make_zip_iterator(boost::make_tuple(s_last, a.end(), b.end())),
                                       [&](const boost::tuple<const field_value_type &, const group_value_type &,
@@ -122,14 +127,13 @@ namespace nil {
                     }
 
                     /// Returns the left and right commitment key part. It makes copy.
-                    std::pair<r1cs_gg_ppzksnark_ipp2_commitment_key<group_type>,
-                              r1cs_gg_ppzksnark_ipp2_commitment_key<group_type>>
+                    std::pair<kzg_commitment_key<group_type>, kzg_commitment_key<group_type>>
                         split(std::size_t at) const {
                         BOOST_ASSERT(a.size() == b.size());
                         BOOST_ASSERT(at > 0 && at < a.size());
 
-                        r1cs_gg_ppzksnark_ipp2_commitment_key<group_type> result_l;
-                        r1cs_gg_ppzksnark_ipp2_commitment_key<group_type> result_r;
+                        kzg_commitment_key<group_type> result_l;
+                        kzg_commitment_key<group_type> result_r;
 
                         auto a_it = a.begin();
                         auto b_it = b.begin();
@@ -152,14 +156,14 @@ namespace nil {
                     /// Takes a left and right commitment key and returns a commitment
                     /// key $left \circ right^{scale} = (left_i*right_i^{scale} ...)$. This is
                     /// required step during GIPA recursion.
-                    r1cs_gg_ppzksnark_ipp2_commitment_key<group_type>
-                        compress(const r1cs_gg_ppzksnark_ipp2_commitment_key<group_type> &right,
+                    kzg_commitment_key<group_type>
+                        compress(const kzg_commitment_key<group_type> &right,
                                  const field_value_type &scale) const {
                         BOOST_ASSERT(a.size() == right.a.size());
                         BOOST_ASSERT(b.size() == right.b.size());
                         BOOST_ASSERT(a.size() == b.size());
 
-                        r1cs_gg_ppzksnark_ipp2_commitment_key<group_type> result;
+                        kzg_commitment_key<group_type> result;
 
                         std::for_each(
                             boost::make_zip_iterator(
@@ -186,18 +190,16 @@ namespace nil {
                 /// well as in the "pair" commitment.
                 /// It contains $\{h^a^i\}_{i=1}^n$ and $\{h^b^i\}_{i=1}^n$
                 template<typename CurveType>
-                using r1cs_gg_ppzksnark_ipp2_vkey =
-                    r1cs_gg_ppzksnark_ipp2_commitment_key<typename CurveType::template g2_type<>>;
+                using r1cs_gg_ppzksnark_ipp2_vkey = kzg_commitment_key<typename CurveType::template g2_type<>>;
 
                 /// Commitment key used by the "pair" commitment. Note the sequence of
                 /// powers starts at $n$ already.
                 /// It contains $\{g^{a^{n+i}}\}_{i=1}^n$ and $\{g^{b^{n+i}}\}_{i=1}^n$
                 template<typename CurveType>
-                using r1cs_gg_ppzksnark_ipp2_wkey =
-                    r1cs_gg_ppzksnark_ipp2_commitment_key<typename CurveType::template g1_type<>>;
+                using r1cs_gg_ppzksnark_ipp2_wkey = kzg_commitment_key<typename CurveType::template g1_type<>>;
 
                 template<typename CurveType>
-                struct r1cs_gg_ppzksnark_ipp2_commitment {
+                struct kzg_commitment {
                     typedef CurveType curve_type;
                     typedef algebra::pairing::pairing_policy<curve_type> pairing;
 

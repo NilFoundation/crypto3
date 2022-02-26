@@ -63,65 +63,72 @@ namespace nil {
                  *     }
                  * };
                  */
-                template<typename TChallenges, typename Hash = hashes::sha2<256>>
-                class fiat_shamir_heuristic {
+                template<typename ChallengesType, typename Hash>
+                class fiat_shamir_heuristic_accumulative {
 
                     accumulator_set<Hash> acc;
 
                 public:
-                    fiat_shamir_heuristic() : acc() {
+                    typedef Hash hash_type;
+                    typedef ChallengesType challenges_type;
+
+                    fiat_shamir_heuristic_accumulative() : acc() {
                     }
 
                     template<typename TAny>
                     void operator()(TAny data) {
                         nil::marshalling::status_type status;
-                        typename Hash::construction::type::block_type byte_data = nil::marshalling::pack(data, status);
+                        typename hash_type::construction::type::block_type byte_data =
+                            nil::marshalling::pack(data, status);
                         acc(byte_data);
                     }
 
-                    template<typename TChallenges::challenges_ids ChallengeId, typename FieldType>
+                    template<typename ChallengesType::challenges_ids ChallengeId, typename FieldType>
                     typename FieldType::value_type challenge() {
                         // acc(ChallengeId);
-                        typename Hash::digest_type hash_res = accumulators::extract::hash<Hash>(acc);
+                        typename hash_type::digest_type hash_res = accumulators::extract::hash<Hash>(acc);
 
                         return FieldType::value_type::one();
                     }
 
-                    template<typename TChallenges::challenges_ids ChallengeId, std::size_t Index, typename FieldType>
+                    template<typename ChallengesType::challenges_ids ChallengeId, std::size_t Index, typename FieldType>
                     typename FieldType::value_type challenge() {
                         // acc(ChallengeId + Index);
-                        typename Hash::digest_type hash_res = accumulators::extract::hash<Hash>(acc);
+                        typename hash_type::digest_type hash_res = accumulators::extract::hash<Hash>(acc);
 
                         return FieldType::value_type::one();
                     }
 
-                    template<typename TChallenges::challenges_ids ChallengeId, std::size_t ChallengesAmount,
+                    template<typename ChallengesType::challenges_ids ChallengeId, std::size_t ChallengesAmount,
                              typename FieldType>
                     std::array<typename FieldType::value_type, ChallengesAmount> challenges() {
 
-                        std::array<typename Hash::digest_type, ChallengesAmount> hash_results;
+                        std::array<typename hash_type::digest_type, ChallengesAmount> hash_results;
                         std::array<typename FieldType::value_type, ChallengesAmount> result;
 
                         for (std::size_t i = 0; i < ChallengesAmount; i++) {
 
                             // acc(ChallengeId + i);
-                            hash_results[i] = accumulators::extract::hash<Hash>(acc);
+                            hash_results[i] = accumulators::extract::hash<hash_type>(acc);
                         }
 
                         return result;
                     }
                 };
 
-                template<typename Hash = hashes::keccak_1600<256>>
-                struct fiat_shamir_heuristic_updated {
+                template<typename Hash>
+                struct fiat_shamir_heuristic_sequential {
                     typedef Hash hash_type;
 
+                    fiat_shamir_heuristic_sequential() : state(hash<hash_type>({0})) {
+                    }
+
                     template<typename InputRange>
-                    fiat_shamir_heuristic_updated(const InputRange &r) : state(hash<hash_type>(r)) {
+                    fiat_shamir_heuristic_sequential(const InputRange &r) : state(hash<hash_type>(r)) {
                     }
 
                     template<typename InputIterator>
-                    fiat_shamir_heuristic_updated(InputIterator first, InputIterator last) :
+                    fiat_shamir_heuristic_sequential(InputIterator first, InputIterator last) :
                         state(hash<hash_type>(first, last)) {
                     }
 

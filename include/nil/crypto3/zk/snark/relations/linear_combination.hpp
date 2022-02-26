@@ -145,9 +145,11 @@ namespace nil {
                         }
 
                         terms = all_terms;
-                        std::sort(terms.begin(), terms.end(),
-                                  [](linear_term<FieldType, RotationSupport> a,
-                                     linear_term<FieldType, RotationSupport> b) { return a.index < b.index; });
+                        std::sort(
+                            terms.begin(), terms.end(),
+                            [](linear_term<FieldType, RotationSupport> a, linear_term<FieldType, RotationSupport> b) {
+                                return a.index < b.index;
+                            });
 
                         auto result_it = terms.begin();
                         for (auto it = ++terms.begin(); it != terms.end(); ++it) {
@@ -239,14 +241,18 @@ namespace nil {
                     bool operator==(const linear_combination &other) const {
 
                         std::vector<linear_term<FieldType, RotationSupport>> thisterms = this->terms;
-                        std::sort(thisterms.begin(), thisterms.end(),
-                                  [](linear_term<FieldType, RotationSupport> a,
-                                     linear_term<FieldType, RotationSupport> b) { return a.index < b.index; });
+                        std::sort(
+                            thisterms.begin(), thisterms.end(),
+                            [](linear_term<FieldType, RotationSupport> a, linear_term<FieldType, RotationSupport> b) {
+                                return a.index < b.index;
+                            });
 
                         std::vector<linear_term<FieldType, RotationSupport>> otherterms = other.terms;
-                        std::sort(otherterms.begin(), otherterms.end(),
-                                  [](linear_term<FieldType, RotationSupport> a,
-                                     linear_term<FieldType, RotationSupport> b) { return a.index < b.index; });
+                        std::sort(
+                            otherterms.begin(), otherterms.end(),
+                            [](linear_term<FieldType, RotationSupport> a, linear_term<FieldType, RotationSupport> b) {
+                                return a.index < b.index;
+                            });
 
                         return (thisterms == otherterms);
                     }

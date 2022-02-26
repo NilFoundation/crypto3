@@ -35,73 +35,69 @@ namespace nil {
                 template<typename FieldType>
                 using plonk_column = std::vector<typename FieldType::value_type>;
 
-                template<typename FieldType,
-                         typename PlonkParams,
-                         typename ColumnType>
+                template<typename FieldType, typename PlonkParams, typename ColumnType>
                 class plonk_private_table {
 
                     std::array<ColumnType, PlonkParams::witness_columns> witness_columns;
 
                 public:
-
-                    plonk_private_table(std::array<ColumnType, PlonkParams::witness_columns> witness_columns):
-                        witness_columns(witness_columns){
+                    plonk_private_table(std::array<ColumnType, PlonkParams::witness_columns> witness_columns) :
+                        witness_columns(witness_columns) {
                     }
 
-                    ColumnType witness(std::size_t index) const{
+                    ColumnType witness(std::size_t index) const {
                         assert(index < PlonkParams::witness_columns);
                         return witness_columns[index];
                     }
 
-                    std::array<ColumnType, PlonkParams::witness_columns> witnesses() const{
+                    std::array<ColumnType, PlonkParams::witness_columns> witnesses() const {
                         return witness_columns;
                     }
 
-                    ColumnType operator[](std::size_t index) const{
+                    ColumnType operator[](std::size_t index) const {
                         if (index < PlonkParams::witness_columns)
                             return witness_columns[index];
                         index -= PlonkParams::witness_columns;
                     }
 
-                    std::size_t size() const{
+                    std::size_t size() const {
                         return witness_columns.size();
                     }
                 };
 
-                template<typename FieldType,
-                         typename PlonkParams,
-                         typename ColumnType>
+                template<typename FieldType, typename PlonkParams, typename ColumnType>
                 class plonk_public_table {
 
                     std::vector<ColumnType> selector_columns;
                     std::vector<ColumnType> public_input_columns;
 
                 public:
-
                     plonk_public_table(std::vector<ColumnType> selector_columns,
-                        std::vector<ColumnType> public_input_columns):
-                        selector_columns(selector_columns), public_input_columns(public_input_columns){
+                                       std::vector<ColumnType>
+                                           public_input_columns) :
+                        selector_columns(selector_columns),
+                        public_input_columns(public_input_columns) {
                     }
 
-                    ColumnType selector(std::size_t index) const{
+                    ColumnType selector(std::size_t index) const {
                         assert(index < selector_columns.size());
                         return selector_columns[index];
                     }
 
-                    std::vector<ColumnType> selectors() const{
+                    std::vector<ColumnType> selectors() const {
                         return selector_columns;
                     }
 
-                    ColumnType public_input(std::size_t index) const{
+                    ColumnType public_input(std::size_t index) const {
                         assert(index < public_input_columns.size());
                         return public_input_columns[index];
                     }
 
-                    std::vector<ColumnType> public_inputs() const{
+                    std::vector<ColumnType> public_inputs() const {
                         return public_input_columns;
                     }
 
-                    ColumnType operator[](std::size_t index) const{
+                    ColumnType operator[](std::size_t index) const {
                         if (index < selector_columns.size())
                             return selector_columns[index];
                         index -= selector_columns.size();
@@ -110,44 +106,39 @@ namespace nil {
                         index -= public_input_columns.size();
                     }
 
-                    std::size_t size() const{
+                    std::size_t size() const {
                         return selector_columns.size() + public_input_columns.size();
                     }
                 };
 
-                template<typename FieldType,
-                         typename PlonkParams,
-                         typename ColumnType>
+                template<typename FieldType, typename PlonkParams, typename ColumnType>
                 struct plonk_table {
 
                     using private_table_type = plonk_private_table<FieldType, PlonkParams, ColumnType>;
                     using public_table_type = plonk_public_table<FieldType, PlonkParams, ColumnType>;
 
                 private:
-
                     private_table_type _private_table;
                     public_table_type _public_table;
 
                 public:
-
-                    plonk_table(private_table_type private_table, 
-                        public_table_type public_table): 
-                        _private_table(private_table), _public_table(public_table){
+                    plonk_table(private_table_type private_table, public_table_type public_table) :
+                        _private_table(private_table), _public_table(public_table) {
                     }
 
-                    ColumnType witness(std::size_t index) const{
+                    ColumnType witness(std::size_t index) const {
                         return _private_table.witness(index);
                     }
 
-                    ColumnType selector(std::size_t index) const{
+                    ColumnType selector(std::size_t index) const {
                         return _public_table.selector(index);
                     }
 
-                    ColumnType public_input(std::size_t index) const{
+                    ColumnType public_input(std::size_t index) const {
                         return _public_table.public_input(index);
                     }
 
-                    ColumnType operator[](std::size_t index) const{
+                    ColumnType operator[](std::size_t index) const {
                         if (index < _private_table.size())
                             return _private_table[index];
                         index -= _private_table.size();
@@ -155,49 +146,41 @@ namespace nil {
                             return _public_table[index];
                     }
 
-                    private_table_type private_table() const{
+                    private_table_type private_table() const {
                         return _private_table;
                     }
 
-                    public_table_type public_table() const{
+                    public_table_type public_table() const {
                         return _public_table;
                     }
 
-                    std::size_t size() const{
+                    std::size_t size() const {
                         return _private_table.size() + _public_table.size();
                     }
-
                 };
 
-                template<typename FieldType,
-                         typename PlonkParams>
-                using plonk_private_assignment_table = plonk_private_table<FieldType, PlonkParams, 
-                    plonk_column<FieldType>>;
+                template<typename FieldType, typename PlonkParams>
+                using plonk_private_assignment_table =
+                    plonk_private_table<FieldType, PlonkParams, plonk_column<FieldType>>;
 
-                template<typename FieldType,
-                         typename PlonkParams>
-                using plonk_public_assignment_table = plonk_public_table<FieldType, PlonkParams, 
-                    plonk_column<FieldType>>;
+                template<typename FieldType, typename PlonkParams>
+                using plonk_public_assignment_table =
+                    plonk_public_table<FieldType, PlonkParams, plonk_column<FieldType>>;
 
-                template<typename FieldType,
-                         typename PlonkParams>
-                using plonk_assignment_table = plonk_table<FieldType, PlonkParams, 
-                    plonk_column<FieldType>>;
+                template<typename FieldType, typename PlonkParams>
+                using plonk_assignment_table = plonk_table<FieldType, PlonkParams, plonk_column<FieldType>>;
 
-                template<typename FieldType,
-                         typename PlonkParams>
-                using plonk_private_polynomial_table = plonk_private_table<FieldType, PlonkParams, 
-                    math::polynomial<typename FieldType::value_type>>;
+                template<typename FieldType, typename PlonkParams>
+                using plonk_private_polynomial_table =
+                    plonk_private_table<FieldType, PlonkParams, math::polynomial<typename FieldType::value_type>>;
 
-                template<typename FieldType,
-                         typename PlonkParams>
-                using plonk_public_polynomial_table = plonk_public_table<FieldType, PlonkParams, 
-                    math::polynomial<typename FieldType::value_type>>;
+                template<typename FieldType, typename PlonkParams>
+                using plonk_public_polynomial_table =
+                    plonk_public_table<FieldType, PlonkParams, math::polynomial<typename FieldType::value_type>>;
 
-                template<typename FieldType,
-                         typename PlonkParams>
-                using plonk_polynomial_table = plonk_table<FieldType, PlonkParams, 
-                    math::polynomial<typename FieldType::value_type>>;
+                template<typename FieldType, typename PlonkParams>
+                using plonk_polynomial_table =
+                    plonk_table<FieldType, PlonkParams, math::polynomial<typename FieldType::value_type>>;
 
             }    // namespace snark
         }        // namespace zk

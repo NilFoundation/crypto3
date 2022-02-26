@@ -67,7 +67,8 @@ namespace nil {
                     }
 
                     // bool
-                    //     is_satisfied(plonk_variable_assignment<FieldType, WitnessColumns> full_variable_assignment) const {
+                    //     is_satisfied(plonk_variable_assignment<FieldType, WitnessColumns> full_variable_assignment)
+                    //     const {
 
                     //     for (std::size_t c = 0; c < constraints.size(); ++c) {
                     //         if (!constraints[c].a.evaluate(full_variable_assignment).is_zero()) {

@@ -34,7 +34,7 @@
 
 #include <nil/crypto3/hash/sha2.hpp>
 
-#include <nil/crypto3/merkle/tree.hpp>
+#include <nil/crypto3/container/merkle/tree.hpp>
 
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
@@ -45,31 +45,26 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
-                template<typename FieldType,
-                         typename RedshiftParams,
-                         std::size_t ArgumentSize = 1>
+                template<typename FieldType, typename ParamsType, std::size_t ArgumentSize = 1>
                 struct redshift_gates_argument;
 
-                template<typename FieldType,
-                         typename RedshiftParams>
-                struct redshift_gates_argument<FieldType, RedshiftParams, 1> {
+                template<typename FieldType, typename ParamsType>
+                struct redshift_gates_argument<FieldType, ParamsType, 1> {
 
-                    using transcript_hash_type = typename RedshiftParams::transcript_hash_type;
+                    typedef typename ParamsType::transcript_hash_type transcript_hash_type;
 
-                    using types_policy = detail::redshift_types_policy<FieldType, RedshiftParams>;
+                    typedef detail::redshift_policy<FieldType, ParamsType> policy_type;
 
                     constexpr static const std::size_t argument_size = 1;
 
                     static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
-                        prove_eval(typename types_policy::constraint_system_type &constraint_system,
-                                    const plonk_polynomial_table<FieldType, RedshiftParams> &column_polynomials,
-                                   fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
+                        prove_eval(typename policy_type::constraint_system_type &constraint_system,
+                                   const plonk_polynomial_table<FieldType, ParamsType> &column_polynomials,
+                                   fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript) {
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
-                        std::array<math::polynomial<typename FieldType::value_type>,
-                                             argument_size> F;
+                        std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
@@ -79,7 +74,8 @@ namespace nil {
                             math::polynomial<typename FieldType::value_type> gate_result = {0};
 
                             for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
-                                gate_result = gate_result + gates[i].constraints[j].evaluate(column_polynomials) * theta_acc;
+                                gate_result =
+                                    gate_result + gates[i].constraints[j].evaluate(column_polynomials) * theta_acc;
                                 theta_acc *= theta;
                             }
 
@@ -91,11 +87,11 @@ namespace nil {
                         return F;
                     }
 
-                    static inline std::array<typename FieldType::value_type, argument_size> 
+                    static inline std::array<typename FieldType::value_type, argument_size>
                         verify_eval(const std::vector<plonk_gate<FieldType>> &gates,
-                            typename types_policy::evaluation_map &evaluations,
-                            typename FieldType::value_type challenge,
-                            fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
+                                    typename policy_type::evaluation_map &evaluations,
+                                    typename FieldType::value_type challenge,
+                                    fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript) {
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
                         std::array<typename FieldType::value_type, argument_size> F;

@@ -266,8 +266,8 @@ namespace nil {
                         fcoeffs, fwz, kzg_challenge);
                 }
 
-                /// gipa_tipp_mipp peforms the recursion of the GIPA protocol for TIPP and MIPP.
-                /// It returns a proof containing all intermdiate committed values, as well as
+                /// gipa_tipp_mipp performs the recursion of the GIPA protocol for TIPP and MIPP.
+                /// It returns a proof containing all intermediate committed values, as well as
                 /// the challenges generated necessary to do the polynomial commitment proof
                 /// later in TIPP.
                 template<typename CurveType, typename Hash = hashes::sha2<256>, typename InputG1Iterator1,
@@ -307,11 +307,11 @@ namespace nil {
                     r1cs_gg_ppzksnark_ipp2_wkey<CurveType> wkey = wkey_input;
 
                     // storing the values for including in the proof
-                    std::vector<std::pair<typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type,
-                                          typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type>>
+                    std::vector<std::pair<typename kzg_commitment<CurveType>::output_type,
+                                          typename kzg_commitment<CurveType>::output_type>>
                         comms_ab;
-                    std::vector<std::pair<typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type,
-                                          typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type>>
+                    std::vector<std::pair<typename kzg_commitment<CurveType>::output_type,
+                                          typename kzg_commitment<CurveType>::output_type>>
                         comms_c;
                     std::vector<
                         std::pair<typename CurveType::gt_type::value_type, typename CurveType::gt_type::value_type>>
@@ -336,11 +336,9 @@ namespace nil {
                         // TODO: parallel
                         // See section 3.3 for paper version with equivalent names
                         // TIPP part
-                        typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type tab_l =
-                            r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(
+                        typename kzg_commitment<CurveType>::output_type tab_l = kzg_commitment<CurveType>::pair(
                                 vk_left, wk_right, m_a.begin() + split, m_a.end(), m_b.begin(), m_b.begin() + split);
-                        typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type tab_r =
-                            r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(
+                        typename kzg_commitment<CurveType>::output_type tab_r = kzg_commitment<CurveType>::pair(
                                 vk_right, wk_left, m_a.begin(), m_a.begin() + split, m_b.begin() + split, m_b.end());
 
                         // \prod e(A_right,B_left)
@@ -373,12 +371,12 @@ namespace nil {
                             algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
                                 m_c.begin(), m_c.begin() + split, m_r.begin() + split, m_r.end(), 1);
                         // u_l = c[n':] * v[:n']
-                        typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type tuc_l =
-                            r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::single(vk_left, m_c.begin() + split,
+                        typename kzg_commitment<CurveType>::output_type tuc_l =
+                            kzg_commitment<CurveType>::single(vk_left, m_c.begin() + split,
                                                                                  m_c.end());
                         // u_r = c[:n'] * v[n':]
-                        typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type tuc_r =
-                            r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::single(vk_right, m_c.begin(),
+                        typename kzg_commitment<CurveType>::output_type tuc_r =
+                            kzg_commitment<CurveType>::single(vk_right, m_c.begin(),
                                                                                  m_c.begin() + split);
 
                         // Fiat-Shamir challenge
@@ -526,11 +524,11 @@ namespace nil {
                     // A and B are committed together in this scheme
                     // we need to take the reference so the macro doesn't consume the value
                     // first
-                    typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type com_ab =
-                        r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(srs.vkey, srs.wkey, a.begin(), a.end(),
+                    typename kzg_commitment<CurveType>::output_type com_ab =
+                        kzg_commitment<CurveType>::pair(srs.vkey, srs.wkey, a.begin(), a.end(),
                                                                            b.begin(), b.end());
-                    typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type com_c =
-                        r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::single(srs.vkey, c.begin(), c.end());
+                    typename kzg_commitment<CurveType>::output_type com_c =
+                        kzg_commitment<CurveType>::single(srs.vkey, c.begin(), c.end());
 
                     // Derive a random scalar to perform a linear combination of proofs
                     constexpr std::array<std::uint8_t, 9> application_tag = {'s', 'n', 'a', 'r', 'k',
@@ -583,7 +581,7 @@ namespace nil {
                     tr.template write<typename CurveType::template g1_type<>>(agg_c);
 
                     // w^{r^{-1}}
-                    r1cs_gg_ppzksnark_ipp2_commitment_key<typename CurveType::template g1_type<>> wkey_r_inv =
+                    kzg_commitment_key<typename CurveType::template g1_type<>> wkey_r_inv =
                         srs.wkey.scale(r_inv.begin(), r_inv.end());
 
                     // we prove tipp and mipp using the same recursive loop
@@ -592,7 +590,7 @@ namespace nil {
                                         wkey_r_inv, r_vec.begin(), r_vec.end());
 
                     // debug assert
-                    BOOST_ASSERT(com_ab == r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(
+                    BOOST_ASSERT(com_ab == kzg_commitment<CurveType>::pair(
                                                srs.vkey, wkey_r_inv, a.begin(), a.end(), b_r.begin(), b_r.end()));
 
                     return {com_ab, com_c, ip_ab, agg_c, proof};

@@ -38,7 +38,7 @@
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/table.hpp>
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/fri.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
@@ -46,62 +46,59 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                    template <typename FieldType,
-                        typename RedshiftParams,
-                        std::size_t rows_log,
-                        std::size_t permutation_size,
-                        std::size_t usable_rows>
-                        class circuit_description
-                    {
-                        using types_policy = zk::snark::detail::redshift_types_policy<FieldType, RedshiftParams>;
-                        constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
-                        constexpr static const std::size_t public_columns = RedshiftParams::public_columns;
-                        using merkle_hash_type = typename RedshiftParams::merkle_hash_type;
-                        using transcript_hash_type = typename RedshiftParams::transcript_hash_type;
+                template<typename FieldType, typename ParamsType, std::size_t rows_log, std::size_t permutation_size,
+                         std::size_t usable_rows>
+                class circuit_description {
+                    typedef zk::snark::detail::redshift_policy<FieldType, ParamsType> policy_type;
 
-                        public:
-                        const std::size_t table_rows = 1 << rows_log;
+                    constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
+                    constexpr static const std::size_t public_columns = ParamsType::public_columns;
+                    using merkle_hash_type = typename ParamsType::merkle_hash_type;
+                    using transcript_hash_type = typename ParamsType::transcript_hash_type;
 
-                        std::shared_ptr<math::evaluation_domain<FieldType>> domain;
+                public:
+                    const std::size_t table_rows = 1 << rows_log;
 
-                        typename FieldType::value_type omega;
-                        typename FieldType::value_type delta;
+                    std::shared_ptr<math::evaluation_domain<FieldType>> domain;
 
-                        plonk_permutation permutation;
+                    typename FieldType::value_type omega;
+                    typename FieldType::value_type delta;
 
-                        std::vector<math::polynomial<typename FieldType::value_type>> S_id;
-                        std::vector<math::polynomial<typename FieldType::value_type>> S_sigma;
+                    plonk_permutation permutation;
 
-                        typename types_policy::variable_assignment_type table;
-                        std::vector<math::polynomial<typename FieldType::value_type>> column_polynomials;
+                    std::vector<math::polynomial<typename FieldType::value_type>> S_id;
+                    std::vector<math::polynomial<typename FieldType::value_type>> S_sigma;
 
-                        // construct q_last, q_blind
-                        math::polynomial<typename FieldType::value_type> q_last;
-                        math::polynomial<typename FieldType::value_type> q_blind;
+                    typename policy_type::variable_assignment_type table;
+                    std::vector<math::polynomial<typename FieldType::value_type>> column_polynomials;
 
-                        std::vector<plonk_gate<FieldType>> gates;
+                    // construct q_last, q_blind
+                    math::polynomial<typename FieldType::value_type> q_last;
+                    math::polynomial<typename FieldType::value_type> q_blind;
 
-                        circuit_description() {
-                            domain = math::make_evaluation_domain<FieldType>(table_rows);
+                    std::vector<plonk_gate<FieldType>> gates;
 
-                            omega = domain->get_domain_element(1);
-                            delta = algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
+                    circuit_description() {
+                        domain = math::make_evaluation_domain<FieldType>(table_rows);
 
-                            permutation = plonk_permutation(witness_columns + public_columns, table_rows);
-                        }
+                        omega = domain->get_domain_element(1);
+                        delta = algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
 
-                        void init() {
-                            S_id = redshift_public_preprocessor<FieldType, RedshiftParams, 1>::identity_polynomials(
+                        permutation = plonk_permutation(witness_columns + public_columns, table_rows);
+                    }
+
+                    void init() {
+                        S_id = redshift_public_preprocessor<FieldType, ParamsType, 1>::identity_polynomials(
                             permutation_size, table_rows, omega, delta, domain);
-                            S_sigma = redshift_public_preprocessor<FieldType, RedshiftParams, 1>::permutation_polynomials(
+                        S_sigma = redshift_public_preprocessor<FieldType, ParamsType, 1>::permutation_polynomials(
                             permutation_size, table_rows, omega, delta, permutation, domain);
 
-                            q_last = redshift_public_preprocessor<FieldType, RedshiftParams, 1>::selector_last(
+                        q_last = redshift_public_preprocessor<FieldType, ParamsType, 1>::selector_last(
                             table_rows, usable_rows, domain);
-                            q_blind = redshift_public_preprocessor<FieldType, RedshiftParams, 1>::selector_blind(
+                        q_blind = redshift_public_preprocessor<FieldType, ParamsType, 1>::selector_blind(
                             table_rows, usable_rows, domain);
-                        }
-                    };
+                    }
+                };
 
                 //---------------------------------------------------------------------------//
                 // Test circuit 1
@@ -111,13 +108,14 @@ namespace nil {
                 // ... | ADD  |  x  |  y  |  z  |   1   |   0   |
                 // k-2 | MUL  |  x  |  y  |  z  |   0   |   1   |
                 // k-1 | MUL  |  x  |  y  |  z  |   0   |   1   |
-                // 
+                //
                 // ADD: x + y = z
                 // MUL: x * y = z
                 //---------------------------------------------------------------------------//
-                typedef redshift_params<3, 0> circuit_1_params; 
+                typedef redshift_params<3, 0> circuit_1_params;
+
                 template<typename FieldType>
-                 circuit_description<FieldType, circuit_1_params, 4, 3, 16> circuit_test_1() {
+                circuit_description<FieldType, circuit_1_params, 4, 3, 16> circuit_test_1() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t table_columns = 3;
                     constexpr static const std::size_t witness_columns = 3;
@@ -190,25 +188,24 @@ namespace nil {
                     test_circuit.table = plonk_assignment_table<FieldType, circuit_1_params>(
                         plonk_private_assignment_table<FieldType, circuit_1_params>(private_assignment),
                         plonk_public_assignment_table<FieldType, circuit_1_params>(selectors_assignment,
-                            public_input_assignment));
+                                                                                   public_input_assignment));
 
                     test_circuit.init();
 
-                    
                     plonk_variable<FieldType> w0(0, plonk_variable<FieldType>::rotation_type::current,
-                        plonk_variable<FieldType>::column_type::witness);
+                                                 plonk_variable<FieldType>::column_type::witness);
                     plonk_variable<FieldType> w1(0, plonk_variable<FieldType>::rotation_type::current,
-                        plonk_variable<FieldType>::column_type::witness);
+                                                 plonk_variable<FieldType>::column_type::witness);
                     plonk_variable<FieldType> w2(0, plonk_variable<FieldType>::rotation_type::current,
-                        plonk_variable<FieldType>::column_type::witness);
-                    
+                                                 plonk_variable<FieldType>::column_type::witness);
+
                     plonk_constraint<FieldType> add_constraint;
                     add_constraint.add_term(w0);
                     add_constraint.add_term(w1);
                     add_constraint.add_term(-w2);
 
                     std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
-                    plonk_gate<FieldType> add_gate (0, add_gate_costraints);
+                    plonk_gate<FieldType> add_gate(0, add_gate_costraints);
                     test_circuit.gates.push_back(add_gate);
 
                     plonk_constraint<FieldType> mul_constraint;
@@ -216,7 +213,7 @@ namespace nil {
                     add_constraint.add_term(-w2);
 
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
-                    plonk_gate<FieldType> mul_gate (1, mul_gate_costraints);
+                    plonk_gate<FieldType> mul_gate(1, mul_gate_costraints);
                     test_circuit.gates.push_back(mul_gate);
 
                     return test_circuit;
@@ -230,13 +227,14 @@ namespace nil {
                 // ... | ADD  |  x  |  y  |  z  |   0    |   1   |   0   |
                 // k-2 | MUL  |  x  |  y  |  z  |   0    |   0   |   1   |
                 // k-1 | MUL  |  x  |  y  |  z  |   0    |   0   |   1   |
-                // 
+                //
                 // ADD: x + y = z, copy(prev(z), y)
                 // MUL: x * y = z, copy(p1, y)
                 //---------------------------------------------------------------------------//
                 typedef redshift_params<3, 1> circuit_2_params;
+
                 template<typename FieldType>
-                 circuit_description<FieldType, circuit_2_params, 4, 4, 16> circuit_test_2() {
+                circuit_description<FieldType, circuit_2_params, 4, 4, 16> circuit_test_2() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t table_columns = 4;
                     constexpr static const std::size_t witness_columns = 3;
@@ -310,24 +308,24 @@ namespace nil {
                     test_circuit.table = plonk_assignment_table<FieldType, circuit_2_params>(
                         plonk_private_assignment_table<FieldType, circuit_2_params>(private_assignment),
                         plonk_public_assignment_table<FieldType, circuit_2_params>(selectors_assignment,
-                            public_input_assignment));
+                                                                                   public_input_assignment));
 
                     test_circuit.init();
-                    
+
                     plonk_variable<FieldType> w0(0, plonk_variable<FieldType>::rotation_type::current,
-                        plonk_variable<FieldType>::column_type::witness);
+                                                 plonk_variable<FieldType>::column_type::witness);
                     plonk_variable<FieldType> w1(0, plonk_variable<FieldType>::rotation_type::current,
-                        plonk_variable<FieldType>::column_type::witness);
+                                                 plonk_variable<FieldType>::column_type::witness);
                     plonk_variable<FieldType> w2(0, plonk_variable<FieldType>::rotation_type::current,
-                        plonk_variable<FieldType>::column_type::witness);
-                    
+                                                 plonk_variable<FieldType>::column_type::witness);
+
                     plonk_constraint<FieldType> add_constraint;
                     add_constraint.add_term(w0);
                     add_constraint.add_term(w1);
                     add_constraint.add_term(-w2);
 
                     std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
-                    plonk_gate<FieldType> add_gate (0, add_gate_costraints);
+                    plonk_gate<FieldType> add_gate(0, add_gate_costraints);
                     test_circuit.gates.push_back(add_gate);
 
                     plonk_constraint<FieldType> mul_constraint;
@@ -335,7 +333,7 @@ namespace nil {
                     add_constraint.add_term(-w2);
 
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
-                    plonk_gate<FieldType> mul_gate (1, mul_gate_costraints);
+                    plonk_gate<FieldType> mul_gate(1, mul_gate_costraints);
                     test_circuit.gates.push_back(mul_gate);
 
                     return test_circuit;
