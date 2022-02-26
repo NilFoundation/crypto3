@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_MERKLE_TREE_NODE_HPP
 #define CRYPTO3_MERKLE_TREE_NODE_HPP
 
+#include <numeric>
+
 namespace nil {
     namespace crypto3 {
         namespace containers {

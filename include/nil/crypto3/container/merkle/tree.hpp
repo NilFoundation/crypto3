@@ -36,7 +36,7 @@
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
-#include <nil/crypto3/merkle/node.hpp>
+#include <nil/crypto3/container/merkle/node.hpp>
 
 namespace nil {
     namespace crypto3 {
