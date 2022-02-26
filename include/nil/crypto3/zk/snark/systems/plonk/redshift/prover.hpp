@@ -133,7 +133,7 @@ namespace nil {
 
                         // 2. Commit witness columns
                         std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_poly = 
-                            preprocessed_private_data.witnesses;
+                            preprocessed_private_data.private_polynomial_table.witnesses();
                         
                         std::array<typename lpc_witness::merkle_tree_type, witness_columns> witness_commitments =
                             lpc_witness::template commit<witness_columns>(witness_poly, fri_params.D[0]);

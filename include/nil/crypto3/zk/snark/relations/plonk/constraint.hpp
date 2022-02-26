@@ -38,14 +38,18 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                namespace detail {
+
+                    template <typename VariableType>
+                    using plonk_evaluation_map = std::map<std::tuple<std::size_t, typename VariableType::rotation_type, 
+                        typename VariableType::column_type>, typename VariableType::assignment_type>;
+
+                }    // namespace detail
 
                 /************************* PLONK constraint ***********************************/
 
                 template<typename FieldType, typename VariableType = plonk_variable<FieldType>>
                 class plonk_constraint : public non_linear_combination<VariableType> {
-
-                    typedef std::map<std::tuple<std::size_t, typename VariableType::rotation_type, 
-                        typename VariableType::column_type>, typename VariableType::assignment_type> evaluation_map;
 
                 public:
 
@@ -114,7 +118,7 @@ namespace nil {
                         return acc;
                     }
 
-                    typename VariableType::assignment_type evaluate(evaluation_map &assignments) const {
+                    typename VariableType::assignment_type evaluate(detail::plonk_evaluation_map<VariableType> &assignments) const {
                         typename VariableType::assignment_type acc = VariableType::assignment_type::zero();
                         for (const non_linear_term<VariableType> &nlt : this->terms) {
                             typename VariableType::assignment_type term_value = nlt.coeff;

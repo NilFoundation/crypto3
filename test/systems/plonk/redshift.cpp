@@ -118,8 +118,7 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
-    typename types_policy::constraint_system_type constraint_system;
-    constraint_system.rows_amount = table_rows;
+    typename types_policy::constraint_system_type constraint_system({}, table_rows);
 
     typename types_policy::variable_assignment_type assigments = circuit.table;
 
@@ -131,11 +130,10 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
     short_description.permutation = circuit.permutation;
 
     typename types_policy::preprocessed_public_data_type preprocessed_data_public = 
-        redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(constraint_system, assigments.public_assignment, short_description);
+        redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(constraint_system, assigments.public_table(), short_description);
 
     typename types_policy::preprocessed_private_data_type preprocessed_data_private = 
-        redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(constraint_system, assigments.private_assignment, short_description);
-
+        redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(constraint_system, assigments.private_table(), short_description);
 
     auto proof = redshift_prover<FieldType, circuit_2_params>::process(
         preprocessed_data_public, preprocessed_data_private, constraint_system, assigments, short_description, fri_params);
@@ -159,8 +157,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
-    typename types_policy::constraint_system_type constraint_system;
-    constraint_system.rows_amount = table_rows;
+    typename types_policy::constraint_system_type constraint_system({}, table_rows);
     typename types_policy::variable_assignment_type assigments = circuit.table;
 
     types_policy::circuit_short_description<lpc_type> short_description;
@@ -171,10 +168,10 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     short_description.permutation = circuit.permutation;
 
     typename types_policy::preprocessed_public_data_type preprocessed_data_public = 
-        redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(constraint_system, assigments.public_assignment, short_description);
+        redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(constraint_system, assigments.public_table(), short_description);
 
     typename types_policy::preprocessed_private_data_type preprocessed_data_private = 
-        redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(constraint_system, assigments.private_assignment, short_description);
+        redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(constraint_system, assigments.private_table(), short_description);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     fiat_shamir_heuristic_updated<redshift_test_params::transcript_hash_type> prover_transcript(init_blob);
@@ -228,9 +225,7 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
     
-    typename types_policy::constraint_system_type constraint_system;
-    constraint_system.rows_amount = table_rows;
-    constraint_system.gates = circuit.gates;
+    typename types_policy::constraint_system_type constraint_system(circuit.gates, table_rows);
     typename types_policy::variable_assignment_type assigments = circuit.table;
 
     types_policy::circuit_short_description<lpc_type> short_description;
@@ -241,10 +236,10 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     short_description.permutation = circuit.permutation;
 
     typename types_policy::preprocessed_public_data_type preprocessed_data_public = 
-        redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(constraint_system, assigments.public_assignment, short_description);
+        redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(constraint_system, assigments.public_table(), short_description);
 
     typename types_policy::preprocessed_private_data_type preprocessed_data_private = 
-        redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(constraint_system, assigments.private_assignment, short_description);
+        redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(constraint_system, assigments.private_table(), short_description);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     fiat_shamir_heuristic_updated<redshift_test_params::transcript_hash_type> prover_transcript(init_blob);
@@ -256,9 +251,9 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     // Challenge phase
     typename FieldType::value_type y = algebra::random_element<FieldType>();
 
-    typename plonk_constraint<FieldType>::evaluation_map columns_at_y;
+    typename types_policy::evaluation_map columns_at_y;
     for (int i = 0; i < table_columns; i++) {
-        auto key = std::make_pair(i, plonk_variable<FieldType>::rotation_type::current, 
+        auto key = std::make_tuple(i, plonk_variable<FieldType>::rotation_type::current, 
             plonk_variable<FieldType>::column_type::witness);
         columns_at_y[key] = circuit.column_polynomials[i].evaluate(y);
     }

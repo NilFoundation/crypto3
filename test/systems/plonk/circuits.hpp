@@ -36,6 +36,7 @@
 #include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/table.hpp>
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/commitments/fri_commitment.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
@@ -120,6 +121,7 @@ namespace nil {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t table_columns = 3;
                     constexpr static const std::size_t witness_columns = 3;
+                    std::size_t selectors_columns = 2;
                     constexpr static const std::size_t public_columns = 0;
                     constexpr static const std::size_t permutation = 3;
                     constexpr static const std::size_t usable = 1 << rows_log;
@@ -165,18 +167,31 @@ namespace nil {
                         test_circuit.column_polynomials[i] = math::polynomial<typename FieldType::value_type>(table[i]);
                     }
 
-                    
-                    test_circuit.table = table;
+                    std::array<plonk_column<FieldType>, witness_columns> private_assignment;
                     for (std::size_t i = 0; i < witness_columns; i++) {
                         for (std::size_t j = 0; j < test_circuit.table_rows; j++) {
-                            test_circuit.table.private_assignment.witnesses[i][j] = table[i][j];
+                            private_assignment[i][j] = table[i][j];
                         }
                     }
+
+                    std::vector<plonk_column<FieldType>> selectors_assignment(selectors_columns);
+                    std::vector<plonk_column<FieldType>> public_input_assignment(public_columns);
+                    for (std::size_t j = 0; j < test_circuit.table_rows; j++) {
+                        selectors_assignment[0][j] = q_add[j];
+                        selectors_assignment[1][j] = q_mul[j];
+                    }
+
                     for (std::size_t i = 0; i < public_columns; i++) {
                         for (std::size_t j = 0; j < test_circuit.table_rows; j++) {
-                            test_circuit.table.public_assignment.public_input[i][j] = table[witness_columns + i][j];
+                            public_input_assignment[i][j] = table[witness_columns + i][j];
                         }
                     }
+
+                    test_circuit.table = plonk_assignment_table<FieldType, circuit_1_params>(
+                        plonk_private_assignment_table<FieldType, circuit_1_params>(private_assignment),
+                        plonk_public_assignment_table<FieldType, circuit_1_params>(selectors_assignment,
+                            public_input_assignment));
+
                     test_circuit.init();
 
                     
@@ -192,20 +207,16 @@ namespace nil {
                     add_constraint.add_term(w1);
                     add_constraint.add_term(-w2);
 
-                    test_circuit.domain->inverse_fft(q_add);
-                    math::polynomial<typename FieldType::value_type> add_selector(q_add);
                     std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
-                    plonk_gate<FieldType> add_gate (add_selector, add_gate_costraints);
+                    plonk_gate<FieldType> add_gate (0, add_gate_costraints);
                     test_circuit.gates.push_back(add_gate);
 
                     plonk_constraint<FieldType> mul_constraint;
                     add_constraint.add_term(w0 * w1);
                     add_constraint.add_term(-w2);
 
-                    test_circuit.domain->inverse_fft(q_mul);
-                    math::polynomial<typename FieldType::value_type> mul_selector(q_mul);
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
-                    plonk_gate<FieldType> mul_gate (mul_selector, mul_gate_costraints);
+                    plonk_gate<FieldType> mul_gate (1, mul_gate_costraints);
                     test_circuit.gates.push_back(mul_gate);
 
                     return test_circuit;
@@ -229,6 +240,7 @@ namespace nil {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t table_columns = 4;
                     constexpr static const std::size_t witness_columns = 3;
+                    std::size_t selectors_columns = 2;
                     constexpr static const std::size_t public_columns = 1;
                     constexpr static const std::size_t permutation = 4;
                     constexpr static const std::size_t usable = 1 << rows_log;
@@ -281,15 +293,26 @@ namespace nil {
                         test_circuit.column_polynomials[i] = math::polynomial<typename FieldType::value_type>(table[i]);
                     }
 
+                    std::array<plonk_column<FieldType>, witness_columns> private_assignment;
                     for (std::size_t i = 0; i < witness_columns; i++) {
-                        test_circuit.table.private_assignment.witnesses[i] = table[i];
+                        private_assignment[i] = table[i];
                     }
-                    for (std::size_t i = 0; i < public_columns; i++) {
-                        test_circuit.table.public_assignment.public_input[i] = table[witness_columns + i];
+
+                    std::vector<plonk_column<FieldType>> selectors_assignment(selectors_columns);
+                    std::vector<plonk_column<FieldType>> public_input_assignment(public_columns);
+
+                    selectors_assignment[0] = q_add;
+                    selectors_assignment[1] = q_mul;
+
+                    for (std::size_t i = selectors_columns; i < selectors_columns + public_columns; i++) {
+                        public_input_assignment[i] = table[witness_columns + i];
                     }
+                    test_circuit.table = plonk_assignment_table<FieldType, circuit_2_params>(
+                        plonk_private_assignment_table<FieldType, circuit_2_params>(private_assignment),
+                        plonk_public_assignment_table<FieldType, circuit_2_params>(selectors_assignment,
+                            public_input_assignment));
 
                     test_circuit.init();
-
                     
                     plonk_variable<FieldType> w0(0, plonk_variable<FieldType>::rotation_type::current,
                         plonk_variable<FieldType>::column_type::witness);
@@ -303,20 +326,16 @@ namespace nil {
                     add_constraint.add_term(w1);
                     add_constraint.add_term(-w2);
 
-                    test_circuit.domain->inverse_fft(q_add);
-                    math::polynomial<typename FieldType::value_type> add_selector(q_add);
                     std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
-                    plonk_gate<FieldType> add_gate (add_selector, add_gate_costraints);
+                    plonk_gate<FieldType> add_gate (0, add_gate_costraints);
                     test_circuit.gates.push_back(add_gate);
 
                     plonk_constraint<FieldType> mul_constraint;
                     add_constraint.add_term(w0 * w1);
                     add_constraint.add_term(-w2);
 
-                    test_circuit.domain->inverse_fft(q_mul);
-                    math::polynomial<typename FieldType::value_type> mul_selector(q_mul);
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
-                    plonk_gate<FieldType> mul_gate (mul_selector, mul_gate_costraints);
+                    plonk_gate<FieldType> mul_gate (1, mul_gate_costraints);
                     test_circuit.gates.push_back(mul_gate);
 
                     return test_circuit;

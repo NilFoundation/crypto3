@@ -66,7 +66,7 @@ namespace nil {
                      * Mnemonic typedefs.
                      */
                     enum rotation_type { pre_previous = -2, previous, current, next, after_next } rotation;
-                    enum column_type { wire, selector, public_imput, constant } type;
+                    enum column_type { witness, selector, public_input, constant } type;
                     std::size_t index;
 
                     constexpr plonk_variable(const std::size_t index, rotation_type rotation, column_type type) :

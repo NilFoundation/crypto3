@@ -50,6 +50,12 @@ namespace nil {
                         constraints(constraints),
                         selector_index(selector_index){
                     }
+
+                    plonk_gate(std::size_t selector_index,
+                                  const std::vector<plonk_constraint<FieldType>> &constraints): 
+                        constraints(constraints),
+                        selector_index(selector_index){
+                    }
                 };
 
             }    // namespace snark

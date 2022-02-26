@@ -53,6 +53,10 @@ namespace nil {
                         return witness_columns[index];
                     }
 
+                    std::array<ColumnType, PlonkParams::witness_columns> witnesses() const{
+                        return witness_columns;
+                    }
+
                     ColumnType operator[](std::size_t index) const{
                         if (index < PlonkParams::witness_columns)
                             return witness_columns[index];
@@ -84,9 +88,17 @@ namespace nil {
                         return selector_columns[index];
                     }
 
+                    std::vector<ColumnType> selectors() const{
+                        return selector_columns;
+                    }
+
                     ColumnType public_input(std::size_t index) const{
                         assert(index < public_input_columns.size());
                         return public_input_columns[index];
+                    }
+
+                    std::vector<ColumnType> public_inputs() const{
+                        return public_input_columns;
                     }
 
                     ColumnType operator[](std::size_t index) const{

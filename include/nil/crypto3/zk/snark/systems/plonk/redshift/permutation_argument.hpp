@@ -70,7 +70,7 @@ namespace nil {
                         prove_eval(fiat_shamir_heuristic_updated<transcript_hash_type> &transcript,
                                    const typename types_policy::preprocessed_public_data_type preprocessed_data,
                                    const typename types_policy::template circuit_short_description<CommitmentSchemeTypePublic> &short_description,
-                                   const std::vector<math::polynomial<typename FieldType::value_type>> &column_polynomials,
+                                   const plonk_polynomial_table<FieldType, RedshiftParams> &column_polynomials,
                                    typename fri_type::params_type fri_params) {
 
                         const std::vector<math::polynomial<typename FieldType::value_type>> &S_sigma = preprocessed_data.permutation_polynomials;

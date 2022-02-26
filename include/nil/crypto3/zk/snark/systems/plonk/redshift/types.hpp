@@ -64,6 +64,8 @@ namespace nil {
 
                         typedef plonk_assignment_table<FieldType, RedshiftParams> variable_assignment_type;
 
+                        typedef detail::plonk_evaluation_map<plonk_variable<FieldType>> evaluation_map;
+
                         /*********************************** Proof ***********************************/
 
                         /**

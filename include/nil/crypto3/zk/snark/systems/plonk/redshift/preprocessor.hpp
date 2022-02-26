@@ -188,46 +188,38 @@ namespace nil {
                                 const typename types_policy::variable_assignment_type::public_table_type &public_assignment,
                                 typename types_policy::template circuit_short_description<lpc_type> &short_description) {
 
-                        typename types_policy::preprocessed_public_data_type data;
+                        std::size_t N_rows = constraint_system.rows_amount();
 
-                        std::size_t N_rows = constraint_system.rows_amount;
+                        std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain = math::make_evaluation_domain<FieldType>(N_rows);
 
-                        data.basic_domain = math::make_evaluation_domain<FieldType>(N_rows);
+                        std::vector<math::polynomial<typename FieldType::value_type>> _permutation_polynomials = permutation_polynomials(short_description.columns_with_copy_constraints.size(), 
+                            short_description.table_rows, basic_domain->get_domain_element(1), short_description.delta, 
+                            short_description.permutation, basic_domain);
 
-                        data.permutation_polynomials = permutation_polynomials(short_description.columns_with_copy_constraints.size(), 
-                            short_description.table_rows, data.basic_domain->get_domain_element(1), short_description.delta, 
-                            short_description.permutation, data.basic_domain);
+                        std::vector<math::polynomial<typename FieldType::value_type>> _identity_polynomials = identity_polynomials(short_description.columns_with_copy_constraints.size(), 
+                            short_description.table_rows, basic_domain->get_domain_element(1), 
+                            short_description.delta, basic_domain);
 
-                        data.identity_polynomials = identity_polynomials(short_description.columns_with_copy_constraints.size(), 
-                            short_description.table_rows, data.basic_domain->get_domain_element(1), 
-                            short_description.delta, data.basic_domain);
+                        math::polynomial<typename FieldType::value_type> lagrange_0 = lagrange_polynomial(basic_domain, 0);
 
-                        data.lagrange_0 = lagrange_polynomial(data.basic_domain, 0);
+                        math::polynomial<typename FieldType::value_type> q_last = selector_last(short_description.table_rows, short_description.usable_rows, basic_domain);
+                        math::polynomial<typename FieldType::value_type> q_blind = selector_blind(short_description.table_rows, short_description.usable_rows, basic_domain);
 
-                        data.q_last = selector_last(short_description.table_rows, short_description.usable_rows, data.basic_domain);
-                        data.q_blind = selector_blind(short_description.table_rows, short_description.usable_rows, data.basic_domain);
-
-                        data.public_polynomial_table = detail::column_range_polynomials<FieldType>(short_description.table_rows, public_assignment.selectors(), data.basic_domain);
+                        plonk_public_polynomial_table<FieldType, RedshiftParams> public_polynomial_table = plonk_public_polynomial_table<FieldType, RedshiftParams>(
+                            detail::column_range_polynomials<FieldType>(public_assignment.selectors(), basic_domain),
+                            detail::column_range_polynomials<FieldType>(public_assignment.public_inputs(), basic_domain));
 
                         std::vector<typename FieldType::value_type> z_numenator(N_rows + 1);
                         z_numenator[0] = -FieldType::value_type::one();
                         z_numenator[N_rows] = FieldType::value_type::one();
 
-                        data.Z = z_numenator;
+                        math::polynomial<typename FieldType::value_type> Z = z_numenator;
                         math::polynomial<typename FieldType::value_type> z_denominator = {-FieldType::value_type::one(), FieldType::value_type::one()};
-                        data.Z = data.Z / z_denominator;
+                        Z = Z / z_denominator;
 
-                        /*data.omega = math::unity_root<FieldType>(math::detail::power_of_two(k));
-                        data.Z = {1};
-                        // data.selectors = constraint_system.selectors();
-                        // ... copy_constraints = constraint_system.copy_constraints();
-
-                        // data.permutations = ...(copy_constraints);
-                        // data.identity_permutations = ...(copy_constraints);
-
-                        // data.Lagrange_basis = math::polynomial::Lagrange_basis(data.omega, ...(assignments).n);*/
-
-                        return data;
+                        return typename types_policy::preprocessed_public_data_type({basic_domain,
+                            public_polynomial_table, _permutation_polynomials, _identity_polynomials,
+                            lagrange_0, q_last, q_blind, Z});
                     }
                 };
 
@@ -243,15 +235,16 @@ namespace nil {
                                 const typename types_policy::variable_assignment_type::private_table_type &private_assignment,
                                 typename types_policy::template circuit_short_description<lpc_type> &short_description) {
 
-                        typename types_policy::preprocessed_private_data_type data;
+                        std::size_t N_rows = constraint_system.rows_amount();
 
-                        std::size_t N_rows = constraint_system.rows_amount;
+                        std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain = math::make_evaluation_domain<FieldType>(N_rows);
 
-                        data.basic_domain = math::make_evaluation_domain<FieldType>(N_rows);
+                        plonk_private_polynomial_table<FieldType, RedshiftParams> private_polynomial_table = 
+                            plonk_private_polynomial_table<FieldType, RedshiftParams>(
+                                detail::column_range_polynomials<FieldType>(private_assignment.witnesses(), basic_domain));
 
-                        data.private_polynomial_table = detail::column_range_polynomials<FieldType>(N_rows, private_assignment.witnesses(), data.basic_domain);
-
-                        return data;
+                        return typename types_policy::preprocessed_private_data_type({basic_domain,
+                            private_polynomial_table});
                     }
                 };
 

@@ -63,7 +63,7 @@ namespace nil {
 
                     static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
                         prove_eval(typename types_policy::constraint_system_type &constraint_system,
-                                    const std::vector<math::polynomial<typename FieldType::value_type>> &column_polynomials,
+                                    const plonk_polynomial_table<FieldType, RedshiftParams> &column_polynomials,
                                    fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
@@ -73,7 +73,7 @@ namespace nil {
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
-                        std::vector<plonk_gate<FieldType>> &gates = constraint_system.gates;
+                        const std::vector<plonk_gate<FieldType>> gates = constraint_system.gates;
 
                         for (std::size_t i = 0; i < gates.size(); i++) {
                             math::polynomial<typename FieldType::value_type> gate_result = {0};
@@ -93,7 +93,7 @@ namespace nil {
 
                     static inline std::array<typename FieldType::value_type, argument_size> 
                         verify_eval(const std::vector<plonk_gate<FieldType>> &gates,
-                            typename plonk_constraint<FieldType>::evaluation_map &evaluations,
+                            typename types_policy::evaluation_map &evaluations,
                             typename FieldType::value_type challenge,
                             fiat_shamir_heuristic_updated<transcript_hash_type> &transcript) {
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();

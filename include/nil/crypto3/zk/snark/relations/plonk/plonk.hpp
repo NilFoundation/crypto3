@@ -50,14 +50,20 @@ namespace nil {
                 class plonk_constraint_system {
 
                     std::vector<plonk_gate<FieldType>> _gates;
+                    std::size_t _rows_amount;
 
                 public:
 
-                    plonk_constraint_system(std::vector<plonk_gate<FieldType>> gates): _gates(gates) {
+                    plonk_constraint_system(std::vector<plonk_gate<FieldType>> gates, std::size_t rows_amount): 
+                        _gates(gates), _rows_amount(rows_amount) {
                     }
 
                     std::size_t num_gates() const {
                         return _gates.size();
+                    }
+
+                    std::size_t rows_amount() const {
+                        return _rows_amount;
                     }
 
                     // bool
