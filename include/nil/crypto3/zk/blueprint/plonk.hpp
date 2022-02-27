@@ -34,50 +34,48 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace components {
 
-                template<typename ArithmetizationType, std::size_t... BlueprintParams>
-                class blueprint;
+            template<typename ArithmetizationType, std::size_t... BlueprintParams>
+            class blueprint;
 
-                template<typename BlueprintFieldType>
-                class blueprint<snark::plonk_constraint_system<BlueprintFieldType>> :
-                    public snark::plonk_constraint_system<BlueprintFieldType> {
+            template<typename BlueprintFieldType>
+            class blueprint<snark::plonk_constraint_system<BlueprintFieldType>> :
+                public snark::plonk_constraint_system<BlueprintFieldType> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
-                public:
-                    
-                    blueprint() : ArithmetizationType(){
-                        this->_rows_amount = 0;
-                    }
+                typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+            public:
+                
+                blueprint() : ArithmetizationType(){
+                    this->_rows_amount = 0;
+                }
 
-                    std::size_t allocate_rows(std::size_t required_amount = 1) {
-                        std::size_t result = this->_rows_amount;
-                        this->_rows_amount += required_amount;
-                        return result;
-                    }
+                std::size_t allocate_rows(std::size_t required_amount = 1) {
+                    std::size_t result = this->_rows_amount;
+                    this->_rows_amount += required_amount;
+                    return result;
+                }
 
-                    std::size_t allocate_row() {
-                        return allocate_rows(1);
-                    }
+                std::size_t allocate_row() {
+                    return allocate_rows(1);
+                }
 
-                    void add_gate(std::size_t selector_index, const snark::plonk_constraint<BlueprintFieldType> &constraint) {
-                        this->_gates.emplace_back(selector_index, constraint);
-                    }
+                void add_gate(std::size_t selector_index, const snark::plonk_constraint<BlueprintFieldType> &constraint) {
+                    this->_gates.emplace_back(selector_index, constraint);
+                }
 
-                    void add_gate(std::size_t selector_index,
-                                  const std::initializer_list<snark::plonk_constraint<BlueprintFieldType>> &constraints) {
-                        this->_gates.emplace_back(selector_index, constraints);
-                    }
+                void add_gate(std::size_t selector_index,
+                              const std::initializer_list<snark::plonk_constraint<BlueprintFieldType>> &constraints) {
+                    this->_gates.emplace_back(selector_index, constraints);
+                }
 
-                    void add_copy_constraint(const snark::plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {
-                        this->_copy_constraints.emplace_back(copy_constraint);
-                    }
+                void add_copy_constraint(const snark::plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {
+                    this->_copy_constraints.emplace_back(copy_constraint);
+                }
 
-                    void add_lookup_constraint(const snark::plonk_lookup_constraint<BlueprintFieldType> &copy_constraint) {
-                        this->_lookup_constraints.emplace_back({});
-                    }
-                };
-            }    // namespace components
+                void add_lookup_constraint(const snark::plonk_lookup_constraint<BlueprintFieldType> &copy_constraint) {
+                    this->_lookup_constraints.emplace_back({});
+                }
+            };
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

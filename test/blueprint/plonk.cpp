@@ -46,9 +46,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_allocat_rows_test_case) {
 	constexpr std::size_t WitnessColumns = 5;
 	using TArithmetization = zk::snark::plonk_constraint_system<BlueprintFieldType>;
 
-	zk::components::blueprint<TArithmetization> bp;
-	zk::components::blueprint_private_assignment_table<TArithmetization, WitnessColumns> private_assignment;
-	zk::components::blueprint_public_assignment_table<TArithmetization> public_assignment;
+	zk::blueprint<TArithmetization> bp;
+	zk::blueprint_private_assignment_table<TArithmetization, WitnessColumns> private_assignment;
+	zk::blueprint_public_assignment_table<TArithmetization> public_assignment;
 
 	BOOST_CHECK_EQUAL(0, bp.allocate_rows());
 	BOOST_CHECK_EQUAL(1, bp.allocate_rows(5));
