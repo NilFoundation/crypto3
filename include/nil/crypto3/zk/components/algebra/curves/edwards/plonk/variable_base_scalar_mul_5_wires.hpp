@@ -28,13 +28,11 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_5_WIRES_HPP
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_5_WIRES_HPP
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/components/component.hpp>
-
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/components/component.hpp>
+#include <nil/crypto3/zk/blueprint/plonk.hpp>
+#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/detail/plonk/n_wires.hpp>
 
 namespace nil {

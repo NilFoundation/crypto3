@@ -28,8 +28,9 @@
 
 #include <nil/crypto3/algebra/matrix/matrix.hpp>
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/components/blueprint_variable.hpp>
+#include <nil/crypto3/zk/blueprint/plonk.hpp>
+#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/blueprint_variable.hpp>
 #include <nil/crypto3/zk/components/detail/plonk/n_wires.hpp>
 
 namespace nil {

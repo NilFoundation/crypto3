@@ -30,7 +30,7 @@
 
 #include <map>
 
-#include <nil/crypto3/zk/components/component.hpp>
+#include <nil/crypto3/zk/component.hpp>
 
 namespace nil {
     namespace crypto3 {

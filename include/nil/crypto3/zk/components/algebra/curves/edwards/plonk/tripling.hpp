@@ -28,9 +28,10 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_TRIPLING_COMPONENT_HPP
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_TRIPLING_COMPONENT_HPP
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/plonk/doubling.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/plonk/addition.hpp>
+#include <nil/crypto3/zk/blueprint/plonk.hpp>
+#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/edwards/plonk/doubling.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/edwards/plonk/addition.hpp>
 
 namespace nil {
     namespace crypto3 {

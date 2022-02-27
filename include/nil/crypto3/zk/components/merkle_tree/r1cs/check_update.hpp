@@ -34,7 +34,7 @@
 #define CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_CHECK_UPDATE_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
-#include <nil/crypto3/zk/components/component.hpp>
+#include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/hashes/knapsack/knapsack_component.hpp>
 #include <nil/crypto3/zk/components/hashes/digest_selector_component.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>

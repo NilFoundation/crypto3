@@ -34,8 +34,8 @@
 
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 
-#include <nil/crypto3/zk/components/blueprint_variable.hpp>
-#include <nil/crypto3/zk/components/blueprint_linear_combination.hpp>
+#include <nil/crypto3/zk/blueprint_variable.hpp>
+#include <nil/crypto3/zk/blueprint_linear_combination.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -30,7 +30,7 @@
 #define CRYPTO3_ZK_BLUEPRINT_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
-#include <nil/crypto3/zk/components/component.hpp>
+#include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
 
 namespace nil {

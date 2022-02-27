@@ -31,7 +31,7 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_FP_COMPONENTS_HPP
 #define CRYPTO3_ZK_BLUEPRINT_FP_COMPONENTS_HPP
 
-#include <nil/crypto3/zk/components/blueprint_variable.hpp>
+#include <nil/crypto3/zk/blueprint_variable.hpp>
 
 namespace nil {
     namespace crypto3 {

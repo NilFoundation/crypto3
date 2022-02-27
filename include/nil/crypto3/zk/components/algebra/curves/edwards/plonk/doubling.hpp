@@ -28,7 +28,8 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_DOUBLING_COMPONENT_HPP
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_DOUBLING_COMPONENT_HPP
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
+#include <nil/crypto3/zk/blueprint/plonk.hpp>
+#include <nil/crypto3/zk/assignment/plonk.hpp>
 
 namespace nil {
     namespace crypto3 {

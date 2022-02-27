@@ -28,8 +28,9 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_EDDSA_5_WIRES_HPP
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_EDDSA_5_WIRES_HPP
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/components/blueprint_variable.hpp>
+#include <nil/crypto3/zk/blueprint/plonk.hpp>
+#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/blueprint_variable.hpp>
 
 namespace nil {
     namespace crypto3 {

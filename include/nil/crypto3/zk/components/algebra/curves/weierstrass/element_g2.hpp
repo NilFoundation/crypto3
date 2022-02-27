@@ -35,11 +35,11 @@
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
-#include <nil/crypto3/zk/components/component.hpp>
+#include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/detail/mnt4.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/detail/mnt6.hpp>
 
-#include <nil/crypto3/zk/components/blueprint_variable.hpp>
+#include <nil/crypto3/zk/blueprint_variable.hpp>
 
 namespace nil {
     namespace crypto3 {

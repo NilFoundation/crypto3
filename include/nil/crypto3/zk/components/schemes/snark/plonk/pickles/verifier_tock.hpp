@@ -30,10 +30,11 @@
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/components/component.hpp>
-
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+
+#include <nil/crypto3/zk/blueprint/plonk.hpp>
+#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/component.hpp>
 
 namespace nil {
     namespace crypto3 {

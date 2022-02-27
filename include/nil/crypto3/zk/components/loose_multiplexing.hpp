@@ -29,7 +29,7 @@
 #include <cassert>
 #include <memory>
 
-#include <nil/crypto3/zk/components/component.hpp>
+#include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/packing.hpp>
 #include <nil/crypto3/zk/components/inner_product.hpp>
 

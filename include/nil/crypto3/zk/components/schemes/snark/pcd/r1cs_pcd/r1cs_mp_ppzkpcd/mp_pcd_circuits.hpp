@@ -41,7 +41,7 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_MP_PCD_CIRCUITS_HPP
 #define CRYPTO3_ZK_BLUEPRINT_MP_PCD_CIRCUITS_HPP
 
-#include <nil/crypto3/zk/components/component.hpp>
+#include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/component_from_r1cs.hpp>
 #include <nil/crypto3/zk/components/hashes/crh_component.hpp>
 #include <nil/crypto3/zk/components/schemes/set_commitment/set_commitment_component.hpp>
