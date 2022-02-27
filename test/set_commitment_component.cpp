@@ -55,7 +55,7 @@ void test_set_commitment_component(){
         BOOST_CHECK(accumulator.is_in_set(elem));
     }
 
-    components::blueprint<FieldT> bp;
+    blueprint<FieldT> bp;
     components::blueprint_variable_array<FieldT> element_bits;
     element_bits.allocate(bp, value_size);
     set_commitment_variable<FieldT, HashT> root_digest(bp, digest_len);

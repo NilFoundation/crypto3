@@ -84,7 +84,7 @@ void test_verifier() {
     const std::size_t vk_size_in_bits =
         r1cs_ppzksnark_verification_key_variable<ppT_B>::size_in_bits(primary_input_size);
 
-    components::blueprint<FieldT_B> bp;
+    blueprint<FieldT_B> bp;
     components::blueprint_variable_vector<FieldT_B> vk_bits;
     vk_bits.allocate(bp, vk_size_in_bits);
 
@@ -150,7 +150,7 @@ void test_hardcoded_verifier() {
     const std::size_t elt_size = FieldT_A::size_in_bits();
     const std::size_t primary_input_size_in_bits = elt_size * primary_input_size;
 
-    components::blueprint<FieldT_B> bp;
+    blueprint<FieldT_B> bp;
     r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT_B> hardcoded_vk(bp, keypair.second);
     components::blueprint_variable_vector<FieldT_B> primary_input_bits;
     primary_input_bits.allocate(bp, primary_input_size_in_bits);
@@ -194,7 +194,7 @@ template<typename FpExtT, template<class> class VarT, template<class> class MulT
 void test_mul() {
     typedef typename FpExtT::my_Fp FieldType;
 
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
     VarT<FpExtT> x(bp);
     VarT<FpExtT> y(bp);
     VarT<FpExtT> xy(bp);
@@ -218,7 +218,7 @@ template<typename FpExtT, template<class> class VarT, template<class> class SqrT
 void test_sqr() {
     typedef typename FpExtT::my_Fp FieldType;
 
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
     VarT<FpExtT> x(bp);
     VarT<FpExtT> xsq(bp);
     SqrT<FpExtT> sqr(bp, x, xsq);
@@ -240,7 +240,7 @@ void test_cyclotomic_sqr() {
     typedef algebra::Fqk<CurveType> FpExtT;
     typedef typename FpExtT::my_Fp FieldType;
 
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
     VarT<FpExtT> x(bp);
     VarT<FpExtT> xsq(bp);
     CycloSqrT<FpExtT> sqr(bp, x, xsq);
@@ -264,7 +264,7 @@ void test_Frobenius() {
     typedef typename FpExtT::my_Fp FieldType;
 
     for (size_t i = 0; i < 100; ++i) {
-        components::blueprint<FieldType> bp;
+        blueprint<FieldType> bp;
         VarT<FpExtT> x(bp);
         VarT<FpExtT> x_frob = x.Frobenius_map(i);
 
@@ -282,7 +282,7 @@ void test_full_pair() {
     typedef typename CurveType::scalar_field_type FieldType;
     typedef typename pairing::CurveType::pairing::pair_curve_type::pairing pairing_policy;
 
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
     pairing::CurveType::pairing::pair_curve_type::template g1_type<>::value_type P_val =
         algebra::random_element<pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
         pairing::CurveType::pairing::pair_curve_type::template g1_type<>::value_type::one();
@@ -337,7 +337,7 @@ void test_full_precomputed_pair() {
     typedef typename CurveType::scalar_field_type FieldType;
     typedef typename pairing::CurveType::pairing::pair_curve_type::pairing pairing_policy;
 
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
     pairing::CurveType::pairing::pair_curve_type::template g1_type<>::value_type P_val =
         algebra::random_element<pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
         pairing::CurveType::pairing::pair_curve_type::template g1_type<>::value_type::one();

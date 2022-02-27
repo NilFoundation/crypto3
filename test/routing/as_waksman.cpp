@@ -40,7 +40,7 @@ using namespace nil::crypto3::algebra;
 
 template<typename FieldType>
 void test_as_waksman_routing_component(const std::size_t num_packets, const std::size_t packet_size) {
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
     integer_permutation permutation(num_packets);
     permutation.random_shuffle();
 

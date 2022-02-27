@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(variable_base_scalar_mul_5_wires_test_case) {
 	constexpr std::size_t WitnessColumns = 5;
 	using TArithmetization = zk::snark::plonk_constraint_system<BlueprintFieldType, WitnessColumns>;
 
-	zk::components::blueprint<TArithmetization> bp;
+	zk::blueprint<TArithmetization> bp;
 
 	using component_type = zk::components::element_g1_variable_base_scalar_mul<TArithmetization, curve_type, 0, 1, 2, 3, 4>;
 
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(variable_base_scalar_mul_9_wires_test_case) {
 	constexpr std::size_t WitnessColumns = 9;
 	using TArithmetization = zk::snark::plonk_constraint_system<BlueprintFieldType, WitnessColumns>;
 
-	zk::components::blueprint<TArithmetization> bp;
+	zk::blueprint<TArithmetization> bp;
 
 	using component_type = zk::components::element_g1_variable_base_scalar_mul<TArithmetization, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 

@@ -43,7 +43,7 @@ void test_benes_routing_component(const std::size_t num_packets, const std::size
     const std::size_t dimension = static_cast<std::size_t>(std::ceil(std::log2(num_packets)));
     assert(num_packets == 1ul << dimension);
 
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
     integer_permutation permutation(num_packets);
     permutation.random_shuffle();
 

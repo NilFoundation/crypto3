@@ -32,14 +32,14 @@ using namespace nil::crypto3::zk;
 
 template <typename FieldType, template<class> class Fpk_variableT, 
           template<class> class Fpk_mul_componentT>
-components::blueprint<typename FieldType::base_field_type> test_field_element_mul(typename FieldType::value_type a_value, 
+blueprint<typename FieldType::base_field_type> test_field_element_mul(typename FieldType::value_type a_value, 
                                                       typename FieldType::value_type b_value){
     using field_type = FieldType;
     using element_component = Fpk_variableT<field_type>;
     using element_mul_component = Fpk_mul_componentT<field_type>;
     using base_field_type = typename field_type::base_field_type;
 
-    components::blueprint<base_field_type> bp;
+    blueprint<base_field_type> bp;
 
     element_component A(bp, a_value);
     element_component B(bp, b_value);
@@ -59,13 +59,13 @@ components::blueprint<typename FieldType::base_field_type> test_field_element_mu
 
 template <typename FieldType, template<class> class Fpk_variableT, 
           template<class> class Fpk_squared_componentT>
-components::blueprint<typename FieldType::base_field_type> test_field_element_squared(typename FieldType::value_type a_value){
+blueprint<typename FieldType::base_field_type> test_field_element_squared(typename FieldType::value_type a_value){
     using field_type = FieldType;
     using element_component = Fpk_variableT<field_type>;
     using element_squared_component = Fpk_squared_componentT<field_type>;
     using base_field_type = typename field_type::base_field_type;
 
-    components::blueprint<base_field_type> bp;
+    blueprint<base_field_type> bp;
 
     element_component A(bp, a_value);
     element_component result(bp);

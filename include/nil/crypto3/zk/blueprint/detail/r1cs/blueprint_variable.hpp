@@ -39,10 +39,11 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace components {
 
-                template<typename TArithmetization>
-                class blueprint;
+            template<typename TArithmetization, std::size_t... BlueprintParams>
+            class blueprint;
+                
+            namespace detail {
 
                 template<typename TArithmetization>
                 class blueprint_variable;
@@ -175,7 +176,7 @@ namespace nil {
                         return result;
                     }
                 };
-            }    // namespace components
+            }    // namespace detail
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

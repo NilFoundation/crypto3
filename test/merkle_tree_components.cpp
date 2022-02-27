@@ -84,7 +84,7 @@ void test_merkle_tree_check_update_component() {
     std::vector<bool> store_root = prev_store_hash;
 
     /* execute the test */
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
     components::blueprint_variable_vector<FieldType> address_bits_va;
     address_bits_va.allocate(bp, tree_depth);
     components::digest_variable<FieldType> prev_leaf_digest(bp, digest_len);
@@ -154,7 +154,7 @@ void test_merkle_tree_check_read_component() {
     std::vector<bool> root = prev_hash;
 
     /* execute test */
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
     components::blueprint_variable_vector<FieldType> address_bits_va;
     address_bits_va.allocate(bp, tree_depth);
     components::digest_variable<FieldType> leaf_digest(bp, digest_len);
