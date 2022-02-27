@@ -32,8 +32,7 @@
 #define CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_G1_COMPONENT_HPP
 
 #include <nil/crypto3/zk/component.hpp>
-
-#include <nil/crypto3/zk/blueprint_variable.hpp>
+#include <nil/crypto3/zk/blueprint/r1cs.hpp>
 
 namespace nil {
     namespace crypto3 {

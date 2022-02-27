@@ -33,8 +33,7 @@
 #include <nil/crypto3/zk/components/packing.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
 #include <nil/crypto3/zk/components/hashes/sha256/sha256_aux.hpp>
-
-#include <nil/crypto3/zk/blueprint_variable.hpp>
+#include <nil/crypto3/zk/blueprint/r1cs.hpp>
 
 namespace nil {
     namespace crypto3 {

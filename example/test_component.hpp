@@ -28,8 +28,7 @@
 
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/blueprint_variable.hpp>
+#include <nil/crypto3/zk/blueprint/r1cs.hpp>
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
