@@ -37,7 +37,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TArithmetization,
+                template<typename ArithmetizationType,
                          typename CurveType,
                          std::size_t W0 = 4,
                          std::size_t W1 = 0,
@@ -53,12 +53,12 @@ namespace nil {
                          std::size_t W2,
                          std::size_t W3,
                          std::size_t W4>
-                class poseidon_plonk<snark::plonk_constraint_system<BlueprintFieldType, 5>, CurveType, W0, W1, W2, W3, W4>
+                class poseidon_plonk<snark::plonk_constraint_system<BlueprintFieldType>, CurveType, W0, W1, W2, W3, W4>
                     : public detail::
-                          n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 5>, W0, W1, W2, W3, W4> {
+                          n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>, W0, W1, W2, W3, W4> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, 5> TArithmetization;
-                    typedef blueprint<TArithmetization> blueprint_type;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+                    typedef blueprint<ArithmetizationType> blueprint_type;
 
                     constexpr static const algebra::matrix<typename CurveType::scalar_field_type::value_type, 3, 3> M;
                     constexpr static const algebra::vector<typename CurveType::scalar_field_type::value_type, 3> RC;
@@ -66,14 +66,14 @@ namespace nil {
                     std::size_t j;
 
                     using n_wires_helper =
-                        detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 5>, W0, W1, W2, W3, W4>;
+                        detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>, W0, W1, W2, W3, W4>;
 
                     using n_wires_helper::w;
                     enum indices { m2 = 0, m1, cur, p1, p2 };
 
                 public:
                     poseidon_plonk(blueprint_type &bp) :
-                        detail::n_wires_helper<TArithmetization, W0, W1, W2, W3, W4>(bp) {
+                        detail::n_wires_helper<ArithmetizationType, W0, W1, W2, W3, W4>(bp) {
 
                         j = bp.allocate_rows();
                     }

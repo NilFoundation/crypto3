@@ -44,11 +44,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_allocat_rows_test_case) {
 	using curve_type = algebra::curves::bls12<381>;
 	using BlueprintFieldType = typename curve_type::base_field_type;
 	constexpr std::size_t WitnessColumns = 5;
-	using TArithmetization = zk::snark::plonk_constraint_system<BlueprintFieldType>;
+	using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
 
-	zk::blueprint<TArithmetization> bp;
-	zk::blueprint_private_assignment_table<TArithmetization, WitnessColumns> private_assignment;
-	zk::blueprint_public_assignment_table<TArithmetization> public_assignment;
+	zk::blueprint<ArithmetizationType> bp;
+	zk::blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> private_assignment;
+	zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment;
 
 	BOOST_CHECK_EQUAL(0, bp.allocate_rows());
 	BOOST_CHECK_EQUAL(1, bp.allocate_rows(5));

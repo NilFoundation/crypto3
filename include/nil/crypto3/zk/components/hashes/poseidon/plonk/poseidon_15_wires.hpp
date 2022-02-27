@@ -37,7 +37,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TArithmetization,
+                template<typename ArithmetizationType,
                          typename CurveType,
                          std::size_t W0 = 0,
                          std::size_t W1 = 1,
@@ -73,7 +73,7 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class poseidon_plonk<snark::plonk_constraint_system<BlueprintFieldType, 15>,
+                class poseidon_plonk<snark::plonk_constraint_system<BlueprintFieldType>,
                                      CurveType,
                                      W0,
                                      W1,
@@ -89,8 +89,8 @@ namespace nil {
                                      W11,
                                      W12,
                                      W13,
-                                     W14> : public component<snark::plonk_constraint_system<BlueprintFieldType, 15>> {
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, 15> arithmetization_type;
+                                     W14> : public component<snark::plonk_constraint_system<BlueprintFieldType>> {
+                    typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
 
                     typedef blueprint<arithmetization_type> blueprint_type;
 

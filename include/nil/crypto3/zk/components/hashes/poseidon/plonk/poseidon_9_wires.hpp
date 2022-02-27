@@ -36,7 +36,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-                template<typename TArithmetization,
+                template<typename ArithmetizationType,
                          typename CurveType,
                          std::size_t W1 = 1,
                          std::size_t W2 = 2,
@@ -60,7 +60,7 @@ namespace nil {
                          std::size_t W7,
                          std::size_t W8,
                          std::size_t W9>
-                class poseidon_plonk<snark::plonk_constraint_system<BlueprintFieldType, 9>,
+                class poseidon_plonk<snark::plonk_constraint_system<BlueprintFieldType>,
                                      CurveType,
                                      W1,
                                      W2,
@@ -71,7 +71,7 @@ namespace nil {
                                      W7,
                                      W8,
                                      W9>
-                    : public detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 9>,
+                    : public detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>,
                                                     W1,
                                                     W2,
                                                     W3,
@@ -82,15 +82,15 @@ namespace nil {
                                                     W8,
                                                     W9> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, 9> TArithmetization;
-                    typedef blueprint<TArithmetization> blueprint_type;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+                    typedef blueprint<ArithmetizationType> blueprint_type;
 
                     constexpr static const algebra::matrix<typename CurveType::scalar_field_type::value_type, 3, 3> M;
                     constexpr static const algebra::vector<typename CurveType::scalar_field_type::value_type, 3> RC;
 
                     std::size_t j;
 
-                    using n_wires_helper = detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 9>,
+                    using n_wires_helper = detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>,
                                                                   W1,
                                                                   W2,
                                                                   W3,
@@ -106,7 +106,7 @@ namespace nil {
 
                 public:
                     poseidon_plonk(blueprint_type &bp) :
-                        detail::n_wires_helper<TArithmetization, W1, W2, W3, W4, W5, W6, W7, W8, W9>(bp) {
+                        detail::n_wires_helper<ArithmetizationType, W1, W2, W3, W4, W5, W6, W7, W8, W9>(bp) {
 
                         j = bp.allocate_rows();
                     }

@@ -37,7 +37,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TArithmetization,
+                template<typename ArithmetizationType,
                          typename CurveType,
                          std::size_t... WireIndexes>
                 class sha256;
@@ -53,7 +53,7 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class sha256<snark::plonk_constraint_system<BlueprintFieldType, 9>,
+                class sha256<snark::plonk_constraint_system<BlueprintFieldType>,
                                                        CurveType,
                                                        W0,
                                                        W1,
@@ -65,16 +65,16 @@ namespace nil {
                                                        W7,
                                                        W8>
                     : public detail::
-                          n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 9>, 
+                          n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>, 
                           W0, W1, W2, W3, W4, W5, W6, W7, W8> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, 9> TArithmetization;
-                    typedef blueprint<TArithmetization> blueprint_type;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+                    typedef blueprint<ArithmetizationType> blueprint_type;
 
                     std::size_t j;
 
                     using n_wires_helper =
-                        detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 9>, 
+                        detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>, 
                         W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 
                     using n_wires_helper::w;

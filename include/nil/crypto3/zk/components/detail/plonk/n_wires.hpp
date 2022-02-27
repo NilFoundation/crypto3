@@ -37,22 +37,22 @@ namespace nil {
             namespace components {
                 namespace detail {
 
-                    template<typename TArithmetization,
+                    template<typename ArithmetizationType,
                         std::size_t... WireIndexes>
                     class n_wires_helper;
 
                     template<typename BlueprintFieldType,
                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, 
                         std::size_t W4>
-                    class n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 5>, 
+                    class n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>, 
                         W0, W1, W2, W3, W4>: 
-                        public component<snark::plonk_constraint_system<BlueprintFieldType, 5>> {
+                        public component<snark::plonk_constraint_system<BlueprintFieldType>> {
 
-                        typedef snark::plonk_constraint_system<BlueprintFieldType, 5> TArithmetization;
-                        typedef blueprint<TArithmetization> blueprint_type;
+                        typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+                        typedef blueprint<ArithmetizationType> blueprint_type;
                     public:
 
-                        n_wires_helper(blueprint_type &bp):component<TArithmetization>(bp){}
+                        n_wires_helper(blueprint_type &bp):component<ArithmetizationType>(bp){}
 
                         constexpr static const std::array<std::array<typename blueprint_type::value_type, 5>,5> w = {{
                             {{
@@ -122,15 +122,15 @@ namespace nil {
                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3,
                         std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
                         std::size_t W8>
-                    class n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 9>, 
+                    class n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>, 
                         W0, W1, W2, W3, W4, W5, W6, W7, W8>: 
-                        public component<snark::plonk_constraint_system<BlueprintFieldType, 9>> {
+                        public component<snark::plonk_constraint_system<BlueprintFieldType>> {
 
-                        typedef snark::plonk_constraint_system<BlueprintFieldType, 9> TArithmetization;
-                        typedef blueprint<TArithmetization> blueprint_type;
+                        typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+                        typedef blueprint<ArithmetizationType> blueprint_type;
                     public:
 
-                        n_wires_helper(blueprint_type &bp):component<TArithmetization>(bp){}
+                        n_wires_helper(blueprint_type &bp):component<ArithmetizationType>(bp){}
 
                         constexpr static const std::array<std::array<typename blueprint_type::value_type, 5>,9> w = {{
                             {{
@@ -248,8 +248,8 @@ namespace nil {
                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3,
                         std::size_t W4>
                     constexpr std::array<std::array<
-                        typename blueprint<snark::plonk_constraint_system<BlueprintFieldType, 5>>::value_type, 5>,5>
-                        const n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 5>,
+                        typename blueprint<snark::plonk_constraint_system<BlueprintFieldType>>::value_type, 5>,5>
+                        const n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>,
                         W0, W1, W2, W3, W4>::w;
 
                     template<typename BlueprintFieldType,
@@ -257,8 +257,8 @@ namespace nil {
                         std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
                         std::size_t W8>
                     constexpr std::array<std::array<
-                        typename blueprint<snark::plonk_constraint_system<BlueprintFieldType, 9>>::value_type, 5>,9>
-                        const n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 9>,
+                        typename blueprint<snark::plonk_constraint_system<BlueprintFieldType>>::value_type, 5>,9>
+                        const n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>,
                         W0, W1, W2, W3, W4, W5, W6, W7, W8>::w;
 
                 }    // namespace detail

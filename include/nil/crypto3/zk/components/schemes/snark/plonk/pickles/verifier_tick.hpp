@@ -41,7 +41,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TArithmetization,
+                template<typename ArithmetizationType,
                          typename CurveType,
                          std::size_t... WireIndexes>
                 class pickles_verifier_tick;
@@ -64,7 +64,7 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class pickles_verifier_tick<
-                    snark::plonk_constraint_system<BlueprintFieldType, 15>,
+                    snark::plonk_constraint_system<BlueprintFieldType>,
                     CurveType,
                     W0,
                     W1,
@@ -80,8 +80,8 @@ namespace nil {
                     W11,
                     W12,
                     W13,
-                    W14> : public component<snark::plonk_constraint_system<BlueprintFieldType, 15>> {
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, 15> arithmetization_type;
+                    W14> : public component<snark::plonk_constraint_system<BlueprintFieldType>> {
+                    typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
 
                     typedef blueprint<arithmetization_type> blueprint_type;
 

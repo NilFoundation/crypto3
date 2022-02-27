@@ -38,7 +38,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TArithmetization, 
+                template<typename ArithmetizationType, 
                          typename CurveType, 
                          std::size_t... WireIndexes>
                 class element_g1_tripling;
@@ -53,7 +53,7 @@ namespace nil {
                          std::size_t W5,
                          std::size_t W6,
                          std::size_t W7>
-                class element_g1_tripling<snark::plonk_constraint_system<BlueprintFieldType, 8>,
+                class element_g1_tripling<snark::plonk_constraint_system<BlueprintFieldType>,
                                                        CurveType,
                                                        W0,
                                                        W1,
@@ -65,7 +65,7 @@ namespace nil {
                                                        W7>
                     : public component<BlueprintFieldType> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, 8> arithmetization_type;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
                     typedef blueprint<arithmetization_type> blueprint_type;
 
                     element_g1_doubling_plonk<arithmetization_type, CurveType, W0, W1, W2, W3, W6> doubling_component;

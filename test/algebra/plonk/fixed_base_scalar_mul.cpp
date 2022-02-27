@@ -50,11 +50,11 @@ BOOST_AUTO_TEST_CASE(fixed_base_scalar_mul_5_wires_test_case) {
 	using BlueprintFieldType = typename curve_type::base_field_type;
 	constexpr std::size_t WitnessColumns = 5;
 	constexpr typename curve_type::template g1_type<>::value_type B = curve_type::template g1_type<>::value_type::one();
-	using TArithmetization = zk::snark::plonk_constraint_system<BlueprintFieldType, WitnessColumns>;
+	using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
 
-	zk::blueprint<TArithmetization> bp;
+	zk::blueprint<ArithmetizationType> bp;
 
-	using component_type = zk::components::element_g1_fixed_base_scalar_mul<TArithmetization, curve_type, 0, 1, 2, 3, 4>;
+	using component_type = zk::components::element_g1_fixed_base_scalar_mul<ArithmetizationType, curve_type, 0, 1, 2, 3, 4>;
 
 	component_type scalar_mul_component = component_type(bp, B);
 
@@ -82,11 +82,11 @@ BOOST_AUTO_TEST_CASE(fixed_base_scalar_mul_9_wires_test_case) {
 	using BlueprintFieldType = typename curve_type::base_field_type;
 	constexpr std::size_t WitnessColumns = 9;
 	constexpr typename curve_type::template g1_type<>::value_type B = curve_type::template g1_type<>::value_type::one();
-	using TArithmetization = zk::snark::plonk_constraint_system<BlueprintFieldType, WitnessColumns>;
+	using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
 
-	zk::blueprint<TArithmetization> bp;
+	zk::blueprint<ArithmetizationType> bp;
 
-	using component_type = zk::components::element_g1_fixed_base_scalar_mul<TArithmetization, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
+	using component_type = zk::components::element_g1_fixed_base_scalar_mul<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
 	component_type scalar_mul_component = component_type(bp, B);
 

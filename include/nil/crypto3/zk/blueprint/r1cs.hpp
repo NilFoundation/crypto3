@@ -42,12 +42,12 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
 
-            template<typename TArithmetization>
+            template<typename ArithmetizationType>
             class blueprint;
 
             template<typename BlueprintFieldType>
             class blueprint<snark::r1cs_constraint_system<BlueprintFieldType>> {
-                typedef snark::r1cs_constraint_system<BlueprintFieldType> TArithmetization;
+                typedef snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
 
                 snark::r1cs_variable_assignment<BlueprintFieldType>
                     values; /* values[0] will hold the value of the first
@@ -55,14 +55,14 @@ namespace nil {
                 typename BlueprintFieldType::value_type constant_term;
 
                 typename snark::variable<BlueprintFieldType>::index_type next_free_var;
-                typename blueprint_linear_combination<TArithmetization>::index_type next_free_lc;
+                typename blueprint_linear_combination<ArithmetizationType>::index_type next_free_lc;
                 std::vector<typename BlueprintFieldType::value_type> lc_values;
                 snark::r1cs_constraint_system<BlueprintFieldType> constraint_system;
 
             public:
                 // typedef BlueprintFieldType field_type;
 
-                using value_type = detail::blueprint_variable<TArithmetization>;
+                using value_type = detail::blueprint_variable<ArithmetizationType>;
 
                 blueprint() {
                     constant_term = BlueprintFieldType::value_type::one();
@@ -86,7 +86,7 @@ namespace nil {
                 }
 
                 typename BlueprintFieldType::value_type &
-                    lc_val(const blueprint_linear_combination<TArithmetization> &lc) {
+                    lc_val(const blueprint_linear_combination<ArithmetizationType> &lc) {
                     if (lc.is_variable) {
                         return this->val(value_type(lc.index));
                     } else {
@@ -96,7 +96,7 @@ namespace nil {
                 }
 
                 typename BlueprintFieldType::value_type
-                    lc_val(const blueprint_linear_combination<TArithmetization> &lc) const {
+                    lc_val(const blueprint_linear_combination<ArithmetizationType> &lc) const {
                     if (lc.is_variable) {
                         return this->val(value_type(lc.index));
                     } else {
@@ -149,8 +149,8 @@ namespace nil {
                     return constraint_system;
                 }
 
-                friend class detail::blueprint_variable<TArithmetization>;
-                friend class detail::blueprint_linear_combination<TArithmetization>;
+                friend class detail::blueprint_variable<ArithmetizationType>;
+                friend class detail::blueprint_linear_combination<ArithmetizationType>;
 
             private:
                 typename snark::variable<BlueprintFieldType>::index_type allocate_var_index() {
@@ -159,7 +159,7 @@ namespace nil {
                     return next_free_var++;
                 }
 
-                typename blueprint_linear_combination<TArithmetization>::index_type allocate_lc_index() {
+                typename blueprint_linear_combination<ArithmetizationType>::index_type allocate_lc_index() {
                     lc_values.emplace_back(BlueprintFieldType::value_type::zero());
                     return next_free_lc++;
                 }

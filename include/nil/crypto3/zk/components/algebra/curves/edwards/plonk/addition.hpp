@@ -36,7 +36,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TArithmetization, 
+                template<typename ArithmetizationType, 
                          typename CurveType, 
                          std::size_t... WireIndexes>
                 class element_g1_addition;
@@ -50,7 +50,7 @@ namespace nil {
                          std::size_t W4,
                          std::size_t W5,
                          std::size_t W6>
-                class element_g1_addition<snark::plonk_constraint_system<BlueprintFieldType, 7>,
+                class element_g1_addition<snark::plonk_constraint_system<BlueprintFieldType>,
                                                        CurveType,
                                                        W0,
                                                        W1,
@@ -61,7 +61,7 @@ namespace nil {
                                                        W6>
                     : public component<BlueprintFieldType> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, 7> arithmetization_type;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
                     typedef blueprint<arithmetization_type> blueprint_type;
 
                     std::size_t i;

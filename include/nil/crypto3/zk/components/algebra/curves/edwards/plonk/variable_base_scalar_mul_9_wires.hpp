@@ -40,7 +40,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TArithmetization,
+                template<typename ArithmetizationType,
                          typename CurveType,
                          std::size_t... WireIndexes>
                 class element_g1_variable_base_scalar_mul;
@@ -56,7 +56,7 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class element_g1_variable_base_scalar_mul<snark::plonk_constraint_system<BlueprintFieldType, 9>,
+                class element_g1_variable_base_scalar_mul<snark::plonk_constraint_system<BlueprintFieldType>,
                                                        CurveType,
                                                        W0,
                                                        W1,
@@ -67,7 +67,7 @@ namespace nil {
                                                        W6,
                                                        W7,
                                                        W8>
-                    : public detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 9>,
+                    : public detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>,
                                                     W0,
                                                     W1,
                                                     W2,
@@ -78,13 +78,13 @@ namespace nil {
                                                     W7,
                                                     W8> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, 9> arithmetization_type;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
                     typedef blueprint<arithmetization_type> blueprint_type;
 
                     std::size_t j;
 
                     using n_wires_helper =
-                        detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 9>,
+                        detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>,
                                                W0,
                                                W1,
                                                W2,

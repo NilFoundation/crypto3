@@ -33,13 +33,13 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TArithmetization>
+                template<typename ArithmetizationType>
                 class component {
                 protected:
-                    blueprint<TArithmetization> &bp;
+                    blueprint<ArithmetizationType> &bp;
 
                 public:
-                    component(blueprint<TArithmetization> &bp) : bp(bp) {
+                    component(blueprint<ArithmetizationType> &bp) : bp(bp) {
                     }
                 };
 
