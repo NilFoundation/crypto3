@@ -61,7 +61,7 @@ namespace nil {
                         typedef plonk_constraint_system<FieldType, witness_columns, public_columns>
                             constraint_system_type;
 
-                        typedef plonk_assignment_table<FieldType, RedshiftParams> variable_assignment_type;
+                        typedef plonk_assignment_table<FieldType, RedshiftParams::witness_columns> variable_assignment_type;
 
                         typedef detail::plonk_evaluation_map<plonk_variable<FieldType>> evaluation_map;
 
@@ -84,7 +84,7 @@ namespace nil {
 
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
-                            plonk_public_polynomial_table<FieldType, RedshiftParams> public_polynomial_table;
+                            plonk_public_polynomial_table<FieldType> public_polynomial_table;
 
                             // S_sigma
                             std::vector<math::polynomial<typename FieldType::value_type>> permutation_polynomials;
@@ -103,7 +103,7 @@ namespace nil {
 
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
-                            plonk_private_polynomial_table<FieldType, RedshiftParams> private_polynomial_table;
+                            plonk_private_polynomial_table<FieldType, RedshiftParams::witness_columns> private_polynomial_table;
                         };
 
                         template<typename CommitmentSchemeType>

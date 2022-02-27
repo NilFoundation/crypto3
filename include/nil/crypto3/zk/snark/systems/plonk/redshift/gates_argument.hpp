@@ -59,7 +59,7 @@ namespace nil {
 
                     static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
                         prove_eval(typename policy_type::constraint_system_type &constraint_system,
-                                   const plonk_polynomial_table<FieldType, ParamsType> &column_polynomials,
+                                   const plonk_polynomial_table<FieldType, ParamsType::witness_columns> &column_polynomials,
                                    fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript) {
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();

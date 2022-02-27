@@ -35,31 +35,31 @@ namespace nil {
                 template<typename FieldType>
                 using plonk_column = std::vector<typename FieldType::value_type>;
 
-                template<typename FieldType, typename PlonkParams, typename ColumnType>
+                template<typename FieldType, std::size_t WitnessColumns, typename ColumnType>
                 struct plonk_private_table {
 
                 protected:
 
-                    std::array<ColumnType, PlonkParams::witness_columns> witness_columns;
+                    std::array<ColumnType, WitnessColumns> witness_columns;
 
                 public:
-                    plonk_private_table(std::array<ColumnType, PlonkParams::witness_columns> witness_columns = {}) :
+                    plonk_private_table(std::array<ColumnType, WitnessColumns> witness_columns = {}) :
                         witness_columns(witness_columns) {
                     }
 
                     ColumnType witness(std::size_t index) const {
-                        assert(index < PlonkParams::witness_columns);
+                        assert(index < WitnessColumns);
                         return witness_columns[index];
                     }
 
-                    std::array<ColumnType, PlonkParams::witness_columns> witnesses() const {
+                    std::array<ColumnType, WitnessColumns> witnesses() const {
                         return witness_columns;
                     }
 
                     ColumnType operator[](std::size_t index) const {
-                        if (index < PlonkParams::witness_columns)
+                        if (index < WitnessColumns)
                             return witness_columns[index];
-                        index -= PlonkParams::witness_columns;
+                        index -= WitnessColumns;
                     }
 
                     std::size_t size() const {
@@ -67,7 +67,7 @@ namespace nil {
                     }
                 };
 
-                template<typename FieldType, typename PlonkParams, typename ColumnType>
+                template<typename FieldType, typename ColumnType>
                 struct plonk_public_table {
 
                 protected:
@@ -131,14 +131,14 @@ namespace nil {
                     }
                 };
 
-                template<typename FieldType, typename PlonkParams, typename ColumnType>
+                template<typename FieldType, std::size_t WitnessColumns, typename ColumnType>
                 struct plonk_table {
 
-                    using private_table_type = plonk_private_table<FieldType, PlonkParams, ColumnType>;
-                    using public_table_type = plonk_public_table<FieldType, PlonkParams, ColumnType>;
+                    using private_table_type = plonk_private_table<FieldType, WitnessColumns, ColumnType>;
+                    using public_table_type = plonk_public_table<FieldType, ColumnType>;
 
                 protected:
-                    
+
                     private_table_type _private_table;
                     public_table_type _public_table;
 
@@ -185,28 +185,28 @@ namespace nil {
                     }
                 };
 
-                template<typename FieldType, typename PlonkParams>
+                template<typename FieldType, std::size_t WitnessColumns>
                 using plonk_private_assignment_table =
-                    plonk_private_table<FieldType, PlonkParams, plonk_column<FieldType>>;
+                    plonk_private_table<FieldType, WitnessColumns, plonk_column<FieldType>>;
 
-                template<typename FieldType, typename PlonkParams>
+                template<typename FieldType>
                 using plonk_public_assignment_table =
-                    plonk_public_table<FieldType, PlonkParams, plonk_column<FieldType>>;
+                    plonk_public_table<FieldType, plonk_column<FieldType>>;
 
-                template<typename FieldType, typename PlonkParams>
-                using plonk_assignment_table = plonk_table<FieldType, PlonkParams, plonk_column<FieldType>>;
+                template<typename FieldType, std::size_t WitnessColumns>
+                using plonk_assignment_table = plonk_table<FieldType, WitnessColumns, plonk_column<FieldType>>;
 
-                template<typename FieldType, typename PlonkParams>
+                template<typename FieldType, std::size_t WitnessColumns>
                 using plonk_private_polynomial_table =
-                    plonk_private_table<FieldType, PlonkParams, math::polynomial<typename FieldType::value_type>>;
+                    plonk_private_table<FieldType, WitnessColumns, math::polynomial<typename FieldType::value_type>>;
 
-                template<typename FieldType, typename PlonkParams>
+                template<typename FieldType>
                 using plonk_public_polynomial_table =
-                    plonk_public_table<FieldType, PlonkParams, math::polynomial<typename FieldType::value_type>>;
+                    plonk_public_table<FieldType, math::polynomial<typename FieldType::value_type>>;
 
-                template<typename FieldType, typename PlonkParams>
+                template<typename FieldType, std::size_t WitnessColumns>
                 using plonk_polynomial_table =
-                    plonk_table<FieldType, PlonkParams, math::polynomial<typename FieldType::value_type>>;
+                    plonk_table<FieldType, WitnessColumns, math::polynomial<typename FieldType::value_type>>;
 
             }    // namespace snark
         }        // namespace zk

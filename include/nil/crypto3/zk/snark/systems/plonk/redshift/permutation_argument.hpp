@@ -72,7 +72,7 @@ namespace nil {
                         const typename policy_type::preprocessed_public_data_type preprocessed_data,
                         const typename policy_type::template circuit_short_description<CommitmentSchemeTypePublic>
                             &short_description,
-                        const plonk_polynomial_table<FieldType, ParamsType> &column_polynomials,
+                        const plonk_polynomial_table<FieldType, ParamsType::witness_columns> &column_polynomials,
                         typename fri_type::params_type fri_params) {
 
                         const std::vector<math::polynomial<typename FieldType::value_type>> &S_sigma =

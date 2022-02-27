@@ -48,7 +48,7 @@ namespace nil {
 
                 /************************* PLONK constraint system ****************************/
 
-                template<typename FieldType, std::size_t WitnessColumns, std::size_t PublicColumns>
+                template<typename FieldType>
                 struct plonk_constraint_system {
 
                 protected:

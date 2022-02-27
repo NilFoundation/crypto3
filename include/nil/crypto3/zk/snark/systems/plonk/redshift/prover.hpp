@@ -143,8 +143,8 @@ namespace nil {
                         std::vector<std::uint8_t> transcript_init {};
                         fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(transcript_init);
 
-                        plonk_polynomial_table<FieldType, ParamsType> polynomial_table =
-                            plonk_polynomial_table<FieldType, ParamsType>(
+                        plonk_polynomial_table<FieldType, ParamsType::witness_columns> polynomial_table =
+                            plonk_polynomial_table<FieldType, ParamsType::witness_columns>(
                                 preprocessed_private_data.private_polynomial_table,
                                 preprocessed_public_data.public_polynomial_table);
 
