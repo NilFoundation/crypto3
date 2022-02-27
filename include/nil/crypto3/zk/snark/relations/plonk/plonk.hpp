@@ -38,6 +38,8 @@
 #include <vector>
 
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/copy_constraint.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/lookup_constraint.hpp>
 
 namespace nil {
     namespace crypto3 {
