@@ -67,20 +67,6 @@ namespace nil {
                     }
                 };
 
-                template<typename TBlueprintField, std::size_t WiresAmount>
-                class blueprint_variable<snark::plonk_constraint_system<TBlueprintField, WiresAmount>> :
-                    public snark::variable<TBlueprintField, true> {
-
-                public:
-                    
-                    std::size_t copy_constraint_index;
-
-                    constexpr blueprint_variable(const std::size_t wire_index, 
-                        typename snark::variable<TBlueprintField, true>::rotation_type rotation = 
-                            snark::variable<TBlueprintField, true>::rotation_type::current) :
-                        snark::variable<TBlueprintField, true>(wire_index, rotation), copy_constraint_index(0) {};
-                };
-
                 template<typename TArithmetization>
                 class blueprint_variable_vector;
 

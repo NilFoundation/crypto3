@@ -33,8 +33,9 @@
 #include <vector>
 
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
-
-#include <nil/crypto3/zk/blueprint_variable.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/constraint.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/copy_constraint.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/lookup_constraint.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -52,73 +53,35 @@ namespace nil {
                 public:
                     
                     blueprint() : ArithmetizationType(){
+                        this->_rows_amount = 0;
                     }
 
                     std::size_t allocate_rows(std::size_t required_amount = 1) {
-                        static std::size_t next_row = 0;
-                        std::size_t result = next_row;
-                        next_row += required_amount;
+                        std::size_t result = this->_rows_amount;
+                        this->_rows_amount += required_amount;
                         return result;
                     }
 
+                    std::size_t allocate_row() {
+                        return allocate_rows(1);
+                    }
+
                     void add_gate(std::size_t selector_index, const snark::plonk_constraint<TBlueprintField> &constraint) {
-                        constraint_system.gates.emplace_back(selector_index, constraint);
+                        this->_gates.emplace_back(selector_index, constraint);
                     }
 
                     void add_gate(std::size_t selector_index,
                                   const std::initializer_list<snark::plonk_constraint<TBlueprintField>> &constraints) {
-                        constraint_system.gates.emplace_back(selector_index, constraints);
+                        this->_gates.emplace_back(selector_index, constraints);
                     }
 
-                    void add_copy_constraint(value_type &A, value_type &B) {
-                        if (A.copy_constraint_index == 0 && B.copy_constraint_index == 0){
-                            std::vector<value_type> copy_constraint = {A, B};
-                            copy_constraints.push_back(copy_constraint);
-                            A.copy_constraint_index = B.copy_constraint_index = copy_constraints.size() + 1;
-                        } else {
-
-                            if (A.copy_constraint_index != B.copy_constraint_index){
-                                value_type &left = A;
-                                value_type &right = B;
-                                if (copy_constraints[A.copy_constraint_index].size() < 
-                                    copy_constraints[B.copy_constraint_index].size()){
-                                    left = B;
-                                    right = A;
-                                }
-
-                                std::copy(copy_constraints[right.copy_constraint_index].begin(), 
-                                    copy_constraints[right.copy_constraint_index].end(),
-                                    copy_constraints[left.copy_constraint_index].end());
-                                for (value_type & var: copy_constraints[right.copy_constraint_index]){
-                                    var.copy_constraint_index = left.copy_constraint_index;
-                                }
-
-                                copy_constraints[right.copy_constraint_index].resize(0);
-                            }
-                        }
+                    void add_copy_constraint(const plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {
+                        this->_copy_constraints.emplace_back(copy_constraint);
                     }
 
-                    bool is_satisfied() const {
-                        return constraint_system.is_satisfied(assignments);
+                    void add_lookup_constraint(const plonk_lookup_constraint<BlueprintFieldType> &copy_constraint) {
+                        this->_lookup_constraints.emplace_back({});
                     }
-
-                    std::size_t num_constraints() const {
-                        return constraint_system.num_constraints();
-                    }
-
-                    constexpr std::size_t num_wires() {
-                        return WitnessColumns;
-                    }
-
-                    snark::plonk_variable_assignment<TBlueprintField, WitnessColumns> full_variable_assignment() const {
-                        return assignments;
-                    }
-
-                    ArithmetizationType get_constraint_system() const {
-                        return constraint_system;
-                    }
-
-                    friend class blueprint_variable<TBlueprintField>;
                 };
             }    // namespace components
         }        // namespace zk
