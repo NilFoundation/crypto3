@@ -36,7 +36,9 @@ namespace nil {
                 using plonk_column = std::vector<typename FieldType::value_type>;
 
                 template<typename FieldType, typename PlonkParams, typename ColumnType>
-                class plonk_private_table {
+                struct plonk_private_table {
+
+                protected:
 
                     std::array<ColumnType, PlonkParams::witness_columns> witness_columns;
 
@@ -66,7 +68,9 @@ namespace nil {
                 };
 
                 template<typename FieldType, typename PlonkParams, typename ColumnType>
-                class plonk_public_table {
+                struct plonk_public_table {
+
+                protected:
 
                     std::vector<ColumnType> selector_columns;
                     std::vector<ColumnType> public_input_columns;
@@ -133,7 +137,8 @@ namespace nil {
                     using private_table_type = plonk_private_table<FieldType, PlonkParams, ColumnType>;
                     using public_table_type = plonk_public_table<FieldType, PlonkParams, ColumnType>;
 
-                private:
+                protected:
+                    
                     private_table_type _private_table;
                     public_table_type _public_table;
 

@@ -47,12 +47,18 @@ namespace nil {
                 /************************* PLONK constraint system ****************************/
 
                 template<typename FieldType, std::size_t WitnessColumns, std::size_t PublicColumns>
-                class plonk_constraint_system {
+                struct plonk_constraint_system {
 
+                protected:
                     std::vector<plonk_gate<FieldType>> _gates;
+                    std::vector<plonk_copy_constraint<FieldType>> _copy_constraints;
+                    std::vector<plonk_lookup_constraint<FieldType>> _lookup_constraints;
                     std::size_t _rows_amount;
 
                 public:
+
+                    plonk_constraint_system() {
+                    }
 
                     plonk_constraint_system(std::vector<plonk_gate<FieldType>> gates, std::size_t rows_amount): 
                         _gates(gates), _rows_amount(rows_amount) {
@@ -84,11 +90,11 @@ namespace nil {
                     }
 
                     std::vector<math::polynomial<typename FieldType::value_type>> copy_constraints() const {
-                        return {};
+                        return _copy_constraints;
                     }
 
-                    std::vector<math::polynomial<typename FieldType::value_type>> lookups() const {
-                        return {};
+                    std::vector<math::polynomial<typename FieldType::value_type>> lookup_constraints() const {
+                        return _lookup_constraints;
                     }
                 };
             }    // namespace snark
