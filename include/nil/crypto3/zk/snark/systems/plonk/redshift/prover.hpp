@@ -29,8 +29,6 @@
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
-#include <nil/crypto3/hash/sha2.hpp>
-
 #include <nil/crypto3/container/merkle/tree.hpp>
 
 #include <nil/crypto3/zk/snark/commitments/lpc.hpp>

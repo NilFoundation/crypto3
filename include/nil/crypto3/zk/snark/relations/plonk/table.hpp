@@ -41,7 +41,7 @@ namespace nil {
                     std::array<ColumnType, PlonkParams::witness_columns> witness_columns;
 
                 public:
-                    plonk_private_table(std::array<ColumnType, PlonkParams::witness_columns> witness_columns) :
+                    plonk_private_table(std::array<ColumnType, PlonkParams::witness_columns> witness_columns = {}) :
                         witness_columns(witness_columns) {
                     }
 
@@ -70,13 +70,17 @@ namespace nil {
 
                     std::vector<ColumnType> selector_columns;
                     std::vector<ColumnType> public_input_columns;
+                    std::vector<ColumnType> constant_columns;
 
                 public:
-                    plonk_public_table(std::vector<ColumnType> selector_columns,
+                    plonk_public_table(std::vector<ColumnType> selector_columns = {},
                                        std::vector<ColumnType>
-                                           public_input_columns) :
+                                           public_input_columns = {},
+                                       std::vector<ColumnType>
+                                           constant_columns = {}) :
                         selector_columns(selector_columns),
-                        public_input_columns(public_input_columns) {
+                        public_input_columns(public_input_columns),
+                        constant_columns() {
                     }
 
                     ColumnType selector(std::size_t index) const {
@@ -97,6 +101,15 @@ namespace nil {
                         return public_input_columns;
                     }
 
+                    ColumnType constant(std::size_t index) const {
+                        assert(index < constant_columns.size());
+                        return constant_columns[index];
+                    }
+
+                    std::vector<ColumnType> constants() const {
+                        return constant_columns;
+                    }
+
                     ColumnType operator[](std::size_t index) const {
                         if (index < selector_columns.size())
                             return selector_columns[index];
@@ -104,10 +117,13 @@ namespace nil {
                         if (index < public_input_columns.size())
                             return public_input_columns[index];
                         index -= public_input_columns.size();
+                        if (index < constant_columns.size())
+                            return constant_columns[index];
+                        index -= constant_columns.size();
                     }
 
                     std::size_t size() const {
-                        return selector_columns.size() + public_input_columns.size();
+                        return selector_columns.size() + public_input_columns.size() + constant_columns.size();
                     }
                 };
 
@@ -122,7 +138,8 @@ namespace nil {
                     public_table_type _public_table;
 
                 public:
-                    plonk_table(private_table_type private_table, public_table_type public_table) :
+                    plonk_table(private_table_type private_table = private_table_type(), 
+                                public_table_type public_table = public_table_type()) :
                         _private_table(private_table), _public_table(public_table) {
                     }
 
@@ -136,6 +153,10 @@ namespace nil {
 
                     ColumnType public_input(std::size_t index) const {
                         return _public_table.public_input(index);
+                    }
+
+                    ColumnType constant(std::size_t index) const {
+                        return _public_table.constant(index);
                     }
 
                     ColumnType operator[](std::size_t index) const {

@@ -102,7 +102,7 @@ namespace nil {
 
                             for (const VariableType &var : nlt.vars) {
 
-                                typename VariableType::assignment_type assignment;
+                                math::polynomial<typename VariableType::assignment_type> assignment;
                                 switch (var.type) {
                                     case VariableType::column_type::witness:
                                         assignment = assignments.witness(var.index);
@@ -130,7 +130,7 @@ namespace nil {
                                 std::tuple<std::size_t,
                                            typename VariableType::rotation_type,
                                            typename VariableType::column_type>
-                                    key = std::make_tuple(var.wire_index, var.rotation, var.type);
+                                    key = std::make_tuple(var.index, var.rotation, var.type);
                                 term_value = term_value * assignments[key];
                             }
                             acc = acc + term_value * nlt.coeff;

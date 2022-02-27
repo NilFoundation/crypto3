@@ -68,7 +68,7 @@ namespace nil {
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
-                        const std::vector<plonk_gate<FieldType>> gates = constraint_system.gates;
+                        const std::vector<plonk_gate<FieldType>> gates = constraint_system.gates();
 
                         for (std::size_t i = 0; i < gates.size(); i++) {
                             math::polynomial<typename FieldType::value_type> gate_result = {0};
@@ -79,7 +79,7 @@ namespace nil {
                                 theta_acc *= theta;
                             }
 
-                            gate_result = gate_result * gates[i].selector;
+                            gate_result = gate_result * column_polynomials.selector(gates[i].selector_index);
 
                             F[0] = F[0] + gate_result;
                         }

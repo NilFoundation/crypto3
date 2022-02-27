@@ -142,6 +142,8 @@ namespace nil {
                 template<typename VariableType>
                 class non_linear_combination {
 
+                protected:
+                    
                     std::vector<non_linear_term<VariableType>> terms;
 
                 public:
