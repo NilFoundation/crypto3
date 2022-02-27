@@ -37,24 +37,24 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename TBlueprintField, typename CurveType, 
+                template<typename BlueprintFieldType, typename CurveType, 
                     std::size_t W0 = 4, std::size_t W1 = 0, std::size_t W2 = 1, std::size_t W3 = 2, 
                     std::size_t W4 = 3>
-                class eddsa_verifier_plonk : public component<TBlueprintField> {
+                class eddsa_verifier_plonk : public component<BlueprintFieldType> {
 
-                    typedef snark::plonk_constraint_system<TBlueprintField> arithmetization_type;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
 
                     constexpr algebra::matrix<typename CurveType::scalar_field_type::value_type, 3, 3> M;
                     constexpr algebra::vector<typename CurveType::scalar_field_type::value_type, 3> RC;
 
-                    typedef blueprint<arithmetization_type, TBlueprintField> blueprint_type;
+                    typedef blueprint<arithmetization_type, BlueprintFieldType> blueprint_type;
 
                     std::size_t j;
 
-                    range_plonk<TBlueprintField> range_proof;
-                    sha512_plonk<TBlueprintField> sha512;
-                    element_g1_fixed_base_scalar_mul_plonk<TBlueprintField> fixed_scalar_mul;
-                    element_g1_variable_base_scalar_mul_plonk<TBlueprintField> variable_base_mul;
+                    range_plonk<BlueprintFieldType> range_proof;
+                    sha512_plonk<BlueprintFieldType> sha512;
+                    element_g1_fixed_base_scalar_mul_plonk<BlueprintFieldType> fixed_scalar_mul;
+                    element_g1_variable_base_scalar_mul_plonk<BlueprintFieldType> variable_base_mul;
                 public:
 
                     eddsa_verifier_plonk(blueprint_type &bp) :

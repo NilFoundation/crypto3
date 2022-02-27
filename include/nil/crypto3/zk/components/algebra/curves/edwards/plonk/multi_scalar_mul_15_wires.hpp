@@ -46,7 +46,7 @@ namespace nil {
                          std::size_t... WireIndexes>
                 class element_g1_multi_scalar_mul;
 
-                template<typename TBlueprintField,
+                template<typename BlueprintFieldType,
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
@@ -64,7 +64,7 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class element_g1_multi_scalar_mul<
-                    snark::plonk_constraint_system<TBlueprintField, 15>,
+                    snark::plonk_constraint_system<BlueprintFieldType, 15>,
                     CurveType,
                     W0,
                     W1,
@@ -80,8 +80,8 @@ namespace nil {
                     W11,
                     W12,
                     W13,
-                    W14> : public component<snark::plonk_constraint_system<TBlueprintField, 15>> {
-                    typedef snark::plonk_constraint_system<TBlueprintField, 15> arithmetization_type;
+                    W14> : public component<snark::plonk_constraint_system<BlueprintFieldType, 15>> {
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, 15> arithmetization_type;
 
                     typedef blueprint<arithmetization_type> blueprint_type;
 

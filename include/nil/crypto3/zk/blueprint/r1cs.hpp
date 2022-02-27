@@ -46,47 +46,47 @@ namespace nil {
                 template<typename TArithmetization>
                 class blueprint;
 
-                template<typename TBlueprintField>
-                class blueprint<snark::r1cs_constraint_system<TBlueprintField>> {
-                    typedef snark::r1cs_constraint_system<TBlueprintField> TArithmetization;
+                template<typename BlueprintFieldType>
+                class blueprint<snark::r1cs_constraint_system<BlueprintFieldType>> {
+                    typedef snark::r1cs_constraint_system<BlueprintFieldType> TArithmetization;
 
-                    snark::r1cs_variable_assignment<TBlueprintField>
+                    snark::r1cs_variable_assignment<BlueprintFieldType>
                         values; /* values[0] will hold the value of the first
                    allocated variable of the blueprint, *NOT* constant 1 */
-                    typename TBlueprintField::value_type constant_term;
+                    typename BlueprintFieldType::value_type constant_term;
 
-                    typename snark::variable<TBlueprintField>::index_type next_free_var;
+                    typename snark::variable<BlueprintFieldType>::index_type next_free_var;
                     typename blueprint_linear_combination<TArithmetization>::index_type next_free_lc;
-                    std::vector<typename TBlueprintField::value_type> lc_values;
-                    snark::r1cs_constraint_system<TBlueprintField> constraint_system;
+                    std::vector<typename BlueprintFieldType::value_type> lc_values;
+                    snark::r1cs_constraint_system<BlueprintFieldType> constraint_system;
 
                 public:
-                    // typedef TBlueprintField field_type;
+                    // typedef BlueprintFieldType field_type;
 
                     using value_type = blueprint_variable<TArithmetization>;
 
                     blueprint() {
-                        constant_term = TBlueprintField::value_type::one();
+                        constant_term = BlueprintFieldType::value_type::one();
 
                         next_free_var = 1; /* to account for constant 1 term */
                         next_free_lc = 0;
                     }
 
                     void clear_values() {
-                        std::fill(values.begin(), values.end(), TBlueprintField::value_type::zero());
+                        std::fill(values.begin(), values.end(), BlueprintFieldType::value_type::zero());
                     }
 
-                    typename TBlueprintField::value_type &val(const value_type &var) {
+                    typename BlueprintFieldType::value_type &val(const value_type &var) {
                         assert(var.index <= values.size());
                         return (var.index == 0 ? constant_term : values[var.index - 1]);
                     }
 
-                    typename TBlueprintField::value_type val(const value_type &var) const {
+                    typename BlueprintFieldType::value_type val(const value_type &var) const {
                         assert(var.index <= values.size());
                         return (var.index == 0 ? constant_term : values[var.index - 1]);
                     }
 
-                    typename TBlueprintField::value_type &
+                    typename BlueprintFieldType::value_type &
                         lc_val(const blueprint_linear_combination<TArithmetization> &lc) {
                         if (lc.is_variable) {
                             return this->val(value_type(lc.index));
@@ -96,7 +96,7 @@ namespace nil {
                         }
                     }
 
-                    typename TBlueprintField::value_type
+                    typename BlueprintFieldType::value_type
                         lc_val(const blueprint_linear_combination<TArithmetization> &lc) const {
                         if (lc.is_variable) {
                             return this->val(value_type(lc.index));
@@ -106,7 +106,7 @@ namespace nil {
                         }
                     }
 
-                    void add_r1cs_constraint(const snark::r1cs_constraint<TBlueprintField> &constr) {
+                    void add_r1cs_constraint(const snark::r1cs_constraint<BlueprintFieldType> &constr) {
                         constraint_system.constraints.emplace_back(constr);
                     }
 
@@ -132,21 +132,21 @@ namespace nil {
                         constraint_system.auxiliary_input_size = num_variables() - primary_input_size;
                     }
 
-                    snark::r1cs_variable_assignment<TBlueprintField> full_variable_assignment() const {
+                    snark::r1cs_variable_assignment<BlueprintFieldType> full_variable_assignment() const {
                         return values;
                     }
 
-                    snark::r1cs_primary_input<TBlueprintField> primary_input() const {
-                        return snark::r1cs_primary_input<TBlueprintField>(values.begin(),
+                    snark::r1cs_primary_input<BlueprintFieldType> primary_input() const {
+                        return snark::r1cs_primary_input<BlueprintFieldType>(values.begin(),
                                                                           values.begin() + num_inputs());
                     }
 
-                    snark::r1cs_auxiliary_input<TBlueprintField> auxiliary_input() const {
-                        return snark::r1cs_auxiliary_input<TBlueprintField>(values.begin() + num_inputs(),
+                    snark::r1cs_auxiliary_input<BlueprintFieldType> auxiliary_input() const {
+                        return snark::r1cs_auxiliary_input<BlueprintFieldType>(values.begin() + num_inputs(),
                                                                             values.end());
                     }
 
-                    snark::r1cs_constraint_system<TBlueprintField> get_constraint_system() const {
+                    snark::r1cs_constraint_system<BlueprintFieldType> get_constraint_system() const {
                         return constraint_system;
                     }
 
@@ -154,14 +154,14 @@ namespace nil {
                     friend class blueprint_linear_combination<TArithmetization>;
 
                 private:
-                    typename snark::variable<TBlueprintField>::index_type allocate_var_index() {
+                    typename snark::variable<BlueprintFieldType>::index_type allocate_var_index() {
                         ++constraint_system.auxiliary_input_size;
-                        values.emplace_back(TBlueprintField::value_type::zero());
+                        values.emplace_back(BlueprintFieldType::value_type::zero());
                         return next_free_var++;
                     }
 
                     typename blueprint_linear_combination<TArithmetization>::index_type allocate_lc_index() {
-                        lc_values.emplace_back(TBlueprintField::value_type::zero());
+                        lc_values.emplace_back(BlueprintFieldType::value_type::zero());
                         return next_free_lc++;
                     }
                 };

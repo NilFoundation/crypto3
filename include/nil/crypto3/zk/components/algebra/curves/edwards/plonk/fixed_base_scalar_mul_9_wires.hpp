@@ -47,7 +47,7 @@ namespace nil {
                          std::size_t... WireIndexes>
                 class element_g1_fixed_base_scalar_mul;
 
-                template<typename TBlueprintField,
+                template<typename BlueprintFieldType,
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
@@ -58,7 +58,7 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class element_g1_fixed_base_scalar_mul<snark::plonk_constraint_system<TBlueprintField, 9>,
+                class element_g1_fixed_base_scalar_mul<snark::plonk_constraint_system<BlueprintFieldType, 9>,
                                                        CurveType,
                                                        W0,
                                                        W1,
@@ -70,17 +70,17 @@ namespace nil {
                                                        W7,
                                                        W8>
                     : public detail::
-                          n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 9>, 
+                          n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 9>, 
                           W0, W1, W2, W3, W4, W5, W6, W7, W8> {
 
-                    typedef snark::plonk_constraint_system<TBlueprintField, 9> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, 9> ArithmetizationType;
                     typedef blueprint<ArithmetizationType> blueprint_type;
 
                     std::size_t j;
                     typename CurveType::template g1_type<>::value_type B;
 
                     using n_wires_helper =
-                        detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 9>, 
+                        detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 9>, 
                         W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 
                     using n_wires_helper::w;
@@ -94,6 +94,7 @@ namespace nil {
 
                     struct assignment_params {
                         typename CurveType::scalar_field_type::value_type a;
+                        typename CurveType::scalar_field_type::value_type s;
                         typename CurveType::template g1_type<>::value_type P;
                     };
 
@@ -267,8 +268,7 @@ namespace nil {
                     void generate_assignments(blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
                                               const assignment_params &params) {
 
-                        std::array<bool, 9> b{};
-                        // = marshalling::unpack(params.a);
+                        std::array<bool, CurveType::scalar_field_type::modulus_bits> b = marshalling::pack(params.s);
 
                         private_assignment.witness(W1)[j] = b[0];
                         private_assignment.witness(W2)[j] = b[1];

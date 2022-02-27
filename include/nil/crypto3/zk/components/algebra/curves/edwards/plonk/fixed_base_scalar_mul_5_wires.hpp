@@ -47,14 +47,14 @@ namespace nil {
                          std::size_t... WireIndexes>
                 class element_g1_fixed_base_scalar_mul;
 
-                template<typename TBlueprintField,
+                template<typename BlueprintFieldType,
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
                          std::size_t W3,
                          std::size_t W4>
-                class element_g1_fixed_base_scalar_mul<snark::plonk_constraint_system<TBlueprintField, 5>,
+                class element_g1_fixed_base_scalar_mul<snark::plonk_constraint_system<BlueprintFieldType, 5>,
                                                        CurveType,
                                                        W0,
                                                        W1,
@@ -62,16 +62,16 @@ namespace nil {
                                                        W3,
                                                        W4>
                     : public detail::
-                          n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 5>, W0, W1, W2, W3, W4> {
+                          n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 5>, W0, W1, W2, W3, W4> {
 
-                    typedef snark::plonk_constraint_system<TBlueprintField, 5> TArithmetization;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, 5> TArithmetization;
                     typedef blueprint<TArithmetization> blueprint_type;
 
                     std::size_t j;
                     typename CurveType::template g1_type<>::value_type B;
 
                     using n_wires_helper =
-                        detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 5>, W0, W1, W2, W3, W4>;
+                        detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 5>, W0, W1, W2, W3, W4>;
 
                     using n_wires_helper::w;
                     enum indices { m2 = 0, m1, cur, p1, p2 };

@@ -47,15 +47,15 @@ namespace nil {
                 template<typename TArithmetization>
                 class blueprint_variable;
 
-                // template<std::size_t WireIndex, typename Rotation, typename TArithmetization, typename TBlueprintField>
+                // template<std::size_t WireIndex, typename Rotation, typename TArithmetization, typename BlueprintFieldType>
                 // class blueprint_variable;
 
-                template<typename TBlueprintField>
-                class blueprint_variable<snark::r1cs_constraint_system<TBlueprintField>> :
-                    public snark::variable<TBlueprintField, false> {
+                template<typename BlueprintFieldType>
+                class blueprint_variable<snark::r1cs_constraint_system<BlueprintFieldType>> :
+                    public snark::variable<BlueprintFieldType, false> {
                 public:
-                    blueprint_variable(const typename snark::variable<TBlueprintField>::index_type index = 0) :
-                        snark::variable<TBlueprintField>(index) {};
+                    blueprint_variable(const typename snark::variable<BlueprintFieldType>::index_type index = 0) :
+                        snark::variable<BlueprintFieldType>(index) {};
 
                     template<typename TArithmetization>
                     void allocate(blueprint<TArithmetization> &bp) {
@@ -70,12 +70,12 @@ namespace nil {
                 template<typename TArithmetization>
                 class blueprint_variable_vector;
 
-                template<typename TBlueprintField>
-                class blueprint_variable_vector<snark::r1cs_constraint_system<TBlueprintField>> : 
-                    private std::vector<blueprint_variable<snark::r1cs_constraint_system<TBlueprintField>>> {
+                template<typename BlueprintFieldType>
+                class blueprint_variable_vector<snark::r1cs_constraint_system<BlueprintFieldType>> : 
+                    private std::vector<blueprint_variable<snark::r1cs_constraint_system<BlueprintFieldType>>> {
 
-                    typedef snark::r1cs_constraint_system<TBlueprintField> TArithmetization;
-                    typedef typename TBlueprintField::value_type field_value_type;
+                    typedef snark::r1cs_constraint_system<BlueprintFieldType> TArithmetization;
+                    typedef typename BlueprintFieldType::value_type field_value_type;
                     typedef std::vector<blueprint_variable<TArithmetization>> contents;
 
                 public:
@@ -108,7 +108,7 @@ namespace nil {
                                               typename contents::const_reverse_iterator last) :
                         contents(first, last) {};
 
-                    /* allocates blueprint_variable<TBlueprintField> vector in MSB->LSB order */
+                    /* allocates blueprint_variable<BlueprintFieldType> vector in MSB->LSB order */
                     void allocate(blueprint<TArithmetization> &bp, const std::size_t n) {
                         (*this).resize(n);
 

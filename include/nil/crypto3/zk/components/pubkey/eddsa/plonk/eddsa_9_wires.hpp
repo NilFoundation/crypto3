@@ -48,7 +48,7 @@ namespace nil {
                          std::size_t... WireIndexes>
                 class eddsa_verifier_plonk;
 
-                template<typename TBlueprintField,
+                template<typename BlueprintFieldType,
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
@@ -59,7 +59,7 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class eddsa_verifier_plonk<snark::plonk_constraint_system<TBlueprintField, 9>,
+                class eddsa_verifier_plonk<snark::plonk_constraint_system<BlueprintFieldType, 9>,
                                                        CurveType,
                                                        W0,
                                                        W1,
@@ -71,17 +71,17 @@ namespace nil {
                                                        W7,
                                                        W8>
                     : public detail::
-                          n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 9>, 
+                          n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 9>, 
                           W0, W1, W2, W3, W4, W5, W6, W7, W8> {
 
-                    typedef snark::plonk_constraint_system<TBlueprintField, 9> TArithmetization;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, 9> TArithmetization;
                     typedef blueprint<TArithmetization> blueprint_type;
 
                     std::size_t j;
                     typename CurveType::template g1_type<>::value_type B;
 
                     using n_wires_helper =
-                        detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 9>, 
+                        detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 9>, 
                         W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 
                     using n_wires_helper::w;

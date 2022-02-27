@@ -33,6 +33,7 @@
 #include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
+#include <nil/crypto3/zk/assignment/plonk.hpp>
 
 using namespace nil::crypto3;
 
@@ -41,15 +42,17 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 BOOST_AUTO_TEST_CASE(blueprint_plonk_allocat_rows_test_case) {
 
 	using curve_type = algebra::curves::bls12<381>;
-	using TBlueprintField = typename curve_type::base_field_type;
+	using BlueprintFieldType = typename curve_type::base_field_type;
 	constexpr std::size_t WitnessColumns = 5;
-	using TArithmetization = zk::snark::plonk_constraint_system<TBlueprintField, WitnessColumns>;
+	using TArithmetization = zk::snark::plonk_constraint_system<BlueprintFieldType>;
 
 	zk::components::blueprint<TArithmetization> bp;
+	zk::components::blueprint_private_assignment_table<TArithmetization, WitnessColumns> private_assignment;
+	zk::components::blueprint_public_assignment_table<TArithmetization> public_assignment;
 
 	BOOST_CHECK_EQUAL(0, bp.allocate_rows());
 	BOOST_CHECK_EQUAL(1, bp.allocate_rows(5));
-	BOOST_CHECK_EQUAL(6, bp.allocate_rows());
+	BOOST_CHECK_EQUAL(6, bp.allocate_row());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

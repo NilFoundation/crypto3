@@ -50,7 +50,7 @@ namespace nil {
                          std::size_t W9 = 9>
                 class poseidon_plonk;
 
-                template<typename TBlueprintField,
+                template<typename BlueprintFieldType,
                          typename CurveType,
                          std::size_t W1,
                          std::size_t W2,
@@ -61,7 +61,7 @@ namespace nil {
                          std::size_t W7,
                          std::size_t W8,
                          std::size_t W9>
-                class poseidon_plonk<snark::plonk_constraint_system<TBlueprintField, 9>,
+                class poseidon_plonk<snark::plonk_constraint_system<BlueprintFieldType, 9>,
                                      CurveType,
                                      W1,
                                      W2,
@@ -72,7 +72,7 @@ namespace nil {
                                      W7,
                                      W8,
                                      W9>
-                    : public detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 9>,
+                    : public detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 9>,
                                                     W1,
                                                     W2,
                                                     W3,
@@ -83,7 +83,7 @@ namespace nil {
                                                     W8,
                                                     W9> {
 
-                    typedef snark::plonk_constraint_system<TBlueprintField, 9> TArithmetization;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, 9> TArithmetization;
                     typedef blueprint<TArithmetization> blueprint_type;
 
                     constexpr static const algebra::matrix<typename CurveType::scalar_field_type::value_type, 3, 3> M;
@@ -91,7 +91,7 @@ namespace nil {
 
                     std::size_t j;
 
-                    using n_wires_helper = detail::n_wires_helper<snark::plonk_constraint_system<TBlueprintField, 9>,
+                    using n_wires_helper = detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType, 9>,
                                                                   W1,
                                                                   W2,
                                                                   W3,

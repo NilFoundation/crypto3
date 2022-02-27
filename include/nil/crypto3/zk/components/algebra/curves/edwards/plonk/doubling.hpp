@@ -41,23 +41,23 @@ namespace nil {
                          std::size_t... WireIndexes>
                 class element_g1_doubling;
 
-                template<typename TBlueprintField,
+                template<typename BlueprintFieldType,
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
                          std::size_t W3,
                          std::size_t W6>
-                class element_g1_doubling<snark::plonk_constraint_system<TBlueprintField, 5>,
+                class element_g1_doubling<snark::plonk_constraint_system<BlueprintFieldType, 5>,
                                                        CurveType,
                                                        W0,
                                                        W1,
                                                        W2,
                                                        W3,
                                                        W6>
-                    : public component<TBlueprintField> {
+                    : public component<BlueprintFieldType> {
 
-                    typedef snark::plonk_constraint_system<TBlueprintField, 5> arithmetization_type;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, 5> arithmetization_type;
                     typedef blueprint<arithmetization_type> blueprint_type;
 
                     std::size_t i;

@@ -26,12 +26,6 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_PLONK_HPP
 #define CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_PLONK_HPP
 
-#include <algorithm>
-#include <cassert>
-#include <cstdio>
-#include <string>
-#include <vector>
-
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/constraint.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/copy_constraint.hpp>
@@ -42,14 +36,14 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType>
+                template<typename ArithmetizationType, std::size_t... BlueprintParams>
                 class blueprint;
 
-                template<typename BlueprintFieldType, std::size_t WitnessColumns>
-                class blueprint<snark::plonk_constraint_system<BlueprintFieldType, WitnessColumns>> :
-                    public snark::plonk_constraint_system<BlueprintFieldType, WitnessColumns>> {
+                template<typename BlueprintFieldType>
+                class blueprint<snark::plonk_constraint_system<BlueprintFieldType>> :
+                    public snark::plonk_constraint_system<BlueprintFieldType> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, WitnessColumns> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
                 public:
                     
                     blueprint() : ArithmetizationType(){
@@ -66,20 +60,20 @@ namespace nil {
                         return allocate_rows(1);
                     }
 
-                    void add_gate(std::size_t selector_index, const snark::plonk_constraint<TBlueprintField> &constraint) {
+                    void add_gate(std::size_t selector_index, const snark::plonk_constraint<BlueprintFieldType> &constraint) {
                         this->_gates.emplace_back(selector_index, constraint);
                     }
 
                     void add_gate(std::size_t selector_index,
-                                  const std::initializer_list<snark::plonk_constraint<TBlueprintField>> &constraints) {
+                                  const std::initializer_list<snark::plonk_constraint<BlueprintFieldType>> &constraints) {
                         this->_gates.emplace_back(selector_index, constraints);
                     }
 
-                    void add_copy_constraint(const plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {
+                    void add_copy_constraint(const snark::plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {
                         this->_copy_constraints.emplace_back(copy_constraint);
                     }
 
-                    void add_lookup_constraint(const plonk_lookup_constraint<BlueprintFieldType> &copy_constraint) {
+                    void add_lookup_constraint(const snark::plonk_lookup_constraint<BlueprintFieldType> &copy_constraint) {
                         this->_lookup_constraints.emplace_back({});
                     }
                 };

@@ -46,12 +46,12 @@ namespace nil {
                 template<typename TArithmetization>
                 class blueprint_linear_combination;
 
-                template<typename TBlueprintField>
-                class blueprint_linear_combination<snark::r1cs_constraint_system<TBlueprintField>> : 
-                    public snark::linear_combination<TBlueprintField> {
+                template<typename BlueprintFieldType>
+                class blueprint_linear_combination<snark::r1cs_constraint_system<BlueprintFieldType>> : 
+                    public snark::linear_combination<BlueprintFieldType> {
 
-                    typedef snark::r1cs_constraint_system<TBlueprintField> TArithmetization;
-                    typedef TBlueprintField field_type;
+                    typedef snark::r1cs_constraint_system<BlueprintFieldType> TArithmetization;
+                    typedef BlueprintFieldType field_type;
                     typedef typename field_type::value_type field_value_type;
 
                 public:
@@ -121,12 +121,12 @@ namespace nil {
                 template<typename TArithmetizatio>
                 class blueprint_linear_combination_vector;
 
-                template<typename TBlueprintField>
-                class blueprint_linear_combination_vector<snark::r1cs_constraint_system<TBlueprintField>>
-                    : private std::vector<blueprint_linear_combination<snark::r1cs_constraint_system<TBlueprintField>>> {
+                template<typename BlueprintFieldType>
+                class blueprint_linear_combination_vector<snark::r1cs_constraint_system<BlueprintFieldType>>
+                    : private std::vector<blueprint_linear_combination<snark::r1cs_constraint_system<BlueprintFieldType>>> {
 
-                    typedef snark::r1cs_constraint_system<TBlueprintField> TArithmetization;
-                    typedef typename TBlueprintField::value_type field_value_type;
+                    typedef snark::r1cs_constraint_system<BlueprintFieldType> TArithmetization;
+                    typedef typename BlueprintFieldType::value_type field_value_type;
                     typedef std::vector<blueprint_linear_combination<TArithmetization>> contents;
 
                 public:
