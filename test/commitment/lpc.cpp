@@ -49,7 +49,6 @@
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
 
-
 BOOST_AUTO_TEST_SUITE(lpc_test_suite)
 
 BOOST_AUTO_TEST_CASE(lpc_basic_test) {
@@ -79,7 +78,8 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
-    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = fri_type::calculate_domain_set(extended_log, r);
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        fri_type::calculate_domain_set(extended_log, r);
 
     typename fri_type::params_type fri_params;
 
@@ -88,19 +88,16 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     fri_params.D = D;
     fri_params.q = q;
     fri_params.max_degree = d - 1;
-    
 
     // commit
 
-    math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1,
-                                                                        5, 6, 7, 2,
-                                                                        8, 7, 5, 6,
-                                                                        1, 2, 1, 1};
+    math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
 
     merkle_tree_type tree = lpc_type::commit(f, D[0]);
 
     // TODO: take a point outside of the basic domain
-    std::array<typename FieldType::value_type, 1> evaluation_points  = {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
+    std::array<typename FieldType::value_type, 1> evaluation_points = {
+        algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
 
     std::array<std::uint8_t, 96> x_data {};
     zk::snark::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
