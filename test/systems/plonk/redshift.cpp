@@ -180,8 +180,8 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
         redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(
             constraint_system, assigments.private_table(), short_description);
 
-    plonk_polynomial_table<FieldType, circuit_2_params> polynomial_table =
-                            plonk_polynomial_table<FieldType, circuit_2_params>(
+    plonk_polynomial_table<FieldType, circuit_2_params::witness_columns> polynomial_table =
+                            plonk_polynomial_table<FieldType, circuit_2_params::witness_columns>(
                                 preprocessed_private_data.private_polynomial_table,
                                 preprocessed_public_data.public_polynomial_table);
 
@@ -255,8 +255,8 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
         redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(
             constraint_system, assigments.private_table(), short_description);
 
-    plonk_polynomial_table<FieldType, circuit_2_params> polynomial_table =
-                            plonk_polynomial_table<FieldType, circuit_2_params>(
+    plonk_polynomial_table<FieldType, circuit_2_params::witness_columns> polynomial_table =
+                            plonk_polynomial_table<FieldType, circuit_2_params::witness_columns>(
                                 preprocessed_private_data.private_polynomial_table,
                                 preprocessed_public_data.public_polynomial_table);
 

@@ -185,9 +185,9 @@ namespace nil {
                         }
                     }
 
-                    test_circuit.table = plonk_assignment_table<FieldType, circuit_1_params>(
-                        plonk_private_assignment_table<FieldType, circuit_1_params>(private_assignment),
-                        plonk_public_assignment_table<FieldType, circuit_1_params>(selectors_assignment,
+                    test_circuit.table = plonk_assignment_table<FieldType, witness_columns>(
+                        plonk_private_assignment_table<FieldType, witness_columns>(private_assignment),
+                        plonk_public_assignment_table<FieldType>(selectors_assignment,
                                                                                    public_input_assignment));
 
                     test_circuit.init();
@@ -305,9 +305,9 @@ namespace nil {
                     for (std::size_t i = selectors_columns; i < selectors_columns + public_columns; i++) {
                         public_input_assignment[i] = table[witness_columns + i];
                     }
-                    test_circuit.table = plonk_assignment_table<FieldType, circuit_2_params>(
-                        plonk_private_assignment_table<FieldType, circuit_2_params>(private_assignment),
-                        plonk_public_assignment_table<FieldType, circuit_2_params>(selectors_assignment,
+                    test_circuit.table = plonk_assignment_table<FieldType, witness_columns>(
+                        plonk_private_assignment_table<FieldType, witness_columns>(private_assignment),
+                        plonk_public_assignment_table<FieldType>(selectors_assignment,
                                                                                    public_input_assignment));
 
                     test_circuit.init();

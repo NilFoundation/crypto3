@@ -58,8 +58,7 @@ namespace nil {
                          * Below are various template aliases (used for convenience).
                          */
 
-                        typedef plonk_constraint_system<FieldType, witness_columns, public_columns>
-                            constraint_system_type;
+                        typedef plonk_constraint_system<FieldType> constraint_system_type;
 
                         typedef plonk_assignment_table<FieldType, RedshiftParams::witness_columns> variable_assignment_type;
 

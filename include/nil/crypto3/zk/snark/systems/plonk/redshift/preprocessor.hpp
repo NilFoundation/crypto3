@@ -217,8 +217,8 @@ namespace nil {
                         math::polynomial<typename FieldType::value_type> q_blind =
                             selector_blind(short_description.table_rows, short_description.usable_rows, basic_domain);
 
-                        plonk_public_polynomial_table<FieldType, ParamsType> public_polynomial_table =
-                            plonk_public_polynomial_table<FieldType, ParamsType>(
+                        plonk_public_polynomial_table<FieldType> public_polynomial_table =
+                            plonk_public_polynomial_table<FieldType>(
                                 detail::column_range_polynomials<FieldType>(public_assignment.selectors(),
                                                                             basic_domain),
                                 detail::column_range_polynomials<FieldType>(public_assignment.public_inputs(),
@@ -256,8 +256,8 @@ namespace nil {
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
                             math::make_evaluation_domain<FieldType>(N_rows);
 
-                        plonk_private_polynomial_table<FieldType, RedshiftParams> private_polynomial_table =
-                            plonk_private_polynomial_table<FieldType, RedshiftParams>(
+                        plonk_private_polynomial_table<FieldType, RedshiftParams::witness_columns> private_polynomial_table =
+                            plonk_private_polynomial_table<FieldType, RedshiftParams::witness_columns>(
                                 detail::column_range_polynomials<FieldType>(private_assignment.witnesses(),
                                                                             basic_domain));
 
