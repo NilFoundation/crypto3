@@ -62,7 +62,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<gost_A_scalar_field<256>>> value_type;
@@ -72,6 +74,9 @@ namespace nil {
                 };
 
                 constexpr typename gost_A_scalar_field<256>::integral_type const gost_A_scalar_field<256>::modulus;
+
+                constexpr typename gost_A_scalar_field<256>::modular_params_type const
+                    gost_A_scalar_field<256>::modulus_params;
 
                 template<std::size_t Version = 256>
                 using gost_A_fr = gost_A_scalar_field<Version>;

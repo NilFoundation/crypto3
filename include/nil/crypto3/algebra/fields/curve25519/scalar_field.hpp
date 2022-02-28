@@ -59,7 +59,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<curve25519_scalar_field>> value_type;
@@ -71,6 +73,8 @@ namespace nil {
                 constexpr typename std::size_t const curve25519_scalar_field::number_bits;
                 constexpr typename std::size_t const curve25519_scalar_field::value_bits;
                 constexpr typename curve25519_scalar_field::integral_type const curve25519_scalar_field::modulus;
+                constexpr
+                    typename curve25519_scalar_field::modular_params_type const curve25519_scalar_field::modulus_params;
 
                 using curve25519_fr = curve25519_scalar_field;
             }    // namespace fields

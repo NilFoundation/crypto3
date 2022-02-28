@@ -62,7 +62,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     constexpr static const integral_type mul_generator = 0x03;
@@ -80,6 +82,9 @@ namespace nil {
                 constexpr typename std::size_t const alt_bn128_base_field<254>::value_bits;
 
                 constexpr typename alt_bn128_base_field<254>::integral_type const alt_bn128_base_field<254>::modulus;
+
+                constexpr typename alt_bn128_base_field<254>::modular_params_type const
+                    alt_bn128_base_field<254>::modulus_params;
 
                 constexpr
                     typename alt_bn128_base_field<254>::integral_type const alt_bn128_base_field<254>::mul_generator;

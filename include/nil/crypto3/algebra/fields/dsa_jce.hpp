@@ -62,7 +62,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<dsa_jce<modulus_bits>>> value_type;
@@ -72,6 +74,7 @@ namespace nil {
                 };
 
                 constexpr typename dsa_jce<1024>::integral_type const dsa_jce<1024>::modulus;
+                constexpr typename dsa_jce<1024>::modular_params_type const dsa_jce<1024>::modulus_params;
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3

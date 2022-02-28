@@ -62,7 +62,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<secp_r1_scalar_field<160>>> value_type;
@@ -88,7 +90,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<secp_r1_scalar_field<192>>> value_type;
@@ -114,7 +118,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<secp_r1_scalar_field<224>>> value_type;
@@ -140,7 +146,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<secp_r1_scalar_field<256>>> value_type;
@@ -166,7 +174,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<secp_r1_scalar_field<384>>> value_type;
@@ -192,7 +202,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<secp_r1_scalar_field<521>>> value_type;
@@ -208,31 +220,37 @@ namespace nil {
                 constexpr typename std::size_t const secp_r1_fr<160>::number_bits;
                 constexpr typename std::size_t const secp_r1_fr<160>::value_bits;
                 constexpr typename secp_r1_fr<160>::integral_type const secp_r1_fr<160>::modulus;
+                constexpr typename secp_r1_fr<160>::modular_params_type const secp_r1_fr<160>::modulus_params;
 
                 constexpr typename std::size_t const secp_r1_fr<192>::modulus_bits;
                 constexpr typename std::size_t const secp_r1_fr<192>::number_bits;
                 constexpr typename std::size_t const secp_r1_fr<192>::value_bits;
                 constexpr typename secp_r1_fr<192>::integral_type const secp_r1_fr<192>::modulus;
+                constexpr typename secp_r1_fr<192>::modular_params_type const secp_r1_fr<192>::modulus_params;
 
                 constexpr typename std::size_t const secp_r1_fr<224>::modulus_bits;
                 constexpr typename std::size_t const secp_r1_fr<224>::number_bits;
                 constexpr typename std::size_t const secp_r1_fr<224>::value_bits;
                 constexpr typename secp_r1_fr<224>::integral_type const secp_r1_fr<224>::modulus;
+                constexpr typename secp_r1_fr<224>::modular_params_type const secp_r1_fr<224>::modulus_params;
 
                 constexpr typename std::size_t const secp_r1_fr<256>::modulus_bits;
                 constexpr typename std::size_t const secp_r1_fr<256>::number_bits;
                 constexpr typename std::size_t const secp_r1_fr<256>::value_bits;
                 constexpr typename secp_r1_fr<256>::integral_type const secp_r1_fr<256>::modulus;
+                constexpr typename secp_r1_fr<256>::modular_params_type const secp_r1_fr<256>::modulus_params;
 
                 constexpr typename std::size_t const secp_r1_fr<384>::modulus_bits;
                 constexpr typename std::size_t const secp_r1_fr<384>::number_bits;
                 constexpr typename std::size_t const secp_r1_fr<384>::value_bits;
                 constexpr typename secp_r1_fr<384>::integral_type const secp_r1_fr<384>::modulus;
+                constexpr typename secp_r1_fr<384>::modular_params_type const secp_r1_fr<384>::modulus_params;
 
                 constexpr typename std::size_t const secp_r1_fr<521>::modulus_bits;
                 constexpr typename std::size_t const secp_r1_fr<521>::number_bits;
                 constexpr typename std::size_t const secp_r1_fr<521>::value_bits;
                 constexpr typename secp_r1_fr<521>::integral_type const secp_r1_fr<521>::modulus;
+                constexpr typename secp_r1_fr<521>::modular_params_type const secp_r1_fr<521>::modulus_params;
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3
