@@ -51,6 +51,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_allocat_rows_test_case) {
 	zk::blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> private_assignment;
 	zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment;
 
+	zk::components::non_native_curve_element_multiplication<
+		ArithmetizationType, curve_type, 0,1,2,3,4,5,6,7,8> mul_component(bp, {});
+
+	mul_component.generate_copy_constraints();
+
 	BOOST_CHECK_EQUAL(0, bp.allocate_rows());
 	BOOST_CHECK_EQUAL(1, bp.allocate_rows(5));
 	BOOST_CHECK_EQUAL(6, bp.allocate_row());

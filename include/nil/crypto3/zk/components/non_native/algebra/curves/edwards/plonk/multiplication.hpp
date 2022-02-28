@@ -73,6 +73,8 @@ namespace nil {
 
                     enum indices { m2 = 0, m1, cur, p1, p2 };
 
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+
                 public:
 
                     struct init_params {
@@ -92,11 +94,9 @@ namespace nil {
 
                     void generate_gates(blueprint_public_assignment_table<ArithmetizationType> &public_assignment) {
 
-                        using var = snark::plonk_variable<BlueprintFieldType>;
-
                         std::size_t selector_index = public_assignment.add_selector({j + 0, j + 2, j + 4, j + 6});
 
-                        snark::plonk_copy_constraint<BlueprintFieldType> s = 
+                        snark::plonk_constraint<BlueprintFieldType> s = 
                             (var(W1, 0) + var(W2, 0) + var(W3, 0) +
                              var(W4, 0) + var(W5, 0) + var(W6, 0) +
                              var(W7, 0) + var(W2, +1) + var(W3, +1) +
@@ -115,31 +115,30 @@ namespace nil {
                     }
 
                     void generate_copy_constraints(){
-                        using copy_constraint_variable_type = snark::plonk_variable<BlueprintFieldType>;
 
-                        this->bp.add_copy_constraint({{W0, j + 8}, {W0, j + 4}});
-                        this->bp.add_copy_constraint({{W1, j + 8}, {W0, j + 5}});
-                        this->bp.add_copy_constraint({{W2, j + 8}, {W1, j + 5}});
-                        this->bp.add_copy_constraint({{W6, j + 8}, {W0, j + 6}});
-                        this->bp.add_copy_constraint({{W7, j + 8}, {W1, j + 4}});
-                        this->bp.add_copy_constraint({{W6, j + 8}, {W0, j + 6}});
-                        this->bp.add_copy_constraint({{W7, j + 8}, {W1, j + 4}});
-                        this->bp.add_copy_constraint({{W8, j + 8}, {W2, j + 4}});
-                        this->bp.add_copy_constraint({{W0, j + 9}, {W0, j + 3}});
-                        this->bp.add_copy_constraint({{W1, j + 9}, {W1, j + 3}});
-                        this->bp.add_copy_constraint({{W2, j + 9}, {W3, j + 4}});
-                        this->bp.add_copy_constraint({{W3, j + 9}, {W1, j + 2}});
-                        this->bp.add_copy_constraint({{W4, j + 9}, {W2, j + 2}});
-                        this->bp.add_copy_constraint({{W5, j + 9}, {W3, j + 2}});
-                        this->bp.add_copy_constraint({{W7, j + 9}, {W0, j + 11}});
-                        this->bp.add_copy_constraint({{W8, j + 9}, {W4, j + 11}});
-                        this->bp.add_copy_constraint({{W0, j + 10}, {W0, j + 0}});
-                        this->bp.add_copy_constraint({{W1, j + 10}, {W0, j + 1}});
-                        this->bp.add_copy_constraint({{W2, j + 10}, {W1, j + 1}});
-                        this->bp.add_copy_constraint({{W3, j + 10}, {W0, j + 2}});
-                        this->bp.add_copy_constraint({{W4, j + 10}, {W1, j + 0}});
-                        this->bp.add_copy_constraint({{W5, j + 10}, {W2, j + 0}});
-                        this->bp.add_copy_constraint({{W6, j + 10}, {W3, j + 0}});
+                        this->bp.add_copy_constraint({var(W0, j + 8, true), var(W0, j + 4, true)});
+                        this->bp.add_copy_constraint({var(W1, j + 8, true), var(W0, j + 5, true)});
+                        this->bp.add_copy_constraint({var(W2, j + 8, true), var(W1, j + 5, true)});
+                        this->bp.add_copy_constraint({var(W6, j + 8, true), var(W0, j + 6, true)});
+                        this->bp.add_copy_constraint({var(W7, j + 8, true), var(W1, j + 4, true)});
+                        this->bp.add_copy_constraint({var(W6, j + 8, true), var(W0, j + 6, true)});
+                        this->bp.add_copy_constraint({var(W7, j + 8, true), var(W1, j + 4, true)});
+                        this->bp.add_copy_constraint({var(W8, j + 8, true), var(W2, j + 4, true)});
+                        this->bp.add_copy_constraint({var(W0, j + 9, true), var(W0, j + 3, true)});
+                        this->bp.add_copy_constraint({var(W1, j + 9, true), var(W1, j + 3, true)});
+                        this->bp.add_copy_constraint({var(W2, j + 9, true), var(W3, j + 4, true)});
+                        this->bp.add_copy_constraint({var(W3, j + 9, true), var(W1, j + 2, true)});
+                        this->bp.add_copy_constraint({var(W4, j + 9, true), var(W2, j + 2, true)});
+                        this->bp.add_copy_constraint({var(W5, j + 9, true), var(W3, j + 2, true)});
+                        this->bp.add_copy_constraint({var(W7, j + 9, true), var(W0, j + 11, true)});
+                        this->bp.add_copy_constraint({var(W8, j + 9, true), var(W4, j + 11, true)});
+                        this->bp.add_copy_constraint({var(W0, j + 10, true), var(W0, j + 0, true)});
+                        this->bp.add_copy_constraint({var(W1, j + 10, true), var(W0, j + 1, true)});
+                        this->bp.add_copy_constraint({var(W2, j + 10, true), var(W1, j + 1, true)});
+                        this->bp.add_copy_constraint({var(W3, j + 10, true), var(W0, j + 2, true)});
+                        this->bp.add_copy_constraint({var(W4, j + 10, true), var(W1, j + 0, true)});
+                        this->bp.add_copy_constraint({var(W5, j + 10, true), var(W2, j + 0, true)});
+                        this->bp.add_copy_constraint({var(W6, j + 10, true), var(W3, j + 0, true)});
                     }
 
                     void generate_assignments(blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
