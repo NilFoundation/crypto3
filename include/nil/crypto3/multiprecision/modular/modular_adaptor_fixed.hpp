@@ -34,8 +34,9 @@ namespace nil {
                     constexpr void set_modular_params(const modular_type &input) {
                     }
 
-                    template <typename T>
-                    constexpr void set_modular_params(const T &input) {}
+                    template<typename T>
+                    constexpr void set_modular_params(const T &input) {
+                    }
 
                     constexpr const modular_type &mod_data() const {
                         return m_mod;
@@ -44,6 +45,9 @@ namespace nil {
                 protected:
                     constexpr static const modular_type m_mod = Modulus;
                 };
+
+                template<typename Backend, const nil::crypto3::multiprecision::modular_params<Backend> &Modulus>
+                constexpr modular_params<Backend> const modular_params_ct<Backend, Modulus>::m_mod;
 
                 template<typename Backend>
                 class modular_params_rt {
@@ -121,7 +125,6 @@ namespace nil {
                     constexpr modular_adaptor(const Backend1 &b, const Backend2 &m) {
                         this->mod_data().adjust_modular(m_base, b);
                         this->set_modular_params(m);
-
                     }
 
                     constexpr explicit modular_adaptor(const Backend &m) :
@@ -206,7 +209,7 @@ namespace nil {
                     constexpr void swap(modular_adaptor &o) {
                         m_base.swap(o.base_data());
                         // TODO: add swap to modular_type
-//                        this->mod_data().swap(o.mod_data());
+                        //                        this->mod_data().swap(o.mod_data());
                         auto t = this->mod_data();
                         this->set_modular_params(o.mod_data());
                         this->set_modular_params(t);
