@@ -26,11 +26,13 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_COMPONENT_HPP
 #define CRYPTO3_ZK_BLUEPRINT_COMPONENT_HPP
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
+
+            template<typename ArithmetizationType, std::size_t... BlueprintParams>
+            class blueprint;
+
             namespace components {
 
                 template<typename ArithmetizationType>

@@ -50,69 +50,71 @@ namespace nil {
 
                         typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
                         typedef blueprint<ArithmetizationType> blueprint_type;
+
+                        using variable_type = snark::plonk_variable<BlueprintFieldType>;
                     public:
 
                         n_wires_helper(blueprint_type &bp):component<ArithmetizationType>(bp){}
 
                         constexpr static const std::array<std::array<typename blueprint_type::value_type, 5>,5> w = {{
                             {{
-                                typename blueprint_type::value_type (W0, 
+                                variable_type(W0, 
                                 blueprint_type::value_type::rotation_type::pre_previous),
-                                typename blueprint_type::value_type(W0, 
+                                variable_type(W0, 
                                 blueprint_type::value_type::rotation_type::previous),
-                                typename blueprint_type::value_type(W0, 
+                                variable_type(W0, 
                                 blueprint_type::value_type::rotation_type::current),
-                                typename blueprint_type::value_type(W0, 
+                                variable_type(W0, 
                                 blueprint_type::value_type::rotation_type::next),
-                                typename blueprint_type::value_type(W0, 
+                                variable_type(W0, 
                                 blueprint_type::value_type::rotation_type::after_next)
                             }},
                             {{
-                                typename blueprint_type::value_type (W1, 
+                                variable_type(W1, 
                                 blueprint_type::value_type::rotation_type::pre_previous),
-                                typename blueprint_type::value_type(W1, 
+                                variable_type(W1, 
                                 blueprint_type::value_type::rotation_type::previous),
-                                typename blueprint_type::value_type(W1, 
+                                variable_type(W1, 
                                 blueprint_type::value_type::rotation_type::current),
-                                typename blueprint_type::value_type(W1, 
+                                variable_type(W1, 
                                 blueprint_type::value_type::rotation_type::next),
-                                typename blueprint_type::value_type(W1, 
+                                variable_type(W1, 
                                 blueprint_type::value_type::rotation_type::after_next)
                             }},
                             {{
-                                typename blueprint_type::value_type (W2, 
+                                variable_type(W2, 
                                 blueprint_type::value_type::rotation_type::pre_previous),
-                                typename blueprint_type::value_type(W2, 
+                                variable_type(W2, 
                                 blueprint_type::value_type::rotation_type::previous),
-                                typename blueprint_type::value_type(W2, 
+                                variable_type(W2, 
                                 blueprint_type::value_type::rotation_type::current),
-                                typename blueprint_type::value_type(W2, 
+                                variable_type(W2, 
                                 blueprint_type::value_type::rotation_type::next),
-                                typename blueprint_type::value_type(W2, 
+                                variable_type(W2, 
                                 blueprint_type::value_type::rotation_type::after_next)
                             }},
                             {{
-                                typename blueprint_type::value_type (W3, 
+                                variable_type(W3, 
                                 blueprint_type::value_type::rotation_type::pre_previous),
-                                typename blueprint_type::value_type(W3, 
+                                variable_type(W3, 
                                 blueprint_type::value_type::rotation_type::previous),
-                                typename blueprint_type::value_type(W3, 
+                                variable_type(W3, 
                                 blueprint_type::value_type::rotation_type::current),
-                                typename blueprint_type::value_type(W3, 
+                                variable_type(W3, 
                                 blueprint_type::value_type::rotation_type::next),
-                                typename blueprint_type::value_type(W3, 
+                                variable_type(W3, 
                                 blueprint_type::value_type::rotation_type::after_next)
                             }},
                             {{
-                                typename blueprint_type::value_type (W4, 
+                                variable_type(W4, 
                                 blueprint_type::value_type::rotation_type::pre_previous),
-                                typename blueprint_type::value_type(W4, 
+                                variable_type(W4, 
                                 blueprint_type::value_type::rotation_type::previous),
-                                typename blueprint_type::value_type(W4, 
+                                variable_type(W4, 
                                 blueprint_type::value_type::rotation_type::current),
-                                typename blueprint_type::value_type(W4, 
+                                variable_type(W4, 
                                 blueprint_type::value_type::rotation_type::next),
-                                typename blueprint_type::value_type(W4, 
+                                variable_type(W4, 
                                 blueprint_type::value_type::rotation_type::after_next)
                             }}
                         }};
@@ -128,6 +130,8 @@ namespace nil {
 
                         typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
                         typedef blueprint<ArithmetizationType> blueprint_type;
+
+                        using variable_type = snark::plonk_variable<BlueprintFieldType>;
                     public:
 
                         n_wires_helper(blueprint_type &bp):component<ArithmetizationType>(bp){}

@@ -53,6 +53,10 @@ macro(define_blueprint_test test)
     endif()
 endmacro()
 
+set(NON_NATIVE_TESTS_FILES
+    "non_native/plonk_eddsa_mul"
+    )
+
 set(BLUEPRINT_TESTS_FILES
     "blueprint/plonk"
     )
@@ -105,6 +109,7 @@ SET(ALGEBRA_TESTS_FILES
     ${PAIRING_TESTS_FILES})
 
 SET(ALL_TESTS_FILES
+    ${NON_NATIVE_TESTS_FILES}
     ${BLUEPRINT_TESTS_FILES}
     ${PLONK_TESTS_FILES}
     ${ALGEBRA_TESTS_FILES}
