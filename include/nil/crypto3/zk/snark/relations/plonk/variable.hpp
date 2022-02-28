@@ -64,12 +64,16 @@ namespace nil {
                     /**
                      * Mnemonic typedefs.
                      */
-                    enum rotation_type { pre_previous = -2, previous, current, next, after_next } rotation;
+                    enum rotation_type { pre_previous = -2, previous, current, next, after_next };
+                    int rotation;
                     enum column_type { witness, selector, public_input, constant } type;
                     std::size_t index;
+                    bool relative;
 
-                    constexpr plonk_variable(const std::size_t index, rotation_type rotation, column_type type) :
-                        index(index), rotation(rotation), type(type) {};
+                    constexpr plonk_variable(const std::size_t index, int rotation,
+                        bool relative = true,
+                        column_type type = column_type::witness) :
+                        index(index), rotation(rotation), relative(relative), type(type) {};
 
                     non_linear_term<plonk_variable<FieldType>> operator^(const std::size_t power) const {
                         return non_linear_term<plonk_variable<FieldType>>(*this) ^ power;

@@ -56,12 +56,20 @@ namespace nil {
                     plonk_constraint(const VariableType &var) : non_linear_combination<VariableType>(var) {
                     }
 
+                    plonk_constraint(const non_linear_combination<VariableType> &nlc) : 
+                    non_linear_combination<VariableType>(nlc) {
+                    }
+
                     plonk_constraint(const non_linear_term<VariableType> &nlt) :
                         non_linear_combination<VariableType>(nlt) {
                     }
 
                     plonk_constraint(const std::vector<non_linear_term<VariableType>> &terms) :
                         non_linear_combination<VariableType>(terms) {
+                    }
+
+                    non_linear_combination<VariableType>(nlc)(){
+                        return *this;
                     }
 
                     template<std::size_t WitnessColumns>
