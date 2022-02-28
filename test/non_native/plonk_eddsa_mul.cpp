@@ -32,6 +32,13 @@
 #include <nil/crypto3/algebra/curves/params/multiexp/bls12.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
 
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+#include <nil/crypto3/hash/sha2.hpp>
+#include <nil/crypto3/hash/keccak.hpp>
+
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
+
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/multiplication.hpp>
@@ -55,8 +62,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_allocat_rows_test_case) {
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8>
         mul_component(bp, {});
 
+    mul_component.generate_gates(public_assignment);
     mul_component.generate_copy_constraints();
 
+    zk::snark::plonk_assignment_table<BlueprintFieldType, WitnessColumns> assignments(
+    	private_assignment, public_assignment);
+    
     BOOST_CHECK_EQUAL(0, bp.allocate_rows());
     BOOST_CHECK_EQUAL(1, bp.allocate_rows(5));
     BOOST_CHECK_EQUAL(6, bp.allocate_row());

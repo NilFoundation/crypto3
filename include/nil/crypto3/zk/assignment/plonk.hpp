@@ -53,12 +53,12 @@ namespace nil {
 
                 snark::plonk_column<BlueprintFieldType> witness(std::size_t witness_index) {
                     assert(witness_index < WitnessColumns);
-                    return this->_witness_columns[witness_index];
+                    return this->witness_columns[witness_index];
                 }
 
                 snark::plonk_column<BlueprintFieldType> operator[](std::size_t index) {
                     if (index < WitnessColumns)
-                        return this->_witness_columns[index];
+                        return this->witness_columns[index];
                     index -= WitnessColumns;
                 }
             };
@@ -75,18 +75,18 @@ namespace nil {
                 }
                 
                 snark::plonk_column<BlueprintFieldType>& selector(std::size_t selector_index){
-                    if (selector_index >= this->_selector_columns.size()) {
-                        this->_selector_columns.resize(selector_index + 1);
+                    if (selector_index >= this->selector_columns.size()) {
+                        this->selector_columns.resize(selector_index + 1);
                     }
-                    return this->_selector_columns[selector_index];
+                    return this->selector_columns[selector_index];
                 }
 
                 std::size_t add_selector(std::size_t row_index){
                     snark::plonk_column<BlueprintFieldType> selector_column(
                         row_index + 1, BlueprintFieldType::value_type::zero());
                     selector_column[row_index] = BlueprintFieldType::value_type::one();
-                    this->_selector_columns.push_back(selector_column);
-                    return this->_selector_columns.size() - 1;
+                    this->selector_columns.push_back(selector_column);
+                    return this->selector_columns.size() - 1;
                 }
 
                 std::size_t add_selector(const std::initializer_list<std::size_t> &&row_indices){
@@ -96,22 +96,22 @@ namespace nil {
                     for (std::size_t row_index : row_indices){
                         selector_column[row_index] = BlueprintFieldType::value_type::one();
                     }
-                    this->_selector_columns.push_back(selector_column);
-                    return this->_selector_columns.size() - 1;
+                    this->selector_columns.push_back(selector_column);
+                    return this->selector_columns.size() - 1;
                 }
 
                 snark::plonk_column<BlueprintFieldType>& public_input(std::size_t public_input_index){
-                    assert(public_input_index < this->_public_input_columns.size());
-                    return this->_public_input_columns[public_input_index];
+                    assert(public_input_index < this->public_input_columns.size());
+                    return this->public_input_columns[public_input_index];
                 }
 
                 snark::plonk_column<BlueprintFieldType>& operator[](std::size_t index){
-                    if (index < this->_selector_columns.size())
-                        return this->_selector_columns[index];
-                    index -= this->_selector_columns.size();
-                    if (index < this->_public_input_columns.size())
-                        return this->_public_input_columns[index];
-                    index -= this->_public_input_columns.size();
+                    if (index < this->selector_columns.size())
+                        return this->selector_columns[index];
+                    index -= this->selector_columns.size();
+                    if (index < this->public_input_columns.size())
+                        return this->public_input_columns[index];
+                    index -= this->public_input_columns.size();
                 }
             };
 

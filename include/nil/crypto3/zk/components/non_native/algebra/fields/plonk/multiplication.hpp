@@ -75,6 +75,8 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
+                    constexpr static const std::size_t required_rows_amount = 1;
+
                 public:
 
                     struct init_params {
@@ -89,10 +91,15 @@ namespace nil {
                                                      const init_params &params) :
                         component<ArithmetizationType>(bp){
 
-                        j = this->bp.allocate_rows();
+                        j = this->bp.allocate_rows(required_rows_amount);
                     }
 
-                    void generate_gates(blueprint_public_assignment_table<ArithmetizationType> &public_assignment) {
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
+                        return in_bp.allocate_rows(required_rows_amount);
+                    }
+
+                    void generate_gates(blueprint_public_assignment_table<ArithmetizationType> &public_assignment, 
+                        std::size_t circuit_start_row = 0) {
 
                         std::size_t selector_index = public_assignment.add_selector({j + 0, j + 2, j + 4, j + 6});
 
@@ -101,20 +108,20 @@ namespace nil {
                              var(W4, 0) + var(W5, 0) + var(W6, 0) +
                              var(W7, 0) + var(W2, +1) + var(W3, +1) +
                              var(W4, +1) + var(W5, +1) + var(W6, +1)
-                             - 12 * (2^20 - 1));
+                             - 12 * ((2^20) - 1));
 
                         this->bp.add_gate(selector_index, s * (var(W8, 0) * s - 1));
                         this->bp.add_gate(selector_index, var(W8, 0) * s + (1 - var(W8, 0) * s) * var(W8, +1) - 1);
-                        this->bp.add_gate(selector_index, var(W0, 0) - (var(W7, +1) + var(W6, +1) * 2^15 + var(W5, +1) * 2^35 + var(W4, +1) * 2^55));
-                        this->bp.add_gate(selector_index, var(W0, +1) - (var(W3, +1) + var(W2, +1) * 2^20 + var(W7, 0) * 2^40));
-                        this->bp.add_gate(selector_index, var(W1, +1) - (var(W6, 0) + var(W5, 0) * 2^20 + var(W4, 0) * 2^40));
+                        this->bp.add_gate(selector_index, var(W0, 0) - (var(W7, +1) + var(W6, +1) * (2^15) + var(W5, +1) * (2^35) + var(W4, +1) * (2^55)));
+                        this->bp.add_gate(selector_index, var(W0, +1) - (var(W3, +1) + var(W2, +1) * (2^20) + var(W7, 0) * (2^40)));
+                        this->bp.add_gate(selector_index, var(W1, +1) - (var(W6, 0) + var(W5, 0) * (2^20) + var(W4, 0) * (2^40)));
 
                         selector_index = public_assignment.add_selector(j + 7);
                         this->bp.add_gate(selector_index, var(W3, +1) - var(W1, 0));
                         this->bp.add_gate(selector_index, var(W5, +1) - var(W0, 0));
                     }
 
-                    void generate_copy_constraints(){
+                    void generate_copy_constraints(std::size_t circuit_start_row = 0){
 
                         this->bp.add_copy_constraint({var(W0, j + 8, true), var(W0, j + 4, true)});
                         this->bp.add_copy_constraint({var(W1, j + 8, true), var(W0, j + 5, true)});
@@ -142,7 +149,8 @@ namespace nil {
                     }
 
                     void generate_assignments(blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
-                                              const assignment_params &params) {
+                                              const assignment_params &params,
+                                              std::size_t circuit_start_row = 0) {
                     }
                 };
 
