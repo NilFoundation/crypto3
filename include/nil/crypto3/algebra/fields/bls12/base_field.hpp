@@ -62,7 +62,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<bls12_base_field<381>>> value_type;
@@ -89,7 +91,9 @@ namespace nil {
                     typedef nil::crypto3::multiprecision::modular_params<modular_backend> modular_params_type;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<bls12_base_field<377>>> value_type;
@@ -109,6 +113,11 @@ namespace nil {
 
                 constexpr typename bls12_base_field<381>::integral_type const bls12_base_field<381>::modulus;
                 constexpr typename bls12_base_field<377>::integral_type const bls12_base_field<377>::modulus;
+
+                constexpr
+                    typename bls12_base_field<381>::modular_params_type const bls12_base_field<381>::modulus_params;
+                constexpr
+                    typename bls12_base_field<377>::modular_params_type const bls12_base_field<377>::modulus_params;
 
                 template<std::size_t Version = 381>
                 using bls12_fq = bls12_base_field<Version>;

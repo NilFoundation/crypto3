@@ -68,7 +68,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<x962_p_v2_scalar_field<192>>> value_type;
@@ -89,6 +91,14 @@ namespace nil {
                     constexpr static const integral_type modulus =
                         0xFFFFFFFFFFFFFFFFFFFFFFFF7A62D031C83F4294F640EC13_cppui192;
 
+                    typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
+
                     typedef typename detail::element_fp<params<x962_p_v3_scalar_field<192>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -106,6 +116,14 @@ namespace nil {
 
                     constexpr static const integral_type modulus =
                         0x7FFFFFFFFFFFFFFFFFFFFFFF7FFFFF9E5E9A9F5D9071FBD1522688909D0B_cppui239;
+
+                    typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
 
                     typedef typename detail::element_fp<params<x962_p_v1_scalar_field<239>>> value_type;
 
@@ -125,6 +143,14 @@ namespace nil {
                     constexpr static const integral_type modulus =
                         0x7FFFFFFFFFFFFFFFFFFFFFFF800000CFA7E8594377D414C03821BC582063_cppui239;
 
+                    typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
+
                     typedef typename detail::element_fp<params<x962_p_v2_scalar_field<239>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -143,6 +169,14 @@ namespace nil {
                     constexpr static const integral_type modulus =
                         0x7FFFFFFFFFFFFFFFFFFFFFFF7FFFFF975DEB41B3A6057C3C432146526551_cppui239;
 
+                    typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
+
                     typedef typename detail::element_fp<params<x962_p_v3_scalar_field<239>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -159,6 +193,17 @@ namespace nil {
                     typename x962_p_v2_scalar_field<239>::integral_type const x962_p_v2_scalar_field<239>::modulus;
                 constexpr
                     typename x962_p_v3_scalar_field<239>::integral_type const x962_p_v3_scalar_field<239>::modulus;
+
+                constexpr typename x962_p_v2_scalar_field<192>::modular_params_type const
+                    x962_p_v2_scalar_field<192>::modulus_params;
+                constexpr typename x962_p_v3_scalar_field<192>::modular_params_type const
+                    x962_p_v3_scalar_field<192>::modulus_params;
+                constexpr typename x962_p_v1_scalar_field<239>::modular_params_type const
+                    x962_p_v1_scalar_field<239>::modulus_params;
+                constexpr typename x962_p_v2_scalar_field<239>::modular_params_type const
+                    x962_p_v2_scalar_field<239>::modulus_params;
+                constexpr typename x962_p_v3_scalar_field<239>::modular_params_type const
+                    x962_p_v3_scalar_field<239>::modulus_params;
 
                 template<std::size_t Version = 192>
                 using x962_p_v2_fr = x962_p_v2_scalar_field_field<Version>;

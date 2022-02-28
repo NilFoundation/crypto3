@@ -62,7 +62,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<edwards_scalar_field<183>>> value_type;
@@ -78,6 +80,8 @@ namespace nil {
                 constexpr typename std::size_t const edwards_scalar_field<183>::value_bits;
 
                 constexpr typename edwards_scalar_field<183>::integral_type const edwards_scalar_field<183>::modulus;
+
+                constexpr typename edwards_scalar_field<183>::modular_params_type const edwards_scalar_field<183>::modulus_params;
 
                 template<std::size_t Version = 183>
                 using edwards_fr = edwards_scalar_field<Version>;

@@ -79,6 +79,8 @@ namespace nil {
 
                 constexpr typename edwards_base_field<183>::integral_type const edwards_base_field<183>::modulus;
 
+                constexpr typename edwards_base_field<183>::modular_params_type const edwards_base_field<183>::modulus_params;
+
                 template<std::size_t Version = 183>
                 using edwards_fq = edwards_base_field<Version>;
 

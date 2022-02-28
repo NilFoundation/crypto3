@@ -62,7 +62,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<mnt6_base_field<298>>> value_type;
@@ -78,6 +80,8 @@ namespace nil {
                 constexpr typename std::size_t const mnt6_base_field<298>::value_bits;
 
                 constexpr typename mnt6_base_field<298>::integral_type const mnt6_base_field<298>::modulus;
+
+                constexpr typename mnt6_base_field<298>::modular_params_type const mnt6_base_field<298>::modulus_params;
 
                 template<std::size_t Version = 298>
                 using mnt6_fq = mnt6_base_field<Version>;

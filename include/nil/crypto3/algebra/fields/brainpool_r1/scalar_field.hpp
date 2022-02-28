@@ -82,6 +82,12 @@ namespace nil {
                     constexpr static const integral_type modulus =
                         0xC302F41D932A36CDA7A3462F9E9E916B5BE8F1029AC4ACC1_cppui192;
 
+                    typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
+
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<192>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -99,6 +105,12 @@ namespace nil {
 
                     constexpr static const integral_type modulus =
                         0xD7C134AA264366862A18302575D0FB98D116BC4B6DDEBCA3A5A7939F_cppui224;
+
+                    typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<224>>> value_type;
 
@@ -118,6 +130,12 @@ namespace nil {
                     constexpr static const integral_type modulus =
                         0xA9FB57DBA1EEA9BC3E660A909D838D718C397AA3B561A6F7901E0E82974856A7_cppui256;
 
+                    typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
+
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<256>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -135,6 +153,12 @@ namespace nil {
 
                     constexpr static const integral_type modulus =
                         0xD35E472036BC4FB7E13C785ED201E065F98FCFA5B68F12A32D482EC7EE8658E98691555B44C59311_cppui320;
+
+                    typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<320>>> value_type;
 
@@ -154,6 +178,12 @@ namespace nil {
                     constexpr static const integral_type modulus =
                         0x8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B31F166E6CAC0425A7CF3AB6AF6B7FC3103B883202E9046565_cppui384;
 
+                    typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
+
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<384>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -171,6 +201,12 @@ namespace nil {
 
                     constexpr static const integral_type modulus =
                         0xAADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA70330870553E5C414CA92619418661197FAC10471DB1D381085DDADDB58796829CA90069_cppui512;
+
+                    typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<512>>> value_type;
 
@@ -192,6 +228,21 @@ namespace nil {
                     brainpool_r1_scalar_field<384>::modulus;
                 constexpr typename brainpool_r1_scalar_field<512>::integral_type const
                     brainpool_r1_scalar_field<512>::modulus;
+
+                constexpr typename brainpool_r1_scalar_field<160>::modular_params_type const
+                    brainpool_r1_scalar_field<160>::modulus_params;
+                constexpr typename brainpool_r1_scalar_field<192>::modular_params_type const
+                    brainpool_r1_scalar_field<192>::modulus_params;
+                constexpr typename brainpool_r1_scalar_field<224>::modular_params_type const
+                    brainpool_r1_scalar_field<224>::modulus_params;
+                constexpr typename brainpool_r1_scalar_field<256>::modular_params_type const
+                    brainpool_r1_scalar_field<256>::modulus_params;
+                constexpr typename brainpool_r1_scalar_field<320>::modular_params_type const
+                    brainpool_r1_scalar_field<320>::modulus_params;
+                constexpr typename brainpool_r1_scalar_field<384>::modular_params_type const
+                    brainpool_r1_scalar_field<384>::modulus_params;
+                constexpr typename brainpool_r1_scalar_field<512>::modular_params_type const
+                    brainpool_r1_scalar_field<512>::modulus_params;
 
                 template<std::size_t Version = 160>
                 using brainpool_r1_fr = brainpool_r1_scalar_field<Version>;

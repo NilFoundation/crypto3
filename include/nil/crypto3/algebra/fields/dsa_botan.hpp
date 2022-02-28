@@ -62,7 +62,9 @@ namespace nil {
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<dsa_botan<modulus_bits>>> value_type;
@@ -81,6 +83,14 @@ namespace nil {
                     constexpr static const integral_type modulus =
                         0xE4B50880759663585E142460CA2D9DFF132F8AE4C840DDA3A2666889124FE5638B84E8A29B7AF3FA1209BE6BFC4B5072ED3B2B7387BAF3F857F478A80228EF3600B76B3DCFB61D20D34465B2506D2CAF87DF6E7DC0CE91BD2D167A46F6ADCC31C531E4F9C7ABBDB92ADDF35B0A806C66292A5F5E17E964DD099903733AC428AB35D80EA6F685BFBA8BE4068E5418AE5ECAD9E8FF073DE2B63E4E7EAD35C8A9B70B5BD47CFB88D373B66F37931939B0AB71BD5595809086DA0155337D185A0E4FB36A519B1B6202B8591E6002449CF1CD3A66384F6D2073B1CD73BECA93BAF1E1A6117D0238F222AE1ED7FED185A890E7F67FAB8FEB9753CC134A5183DFE87AE2595F7B5C2D9FBB42249FDD59513E1D3396B3EB2FD86684F285A8448FE757A029881C40760B94EF919BDF9740C38389599EC51A6E9BB519A8E068491E9CE0A2FCFE3CB60D66CF0DFAD20A8EC684048684A61444575BD1724D7352B44A760077B3BD6BD385CE5B0A7250CC0BF768DA82923806EB9CFBB138843731B618208C759B_cppui3072;
 
+                    typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const modular_params_type modulus_params = modulus;
+                    typedef nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                            modular_backend,
+                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                        modular_type;
+
                     typedef typename detail::element_fp<params<dsa_botan<modulus_bits>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -89,6 +99,8 @@ namespace nil {
 
                 constexpr typename dsa_botan<2048>::integral_type const dsa_botan<2048>::modulus;
                 constexpr typename dsa_botan<3072>::integral_type const dsa_botan<3072>::modulus;
+                constexpr typename dsa_botan<2048>::modular_params_type const dsa_botan<2048>::modulus_params;
+                constexpr typename dsa_botan<3072>::modular_params_type const dsa_botan<3072>::modulus_params;
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3

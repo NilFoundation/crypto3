@@ -52,6 +52,9 @@ namespace nil {
                 constexpr typename params<FieldType>::integral_type const params<FieldType>::modulus;
 
                 template<typename FieldType>
+                constexpr typename params<FieldType>::modular_params_type const params<FieldType>::modulus_params;
+
+                template<typename FieldType>
                 constexpr typename std::size_t const params<FieldType>::modulus_bits;
 
                 template<typename FieldType>
