@@ -87,6 +87,18 @@ namespace nil {
                         return result;
                     }
 
+                    non_linear_term operator^(const std::size_t power) const {
+                        
+                        non_linear_term result(this->vars);
+
+                        for (std::size_t i = 0; i < power; i++){
+                            std::copy(this->vars.begin(), this->vars.end(), std::back_inserter(result.vars));
+                        }
+
+                        result.coeff = this->coeff.pow(power);
+                        return result;
+                    }
+
                     // non_linear_combination<field_type> operator+(const non_linear_combination<field_type> &other)
                     // const {
                     //     return non_linear_combination<field_type>(*this) + other;
@@ -306,6 +318,20 @@ namespace nil {
                               const typename VariableType::assignment_type &field_coeff) {
 
                     return -(field_coeff - lc);
+                }
+
+                template<typename VariableType>
+                non_linear_combination<VariableType>
+                    operator-(const non_linear_term<VariableType> &term,
+                              const non_linear_combination<VariableType> &lc) {
+                    return non_linear_combination<VariableType>(term) - lc;
+                }
+
+                template<typename VariableType>
+                non_linear_combination<VariableType>
+                    operator-(const non_linear_combination<VariableType> &lc,
+                        const non_linear_term<VariableType> &term) {
+                    return lc - non_linear_combination<VariableType>(term);
                 }
             }    // namespace snark
         }        // namespace zk

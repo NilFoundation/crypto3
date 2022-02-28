@@ -70,7 +70,8 @@ namespace nil {
                     std::size_t index;
                     bool relative;
 
-                    constexpr plonk_variable(const std::size_t index, int rotation,
+                    constexpr plonk_variable(const std::size_t index, 
+                        int rotation,
                         bool relative = true,
                         column_type type = column_type::witness) :
                         index(index), rotation(rotation), relative(relative), type(type) {};
@@ -135,7 +136,7 @@ namespace nil {
                 template<typename FieldType>
                 non_linear_combination<plonk_variable<FieldType>>
                     operator-(const typename FieldType::value_type &field_val, const plonk_variable<FieldType> &var) {
-                    return (-var) + field_val;
+                    return - (var - field_val);
                 }
 
             }    // namespace snark
