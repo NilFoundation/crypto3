@@ -28,7 +28,6 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_EDDSA_9_WIRES_HPP
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_EDDSA_9_WIRES_HPP
 
-
 #include <nil/crypto3/math/detail/field_utils.hpp>
 
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
@@ -43,9 +42,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                         typename CurveType,
-                         std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class eddsa_verifier_plonk;
 
                 template<typename BlueprintFieldType,
@@ -60,19 +57,26 @@ namespace nil {
                          std::size_t W7,
                          std::size_t W8>
                 class eddsa_verifier_plonk<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                       CurveType,
-                                                       W0,
-                                                       W1,
-                                                       W2,
-                                                       W3,
-                                                       W4,
-                                                       W5,
-                                                       W6,
-                                                       W7,
-                                                       W8>
-                    : public detail::
-                          n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>, 
-                          W0, W1, W2, W3, W4, W5, W6, W7, W8> {
+                                           CurveType,
+                                           W0,
+                                           W1,
+                                           W2,
+                                           W3,
+                                           W4,
+                                           W5,
+                                           W6,
+                                           W7,
+                                           W8>
+                    : public detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>,
+                                                    W0,
+                                                    W1,
+                                                    W2,
+                                                    W3,
+                                                    W4,
+                                                    W5,
+                                                    W6,
+                                                    W7,
+                                                    W8> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
                     typedef blueprint<ArithmetizationType> blueprint_type;
@@ -80,35 +84,42 @@ namespace nil {
                     std::size_t j;
                     typename CurveType::template g1_type<>::value_type B;
 
-                    using n_wires_helper =
-                        detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>, 
-                        W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using n_wires_helper = detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>,
+                                                                  W0,
+                                                                  W1,
+                                                                  W2,
+                                                                  W3,
+                                                                  W4,
+                                                                  W5,
+                                                                  W6,
+                                                                  W7,
+                                                                  W8>;
 
                     using n_wires_helper::w;
                     enum indices { m2 = 0, m1, cur, p1, p2 };
 
-                    constexpr static const std::size_t L = 
+                    constexpr static const std::size_t L =
                         math::detail::power_of_two(252) + 27742317777372353535851937790883648493;
 
                 public:
                     eddsa_verifier_plonk(blueprint_type &bp,
-                        std::pair<typename CurveType::value_type, typename CurveType> signature,
-                        typename CurveType::value_type M,
-                        typename CurveType::value_type A,
-                        typename CurveType::value_type B) :
-                    {}
+                                         std::pair<typename CurveType::value_type, typename CurveType>
+                                             signature,
+                                         typename CurveType::value_type M,
+                                         typename CurveType::value_type A,
+                                         typename CurveType::value_type B) :
+                    {
+                    }
 
                     void generate_gates() {
-
                     }
 
-                    void generate_assignments(){
-
+                    void generate_assignments() {
                     }
 
-            }    // namespace components
-        }        // namespace zk
-    }            // namespace crypto3
-}    // namespace nil
+                }    // namespace components
+            }        // namespace zk
+        }            // namespace crypto3
+    }                // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_EDDSA_9_WIRES_HPP

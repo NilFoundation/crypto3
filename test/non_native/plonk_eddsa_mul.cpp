@@ -34,7 +34,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/non_native/algebra/fields/eddsa/plonk/multiplication.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/multiplication.hpp>
 
 using namespace nil::crypto3;
 
@@ -42,23 +42,24 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_allocat_rows_test_case) {
 
-	using curve_type = algebra::curves::bls12<381>;
-	using BlueprintFieldType = typename curve_type::base_field_type;
-	constexpr std::size_t WitnessColumns = 5;
-	using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    using curve_type = algebra::curves::bls12<381>;
+    using BlueprintFieldType = typename curve_type::base_field_type;
+    constexpr std::size_t WitnessColumns = 5;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
 
-	zk::blueprint<ArithmetizationType> bp;
-	zk::blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> private_assignment;
-	zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment;
+    zk::blueprint<ArithmetizationType> bp;
+    zk::blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> private_assignment;
+    zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment;
 
-	zk::components::non_native_field_element_multiplication<
-		ArithmetizationType, typename curve_type::base_field_type, 0,1,2,3,4,5,6,7,8> mul_component(bp, {});
+    zk::components::non_native_field_element_multiplication<ArithmetizationType, typename curve_type::base_field_type,
+                                                            0, 1, 2, 3, 4, 5, 6, 7, 8>
+        mul_component(bp, {});
 
-	mul_component.generate_copy_constraints();
+    mul_component.generate_copy_constraints();
 
-	BOOST_CHECK_EQUAL(0, bp.allocate_rows());
-	BOOST_CHECK_EQUAL(1, bp.allocate_rows(5));
-	BOOST_CHECK_EQUAL(6, bp.allocate_row());
+    BOOST_CHECK_EQUAL(0, bp.allocate_rows());
+    BOOST_CHECK_EQUAL(1, bp.allocate_rows(5));
+    BOOST_CHECK_EQUAL(6, bp.allocate_row());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
