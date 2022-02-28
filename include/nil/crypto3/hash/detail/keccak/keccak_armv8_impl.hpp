@@ -90,6 +90,14 @@ namespace nil {
                                 );
                             std::cout << A0 << std::endl;
                             std::cout << A1 << std::endl;
+//                            __asm__(
+//                                "eor %%x0, [%[A], #0], %%x1\n"
+//                                : [A1] "+r" (A1), [A0] "+r" (A0)
+//                                : [A] "r" (A.begin())
+//                                : "cc", "memory"
+//                            );
+//                            std::cout << A0 << std::endl;
+//                            std::cout << A1 << std::endl;
                         }
 //                        __asm__(
 //                            "1:\n"
