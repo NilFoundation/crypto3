@@ -68,10 +68,6 @@ namespace nil {
                         non_linear_combination<VariableType>(terms) {
                     }
 
-                    non_linear_combination<VariableType>(nlc)(){
-                        return *this;
-                    }
-
                     template<std::size_t WitnessColumns>
                     typename VariableType::assignment_type
                         evaluate(std::size_t row_index,

@@ -140,13 +140,13 @@ namespace nil {
                  * A linear combination represents a formal expression of the form "sum_i coeff_i * x_{index_i}".
                  */
                 template<typename VariableType>
-                class non_linear_combination {
+                struct non_linear_combination {
 
-                protected:
+                    using term_type = non_linear_term<VariableType>;
+                    using variable_type = VariableType;
                     
-                    std::vector<non_linear_term<VariableType>> terms;
+                    std::vector<term_type> terms;
 
-                public:
                     non_linear_combination() {};
                     // non_linear_combination(const field_value_type &field_coeff) {
                     //     this->add_term(non_linear_term<VariableType>(field_coeff));
@@ -154,10 +154,10 @@ namespace nil {
                     non_linear_combination(const VariableType &var) {
                         this->add_term(var);
                     }
-                    non_linear_combination(const non_linear_term<VariableType> &nlt) {
+                    non_linear_combination(const term_type &nlt) {
                         this->add_term(nlt);
                     }
-                    non_linear_combination(const std::vector<non_linear_term<VariableType>> &terms) : terms(terms) {
+                    non_linear_combination(const std::vector<term_type> &terms) : terms(terms) {
                     }
 
                     // non_linear_combination(const non_linear_combination &other):
@@ -165,28 +165,28 @@ namespace nil {
                     // }
 
                     /* for supporting range-based for loops over non_linear_combination */
-                    typename std::vector<non_linear_term<VariableType>>::const_iterator begin() const {
+                    typename std::vector<term_type>::const_iterator begin() const {
                         return terms.begin();
                     }
 
-                    typename std::vector<non_linear_term<VariableType>>::const_iterator end() const {
+                    typename std::vector<term_type>::const_iterator end() const {
                         return terms.end();
                     }
 
                     void add_term(const VariableType &var) {
-                        this->terms.emplace_back(non_linear_term<VariableType>(var));
+                        this->terms.emplace_back(term_type(var));
                     }
                     void add_term(const VariableType &var, const typename VariableType::assignment_type &field_coeff) {
-                        this->terms.emplace_back(non_linear_term<VariableType>(var) * field_coeff);
+                        this->terms.emplace_back(term_type(var) * field_coeff);
                     }
-                    void add_term(const non_linear_term<VariableType> &nlt) {
+                    void add_term(const term_type &nlt) {
                         this->terms.emplace_back(nlt);
                     }
 
                     non_linear_combination operator*(const typename VariableType::assignment_type &field_coeff) const {
                         non_linear_combination result;
                         result.terms.reserve(this->terms.size());
-                        for (const non_linear_term<VariableType> &nlt : this->terms) {
+                        for (const term_type &nlt : this->terms) {
                             result.terms.emplace_back(nlt * field_coeff);
                         }
                         return result;
@@ -209,7 +209,7 @@ namespace nil {
 
                     void sort() {
                         std::sort(terms.begin(), terms.end());
-                        std::vector<non_linear_term<VariableType>> new_terms;
+                        std::vector<term_type> new_terms;
 
                         if (terms.size()) {
                             new_terms.push_back(terms[0]);
@@ -246,8 +246,8 @@ namespace nil {
                     non_linear_combination<VariableType> result;
                     result.terms.reserve(A.terms.size() * B.terms.size());
 
-                    for (const non_linear_term<VariableType> &this_nlt : A.terms) {
-                        for (const non_linear_term<VariableType> &other_nlt : B.terms) {
+                    for (const typename non_linear_combination<VariableType>::term_type &this_nlt : A.terms) {
+                        for (const typename non_linear_combination<VariableType>::term_type &other_nlt : B.terms) {
                             result.terms.emplace_back(this_nlt * other_nlt);
                         }
                     }
@@ -260,7 +260,19 @@ namespace nil {
                     non_linear_combination<VariableType> result;
                     result.terms.reserve(A.terms.size());
 
-                    for (const non_linear_term<VariableType> &this_nlt : A.terms) {
+                    for (const typename non_linear_combination<VariableType>::term_type &this_nlt : A.terms) {
+                        result.terms.emplace_back(this_nlt * var);
+                    }
+                    return result;
+                }
+
+                template<typename VariableType>
+                non_linear_combination<VariableType> operator*(const non_linear_combination<VariableType> &A,
+                                                               const VariableType &var) {
+                    non_linear_combination<VariableType> result;
+                    result.terms.reserve(A.terms.size());
+
+                    for (const typename non_linear_combination<VariableType>::term_type &this_nlt : A.terms) {
                         result.terms.emplace_back(this_nlt * var);
                     }
                     return result;
