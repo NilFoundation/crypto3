@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_CURVES_ED25519_MULTIPLICATION_COMPONENT_9_WIRES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_CURVES_ED25519_MULTIPLICATION_COMPONENT_9_WIRES_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_FIELDS_EDDSA_MULTIPLICATION_COMPONENT_9_WIRES_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_FIELDS_EDDSA_MULTIPLICATION_COMPONENT_9_WIRES_HPP
 
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 
@@ -38,12 +38,12 @@ namespace nil {
             namespace components {
 
                 template<typename ArithmetizationType,
-                         typename CurveType,
+                         typename FieldType,
                          std::size_t... WireIndexes>
-                class non_native_curve_element_multiplication;
+                class non_native_field_element_multiplication;
 
                 template<typename BlueprintFieldType,
-                         typename CurveType,
+                         typename FieldType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -53,8 +53,8 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class non_native_curve_element_multiplication<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                       CurveType,
+                class non_native_field_element_multiplication<snark::plonk_constraint_system<BlueprintFieldType>,
+                                                       FieldType,
                                                        W0,
                                                        W1,
                                                        W2,
@@ -81,11 +81,11 @@ namespace nil {
                     };
 
                     struct assignment_params {
-                        typename CurveType::scalar_field_type::value_type A;
-                        typename CurveType::scalar_field_type::value_type B;
+                        typename FieldType::value_type A;
+                        typename FieldType::value_type B;
                     };
 
-                    non_native_curve_element_multiplication(blueprint<ArithmetizationType> &bp,
+                    non_native_field_element_multiplication(blueprint<ArithmetizationType> &bp,
                                                      const init_params &params) :
                         component<ArithmetizationType>(bp){
 
@@ -151,4 +151,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_CURVES_ED25519_MULTIPLICATION_COMPONENT_9_WIRES_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_FIELDS_EDDSA_MULTIPLICATION_COMPONENT_9_WIRES_HPP
