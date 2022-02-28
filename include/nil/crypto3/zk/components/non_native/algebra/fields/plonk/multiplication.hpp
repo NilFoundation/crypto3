@@ -71,8 +71,6 @@ namespace nil {
 
                     std::size_t j;
 
-                    enum indices { m2 = 0, m1, cur, p1, p2 };
-
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     constexpr static const std::size_t required_rows_amount = 1;
@@ -98,7 +96,7 @@ namespace nil {
                         return in_bp.allocate_rows(required_rows_amount);
                     }
 
-                    void generate_gates(blueprint_public_assignment_table<ArithmetizationType> &public_assignment, 
+                    void generate_gates(blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         std::size_t circuit_start_row = 0) {
 
                         std::size_t selector_index = public_assignment.add_selector({j + 0, j + 2, j + 4, j + 6});
@@ -121,36 +119,40 @@ namespace nil {
                         this->bp.add_gate(selector_index, var(W5, +1) - var(W0, 0));
                     }
 
-                    void generate_copy_constraints(std::size_t circuit_start_row = 0){
+                    void generate_copy_constraints(blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        std::size_t circuit_start_row = 0){
 
-                        this->bp.add_copy_constraint({var(W0, j + 8, true), var(W0, j + 4, true)});
-                        this->bp.add_copy_constraint({var(W1, j + 8, true), var(W0, j + 5, true)});
-                        this->bp.add_copy_constraint({var(W2, j + 8, true), var(W1, j + 5, true)});
-                        this->bp.add_copy_constraint({var(W6, j + 8, true), var(W0, j + 6, true)});
-                        this->bp.add_copy_constraint({var(W7, j + 8, true), var(W1, j + 4, true)});
-                        this->bp.add_copy_constraint({var(W6, j + 8, true), var(W0, j + 6, true)});
-                        this->bp.add_copy_constraint({var(W7, j + 8, true), var(W1, j + 4, true)});
-                        this->bp.add_copy_constraint({var(W8, j + 8, true), var(W2, j + 4, true)});
-                        this->bp.add_copy_constraint({var(W0, j + 9, true), var(W0, j + 3, true)});
-                        this->bp.add_copy_constraint({var(W1, j + 9, true), var(W1, j + 3, true)});
-                        this->bp.add_copy_constraint({var(W2, j + 9, true), var(W3, j + 4, true)});
-                        this->bp.add_copy_constraint({var(W3, j + 9, true), var(W1, j + 2, true)});
-                        this->bp.add_copy_constraint({var(W4, j + 9, true), var(W2, j + 2, true)});
-                        this->bp.add_copy_constraint({var(W5, j + 9, true), var(W3, j + 2, true)});
-                        this->bp.add_copy_constraint({var(W7, j + 9, true), var(W0, j + 11, true)});
-                        this->bp.add_copy_constraint({var(W8, j + 9, true), var(W4, j + 11, true)});
-                        this->bp.add_copy_constraint({var(W0, j + 10, true), var(W0, j + 0, true)});
-                        this->bp.add_copy_constraint({var(W1, j + 10, true), var(W0, j + 1, true)});
-                        this->bp.add_copy_constraint({var(W2, j + 10, true), var(W1, j + 1, true)});
-                        this->bp.add_copy_constraint({var(W3, j + 10, true), var(W0, j + 2, true)});
-                        this->bp.add_copy_constraint({var(W4, j + 10, true), var(W1, j + 0, true)});
-                        this->bp.add_copy_constraint({var(W5, j + 10, true), var(W2, j + 0, true)});
-                        this->bp.add_copy_constraint({var(W6, j + 10, true), var(W3, j + 0, true)});
+                        this->bp.add_copy_constraint({var(W0, j + 8, false), var(W0, j + 4, false)});
+                        this->bp.add_copy_constraint({var(W1, j + 8, false), var(W0, j + 5, false)});
+                        this->bp.add_copy_constraint({var(W2, j + 8, false), var(W1, j + 5, false)});
+                        this->bp.add_copy_constraint({var(W6, j + 8, false), var(W0, j + 6, false)});
+                        this->bp.add_copy_constraint({var(W7, j + 8, false), var(W1, j + 4, false)});
+                        this->bp.add_copy_constraint({var(W6, j + 8, false), var(W0, j + 6, false)});
+                        this->bp.add_copy_constraint({var(W7, j + 8, false), var(W1, j + 4, false)});
+                        this->bp.add_copy_constraint({var(W8, j + 8, false), var(W2, j + 4, false)});
+                        this->bp.add_copy_constraint({var(W0, j + 9, false), var(W0, j + 3, false)});
+                        this->bp.add_copy_constraint({var(W1, j + 9, false), var(W1, j + 3, false)});
+                        this->bp.add_copy_constraint({var(W2, j + 9, false), var(W3, j + 4, false)});
+                        this->bp.add_copy_constraint({var(W3, j + 9, false), var(W1, j + 2, false)});
+                        this->bp.add_copy_constraint({var(W4, j + 9, false), var(W2, j + 2, false)});
+                        this->bp.add_copy_constraint({var(W5, j + 9, false), var(W3, j + 2, false)});
+                        this->bp.add_copy_constraint({var(W7, j + 9, false), var(W0, j + 11, false)});
+                        this->bp.add_copy_constraint({var(W8, j + 9, false), var(W4, j + 11, false)});
+                        this->bp.add_copy_constraint({var(W0, j + 10, false), var(W0, j + 0, false)});
+                        this->bp.add_copy_constraint({var(W1, j + 10, false), var(W0, j + 1, false)});
+                        this->bp.add_copy_constraint({var(W2, j + 10, false), var(W1, j + 1, false)});
+                        this->bp.add_copy_constraint({var(W3, j + 10, false), var(W0, j + 2, false)});
+                        this->bp.add_copy_constraint({var(W4, j + 10, false), var(W1, j + 0, false)});
+                        this->bp.add_copy_constraint({var(W5, j + 10, false), var(W2, j + 0, false)});
+                        this->bp.add_copy_constraint({var(W6, j + 10, false), var(W3, j + 0, false)});
                     }
 
-                    void generate_assignments(blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
+                    template <std::size_t WitnessColumns>
+                    void generate_assignments(blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
+                                              blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                                               const assignment_params &params,
                                               std::size_t circuit_start_row = 0) {
+
                     }
                 };
 

@@ -44,7 +44,7 @@ namespace nil {
                 template<typename ArithmetizationType,
                          typename CurveType,
                          std::size_t... WireIndexes>
-                class element_g1_unified_addition;
+                class curve_element_unified_addition;
 
                 template<typename BlueprintFieldType,
                          typename CurveType,
@@ -58,12 +58,8 @@ namespace nil {
                          std::size_t W7,
                          std::size_t W8,
                          std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
-                         std::size_t W14>
-                class element_g1_unified_addition<
+                         std::size_t W10>
+                class curve_element_unified_addition<
                     snark::plonk_constraint_system<BlueprintFieldType>,
                     CurveType,
                     W0,
@@ -76,31 +72,70 @@ namespace nil {
                     W7,
                     W8,
                     W9,
-                    W10,
-                    W11,
-                    W12,
-                    W13,
-                    W14> : public component<snark::plonk_constraint_system<BlueprintFieldType>> {
-                    typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
+                    W10> : public component<snark::plonk_constraint_system<BlueprintFieldType>> {
 
-                    typedef blueprint<arithmetization_type> blueprint_type;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+                    typedef blueprint<ArithmetizationType> blueprint_type;
 
                     std::size_t j;
 
-                    constexpr static const std::size_t endo = 3;
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+
+                    constexpr static const std::size_t required_rows_amount = 1;
 
                 public:
-                    element_g1_unified_addition(blueprint_type &bp) :
-                        component<arithmetization_type>(bp) {
+
+                    struct init_params {
+                    };
+
+                    struct assignment_params {
+                        typename CurveType::template g1_type<>::value_type A;
+                        typename CurveType::template g1_type<>::value_type B;
+                    };
+
+                    curve_element_unified_addition(blueprint_type &bp, 
+                        const init_params &params) :
+                        component<ArithmetizationType>(bp) {
 
                         j = this->bp.allocate_rows();
                     }
 
-                    void generate_gates() {
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
+                        return in_bp.allocate_rows(required_rows_amount);
                     }
 
-                public:
-                    void generate_assignments() {
+                    void generate_gates(blueprint_public_assignment_table<ArithmetizationType> &public_assignment, 
+                        std::size_t circuit_start_row = 0) {
+
+                        std::size_t selector_index = public_assignment.add_selector(j);
+
+                        this->bp.add_gate(selector_index, var(W7, 0) * (var(W2, 0) - var(W0, 0)));
+                        this->bp.add_gate(selector_index, (var(W2, 0) - var(W0, 0)) * var(W10, 0) - 
+                            (1 - var(W7, 0)));
+                        this->bp.add_gate(selector_index, var(W7, 0) * (2*var(W8, 0) * var(W1, 0) - 
+                            3*(var(W0, 0)^2)) + (1 - var(W7, 0)) * 
+                            (var(W2, 0) - var(W0, 0) * var(W8, 0) - 
+                            (var(W3, 0) - var(W1, 0))));
+                        this->bp.add_gate(selector_index, (var(W8, 0)^2) - (var(W0, 0) + var(W2, 0) + var(W4, 0)));
+                        this->bp.add_gate(selector_index, var(W5, 0) - (var(W8, 0) * (var(W0, 0) - 
+                            var(W4, 0)) - var(W1, 0)));
+                        this->bp.add_gate(selector_index, (var(W3, 0) - var(W1, 0)) * (var(W7, 0) - var(W6, 0)));
+                        this->bp.add_gate(selector_index, (var(W3, 0) - var(W1, 0)) * var(W9, 0) - var(W6, 0));
+
+                    }
+
+                    void generate_copy_constraints(blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        std::size_t circuit_start_row = 0){
+
+                        this->bp.add_copy_constraint({{W6, j, false}, {0, j, false, var::column_type::public_input}});
+                    }
+
+                    template <std::size_t WitnessColumns>
+                    void generate_assignments(blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
+                                              blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                                              const assignment_params &params,
+                                              std::size_t circuit_start_row = 0) {
+                        
                     }
                 };
             }    // namespace components

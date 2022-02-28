@@ -54,7 +54,7 @@ macro(define_blueprint_test test)
 endmacro()
 
 set(NON_NATIVE_TESTS_FILES
-    "non_native/plonk_eddsa_mul"
+    "non_native/plonk_field_mul"
     )
 
 set(BLUEPRINT_TESTS_FILES
@@ -64,6 +64,7 @@ set(BLUEPRINT_TESTS_FILES
 set(PLONK_TESTS_FILES
     "algebra/plonk/fixed_base_scalar_mul"
     "algebra/plonk/variable_base_scalar_mul"
+    "algebra/plonk/unified_addition"
     )
 
 set(FIELDS_TESTS_FILES
