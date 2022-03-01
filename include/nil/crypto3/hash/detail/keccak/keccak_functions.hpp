@@ -31,10 +31,14 @@
 #include <nil/crypto3/hash/detail/keccak/keccak_impl.hpp>
 
 #if BOOST_ARCH_X86_64
+#if defined(CRYPTO3_HAS_AVX512)
+#include <nil/crypto3/hash/detail/keccak/keccak_avx512_impl.hpp>
+#else
 #if defined(CRYPTO3_HAS_AVX2)
 #include <nil/crypto3/hash/detail/keccak/keccak_avx2_impl.hpp>
 #else
 #include <nil/crypto3/hash/detail/keccak/keccak_x86_64_impl.hpp>
+#endif
 #endif
 #elif BOOST_ARCH_ARM
 #include <nil/crypto3/hash/detail/keccak/keccak_armv8_impl.hpp>
@@ -55,12 +59,16 @@ namespace nil {
 
                     typedef typename std::conditional<word_bits == 64,
 #if BOOST_ARCH_X86_64
+#if defined(CRYPTO3_HAS_AVX512)
+                                                      keccak_1600_avx512_impl<policy_type>,
+#else
 #if defined(CRYPTO3_HAS_AVX2)
                                                       keccak_1600_avx2_impl<policy_type>,
 #else
                                                       keccak_1600_x86_64_impl<policy_type>,
 #endif
-#elif BOOST_ARCH_ARM && BOOST_ARCH_ARM >= BOOST_VERSION_NUMBER(8,0,0)
+#endif
+#elif BOOST_ARCH_ARM && BOOST_ARCH_ARM >= BOOST_VERSION_NUMBER(8, 0, 0)
                                                       keccak_1600_armv8_impl<policy_type>,
 #else
                                                       keccak_1600_impl<policy_type>,
