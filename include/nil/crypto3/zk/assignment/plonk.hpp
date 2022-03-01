@@ -100,6 +100,21 @@ namespace nil {
                     return this->selector_columns.size() - 1;
                 }
 
+                std::size_t add_selector(std::size_t begin_row_index, 
+                                         std::size_t end_row_index,
+                                         std::size_t index_step = 1){
+                    
+                    snark::plonk_column<BlueprintFieldType> selector_column(
+                        end_row_index + 1, BlueprintFieldType::value_type::zero());
+                    for (std::size_t row_index = begin_row_index;
+                         row_index <= end_row_index;
+                         row_index += index_step){
+                        selector_column[row_index] = BlueprintFieldType::value_type::one();
+                    }
+                    this->selector_columns.push_back(selector_column);
+                    return this->selector_columns.size() - 1;
+                }
+
                 snark::plonk_column<BlueprintFieldType>& public_input(std::size_t public_input_index){
                     assert(public_input_index < this->public_input_columns.size());
                     return this->public_input_columns[public_input_index];

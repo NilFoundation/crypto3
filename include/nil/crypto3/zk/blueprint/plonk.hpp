@@ -59,6 +59,11 @@ namespace nil {
                     return allocate_rows(1);
                 }
 
+                // TODO: should put constraint in some storage and return its index
+                void add_constraint(const snark::plonk_constraint<BlueprintFieldType> &constraint) {
+                    return constraint;
+                }
+
                 void add_gate(std::size_t selector_index, const snark::plonk_constraint<BlueprintFieldType> &constraint) {
                     this->_gates.emplace_back(selector_index, constraint);
                 }

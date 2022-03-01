@@ -44,7 +44,7 @@ namespace nil {
                 template<typename ArithmetizationType,
                          typename CurveType,
                          std::size_t... WireIndexes>
-                class element_g1_variable_base_endo_scalar_mul;
+                class curve_element_variable_base_scalar_mul;
 
                 template<typename BlueprintFieldType,
                          typename CurveType,
@@ -63,7 +63,7 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class element_g1_variable_base_endo_scalar_mul<
+                class curve_element_variable_base_scalar_mul<
                     snark::plonk_constraint_system<BlueprintFieldType>,
                     CurveType,
                     W0,
@@ -86,117 +86,121 @@ namespace nil {
                     typedef blueprint<arithmetization_type> blueprint_type;
 
                     std::size_t j;
+                    typename CurveType::template g1_type<>::value_type B;
 
-                    constexpr static const std::size_t endo = 3;
+                    using var = snark::plonk_variable<BlueprintFieldType>;
 
-                public:
-                    element_g1_variable_base_endo_scalar_mul(blueprint_type &bp) :
-                        component<arithmetization_type>(bp) {
-
-                        // the last row is only for the n
-                        j = this->bp.allocate_rows(64 + 1);
-                    }
-
-                    void generate_gates() {
-
-                        constexpr static const typename blueprint_type::value_type x_T(
-                            W0, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type y_T(
-                            W1, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type x_S(
-                            W2, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type y_S(
-                            W3, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type x_P(
-                            W4, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type y_P(
-                            W5, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type n(
-                            W6, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type x_R(
-                            W7, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type y_R(
-                            W8, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type s_1(
-                            W9, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type s_3(
-                            W10, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type b_1(
-                            W11, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type b_2(
-                            W12, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type b_3(
-                            W13, blueprint_type::value_type::rotation_type::current);
-                        constexpr static const typename blueprint_type::value_type b_4(
-                            W14, blueprint_type::value_type::rotation_type::current);
-
-                        constexpr static const typename blueprint_type::value_type next_n(
-                            W6, blueprint_type::value_type::rotation_type::next);
-
-                        for (std::size_t z = 0; z <= 63; z++) {
-                            this->bp.add_gate(j + z, b_1 * (b_1 - 1));
-                            this->bp.add_gate(j + z, b_2 * (b_2 - 1));
-                            this->bp.add_gate(j + z, b_3 * (b_3 - 1));
-                            this->bp.add_gate(j + z, b_4 * (b_4 - 1));
-
-                            this->bp.add_gate(j + z,
-                                              ((1 + (endo - 1) * b_2) * x_T - x_P) * s_1 - (2 * b_1 - 1) * y_T + y_P);
-                            this->bp.add_gate(j + z,
-                                              (2 * x_P - s_1 ^ 2 + (1 + (endo - 1) * b_2) * x_T) *
-                                                      ((x_P - x_R) * s_1 + y_R + y_P) -
-                                                  (x_P - x_R) * 2 * y_P);
-                            this->bp.add_gate(
-                                j + z,
-                                (y_R + y_P) ^ 2 - ((x_P - x_R) ^ 2 * (s_1 ^ 2 - (1 + (endo - 1) * b_2) * x_T + x_R)));
-                            this->bp.add_gate(j + z,
-                                              ((1 + (endo - 1) * b_2) * x_T - x_R) * s_3 - (2 * b_3 - 1) * y_T + y_R);
-                            this->bp.add_gate(j + z,
-                                              (2 * x_R - s_3 ^ 2 + (1 + (endo - 1) * b_4) * x_T) *
-                                                      ((x_R - x_S) * s_3 + y_S + y_R) -
-                                                  (x_R - x_S) * 2 * y_R);
-                            this->bp.add_gate(
-                                j + z,
-                                (y_S + y_R) ^ 2 - ((x_R - x_S) ^ 2 * (s_3 ^ 2 - (1 + (endo - 1) * b_4) * x_T + x_S)));
-                            this->bp.add_gate(j + z, n - (16 * next_n + 8 * b_1 + 4 * b_2 + 2 * b_3 + b_4));
-                        }
-                    }
-
-                private:
-                    static typename CurveType::scalar_field_type::value_type
-                        lambda(typename CurveType::template g1_type<>::value_type P1,
-                               typename CurveType::template g1_type<>::value_type P2) {
-                        return (P1.Y - P2.Y) * (P1.X - P2.X);
-                    }
+                    constexpr static const std::size_t required_rows_amount = 102;
 
                 public:
-                    void generate_assignments(typename CurveType::scalar_field_type::value_type &r,
-                                              typename CurveType::template g1_type<>::value_type &T) {
 
-                        typename CurveType::template g1_type<>::value_type Q = ...;
-                        typename CurveType::template g1_type<>::value_type S = ...;
-                        typename CurveType::template g1_type<>::value_type R = S + Q;
+                    struct init_params {
+                        typename CurveType::template g1_type<>::value_type B;
+                    };
 
-                        std::array<bool, 4> b = marshalling::pack(r);
+                    struct assignment_params {
+                    };
 
-                        for (std::size_t z = 0; z <= 63; z++) {
-                            this->bp.assignment(W0, j + z) = T.X;
-                            this->bp.assignment(W1, j + z) = T.Y;
-                            this->bp.assignment(W2, j + z) = S.X;
-                            this->bp.assignment(W3, j + z) = S.Y;
-                            this->bp.assignment(W4, j + z) = Q.X;
-                            this->bp.assignment(W5, j + z) = Q.Y;
-                            this->bp.assignment(W6, j + z) = r;
-                            this->bp.assignment(W7, j + z) = R.X;
-                            this->bp.assignment(W8, j + z) = R.Y;
-                            this->bp.assignment(W9, j + z) = lambda(S, Q);
-                            this->bp.assignment(W10, j + z) = lambda(R, S);
-                            this->bp.assignment(W11, j + z) = b[0];
-                            this->bp.assignment(W12, j + z) = b[1];
-                            this->bp.assignment(W13, j + z) = b[2];
-                            this->bp.assignment(W14, j + z) = b[3];
-                        }
+                    curve_element_variable_base_scalar_mul(blueprint_type &bp,
+                        const init_params &params) :
+                        component<arithmetization_type>(bp),
+                        B(params.B) {
 
-                        this->bp.assignment(W6, j + 64) = 0;
+                        j = this->bp.allocate_rows(required_rows_amount);
+                    }
+
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
+                        return in_bp.allocate_rows(required_rows_amount);
+                    }
+
+                    void generate_gates(blueprint_public_assignment_table<ArithmetizationType> &public_assignment, 
+                        std::size_t circuit_start_row = 0) {
+
+                        std::size_t vbsm_selector_index = public_assignment.add_selector(j, j + required_rows_amount - 1, 2);
+
+                        auto bit_check_1 = this->bp.add_constraint(var(W2, +1) * (var(W2, 0) - 1) );
+                        auto bit_check_2 = this->bp.add_constraint(var(W3, +1) * (var(W3, 0) - 1) );
+                        auto bit_check_3 = this->bp.add_constraint(var(W4, +1) * (var(W4, 0) - 1) );
+                        auto bit_check_4 = this->bp.add_constraint(var(W5, +1) * (var(W5, 0) - 1) );
+                        auto bit_check_5 = this->bp.add_constraint(var(W6, +1) * (var(W6, 0) - 1) );
+
+                        auto constraint_1 = this->bp.add_constraint((var(W2, 0) - var(W0, 0)) * var(W7, +1) -
+                            (var(W3, 0) - (2 * var(W2, +1) - 1) * var(W1, 0)));
+                        auto constraint_2 = this->bp.add_constraint((var(W7, 0) - var(W0, 0)) * var(W8, +1) -
+                            (var(W8, 0) - (2 * var(W3, +1) - 1) * var(W1, 0)));
+                        auto constraint_3 = this->bp.add_constraint((var(W10, 0) - var(W0, 0)) * var(W9, +1) -
+                            (var(W11, 0) - (2 * var(W4, +1) - 1) * var(W1, 0)));
+                        auto constraint_4 = this->bp.add_constraint((var(W12, 0) - var(W0, 0)) * var(W10, +1) -
+                            (var(W13, 0) - (2 * var(W5, +1) - 1) * var(W1, 0)));
+                        auto constraint_5 = this->bp.add_constraint((var(W0, +1) - var(W0, 0)) * var(W11, +1) -
+                            (var(W1, +1) - (2 * var(W6, +1) - 1) * var(W1, 0)));
+
+                        auto constraint_6 = this->bp.add_constraint((2 * var(W3, 0) -
+                            var(W7, 1) * (2  * var(W2, 0) - var(W7, 1)^2 + var(W0, 0)))^2 -
+                            ((2  * var(W2, 0) - var(W7, 1)^2 + var(W0, 0))^2  * (var(W7, 0) -
+                            var(W0, 0) + var(W7, 1)^2)));
+                        auto constraint_7 = this->bp.add_constraint((2 * var(W8, 0) -
+                            var(W8, 1) * (2  * var(W7, 0) - var(W8, 1)^2 + var(W0, 0)))^2 -
+                            ((2  * var(W7, 0) - var(W8, 1)^2 + var(W0, 0))^2  * (var(W9, 0) -
+                            var(W0, 0) + var(W8, 1)^2)));
+                        auto constraint_8 = this->bp.add_constraint((2 * var(W10, 0) -
+                            var(W9, 1) * (2  * var(W9, 0) - var(W9, 1)^2 + var(W0, 0)))^2 -
+                            ((2  * var(W9, 0) - var(W9, 1)^2 + var(W0, 0))^2  * (var(W11, 0) -
+                            var(W0, 0) + var(W9, 1)^2)));
+                        auto constraint_9 = this->bp.add_constraint((2 * var(W12, 0) - 
+                            var(W10, +1)  * (2  * var(W11, 0) - var(W10, +1)^2 + var(W0, 0)))^2 -
+                            ((2  * var(W11, 0) - var(W10, +1)^2 + var(W0, 0))^2  * 
+                            (var(W13, 0) - var(W0, 0) + var(W10, +1)^2)));
+                        auto constraint_10 = this->bp.add_constraint((2 * var(W14, 0) -
+                            var(W11, +1)  * (2  * var(W13, 0) - var(W11, +1)^2 + var(W0, 0)))^2 -
+                            (2  * var(W13, 0) - var(W11, +1)^2 + var(W0, 0))^2  * 
+                            (var(W0, 1) - var(W0, 0) + var(W11, +1)^2));
+
+                        auto constraint_11 = this->bp.add_constraint((var(W8, 0) + var(W3, 0)) *
+                            (2 * var(W2, 0) - var(W7, +1)^2 + var(W0, 0)) -
+                            ((var(W2, 0) - var(W7, 0)) * (2* var(W3, 0) - var(W7, +1) *
+                            (2 * var(W2, 0) - var(W7, +1)^2 + var(W0, 0)))));
+                        auto constraint_12 = this->bp.add_constraint((var(W10, 0) + var(W8, 0)) *
+                            (2 * var(W7, 0) - var(W8, +1)^2 + var(W0, 0)) -
+                            ((var(W7, 0) - var(W9, 0)) * (2* var(W8, 0) - var(W8, +1) *
+                            (2 * var(W7, 0) - var(W8, +1)^2 + var(W0, 0)))));
+                        auto constraint_13 = this->bp.add_constraint((var(W12, 0) + var(W10, 0)) *
+                            (2 * var(W9, 0) - var(W9, +1)^2 + var(W0, 0)) -
+                            ((var(W9, 0) - var(W11, 0)) * (2* var(W10, 0) - var(W9, +1) * 
+                            (2 * var(W9, 0) - var(W9, +1)^2 + var(W0, 0)))));
+                        auto constraint_14 = this->bp.add_constraint((var(W14, 0) + var(W10, 0)) *
+                            (2 * var(W11, 0) - var(W10, +1)^2 + var(W0, 0)) -
+                            ((var(W11, 0) - var(W13, 0)) * (2* var(W12, 0) - var(W10, +1) * 
+                            (2 * var(W11, 0) - var(W10, +1)^2 + var(W0, 0)))));
+                        auto constraint_15 = this->bp.add_constraint((var(W1, +1) + var(W14, 0)) *
+                            (2 * var(W13, 0) - var(W11, +1)^2 + var(W0, 0)) -
+                            ((var(W13, 0) - var(W0, +1)) * (2* var(W14, 0) - var(W11, +1) * 
+                            (2 * var(W13, 0) - var(W11, +1)^2 + var(W0, 0)))));
+                        
+                        auto constraint_16 = this->bp.add_constraint(var(W5, 0) - (32 * (var(W4, 0)) + 
+                            16 * var(W2, +1) + 8 * var(W3, +1) + 4 * var(W4, +1) + 
+                            2 * var(W5, +1) + var(W6, +1)));
+                        this->bp.add_gate(vbsm_selector_index, 
+                            {bit_check_1, bit_check_2, bit_check_3, bit_check_4, bit_check_5,
+                            constraint_1, constraint_2, constraint_3, constraint_4, constraint_5,
+                            constraint_6, constraint_7, constraint_8, constraint_9, constraint_10,
+                            constraint_11, constraint_12, constraint_13, constraint_14, constraint_15,
+                            constraint_16});
+                    }
+
+                    void generate_copy_constraints(blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        std::size_t circuit_start_row = 0){
+
+                        std::size_t public_input_column_index = 0;
+                        this->bp.add_copy_constraint({{W6, j, false}, {0, j, false, var::column_type::public_input}});
+                    }
+
+                    template <std::size_t WitnessColumns>
+                    void generate_assignments(blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
+                                              blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                                              const assignment_params &params,
+                                              std::size_t circuit_start_row = 0) {
+
                     }
                 };
             }    // namespace components

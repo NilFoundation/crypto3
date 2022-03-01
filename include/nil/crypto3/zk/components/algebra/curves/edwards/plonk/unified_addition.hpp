@@ -127,7 +127,9 @@ namespace nil {
                     void generate_copy_constraints(blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         std::size_t circuit_start_row = 0){
 
-                        this->bp.add_copy_constraint({{W6, j, false}, {0, j, false, var::column_type::public_input}});
+                        std::size_t public_input_column_index = 0;
+                        this->bp.add_copy_constraint({{W6, j, false}, 
+                            {public_input_column_index, j, false, var::column_type::public_input}});
                     }
 
                     template <std::size_t WitnessColumns>
