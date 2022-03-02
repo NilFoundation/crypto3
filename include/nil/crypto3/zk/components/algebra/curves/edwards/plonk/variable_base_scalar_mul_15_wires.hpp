@@ -86,7 +86,6 @@ namespace nil {
                     typedef blueprint<arithmetization_type> blueprint_type;
 
                     std::size_t j;
-                    typename CurveType::template g1_type<>::value_type B;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
@@ -95,16 +94,16 @@ namespace nil {
                 public:
 
                     struct init_params {
-                        typename CurveType::template g1_type<>::value_type B;
                     };
 
                     struct assignment_params {
+                        typename CurveType::template g1_type<>::value_type P;
+                        typename CurveType::scalar_field_type::value_type b;
                     };
 
                     curve_element_variable_base_scalar_mul(blueprint_type &bp,
                         const init_params &params) :
-                        component<arithmetization_type>(bp),
-                        B(params.B) {
+                        component<arithmetization_type>(bp) {
 
                         j = this->bp.allocate_rows(required_rows_amount);
                     }
@@ -118,11 +117,11 @@ namespace nil {
 
                         std::size_t vbsm_selector_index = public_assignment.add_selector(j, j + required_rows_amount - 1, 2);
 
-                        auto bit_check_1 = this->bp.add_constraint(var(W2, +1) * (var(W2, 0) - 1) );
-                        auto bit_check_2 = this->bp.add_constraint(var(W3, +1) * (var(W3, 0) - 1) );
-                        auto bit_check_3 = this->bp.add_constraint(var(W4, +1) * (var(W4, 0) - 1) );
-                        auto bit_check_4 = this->bp.add_constraint(var(W5, +1) * (var(W5, 0) - 1) );
-                        auto bit_check_5 = this->bp.add_constraint(var(W6, +1) * (var(W6, 0) - 1) );
+                        auto bit_check_1 = this->bp.add_bit_check(var(W2, +1));
+                        auto bit_check_2 = this->bp.add_bit_check(var(W3, +1));
+                        auto bit_check_3 = this->bp.add_bit_check(var(W4, +1));
+                        auto bit_check_4 = this->bp.add_bit_check(var(W5, +1));
+                        auto bit_check_5 = this->bp.add_bit_check(var(W6, +1));
 
                         auto constraint_1 = this->bp.add_constraint((var(W2, 0) - var(W0, 0)) * var(W7, +1) -
                             (var(W3, 0) - (2 * var(W2, +1) - 1) * var(W1, 0)));

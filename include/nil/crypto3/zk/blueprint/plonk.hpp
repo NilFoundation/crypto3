@@ -60,7 +60,8 @@ namespace nil {
                 }
 
                 // TODO: should put constraint in some storage and return its index
-                void add_constraint(const snark::plonk_constraint<BlueprintFieldType> &constraint) {
+                snark::plonk_constraint<BlueprintFieldType> add_constraint(
+                    const snark::plonk_constraint<BlueprintFieldType> &constraint) {
                     return constraint;
                 }
 
@@ -71,6 +72,11 @@ namespace nil {
                 void add_gate(std::size_t selector_index,
                               const std::initializer_list<snark::plonk_constraint<BlueprintFieldType>> &constraints) {
                     this->_gates.emplace_back(selector_index, constraints);
+                }
+
+                snark::plonk_constraint<BlueprintFieldType>
+                    add_bit_check(const snark::plonk_variable<BlueprintFieldType> &bit_variable) {
+                    return add_constraint(bit_variable * (bit_variable - 1));
                 }
 
                 void add_copy_constraint(const snark::plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {

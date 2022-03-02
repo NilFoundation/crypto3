@@ -86,7 +86,6 @@ namespace nil {
                     typedef blueprint<arithmetization_type> blueprint_type;
 
                     std::size_t j;
-                    typename CurveType::template g1_type<>::value_type B;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
@@ -96,34 +95,34 @@ namespace nil {
                 public:
 
                     struct init_params {
-                        typename CurveType::template g1_type<>::value_type B;
                     };
 
                     struct assignment_params {
+                        typename CurveType::template g1_type<>::value_type P;
+                        typename CurveType::scalar_field_type::value_type b;
                     };
 
                     curve_element_variable_base_endo_scalar_mul(blueprint_type &bp,
                         const init_params &params) :
-                        component<arithmetization_type>(bp),
-                        B(params.B) {
+                        component<arithmetization_type>(bp) {
 
                         // the last row is only for the n
                         j = this->bp.allocate_rows(required_rows_amount);
                     }
 
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
+                    static std::size_t allocate_rows (blueprint<arithmetization_type> &in_bp){
                         return in_bp.allocate_rows(required_rows_amount);
                     }
 
-                    void generate_gates(blueprint_public_assignment_table<ArithmetizationType> &public_assignment, 
+                    void generate_gates(blueprint_public_assignment_table<arithmetization_type> &public_assignment, 
                         std::size_t circuit_start_row = 0) {
 
                         std::size_t selector_index = public_assignment.add_selector(j, j + required_rows_amount - 2);
 
-                        auto bit_check_1 = this->bp.add_constraint(var(W11, 0) * (var(W11, 0) - 1));
-                        auto bit_check_2 = this->bp.add_constraint(var(W12, 0) * (var(W12, 0) - 1));
-                        auto bit_check_3 = this->bp.add_constraint(var(W13, 0) * (var(W13, 0) - 1));
-                        auto bit_check_4 = this->bp.add_constraint(var(W14, 0) * (var(W14, 0) - 1));
+                        auto bit_check_1 = this->bp.add_bit_check(var(W11, 0));
+                        auto bit_check_2 = this->bp.add_bit_check(var(W12, 0));
+                        auto bit_check_3 = this->bp.add_bit_check(var(W13, 0));
+                        auto bit_check_4 = this->bp.add_bit_check(var(W14, 0));
                         
                         auto constraint_1 = this->bp.add_constraint(((1 + (endo - 1) * var(W12, 0)) * 
                             var(W0, 0) - var(W4, 0)) * var(W9, 0) -
@@ -155,14 +154,14 @@ namespace nil {
                             constraint_6, constraint_7});
                     }
 
-                    void generate_copy_constraints(blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    void generate_copy_constraints(blueprint_public_assignment_table<arithmetization_type> &public_assignment,
                         std::size_t circuit_start_row = 0){
 
                     }
 
                     template <std::size_t WitnessColumns>
-                    void generate_assignments(blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
-                                              blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    void generate_assignments(blueprint_private_assignment_table<arithmetization_type, WitnessColumns> &private_assignment,
+                                              blueprint_public_assignment_table<arithmetization_type> &public_assignment,
                                               const assignment_params &params,
                                               std::size_t circuit_start_row = 0) {
 

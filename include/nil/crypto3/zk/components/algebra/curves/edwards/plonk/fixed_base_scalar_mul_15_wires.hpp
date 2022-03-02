@@ -80,39 +80,18 @@ namespace nil {
                     W11,
                     W12,
                     W13,
-                    W14> : 
-                    public detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                    W0,
-                                                    W1,
-                                                    W2,
-                                                    W3,
-                                                    W4,
-                                                    W5,
-                                                    W6,
-                                                    W7,
-                                                    W8,
-                                                    W9,
-                                                    W10,
-                                                    W11,
-                                                    W12,
-                                                    W13,
-                                                    W14> {
+                    W14> : public component<snark::plonk_constraint_system<BlueprintFieldType>> {
                     typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
 
                     typedef blueprint<arithmetization_type> blueprint_type;
 
                     std::size_t j;
 
-                    constexpr static const std::size_t endo = 3;
-
                     typename CurveType::template g1_type<>::value_type B;
 
-                    using n_wires_helper =
-                        detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>, 
-                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    using n_wires_helper::w;
-                    enum indices { m2 = 0, m1, cur, p1, p2 };
+                    constexpr static const std::size_t required_rows_amount = 43;
 
                 public:
 
@@ -128,10 +107,14 @@ namespace nil {
 
                     element_g1_fixed_base_scalar_mul(blueprint_type &bp,
                         const init_params &params) :
-                        n_wires_helper(bp),
+                        component<arithmetization_type>(bp),
                         B(params.B) {
 
-                        j = this->bp.allocate_rows(43);
+                        j = this->bp.allocate_rows(required_rows_amount);
+                    }
+
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
+                        return in_bp.allocate_rows(required_rows_amount);
                     }
 
                 private:
@@ -143,15 +126,15 @@ namespace nil {
                         return coef * B;
                     }
 
-                    void generate_phi1_gate(std::size_t selector_index,
-                                            typename blueprint_type::value_type x_1,
-                                            typename blueprint_type::value_type x_2,
-                                            typename blueprint_type::value_type x_3,
-                                            typename blueprint_type::value_type x_4,
-                                            std::array<typename CurveType::base_field_type::value_type, 8>
-                                                u) {
+                    snark::plonk_constraint<BlueprintFieldType> generate_phi1_gate(
+                        typename blueprint_type::value_type x_1,
+                        typename blueprint_type::value_type x_2,
+                        typename blueprint_type::value_type x_3,
+                        typename blueprint_type::value_type x_4,
+                        std::array<typename CurveType::base_field_type::value_type, 8>
+                            u) {
 
-                        this->bp.add_gate(selector_index,
+                        return this->bp.add_constraint(
                             x_3 * (-u[0] * x_2 * x_1 + u[0] * x_1 + u[0] * x_2
                             - u[0] + u[2] * x_1 * x_2 - u[2]* x_2 + u[4] * x_1 * x_2
                             - u[4]* x_2 -u[6] * x_1 * x_2 + u[1] * x_2 * x_1
@@ -162,14 +145,14 @@ namespace nil {
                             - u[4]* x_2 -u[6] * x_1 * x_2));
                     }
 
-                    void generate_phi2_gate(std::size_t selector_index,
-                                            typename blueprint_type::value_type x_1,
-                                            typename blueprint_type::value_type x_2,
-                                            typename blueprint_type::value_type x_3,
-                                            typename blueprint_type::value_type x_4,
-                                            std::array<typename CurveType::base_field_type::value_type, 8>
-                                                v) {
-                        this->bp.add_gate(selector_index,
+                    snark::plonk_constraint<BlueprintFieldType> generate_phi2_gate(
+                        typename blueprint_type::value_type x_1,
+                        typename blueprint_type::value_type x_2,
+                        typename blueprint_type::value_type x_3,
+                        typename blueprint_type::value_type x_4,
+                        std::array<typename CurveType::base_field_type::value_type, 8>
+                            v) {
+                        return this->bp.add_constraint(
                             x_3 * (-v[0] * x_2 * x_1 + v[0] * x_1 + v[0] * x_2
                             - v[0] + v[2] * x_1 * x_2 -v[2] * x_2 + v[4] * x_1 * x_2
                             - v[4] * x_2 - v[6] * x_1 * x_2 + v[1] * x_2 * x_1
@@ -179,48 +162,142 @@ namespace nil {
                             + v[0] * x_1 + v[0] * x_2 - v[0] + v[2] * x_1 * x_2
                             - v[2] * x_2 + v[4] * x_1 * x_2 - v[4] * x_2 - v[6] * x_1 * x_2));
                     }
+
                 public:
 
-                    void generate_gates() {
+                    void generate_gates(blueprint_public_assignment_table<ArithmetizationType> &public_assignment, 
+                        std::size_t circuit_start_row = 0) {
 
-                        // For j + 0:
-                        std::size_t selector_index_j_0 = public_assignment.add_selector(j);
-
-                        for (std::size_t i = 0; i <= 5; i++){
-                            this->bp.add_gate(selector_index_j_0, w[i][cur] * (w[i][cur] - 1));
-                        }
+                        auto bit_check_0 = this->bp.add_bit_check(var(W0, 0));
+                        auto bit_check_1 = this->bp.add_bit_check(var(W1, 0));
+                        auto bit_check_2 = this->bp.add_bit_check(var(W2, 0));
+                        auto bit_check_3 = this->bp.add_bit_check(var(W3, 0));
+                        auto bit_check_4 = this->bp.add_bit_check(var(W4, 0));
+                        auto bit_check_5 = this->bp.add_bit_check(var(W5, 0));
 
                         std::array<typename CurveType::base_field_type::value_type, 8> u;
                         std::array<typename CurveType::base_field_type::value_type, 8> v;
 
-                        for (std::size_t i = 0; i < 7; i++) {
-                            typename CurveType::template g1_type<>::value_type omega = get_omega(0, i);
-                            u[i] = omega.X;
-                            v[i] = omega.Y;
+                        // For j + 0:
+                        {
+                            std::size_t selector_index_j_0 = public_assignment.add_selector(j);
+
+                            for (std::size_t i = 0; i <= 7; i++) {
+                                typename CurveType::template g1_type<>::value_type omega = get_omega(0, i);
+                                u[i] = omega.X;
+                                v[i] = omega.Y;
+                            }
+
+                            auto constraint_1 = generate_phi1_gate(var(W0, 0), var(W1, 0), var(W2, 0), var(W6, 0), u);
+                            auto constraint_2 = generate_phi2_gate(var(W0, 0), var(W1, 0), var(W2, 0), var(W8, 0), v);
+
+                            for (std::size_t i = 0; i <= 7; i++) {
+                                typename CurveType::template g1_type<>::value_type omega = get_omega(1, i);
+                                u[i] = omega.X;
+                                v[i] = omega.Y;
+                            }
+                            auto constraint_3 = generate_phi1_gate(var(W3, 0), var(W4, 0), var(W5, 0), var(W7, 0), u);
+                            auto constraint_4 = generate_phi2_gate(var(W3, 0), var(W4, 0), var(W5, 0), var(W9, 0), v);
+
+                            auto acc_constraint = this->bp.add_constraint(var(W14, 0) - (var(W0, 0) + var(W1, 0) * 2 + 
+                                var(W2, 0) * 4 + var(W3, 0) * 8 + var(W4, 0) * 16 + var(W5, 0) * 32));
+
+                            auto constraint_6 = this->bp.add_constraint(var(W10, 0) - var(W6, 0));
+                            auto constraint_7 = this->bp.add_constraint(var(W11, 0) - var(W8, 0));
+
+                            auto incomplete_addition_constraint_1;
+                            auto incomplete_addition_constraint_2;
+                            //TODO: add constraints for incomplete addition
+
+                            this->bp.add_gate(selector_index_j_0,
+                            {bit_check_0, bit_check_1, bit_check_2, bit_check_3, bit_check_4, bit_check_5,
+                            constraint_1, constraint_2, constraint_3, constraint_4, acc_constraint,
+                            constraint_6, constraint_7,
+                            incomplete_addition_constraint_1, incomplete_addition_constraint_2});
                         }
 
-                        generate_phi1_gate(selector_index_j_0, w[0][cur], w[1][cur], w[2][cur], w[6][cur], u);
-                        generate_phi1_gate(selector_index_j_0, w[0][cur], w[1][cur], w[2][cur], w[8][cur], v);
+                        // For j + z, z = 1..41:
+                        for (std::size_t z = 1; z <= 41; z++){
 
-                        for (std::size_t i = 0; i < 7; i++) {
-                            typename CurveType::template g1_type<>::value_type omega = get_omega(1, i);
-                            u[i] = omega.X;
-                            v[i] = omega.Y;
+                            std::size_t selector_index_j_z = public_assignment.add_selector(j + z);
+
+                            for (std::size_t i = 0; i <= 7; i++) {
+                                typename CurveType::template g1_type<>::value_type omega = get_omega(z*2, i);
+                                u[i] = omega.X;
+                                v[i] = omega.Y;
+                            }
+
+                            auto constraint_1 = generate_phi1_gate(
+                                var(W0, 0), var(W1, 0), var(W2, 0), var(W6, 0), u);
+                            auto constraint_2 = generate_phi2_gate(
+                                var(W0, 0), var(W1, 0), var(W2, 0), var(W8, 0), v);
+
+                            for (std::size_t i = 0; i <= 7; i++) {
+                                typename CurveType::template g1_type<>::value_type omega = get_omega(z*2 + 1, i);
+                                u[i] = omega.X;
+                                v[i] = omega.Y;
+                            }
+                            auto constraint_3 = generate_phi1_gate(
+                                var(W3, 0), var(W4, 0), var(W5, 0), var(W7, 0), u);
+                            auto constraint_4 = generate_phi2_gate(
+                                var(W3, 0), var(W4, 0), var(W5, 0), var(W9, 0), v);
+
+                            auto acc_constraint = this->bp.add_constraint(
+                                var(W14, 0) - (var(W0, 0) + var(W1, 0) * 2 + 
+                                var(W2, 0) * 4 + var(W3, 0) * 8 + var(W4, 0) * 16 + 
+                                var(W5, 0) * 32 + var(W14, -1) * 64));
+
+                            auto incomplete_addition_constraint_1;
+                            auto incomplete_addition_constraint_2;
+                            //TODO: add constraints for incomplete addition
+
+                            this->bp.add_gate(selector_index_j_z,
+                            {bit_check_0, bit_check_1, bit_check_2, bit_check_3, bit_check_4, bit_check_5,
+                            constraint_1, constraint_2, constraint_3, constraint_4, acc_constraint,
+                            incomplete_addition_constraint_1, incomplete_addition_constraint_2});
                         }
-                        generate_phi1_gate(selector_index_j_0, w[3][cur], w[4][cur], w[5][cur], w[7][cur], u);
-                        generate_phi1_gate(selector_index_j_0, w[3][cur], w[4][cur], w[5][cur], w[9][cur], v);
 
-                        this->bp.add_gate(selector_index, w[14][cur] - (w[0][cur] + w[1][cur] * 2 + 
-                            w[2][cur] * 4 + w[3][cur] * 8 + w[4][cur] * 16 + w[5][cur] * 32));
+                        // For j + 42:
+                        {
 
-                        this->bp.add_gate(selector_index, w[10][cur] - w[6][cur]);
+                            std::size_t selector_index_j_42 = public_assignment.add_selector(j + 42);
 
-                        //TODO: add_gate for incomplete addition
+                            for (std::size_t i = 0; i <= 7; i++) {
+                                typename CurveType::template g1_type<>::value_type omega = get_omega(84, i);
+                                u[i] = omega.X;
+                                v[i] = omega.Y;
+                            }
+
+                            auto constraint_1 = generate_phi1_gate(
+                                var(W0, 0), var(W1, 0), var(W2, 0), var(W6, 0), u);
+                            auto constraint_2 = generate_phi2_gate(
+                                var(W0, 0), var(W1, 0), var(W2, 0), var(W8, 0), v);
+
+                            auto acc_constraint = this->bp.add_constraint(
+                                var(W14, 0) - (var(W0, 0) + var(W1, 0) * 2 + 
+                                var(W2, 0) * 4 + var(W14, -1) * 8));
+
+                            auto complete_addition_constraint_1;
+                            auto complete_addition_constraint_2;
+                            //TODO: add constraints for complete addition
+
+                            this->bp.add_gate(selector_index_j_42,
+                            {bit_check_0, bit_check_1, bit_check_2,
+                            constraint_1, constraint_2, acc_constraint,
+                            complete_addition_constraint_1, complete_addition_constraint_2});
+                        }
 
                     }
 
-                    void generate_assignments() {
+                    void generate_copy_constraints(blueprint_public_assignment_table<arithmetization_type> &public_assignment,
+                        std::size_t circuit_start_row = 0){
+                    }
 
+                    template <std::size_t WitnessColumns>
+                    void generate_assignments(blueprint_private_assignment_table<arithmetization_type, WitnessColumns> &private_assignment,
+                                              blueprint_public_assignment_table<arithmetization_type> &public_assignment,
+                                              const assignment_params &params,
+                                              std::size_t circuit_start_row = 0) {
 
                     }
                 };
