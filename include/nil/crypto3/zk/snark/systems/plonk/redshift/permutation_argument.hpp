@@ -158,11 +158,14 @@ namespace nil {
                         const typename policy_type::preprocessed_public_data_type preprocessed_data,
                         const typename policy_type::template circuit_short_description<CommitmentSchemeTypePublic>
                             &short_description,
-                        const typename FieldType::value_type &challenge,                          // y
-                        const std::vector<typename FieldType::value_type> &column_polynomials,    // f(y)
-                        const typename FieldType::value_type &perm_polynomial,                    //
-                                                                                                  // V_P(y)
-                        const typename FieldType::value_type &perm_polynomial_shifted,            // V_P(omega * y)
+                        // y
+                        const typename FieldType::value_type &challenge,
+                        // f(y):
+                        const std::vector<typename FieldType::value_type> &column_polynomials_values,
+                        // V_P(y):
+                        const typename FieldType::value_type &perm_polynomial_value,
+                        // V_P(omega * y):
+                        const typename FieldType::value_type &perm_polynomial_shifted_value,
                         const typename CommitmentSchemeTypePermutation::commitment_type &V_P_commitment) {
 
                         const std::vector<math::polynomial<typename FieldType::value_type>> &S_sigma =
@@ -181,19 +184,19 @@ namespace nil {
                         typename FieldType::value_type g = FieldType::value_type::one();
                         typename FieldType::value_type h = FieldType::value_type::one();
 
-                        for (std::size_t i = 0; i < column_polynomials.size(); i++) {
-                            g = g * (column_polynomials[i] + beta * S_id[i].evaluate(challenge) + gamma);
-                            h = h * (column_polynomials[i] + beta * S_sigma[i].evaluate(challenge) + gamma);
+                        for (std::size_t i = 0; i < column_polynomials_values.size(); i++) {
+                            g = g * (column_polynomials_values[i] + beta * S_id[i].evaluate(challenge) + gamma);
+                            h = h * (column_polynomials_values[i] + beta * S_sigma[i].evaluate(challenge) + gamma);
                         }
 
                         std::array<typename FieldType::value_type, argument_size> F;
                         typename FieldType::value_type one = FieldType::value_type::one();
-                        F[0] = preprocessed_data.lagrange_0.evaluate(challenge) * (one - perm_polynomial);
+                        F[0] = preprocessed_data.lagrange_0.evaluate(challenge) * (one - perm_polynomial_value);
                         F[1] = (one - preprocessed_data.q_last.evaluate(challenge) -
                                 preprocessed_data.q_blind.evaluate(challenge)) *
-                               (perm_polynomial_shifted * h - perm_polynomial * g);
+                               (perm_polynomial_shifted_value * h - perm_polynomial_value * g);
                         F[2] = preprocessed_data.q_last.evaluate(challenge) *
-                               (perm_polynomial.squared() - perm_polynomial);
+                               (perm_polynomial_value.squared() - perm_polynomial_value);
 
                         return F;
                     }

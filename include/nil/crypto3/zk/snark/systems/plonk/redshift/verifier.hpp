@@ -84,13 +84,12 @@ namespace nil {
                         const typename policy_type::template circuit_short_description<commitment_scheme_witness_type>
                             &short_description) {    // TODO: decsription commitment scheme
 
-                        fiat_shamir_heuristic_sequential<transcript_hash_type> transcript;
-
                         // 1. Add circuit definition to transcript
                         // transcript(short_description);
+                        fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(short_description);
 
                         for (std::size_t i = 0; i < witness_columns; i++) {
-                            // transcript(proof.witness_commitments[i]);
+                            transcript(proof.witness_commitments[i]);
                         }
 
                         /*std::array<typename FieldType::value_type, permutation_parts> permutation_argument =

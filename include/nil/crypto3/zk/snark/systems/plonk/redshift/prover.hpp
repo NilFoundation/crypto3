@@ -140,8 +140,6 @@ namespace nil {
                                                                   commitment_scheme_permutation_type,
                                                                   commitment_scheme_quotient_type>
                             proof;
-                        std::vector<std::uint8_t> transcript_init {};
-                        fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(transcript_init);
 
                         plonk_polynomial_table<FieldType, ParamsType::witness_columns> polynomial_table =
                             plonk_polynomial_table<FieldType, ParamsType::witness_columns>(
@@ -150,6 +148,8 @@ namespace nil {
 
                         // 1. Add circuit definition to transcript
                         // transcript(short_description); //TODO: circuit_short_description marshalling
+                        std::vector<std::uint8_t> transcript_init {};
+                        fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(transcript_init);
 
                         // 2. Commit witness columns
                         std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_poly =
@@ -162,7 +162,7 @@ namespace nil {
                         proof.witness_commitments.resize(witness_columns);
                         for (std::size_t i = 0; i < witness_columns; i++) {
                             proof.witness_commitments[i] = witness_commitments[i].root();
-                            // transcript(proof.witness_commitments[i]);
+                            transcript(proof.witness_commitments[i]);
                         }
 
                         // 4. permutation_argument
