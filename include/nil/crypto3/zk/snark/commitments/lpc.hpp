@@ -95,7 +95,7 @@ namespace nil {
 
                     struct proof_type {
                         bool operator==(const proof_type &rhs) const {
-                            return z == rhs.z && fri_proof == rhs.fri_proof;
+                            return z == rhs.z && fri_proof == rhs.fri_proof && T_root == rhs.T_root;
                         }
                         bool operator!=(const proof_type &rhs) const {
                             return !(rhs == *this);
