@@ -89,8 +89,8 @@ namespace nil {
                     };
 
                     struct assignment_params {
-                        typename CurveType::template g1_type<>::value_type A;
-                        typename CurveType::template g1_type<>::value_type B;
+                        typename CurveType::template g1_type<>::value_type P;
+                        typename CurveType::template g1_type<>::value_type Q;
                     };
 
                     curve_element_unified_addition(blueprint_type &bp, 
@@ -138,6 +138,40 @@ namespace nil {
                                               const assignment_params &params,
                                               std::size_t circuit_start_row = 0) {
                         
+                        typename CurveType::template g1_type<>::value_type R = params.P + params.Q;
+                        private_assignment.witness(W0)[j] = P.X;
+                        private_assignment.witness(W1)[j] = P.Y;
+                        private_assignment.witness(W2)[j] = Q.X;
+                        private_assignment.witness(W3)[j] = Q.Y;
+                        private_assignment.witness(W4)[j] = R.X;
+                        private_assignment.witness(W5)[j] = R.Y;
+
+                        // TODO: check, if this one correct:
+                        private_assignment.witness(W6)[j] = R.is_zero();
+
+                        if (P == Q){
+                            private_assignment.witness(W7)[j] = (P.X == Q.X);
+
+                            if (private_assignment.witness(W7)[j].is_zero()){
+                                private_assignment.witness(W8)[j] = 0;
+                            } else {
+                                private_assignment.witness(W8)[j] = (P.Y - Q.Y)/(P.X - Q.X);
+                            }
+
+                            private_assignment.witness(W9)[j] = (Q.Y - P.Y).inversed();
+                            private_assignment.witness(W10)[j] = (Q.X - P.X).inversed();
+                        } else {
+                            private_assignment.witness(W7)[j] = 1;
+
+                            if (P.Y.is_zero()){
+                                private_assignment.witness(W8)[j] = 0;
+                            } else {
+                                private_assignment.witness(W8)[j] = (3 * P.X.pow(2))/(2 * P.Y);
+                            }
+
+                            private_assignment.witness(W9)[j] = 0;
+                            private_assignment.witness(W10)[j] = 0;
+                        }
                     }
                 };
             }    // namespace components
