@@ -80,70 +80,138 @@ typename std::enable_if<std::is_unsigned<ValueType>::value, std::vector<std::arr
     return v;
 }
 
-template<typename Field, typename Hash, typename Endianness>
-void test_lpc(std::size_t tree_depth) {
+template<typename FRIScheme>
+typename FRIScheme::round_proof_type generate_random_fri_round_proof(std::size_t tree_depth) {
+    std::random_device rd;
+    std::size_t leafs_number = 1 << tree_depth;
+    typename FRIScheme::round_proof_type proof;
+
+    auto data = generate_random_data<std::uint8_t, 32>(leafs_number);
+    typename FRIScheme::merkle_tree_type tree(data.cbegin(), data.cend());
+    std::size_t idx = rd() % leafs_number;
+    typename FRIScheme::merkle_proof_type mp(tree, idx);
+    proof.colinear_path = mp;
+    //    std::cout << "colinear_path_verifiable_data = hex\"";
+    //    for (const auto c : data[idx]) {
+    //        std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
+    //    }
+    //    std::cout << "\";" << std::endl;
+
+    //    std::cout << "p_verifiable_data" << " = [";
+    for (std::size_t i = 0; i < proof.p.size(); ++i) {
+        auto data = generate_random_data<std::uint8_t, 32>(leafs_number);
+        typename FRIScheme::merkle_tree_type tree(data.cbegin(), data.cend());
+        idx = rd() % leafs_number;
+        typename FRIScheme::merkle_proof_type mp(tree, idx);
+        proof.p.at(i) = mp;
+        //        std::cout << "hex\"";
+        //        for (const auto c : data[idx]) {
+        //            std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
+        //        }
+        //        std::cout << "\",";
+    }
+    //    std::cout << "];" << std::endl;
+
+    nil::crypto3::random::algebraic_random_device<typename FRIScheme::field_type> d;
+    proof.colinear_value = d();
+
+    for (std::size_t i = 0; i < proof.y.size(); ++i) {
+        proof.y.at(i) = d();
+    }
+
+    proof.T_root =
+        nil::crypto3::hash<typename FRIScheme::transcript_hash_type>(generate_random_data<std::uint8_t, 32>(1).at(0));
+
+    //    std::cout << "FRI round proof:" << std::endl;
+    //    std::cout << "y = [";
+    //    for (const auto &y_i : proof.y) {
+    //        std::cout << std::dec << "uint256(" << y_i.data << "), ";
+    //    }
+    //    std::cout << "];" << std::endl << std::endl;
+    //
+    //    std::cout << "colinear_value = uint256(" << proof.colinear_value.data << ");" << std::endl;
+    //
+    //    std::cout << "T_root = hex\"";
+    //    for (const auto c : proof.T_root) {
+    //        std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
+    //    }
+    //    std::cout << "\";" << std::endl;
+
+    return proof;
+}
+
+template<typename FRIScheme>
+typename FRIScheme::proof_type generate_random_fri_proof(std::size_t tree_depth, std::size_t round_proofs_n,
+                                                         std::size_t degree) {
+    typename FRIScheme::proof_type proof;
+
+    for (std::size_t i = 0; i < round_proofs_n; ++i) {
+        proof.round_proofs.emplace_back(generate_random_fri_round_proof<FRIScheme>(tree_depth));
+    }
+
+    nil::crypto3::random::algebraic_random_device<typename FRIScheme::field_type> d;
+    for (std::size_t i = 0; i < degree; ++i) {
+        proof.final_polynomial.emplace_back(d());
+    }
+
+    return proof;
+}
+
+template<typename LPCScheme>
+typename LPCScheme::proof_type generate_lpc_proof(std::size_t tree_depth, std::size_t round_proofs_n,
+                                                  std::size_t degree) {
+    typename LPCScheme::proof_type proof;
+
+    proof.T_root =
+        nil::crypto3::hash<typename LPCScheme::transcript_hash_type>(generate_random_data<std::uint8_t, 32>(1).at(0));
+
+    nil::crypto3::random::algebraic_random_device<typename LPCScheme::field_type> d;
+    for (std::size_t i = 0; i < proof.z.size(); ++i) {
+        proof.z.at(i) = d();
+    }
+
+    for (std::size_t i = 0; i < LPCScheme::lambda; ++i) {
+        proof.fri_proof.at(i) =
+            generate_random_fri_proof<typename LPCScheme::fri_type>(tree_depth, round_proofs_n, degree);
+    }
+
+    return proof;
+}
+
+template<typename Field, typename Hash, std::size_t Lambda, std::size_t R, std::size_t M, std::size_t K, typename Endianness>
+void test_lpc(std::size_t tree_depth, std::size_t round_proofs_n,
+              std::size_t degree) {
     using namespace nil::crypto3::marshalling;
 
-    using commitment_scheme_type = nil::crypto3::zk::snark::list_polynomial_commitment_scheme<Field, Hash>;
-    using commitment_scheme_marshalling_type =
+    using lpc_params_type = nil::crypto3::zk::snark::list_polynomial_commitment_params<Hash, Hash, Lambda, R, M>;
+    using commitment_scheme_type = nil::crypto3::zk::snark::list_polynomial_commitment_scheme<Field, lpc_params_type, K>;
+    using proof_marshalling_type =
         types::lpc_proof<nil::marshalling::field_type<Endianness>, commitment_scheme_type>;
 
-    std::size_t leafs_number = 1 << tree_depth;
-    typename commitment_scheme_type::proof_type lpc_proof;
+    typename commitment_scheme_type::proof_type proof = generate_lpc_proof<commitment_scheme_type>(tree_depth, round_proofs_n,
+                                                                                                   degree);
 
-    for (std::size_t i = 0; i < lpc_proof.z_openings.size(); ++i) {
-        typename commitment_scheme_type::merkle_tree_type tree(generate_random_data<std::uint8_t, 32>(leafs_number));
-        typename commitment_scheme_type::merkle_proof_type proof(tree, std::rand() % leafs_number);
-        lpc_proof.z_openings.at(i) = proof;
-    }
-
-    for (std::size_t i = 0; i < lpc_proof.alpha_openings.size(); ++i) {
-        for (std::size_t j = 0; j < lpc_proof.alpha_openings.at(i).size(); ++j) {
-            typename commitment_scheme_type::merkle_tree_type tree(
-                generate_random_data<std::uint8_t, 32>(leafs_number));
-            typename commitment_scheme_type::merkle_proof_type proof(tree, std::rand() % leafs_number);
-            lpc_proof.alpha_openings.at(i).at(j) = proof;
-        }
-    }
-
-    for (std::size_t i = 0; i < lpc_proof.f_y_openings.size(); ++i) {
-        for (std::size_t j = 0; j < lpc_proof.f_y_openings.at(i).size(); ++j) {
-            typename commitment_scheme_type::merkle_tree_type tree(
-                generate_random_data<std::uint8_t, 32>(leafs_number));
-            typename commitment_scheme_type::merkle_proof_type proof(tree, std::rand() % leafs_number);
-            lpc_proof.f_y_openings.at(i).at(j) = proof;
-        }
-    }
-
-    for (std::size_t i = 0; i < lpc_proof.f_commitments.size(); ++i) {
-        for (std::size_t j = 0; j < lpc_proof.f_commitments.at(i).size(); ++j) {
-            lpc_proof.f_commitments.at(i).at(j) =
-                nil::crypto3::hash<Hash>(generate_random_data<std::uint8_t, 32>(1).at(0));
-        }
-    }
-
-    nil::crypto3::random::algebraic_random_device<Field> d;
-    for (std::size_t i = 0; i < lpc_proof.f_ip1_coefficients.size(); ++i) {
-        lpc_proof.f_ip1_coefficients.at(i) =
-            typename decltype(lpc_proof.f_ip1_coefficients)::value_type({d(), d(), d(), d()});
-    }
-
-    auto filled_lpc_proof = types::fill_lpc_proof<commitment_scheme_type, Endianness>(lpc_proof);
-    typename commitment_scheme_type::proof_type _lpc_proof =
-        types::make_lpc_proof<commitment_scheme_type, Endianness>(filled_lpc_proof);
-    BOOST_CHECK(lpc_proof == _lpc_proof);
+    auto filled_proof = types::fill_lpc_proof<commitment_scheme_type, Endianness>(proof);
+    typename commitment_scheme_type::proof_type _proof =
+        types::make_lpc_proof<commitment_scheme_type, Endianness>(filled_proof);
+    BOOST_CHECK(proof == _proof);
 
     std::vector<std::uint8_t> cv;
-    cv.resize(filled_lpc_proof.length(), 0x00);
+    cv.resize(filled_proof.length(), 0x00);
     auto write_iter = cv.begin();
-    nil::marshalling::status_type status = filled_lpc_proof.write(write_iter, cv.size());
+    nil::marshalling::status_type status = filled_proof.write(write_iter, cv.size());
+//    std::cout << "LPC proof (" << cv.size() << " bytes): ";
+//    for (auto c : cv) {
+//        std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
+//    }
+//    std::cout << std::endl << std::endl;
 
-    commitment_scheme_marshalling_type test_val_read;
+    proof_marshalling_type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
     typename commitment_scheme_type::proof_type constructed_val_read =
         types::make_lpc_proof<commitment_scheme_type, Endianness>(test_val_read);
-    BOOST_CHECK(lpc_proof == constructed_val_read);
+    BOOST_CHECK(proof == constructed_val_read);
 }
 
 BOOST_AUTO_TEST_SUITE(lpc_test_suite)
@@ -151,8 +219,15 @@ BOOST_AUTO_TEST_SUITE(lpc_test_suite)
 BOOST_AUTO_TEST_CASE(lpc_bls12_381_be) {
     using curve_type = nil::crypto3::algebra::curves::bls12<381>;
     using field_type = typename curve_type::scalar_field_type;
-    using hash_type = nil::crypto3::hashes::sha2<256>;
-    test_lpc<field_type, hash_type, nil::marshalling::option::big_endian>(3);
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+
+    constexpr static const std::size_t lambda = 40;
+    constexpr static const std::size_t k = 1;
+    constexpr static const std::size_t d = 16;
+    constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
+    constexpr static const std::size_t m = 2;
+
+    test_lpc<field_type, hash_type, lambda, r, m, k, nil::marshalling::option::big_endian>(5, 6, 7);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
