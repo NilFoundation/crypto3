@@ -84,6 +84,7 @@ namespace nil {
                     constexpr static const std::size_t k = K;
 
                     typedef FieldType field_type;
+                    typedef LPCParams lpc_params;
 
                     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
                     typedef typename containers::merkle_proof<merkle_hash_type, 2> merkle_proof_type;
