@@ -68,10 +68,12 @@ namespace nil {
                         non_linear_combination<VariableType>(terms) {
                     }
 
-                    template<std::size_t WitnessColumns>
+                    template<std::size_t WitnessColumns, std::size_t SelectorColumns, 
+                        std::size_t PublicInputColumns, std::size_t ConstantColumns>
                     typename VariableType::assignment_type
                         evaluate(std::size_t row_index,
-                                 const plonk_assignment_table<FieldType, WitnessColumns> &assignments) const {
+                                 const plonk_assignment_table<FieldType, WitnessColumns, 
+                                    SelectorColumns, PublicInputColumns, ConstantColumns> &assignments) const {
                         typename VariableType::assignment_type acc = VariableType::assignment_type::zero();
                         for (const non_linear_term<VariableType> &nlt : this->terms) {
                             typename VariableType::assignment_type term_value = nlt.coeff;
@@ -97,9 +99,11 @@ namespace nil {
                         return acc;
                     }
 
-                    template<std::size_t WitnessColumns>
+                    template<std::size_t WitnessColumns, std::size_t SelectorColumns, 
+                        std::size_t PublicInputColumns, std::size_t ConstantColumns>
                     math::polynomial<typename VariableType::assignment_type>
-                        evaluate(const plonk_polynomial_table<FieldType, WitnessColumns> &assignments) const {
+                        evaluate(const plonk_polynomial_table<FieldType, WitnessColumns,
+                                    SelectorColumns, PublicInputColumns, ConstantColumns> &assignments) const {
                         math::polynomial<typename VariableType::assignment_type> acc = {0};
                         for (const non_linear_term<VariableType> &nlt : this->terms) {
                             math::polynomial<typename VariableType::assignment_type> term_value = {nlt.coeff};

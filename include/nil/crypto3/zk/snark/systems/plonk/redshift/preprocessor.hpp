@@ -198,10 +198,14 @@ namespace nil {
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
                             math::make_evaluation_domain<FieldType>(N_rows);
 
+                        // TODO: add std::vector<std::size_t> columns_with_copy_constraints;
+
+                        plonk_permutation permutation;
+
                         std::vector<math::polynomial<typename FieldType::value_type>> _permutation_polynomials =
                             permutation_polynomials(short_description.columns_with_copy_constraints.size(),
                                                     short_description.table_rows, basic_domain->get_domain_element(1),
-                                                    short_description.delta, short_description.permutation,
+                                                    short_description.delta, permutation,
                                                     basic_domain);
 
                         std::vector<math::polynomial<typename FieldType::value_type>> _identity_polynomials =
@@ -217,8 +221,11 @@ namespace nil {
                         math::polynomial<typename FieldType::value_type> q_blind =
                             selector_blind(short_description.table_rows, short_description.usable_rows, basic_domain);
 
-                        plonk_public_polynomial_table<FieldType> public_polynomial_table =
-                            plonk_public_polynomial_table<FieldType>(
+                        plonk_public_polynomial_table<FieldType, ParamsType::selector_columns,
+                            ParamsType::public_input_columns, ParamsType::constant_columns> 
+                            public_polynomial_table =
+                            plonk_public_polynomial_table<FieldType, ParamsType::selector_columns,
+                                ParamsType::public_input_columns, ParamsType::constant_columns>(
                                 detail::column_range_polynomials<FieldType>(public_assignment.selectors(),
                                                                             basic_domain),
                                 detail::column_range_polynomials<FieldType>(public_assignment.public_inputs(),
@@ -239,9 +246,9 @@ namespace nil {
                     }
                 };
 
-                template<typename FieldType, typename RedshiftParams, std::size_t k>
+                template<typename FieldType, typename ParamsType, std::size_t k>
                 class redshift_private_preprocessor {
-                    using policy_type = detail::redshift_policy<FieldType, RedshiftParams>;
+                    using policy_type = detail::redshift_policy<FieldType, ParamsType>;
 
                 public:
                     template<typename CommitmentSchemeType>
@@ -256,8 +263,8 @@ namespace nil {
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
                             math::make_evaluation_domain<FieldType>(N_rows);
 
-                        plonk_private_polynomial_table<FieldType, RedshiftParams::witness_columns> private_polynomial_table =
-                            plonk_private_polynomial_table<FieldType, RedshiftParams::witness_columns>(
+                        plonk_private_polynomial_table<FieldType, ParamsType::witness_columns> private_polynomial_table =
+                            plonk_private_polynomial_table<FieldType, ParamsType::witness_columns>(
                                 detail::column_range_polynomials<FieldType>(private_assignment.witnesses(),
                                                                             basic_domain));
 

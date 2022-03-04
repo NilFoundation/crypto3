@@ -50,7 +50,10 @@ namespace nil {
                     struct redshift_policy {
 
                         constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
-                        constexpr static const std::size_t public_columns = RedshiftParams::public_columns;
+                        constexpr static const std::size_t public_input_columns = 
+                            RedshiftParams::public_input_columns;
+                        constexpr static const std::size_t selector_columns = RedshiftParams::selector_columns;
+                        constexpr static const std::size_t constant_columns = RedshiftParams::constant_columns;                        
 
                         /******************************** Params ********************************/
 
@@ -60,7 +63,8 @@ namespace nil {
 
                         typedef plonk_constraint_system<FieldType> constraint_system_type;
 
-                        typedef plonk_assignment_table<FieldType, RedshiftParams::witness_columns> variable_assignment_type;
+                        typedef plonk_assignment_table<FieldType, witness_columns,
+                            selector_columns, public_input_columns, constant_columns> variable_assignment_type;
 
                         typedef detail::plonk_evaluation_map<plonk_variable<FieldType>> evaluation_map;
 
@@ -79,11 +83,13 @@ namespace nil {
                             redshift_proof<FieldType, CommitmentSchemeTypeWitness, CommitmentSchemeTypePermutation,
                                            CommitmentSchemeTypeQuotient>;
 
+                        // template<typename CommitmentSchemeType>
                         struct preprocessed_public_data_type {
 
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
-                            plonk_public_polynomial_table<FieldType> public_polynomial_table;
+                            plonk_public_polynomial_table<FieldType, selector_columns,
+                                public_input_columns, constant_columns> public_polynomial_table;
 
                             // S_sigma
                             std::vector<math::polynomial<typename FieldType::value_type>> permutation_polynomials;
@@ -96,6 +102,10 @@ namespace nil {
                             math::polynomial<typename FieldType::value_type> q_blind;
 
                             math::polynomial<typename FieldType::value_type> Z;
+
+                            // std::vector<typename CommitmentSchemeType::commitment_type> selectors_commits;
+                            // std::vector<typename CommitmentSchemeType::commitment_type> id_polys_commits;
+                            // std::vector<typename CommitmentSchemeType::commitment_type> perm_polys_commits;
                         };
 
                         struct preprocessed_private_data_type {
@@ -103,22 +113,6 @@ namespace nil {
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
                             plonk_private_polynomial_table<FieldType, RedshiftParams::witness_columns> private_polynomial_table;
-                        };
-
-                        template<typename CommitmentSchemeType>
-                        struct circuit_short_description {
-                            std::vector<typename CommitmentSchemeType::commitment_type> selectors_commits;
-                            std::vector<typename CommitmentSchemeType::commitment_type> id_polys_commits;
-                            std::vector<typename CommitmentSchemeType::commitment_type> perm_polys_commits;
-
-                            std::vector<std::size_t> columns_with_copy_constraints;
-
-                            std::size_t table_rows;
-                            std::size_t usable_rows;
-
-                            typename FieldType::value_type delta;
-                            plonk_permutation permutation;
-                            // TODO: Gates and field elements
                         };
                     };
                 }    // namespace detail
