@@ -63,15 +63,19 @@ namespace nil {
                 }
             };
 
-            template<typename BlueprintFieldType>
-            class blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>> :
-                public snark::plonk_public_assignment_table<BlueprintFieldType> {
+            template<typename BlueprintFieldType, std::size_t SelectorColumns, std::size_t PublicInputColumns,
+                    std::size_t ConstantColumns>
+            class blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
+                SelectorColumns, PublicInputColumns, ConstantColumns> :
+                public snark::plonk_public_assignment_table<BlueprintFieldType,
+                    SelectorColumns, PublicInputColumns, ConstantColumns> {
 
                 typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
             public:
                 
                 blueprint_public_assignment_table() : 
-                snark::plonk_public_assignment_table<BlueprintFieldType>(){
+                snark::plonk_public_assignment_table<BlueprintFieldType,
+                    SelectorColumns, PublicInputColumns, ConstantColumns>(){
                 }
                 
                 snark::plonk_column<BlueprintFieldType>& selector(std::size_t selector_index){
@@ -82,28 +86,34 @@ namespace nil {
                 }
 
                 std::size_t add_selector(std::size_t row_index){
+                    static std::size_t selector_index = 0;
                     snark::plonk_column<BlueprintFieldType> selector_column(
                         row_index + 1, BlueprintFieldType::value_type::zero());
+
                     selector_column[row_index] = BlueprintFieldType::value_type::one();
-                    this->selector_columns.push_back(selector_column);
-                    return this->selector_columns.size() - 1;
+                    this->selector_columns[selector_index] = selector_column;
+                    selector_index++;
+                    return selector_index - 1;
                 }
 
                 std::size_t add_selector(const std::initializer_list<std::size_t> &&row_indices){
+                    static std::size_t selector_index = 0;
                     std::size_t max_row_index = std::max(row_indices);
                     snark::plonk_column<BlueprintFieldType> selector_column(
                         max_row_index + 1, BlueprintFieldType::value_type::zero());
                     for (std::size_t row_index : row_indices){
                         selector_column[row_index] = BlueprintFieldType::value_type::one();
                     }
-                    this->selector_columns.push_back(selector_column);
-                    return this->selector_columns.size() - 1;
+                    this->selector_columns[selector_index] = selector_column;
+                    selector_index++;
+                    return selector_index - 1;
                 }
 
                 std::size_t add_selector(std::size_t begin_row_index, 
                                          std::size_t end_row_index,
                                          std::size_t index_step = 1){
                     
+                    static std::size_t selector_index = 0;
                     snark::plonk_column<BlueprintFieldType> selector_column(
                         end_row_index + 1, BlueprintFieldType::value_type::zero());
                     for (std::size_t row_index = begin_row_index;
@@ -111,8 +121,9 @@ namespace nil {
                          row_index += index_step){
                         selector_column[row_index] = BlueprintFieldType::value_type::one();
                     }
-                    this->selector_columns.push_back(selector_column);
-                    return this->selector_columns.size() - 1;
+                    this->selector_columns[selector_index] = selector_column;
+                    selector_index++;
+                    return selector_index - 1;
                 }
 
                 snark::plonk_column<BlueprintFieldType>& public_input(std::size_t public_input_index){

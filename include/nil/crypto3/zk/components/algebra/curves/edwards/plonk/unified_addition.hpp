@@ -104,7 +104,10 @@ namespace nil {
                         return in_bp.allocate_rows(required_rows_amount);
                     }
 
-                    void generate_gates(blueprint_public_assignment_table<ArithmetizationType> &public_assignment, 
+                    template <std::size_t SelectorColumns, std::size_t PublicInputColumns,
+                        std::size_t ConstantColumns>
+                    void generate_gates(blueprint_public_assignment_table<ArithmetizationType,
+                            SelectorColumns, PublicInputColumns, ConstantColumns> &public_assignment, 
                         std::size_t circuit_start_row = 0) {
 
                         std::size_t selector_index = public_assignment.add_selector(j);
@@ -124,7 +127,11 @@ namespace nil {
 
                     }
 
-                    void generate_copy_constraints(blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    template <std::size_t SelectorColumns, std::size_t PublicInputColumns,
+                        std::size_t ConstantColumns>
+                    void generate_copy_constraints(
+                            blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
+                                PublicInputColumns, ConstantColumns> &public_assignment,
                         std::size_t circuit_start_row = 0){
 
                         std::size_t public_input_column_index = 0;
@@ -132,13 +139,19 @@ namespace nil {
                             {public_input_column_index, j, false, var::column_type::public_input}});
                     }
 
-                    template <std::size_t WitnessColumns>
-                    void generate_assignments(blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
-                                              blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    template <std::size_t WitnessColumns, std::size_t SelectorColumns,
+                        std::size_t PublicInputColumns, std::size_t ConstantColumns>
+                    void generate_assignments(
+                            blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
+                            blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
+                                PublicInputColumns, ConstantColumns> &public_assignment,
                                               const assignment_params &params,
                                               std::size_t circuit_start_row = 0) {
                         
-                        typename CurveType::template g1_type<>::value_type R = params.P + params.Q;
+                        const typename CurveType::template g1_type<>::value_type R = params.P + params.Q;
+                        const typename CurveType::template g1_type<>::value_type &P = params.P;
+                        const typename CurveType::template g1_type<>::value_type &Q = params.Q;
+
                         private_assignment.witness(W0)[j] = P.X;
                         private_assignment.witness(W1)[j] = P.Y;
                         private_assignment.witness(W2)[j] = Q.X;

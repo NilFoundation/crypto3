@@ -52,11 +52,15 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_allocat_rows_test_case) {
     using curve_type = algebra::curves::bls12<381>;
     using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 5;
+    constexpr std::size_t SelectorColumns = 15;
+    constexpr std::size_t PublicInputColumns = 5;
+    constexpr std::size_t ConstantColumns = 5;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
 
     zk::blueprint<ArithmetizationType> bp;
     zk::blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> private_assignment;
-    zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment;
+    zk::blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
+    	PublicInputColumns, ConstantColumns> public_assignment;
 
     zk::components::curve_element_unified_addition<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10>
@@ -66,7 +70,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_allocat_rows_test_case) {
     unified_addition_component.generate_copy_constraints(public_assignment);
     unified_addition_component.generate_assignments(private_assignment, public_assignment, {});
 
-    zk::snark::plonk_assignment_table<BlueprintFieldType, WitnessColumns> assignments(
+    zk::snark::plonk_assignment_table<BlueprintFieldType, WitnessColumns, SelectorColumns,
+    	PublicInputColumns, ConstantColumns> assignments(
     	private_assignment, public_assignment);
 
     BOOST_CHECK_EQUAL(0, bp.allocate_rows());
