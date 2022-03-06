@@ -40,6 +40,7 @@
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include "nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp"
 
 namespace nil {
     namespace crypto3 {
@@ -91,6 +92,11 @@ namespace nil {
 
                     static inline std::array<typename FieldType::value_type, argument_size>
                         verify_eval(const std::vector<plonk_gate<FieldType>> &gates,
+                                    const plonk_polynomial_table<FieldType, ParamsType::witness_columns,
+                                    ParamsType::selector_columns, ParamsType::public_input_columns,
+                                    ParamsType::constant_columns> &public_polynomials,
+                                    //const plonk_public_polynomial_table<FieldType, ParamsType::selector_columns,
+                                    //    ParamsType::public_input_columns, ParamsType::constant_columns> public_polynomials,
                                     typename policy_type::evaluation_map &evaluations,
                                     typename FieldType::value_type challenge,
                                     fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript) {
@@ -108,7 +114,7 @@ namespace nil {
                                 theta_acc *= theta;
                             }
 
-                            gate_result = gate_result * gates[i].selector.evaluate(challenge);
+                            gate_result = gate_result * public_polynomials.selector(gates[i].selector_index).evaluate(challenge);
 
                             F[0] = F[0] + gate_result;
                         }

@@ -43,9 +43,9 @@
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/verifier.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
+//#include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
+//#include <nil/crypto3/zk/snark/systems/plonk/redshift/verifier.hpp>
+//#include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/gates_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 #include "nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp"
@@ -95,7 +95,9 @@ struct redshift_test_params {
     using transcript_hash_type = hashes::keccak_1600<512>;
 
     constexpr static const std::size_t witness_columns = 3;
+    constexpr static const std::size_t selector_columns = 2;
     constexpr static const std::size_t public_columns = 1;
+    constexpr static const std::size_t constant_columns = 0;
 
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t r = table_rows_log - 1;
@@ -109,9 +111,10 @@ typedef fri_commitment_scheme<FieldType, redshift_test_params::merkle_hash_type,
                               redshift_test_params::transcript_hash_type, m>
     fri_type;
 
-typedef redshift_params<3, 1> circuit_2_params;
+typedef redshift_params<FieldType, redshift_test_params::witness_columns, redshift_test_params::selector_columns, 
+    redshift_test_params::public_columns, redshift_test_params::constant_columns> circuit_2_params;
 
-BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
+/*BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 
     circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size, usable_rows> circuit =
         circuit_test_2<FieldType>();
@@ -122,30 +125,32 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
-    typename policy_type::constraint_system_type constraint_system({}, table_rows);
+    typename policy_type::constraint_system_type constraint_system({}, table_rows, usable_rows);
 
     typename policy_type::variable_assignment_type assigments = circuit.table;
 
-    policy_type::circuit_short_description<lpc_type> short_description;
-    short_description.columns_with_copy_constraints = {0, 1, 2, 3};
-    short_description.table_rows = table_rows;
-    short_description.usable_rows = usable_rows;
-    short_description.delta = circuit.delta;
-    short_description.permutation = circuit.permutation;
+    // policy_type::circuit_short_description<lpc_type> short_description;
+    // short_description.columns_with_copy_constraints = {0, 1, 2, 3};
+    // short_description.table_rows = table_rows;
+    // short_description.usable_rows = usable_rows;
+    // short_description.delta = circuit.delta;
+    // short_description.permutation = circuit.permutation;
+
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
     typename policy_type::preprocessed_public_data_type preprocessed_public_data =
         redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(
-            constraint_system, assigments.public_table(), short_description);
+            constraint_system, assigments.public_table(), columns_with_copy_constraints);
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
         redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(
-            constraint_system, assigments.private_table(), short_description);
+            constraint_system, assigments.private_table());
     
     auto proof = redshift_prover<FieldType, circuit_2_params>::process(preprocessed_public_data,
                                                                        preprocessed_private_data, constraint_system,
-                                                                       assigments, short_description, fri_params);
+                                                                       assigments, fri_params);
 
-    bool verifier_res = redshift_verifier<FieldType, circuit_2_params>::process(proof, short_description);
+    bool verifier_res = redshift_verifier<FieldType, circuit_2_params>::process(proof);
     BOOST_CHECK(verifier_res);
 }
 
@@ -216,7 +221,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     for (int i = 0; i < argument_size; i++) {
         BOOST_CHECK(prover_res.F[i].evaluate(y) == verifier_res[i]);
     }
-}
+}*/
 
 BOOST_AUTO_TEST_CASE(redshift_lookup_argument_test) {
 
@@ -238,26 +243,30 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, table_rows);
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, table_rows, usable_rows);
     typename policy_type::variable_assignment_type assigments = circuit.table;
 
-    policy_type::circuit_short_description<lpc_type> short_description;
+    /*policy_type::circuit_short_description<lpc_type> short_description;
     short_description.columns_with_copy_constraints = {0, 1, 2, 3};
     short_description.table_rows = table_rows;
     short_description.usable_rows = usable_rows;
     short_description.delta = circuit.delta;
-    short_description.permutation = circuit.permutation;
+    short_description.permutation = circuit.permutation;*/
+
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
     typename policy_type::preprocessed_public_data_type preprocessed_public_data =
         redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(
-            constraint_system, assigments.public_table(), short_description);
+            constraint_system, assigments.public_table(), columns_with_copy_constraints);
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
         redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(
-            constraint_system, assigments.private_table(), short_description);
+            constraint_system, assigments.private_table());
 
-    plonk_polynomial_table<FieldType, circuit_2_params::witness_columns> polynomial_table =
-                            plonk_polynomial_table<FieldType, circuit_2_params::witness_columns>(
+    auto polynomial_table =
+                            plonk_polynomial_table<FieldType, redshift_test_params::witness_columns,
+                                redshift_test_params::selector_columns, redshift_test_params::public_columns, 
+                                redshift_test_params::constant_columns>(
                                 preprocessed_private_data.private_polynomial_table,
                                 preprocessed_public_data.public_polynomial_table);
 
@@ -273,14 +282,14 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     typename FieldType::value_type y = algebra::random_element<FieldType>();
 
     typename policy_type::evaluation_map columns_at_y;
-    for (int i = 0; i < table_columns; i++) {
+    for (std::size_t i = 0; i < redshift_test_params::witness_columns; i++) {
         auto key = std::make_tuple(i, plonk_variable<FieldType>::rotation_type::current,
                                    plonk_variable<FieldType>::column_type::witness);
-        columns_at_y[key] = circuit.column_polynomials[i].evaluate(y);
+        columns_at_y[key] = polynomial_table.witness(i).evaluate(y);
     }
 
     std::array<typename FieldType::value_type, 1> verifier_res =
-        redshift_gates_argument<FieldType, circuit_2_params>::verify_eval(circuit.gates, columns_at_y, y,
+        redshift_gates_argument<FieldType, circuit_2_params>::verify_eval(constraint_system.gates(), polynomial_table, columns_at_y, y,
                                                                           verifier_transcript);
 
     typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();

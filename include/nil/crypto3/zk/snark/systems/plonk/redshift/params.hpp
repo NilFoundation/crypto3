@@ -47,11 +47,11 @@ namespace nil {
                     typedef TranscriptHashType transcript_hash_type;
 
                     constexpr static const std::size_t witness_columns = WitnessColumns;
-                    constexpr static const std::size_t selectors_columns = SelectorColumns;
+                    constexpr static const std::size_t selector_columns = SelectorColumns;
                     constexpr static const std::size_t public_input_columns = PublicInputColumns;
                     constexpr static const std::size_t constant_columns = ConstantColumns;
 
-                    constexpr static const typename FieldType::value_type delta = 1;
+                    constexpr static const typename FieldType::value_type delta = algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
 
                     typedef list_polynomial_commitment_params<MerkleTreeHashType, TranscriptHashType, Lambda, R, M>
                         commitment_params_type;

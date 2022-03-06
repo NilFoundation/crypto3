@@ -56,14 +56,15 @@ namespace nil {
                     std::vector<plonk_copy_constraint<FieldType>> _copy_constraints;
                     std::vector<plonk_lookup_constraint<FieldType>> _lookup_constraints;
                     std::size_t _rows_amount;
+                    std::size_t _usable_rows_amount;
 
                 public:
 
                     plonk_constraint_system() {
                     }
 
-                    plonk_constraint_system(std::vector<plonk_gate<FieldType>> gates, std::size_t rows_amount): 
-                        _gates(gates), _rows_amount(rows_amount) {
+                    plonk_constraint_system(std::vector<plonk_gate<FieldType>> gates, std::size_t rows_amount, std::size_t usable_rows_amount): 
+                        _gates(gates), _rows_amount(rows_amount), _usable_rows_amount(usable_rows_amount) {
                     }
 
                     std::size_t num_gates() const {
@@ -72,6 +73,10 @@ namespace nil {
 
                     std::size_t rows_amount() const {
                         return _rows_amount;
+                    }
+
+                    std::size_t usable_rows_amount() const {
+                        return _usable_rows_amount;
                     }
 
                     // bool

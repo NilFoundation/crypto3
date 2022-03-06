@@ -29,7 +29,6 @@
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
-#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/variable.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/table.hpp>
 #include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
@@ -41,7 +40,7 @@ namespace nil {
                 namespace detail {
 
                     template <typename VariableType>
-                    using plonk_evaluation_map = std::map<std::tuple<std::size_t, typename VariableType::rotation_type, 
+                    using plonk_evaluation_map = std::map<std::tuple<std::size_t, int, 
                         typename VariableType::column_type>, typename VariableType::assignment_type>;
 
                 }    // namespace detail
@@ -84,12 +83,16 @@ namespace nil {
                                 switch (var.type) {
                                     case VariableType::column_type::witness:
                                         assignment = assignments.witness(var.index)[row_index + var.rotation];
+                                        break;
                                     case VariableType::column_type::selector:
                                         assignment = assignments.selector(var.index)[row_index + var.rotation];
+                                        break;
                                     case VariableType::column_type::public_input:
                                         assignment = assignments.public_input(var.index)[row_index + var.rotation];
+                                        break;
                                     case VariableType::column_type::constant:
                                         assignment = assignments.constant(var.index)[row_index + var.rotation];
+                                        break;
                                 }
 
                                 term_value = term_value * assignment;
@@ -114,12 +117,16 @@ namespace nil {
                                 switch (var.type) {
                                     case VariableType::column_type::witness:
                                         assignment = assignments.witness(var.index);
+                                        break;
                                     case VariableType::column_type::selector:
                                         assignment = assignments.selector(var.index);
+                                        break;
                                     case VariableType::column_type::public_input:
                                         assignment = assignments.public_input(var.index);
+                                        break;
                                     case VariableType::column_type::constant:
                                         assignment = assignments.constant(var.index);
+                                        break;
                                 }
 
                                 term_value = term_value * assignment;
@@ -136,7 +143,7 @@ namespace nil {
 
                             for (const VariableType &var : nlt.vars) {
                                 std::tuple<std::size_t,
-                                           typename VariableType::rotation_type,
+                                           int,
                                            typename VariableType::column_type>
                                     key = std::make_tuple(var.index, var.rotation, var.type);
                                 term_value = term_value * assignments[key];

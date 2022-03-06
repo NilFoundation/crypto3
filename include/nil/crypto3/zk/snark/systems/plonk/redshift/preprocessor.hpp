@@ -186,14 +186,13 @@ namespace nil {
                         return q_last;
                     }
 
-                    template<typename CommitmentSchemeType>
                     static inline typename policy_type::preprocessed_public_data_type process(
                         const typename policy_type::constraint_system_type &constraint_system,
                         const typename policy_type::variable_assignment_type::public_table_type &public_assignment,
-                        typename policy_type::template circuit_short_description<CommitmentSchemeType>
-                            &short_description) {
+                        std::vector<std::size_t> columns_with_copy_constraints) {
 
                         std::size_t N_rows = constraint_system.rows_amount();
+                        std::size_t usable_rows = constraint_system.usable_rows_amount();
 
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
                             math::make_evaluation_domain<FieldType>(N_rows);
@@ -203,23 +202,23 @@ namespace nil {
                         plonk_permutation permutation;
 
                         std::vector<math::polynomial<typename FieldType::value_type>> _permutation_polynomials =
-                            permutation_polynomials(short_description.columns_with_copy_constraints.size(),
-                                                    short_description.table_rows, basic_domain->get_domain_element(1),
-                                                    short_description.delta, permutation,
+                            permutation_polynomials(columns_with_copy_constraints.size(),
+                                                    N_rows, basic_domain->get_domain_element(1),
+                                                    policy_type::redshift_params_type::delta, permutation,
                                                     basic_domain);
 
                         std::vector<math::polynomial<typename FieldType::value_type>> _identity_polynomials =
-                            identity_polynomials(short_description.columns_with_copy_constraints.size(),
-                                                 short_description.table_rows, basic_domain->get_domain_element(1),
-                                                 short_description.delta, basic_domain);
+                            identity_polynomials(columns_with_copy_constraints.size(),
+                                                 N_rows, basic_domain->get_domain_element(1),
+                                                 policy_type::redshift_params_type::delta, basic_domain);
 
                         math::polynomial<typename FieldType::value_type> lagrange_0 =
                             lagrange_polynomial(basic_domain, 0);
 
                         math::polynomial<typename FieldType::value_type> q_last =
-                            selector_last(short_description.table_rows, short_description.usable_rows, basic_domain);
+                            selector_last(N_rows, usable_rows, basic_domain);
                         math::polynomial<typename FieldType::value_type> q_blind =
-                            selector_blind(short_description.table_rows, short_description.usable_rows, basic_domain);
+                            selector_blind(N_rows, usable_rows, basic_domain);
 
                         plonk_public_polynomial_table<FieldType, ParamsType::selector_columns,
                             ParamsType::public_input_columns, ParamsType::constant_columns> 
@@ -229,6 +228,8 @@ namespace nil {
                                 detail::column_range_polynomials<FieldType>(public_assignment.selectors(),
                                                                             basic_domain),
                                 detail::column_range_polynomials<FieldType>(public_assignment.public_inputs(),
+                                                                            basic_domain), 
+                                detail::column_range_polynomials<FieldType>(public_assignment.constants(),
                                                                             basic_domain));
 
                         std::vector<typename FieldType::value_type> z_numenator(N_rows + 1);
@@ -251,12 +252,9 @@ namespace nil {
                     using policy_type = detail::redshift_policy<FieldType, ParamsType>;
 
                 public:
-                    template<typename CommitmentSchemeType>
                     static inline typename policy_type::preprocessed_private_data_type process(
                         const typename policy_type::constraint_system_type &constraint_system,
-                        const typename policy_type::variable_assignment_type::private_table_type &private_assignment,
-                        typename policy_type::template circuit_short_description<CommitmentSchemeType>
-                            &short_description) {
+                        const typename policy_type::variable_assignment_type::private_table_type &private_assignment) {
 
                         std::size_t N_rows = constraint_system.rows_amount();
 

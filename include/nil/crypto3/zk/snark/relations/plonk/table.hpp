@@ -98,7 +98,7 @@ namespace nil {
                         return selector_columns[index];
                     }
 
-                    std::vector<ColumnType> selectors() const {
+                    std::array<ColumnType, SelectorColumns> selectors() const {
                         return selector_columns;
                     }
 
@@ -107,7 +107,7 @@ namespace nil {
                         return public_input_columns[index];
                     }
 
-                    std::vector<ColumnType> public_inputs() const {
+                    std::array<ColumnType, PublicInputColumns> public_inputs() const {
                         return public_input_columns;
                     }
 
@@ -116,7 +116,7 @@ namespace nil {
                         return constant_columns[index];
                     }
 
-                    std::vector<ColumnType> constants() const {
+                    std::array<ColumnType, ConstantColumns> constants() const {
                         return constant_columns;
                     }
 

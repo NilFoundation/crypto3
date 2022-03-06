@@ -52,7 +52,7 @@ namespace nil {
                     typedef zk::snark::detail::redshift_policy<FieldType, ParamsType> policy_type;
 
                     constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
-                    constexpr static const std::size_t public_columns = ParamsType::public_columns;
+                    constexpr static const std::size_t public_columns = ParamsType::public_input_columns;
                     using merkle_hash_type = typename ParamsType::merkle_hash_type;
                     using transcript_hash_type = typename ParamsType::transcript_hash_type;
 
@@ -70,7 +70,6 @@ namespace nil {
                     std::vector<math::polynomial<typename FieldType::value_type>> S_sigma;
 
                     typename policy_type::variable_assignment_type table;
-                    std::vector<math::polynomial<typename FieldType::value_type>> column_polynomials;
 
                     // construct q_last, q_blind
                     math::polynomial<typename FieldType::value_type> q_last;
@@ -112,20 +111,26 @@ namespace nil {
                 // ADD: x + y = z
                 // MUL: x * y = z
                 //---------------------------------------------------------------------------//
-                typedef redshift_params<3, 0> circuit_1_params;
+                constexpr static const std::size_t witness_columns_1 = 3;
+                constexpr static const std::size_t selector_columns_1 = 2;
+                constexpr static const std::size_t public_columns_1 = 0;
+                constexpr static const std::size_t constant_columns_1 = 0;
 
                 template<typename FieldType>
-                circuit_description<FieldType, circuit_1_params, 4, 3, 16> circuit_test_1() {
+                circuit_description<FieldType, redshift_params<FieldType, witness_columns_1, selector_columns_1, public_columns_1, constant_columns_1>, 4, 3, 16> circuit_test_1() {
                     constexpr static const std::size_t rows_log = 4;
-                    constexpr static const std::size_t table_columns = 3;
-                    constexpr static const std::size_t witness_columns = 3;
-                    std::size_t selectors_columns = 2;
-                    constexpr static const std::size_t public_columns = 0;
                     constexpr static const std::size_t permutation = 3;
                     constexpr static const std::size_t usable = 1 << rows_log;
 
-                    circuit_description<FieldType, circuit_1_params, rows_log, permutation, usable> test_circuit;
-                    test_circuit.column_polynomials.resize(witness_columns + public_columns);
+                    constexpr static const std::size_t witness_columns = witness_columns_1;
+                    constexpr static const std::size_t selector_columns = selector_columns_1;
+                    constexpr static const std::size_t public_columns = public_columns_1;
+                    constexpr static const std::size_t constant_columns = constant_columns_1;
+                    constexpr static const std::size_t table_columns = witness_columns + public_columns + constant_columns;
+
+                    typedef redshift_params<FieldType, witness_columns, selector_columns, public_columns, constant_columns> circuit_params;
+
+                    circuit_description<FieldType, circuit_params, rows_log, permutation, usable> test_circuit;
 
                     std::array<std::vector<typename FieldType::value_type>, table_columns> table;
 
@@ -160,11 +165,6 @@ namespace nil {
                         q_mul[i] = FieldType::value_type::one();
                     }
 
-                    for (std::size_t i = 0; i < table_columns; i++) {
-                        test_circuit.domain->inverse_fft(table[i]);
-                        test_circuit.column_polynomials[i] = math::polynomial<typename FieldType::value_type>(table[i]);
-                    }
-
                     std::array<plonk_column<FieldType>, witness_columns> private_assignment;
                     for (std::size_t i = 0; i < witness_columns; i++) {
                         for (std::size_t j = 0; j < test_circuit.table_rows; j++) {
@@ -172,7 +172,7 @@ namespace nil {
                         }
                     }
 
-                    std::vector<plonk_column<FieldType>> selectors_assignment(selectors_columns);
+                    std::vector<plonk_column<FieldType>> selectors_assignment(selector_columns);
                     std::vector<plonk_column<FieldType>> public_input_assignment(public_columns);
                     for (std::size_t j = 0; j < test_circuit.table_rows; j++) {
                         selectors_assignment[0][j] = q_add[j];
@@ -185,9 +185,9 @@ namespace nil {
                         }
                     }
 
-                    test_circuit.table = plonk_assignment_table<FieldType, witness_columns>(
+                    test_circuit.table = plonk_assignment_table<FieldType, witness_columns, selector_columns, public_columns, constant_columns>(
                         plonk_private_assignment_table<FieldType, witness_columns>(private_assignment),
-                        plonk_public_assignment_table<FieldType>(selectors_assignment,
+                        plonk_public_assignment_table<FieldType, selector_columns, public_columns, constant_columns>(selectors_assignment,
                                                                                    public_input_assignment));
 
                     test_circuit.init();
@@ -231,20 +231,26 @@ namespace nil {
                 // ADD: x + y = z, copy(prev(z), y)
                 // MUL: x * y = z, copy(p1, y)
                 //---------------------------------------------------------------------------//
-                typedef redshift_params<3, 1> circuit_2_params;
+                constexpr static const std::size_t witness_columns_2 = 3;
+                constexpr static const std::size_t selector_columns_2 = 2;
+                constexpr static const std::size_t public_columns_2 = 1;
+                constexpr static const std::size_t constant_columns_2 = 0;
 
                 template<typename FieldType>
-                circuit_description<FieldType, circuit_2_params, 4, 4, 16> circuit_test_2() {
+                circuit_description<FieldType, redshift_params<FieldType, witness_columns_2, selector_columns_2, public_columns_2, constant_columns_2>, 4, 4, 16> circuit_test_2() {
                     constexpr static const std::size_t rows_log = 4;
-                    constexpr static const std::size_t table_columns = 4;
-                    constexpr static const std::size_t witness_columns = 3;
-                    std::size_t selectors_columns = 2;
-                    constexpr static const std::size_t public_columns = 1;
                     constexpr static const std::size_t permutation = 4;
                     constexpr static const std::size_t usable = 1 << rows_log;
 
-                    circuit_description<FieldType, circuit_2_params, rows_log, permutation, usable> test_circuit;
-                    test_circuit.column_polynomials.resize(witness_columns + public_columns);
+                    constexpr static const std::size_t witness_columns = witness_columns_2;
+                    constexpr static const std::size_t selector_columns = selector_columns_2;
+                    constexpr static const std::size_t public_columns = public_columns_2;
+                    constexpr static const std::size_t constant_columns = constant_columns_2;
+                    constexpr static const std::size_t table_columns = witness_columns + public_columns + constant_columns;
+
+                    typedef redshift_params<FieldType, witness_columns, selector_columns, public_columns, constant_columns> circuit_params;
+
+                    circuit_description<FieldType, circuit_params, rows_log, permutation, usable> test_circuit;
 
                     std::array<std::vector<typename FieldType::value_type>, table_columns> table;
 
@@ -286,29 +292,25 @@ namespace nil {
                         test_circuit.permutation.cells_equal(1, i, 3, 0);
                     }
 
-                    for (std::size_t i = 0; i < table_columns; i++) {
-                        test_circuit.domain->inverse_fft(table[i]);
-                        test_circuit.column_polynomials[i] = math::polynomial<typename FieldType::value_type>(table[i]);
-                    }
-
                     std::array<plonk_column<FieldType>, witness_columns> private_assignment;
                     for (std::size_t i = 0; i < witness_columns; i++) {
                         private_assignment[i] = table[i];
                     }
 
-                    std::vector<plonk_column<FieldType>> selectors_assignment(selectors_columns);
-                    std::vector<plonk_column<FieldType>> public_input_assignment(public_columns);
+                    std::array<plonk_column<FieldType>, selector_columns> selectors_assignment;
+                    std::array<plonk_column<FieldType>, public_columns> public_input_assignment;
+                    std::array<plonk_column<FieldType>, constant_columns> constant_assignment;
 
                     selectors_assignment[0] = q_add;
                     selectors_assignment[1] = q_mul;
 
-                    for (std::size_t i = selectors_columns; i < selectors_columns + public_columns; i++) {
+                    for (std::size_t i = 0; i < public_columns; i++) {
                         public_input_assignment[i] = table[witness_columns + i];
                     }
-                    test_circuit.table = plonk_assignment_table<FieldType, witness_columns>(
+                    test_circuit.table = plonk_assignment_table<FieldType, witness_columns, selector_columns, public_columns, constant_columns>(
                         plonk_private_assignment_table<FieldType, witness_columns>(private_assignment),
-                        plonk_public_assignment_table<FieldType>(selectors_assignment,
-                                                                                   public_input_assignment));
+                        plonk_public_assignment_table<FieldType, selector_columns, public_columns, constant_columns>(selectors_assignment,
+                                                                                   public_input_assignment, constant_assignment));
 
                     test_circuit.init();
 

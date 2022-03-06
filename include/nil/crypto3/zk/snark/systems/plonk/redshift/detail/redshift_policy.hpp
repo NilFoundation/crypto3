@@ -63,6 +63,8 @@ namespace nil {
 
                         typedef plonk_constraint_system<FieldType> constraint_system_type;
 
+                        typedef RedshiftParams redshift_params_type;
+
                         typedef plonk_assignment_table<FieldType, witness_columns,
                             selector_columns, public_input_columns, constant_columns> variable_assignment_type;
 

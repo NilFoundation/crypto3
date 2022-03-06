@@ -80,9 +80,7 @@ namespace nil {
                                                    // const policy_type::primary_input_type &primary_input,
                         const typename policy_type::template proof_type<commitment_scheme_witness_type,
                                                                         commitment_scheme_permutation_type,
-                                                                        commitment_scheme_quotient_type> &proof,
-                        const typename policy_type::template circuit_short_description<commitment_scheme_witness_type>
-                            &short_description) {    // TODO: decsription commitment scheme
+                                                                        commitment_scheme_quotient_type> &proof) {    // TODO: decsription commitment scheme
 
                         // 1. Add circuit definition to transcript
                         // transcript(short_description);
