@@ -92,11 +92,8 @@ namespace nil {
 
                     static inline std::array<typename FieldType::value_type, argument_size>
                         verify_eval(const std::vector<plonk_gate<FieldType>> &gates,
-                                    const plonk_polynomial_table<FieldType, ParamsType::witness_columns,
-                                    ParamsType::selector_columns, ParamsType::public_input_columns,
-                                    ParamsType::constant_columns> &public_polynomials,
-                                    //const plonk_public_polynomial_table<FieldType, ParamsType::selector_columns,
-                                    //    ParamsType::public_input_columns, ParamsType::constant_columns> public_polynomials,
+                                    const plonk_public_polynomial_table<FieldType, ParamsType::selector_columns,
+                                        ParamsType::public_input_columns, ParamsType::constant_columns> public_polynomials,
                                     typename policy_type::evaluation_map &evaluations,
                                     typename FieldType::value_type challenge,
                                     fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript) {

@@ -279,7 +279,7 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     }
 
     std::array<typename FieldType::value_type, 1> verifier_res =
-        redshift_gates_argument<FieldType, circuit_2_params>::verify_eval(constraint_system.gates(), polynomial_table, columns_at_y, y,
+        redshift_gates_argument<FieldType, circuit_2_params>::verify_eval(constraint_system.gates(), preprocessed_public_data.public_polynomial_table, columns_at_y, y,
                                                                           verifier_transcript);
 
     typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
