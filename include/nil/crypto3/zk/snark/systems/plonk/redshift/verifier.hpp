@@ -84,7 +84,8 @@ namespace nil {
 
                         // 1. Add circuit definition to transcript
                         // transcript(short_description);
-                        fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(short_description);
+                        std::vector<std::uint8_t> transcript_init {};
+                        fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(transcript_init);
 
                         for (std::size_t i = 0; i < witness_columns; i++) {
                             transcript(proof.witness_commitments[i]);

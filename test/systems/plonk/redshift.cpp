@@ -43,8 +43,8 @@
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 
-//#include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
-//#include <nil/crypto3/zk/snark/systems/plonk/redshift/verifier.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/verifier.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/gates_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
@@ -114,7 +114,7 @@ typedef fri_commitment_scheme<FieldType, redshift_test_params::merkle_hash_type,
 typedef redshift_params<FieldType, redshift_test_params::witness_columns, redshift_test_params::selector_columns, 
     redshift_test_params::public_input_columns, redshift_test_params::constant_columns> circuit_2_params;
 
-/*BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
+BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 
     circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size, usable_rows> circuit =
         circuit_test_2<FieldType>();
@@ -125,16 +125,8 @@ typedef redshift_params<FieldType, redshift_test_params::witness_columns, redshi
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
-    typename policy_type::constraint_system_type constraint_system({}, table_rows, usable_rows);
-
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, table_rows, usable_rows);
     typename policy_type::variable_assignment_type assigments = circuit.table;
-
-    // policy_type::circuit_short_description<lpc_type> short_description;
-    // short_description.columns_with_copy_constraints = {0, 1, 2, 3};
-    // short_description.table_rows = table_rows;
-    // short_description.usable_rows = usable_rows;
-    // short_description.delta = circuit.delta;
-    // short_description.permutation = circuit.permutation;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
@@ -152,7 +144,7 @@ typedef redshift_params<FieldType, redshift_test_params::witness_columns, redshi
 
     bool verifier_res = redshift_verifier<FieldType, circuit_2_params>::process(proof);
     BOOST_CHECK(verifier_res);
-}*/
+}
 
 BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
 

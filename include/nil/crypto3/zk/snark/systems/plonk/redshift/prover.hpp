@@ -173,8 +173,8 @@ namespace nil {
                                                           commitment_scheme_public_points_type,
                                                           commitment_scheme_permutation_type,
                                                           ParamsType>::prove_eval(transcript,
+                                                                                  constraint_system,
                                                                                   preprocessed_public_data,
-                                                                                  short_description,
                                                                                   polynomial_table,
                                                                                   fri_params);
 
