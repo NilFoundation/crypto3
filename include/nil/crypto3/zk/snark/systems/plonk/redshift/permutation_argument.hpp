@@ -39,6 +39,7 @@
 #include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/commitments/lpc.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -52,7 +53,7 @@ namespace nil {
 
                     using transcript_hash_type = typename ParamsType::transcript_hash_type;
 
-                    using policy_type = detail::redshift_policy<FieldType, ParamsType>;
+                    typedef detail::redshift_policy<FieldType, ParamsType> policy_type;
 
                     typedef typename CommitmentSchemeTypePermutation::fri_type fri_type;
 
@@ -69,13 +70,14 @@ namespace nil {
 
                     static inline prover_result_type prove_eval(
                         fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript,
+                        typename policy_type::constraint_system_type &constraint_system,
                         const typename policy_type::preprocessed_public_data_type preprocessed_data,
-                        const typename policy_type::template circuit_short_description<CommitmentSchemeTypePublic>
-                            &short_description,
                         const plonk_polynomial_table<FieldType, ParamsType::witness_columns,
                             ParamsType::selector_columns, ParamsType::public_input_columns,
                             ParamsType::constant_columns> &column_polynomials,
                         typename fri_type::params_type fri_params) {
+
+                        const std::size_t table_rows = constraint_system.rows_amount();
 
                         const std::vector<math::polynomial<typename FieldType::value_type>> &S_sigma =
                             preprocessed_data.permutation_polynomials;
@@ -89,10 +91,10 @@ namespace nil {
                         typename FieldType::value_type gamma = transcript.template challenge<FieldType>();
 
                         // 2. Calculate id_binding, sigma_binding for j from 1 to N_rows
-                        std::vector<typename FieldType::value_type> id_binding(short_description.table_rows);
-                        std::vector<typename FieldType::value_type> sigma_binding(short_description.table_rows);
+                        std::vector<typename FieldType::value_type> id_binding(table_rows);
+                        std::vector<typename FieldType::value_type> sigma_binding(table_rows);
 
-                        for (std::size_t j = 0; j < short_description.table_rows; j++) {
+                        for (std::size_t j = 0; j < table_rows; j++) {
                             id_binding[j] = FieldType::value_type::one();
                             sigma_binding[j] = FieldType::value_type::one();
                             for (std::size_t i = 0; i < S_id.size(); i++) {
@@ -106,10 +108,10 @@ namespace nil {
 
                         // 3. Calculate $V_P$
                         std::vector<typename FieldType::value_type> V_P_interpolation_points(
-                            short_description.table_rows);
+                            table_rows);
 
                         V_P_interpolation_points[0] = FieldType::value_type::one();
-                        for (std::size_t j = 1; j < short_description.table_rows; j++) {
+                        for (std::size_t j = 1; j < table_rows; j++) {
                             typename FieldType::value_type tmp_mul_result = FieldType::value_type::one();
                             for (std::size_t i = 0; i <= j - 1; i++) {
                                 // TODO: use one division
@@ -158,8 +160,6 @@ namespace nil {
                     static inline std::array<typename FieldType::value_type, argument_size> verify_eval(
                         fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript,
                         const typename policy_type::preprocessed_public_data_type preprocessed_data,
-                        const typename policy_type::template circuit_short_description<CommitmentSchemeTypePublic>
-                            &short_description,
                         // y
                         const typename FieldType::value_type &challenge,
                         // f(y):
