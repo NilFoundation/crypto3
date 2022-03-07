@@ -79,18 +79,18 @@ namespace nil {
                     typedef list_polynomial_commitment_scheme<FieldType,
                                                               typename ParamsType::commitment_params_type,
                                                               opening_points_public>
-                        commitment_scheme_public_points_type;
+                        commitment_scheme_public_input_type;
 
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
-                    constexpr static const std::size_t f_parts = 9;
+                    constexpr static const std::size_t f_parts = 4;
 
                     static inline math::polynomial<typename FieldType::value_type> quotient_polynomial(
                         const typename policy_type::preprocessed_public_data_type preprocessed_public_data,
                         std::array<math::polynomial<typename FieldType::value_type>, f_parts>
                             F,
                         fiat_shamir_heuristic_sequential<transcript_hash_type>
-                            transcript) {
+                            &transcript) {
                         // 7.1. Get $\alpha_0, \dots, \alpha_8 \in \mathbb{F}$ from $hash(\text{transcript})$
                         std::array<typename FieldType::value_type, f_parts> alphas =
                             transcript.template challenges<FieldType, f_parts>();
@@ -170,7 +170,7 @@ namespace nil {
                         // 4. permutation_argument
                         auto permutation_argument =
                             redshift_permutation_argument<FieldType,
-                                                          commitment_scheme_public_points_type,
+                                                          commitment_scheme_public_input_type,
                                                           commitment_scheme_permutation_type,
                                                           ParamsType>::prove_eval(transcript,
                                                                                   constraint_system,
@@ -207,12 +207,13 @@ namespace nil {
                         for (std::size_t i = 0; i < T_splitted.size(); i++) {
                             T_commitments[i] = commitment_scheme_quotient_type::commit(T_splitted[i], fri_params.D[0]);
                             proof.T_commitments.push_back(T_commitments[i].root());
+                            transcript(proof.T_commitments[i]);
                         }
-
-                        // transcript(T_commitments);
 
                         // 8. Run evaluation proofs
                         typename FieldType::value_type challenge = transcript.template challenge<FieldType>();
+                        proof.eval_proof.challenge = challenge;
+                        std::cout<<"P: T(y) = "<<T.evaluate(challenge).data<<std::endl;
 
                         typename FieldType::value_type omega =
                             preprocessed_public_data.basic_domain->get_domain_element(1);
@@ -249,6 +250,7 @@ namespace nil {
                                 fri_params);
                         proof.eval_proof.permutation.push_back(v_p_evaluation);
 
+                        // quotient
                         std::array<typename FieldType::value_type, 1> evaluation_points_quotient = {challenge};
                         std::vector<typename commitment_scheme_quotient_type::proof_type> quotient_evaluation(
                             T_splitted.size());
@@ -257,6 +259,20 @@ namespace nil {
                                 evaluation_points_quotient, T_commitments[i], T_splitted[i], transcript, fri_params);
                             proof.eval_proof.quotient.push_back(quotient_evaluation[i]);
                         }
+
+                        math::polynomial<typename FieldType::value_type> t_recalculated = {0};
+                        math::polynomial<typename FieldType::value_type> base = {1, 0};
+                        math::polynomial<typename FieldType::value_type> shift = {1, 0};
+                        for (std::size_t i = 1; i < fri_params.max_degree; i++) {
+                            shift = shift * base;
+                        }
+                        math::polynomial<typename FieldType::value_type> acc = shift;
+                        for (std::size_t i = 0; i < T_splitted.size(); i++) {
+                            t_recalculated = t_recalculated + T_splitted[i] * acc;
+                            acc = acc * shift;
+                        }
+
+                        std::cout<<"P: t_recalculated(y) = "<<t_recalculated.evaluate(challenge).data<<std::endl;
 
                         return proof;
                     }

@@ -142,7 +142,8 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
                                                                        preprocessed_private_data, constraint_system,
                                                                        assigments, fri_params);
 
-    bool verifier_res = redshift_verifier<FieldType, circuit_2_params>::process(proof);
+    bool verifier_res = redshift_verifier<FieldType, circuit_2_params>::process(preprocessed_public_data, proof, 
+                                                                        constraint_system, fri_params);
     BOOST_CHECK(verifier_res);
 }
 

@@ -37,6 +37,7 @@ namespace nil {
                 struct redshift_proof {
 
                     struct evaluation_proof {
+                        typename FieldType::value_type challenge;
                         std::vector<typename CommitmentSchemeTypeWitness::proof_type> witness;
                         std::vector<typename CommitmentSchemeTypePermutation::proof_type> permutation;
                         std::vector<typename CommitmentSchemeTypeQuotient::proof_type> quotient;
