@@ -213,6 +213,28 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     }
 }
 
+BOOST_AUTO_TEST_CASE(redshift_split_polynomial_test) {
+
+    math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
+    std::size_t expected_size = 4;
+    std::size_t max_degree = 3;
+
+    std::vector<math::polynomial<typename FieldType::value_type>> f_splitted =
+                            zk::snark::detail::split_polynomial<FieldType>(f, max_degree);
+
+    BOOST_CHECK(f_splitted.size() == expected_size);
+
+    typename FieldType::value_type y = algebra::random_element<FieldType>();
+
+    typename FieldType::value_type f_at_y = f.evaluate(y);
+    typename FieldType::value_type f_splitted_at_y = FieldType::value_type::zero();
+    for (std::size_t i = 0; i < f_splitted.size(); i++) {
+        f_splitted_at_y = f_splitted_at_y + f_splitted[i].evaluate(y) * y.pow((max_degree + 1) * i);
+    }
+
+    BOOST_CHECK(f_at_y == f_splitted_at_y);
+}
+
 BOOST_AUTO_TEST_CASE(redshift_lookup_argument_test) {
 
     // zk::snark::redshift_preprocessor<typename curve_type::base_field_type, 5, 2> preprocess;

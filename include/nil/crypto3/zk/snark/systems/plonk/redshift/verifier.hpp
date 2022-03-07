@@ -199,13 +199,11 @@ namespace nil {
                             T_consolidated = T_consolidated + proof.eval_proof.quotient[i].z[0] * challenge.pow((fri_params.max_degree + 1) * i);
                         }
 
-                        std::cout<<"V: T(y) = "<<T_consolidated.data<<std::endl;
-
                         typename FieldType::value_type Z_at_challenge = preprocessed_public_data.Z.evaluate(challenge);
 
                         if (F_consolidated != Z_at_challenge * T_consolidated) {
                             std::cout<<"F = Z * T failed"<<std::endl;
-                            //return false;
+                            return false;
                         }
 
                         return true;

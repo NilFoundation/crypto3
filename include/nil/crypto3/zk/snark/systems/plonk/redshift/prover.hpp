@@ -43,6 +43,22 @@ namespace nil {
         namespace zk {
             namespace snark {
 
+                namespace detail {
+                    template<typename FieldType>
+                    static inline std::vector<math::polynomial<typename FieldType::value_type>>
+                        split_polynomial(math::polynomial<typename FieldType::value_type> f, std::size_t max_degree) {
+                        std::size_t parts = ((f.size() - 1) / (max_degree + 1)) + 1;
+                        std::vector<math::polynomial<typename FieldType::value_type>> f_splitted;
+
+                        std::size_t chunk_size = max_degree + 1;    // polynomial contains max_degree + 1 coeffs
+                        for(size_t i = 0; i < f.size(); i += chunk_size) {
+                            auto last = std::min(f.size(), i + chunk_size);
+                            f_splitted.emplace_back(f.begin() + i, f.begin() + last);
+                        }
+                        return f_splitted;
+                    }
+                }
+
                 template<typename FieldType, typename ParamsType>
                 class redshift_prover {
 
@@ -107,23 +123,8 @@ namespace nil {
                         return T_consolidated;
                     }
 
-                    static inline std::vector<math::polynomial<typename FieldType::value_type>>
-                        split_polynomial(math::polynomial<typename FieldType::value_type> f, std::size_t max_degree) {
-                        std::size_t parts = ((f.size() - 1) / (max_degree + 1)) + 1;
-                        std::vector<math::polynomial<typename FieldType::value_type>> f_splitted(parts);
-
-                        std::size_t chunk_size = max_degree + 1;    // polynomial contains max_degree + 1 coeffs
-                        for (std::size_t i = 0; i < parts - 1; i++) {
-                            std::copy(f.begin() + i * chunk_size,
-                                      f.begin() + (i + 1) * chunk_size - 1,
-                                      std::back_inserter(f_splitted[i]));
-                        }
-                        std::copy(
-                            f.begin() + (parts - 1) * chunk_size, f.end(), std::back_inserter(f_splitted[parts - 1]));
-                        return f_splitted;
-                    }
-
                 public:
+
                     static inline typename policy_type::template proof_type<commitment_scheme_witness_type,
                                                                             commitment_scheme_permutation_type,
                                                                             commitment_scheme_quotient_type>
@@ -201,7 +202,7 @@ namespace nil {
                         math::polynomial<typename FieldType::value_type> T =
                             quotient_polynomial(preprocessed_public_data, F, transcript);
                         std::vector<math::polynomial<typename FieldType::value_type>> T_splitted =
-                            split_polynomial(T, fri_params.max_degree);
+                            detail::split_polynomial<FieldType>(T, fri_params.max_degree);
                         std::vector<typename commitment_scheme_quotient_type::merkle_tree_type> T_commitments(
                             T_splitted.size());
                         for (std::size_t i = 0; i < T_splitted.size(); i++) {
@@ -213,7 +214,6 @@ namespace nil {
                         // 8. Run evaluation proofs
                         typename FieldType::value_type challenge = transcript.template challenge<FieldType>();
                         proof.eval_proof.challenge = challenge;
-                        std::cout<<"P: T(y) = "<<T.evaluate(challenge).data<<std::endl;
 
                         typename FieldType::value_type omega =
                             preprocessed_public_data.basic_domain->get_domain_element(1);
@@ -258,21 +258,7 @@ namespace nil {
                             quotient_evaluation[i] = commitment_scheme_quotient_type::proof_eval(
                                 evaluation_points_quotient, T_commitments[i], T_splitted[i], transcript, fri_params);
                             proof.eval_proof.quotient.push_back(quotient_evaluation[i]);
-                        }
-
-                        math::polynomial<typename FieldType::value_type> t_recalculated = {0};
-                        math::polynomial<typename FieldType::value_type> base = {1, 0};
-                        math::polynomial<typename FieldType::value_type> shift = {1, 0};
-                        for (std::size_t i = 1; i < fri_params.max_degree; i++) {
-                            shift = shift * base;
-                        }
-                        math::polynomial<typename FieldType::value_type> acc = shift;
-                        for (std::size_t i = 0; i < T_splitted.size(); i++) {
-                            t_recalculated = t_recalculated + T_splitted[i] * acc;
-                            acc = acc * shift;
-                        }
-
-                        std::cout<<"P: t_recalculated(y) = "<<t_recalculated.evaluate(challenge).data<<std::endl;
+                        }                        
 
                         return proof;
                     }
