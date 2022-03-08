@@ -37,8 +37,8 @@
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/table.hpp>
-#include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/snark/commitments/fri.hpp>
+#include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 

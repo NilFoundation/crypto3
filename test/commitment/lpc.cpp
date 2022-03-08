@@ -42,8 +42,8 @@
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
-#include <nil/crypto3/zk/snark/commitments/lpc.hpp>
-#include <nil/crypto3/zk/snark/commitments/fri.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
 using namespace nil::crypto3;

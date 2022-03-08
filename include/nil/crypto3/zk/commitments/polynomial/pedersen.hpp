@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -23,23 +23,33 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_SNARK_ALGORITHMS_ACCUMULATE_HPP
-#define CRYPTO3_ZK_SNARK_ALGORITHMS_ACCUMULATE_HPP
+#ifndef CRYPTO3_ZK_PICKLES_COMMITMENT_SCHEME_HPP
+#define CRYPTO3_ZK_PICKLES_COMMITMENT_SCHEME_HPP
+
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                template<typename ProofSystemType, template<typename T> class ProofRange>
-                bool aggregate(const typename ProofSystemType::processed_verification_key_type &pvk,
-                               const typename ProofSystemType::primary_input_type &primary_input,
-                               const typename ProofSystemType::proof_type &proof) {
+            namespace commitments {
+                template<typename CurveType>
+                class pedersen_commitment_scheme {
+                public:
+                    typedef typename CurveType::scalar_field_type::value_type evaluation_type;
+                    typedef typename CurveType::template g1_type<>::value_type commitment_type;
 
-                    return ProofSystemType::verify(pvk, primary_input, proof);
-                }
-            }    // namespace snark
+                    struct openning_type { };
+
+                    struct proof_type { };
+
+                    static commitment_type commit() {
+                        return commitment_type();
+                    }
+                };
+
+            }    // namespace commitments
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_SNARK_ALGORITHMS_HPP
+#endif    // CRYPTO3_ZK_PICKLES_COMMITMENT_SCHEME_HPP

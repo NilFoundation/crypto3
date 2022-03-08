@@ -38,7 +38,7 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace commitments {
 
                 /**
                  * A sparse vector is a list of indices along with corresponding values.
@@ -251,7 +251,7 @@ namespace nil {
                         return std::make_pair(accumulated_value, resulting_vector);
                     }
                 };
-            }    // namespace snark
+            }    // namespace commitments
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

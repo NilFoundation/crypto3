@@ -32,7 +32,7 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace commitments {
 
                 /********************** Knowledge commitment *********************************/
 
@@ -61,9 +61,9 @@ namespace nil {
                 template<typename Type1, typename Type2>
                 using knowledge_commitment_vector = sparse_vector<knowledge_commitment<Type1, Type2>>;
 
-            }    // namespace snark
+            }    // namespace commitments
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // KNOWLEDGE_COMMITMENT_HPP
+#endif    // CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP

@@ -69,7 +69,7 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace commitments {
                 /// KZGOpening represents the KZG opening of a commitment key (which is a tuple
                 /// given commitment keys are a tuple).
                 template<typename GroupType>
@@ -290,7 +290,7 @@ namespace nil {
                                               algebra::final_exponentiation<curve_type>(u1));
                     }
                 };
-            }    // namespace snark
+            }    // namespace commitments
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

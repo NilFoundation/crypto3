@@ -36,8 +36,8 @@
 
 #include <nil/crypto3/container/merkle/tree.hpp>
 
-#include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/snark/commitments/lpc.hpp>
+#include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
 

@@ -36,7 +36,7 @@
 
 #include <nil/crypto3/container/merkle/tree.hpp>
 
-#include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>

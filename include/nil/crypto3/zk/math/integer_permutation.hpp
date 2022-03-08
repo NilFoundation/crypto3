@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_SNARK_INTEGER_PERMUTATION_HPP
-#define CRYPTO3_ZK_SNARK_INTEGER_PERMUTATION_HPP
+#ifndef CRYPTO3_ZK_MATH_INTEGER_PERMUTATION_HPP
+#define CRYPTO3_ZK_MATH_INTEGER_PERMUTATION_HPP
 
 #include <algorithm>
 #include <cstddef>
@@ -35,7 +35,8 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace math {
+
                 class integer_permutation {
                 private:
                     std::vector<std::size_t> contents; /* offset by min_element */
@@ -139,9 +140,10 @@ namespace nil {
                         return std::random_shuffle(contents.begin(), contents.end());
                     }
                 };
-            }    // namespace snark
+
+            }    // namespace math
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_SNARK_INTEGER_PERMUTATION_HPP
+#endif    // CRYPTO3_ZK_MATH_INTEGER_PERMUTATION_HPP

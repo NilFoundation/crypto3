@@ -36,7 +36,7 @@
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/alt_bn128.hpp>
 
-#include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;

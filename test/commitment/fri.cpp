@@ -44,8 +44,8 @@
 
 #include <nil/crypto3/container/merkle/tree.hpp>    // until fri inclusion
 
-#include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/snark/commitments/fri.hpp>
+#include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 
 using namespace nil::crypto3;
 

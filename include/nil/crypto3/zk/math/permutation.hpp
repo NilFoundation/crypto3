@@ -24,13 +24,13 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_PERMUTATION_HPP
-#define CRYPTO3_ZK_PLONK_PERMUTATION_HPP
+#ifndef CRYPTO3_ZK_MATH_PLONK_PERMUTATION_HPP
+#define CRYPTO3_ZK_MATH_PLONK_PERMUTATION_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace math {
 
                 struct plonk_permutation {
                     typedef std::pair<std::size_t, std::size_t> key_type;
@@ -64,9 +64,9 @@ namespace nil {
                     }
                 };
 
-            }    // namespace snark
+            }    // namespace math
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_PERMUTATION_HPP
+#endif    // CRYPTO3_ZK_MATH_PLONK_PERMUTATION_HPP

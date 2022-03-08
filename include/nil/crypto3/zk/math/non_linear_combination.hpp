@@ -28,15 +28,15 @@
 // - a linear combination (i.e., sum_i a_i * x_i).
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_NON_LINEAR_COMBINATION_HPP
-#define CRYPTO3_ZK_NON_LINEAR_COMBINATION_HPP
+#ifndef CRYPTO3_ZK_MATH_NON_LINEAR_COMBINATION_HPP
+#define CRYPTO3_ZK_MATH_NON_LINEAR_COMBINATION_HPP
 
 #include <vector>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace math {
 
                 /**
                  * Forward declaration.
@@ -333,9 +333,9 @@ namespace nil {
                         const non_linear_term<VariableType> &term) {
                     return lc - non_linear_combination<VariableType>(term);
                 }
-            }    // namespace snark
+            }    // namespace math
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_NON_LINEAR_COMBINATION_HPP
+#endif    // CRYPTO3_ZK_MATH_NON_LINEAR_COMBINATION_HPP

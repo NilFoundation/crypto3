@@ -29,12 +29,12 @@
 #include <iostream>
 #include <iterator>
 
-#include <nil/crypto3/zk/snark/sparse_vector.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/sparse_vector.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace commitments {
 
                 /**
                  * An accumulation vector comprises an accumulation value and a sparse vector.
@@ -96,7 +96,7 @@ namespace nil {
                         return accumulation_vector<Type>(std::move(new_first), std::move(acc_result.second));
                     }
                 };
-            }    // namespace snark
+            }    // namespace commitments
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

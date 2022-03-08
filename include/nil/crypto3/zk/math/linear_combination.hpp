@@ -28,22 +28,20 @@
 // - a linear combination (i.e., sum_i a_i * x_i).
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_LINEAR_COMBINATION_HPP
-#define CRYPTO3_ZK_LINEAR_COMBINATION_HPP
+#ifndef CRYPTO3_ZK_MATH_LINEAR_COMBINATION_HPP
+#define CRYPTO3_ZK_MATH_LINEAR_COMBINATION_HPP
 
 #include <vector>
-
-#include <nil/crypto3/zk/snark/relations/variable.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace math {
 
                 /**
                  * Forward declaration.
                  */
-                template<typename FieldType, bool RotationSupport>
+                template<typename VariableType>
                 struct linear_combination;
 
                 /****************************** Linear term **********************************/
@@ -51,22 +49,16 @@ namespace nil {
                 /**
                  * A linear term represents a formal expression of the form "coeff * x_{index}".
                  */
-                template<typename FieldType, bool RotationSupport = false>
-                class linear_term;
-
-                template<typename FieldType>
-                class linear_term<FieldType, false> {
-                    typedef FieldType field_type;
-                    typedef typename field_type::value_type field_value_type;
-
-                    constexpr static const bool RotationSupport = false;
+                template<typename VariableType>
+                class linear_term {
+                    typedef typename VariableType::value_type field_value_type;
 
                 public:
-                    typename variable<FieldType, RotationSupport>::index_type index;
+                    std::size_t index;
                     field_value_type coeff;
 
                     linear_term() {};
-                    linear_term(const variable<field_type> &var) : index(var.index), coeff(field_value_type::one()) {
+                    linear_term(const VariableType &var) : index(var.index), coeff(field_value_type::one()) {
                     }
 
                     linear_term operator*(const field_value_type &field_coeff) const {
@@ -75,13 +67,13 @@ namespace nil {
                         return result;
                     }
 
-                    // linear_combination<field_type, RotationSupport> operator+(
-                    //     const linear_combination<field_type, RotationSupport> &other) const {
-                    //     return linear_combination<field_type, RotationSupport>(*this) + other;
+                    // linear_combination<VariableType> operator+(
+                    //     const linear_combination<VariableType> &other) const {
+                    //     return linear_combination<VariableType>(*this) + other;
                     // }
 
-                    // linear_combination<field_type, RotationSupport> operator-(
-                    //     const linear_combination<field_type, RotationSupport> &other) const {
+                    // linear_combination<VariableType> operator-(
+                    //     const linear_combination<VariableType> &other) const {
                     //     return (*this) + (-other);
                     // }
 
@@ -94,24 +86,24 @@ namespace nil {
                     }
                 };
 
-                template<typename FieldType, bool RotationSupport>
-                linear_term<FieldType, RotationSupport> operator*(const typename FieldType::value_type &field_coeff,
-                                                                  const linear_term<FieldType, RotationSupport> &lt) {
+                template<typename VariableType>
+                linear_term<VariableType> operator*(const typename VariableType::value_type &field_coeff,
+                                                                  const linear_term<VariableType> &lt) {
                     return lt * field_coeff;
                 }
 
-                // template<typename FieldType, bool RotationSupport>
-                // linear_combination<FieldType, RotationSupport> operator+(const typename FieldType::value_type
+                // template<typename VariableType>
+                // linear_combination<VariableType> operator+(const typename VariableType::value_type
                 // &field_coeff,
-                //                                         const linear_term<FieldType, RotationSupport> &lt) {
-                //     return linear_combination<FieldType, RotationSupport>(field_coeff) + lt;
+                //                                         const linear_term<VariableType> &lt) {
+                //     return linear_combination<VariableType>(field_coeff) + lt;
                 // }
 
-                // template<typename FieldType, bool RotationSupport>
-                // linear_combination<FieldType, RotationSupport> operator-(const typename FieldType::value_type
+                // template<typename VariableType>
+                // linear_combination<VariableType> operator-(const typename VariableType::value_type
                 // &field_coeff,
-                //                                         const linear_term<FieldType, RotationSupport> &lt) {
-                //     return linear_combination<FieldType, RotationSupport>(field_coeff) - lt;
+                //                                         const linear_term<VariableType> &lt) {
+                //     return linear_combination<VariableType>(field_coeff) - lt;
                 // }
 
                 /***************************** Linear combination ****************************/
@@ -119,27 +111,26 @@ namespace nil {
                 /**
                  * A linear combination represents a formal expression of the form "sum_i coeff_i * x_{index_i}".
                  */
-                template<typename FieldType>
-                class linear_combination<FieldType, false> {
-                    typedef FieldType field_type;
-                    typedef typename field_type::value_type field_value_type;
+                template<typename VariableType>
+                class linear_combination {
+                    typedef typename VariableType::value_type field_value_type;
 
                     constexpr static const bool RotationSupport = false;
 
                 public:
-                    std::vector<linear_term<FieldType, RotationSupport>> terms;
+                    std::vector<linear_term<VariableType>> terms;
 
                     linear_combination() {};
                     linear_combination(const field_value_type &field_coeff) {
-                        this->add_term(linear_term<FieldType, RotationSupport>(0) * field_coeff);
+                        this->add_term(linear_term<VariableType>(0) * field_coeff);
                     }
-                    linear_combination(const variable<FieldType, RotationSupport> &var) {
+                    linear_combination(const VariableType &var) {
                         this->add_term(var);
                     }
-                    linear_combination(const linear_term<FieldType, RotationSupport> &lt) {
+                    linear_combination(const linear_term<VariableType> &lt) {
                         this->add_term(lt);
                     }
-                    linear_combination(const std::vector<linear_term<FieldType, RotationSupport>> &all_terms) {
+                    linear_combination(const std::vector<linear_term<VariableType>> &all_terms) {
                         if (all_terms.empty()) {
                             return;
                         }
@@ -147,7 +138,7 @@ namespace nil {
                         terms = all_terms;
                         std::sort(
                             terms.begin(), terms.end(),
-                            [](linear_term<FieldType, RotationSupport> a, linear_term<FieldType, RotationSupport> b) {
+                            [](linear_term<VariableType> a, linear_term<VariableType> b) {
                                 return a.index < b.index;
                             });
 
@@ -163,22 +154,22 @@ namespace nil {
                     }
 
                     /* for supporting range-based for loops over linear_combination */
-                    typename std::vector<linear_term<FieldType, RotationSupport>>::const_iterator begin() const {
+                    typename std::vector<linear_term<VariableType>>::const_iterator begin() const {
                         return terms.begin();
                     }
 
-                    typename std::vector<linear_term<FieldType, RotationSupport>>::const_iterator end() const {
+                    typename std::vector<linear_term<VariableType>>::const_iterator end() const {
                         return terms.end();
                     }
 
-                    void add_term(const variable<FieldType, RotationSupport> &var) {
-                        this->terms.emplace_back(linear_term<FieldType, RotationSupport>(var));
+                    void add_term(const VariableType &var) {
+                        this->terms.emplace_back(linear_term<VariableType>(var));
                     }
-                    void add_term(const variable<FieldType, RotationSupport> &var,
+                    void add_term(const VariableType &var,
                                   const field_value_type &field_coeff) {
-                        this->terms.emplace_back(linear_term<FieldType, RotationSupport>(var) * field_coeff);
+                        this->terms.emplace_back(linear_term<VariableType>(var) * field_coeff);
                     }
-                    void add_term(const linear_term<FieldType, RotationSupport> &lt) {
+                    void add_term(const linear_term<VariableType> &lt) {
                         this->terms.emplace_back(lt);
                     }
 
@@ -192,7 +183,7 @@ namespace nil {
                     linear_combination operator*(const field_value_type &field_coeff) const {
                         linear_combination result;
                         result.terms.reserve(this->terms.size());
-                        for (const linear_term<FieldType, RotationSupport> &lt : this->terms) {
+                        for (const linear_term<VariableType> &lt : this->terms) {
                             result.terms.emplace_back(lt * field_coeff);
                         }
                         return result;
@@ -215,8 +206,8 @@ namespace nil {
                                 ++it2;
                             } else {
                                 /* it1->index == it2->index */
-                                result.terms.emplace_back(linear_term<FieldType, RotationSupport>(
-                                                              variable<FieldType, RotationSupport>(it1->index)) *
+                                result.terms.emplace_back(linear_term<VariableType>(
+                                                              VariableType(it1->index)) *
                                                           (it1->coeff + it2->coeff));
                                 ++it1;
                                 ++it2;
@@ -240,17 +231,17 @@ namespace nil {
 
                     bool operator==(const linear_combination &other) const {
 
-                        std::vector<linear_term<FieldType, RotationSupport>> thisterms = this->terms;
+                        std::vector<linear_term<VariableType>> thisterms = this->terms;
                         std::sort(
                             thisterms.begin(), thisterms.end(),
-                            [](linear_term<FieldType, RotationSupport> a, linear_term<FieldType, RotationSupport> b) {
+                            [](linear_term<VariableType> a, linear_term<VariableType> b) {
                                 return a.index < b.index;
                             });
 
-                        std::vector<linear_term<FieldType, RotationSupport>> otherterms = other.terms;
+                        std::vector<linear_term<VariableType>> otherterms = other.terms;
                         std::sort(
                             otherterms.begin(), otherterms.end(),
-                            [](linear_term<FieldType, RotationSupport> a, linear_term<FieldType, RotationSupport> b) {
+                            [](linear_term<VariableType> a, linear_term<VariableType> b) {
                                 return a.index < b.index;
                             });
 
@@ -275,29 +266,29 @@ namespace nil {
                     }
                 };
 
-                template<typename FieldType, bool RotationSupport>
-                linear_combination<FieldType, RotationSupport>
-                    operator*(const typename FieldType::value_type &field_coeff,
-                              const linear_combination<FieldType, RotationSupport> &lc) {
+                template<typename VariableType>
+                linear_combination<VariableType>
+                    operator*(const typename VariableType::value_type &field_coeff,
+                              const linear_combination<VariableType> &lc) {
                     return lc * field_coeff;
                 }
 
-                template<typename FieldType, bool RotationSupport>
-                linear_combination<FieldType, RotationSupport>
-                    operator+(const typename FieldType::value_type &field_coeff,
-                              const linear_combination<FieldType, RotationSupport> &lc) {
-                    return linear_combination<FieldType, RotationSupport>(field_coeff) + lc;
+                template<typename VariableType>
+                linear_combination<VariableType>
+                    operator+(const typename VariableType::value_type &field_coeff,
+                              const linear_combination<VariableType> &lc) {
+                    return linear_combination<VariableType>(field_coeff) + lc;
                 }
 
-                template<typename FieldType, bool RotationSupport>
-                linear_combination<FieldType, RotationSupport>
-                    operator-(const typename FieldType::value_type &field_coeff,
-                              const linear_combination<FieldType, RotationSupport> &lc) {
-                    return linear_combination<FieldType, RotationSupport>(field_coeff) - lc;
+                template<typename VariableType>
+                linear_combination<VariableType>
+                    operator-(const typename VariableType::value_type &field_coeff,
+                              const linear_combination<VariableType> &lc) {
+                    return linear_combination<VariableType>(field_coeff) - lc;
                 }
-            }    // namespace snark
+            }    // namespace math
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_LINEAR_COMBINATION_HPP
+#endif    // CRYPTO3_ZK_MATH_LINEAR_COMBINATION_HPP

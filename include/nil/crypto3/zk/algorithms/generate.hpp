@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -23,33 +24,32 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PICKLES_COMMITMENT_SCHEME_HPP
-#define CRYPTO3_ZK_PICKLES_COMMITMENT_SCHEME_HPP
-
-#include <nil/crypto3/math/polynomial/polynomial.hpp>
+#ifndef CRYPTO3_ZK_SNARK_ALGORITHMS_GENERATE_HPP
+#define CRYPTO3_ZK_SNARK_ALGORITHMS_GENERATE_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                template<typename CurveType>
-                class pedersen_commitment_scheme {
-                public:
-                    typedef typename CurveType::scalar_field_type::value_type evaluation_type;
-                    typedef typename CurveType::template g1_type<>::value_type commitment_type;
+            template<typename ProofSystemType>
+            typename ProofSystemType::keypair_type
+                generate(const typename ProofSystemType::constraint_system_type &constraint_system) {
 
-                    struct openning_type { };
+                return ProofSystemType::generate(constraint_system);
+            }
 
-                    struct proof_type { };
+            template<typename ProofSystemType>
+            typename ProofSystemType::keypair_type generate(const typename ProofSystemType::circuit_type &circuit) {
 
-                    static commitment_type commit() {
-                        return commitment_type();
-                    }
-                };
+                return ProofSystemType::generate(circuit);
+            }
 
-            }    // namespace snark
+            template<typename ProofSystemType>
+            typename ProofSystemType::srs_pair_type generate(std::size_t num_proofs) {
+
+                return ProofSystemType::generate(num_proofs);
+            }
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PICKLES_COMMITMENT_SCHEME_HPP
+#endif    // CRYPTO3_ZK_SNARK_ALGORITHMS_GENERATE_HPP

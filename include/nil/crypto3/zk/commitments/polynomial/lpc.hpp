@@ -33,13 +33,13 @@
 #include <nil/crypto3/container/merkle/tree.hpp>
 #include <nil/crypto3/container/merkle/proof.hpp>
 
-#include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/snark/commitments/fri.hpp>
+#include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace commitments {
                 template<typename MerkleTreeHashType,
                          typename TranscriptHashType,
                          std::size_t Lambda = 40,
@@ -207,7 +207,7 @@ namespace nil {
                         return true;
                     }
                 };
-            }    // namespace snark
+            }    // namespace commitments
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

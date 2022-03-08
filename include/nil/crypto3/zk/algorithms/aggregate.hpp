@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -22,20 +23,21 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_SNARK_PROVING_KEY_HPP
-#define CRYPTO3_ZK_SNARK_PROVING_KEY_HPP
+#ifndef CRYPTO3_ZK_SNARK_ALGORITHMS_AGGREGATE_HPP
+#define CRYPTO3_ZK_SNARK_ALGORITHMS_AGGREGATE_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                template<typename ZkScheme>
-                class proving_key {
-                    typedef ZkScheme scheme_type;
-                };
-            }    // namespace snark
+            template<typename ProofSystemType, template<typename T> class ProofRange>
+            bool aggregate(const typename ProofSystemType::processed_verification_key_type &pvk,
+                           const typename ProofSystemType::primary_input_type &primary_input,
+                           const typename ProofSystemType::proof_type &proof) {
+
+                return ProofSystemType::verify(pvk, primary_input, proof);
+            }
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif
+#endif    // CRYPTO3_ZK_SNARK_ALGORITHMS_AGGREGATE_HPP

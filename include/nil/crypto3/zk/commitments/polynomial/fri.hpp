@@ -37,12 +37,12 @@
 #include <nil/crypto3/container/merkle/tree.hpp>
 #include <nil/crypto3/container/merkle/proof.hpp>
 
-#include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace commitments {
 
                 /**
                  * @brief Based on the FRI Commitment description from \[ResShift].
@@ -75,6 +75,8 @@ namespace nil {
                     using field_element_type =
                         nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
                                                                         FieldType>;
+                    
+                    using commitment_type = typename merkle_tree_type::value_type;
 
                     struct params_type {
                         bool operator==(const params_type &rhs) const {
@@ -367,7 +369,7 @@ namespace nil {
                         return true;
                     }
                 };
-            }    // namespace snark
+            }    // namespace commitments
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

@@ -30,33 +30,31 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                template<typename ProofSystemType>
-                typename ProofSystemType::proof_type
-                    prove(const typename ProofSystemType::proving_key_type &pk,
-                          const typename ProofSystemType::primary_input_type &primary_input,
-                          const typename ProofSystemType::auxiliary_input_type &auxiliary_input) {
+            template<typename ProofSystemType>
+            typename ProofSystemType::proof_type
+                prove(const typename ProofSystemType::proving_key_type &pk,
+                      const typename ProofSystemType::primary_input_type &primary_input,
+                      const typename ProofSystemType::auxiliary_input_type &auxiliary_input) {
 
-                    return ProofSystemType::prove(pk, primary_input, auxiliary_input);
-                }
+                return ProofSystemType::prove(pk, primary_input, auxiliary_input);
+            }
 
-                template<typename ProofSystemType,
-                         typename Hash,
-                         typename InputTranscriptIncludeIterator,
-                         typename InputProofIterator>
-                typename ProofSystemType::aggregate_proof_type
-                    prove(const typename ProofSystemType::proving_srs_type &srs,
-                          InputTranscriptIncludeIterator transcript_include_first,
-                          InputTranscriptIncludeIterator transcript_include_last,
-                          InputProofIterator proofs_first,
-                          InputProofIterator proofs_last) {
+            template<typename ProofSystemType,
+                     typename Hash,
+                     typename InputTranscriptIncludeIterator,
+                     typename InputProofIterator>
+            typename ProofSystemType::aggregate_proof_type
+                prove(const typename ProofSystemType::proving_srs_type &srs,
+                      InputTranscriptIncludeIterator transcript_include_first,
+                      InputTranscriptIncludeIterator transcript_include_last,
+                      InputProofIterator proofs_first,
+                      InputProofIterator proofs_last) {
 
-                    return ProofSystemType::template prove<Hash>(
-                        srs, transcript_include_first, transcript_include_last, proofs_first, proofs_last);
-                }
-            }    // namespace snark
+                return ProofSystemType::template prove<Hash>(
+                    srs, transcript_include_first, transcript_include_last, proofs_first, proofs_last);
+            }
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_SNARK_ALGORITHMS_HPP
+#endif    // CRYPTO3_ZK_SNARK_ALGORITHMS_PROVE_HPP
