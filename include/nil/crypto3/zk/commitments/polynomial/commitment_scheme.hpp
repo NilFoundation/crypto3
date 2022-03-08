@@ -34,6 +34,8 @@ namespace nil {
 
                 template<typename FieldType>
                 struct polynomial {
+
+                    
                     
                 };
             }    // namespace commitments

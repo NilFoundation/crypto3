@@ -61,7 +61,8 @@ namespace nil {
                          typename MerkleTreeHashType,
                          typename TranscriptHashType,
                          std::size_t M = 2>
-                struct fri_commitment_scheme {
+                struct fri {
+
                     constexpr static const std::size_t m = M;
 
                     typedef FieldType field_type;
@@ -76,7 +77,9 @@ namespace nil {
                         nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
                                                                         FieldType>;
                     
-                    using commitment_type = typename merkle_tree_type::value_type;
+                    using precommitment_type = merkle_tree_type;
+                    using commitment_type = typename precommitment_type::value_type;
+                    using transcript_type = transcript::fiat_shamir_heuristic_sequential<TranscriptHashType>;
 
                     struct params_type {
                         bool operator==(const params_type &rhs) const {
@@ -141,7 +144,7 @@ namespace nil {
                     // After this function
                     // result.root();
                     // should be called
-                    static merkle_tree_type commit(math::polynomial<typename FieldType::value_type> &f,
+                    static precommitment_type precommit(math::polynomial<typename FieldType::value_type> &f,
                                                    const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
                         std::vector<std::array<std::uint8_t, field_element_type::length()>> y_data;
@@ -155,7 +158,33 @@ namespace nil {
                             y_val.write(write_iter, field_element_type::length());
                         }
 
-                        return merkle_tree_type(y_data.begin(), y_data.end());
+                        return precommitment_type(y_data.begin(), y_data.end());
+                    }
+
+                    template<std::size_t list_size>
+                    static std::array<precommitment_type, list_size>
+                        precommit(std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
+                               const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
+                        std::array<precommitment_type, list_size> precommits;
+                        for (std::size_t i = 0; i < list_size; i++) {
+                            precommits[i] = precommit(poly[i], domain);
+                        }
+                        return precommits;
+                    }
+
+                    static commitment_type commit(precommitment_type P) {
+                        return P.root();
+                    }
+
+                    template<std::size_t list_size>
+                    static std::array<commitment_type, list_size>
+                        commit(std::array<precommitment_type, list_size> P) {
+
+                        std::array<commitment_type, list_size> commits;
+                        for (std::size_t i = 0; i < list_size; i++) {
+                            commits[i] = commit(P);
+                        }
+                        return commits;
                     }
 
                     static inline math::polynomial<typename FieldType::value_type>
@@ -179,8 +208,8 @@ namespace nil {
                     static proof_type proof_eval(const math::polynomial<typename FieldType::value_type> &Q,
                                                  const math::polynomial<typename FieldType::value_type> &g,
                                                  merkle_tree_type &T,
-                                                 fiat_shamir_heuristic_sequential<TranscriptHashType> &transcript,
-                                                 const params_type &fri_params) {
+                                                 const params_type &fri_params,
+                                                 transcript_type &transcript = transcript_type()) {
 
                         proof_type proof;
 
@@ -249,7 +278,7 @@ namespace nil {
                                 f_next.evaluate(x_next);    // polynomial evaluation
 
                             if (i < r - 1) {
-                                T_next = commit(f_next, fri_params.D[i + 1]);    // new merkle tree
+                                T_next = precommit(f_next, fri_params.D[i + 1]);    // new merkle tree
                                 transcript(T_next.root());
 
                                 std::vector<typename FieldType::value_type> tmp(f_next.begin(),
@@ -282,10 +311,10 @@ namespace nil {
                     }
 
                     static bool verify_eval(proof_type &proof,
-                                            fiat_shamir_heuristic_sequential<TranscriptHashType> &transcript,
                                             params_type &fri_params,
                                             const math::polynomial<typename FieldType::value_type> &U,
-                                            const math::polynomial<typename FieldType::value_type> &V) {
+                                            const math::polynomial<typename FieldType::value_type> &V,
+                                            transcript_type &transcript = transcript_type()) {
 
                         std::size_t idx = transcript.template int_challenge<std::size_t>();
                         typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(idx);

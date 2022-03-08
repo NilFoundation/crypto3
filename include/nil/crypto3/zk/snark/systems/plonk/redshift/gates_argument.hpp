@@ -53,6 +53,7 @@ namespace nil {
                 struct redshift_gates_argument<FieldType, ParamsType, 1> {
 
                     typedef typename ParamsType::transcript_hash_type transcript_hash_type;
+                    using transcript_type = transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
 
                     typedef detail::redshift_policy<FieldType, ParamsType> policy_type;
 
@@ -61,9 +62,9 @@ namespace nil {
                     static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
                         prove_eval(typename policy_type::constraint_system_type &constraint_system,
                                    const plonk_polynomial_table<FieldType, ParamsType::witness_columns,
-                                    ParamsType::selector_columns, ParamsType::public_input_columns,
-                                    ParamsType::constant_columns> &column_polynomials,
-                                   fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript) {
+                                   ParamsType::selector_columns, ParamsType::public_input_columns,
+                                   ParamsType::constant_columns> &column_polynomials,
+                                   transcript_type &transcript = transcript_type()) {
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
@@ -96,7 +97,7 @@ namespace nil {
                                         ParamsType::public_input_columns, ParamsType::constant_columns> public_polynomials,
                                     typename policy_type::evaluation_map &evaluations,
                                     typename FieldType::value_type challenge,
-                                    fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript) {
+                                    transcript_type &transcript = transcript_type()) {
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
                         std::array<typename FieldType::value_type, argument_size> F;

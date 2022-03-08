@@ -33,7 +33,7 @@ namespace nil {
         namespace zk {
             namespace commitments {
                 template<typename CurveType>
-                class pedersen_commitment_scheme {
+                class pedersen {
                 public:
                     typedef typename CurveType::scalar_field_type::value_type evaluation_type;
                     typedef typename CurveType::template g1_type<>::value_type commitment_type;

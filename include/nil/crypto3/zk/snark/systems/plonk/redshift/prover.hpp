@@ -80,19 +80,19 @@ namespace nil {
                     constexpr static const std::size_t opening_points_t = 1;
                     constexpr static const std::size_t opening_points_public = 1;
 
-                    typedef list_polynomial_commitment_scheme<FieldType,
+                    typedef commitments::list_polynomial_commitment<FieldType,
                                                               typename ParamsType::commitment_params_type,
                                                               opening_points_witness>
                         commitment_scheme_witness_type;
-                    typedef list_polynomial_commitment_scheme<FieldType,
+                    typedef commitments::list_polynomial_commitment<FieldType,
                                                               typename ParamsType::commitment_params_type,
                                                               opening_points_v_p>
                         commitment_scheme_permutation_type;
-                    typedef list_polynomial_commitment_scheme<FieldType,
+                    typedef commitments::list_polynomial_commitment<FieldType,
                                                               typename ParamsType::commitment_params_type,
                                                               opening_points_t>
                         commitment_scheme_quotient_type;
-                    typedef list_polynomial_commitment_scheme<FieldType,
+                    typedef commitments::list_polynomial_commitment<FieldType,
                                                               typename ParamsType::commitment_params_type,
                                                               opening_points_public>
                         commitment_scheme_public_input_type;
@@ -105,7 +105,7 @@ namespace nil {
                         const typename policy_type::preprocessed_public_data_type preprocessed_public_data,
                         std::array<math::polynomial<typename FieldType::value_type>, f_parts>
                             F,
-                        fiat_shamir_heuristic_sequential<transcript_hash_type>
+                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>
                             &transcript) {
                         // 7.1. Get $\alpha_0, \dots, \alpha_8 \in \mathbb{F}$ from $hash(\text{transcript})$
                         std::array<typename FieldType::value_type, f_parts> alphas =
@@ -152,19 +152,19 @@ namespace nil {
                         // 1. Add circuit definition to transcript
                         // transcript(short_description); //TODO: circuit_short_description marshalling
                         std::vector<std::uint8_t> transcript_init {};
-                        fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(transcript_init);
+                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(transcript_init);
 
                         // 2. Commit witness columns
                         std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_poly =
                             preprocessed_private_data.private_polynomial_table.witnesses();
 
                         std::array<typename commitment_scheme_witness_type::merkle_tree_type, witness_columns>
-                            witness_commitments = commitment_scheme_witness_type::template commit<witness_columns>(
+                            witness_precommitments = commitment_scheme_witness_type::template precommit<witness_columns>(
                                 witness_poly, fri_params.D[0]);
 
                         proof.witness_commitments.resize(witness_columns);
                         for (std::size_t i = 0; i < witness_columns; i++) {
-                            proof.witness_commitments[i] = witness_commitments[i].root();
+                            proof.witness_commitments[i] = commitment_scheme_witness_type::commit(witness_precommitments[i]);
                             transcript(proof.witness_commitments[i]);
                         }
 
@@ -173,11 +173,11 @@ namespace nil {
                             redshift_permutation_argument<FieldType,
                                                           commitment_scheme_public_input_type,
                                                           commitment_scheme_permutation_type,
-                                                          ParamsType>::prove_eval(transcript,
-                                                                                  constraint_system,
+                                                          ParamsType>::prove_eval(constraint_system,
                                                                                   preprocessed_public_data,
                                                                                   polynomial_table,
-                                                                                  fri_params);
+                                                                                  fri_params,
+                                                                                  transcript);
 
                         proof.v_perm_commitment = permutation_argument.permutation_poly_commitment.root();
 
@@ -203,11 +203,12 @@ namespace nil {
                             quotient_polynomial(preprocessed_public_data, F, transcript);
                         std::vector<math::polynomial<typename FieldType::value_type>> T_splitted =
                             detail::split_polynomial<FieldType>(T, fri_params.max_degree);
-                        std::vector<typename commitment_scheme_quotient_type::merkle_tree_type> T_commitments(
+                        std::vector<typename commitment_scheme_quotient_type::merkle_tree_type> T_precommitments(
                             T_splitted.size());
                         for (std::size_t i = 0; i < T_splitted.size(); i++) {
-                            T_commitments[i] = commitment_scheme_quotient_type::commit(T_splitted[i], fri_params.D[0]);
-                            proof.T_commitments.push_back(T_commitments[i].root());
+                            T_precommitments[i] = commitment_scheme_quotient_type::precommit(T_splitted[i], fri_params.D[0]);
+                            proof.T_commitments.push_back(
+                                commitment_scheme_quotient_type::commit(T_precommitments[i]));
                             transcript(proof.T_commitments[i]);
                         }
 
@@ -221,7 +222,7 @@ namespace nil {
                         // witness polynomials (table columns)
                         std::array<typename commitment_scheme_witness_type::proof_type, witness_columns>
                             witnesses_evaluation;
-                        for (std::size_t i = 0; i < witness_commitments.size(); i++) {
+                        for (std::size_t i = 0; i < witness_precommitments.size(); i++) {
                             std::vector<std::size_t> rotation_gates = {0};    // TODO: Rotation
                             std::array<typename FieldType::value_type, 1>
                                 evaluation_points_gates;    // TODO: array size with rotation
@@ -231,10 +232,10 @@ namespace nil {
 
                             witnesses_evaluation[i] =
                                 commitment_scheme_witness_type::proof_eval(evaluation_points_gates,
-                                                                           witness_commitments[i],
+                                                                           witness_precommitments[i],
                                                                            witness_poly[i],
-                                                                           transcript,
-                                                                           fri_params);
+                                                                           fri_params,
+                                                                           transcript);
                             proof.eval_proof.witness.push_back(witnesses_evaluation[i]);
                         }
 
@@ -246,8 +247,8 @@ namespace nil {
                                 evaluation_points_v_p,
                                 permutation_argument.permutation_poly_commitment,
                                 permutation_argument.permutation_polynomial,
-                                transcript,
-                                fri_params);
+                                fri_params,
+                                transcript);
                         proof.eval_proof.permutation.push_back(v_p_evaluation);
 
                         // quotient
@@ -256,7 +257,7 @@ namespace nil {
                             T_splitted.size());
                         for (std::size_t i = 0; i < T_splitted.size(); i++) {
                             quotient_evaluation[i] = commitment_scheme_quotient_type::proof_eval(
-                                evaluation_points_quotient, T_commitments[i], T_splitted[i], transcript, fri_params);
+                                evaluation_points_quotient, T_precommitments[i], T_splitted[i], fri_params, transcript);
                             proof.eval_proof.quotient.push_back(quotient_evaluation[i]);
                         }                        
 

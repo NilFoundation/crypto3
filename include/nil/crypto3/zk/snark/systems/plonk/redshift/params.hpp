@@ -53,7 +53,7 @@ namespace nil {
 
                     constexpr static const typename FieldType::value_type delta = algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
 
-                    typedef list_polynomial_commitment_params<MerkleTreeHashType, TranscriptHashType, Lambda, R, M>
+                    typedef commitments::list_polynomial_commitment_params<MerkleTreeHashType, TranscriptHashType, Lambda, R, M>
                         commitment_params_type;
                 };
             }    // namespace snark

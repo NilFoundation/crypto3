@@ -68,7 +68,7 @@ namespace nil {
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
                 template<typename FieldType, typename LPCParams, std::size_t K = 1>
-                struct list_polynomial_commitment_scheme {
+                struct list_polynomial_commitment {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
                     using transcript_hash_type = typename LPCParams::transcript_hash_type;
@@ -89,9 +89,11 @@ namespace nil {
                     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
                     typedef typename containers::merkle_proof<merkle_hash_type, 2> merkle_proof_type;
 
-                    typedef fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+                    typedef fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
 
-                    using commitment_type = typename merkle_tree_type::value_type;
+                    using precommitment_type = typename fri_type::precommitment_type;
+                    using commitment_type = typename fri_type::commitment_type;
+                    using transcript_type = typename fri_type::transcript_type;
 
                     struct proof_type {
                         bool operator==(const proof_type &rhs) const {
@@ -103,7 +105,7 @@ namespace nil {
 
                         std::array<typename FieldType::value_type, k> z;
 
-                        typename merkle_tree_type::value_type T_root;
+                        commitment_type T_root;
 
                         std::array<typename fri_type::proof_type, lambda> fri_proof;
                     };
@@ -121,28 +123,36 @@ namespace nil {
                     // After this function
                     // result.root();
                     // should be called
-                    static merkle_tree_type commit(math::polynomial<typename FieldType::value_type> &poly,
+                    static precommitment_type precommit(math::polynomial<typename FieldType::value_type> &poly,
                                                    const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
 
-                        return fri_type::commit(poly, domain);
+                        return fri_type::precommit(poly, domain);
                     }
 
                     template<std::size_t list_size>
-                    static std::array<merkle_tree_type, list_size>
-                        commit(std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
+                    static std::array<precommitment_type, list_size>
+                        precommit(std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
                                const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
-                        std::array<merkle_tree_type, list_size> commits;
-                        for (std::size_t i = 0; i < list_size; i++) {
-                            commits[i] = fri_type::commit(poly[i], domain);
-                        }
-                        return commits;
+                        
+                        return fri_type::precommit(poly, domain);
+                    }
+
+                    static commitment_type commit(precommitment_type P) {
+                        return fri_type::commit(P);
+                    }
+
+                    template<std::size_t list_size>
+                    static std::array<commitment_type, list_size>
+                        commit(std::array<precommitment_type, list_size> P) {
+
+                        return fri_type::commit(P);
                     }
 
                     static proof_type proof_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
-                                                 merkle_tree_type &T,
+                                                 precommitment_type &T,
                                                  const math::polynomial<typename FieldType::value_type> &g,
-                                                 fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript,
-                                                 const typename fri_type::params_type &fri_params) {
+                                                 const typename fri_type::params_type &fri_params,
+                                                 transcript_type &transcript = transcript_type()) {
 
                         std::array<typename FieldType::value_type, k> z;
                         std::array<merkle_proof_type, k> p;
@@ -172,7 +182,7 @@ namespace nil {
 
                         for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {
                             fri_proof[round_id] =
-                                fri_type::proof_eval(Q, g, T, transcript, fri_params);    // fri_commitment_scheme.hpp
+                                fri_type::proof_eval(Q, g, T, fri_params, transcript);
                         }
 
                         return proof_type({z, T.root(), fri_proof});
@@ -180,8 +190,9 @@ namespace nil {
 
                     static bool verify_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
                                             proof_type &proof,
-                                            fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript,
-                                            typename fri_type::params_type fri_params) {
+                                            typename fri_type::params_type fri_params,
+                                            transcript_type &transcript = transcript_type()) {
+
                         std::array<std::pair<typename FieldType::value_type, typename FieldType::value_type>, k>
                             U_interpolation_points;
 
@@ -199,7 +210,7 @@ namespace nil {
                         }
 
                         for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {
-                            if (!fri_type::verify_eval(proof.fri_proof[round_id], transcript, fri_params, U, V)) {
+                            if (!fri_type::verify_eval(proof.fri_proof[round_id], fri_params, U, V, transcript)) {
                                 return false;
                             }
                         }
@@ -207,6 +218,9 @@ namespace nil {
                         return true;
                     }
                 };
+
+                template<typename FieldType, typename LPCParams, std::size_t K>
+                using lpc = list_polynomial_commitment<FieldType, LPCParams, K>;
             }    // namespace commitments
         }        // namespace zk
     }            // namespace crypto3

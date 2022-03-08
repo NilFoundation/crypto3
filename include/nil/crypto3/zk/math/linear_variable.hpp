@@ -33,85 +33,83 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
-            namespace math {
+        namespace math {
 
-                /**
-                 * Forward declaration.
-                 */
-                template<typename VariableType>
-                struct linear_term;
+            /**
+             * Forward declaration.
+             */
+            template<typename VariableType>
+            struct linear_term;
 
-                /**
-                 * Forward declaration.
-                 */
-                template<typename VariableType>
-                struct linear_combination;
+            /**
+             * Forward declaration.
+             */
+            template<typename VariableType>
+            struct linear_combination;
 
-                /********************************* Variable **********************************/
+            /********************************* Variable **********************************/
 
-                /**
-                 * A variable represents a formal expression of the form "x_{index}".
-                 */
-                template<typename FieldType>
-                class linear_variable {
+            /**
+             * A variable represents a formal expression of the form "x_{index}".
+             */
+            template<typename FieldType>
+            class linear_variable {
 
-                    using variable_type = linear_variable<FieldType>;
-                public:
+                using variable_type = linear_variable<FieldType>;
+            public:
 
-                    std::size_t index;
+                std::size_t index;
 
-                    linear_variable(const std::size_t index = 0) : index(index) {};
+                linear_variable(const std::size_t index = 0) : index(index) {};
 
-                    linear_term<variable_type>
-                        operator*(const typename FieldType::value_type &field_coeff) const {
-                        return linear_term<variable_type>(*this) * field_coeff;
-                    }
-
-                    linear_combination<variable_type>
-                        operator+(const linear_combination<variable_type> &other) const {
-                        linear_combination<variable_type> result;
-
-                        result.add_term(*this);
-                        result.terms.insert(result.terms.begin(), other.terms.begin(), other.terms.end());
-
-                        return result;
-                    }
-
-                    linear_combination<variable_type>
-                        operator-(const linear_combination<FieldType> &other) const {
-                        return (*this) + (-other);
-                    }
-
-                    linear_term<variable_type> operator-() const {
-                        return linear_term<FieldType>(*this) * (-FieldType::value_type::one());
-                    }
-
-                    bool operator==(const linear_variable &other) const {
-                        return (this->index == other.index);
-                    }
-                };
-
-                template<typename FieldType>
-                linear_term<linear_variable<FieldType>> operator*(const typename FieldType::value_type &field_coeff,
-                                                        const linear_variable<FieldType> &var) {
-                    return var * field_coeff;
+                linear_term<variable_type>
+                    operator*(const typename FieldType::value_type &field_coeff) const {
+                    return linear_term<variable_type>(*this) * field_coeff;
                 }
 
-                template<typename FieldType>
-                linear_combination<linear_variable<FieldType>> operator+(const typename FieldType::value_type &field_coeff,
-                                                               const linear_variable<FieldType> &var) {
-                    return var + field_coeff;
+                linear_combination<variable_type>
+                    operator+(const linear_combination<variable_type> &other) const {
+                    linear_combination<variable_type> result;
+
+                    result.add_term(*this);
+                    result.terms.insert(result.terms.begin(), other.terms.begin(), other.terms.end());
+
+                    return result;
                 }
 
-                template<typename FieldType>
-                linear_combination<linear_variable<FieldType>> operator-(const typename FieldType::value_type &field_coeff,
-                                                               const linear_variable<FieldType> &var) {
-                    return linear_combination<linear_variable<FieldType>>(field_coeff) - var;
+                linear_combination<variable_type>
+                    operator-(const linear_combination<FieldType> &other) const {
+                    return (*this) + (-other);
                 }
 
-            }    // namespace math
-        }        // namespace zk
+                linear_term<variable_type> operator-() const {
+                    return linear_term<FieldType>(*this) * (-FieldType::value_type::one());
+                }
+
+                bool operator==(const linear_variable &other) const {
+                    return (this->index == other.index);
+                }
+            };
+
+            template<typename FieldType>
+            linear_term<linear_variable<FieldType>> operator*(const typename FieldType::value_type &field_coeff,
+                                                    const linear_variable<FieldType> &var) {
+                return var * field_coeff;
+            }
+
+            template<typename FieldType>
+            linear_combination<linear_variable<FieldType>> operator+(const typename FieldType::value_type &field_coeff,
+                                                           const linear_variable<FieldType> &var) {
+                return var + field_coeff;
+            }
+
+            template<typename FieldType>
+            linear_combination<linear_variable<FieldType>> operator-(const typename FieldType::value_type &field_coeff,
+                                                           const linear_variable<FieldType> &var) {
+                return linear_combination<linear_variable<FieldType>>(field_coeff) - var;
+            }
+
+        }    // namespace math
     }            // namespace crypto3
 }    // namespace nil
 

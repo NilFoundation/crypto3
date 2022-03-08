@@ -32,8 +32,8 @@
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 
+#include <nil/crypto3/zk/math/permutation.hpp>
 #include "nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp"
-#include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
 
 using namespace nil::crypto3;
 
@@ -137,7 +137,7 @@ namespace nil {
                         permutation_polynomials(std::size_t permutation_size, std::size_t table_size,
                                                 const typename FieldType::value_type &omega,
                                                 const typename FieldType::value_type &delta,
-                                                plonk_permutation &permutation,
+                                                math::plonk_permutation &permutation,
                                                 const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
 
                         std::vector<math::polynomial<typename FieldType::value_type>> S_perm(permutation_size);
@@ -199,7 +199,7 @@ namespace nil {
 
                         // TODO: add std::vector<std::size_t> columns_with_copy_constraints;
 
-                        plonk_permutation permutation;
+                        math::plonk_permutation permutation;
 
                         std::vector<math::polynomial<typename FieldType::value_type>> _permutation_polynomials =
                             permutation_polynomials(columns_with_copy_constraints.size(),

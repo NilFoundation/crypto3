@@ -33,9 +33,10 @@
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
-#include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
+#include <nil/crypto3/zk/math/permutation.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/variable.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/table.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
@@ -64,7 +65,7 @@ namespace nil {
                     typename FieldType::value_type omega;
                     typename FieldType::value_type delta;
 
-                    plonk_permutation permutation;
+                    math::plonk_permutation permutation;
 
                     std::vector<math::polynomial<typename FieldType::value_type>> S_id;
                     std::vector<math::polynomial<typename FieldType::value_type>> S_sigma;
@@ -83,7 +84,7 @@ namespace nil {
                         omega = domain->get_domain_element(1);
                         delta = algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
 
-                        permutation = plonk_permutation(witness_columns + public_columns, table_rows);
+                        permutation = math::plonk_permutation(witness_columns + public_columns, table_rows);
                     }
 
                     void init() {

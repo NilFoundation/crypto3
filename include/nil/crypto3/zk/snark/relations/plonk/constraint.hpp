@@ -31,7 +31,7 @@
 
 #include <nil/crypto3/zk/snark/relations/plonk/variable.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/table.hpp>
-#include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
+#include <nil/crypto3/zk/math/non_linear_combination.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,23 +48,23 @@ namespace nil {
                 /************************* PLONK constraint ***********************************/
 
                 template<typename FieldType, typename VariableType = plonk_variable<FieldType>>
-                class plonk_constraint : public non_linear_combination<VariableType> {
+                class plonk_constraint : public math::non_linear_combination<VariableType> {
                 public:
-                    plonk_constraint() : non_linear_combination<VariableType>() {};
+                    plonk_constraint() : math::non_linear_combination<VariableType>() {};
 
-                    plonk_constraint(const VariableType &var) : non_linear_combination<VariableType>(var) {
+                    plonk_constraint(const VariableType &var) : math::non_linear_combination<VariableType>(var) {
                     }
 
-                    plonk_constraint(const non_linear_combination<VariableType> &nlc) : 
-                    non_linear_combination<VariableType>(nlc) {
+                    plonk_constraint(const math::non_linear_combination<VariableType> &nlc) : 
+                    math::non_linear_combination<VariableType>(nlc) {
                     }
 
-                    plonk_constraint(const non_linear_term<VariableType> &nlt) :
-                        non_linear_combination<VariableType>(nlt) {
+                    plonk_constraint(const math::non_linear_term<VariableType> &nlt) :
+                        math::non_linear_combination<VariableType>(nlt) {
                     }
 
-                    plonk_constraint(const std::vector<non_linear_term<VariableType>> &terms) :
-                        non_linear_combination<VariableType>(terms) {
+                    plonk_constraint(const std::vector<math::non_linear_term<VariableType>> &terms) :
+                        math::non_linear_combination<VariableType>(terms) {
                     }
 
                     template<std::size_t WitnessColumns, std::size_t SelectorColumns, 
@@ -74,7 +74,7 @@ namespace nil {
                                  const plonk_assignment_table<FieldType, WitnessColumns, 
                                     SelectorColumns, PublicInputColumns, ConstantColumns> &assignments) const {
                         typename VariableType::assignment_type acc = VariableType::assignment_type::zero();
-                        for (const non_linear_term<VariableType> &nlt : this->terms) {
+                        for (const math::non_linear_term<VariableType> &nlt : this->terms) {
                             typename VariableType::assignment_type term_value = nlt.coeff;
 
                             for (const VariableType &var : nlt.vars) {
@@ -108,7 +108,7 @@ namespace nil {
                         evaluate(const plonk_polynomial_table<FieldType, WitnessColumns,
                                     SelectorColumns, PublicInputColumns, ConstantColumns> &assignments) const {
                         math::polynomial<typename VariableType::assignment_type> acc = {0};
-                        for (const non_linear_term<VariableType> &nlt : this->terms) {
+                        for (const math::non_linear_term<VariableType> &nlt : this->terms) {
                             math::polynomial<typename VariableType::assignment_type> term_value = {nlt.coeff};
 
                             for (const VariableType &var : nlt.vars) {
@@ -138,7 +138,7 @@ namespace nil {
 
                     typename VariableType::assignment_type evaluate(detail::plonk_evaluation_map<VariableType> &assignments) const {
                         typename VariableType::assignment_type acc = VariableType::assignment_type::zero();
-                        for (const non_linear_term<VariableType> &nlt : this->terms) {
+                        for (const math::non_linear_term<VariableType> &nlt : this->terms) {
                             typename VariableType::assignment_type term_value = nlt.coeff;
 
                             for (const VariableType &var : nlt.vars) {
