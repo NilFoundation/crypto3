@@ -87,7 +87,7 @@ namespace nil {
                     struct params_type {
 
                     };
-                    
+
                     /// Returns both vectors scaled by the given vector entrywise.
                     /// In other words, it returns $\{v_i^{s_i}\}$
                     static std::pair<commitment_key_type, verification_key_type> setup(const std::size_t n) {
@@ -108,7 +108,8 @@ namespace nil {
                     /// $C = \prod_{i=0}^n (g^{a^i})^{f_i}$
                     /// Output is $C$
                     static commitment_type commit(const commitment_key_type &ckey, 
-                            const math::polynomial<typename FieldType::value_type> &f) {
+                            const math::polynomial<typename FieldType::value_type> &f,
+                            params_type params) {
                         BOOST_ASSERT(ckey.has_correct_len(std::distance(f_first, f_last)));
 
                         g1_value_type c = g1_value_type::one();
@@ -126,7 +127,8 @@ namespace nil {
                                                  commitment_type C_f,
                                                  typename CurveType::base_field_type::value_type x,
                                                  typename CurveType::base_field_type::value_type y,
-                                                 const math::polynomial<typename FieldType::value_type> &f) {
+                                                 const math::polynomial<typename FieldType::value_type> &f,
+                                                 params_type params) {
 
                         const math::polynomial<typename FieldType::value_type> denominator_polynom = {1, -x};
 
@@ -138,7 +140,8 @@ namespace nil {
                                             commitment_type C_f,
                                             typename CurveType::base_field_type::value_type x,
                                             typename CurveType::base_field_type::value_type y,
-                                            proof_type p) {
+                                            proof_type p,
+                                            params_type params) {
 
                     }
 
