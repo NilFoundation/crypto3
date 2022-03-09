@@ -84,6 +84,10 @@ namespace nil {
                     using commitment_type = typename CurveType::template g1_type<>::value_type;
                     using proof_type = commitment_type;
 
+                    struct params_type {
+
+                    };
+                    
                     /// Returns both vectors scaled by the given vector entrywise.
                     /// In other words, it returns $\{v_i^{s_i}\}$
                     static std::pair<commitment_key_type, verification_key_type> setup(const std::size_t n) {
