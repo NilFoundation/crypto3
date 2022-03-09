@@ -26,21 +26,16 @@
 #ifndef CRYPTO3_ZK_COMMITMENTS_TYPE_TRAITS_HPP
 #define CRYPTO3_ZK_COMMITMENTS_TYPE_TRAITS_HPP
 
-#include <complex>
-
-#include <boost/type_traits.hpp>
 #include <boost/tti/tti.hpp>
-#include <boost/mpl/placeholders.hpp>
-#include <boost/type_traits/is_same.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace algebra {
-
-            using namespace boost::mpl::placeholders;
+        namespace zk {
 
             BOOST_TTI_HAS_TYPE(commitment_type)
             BOOST_TTI_HAS_TYPE(proof_type)
+
+            BOOST_TTI_MEMBER_TYPE(commitment_type)
             // BOOST_TTI_HAS_TYPE(proving_key)
             // BOOST_TTI_HAS_TYPE(verification_key)
 
@@ -50,13 +45,14 @@ namespace nil {
             
             template<typename T>
             struct is_commitment {
-                static const bool value = has_type_base_field_type<T>::value && has_type_scalar_field_type<T>::value &&
-                                          has_type_g1_type<T>::value && has_type_g2_type<T>::value &&
-                                          has_type_gt_type<T>::value;
+                using commitment_type = typename member_type_commitment_type<T>::type;
+
+                static const bool value = has_type_commitment_type<T>::value && has_type_proof_type<T>::value &&
+                                          has_static_member_function_commit<T, commitment_type>::value;
                 typedef T type;
             };
 
-        }    // namespace algebra
+        }    // namespace zk
     }        // namespace crypto3
 }    // namespace nil
 

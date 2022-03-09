@@ -51,8 +51,8 @@
 // verifier of the Groth16 verification protocol since we pack two vectors in
 // one commitment.
 
-#ifndef KZG_COMMITMENT_HPP
-#define KZG_COMMITMENT_HPP
+#ifndef CRYPTO3_ZK_COMMITMENTS_KZG_COMMITMENT_HPP
+#define CRYPTO3_ZK_COMMITMENTS_KZG_COMMITMENT_HPP
 
 #include <tuple>
 #include <vector>
@@ -70,44 +70,23 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                /// KZGOpening represents the KZG opening of a commitment key (which is a tuple
-                /// given commitment keys are a tuple).
-                template<typename GroupType>
-                using kzg_opening = typename GroupType::value_type;
 
-                /// Both commitment outputs a pair of $F_q^k$ element.
                 template<typename CurveType>
-                using kzg_commitment_output = typename CurveType::g1_type::value_type;
+                struct kzg_commitment {
+                    typedef CurveType curve_type;
+                    typedef algebra::pairing::pairing_policy<curve_type> pairing;
 
-                /// Key is a generic commitment key that is instantiated with g and h as basis,
-                /// and a and b as powers.
-                template<typename GroupType>
-                struct kzg_commitment_key {
-                    typedef GroupType group_type;
-                    typedef typename group_type::curve_type curve_type;
-                    typedef typename curve_type::scalar_field_type field_type;
+                    /// Key is a generic commitment key that is instantiated with g and h as basis,
+                    /// and a and b as powers.
+                    using commitment_key_type = std::vector<typename CurveType::template g1_type<>::value_type>;
+                    using verification_key_type = typename CurveType::template g1_type<>::value_type;
 
-                    typedef typename group_type::value_type group_value_type;
-                    typedef typename field_type::value_type field_value_type;
-
-                    /// Exponent is a
-                    std::vector<group_value_type> a;
-
-                    /// Returns true if commitment keys have the exact required length.
-                 
-                    inline bool has_correct_len(std::size_t n) const {
-                        return a.size() == n ;
-                    }
+                    using commitment_type = typename CurveType::template g1_type<>::value_type;
+                    using proof_type = commitment_type;
 
                     /// Returns both vectors scaled by the given vector entrywise.
                     /// In other words, it returns $\{v_i^{s_i}\}$
-                    template<
-                        typename InputIterator,
-                        typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
-                        typename std::enable_if<std::is_same<field_value_type, ValueType>::value, bool>::type = true>
-                    kzg_commitment_key<group_type> setup(InputIterator s_first,
-                                                                            InputIterator s_last) const {
-                        BOOST_ASSERT(has_correct_len(std::distance(s_first, s_last)));
+                    static std::pair<commitment_key_type, verification_key_type> setup(const std::size_t n) {
 
                         kzg_commitment_key<group_type> result;
                         std::for_each(boost::make_zip_iterator(boost::make_tuple(s_first, a.begin())),
@@ -120,35 +99,12 @@ namespace nil {
 
                         return result;
                     }
-                };
-
-                template<typename CurveType>
-                using kzg_ckey = kzg_commitment_key<typename CurveType::template g1_type<>>;
-
-
-                template<typename CurveType>
-                struct kzg_commitment {
-                    typedef CurveType curve_type;
-                    typedef algebra::pairing::pairing_policy<curve_type> pairing;
-
-                    typedef kzg_ckey<curve_type>ckey_type;
-                    typedef kzg_vkey<curve_type> vkey_type;
-
-                    typedef typename ckey_type::group_value_type g1_value_type;
-                    typedef typename vkey_type::group_value_type g2_value_type;
-                    typedef typename curve_type::gt_type::value_type gt_value_type;
-
-                    typedef kzg_commitment_output<curve_type> output_type;
-
-                   
 
                     /// Commits to a single vector of G1 elements in the following way:
                     /// $C = \prod_{i=0}^n (g^{a^i})^{f_i}$
                     /// Output is $C$
-                    template<typename InputG1Iterator,
-                             typename ValueType1 = typename std::iterator_traits<InputG1Iterator>::value_type,
-                             typename std::enable_if<std::is_same<g1_value_type, ValueType1>::value, bool>::type = true>
-                    static output_type commit(const ckey_type &ckey, InputG1Iterator f_first, InputG1Iterator f_last) {
+                    static commitment_type commit(const commitment_key_type &ckey, 
+                            const math::polynomial<typename FieldType::value_type> &f) {
                         BOOST_ASSERT(ckey.has_correct_len(std::distance(f_first, f_last)));
 
                         g1_value_type c = g1_value_type::one();
@@ -161,10 +117,27 @@ namespace nil {
                                       });
                 
                     }
+
+                    static proof_type proof_eval(commitment_key_type commitment_key,
+                                                 commitment_type C_f,
+                                                 typename CurveType::base_field_type::value_type x,
+                                                 typename CurveType::base_field_type::value_type y,
+                                                 const math::polynomial<typename FieldType::value_type> &f) {
+
+                    }
+
+                    static bool verify_eval(verification_key_type verification_key,
+                                            commitment_type C_f,
+                                            typename CurveType::base_field_type::value_type x,
+                                            typename CurveType::base_field_type::value_type y,
+                                            proof_type p) {
+
+                    }
+
                 };
             } ;   // namespace snark 
         }        // namespace zk
     }          // namespace crypto3
 }    // namespace nil
 
-#endif   
+#endif    // CRYPTO3_ZK_COMMITMENTS_KZG_COMMITMENT_HPP

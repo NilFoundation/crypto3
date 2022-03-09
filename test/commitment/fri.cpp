@@ -44,6 +44,7 @@
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
+#include <nil/crypto3/zk/commitments/type_traits.hpp>
 
 using namespace nil::crypto3;
 
@@ -66,6 +67,10 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     constexpr static const std::size_t m = 2;
 
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+
+    static_assert(zk::is_commitment<fri_type>::value);
+    static_assert(!zk::is_commitment<merkle_hash_type>::value);
+
     typedef typename fri_type::proof_type proof_type;
     typedef typename fri_type::params_type params_type;
 
