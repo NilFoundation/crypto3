@@ -66,7 +66,7 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log) {
     math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
-        fri_type::calculate_domain_set(degree_log, degree_log - 1);
+        zk::commitments::detail::calculate_domain_set<FieldType>(degree_log, degree_log - 1);
 
     params.r = degree_log - 1;
     params.D = domain_set;
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     std::array<typename FieldType::value_type, 3> verifier_res =
         redshift_permutation_argument<FieldType, lpc_type, lpc_type, circuit_2_params>::verify_eval(
             preprocessed_public_data, y, f_at_y, v_p_at_y, v_p_at_y_shifted,
-            prover_res.permutation_poly_commitment.root(),
+            prover_res.permutation_poly_precommitment.root(),
             verifier_transcript);
 
     typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();

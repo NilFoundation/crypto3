@@ -87,7 +87,7 @@ namespace nil {
                                                                         commitment_scheme_permutation_type,
                                                                         commitment_scheme_quotient_type> &proof,
                         typename policy_type::constraint_system_type &constraint_system,
-                        const typename commitment_scheme_witness_type::fri_type::params_type
+                        const typename commitment_scheme_witness_type::params_type
                                     &fri_params) {
 
                         // 1. Add circuit definition to transcript

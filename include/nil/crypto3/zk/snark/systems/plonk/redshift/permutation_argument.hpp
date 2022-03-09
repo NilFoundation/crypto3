@@ -56,8 +56,6 @@ namespace nil {
 
                     typedef detail::redshift_policy<FieldType, ParamsType> policy_type;
 
-                    typedef typename CommitmentSchemeTypePermutation::fri_type fri_type;
-
                     static constexpr std::size_t argument_size = 3;
 
                 public:
@@ -66,7 +64,8 @@ namespace nil {
 
                         math::polynomial<typename FieldType::value_type> permutation_polynomial;
 
-                        typename CommitmentSchemeTypePermutation::merkle_tree_type permutation_poly_commitment;
+                        typename CommitmentSchemeTypePermutation::precommitment_type 
+                            permutation_poly_precommitment;
                     };
 
                     static inline prover_result_type prove_eval(
@@ -75,7 +74,7 @@ namespace nil {
                         const plonk_polynomial_table<FieldType, ParamsType::witness_columns,
                             ParamsType::selector_columns, ParamsType::public_input_columns,
                             ParamsType::constant_columns> &column_polynomials,
-                        typename fri_type::params_type fri_params,
+                        typename CommitmentSchemeTypePermutation::params_type fri_params,
                         transcript_type &transcript = transcript_type()) {
 
                         const std::size_t table_rows = constraint_system.rows_amount();

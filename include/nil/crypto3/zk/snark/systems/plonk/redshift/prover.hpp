@@ -132,7 +132,7 @@ namespace nil {
                                 const typename policy_type::preprocessed_private_data_type preprocessed_private_data,
                                 typename policy_type::constraint_system_type &constraint_system,
                                 const typename policy_type::variable_assignment_type &assignments,
-                                const typename commitment_scheme_witness_type::fri_type::params_type
+                                const typename commitment_scheme_witness_type::params_type
                                     &fri_params) {    // TODO: fri_type are the same for each lpc_type here
 
                         typename policy_type::template proof_type<commitment_scheme_witness_type,
@@ -158,7 +158,7 @@ namespace nil {
                         std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_poly =
                             preprocessed_private_data.private_polynomial_table.witnesses();
 
-                        std::array<typename commitment_scheme_witness_type::merkle_tree_type, witness_columns>
+                        std::array<typename commitment_scheme_witness_type::precommitment_type, witness_columns>
                             witness_precommitments = commitment_scheme_witness_type::template precommit<witness_columns>(
                                 witness_poly, fri_params.D[0]);
 
@@ -179,7 +179,7 @@ namespace nil {
                                                                                   fri_params,
                                                                                   transcript);
 
-                        proof.v_perm_commitment = permutation_argument.permutation_poly_commitment.root();
+                        proof.v_perm_commitment = permutation_argument.permutation_poly_precommitment.root();
 
                         std::array<math::polynomial<typename FieldType::value_type>, f_parts> F;
 
@@ -203,7 +203,7 @@ namespace nil {
                             quotient_polynomial(preprocessed_public_data, F, transcript);
                         std::vector<math::polynomial<typename FieldType::value_type>> T_splitted =
                             detail::split_polynomial<FieldType>(T, fri_params.max_degree);
-                        std::vector<typename commitment_scheme_quotient_type::merkle_tree_type> T_precommitments(
+                        std::vector<typename commitment_scheme_quotient_type::precommitment_type> T_precommitments(
                             T_splitted.size());
                         for (std::size_t i = 0; i < T_splitted.size(); i++) {
                             T_precommitments[i] = commitment_scheme_quotient_type::precommit(T_splitted[i], fri_params.D[0]);
@@ -245,7 +245,7 @@ namespace nil {
                         typename commitment_scheme_permutation_type::proof_type v_p_evaluation =
                             commitment_scheme_permutation_type::proof_eval(
                                 evaluation_points_v_p,
-                                permutation_argument.permutation_poly_commitment,
+                                permutation_argument.permutation_poly_precommitment,
                                 permutation_argument.permutation_polynomial,
                                 fri_params,
                                 transcript);

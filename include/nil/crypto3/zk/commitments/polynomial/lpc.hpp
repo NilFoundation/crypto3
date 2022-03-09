@@ -34,7 +34,7 @@
 #include <nil/crypto3/container/merkle/proof.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -68,32 +68,28 @@ namespace nil {
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
                 template<typename FieldType, typename LPCParams, std::size_t K = 1>
-                struct list_polynomial_commitment {
+                class list_polynomial_commitment : 
+                    public detail::basic_fri<FieldType, typename LPCParams::merkle_hash_type,
+                        typename LPCParams::transcript_hash_type, LPCParams::m> {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
-                    using transcript_hash_type = typename LPCParams::transcript_hash_type;
-
-                    using Endianness = nil::marshalling::option::big_endian;
-                    using field_element_type =
-                        nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
-                                                                        FieldType>;
 
                     constexpr static const std::size_t lambda = LPCParams::lambda;
                     constexpr static const std::size_t r = LPCParams::r;
                     constexpr static const std::size_t m = LPCParams::m;
                     constexpr static const std::size_t k = K;
 
-                    typedef FieldType field_type;
                     typedef LPCParams lpc_params;
 
-                    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
                     typedef typename containers::merkle_proof<merkle_hash_type, 2> merkle_proof_type;
 
-                    typedef fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+                    using basic_fri = detail::basic_fri<FieldType, typename LPCParams::merkle_hash_type,
+                        typename LPCParams::transcript_hash_type, m>;
 
-                    using precommitment_type = typename fri_type::precommitment_type;
-                    using commitment_type = typename fri_type::commitment_type;
-                    using transcript_type = typename fri_type::transcript_type;
+                public:
+
+                    using precommitment_type = typename basic_fri::precommitment_type;
+                    using commitment_type = typename basic_fri::commitment_type;
 
                     struct proof_type {
                         bool operator==(const proof_type &rhs) const {
@@ -107,52 +103,15 @@ namespace nil {
 
                         commitment_type T_root;
 
-                        std::array<typename fri_type::proof_type, lambda> fri_proof;
+                        std::array<typename basic_fri::proof_type, lambda> fri_proof;
                     };
-
-                private:
-                    static std::shared_ptr<math::evaluation_domain<FieldType>>
-                        prepare_domain(const std::size_t domain_size) {
-                        return math::make_evaluation_domain<FieldType>(domain_size);
-                    }
-
-                public:
-                    // The result of this function is not commitment_type (as it would expected),
-                    // but the built Merkle tree. This is done so, because we often need to reuse
-                    // the built Merkle tree
-                    // After this function
-                    // result.root();
-                    // should be called
-                    static precommitment_type precommit(math::polynomial<typename FieldType::value_type> &poly,
-                                                   const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
-
-                        return fri_type::precommit(poly, domain);
-                    }
-
-                    template<std::size_t list_size>
-                    static std::array<precommitment_type, list_size>
-                        precommit(std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
-                               const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
-                        
-                        return fri_type::precommit(poly, domain);
-                    }
-
-                    static commitment_type commit(precommitment_type P) {
-                        return fri_type::commit(P);
-                    }
-
-                    template<std::size_t list_size>
-                    static std::array<commitment_type, list_size>
-                        commit(std::array<precommitment_type, list_size> P) {
-
-                        return fri_type::commit(P);
-                    }
-
+                    
                     static proof_type proof_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
                                                  precommitment_type &T,
                                                  const math::polynomial<typename FieldType::value_type> &g,
-                                                 const typename fri_type::params_type &fri_params,
-                                                 transcript_type &transcript = transcript_type()) {
+                                                 const typename basic_fri::params_type &fri_params,
+                                                 typename basic_fri::transcript_type &transcript = 
+                                                    typename basic_fri::transcript_type()) {
 
                         std::array<typename FieldType::value_type, k> z;
                         std::array<merkle_proof_type, k> p;
@@ -178,20 +137,21 @@ namespace nil {
                         // temporary definition, until polynomial is constexpr
                         const math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
-                        std::array<typename fri_type::proof_type, lambda> fri_proof;
+                        std::array<typename basic_fri::proof_type, lambda> fri_proof;
 
                         for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {
                             fri_proof[round_id] =
-                                fri_type::proof_eval(Q, g, T, fri_params, transcript);
+                                basic_fri::proof_eval(Q, g, T, fri_params, transcript);
                         }
 
-                        return proof_type({z, T.root(), fri_proof});
+                        return proof_type({z, basic_fri::commit(T), fri_proof});
                     }
 
                     static bool verify_eval(const std::array<typename FieldType::value_type, k> &evaluation_points,
                                             proof_type &proof,
-                                            typename fri_type::params_type fri_params,
-                                            transcript_type &transcript = transcript_type()) {
+                                            typename basic_fri::params_type fri_params,
+                                            typename basic_fri::transcript_type &transcript = 
+                                                typename basic_fri::transcript_type()) {
 
                         std::array<std::pair<typename FieldType::value_type, typename FieldType::value_type>, k>
                             U_interpolation_points;
@@ -210,7 +170,7 @@ namespace nil {
                         }
 
                         for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {
-                            if (!fri_type::verify_eval(proof.fri_proof[round_id], fri_params, U, V, transcript)) {
+                            if (!basic_fri::verify_eval(proof.fri_proof[round_id], fri_params, U, V, transcript)) {
                                 return false;
                             }
                         }
