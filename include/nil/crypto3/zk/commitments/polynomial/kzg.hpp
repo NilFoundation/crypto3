@@ -124,6 +124,10 @@ namespace nil {
                                                  typename CurveType::base_field_type::value_type y,
                                                  const math::polynomial<typename FieldType::value_type> &f) {
 
+                        const math::polynomial<typename FieldType::value_type> denominator_polynom = {1, -x};
+
+                        const math::polynomial<typename FieldType::value_type> q = 
+                            (f - {y})/denominator_polynom;
                     }
 
                     static bool verify_eval(verification_key_type verification_key,
