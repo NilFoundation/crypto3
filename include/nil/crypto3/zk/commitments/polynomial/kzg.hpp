@@ -51,8 +51,8 @@
 // verifier of the Groth16 verification protocol since we pack two vectors in
 // one commitment.
 
-#ifndef CRYPTO3_R1CS_GG_PPZKSNARK_AGGREGATE_IPP2_COMMITMENT_HPP
-#define CRYPTO3_R1CS_GG_PPZKSNARK_AGGREGATE_IPP2_COMMITMENT_HPP
+#ifndef KZG_COMMITMENT_HPP
+#define KZG_COMMITMENT_HPP
 
 #include <tuple>
 #include <vector>
@@ -69,16 +69,15 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace commitments {
+            namespace snark {
                 /// KZGOpening represents the KZG opening of a commitment key (which is a tuple
                 /// given commitment keys are a tuple).
                 template<typename GroupType>
-                using kzg_opening = std::pair<typename GroupType::value_type, typename GroupType::value_type>;
+                using kzg_opening = typename GroupType::value_type;
 
                 /// Both commitment outputs a pair of $F_q^k$ element.
                 template<typename CurveType>
-                using r1cs_gg_ppzksnark_ipp2_commitment_output =
-                    std::pair<typename CurveType::gt_type::value_type, typename CurveType::gt_type::value_type>;
+                using kzg_commitment_output = typename CurveType::g1_type::value_type;
 
                 /// Key is a generic commitment key that is instantiated with g and h as basis,
                 /// and a and b as powers.
@@ -94,14 +93,14 @@ namespace nil {
                     /// Exponent is a
                     std::vector<group_value_type> a;
                     /// Exponent is b
-                    std::vector<group_value_type> b;
+                    //std::vector<group_value_type> b;
 
                     /// Returns true if commitment keys have the exact required length.
                     /// It is necessary for the IPP scheme to work that commitment
                     /// key have the exact same number of arguments as the number of proofs to
                     /// aggregate.
                     inline bool has_correct_len(std::size_t n) const {
-                        return a.size() == n && n == b.size();
+                        return a.size() == n ;
                     }
 
                     /// Returns both vectors scaled by the given vector entrywise.
@@ -115,152 +114,151 @@ namespace nil {
                         BOOST_ASSERT(has_correct_len(std::distance(s_first, s_last)));
 
                         kzg_commitment_key<group_type> result;
-                        std::for_each(boost::make_zip_iterator(boost::make_tuple(s_first, a.begin(), b.begin())),
-                                      boost::make_zip_iterator(boost::make_tuple(s_last, a.end(), b.end())),
+                        std::for_each(boost::make_zip_iterator(boost::make_tuple(s_first, a.begin())),
+                                      boost::make_zip_iterator(boost::make_tuple(s_last, a.end())),
                                       [&](const boost::tuple<const field_value_type &, const group_value_type &,
                                                              const group_value_type &> &t) {
                                           result.a.emplace_back(t.template get<1>() * t.template get<0>());
-                                          result.b.emplace_back(t.template get<2>() * t.template get<0>());
+                                          //result.b.emplace_back(t.template get<2>() * t.template get<0>());
                                       });
 
                         return result;
                     }
+                };
 
                     /// Returns the left and right commitment key part. It makes copy.
-                    std::pair<kzg_commitment_key<group_type>, kzg_commitment_key<group_type>>
-                        split(std::size_t at) const {
-                        BOOST_ASSERT(a.size() == b.size());
-                        BOOST_ASSERT(at > 0 && at < a.size());
+                    // std::pair<kzg_commitment_key<group_type>, kzg_commitment_key<group_type>>
+                    //     split(std::size_t at) const {
+                    //     BOOST_ASSERT(a.size() == b.size());
+                    //     BOOST_ASSERT(at > 0 && at < a.size());
 
-                        kzg_commitment_key<group_type> result_l;
-                        kzg_commitment_key<group_type> result_r;
+                    //     kzg_commitment_key<group_type> result_l;
+                    //     kzg_commitment_key<group_type> result_r;
 
-                        auto a_it = a.begin();
-                        auto b_it = b.begin();
-                        while (a_it != a.begin() + at && b_it != b.begin() + at) {
-                            result_l.a.emplace_back(*a_it);
-                            result_l.b.emplace_back(*b_it);
-                            ++a_it;
-                            ++b_it;
-                        }
-                        while (a_it != a.end() && b_it != b.end()) {
-                            result_r.a.emplace_back(*a_it);
-                            result_r.b.emplace_back(*b_it);
-                            ++a_it;
-                            ++b_it;
-                        }
+                    //     auto a_it = a.begin();
+                    //     auto b_it = b.begin();
+                    //     while (a_it != a.begin() + at && b_it != b.begin() + at) {
+                    //         result_l.a.emplace_back(*a_it);
+                    //         result_l.b.emplace_back(*b_it);
+                    //         ++a_it;
+                    //         ++b_it;
+                    //     }
+                    //     while (a_it != a.end() && b_it != b.end()) {
+                    //         result_r.a.emplace_back(*a_it);
+                    //         result_r.b.emplace_back(*b_it);
+                    //         ++a_it;
+                    //         ++b_it;
+                    //     }
 
-                        return std::make_pair(result_l, result_r);
-                    }
+                    //     return std::make_pair(result_l, result_r);
+                    // }
 
-                    /// Takes a left and right commitment key and returns a commitment
-                    /// key $left \circ right^{scale} = (left_i*right_i^{scale} ...)$. This is
-                    /// required step during GIPA recursion.
-                    kzg_commitment_key<group_type>
-                        compress(const kzg_commitment_key<group_type> &right,
-                                 const field_value_type &scale) const {
-                        BOOST_ASSERT(a.size() == right.a.size());
-                        BOOST_ASSERT(b.size() == right.b.size());
-                        BOOST_ASSERT(a.size() == b.size());
+                    // /// Takes a left and right commitment key and returns a commitment
+                    // /// key $left \circ right^{scale} = (left_i*right_i^{scale} ...)$. This is
+                    // /// required step during GIPA recursion.
+                    // kzg_commitment_key<group_type>
+                    //     compress(const kzg_commitment_key<group_type> &right,
+                    //              const field_value_type &scale) const {
+                    //     BOOST_ASSERT(a.size() == right.a.size());
 
-                        kzg_commitment_key<group_type> result;
+                    //     kzg_commitment_key<group_type> result;
 
-                        std::for_each(
-                            boost::make_zip_iterator(
-                                boost::make_tuple(a.begin(), b.begin(), right.a.begin(), right.b.begin())),
-                            boost::make_zip_iterator(boost::make_tuple(a.end(), b.end(), right.a.end(), right.b.end())),
-                            [&](const boost::tuple<const group_value_type &, const group_value_type &,
-                                                   const group_value_type &, const group_value_type &> &t) {
-                                result.a.emplace_back(t.template get<0>() + t.template get<2>() * scale);
-                                result.b.emplace_back(t.template get<1>() + t.template get<3>() * scale);
-                            });
+                    //     std::for_each(
+                    //         boost::make_zip_iterator(
+                    //             boost::make_tuple(a.begin(), b.begin(), right.a.begin(), right.b.begin())),
+                    //         boost::make_zip_iterator(boost::make_tuple(a.end(), b.end(), right.a.end(), right.b.end())),
+                    //         [&](const boost::tuple<const group_value_type &, const group_value_type &,
+                    //                                const group_value_type &, const group_value_type &> &t) {
+                    //             result.a.emplace_back(t.template get<0>() + t.template get<2>() * scale);
+                    //             result.b.emplace_back(t.template get<1>() + t.template get<3>() * scale);
+                    //         });
 
-                        return result;
-                    }
+                    //     return result;
+                    // }
 
                     /// Returns the first values in the vector of v1 and v2 (respectively
                     /// w1 and w2). When commitment key is of size one, it's a proxy to get the
                     /// final values.
-                    std::pair<group_value_type, group_value_type> first() const {
-                        return std::make_pair(a.front(), b.front());
-                    }
-                };
-
+                    // std::pair<group_value_type, group_value_type> first() const {
+                    //     return std::make_pair(a.front(), b.front());
+                    // }
+               // }
+         //   };
                 /// Commitment key used by the "single" commitment on G1 values as
                 /// well as in the "pair" commitment.
                 /// It contains $\{h^a^i\}_{i=1}^n$ and $\{h^b^i\}_{i=1}^n$
                 template<typename CurveType>
-                using r1cs_gg_ppzksnark_ipp2_vkey = kzg_commitment_key<typename CurveType::template g2_type<>>;
+                using kzg_ckey = kzg_commitment_key<typename CurveType::template g1_type<>>;
 
                 /// Commitment key used by the "pair" commitment. Note the sequence of
                 /// powers starts at $n$ already.
                 /// It contains $\{g^{a^{n+i}}\}_{i=1}^n$ and $\{g^{b^{n+i}}\}_{i=1}^n$
-                template<typename CurveType>
-                using r1cs_gg_ppzksnark_ipp2_wkey = kzg_commitment_key<typename CurveType::template g1_type<>>;
+                 template<typename CurveType>
+                using kzg_vkey = kzg_commitment_key<typename CurveType::template g2_type<>>;
 
                 template<typename CurveType>
                 struct kzg_commitment {
                     typedef CurveType curve_type;
                     typedef algebra::pairing::pairing_policy<curve_type> pairing;
 
-                    typedef r1cs_gg_ppzksnark_ipp2_wkey<curve_type> wkey_type;
-                    typedef r1cs_gg_ppzksnark_ipp2_vkey<curve_type> vkey_type;
+                    typedef kzg_ckey<curve_type>ckey_type;
+                    typedef kzg_vkey<curve_type> vkey_type;
 
-                    typedef typename wkey_type::group_value_type g1_value_type;
+                    typedef typename ckey_type::group_value_type g1_value_type;
                     typedef typename vkey_type::group_value_type g2_value_type;
                     typedef typename curve_type::gt_type::value_type gt_value_type;
 
-                    typedef r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type> output_type;
+                    typedef kzg_commitment_output<curve_type> output_type;
 
                     /// Commits to a tuple of G1 vector and G2 vector in the following way:
                     /// $T = \prod_{i=0}^n e(A_i, v_{1,i})e(B_i,w_{1,i})$
                     /// $U = \prod_{i=0}^n e(A_i, v_{2,i})e(B_i,w_{2,i})$
                     /// Output is $(T,U)$
-                    template<typename InputG1Iterator, typename InputG2Iterator,
-                             typename ValueType1 = typename std::iterator_traits<InputG1Iterator>::value_type,
-                             typename ValueType2 = typename std::iterator_traits<InputG2Iterator>::value_type,
-                             typename std::enable_if<std::is_same<g1_value_type, ValueType1>::value, bool>::type = true,
-                             typename std::enable_if<std::is_same<g2_value_type, ValueType2>::value, bool>::type = true>
-                    static output_type pair(const vkey_type &vkey, const wkey_type &wkey, InputG1Iterator a_first,
-                                            InputG1Iterator a_last, InputG2Iterator b_first, InputG2Iterator b_last) {
-                        BOOST_ASSERT(vkey.has_correct_len(std::distance(a_first, a_last)));
-                        BOOST_ASSERT(wkey.has_correct_len(std::distance(b_first, b_last)));
-                        BOOST_ASSERT(std::distance(a_first, a_last) == std::distance(b_first, b_last));
+                    // template<typename InputG1Iterator, typename InputG2Iterator,
+                    //          typename ValueType1 = typename std::iterator_traits<InputG1Iterator>::value_type,
+                    //          typename ValueType2 = typename std::iterator_traits<InputG2Iterator>::value_type,
+                    //          typename std::enable_if<std::is_same<g1_value_type, ValueType1>::value, bool>::type = true,
+                    //          typename std::enable_if<std::is_same<g2_value_type, ValueType2>::value, bool>::type = true>
+                    // static output_type pair(const vkey_type &vkey, const wkey_type &wkey, InputG1Iterator a_first,
+                    //                         InputG1Iterator a_last, InputG2Iterator b_first, InputG2Iterator b_last) {
+                    //     BOOST_ASSERT(vkey.has_correct_len(std::distance(a_first, a_last)));
+                    //     BOOST_ASSERT(wkey.has_correct_len(std::distance(b_first, b_last)));
+                    //     BOOST_ASSERT(std::distance(a_first, a_last) == std::distance(b_first, b_last));
 
-                        // (A * v)
-                        gt_value_type t1 = gt_value_type::one();
-                        std::for_each(boost::make_zip_iterator(boost::make_tuple(a_first, vkey.a.begin())),
-                                      boost::make_zip_iterator(boost::make_tuple(a_last, vkey.a.end())),
-                                      [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
-                                          t1 = t1 * algebra::pair<curve_type>(t.template get<0>(), t.template get<1>());
-                                      });
+                    //     // (A * v)
+                    //     gt_value_type t1 = gt_value_type::one();
+                    //     std::for_each(boost::make_zip_iterator(boost::make_tuple(a_first, vkey.a.begin())),
+                    //                   boost::make_zip_iterator(boost::make_tuple(a_last, vkey.a.end())),
+                    //                   [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
+                    //                       t1 = t1 * algebra::pair<curve_type>(t.template get<0>(), t.template get<1>());
+                    //                   });
 
-                        // (B * v)
-                        gt_value_type t2 = gt_value_type::one();
-                        std::for_each(boost::make_zip_iterator(boost::make_tuple(wkey.a.begin(), b_first)),
-                                      boost::make_zip_iterator(boost::make_tuple(wkey.a.end(), b_last)),
-                                      [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
-                                          t2 = t2 * algebra::pair<curve_type>(t.template get<0>(), t.template get<1>());
-                                      });
+                    //     // (B * v)
+                    //     gt_value_type t2 = gt_value_type::one();
+                    //     std::for_each(boost::make_zip_iterator(boost::make_tuple(wkey.a.begin(), b_first)),
+                    //                   boost::make_zip_iterator(boost::make_tuple(wkey.a.end(), b_last)),
+                    //                   [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
+                    //                       t2 = t2 * algebra::pair<curve_type>(t.template get<0>(), t.template get<1>());
+                    //                   });
 
-                        gt_value_type u1 = gt_value_type::one();
-                        std::for_each(boost::make_zip_iterator(boost::make_tuple(a_first, vkey.b.begin())),
-                                      boost::make_zip_iterator(boost::make_tuple(a_last, vkey.b.end())),
-                                      [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
-                                          u1 = u1 * algebra::pair<curve_type>(t.template get<0>(), t.template get<1>());
-                                      });
+                    //     gt_value_type u1 = gt_value_type::one();
+                    //     std::for_each(boost::make_zip_iterator(boost::make_tuple(a_first, vkey.b.begin())),
+                    //                   boost::make_zip_iterator(boost::make_tuple(a_last, vkey.b.end())),
+                    //                   [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
+                    //                       u1 = u1 * algebra::pair<curve_type>(t.template get<0>(), t.template get<1>());
+                    //                   });
 
-                        gt_value_type u2 = gt_value_type::one();
-                        std::for_each(boost::make_zip_iterator(boost::make_tuple(wkey.b.begin(), b_first)),
-                                      boost::make_zip_iterator(boost::make_tuple(wkey.b.end(), b_last)),
-                                      [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
-                                          u2 = u2 * algebra::pair<curve_type>(t.template get<0>(), t.template get<1>());
-                                      });
+                    //     gt_value_type u2 = gt_value_type::one();
+                    //     std::for_each(boost::make_zip_iterator(boost::make_tuple(wkey.b.begin(), b_first)),
+                    //                   boost::make_zip_iterator(boost::make_tuple(wkey.b.end(), b_last)),
+                    //                   [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
+                    //                       u2 = u2 * algebra::pair<curve_type>(t.template get<0>(), t.template get<1>());
+                    //                   });
 
-                        // (A * v)(w * B)
-                        return std::make_pair(algebra::final_exponentiation<curve_type>(t1 * t2),
-                                              algebra::final_exponentiation<curve_type>(u1 * u2));
-                    }
+                    //     // (A * v)(w * B)
+                    //     return std::make_pair(algebra::final_exponentiation<curve_type>(t1 * t2),
+                    //                           algebra::final_exponentiation<curve_type>(u1 * u2));
+                    // }
 
                     /// Commits to a single vector of G1 elements in the following way:
                     /// $T = \prod_{i=0}^n e(A_i, v_{1,i})$
@@ -269,30 +267,43 @@ namespace nil {
                     template<typename InputG1Iterator,
                              typename ValueType1 = typename std::iterator_traits<InputG1Iterator>::value_type,
                              typename std::enable_if<std::is_same<g1_value_type, ValueType1>::value, bool>::type = true>
-                    static output_type single(const vkey_type &vkey, InputG1Iterator a_first, InputG1Iterator a_last) {
-                        BOOST_ASSERT(vkey.has_correct_len(std::distance(a_first, a_last)));
+                    static output_type commit(const ckey_type &ckey, InputG1Iterator f_first, InputG1Iterator f_last) {
+                        BOOST_ASSERT(ckey.has_correct_len(std::distance(f_first, f_last)));
 
-                        gt_value_type t1 = gt_value_type::one();
-                        std::for_each(boost::make_zip_iterator(boost::make_tuple(a_first, vkey.a.begin())),
-                                      boost::make_zip_iterator(boost::make_tuple(a_last, vkey.a.end())),
-                                      [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
-                                          t1 = t1 * algebra::pair<curve_type>(t.template get<0>(), t.template get<1>());
+                        g1_value_type c = g1_value_type::one();
+                        // for(size_t i=0; i< std::distance(f_first, f_last))
+                        std::for_each_n(boost::make_zip_iterator(boost::make_tuple(f_first, ckey.a.begin())),
+                        std::distance(f_first, f_last),
+                                      //boost::make_zip_iterator(boost::make_tuple(f_last, ckey.a.end())),
+                                      [&](const boost::tuple<const g1_value_type &, const g1_value_type &> &t) {
+
+                        //  for(size_t i=0; i< t.template get<0>(); t++){}
+                        //                   //std::for_each(ckey.a.begin())),
+                        //              // boost::make_zip_iterator(boost::make_tuple(f_last, ckey.a.end())),
+                        //                   t1 = t1 * algebra::pair<curve_type>(t.template get<0>(), t.template get<1>());
+                        //               });
+
+                 //       g1_value_type c = g1_value_type::one();
+                        for(size_t i = 0; i < (t.template get<0>()); i++){
+                            c = c * t.template get<1>();
+                        }
                                       });
+                    
+                        // std::for_each(ckey.a.begin())),
+                        //               boost::make_zip_iterator(boost::make_tuple(a_last, vkey.b.end())),
+                        //               [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
+                        //                   u1 = u1 * algebra::pair<curve_type>(t.template get<0>(), t.template get<1>());
+                        //               });
 
-                        gt_value_type u1 = gt_value_type::one();
-                        std::for_each(boost::make_zip_iterator(boost::make_tuple(a_first, vkey.b.begin())),
-                                      boost::make_zip_iterator(boost::make_tuple(a_last, vkey.b.end())),
-                                      [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
-                                          u1 = u1 * algebra::pair<curve_type>(t.template get<0>(), t.template get<1>());
-                                      });
-
-                        return std::make_pair(algebra::final_exponentiation<curve_type>(t1),
-                                              algebra::final_exponentiation<curve_type>(u1));
+                        // return std::make_pair(algebra::final_exponentiation<curve_type>(t1),
+                        //                       algebra::final_exponentiation<curve_type>(u1));
                     }
                 };
-            }    // namespace commitments
+            } ;   // namespace snark
+            
         }        // namespace zk
-    }            // namespace crypto3
+    
+    }          // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_R1CS_GG_PPZKSNARK_AGGREGATE_IPP2_COMMITMENT_HPP
+#endif   
