@@ -190,8 +190,26 @@ namespace nil {
                     void generate_copy_constraints(blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         std::size_t circuit_start_row = 0){
 
+                        for (int z = 0; z < required_rows_amount - 2; z+=2){
+                            this->bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 2, false}});
+                            this->bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 2, false}});
+                        }
+
+                        // TODO: (x0, y0) in row i are copy constrained with values from the first doubling circuit
+
+                        for (int z = 2; z < required_rows_amount; z+=2){
+                            this->bp.add_copy_constraint({{W2, j + z, false}, {W0, j + z - 1, false}});
+                            this->bp.add_copy_constraint({{W3, j + z, false}, {W1, j + z - 1, false}});
+                        }
+
                         std::size_t public_input_column_index = 0;
-                        this->bp.add_copy_constraint({{W6, j, false}, {0, j, false, var::column_type::public_input}});
+                        this->bp.add_copy_constraint({{W4, j, false}, 
+                            {public_input_column_index, j, false, var::column_type::public_input}});
+                        public_assignment.public_input(public_input_column_index)[j] = 0;
+
+                        for (int z = 2; z < required_rows_amount; z+=2){
+                            this->bp.add_copy_constraint({{W5, j + z, false}, {W4, j + z - 2, false}});
+                        }
                     }
 
                     template <std::size_t WitnessColumns>

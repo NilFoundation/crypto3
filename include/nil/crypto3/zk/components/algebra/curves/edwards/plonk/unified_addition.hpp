@@ -137,6 +137,7 @@ namespace nil {
                         std::size_t public_input_column_index = 0;
                         this->bp.add_copy_constraint({{W6, j, false}, 
                             {public_input_column_index, j, false, var::column_type::public_input}});
+                        public_assignment.public_input(public_input_column_index)[j] = 0;
                     }
 
                     template <std::size_t WitnessColumns, std::size_t SelectorColumns,
