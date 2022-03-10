@@ -38,6 +38,8 @@
 
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/verifier.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
@@ -73,6 +75,21 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_allocat_rows_test_case) {
     zk::snark::plonk_assignment_table<BlueprintFieldType, WitnessColumns, SelectorColumns,
     	PublicInputColumns, ConstantColumns> assignments(
     	private_assignment, public_assignment);
+
+    using params = zk::snark::redshift_params<BlueprintFieldType, WitnessColumns, SelectorColumns,
+        PublicInputColumns, ConstantColumns>;
+    using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
+
+    typename types::preprocessed_public_data_type public_preprocessed_data =
+        zk::snark::redshift_public_preprocessor<BlueprintFieldType, params, 5>::process(bp, public_assignment, {});
+    typename types::preprocessed_private_data_type private_preprocessed_data =
+        zk::snark::redshift_private_preprocessor<BlueprintFieldType, params, 5>::process(bp, private_assignment);
+
+    auto proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(public_preprocessed_data, private_preprocessed_data,
+        bp, assignments, {});
+
+    bool verified = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data,
+        proof, bp, {});
 
     BOOST_CHECK_EQUAL(0, bp.allocate_rows());
     BOOST_CHECK_EQUAL(1, bp.allocate_rows(5));
