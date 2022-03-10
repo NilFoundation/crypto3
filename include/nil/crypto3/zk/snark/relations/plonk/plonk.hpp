@@ -96,7 +96,7 @@ namespace nil {
                         return _gates;
                     }
 
-                    std::vector<math::polynomial<typename FieldType::value_type>> copy_constraints() const {
+                    std::vector<plonk_copy_constraint<FieldType>> copy_constraints() const {
                         return _copy_constraints;
                     }
 

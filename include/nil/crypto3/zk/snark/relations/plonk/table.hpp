@@ -27,6 +27,8 @@
 #ifndef CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_HPP
 #define CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_HPP
 
+#include <nil/crypto3/zk/snark/relations/plonk/table_description.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -102,6 +104,10 @@ namespace nil {
                         return selector_columns;
                     }
 
+                    std::size_t selectors_size() {
+                        return selector_columns.size();
+                    }
+
                     ColumnType public_input(std::size_t index) const {
                         assert(index < PublicInputColumns);
                         return public_input_columns[index];
@@ -111,6 +117,10 @@ namespace nil {
                         return public_input_columns;
                     }
 
+                    std::size_t public_input_size() {
+                        return public_input_columns.size();
+                    }
+
                     ColumnType constant(std::size_t index) const {
                         assert(index < ConstantColumns);
                         return constant_columns[index];
@@ -118,6 +128,10 @@ namespace nil {
 
                     std::array<ColumnType, ConstantColumns> constants() const {
                         return constant_columns;
+                    }
+
+                    std::size_t constant_size() {
+                        return constant_columns.size();
                     }
 
                     ColumnType operator[](std::size_t index) const {
@@ -191,6 +205,13 @@ namespace nil {
 
                     std::size_t size() const {
                         return _private_table.size() + _public_table.size();
+                    }
+
+                    plonk_table_description<FieldType> table_description() {
+                        return plonk_table_description<FieldType> {_private_table.size(), 
+                            _public_table.selectors_size(),
+                            _public_table.public_input_size(),
+                            _public_table.constant_size()};
                     }
                 };
 

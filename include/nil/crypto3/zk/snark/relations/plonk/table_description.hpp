@@ -24,24 +24,39 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_POLYNOMIAL_COMMITMENT_SCHEME_HPP
-#define CRYPTO3_ZK_POLYNOMIAL_COMMITMENT_SCHEME_HPP
+#ifndef CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_DESCRIPTION_HPP
+#define CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_DESCRIPTION_HPP
 
+#include <nil/crypto3/zk/snark/relations/plonk/variable.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace commitments {
-
+            namespace snark {
                 template<typename FieldType>
-                struct polynomial {
+                struct plonk_table_description {
+                    std::size_t witness_columns;
+                    std::size_t selector_columns;
+                    std::size_t public_input_columns;
+                    std::size_t constant_columns;
 
-                    
-                    
+                    std::size_t global_index(const plonk_variable<FieldType> &a) const {
+                        switch (a.type)
+                        {
+                        case plonk_variable<FieldType>::column_type::witness:
+                            return a.index;
+                        case plonk_variable<FieldType>::column_type::selector:
+                            return witness_columns + a.index;
+                        case plonk_variable<FieldType>::column_type::public_input:
+                            return witness_columns + selector_columns + a.index;
+                        case plonk_variable<FieldType>::column_type::constant:
+                            return witness_columns + selector_columns + public_input_columns + a.index;
+                        }
+                    }
                 };
-            }    // namespace commitments
+            }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_POLYNOMIAL_COMMITMENT_SCHEME_HPP
+#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_DESCRIPTION_HPP
