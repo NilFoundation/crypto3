@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 
     typename policy_type::preprocessed_public_data_type preprocessed_public_data =
         redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(
-            constraint_system, assigments.public_table(), columns_with_copy_constraints);
+            constraint_system, assigments.public_table(), assigments.table_description(), columns_with_copy_constraints);
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
         redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
 
     typename policy_type::preprocessed_public_data_type preprocessed_public_data =
         redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(
-            constraint_system, assigments.public_table(), columns_with_copy_constraints);
+            constraint_system, assigments.public_table(), assigments.table_description(), columns_with_copy_constraints);
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
         redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(
@@ -235,6 +235,79 @@ BOOST_AUTO_TEST_CASE(redshift_split_polynomial_test) {
     BOOST_CHECK(f_at_y == f_splitted_at_y);
 }
 
+BOOST_AUTO_TEST_CASE(redshift_permutation_polynomials_test) {
+
+    circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size, usable_rows> circuit =
+        circuit_test_2<FieldType>();
+
+    constexpr std::size_t argument_size = 3;
+
+    using policy_type = zk::snark::detail::redshift_policy<FieldType, circuit_2_params>;
+
+    constexpr static const std::size_t r = table_rows_log - 1;
+    typedef list_polynomial_commitment_scheme<FieldType, circuit_2_params::commitment_params_type, k> lpc_type;
+
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
+
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, table_rows, usable_rows);
+    typename policy_type::variable_assignment_type assigments = circuit.table;
+
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+    typename policy_type::preprocessed_public_data_type preprocessed_public_data =
+        redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(
+            constraint_system, assigments.public_table(), assigments.table_description(), columns_with_copy_constraints);
+
+    typename policy_type::preprocessed_private_data_type preprocessed_private_data =
+        redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(
+            constraint_system, assigments.private_table());
+
+    auto polynomial_table =
+                            plonk_polynomial_table<FieldType, redshift_test_params::witness_columns,
+                                redshift_test_params::selector_columns, redshift_test_params::public_input_columns, 
+                                redshift_test_params::constant_columns>(
+                                preprocessed_private_data.private_polynomial_table,
+                                preprocessed_public_data.public_polynomial_table);
+
+    std::shared_ptr<math::evaluation_domain<FieldType>> domain = preprocessed_public_data.basic_domain;
+    typename FieldType::value_type id_res = FieldType::value_type::one();
+    typename FieldType::value_type sigma_res = FieldType::value_type::one();
+    for (std::size_t i = 0; i < table_rows; i++) {
+        for (std::size_t j = 0; j < preprocessed_public_data.identity_polynomials.size(); j++) {
+            id_res = id_res * preprocessed_public_data.identity_polynomials[j].evaluate(domain->get_domain_element(i));
+        } 
+
+        for (std::size_t j = 0; j < preprocessed_public_data.permutation_polynomials.size(); j++) {
+            sigma_res = sigma_res * preprocessed_public_data.permutation_polynomials[j].evaluate(domain->get_domain_element(i));
+        }
+    }
+    BOOST_CHECK_MESSAGE(id_res == sigma_res, "Simple check");
+
+    typename FieldType::value_type beta = algebra::random_element<FieldType>();
+    typename FieldType::value_type gamma = algebra::random_element<FieldType>();
+
+    id_res = FieldType::value_type::one();
+    sigma_res = FieldType::value_type::one();
+
+    for (std::size_t i = 0; i < table_rows; i++) {
+        for (std::size_t j = 0; j < preprocessed_public_data.identity_polynomials.size(); j++) {
+            id_res = id_res * (
+                            polynomial_table[j].evaluate(domain->get_domain_element(i)) +
+                            beta * preprocessed_public_data.identity_polynomials[j].evaluate(domain->get_domain_element(i))
+                            + gamma);
+        } 
+
+        for (std::size_t j = 0; j < preprocessed_public_data.permutation_polynomials.size(); j++) {
+            sigma_res = sigma_res * (
+                            polynomial_table[j].evaluate(domain->get_domain_element(i)) +
+                            beta * preprocessed_public_data.permutation_polynomials[j].evaluate(domain->get_domain_element(i))
+                            + gamma);
+        } 
+    }
+    BOOST_CHECK_MESSAGE(id_res == sigma_res, "Complex check");
+}
+
+
 BOOST_AUTO_TEST_CASE(redshift_lookup_argument_test) {
 
     // zk::snark::redshift_preprocessor<typename curve_type::base_field_type, 5, 2> preprocess;
@@ -262,7 +335,7 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
 
     typename policy_type::preprocessed_public_data_type preprocessed_public_data =
         redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(
-            constraint_system, assigments.public_table(), columns_with_copy_constraints);
+            constraint_system, assigments.public_table(), assigments.table_description(), columns_with_copy_constraints);
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
         redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(

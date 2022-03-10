@@ -66,14 +66,7 @@ namespace nil {
 
                     plonk_permutation permutation;
 
-                    std::vector<math::polynomial<typename FieldType::value_type>> S_id;
-                    std::vector<math::polynomial<typename FieldType::value_type>> S_sigma;
-
                     typename policy_type::variable_assignment_type table;
-
-                    // construct q_last, q_blind
-                    math::polynomial<typename FieldType::value_type> q_last;
-                    math::polynomial<typename FieldType::value_type> q_blind;
 
                     std::vector<plonk_gate<FieldType>> gates;
 
@@ -87,15 +80,6 @@ namespace nil {
                     }
 
                     void init() {
-                        S_id = redshift_public_preprocessor<FieldType, ParamsType, 1>::identity_polynomials(
-                            permutation_size, table_rows, omega, delta, domain);
-                        S_sigma = redshift_public_preprocessor<FieldType, ParamsType, 1>::permutation_polynomials(
-                            permutation_size, table_rows, omega, delta, permutation, domain);
-
-                        q_last = redshift_public_preprocessor<FieldType, ParamsType, 1>::selector_last(
-                            table_rows, usable_rows, domain);
-                        q_blind = redshift_public_preprocessor<FieldType, ParamsType, 1>::selector_blind(
-                            table_rows, usable_rows, domain);
                     }
                 };
 

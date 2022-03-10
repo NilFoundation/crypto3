@@ -34,6 +34,8 @@
 
 #include "nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp"
 #include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/copy_constraint.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/table_description.hpp>
 
 using namespace nil::crypto3;
 
@@ -111,6 +113,68 @@ namespace nil {
                         return f;
                     }
 
+                    struct cycle_representation {
+                        typedef std::pair<std::size_t, std::size_t> key_type;
+
+                        std::map<key_type, key_type> _mapping;
+                        std::map<key_type, key_type> _aux;
+                        std::map<key_type, std::size_t> _sizes;
+
+                        cycle_representation (typename policy_type::constraint_system_type &constraint_system, 
+                            const plonk_table_description<FieldType> &table_description) {
+                            std::vector<plonk_copy_constraint<FieldType>> copy_constraints = 
+                                                                constraint_system.copy_constraints();
+                            for (std::size_t i = 0; i < copy_constraints.size(); i++) {
+                                std::size_t x_idx = table_description.global_index(copy_constraints[i].first);
+                                key_type x = key_type(x_idx, copy_constraints[i].first.rotation);
+
+                                std::size_t y_idx = table_description.global_index(copy_constraints[i].second);
+                                key_type y = key_type(y_idx, copy_constraints[i].second.rotation);
+                                this->apply_copy_constraint(x, y);
+                            }
+                        }
+
+                        void apply_copy_constraint(key_type x, key_type y) {
+
+                            if (!_mapping.count(x)) {
+                                _mapping[x] = x;
+                                _aux[x] = x;
+                                _sizes[x] = 1;
+                            }
+
+                            if (!_mapping.count(y)) {
+                                _mapping[y] = y;
+                                _aux[y] = y;
+                                _sizes[y] = 1;
+                            }
+
+                            if (_aux[x] != _aux[y]) {
+                                key_type &left = x;
+                                key_type &right = y;
+                                if (_sizes[_aux[left]] < _sizes[_aux[right]]){
+                                    left = y;
+                                    right = x;
+                                }
+
+                                _sizes[_aux[left]] = _sizes[_aux[left]] + _sizes[_aux[right]];
+                                key_type z = _aux[right];
+
+                                do {
+                                    _aux[z] = _aux[left];
+                                    z = _mapping[z];
+                                } while (z != _aux[right]);
+
+                                key_type tmp = _mapping[left];
+                                _mapping[left] = _mapping[right];
+                                _mapping[right] = tmp;
+                            }
+                        }
+
+                        key_type &operator[](key_type key) {
+                            return _mapping[key];
+                        }
+                    };
+
                 public:
                     static inline std::vector<math::polynomial<typename FieldType::value_type>>
                         identity_polynomials(std::size_t permutation_size, std::size_t table_size,
@@ -137,7 +201,7 @@ namespace nil {
                         permutation_polynomials(std::size_t permutation_size, std::size_t table_size,
                                                 const typename FieldType::value_type &omega,
                                                 const typename FieldType::value_type &delta,
-                                                plonk_permutation &permutation,
+                                                cycle_representation &permutation,
                                                 const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
 
                         std::vector<math::polynomial<typename FieldType::value_type>> S_perm(permutation_size);
@@ -187,8 +251,9 @@ namespace nil {
                     }
 
                     static inline typename policy_type::preprocessed_public_data_type process(
-                        const typename policy_type::constraint_system_type &constraint_system,
+                        typename policy_type::constraint_system_type &constraint_system,
                         const typename policy_type::variable_assignment_type::public_table_type &public_assignment,
+                        const plonk_table_description<FieldType> &table_description,
                         std::vector<std::size_t> columns_with_copy_constraints) {
 
                         std::size_t N_rows = constraint_system.rows_amount();
@@ -198,8 +263,7 @@ namespace nil {
                             math::make_evaluation_domain<FieldType>(N_rows);
 
                         // TODO: add std::vector<std::size_t> columns_with_copy_constraints;
-
-                        plonk_permutation permutation;
+                        cycle_representation permutation(constraint_system, table_description);
 
                         std::vector<math::polynomial<typename FieldType::value_type>> _permutation_polynomials =
                             permutation_polynomials(columns_with_copy_constraints.size(),
@@ -232,14 +296,9 @@ namespace nil {
                                 detail::column_range_polynomials<FieldType>(public_assignment.constants(),
                                                                             basic_domain));
 
-                        std::vector<typename FieldType::value_type> z_numenator(N_rows + 1);
-                        z_numenator[0] = -FieldType::value_type::one();
-                        z_numenator[N_rows] = FieldType::value_type::one();
-
-                        math::polynomial<typename FieldType::value_type> Z = z_numenator;
-                        math::polynomial<typename FieldType::value_type> z_denominator = {-FieldType::value_type::one(),
-                                                                                          FieldType::value_type::one()};
-                        Z = Z / z_denominator;
+                        std::vector<typename FieldType::value_type> Z(N_rows + 1);
+                        Z[0] = -FieldType::value_type::one();
+                        Z[N_rows] = FieldType::value_type::one();
 
                         return typename policy_type::preprocessed_public_data_type(
                             {basic_domain, public_polynomial_table, _permutation_polynomials, _identity_polynomials,

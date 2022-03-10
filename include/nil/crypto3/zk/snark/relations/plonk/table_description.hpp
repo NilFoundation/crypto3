@@ -24,51 +24,39 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_PERMUTATION_HPP
-#define CRYPTO3_ZK_PLONK_PERMUTATION_HPP
+#ifndef CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_DESCRIPTION_HPP
+#define CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_DESCRIPTION_HPP
 
+#include <nil/crypto3/zk/snark/relations/plonk/variable.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                template<typename FieldType>
+                struct plonk_table_description {
+                    std::size_t witness_columns;
+                    std::size_t selector_columns;
+                    std::size_t public_input_columns;
+                    std::size_t constant_columns;
 
-                struct plonk_permutation {
-
-                    typedef std::pair<std::size_t, std::size_t> key_type;
-                    typedef std::pair<std::size_t, std::size_t> value_type;
-
-                    std::map<key_type, value_type> _permutation_map;
-
-                    plonk_permutation(std::size_t columns, std::size_t rows) {
-                        for (std::size_t i = 0; i < columns; i++) {
-                            for (std::size_t j = 0; j < rows; j++) {
-                                auto key = key_type(i, j);
-                                _permutation_map[key] = value_type(i, j);
-                            }
+                    std::size_t global_index(const plonk_variable<FieldType> &a) const {
+                        switch (a.type)
+                        {
+                        case plonk_variable<FieldType>::column_type::witness:
+                            return a.index;
+                        case plonk_variable<FieldType>::column_type::selector:
+                            return witness_columns + a.index;
+                        case plonk_variable<FieldType>::column_type::public_input:
+                            return witness_columns + selector_columns + a.index;
+                        case plonk_variable<FieldType>::column_type::constant:
+                            return witness_columns + selector_columns + public_input_columns + a.index;
                         }
                     }
-
-                    plonk_permutation() {
-                    }
-
-                    void cells_equal(key_type cell, key_type equal_to) {
-                        _permutation_map[cell] = _permutation_map[equal_to];
-                    }
-
-                    void cells_equal(std::size_t cell_x, std::size_t cell_y, std::size_t equal_to_x,
-                                     std::size_t equal_to_y) {
-                        _permutation_map[key_type(cell_x, cell_y)] = _permutation_map[key_type(equal_to_x, equal_to_y)];
-                    }
-
-                    value_type &operator[](key_type key) {
-                        return _permutation_map[key];
-                    }
                 };
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_PERMUTATION_HPP
+#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_DESCRIPTION_HPP
