@@ -42,8 +42,8 @@ namespace nil {
                 class uscs_ppzksnark_verification_key {
                     using g1_type = typename CurveType::template g1_type<>;
                     using g2_type = typename CurveType::template g2_type<>;
-                public:
 
+                public:
                     typename g2_type::value_type tilde_g2;
                     typename g2_type::value_type alpha_tilde_g2;
                     typename g2_type::value_type Z_g2;
@@ -115,4 +115,3 @@ namespace nil {
 }    // namespace nil
 
 #endif    // CRYPTO3_R1CS_PPZKSNARK_BASIC_PROVER_HPP
-

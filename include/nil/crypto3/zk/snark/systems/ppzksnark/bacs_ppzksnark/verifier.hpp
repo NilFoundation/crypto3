@@ -27,9 +27,9 @@
 #define CRYPTO3_ZK_BACS_PPZKSNARK_BASIC_VERIFIER_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/bacs_ppzksnark/detail/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/bacs_ppzksnark/detail/basic_policy.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_ppzksnark.hpp>
 
 #include <nil/crypto3/zk/snark/algorithms/verify.hpp>
 

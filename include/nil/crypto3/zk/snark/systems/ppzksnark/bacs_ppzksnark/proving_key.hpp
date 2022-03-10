@@ -27,7 +27,7 @@
 #define CRYPTO3_ZK_BACS_PPZKSNARK_PROVING_KEY_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_ppzksnark.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,13 +48,11 @@ namespace nil {
 
                     bacs_ppzksnark_proving_key(bacs_ppzksnark_proving_key &&other) = default;
 
-                    bacs_ppzksnark_proving_key(const circuit_type &circuit, 
-                                               const r1cs_proving_key_type &r1cs_pk) :
+                    bacs_ppzksnark_proving_key(const circuit_type &circuit, const r1cs_proving_key_type &r1cs_pk) :
                         circuit(circuit), r1cs_pk(r1cs_pk) {
                     }
 
-                    bacs_ppzksnark_proving_key(circuit_type &&circuit, 
-                                               r1cs_proving_key_type &&r1cs_pk) :
+                    bacs_ppzksnark_proving_key(circuit_type &&circuit, r1cs_proving_key_type &&r1cs_pk) :
                         circuit(std::move(circuit)), r1cs_pk(std::move(r1cs_pk)) {
                     }
 

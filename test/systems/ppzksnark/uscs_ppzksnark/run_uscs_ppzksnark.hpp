@@ -31,7 +31,7 @@
 
 #include "uscs_examples.hpp"
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/uscs_ppzksnark.hpp>
 
 #include <nil/crypto3/zk/snark/algorithms/generate.hpp>
 #include <nil/crypto3/zk/snark/algorithms/verify.hpp>

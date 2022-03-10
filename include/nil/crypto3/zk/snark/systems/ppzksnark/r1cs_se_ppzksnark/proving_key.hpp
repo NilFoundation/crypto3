@@ -39,8 +39,8 @@ namespace nil {
                 class r1cs_se_ppzksnark_proving_key {
                     using g1_type = typename CurveType::template g1_type<>;
                     using g2_type = typename CurveType::template g2_type<>;
-                public:
 
+                public:
                     typedef ConstraintSystem constraint_system_type;
 
                     // G^{gamma * A_i(t)} for 0 <= i <= sap.num_variables()
@@ -90,7 +90,8 @@ namespace nil {
                         A_query(std::move(A_query)),
                         B_query(std::move(B_query)), C_query_1(std::move(C_query_1)), C_query_2(std::move(C_query_2)),
                         G_gamma_Z(G_gamma_Z), H_gamma_Z(H_gamma_Z), G_ab_gamma_Z(G_ab_gamma_Z),
-                        G_gamma2_Z2(G_gamma2_Z2), G_gamma2_Z_t(std::move(G_gamma2_Z_t)), constraint_system(std::move(constraint_system)) {};
+                        G_gamma2_Z2(G_gamma2_Z2), G_gamma2_Z_t(std::move(G_gamma2_Z_t)),
+                        constraint_system(std::move(constraint_system)) {};
 
                     std::size_t G1_size() const {
                         return A_query.size() + C_query_1.size() + C_query_2.size() + 3 + G_gamma2_Z_t.size();
@@ -109,7 +110,8 @@ namespace nil {
                                 this->C_query_1 == other.C_query_1 && this->C_query_2 == other.C_query_2 &&
                                 this->G_gamma_Z == other.G_gamma_Z && this->H_gamma_Z == other.H_gamma_Z &&
                                 this->G_ab_gamma_Z == other.G_ab_gamma_Z && this->G_gamma2_Z2 == other.G_gamma2_Z2 &&
-                                this->G_gamma2_Z_t == other.G_gamma2_Z_t && this->constraint_system == other.constraint_system);
+                                this->G_gamma2_Z_t == other.G_gamma2_Z_t &&
+                                this->constraint_system == other.constraint_system);
                     }
                 };
             }    // namespace snark

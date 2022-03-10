@@ -34,7 +34,7 @@
 #include <nil/crypto3/algebra/multiexp/policies.hpp>
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/detail/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_se_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -46,7 +46,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class r1cs_se_ppzksnark_process_verification_key {
-                    typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
+                    typedef detail::r1cs_se_ppzksnark_policy<CurveType> policy_type;
 
                 public:
                     typedef typename policy_type::verification_key_type verification_key_type;
@@ -55,22 +55,18 @@ namespace nil {
                     static inline processed_verification_key_type
                         process(const verification_key_type &verification_key) {
 
-                        typename pairing::pairing_policy<CurveType>::g1_precomputed_type 
-                            G_alpha_pc = precompute_g1<CurveType>(verification_key.G_alpha);
-                        typename pairing::pairing_policy<CurveType>::g2_precomputed_type 
-                            H_beta_pc = precompute_g2<CurveType>(verification_key.H_beta);
+                        typename pairing::pairing_policy<CurveType>::g1_precomputed_type G_alpha_pc =
+                            precompute_g1<CurveType>(verification_key.G_alpha);
+                        typename pairing::pairing_policy<CurveType>::g2_precomputed_type H_beta_pc =
+                            precompute_g2<CurveType>(verification_key.H_beta);
 
                         processed_verification_key_type processed_verification_key;
                         processed_verification_key.G_alpha = verification_key.G_alpha;
                         processed_verification_key.H_beta = verification_key.H_beta;
-                        processed_verification_key.G_alpha_H_beta_ml =
-                            miller_loop<CurveType>(G_alpha_pc, H_beta_pc);
-                        processed_verification_key.G_gamma_pc = 
-                            precompute_g1<CurveType>(verification_key.G_gamma);
-                        processed_verification_key.H_gamma_pc = 
-                            precompute_g2<CurveType>(verification_key.H_gamma);
-                        processed_verification_key.H_pc = 
-                            precompute_g2<CurveType>(verification_key.H);
+                        processed_verification_key.G_alpha_H_beta_ml = miller_loop<CurveType>(G_alpha_pc, H_beta_pc);
+                        processed_verification_key.G_gamma_pc = precompute_g1<CurveType>(verification_key.G_gamma);
+                        processed_verification_key.H_gamma_pc = precompute_g2<CurveType>(verification_key.H_gamma);
+                        processed_verification_key.H_pc = precompute_g2<CurveType>(verification_key.H);
 
                         processed_verification_key.query = verification_key.query;
 
@@ -94,7 +90,7 @@ namespace nil {
 
                 template<typename CurveType>
                 class r1cs_se_ppzksnark_verifier_weak_input_consistency {
-                    typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
+                    typedef detail::r1cs_se_ppzksnark_policy<CurveType> policy_type;
 
                 public:
                     typedef typename policy_type::primary_input_type primary_input_type;
@@ -110,8 +106,8 @@ namespace nil {
                     static inline bool process(const verification_key_type &vk,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        return process(
-                            r1cs_se_ppzksnark_process_verification_key<CurveType>::process(vk), primary_input, proof);
+                        return process(r1cs_se_ppzksnark_process_verification_key<CurveType>::process(vk),
+                                       primary_input, proof);
                     }
 
                     /**
@@ -153,9 +149,9 @@ namespace nil {
                                 precompute_g2<CurveType>(proof.B + processed_verification_key.H_beta)),
                             test1_r1 = processed_verification_key.G_alpha_H_beta_ml,
                             test1_r2 = miller_loop<CurveType>(precompute_g1<CurveType>(G_psi),
-                                                                   processed_verification_key.H_gamma_pc),
+                                                              processed_verification_key.H_gamma_pc),
                             test1_r3 = miller_loop<CurveType>(precompute_g1<CurveType>(proof.C),
-                                                                   processed_verification_key.H_pc);
+                                                              processed_verification_key.H_pc);
                         typename CurveType::gt_type::value_type test1 = final_exponentiation<CurveType>(
                             test1_l.unitary_inversed() * test1_r1 * test1_r2 * test1_r3);
 
@@ -167,11 +163,11 @@ namespace nil {
                          * e(A, H^{gamma}) = e(G^{gamma}, B)
                          */
                         typename CurveType::gt_type::value_type test2_l = miller_loop<CurveType>(
-                                                              precompute_g1<CurveType>(proof.A),
-                                                              processed_verification_key.H_gamma_pc),
-                                                          test2_r = miller_loop<CurveType>(
-                                                              processed_verification_key.G_gamma_pc,
-                                                              precompute_g2<CurveType>(proof.B));
+                                                                    precompute_g1<CurveType>(proof.A),
+                                                                    processed_verification_key.H_gamma_pc),
+                                                                test2_r = miller_loop<CurveType>(
+                                                                    processed_verification_key.G_gamma_pc,
+                                                                    precompute_g2<CurveType>(proof.B));
                         typename CurveType::gt_type::value_type test2 =
                             final_exponentiation<CurveType>(test2_l * test2_r.unitary_inversed());
 
@@ -185,7 +181,7 @@ namespace nil {
 
                 template<typename CurveType>
                 class r1cs_se_ppzksnark_verifier_strong_input_consistency {
-                    typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
+                    typedef detail::r1cs_se_ppzksnark_policy<CurveType> policy_type;
 
                 public:
                     typedef typename policy_type::primary_input_type primary_input_type;
@@ -201,8 +197,8 @@ namespace nil {
                     static inline bool process(const verification_key_type &vk,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        return process(
-                            r1cs_se_ppzksnark_process_verification_key<CurveType>::process(vk), primary_input, proof);
+                        return process(r1cs_se_ppzksnark_process_verification_key<CurveType>::process(vk),
+                                       primary_input, proof);
                     }
 
                     /**

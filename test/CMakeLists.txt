@@ -47,11 +47,18 @@ macro(define_zk_test test)
 endmacro()
 
 set(TESTS_NAMES
+    "commitment/lpc"
+    "commitment/fri"
+    "commitment/lpc_performance"
+
     "routing_algorithms/test_routing_algorithms"
 
     "relations/numeric/qap"
     "relations/numeric/sap"
     "relations/numeric/ssp"
+
+    "systems/plonk/pickles"
+    "systems/plonk/redshift"
 
     "systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
     "systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"
@@ -65,7 +72,9 @@ set(TESTS_NAMES
     "systems/ppzksnark/ram_ppzksnark/ram_ppzksnark"
     "systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark"
     "systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark"
-    "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity")
+    "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity"
+
+    "transcript/transcript")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_zk_test(${TEST_NAME})

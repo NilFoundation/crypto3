@@ -29,8 +29,8 @@
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
 #include <nil/crypto3/zk/snark/reductions/bacs_to_r1cs.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/bacs_ppzksnark/detail/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/bacs_ppzksnark/detail/basic_policy.hpp>
 
 #include <nil/crypto3/zk/snark/algorithms/prove.hpp>
 
@@ -70,13 +70,14 @@ namespace nil {
                         typedef typename CurveType::scalar_field_type field_type;
 
                         const r1cs_variable_assignment<field_type> r1cs_va =
-                            reductions::bacs_to_r1cs<field_type>::witness_map(proving_key.circuit, primary_input, auxiliary_input);
+                            reductions::bacs_to_r1cs<field_type>::witness_map(
+                                proving_key.circuit, primary_input, auxiliary_input);
                         const r1cs_auxiliary_input<field_type> r1cs_ai(
                             r1cs_va.begin() + primary_input.size(),
-                            r1cs_va.end());    // TODO: faster to just change bacs_to_r1cs<field_type>::witness_map into two :(
+                            r1cs_va.end());    // TODO: faster to just change bacs_to_r1cs<field_type>::witness_map into
+                                               // two :(
 
-                        return prove<r1cs_ppzksnark<CurveType>>(
-                            proving_key.r1cs_pk, primary_input, r1cs_ai);
+                        return prove<r1cs_ppzksnark<CurveType>>(proving_key.r1cs_pk, primary_input, r1cs_ai);
                     }
                 };
             }    // namespace snark

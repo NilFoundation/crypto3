@@ -50,8 +50,8 @@
 #ifndef CRYPTO3_ZK_BACS_PPZKSNARK_TYPES_POLICY_HPP
 #define CRYPTO3_ZK_BACS_PPZKSNARK_TYPES_POLICY_HPP
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/bacs_ppzksnark/proving_key.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/bacs_ppzksnark/keypair.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/bacs_ppzksnark/proving_key.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/bacs_ppzksnark/keypair.hpp>
 
 namespace nil {
     namespace crypto3 {

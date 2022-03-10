@@ -26,11 +26,11 @@
 #ifndef CRYPTO3_ZK_R1CS_PPZKSNARK_HPP
 #define CRYPTO3_ZK_R1CS_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_ppzksnark/detail/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_ppzksnark/detail/basic_policy.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_ppzksnark/generator.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_ppzksnark/prover.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_ppzksnark/verifier.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_ppzksnark/prover.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_ppzksnark/verifier.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -98,8 +98,8 @@ namespace nil {
                     }
 
                     static inline bool verify(const typename Verifier::verification_key_type &vk,
-                                               const primary_input_type &primary_input,
-                                               const proof_type &proof) {
+                                              const primary_input_type &primary_input,
+                                              const proof_type &proof) {
                         return Verifier::process(vk, primary_input, proof);
                     }
 

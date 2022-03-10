@@ -30,7 +30,7 @@
 #define CRYPTO3_ZK_TBCS_EXAMPLES_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/tbcs_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/tbcs_ppzksnark.hpp>
 
 namespace nil {
     namespace crypto3 {

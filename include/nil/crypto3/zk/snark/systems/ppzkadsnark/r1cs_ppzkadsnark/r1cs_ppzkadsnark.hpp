@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_R1CS_PPZKADSNARK_POLICY_HPP
 #define CRYPTO3_R1CS_PPZKADSNARK_POLICY_HPP
 
-#include <nil/crypto3/zk/snark/schemes/ppzkadsnark/r1cs_ppzkadsnark/detail/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzkadsnark/r1cs_ppzkadsnark/detail/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -30,7 +30,7 @@
 #define CRYPTO3_ZK_USCS_EXAMPLES_HPP
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/uscs_ppzksnark.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 

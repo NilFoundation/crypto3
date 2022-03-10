@@ -110,9 +110,9 @@ namespace nil {
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
                 class r1cs_gg_ppzksnark<
-                    CurveType, Generator, Prover, Verifier, ProvingMode::Basic,
+                    CurveType, Generator, Prover, Verifier, proving_mode::basic,
                     typename std::enable_if<is_basic_mode<CurveType, Generator, Prover, Verifier>::value>::type> {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> policy_type;
 
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;
@@ -148,7 +148,7 @@ namespace nil {
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
                 class r1cs_gg_ppzksnark<
-                    CurveType, Generator, Prover, Verifier, ProvingMode::Aggregate,
+                    CurveType, Generator, Prover, Verifier, proving_mode::aggregate,
                     typename std::enable_if<is_aggregate_mode<CurveType, Generator, Prover, Verifier>::value>::type> {
 
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
@@ -197,7 +197,7 @@ namespace nil {
                         return Prover::process(pk, primary_input, auxiliary_input);
                     }
 
-                    // Aggregate prove
+                    // aggregate prove
                     template<typename Hash, typename InputTranscriptIncludeIterator, typename InputProofIterator>
                     static inline proof_type prove(const proving_srs_type &srs,
                                                    InputTranscriptIncludeIterator transcript_include_first,
@@ -218,7 +218,7 @@ namespace nil {
                         return Verifier::process(vk, primary_input, proof);
                     }
 
-                    // Aggregate verify
+                    // aggregate verify
                     template<typename DistributionType = boost::random::uniform_int_distribution<
                                  typename CurveType::scalar_field_type::integral_type>,
                              typename GeneratorType = boost::random::mt19937, typename Hash = hashes::sha2<256>,

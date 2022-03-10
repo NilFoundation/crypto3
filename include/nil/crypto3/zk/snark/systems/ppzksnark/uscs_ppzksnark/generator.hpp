@@ -32,7 +32,7 @@
 #include <nil/crypto3/zk/snark/reductions/uscs_to_ssp.hpp>
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark/detail/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/uscs_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -69,14 +69,13 @@ namespace nil {
 
                         /* draw random element at which the SSP is evaluated */
 
-                        const typename scalar_field_type::value_type t =
-                            algebra::random_element<scalar_field_type>();
+                        const typename scalar_field_type::value_type t = algebra::random_element<scalar_field_type>();
 
                         /* perform USCS-to-SSP reduction */
 
                         ssp_instance_evaluation<scalar_field_type> ssp_inst =
-                            reductions::uscs_to_ssp<
-                                scalar_field_type>::instance_map_with_evaluation(constraint_system, t);
+                            reductions::uscs_to_ssp<scalar_field_type>::instance_map_with_evaluation(constraint_system,
+                                                                                                     t);
 
                         /* construct various tables of typename FieldType::value_type elements */
 
@@ -99,8 +98,7 @@ namespace nil {
                         assert(Vt_table.size() == ssp_inst.num_variables + 2);
                         assert(Ht_table.size() == ssp_inst.degree + 1);
                         assert(Xt_table.size() == ssp_inst.num_inputs + 1);
-                        assert(Vt_table_minus_Xt_table.size() ==
-                               ssp_inst.num_variables + 2 - ssp_inst.num_inputs - 1);
+                        assert(Vt_table_minus_Xt_table.size() == ssp_inst.num_variables + 2 - ssp_inst.num_inputs - 1);
                         for (std::size_t i = 0; i < ssp_inst.num_inputs + 1; ++i) {
                             assert(!Xt_table[i].is_zero());
                         }
@@ -121,48 +119,48 @@ namespace nil {
                         algebra::window_table<g2_type> g2_table = algebra::get_window_table<g2_type>(
                             scalar_field_type::value_bits, g2_window, g2_type::value_type::one());
 
-                        typename std::vector<typename g1_type::value_type> V_g1_query = algebra::batch_exp<g1_type, scalar_field_type>(
-                            scalar_field_type::value_bits, g1_window, g1_table, Vt_table_minus_Xt_table);
+                        typename std::vector<typename g1_type::value_type> V_g1_query =
+                            algebra::batch_exp<g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window,
+                                                                           g1_table, Vt_table_minus_Xt_table);
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<g1_type>(V_g1_query);
 #endif
 
                         typename std::vector<typename g1_type::value_type> alpha_V_g1_query =
-                            algebra::batch_exp_with_coeff<g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window, g1_table, alpha,
-                                                 Vt_table_minus_Xt_table);
+                            algebra::batch_exp_with_coeff<g1_type, scalar_field_type>(
+                                scalar_field_type::value_bits, g1_window, g1_table, alpha, Vt_table_minus_Xt_table);
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<g1_type>(alpha_V_g1_query);
 #endif
 
                         typename std::vector<typename g1_type::value_type> H_g1_query =
-                            algebra::batch_exp<g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window, g1_table, Ht_table);
+                            algebra::batch_exp<g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window,
+                                                                           g1_table, Ht_table);
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<g1_type>(H_g1_query);
 #endif
 
                         typename std::vector<typename g2_type::value_type> V_g2_query =
-                            algebra::batch_exp<g2_type, scalar_field_type>(scalar_field_type::value_bits, g2_window, g2_table, Vt_table);
+                            algebra::batch_exp<g2_type, scalar_field_type>(scalar_field_type::value_bits, g2_window,
+                                                                           g2_table, Vt_table);
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<g2_type>(V_g2_query);
 #endif
                         const typename scalar_field_type::value_type tilde =
                             algebra::random_element<scalar_field_type>();
-                        typename g2_type::value_type tilde_g2 =
-                            tilde * g2_type::value_type::one();
-                        typename g2_type::value_type alpha_tilde_g2 =
-                            (alpha * tilde) * g2_type::value_type::one();
-                        typename g2_type::value_type Z_g2 =
-                            ssp_inst.Zt * g2_type::value_type::one();
+                        typename g2_type::value_type tilde_g2 = tilde * g2_type::value_type::one();
+                        typename g2_type::value_type alpha_tilde_g2 = (alpha * tilde) * g2_type::value_type::one();
+                        typename g2_type::value_type Z_g2 = ssp_inst.Zt * g2_type::value_type::one();
 
-                        typename g1_type::value_type encoded_IC_base =
-                            Xt_table[0] * g1_type::value_type::one();
+                        typename g1_type::value_type encoded_IC_base = Xt_table[0] * g1_type::value_type::one();
                         typename std::vector<typename g1_type::value_type> encoded_IC_values =
-                            algebra::batch_exp<g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window, g1_table,
-                                      std::vector<typename scalar_field_type::value_type>(
-                                          Xt_table.begin() + 1, Xt_table.end()));
+                            algebra::batch_exp<g1_type, scalar_field_type>(
+                                scalar_field_type::value_bits, g1_window, g1_table,
+                                std::vector<typename scalar_field_type::value_type>(Xt_table.begin() + 1,
+                                                                                    Xt_table.end()));
 
                         accumulation_vector<g1_type> encoded_IC_query(std::move(encoded_IC_base),
-                                                                                          std::move(encoded_IC_values));
+                                                                      std::move(encoded_IC_values));
 
                         verification_key_type vk =
                             verification_key_type(tilde_g2, alpha_tilde_g2, Z_g2, encoded_IC_query);

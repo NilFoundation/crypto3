@@ -29,8 +29,8 @@
 // (2) it enables us to test r1cs_pcd functionalities.
 //
 // See
-// - snark/schemes/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/examples/run_r1cs_sp_ppzkpcd.hpp
-// - snark/schemes/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/examples/run_r1cs_mp_ppzkpcd.hpp
+// - snark/systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/examples/run_r1cs_sp_ppzkpcd.hpp
+// - snark/systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/examples/run_r1cs_mp_ppzkpcd.hpp
 // for code that uses the tally compliance predicate.
 //---------------------------------------------------------------------------//
 

@@ -37,7 +37,7 @@
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
 #include <nil/crypto3/zk/snark/reductions/uscs_to_ssp.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark/detail/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/uscs_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -58,10 +58,12 @@ namespace nil {
 
                     using g1_type = typename CurveType::template g1_type<>;
                     using g2_type = typename CurveType::template g2_type<>;
+
                 public:
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-                    typedef typename policy_type::proving_key_type proving_key_type;;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    ;
                     typedef typename policy_type::proof_type proof_type;
 
                     static inline proof_type process(const proving_key_type &proving_key,

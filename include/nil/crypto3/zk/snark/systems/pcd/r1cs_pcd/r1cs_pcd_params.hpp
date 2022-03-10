@@ -29,7 +29,7 @@
 #include <memory>
 #include <vector>
 
-#include <nil/crypto3/zk/snark/schemes/pcd/r1cs_pcd/compliance_predicate/cp_handler.hpp>
+#include <nil/crypto3/zk/snark/systems/pcd/r1cs_pcd/compliance_predicate/cp_handler.hpp>
 
 namespace nil {
     namespace crypto3 {

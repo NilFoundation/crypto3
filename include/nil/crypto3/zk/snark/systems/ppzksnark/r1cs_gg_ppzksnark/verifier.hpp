@@ -239,7 +239,7 @@ namespace nil {
                 //  */
                 // template<typename CurveType>
                 // class r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency {
-                //     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
+                //     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> policy_type;
 
                 //     typedef typename CurveType::scalar_field_type scalar_field_type;
                 //     typedef typename CurveType::template g1_type<> g1_type;

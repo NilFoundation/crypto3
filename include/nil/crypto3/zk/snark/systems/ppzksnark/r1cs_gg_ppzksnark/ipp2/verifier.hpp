@@ -31,7 +31,6 @@
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/verifier.hpp>
-
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/verification_key.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/prover.hpp>
@@ -676,7 +675,7 @@ namespace nil {
                     typedef typename policy_type::verification_srs_type verification_srs_type;
                     typedef typename policy_type::proof_type proof_type;
 
-                    // Aggregate verify
+                    // aggregate verify
                     template<typename DistributionType, typename GeneratorType, typename Hash,
                              typename InputPrimaryInputRange, typename InputIterator>
                     static inline typename std::enable_if<

@@ -31,7 +31,7 @@
 
 #include <boost/config.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_ppzksnark.hpp>
 
 #include "../r1cs_examples.hpp"
 

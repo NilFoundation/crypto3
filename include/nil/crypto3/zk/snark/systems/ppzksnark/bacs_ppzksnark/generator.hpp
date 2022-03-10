@@ -29,8 +29,8 @@
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
 #include <nil/crypto3/zk/snark/reductions/bacs_to_r1cs.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/bacs_ppzksnark/detail/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/bacs_ppzksnark/detail/basic_policy.hpp>
 
 #include <nil/crypto3/zk/snark/algorithms/generate.hpp>
 

@@ -39,8 +39,8 @@ namespace nil {
                 class uscs_ppzksnark_proving_key {
                     using g1_type = typename CurveType::template g1_type<>;
                     using g2_type = typename CurveType::template g2_type<>;
-                public:
 
+                public:
                     typedef ConstraintSystem constraint_system_type;
 
                     std::vector<typename g1_type::value_type> V_g1_query;

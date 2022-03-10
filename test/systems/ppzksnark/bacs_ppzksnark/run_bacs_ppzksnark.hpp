@@ -28,7 +28,7 @@
 
 #include "bacs_examples.hpp"
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/bacs_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/bacs_ppzksnark.hpp>
 
 #include "../r1cs_examples.hpp"
 

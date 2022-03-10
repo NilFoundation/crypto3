@@ -39,11 +39,6 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                /// KZGOpening represents the KZG opening of a commitment key (which is a tuple
-                /// given commitment keys are a tuple).
-                template<typename GroupType>
-                using kzg_opening = std::pair<typename GroupType::value_type, typename GroupType::value_type>;
-
                 /// It contains all elements derived in the GIPA loop for both TIPP and MIPP at
                 /// the same time.
                 template<typename CurveType>

@@ -26,11 +26,11 @@
 #ifndef CRYPTO3_R1CS_SE_PPZKSNARK_HPP
 #define CRYPTO3_R1CS_SE_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/detail/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_se_ppzksnark/detail/basic_policy.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/generator.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/prover.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/verifier.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_se_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_se_ppzksnark/prover.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_se_ppzksnark/verifier.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -71,7 +71,7 @@ namespace nil {
                          typename Prover = r1cs_se_ppzksnark_prover<CurveType>,
                          typename Verifier = r1cs_se_ppzksnark_verifier_strong_input_consistency<CurveType>>
                 class r1cs_se_ppzksnark {
-                    typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
+                    typedef detail::r1cs_se_ppzksnark_policy<CurveType> policy_type;
 
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;

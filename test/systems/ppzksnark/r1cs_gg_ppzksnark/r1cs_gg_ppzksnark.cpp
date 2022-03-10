@@ -61,7 +61,7 @@ void run_r1cs_gg_ppzksnark_basic_test(std::size_t num_constraints, std::size_t i
 BOOST_AUTO_TEST_SUITE(r1cs_gg_ppzksnark_test_suite)
 
 BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_basic_test) {
-    run_r1cs_gg_ppzksnark_basic_test<curves::mnt4<298>>(1000, 100);
+    run_r1cs_gg_ppzksnark_basic_test<curves::mnt4<298>>(100, 10);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

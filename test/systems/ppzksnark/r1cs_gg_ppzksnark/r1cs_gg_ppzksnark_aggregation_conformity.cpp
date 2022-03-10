@@ -45,7 +45,7 @@
 #include <nil/crypto3/algebra/pairing/mnt6.hpp>
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/kzg.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/prover.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/verifier.hpp>
@@ -54,6 +54,7 @@
 #include <nil/crypto3/zk/snark/algorithms/prove.hpp>
 #include <nil/crypto3/zk/snark/algorithms/verify.hpp>
 
+using namespace nil::crypto3;
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::zk::snark;
 
@@ -250,8 +251,7 @@ BOOST_AUTO_TEST_CASE(bls381_commitment_test) {
             fq_value_type::one()),
     };
 
-    typename r1cs_gg_ppzksnark_ipp2_commitment<curve_type>::output_type c1 =
-        r1cs_gg_ppzksnark_ipp2_commitment<curve_type>::single(vkey, a.begin(), a.end());
+    typename kzg_commitment<curve_type>::output_type c1 = kzg_commitment<curve_type>::single(vkey, a.begin(), a.end());
 
     fq12_value_type etalon_c1_first = fq12_value_type(
         fq6_value_type(
@@ -382,8 +382,8 @@ BOOST_AUTO_TEST_CASE(bls381_commitment_test) {
             fq2_value_type::one()),
     };
 
-    typename r1cs_gg_ppzksnark_ipp2_commitment<curve_type>::output_type c2 =
-        r1cs_gg_ppzksnark_ipp2_commitment<curve_type>::pair(vkey, wkey, a.begin(), a.end(), b.begin(), b.end());
+    typename kzg_commitment<curve_type>::output_type c2 =
+        kzg_commitment<curve_type>::pair(vkey, wkey, a.begin(), a.end(), b.begin(), b.end());
 
     fq12_value_type etalon_c2_first = fq12_value_type(
         fq6_value_type(
@@ -433,9 +433,9 @@ BOOST_AUTO_TEST_CASE(bls381_commitment_test) {
 
     scalar_field_value_type c(0x72629fcfc3205536b36d285f185f874593443f8ceab231d81ef8178d2958d4c3_cppui255);
     auto [vkey_left, vkey_right] = vkey.split(n / 2);
-    r1cs_gg_ppzksnark_ipp2_commitment_key<g2_type> vkey_compressed = vkey_left.compress(vkey_right, c);
+    kzg_commitment_key<g2_type> vkey_compressed = vkey_left.compress(vkey_right, c);
     auto [wkey_left, wkey_right] = wkey.split(n / 2);
-    r1cs_gg_ppzksnark_ipp2_commitment_key<g1_type> wkey_compressed = wkey_left.compress(wkey_right, c);
+    kzg_commitment_key<g1_type> wkey_compressed = wkey_left.compress(wkey_right, c);
 
     std::vector<G2_value_type> et_v1_compressed = {
         G2_value_type(
@@ -933,13 +933,13 @@ BOOST_AUTO_TEST_CASE(bls381_transcript_test) {
         93, 227, 44,  5,   215, 179, 179, 161, 188, 47,  202, 226, 198, 224, 235, 229,
         51, 172, 126, 121, 244, 132, 95,  94,  122, 217, 155, 123, 243, 93,  170, 87,
     };
-    std::vector<std::uint8_t> a_ser(nil::marshalling::curve_bincode<curve_type>::fr_octets_num);
-    nil::marshalling::curve_bincode<curve_type>::field_element_to_bytes<scalar_field_type>(a, a_ser.begin(),
-                                                                                           a_ser.end());
+    std::vector<std::uint8_t> a_ser(nil::marshalling::bincode::curve<curve_type>::fr_octets_num);
+    nil::marshalling::bincode::curve<curve_type>::field_element_to_bytes<scalar_field_type>(a, a_ser.begin(),
+                                                                                            a_ser.end());
     BOOST_CHECK_EQUAL(et_a_ser, a_ser);
     scalar_field_value_type a_deser =
-        nil::marshalling::curve_bincode<curve_type>::field_element_from_bytes<scalar_field_type>(a_ser.begin(),
-                                                                                                 a_ser.end())
+        nil::marshalling::bincode::curve<curve_type>::field_element_from_bytes<scalar_field_type>(a_ser.begin(),
+                                                                                                  a_ser.end())
             .second;
     BOOST_CHECK_EQUAL(a_deser, a);
 
@@ -952,11 +952,11 @@ BOOST_AUTO_TEST_CASE(bls381_transcript_test) {
         136, 183, 116, 154, 64,  227, 68,  245, 98,  247, 204, 23,  22,  18,  218, 161,
         152, 27,  155, 234, 230, 152, 24,  2,   2,   153, 59,  205, 235, 66,  175, 83,
     };
-    std::vector<std::uint8_t> b_ser(nil::marshalling::curve_bincode<curve_type>::g1_octets_num);
-    nil::marshalling::curve_bincode<curve_type>::point_to_bytes<g1_type>(b, b_ser.begin(), b_ser.end());
+    std::vector<std::uint8_t> b_ser(nil::marshalling::bincode::curve<curve_type>::g1_octets_num);
+    nil::marshalling::bincode::curve<curve_type>::point_to_bytes<g1_type>(b, b_ser.begin(), b_ser.end());
     BOOST_CHECK_EQUAL(et_b_ser, b_ser);
     G1_value_type b_deser =
-        nil::marshalling::curve_bincode<curve_type>::g1_point_from_bytes(b_ser.begin(), b_ser.end());
+        nil::marshalling::bincode::curve<curve_type>::g1_point_from_bytes(b_ser.begin(), b_ser.end());
     BOOST_CHECK_EQUAL(b_deser, b);
 
     G2_value_type c(
@@ -974,11 +974,11 @@ BOOST_AUTO_TEST_CASE(bls381_transcript_test) {
         195, 169, 47,  227, 168, 42,  194, 207, 138, 86,  53,  169, 214, 1,   136, 180, 62,  241, 64,  134,
         39,  35,  12,  91,  110, 57,  88,  208, 115, 235, 231, 194, 57,  234, 57,  30,
     };
-    std::vector<std::uint8_t> c_ser(nil::marshalling::curve_bincode<curve_type>::g2_octets_num);
-    nil::marshalling::curve_bincode<curve_type>::point_to_bytes<g2_type>(c, c_ser.begin(), c_ser.end());
+    std::vector<std::uint8_t> c_ser(nil::marshalling::bincode::curve<curve_type>::g2_octets_num);
+    nil::marshalling::bincode::curve<curve_type>::point_to_bytes<g2_type>(c, c_ser.begin(), c_ser.end());
     BOOST_CHECK_EQUAL(et_c_ser, c_ser);
     G2_value_type c_deser =
-        nil::marshalling::curve_bincode<curve_type>::g2_point_from_bytes(c_ser.begin(), c_ser.end());
+        nil::marshalling::bincode::curve<curve_type>::g2_point_from_bytes(c_ser.begin(), c_ser.end());
     BOOST_CHECK_EQUAL(c_deser, c);
 
     fq12_value_type d(
@@ -1031,11 +1031,11 @@ BOOST_AUTO_TEST_CASE(bls381_transcript_test) {
         212, 1,   226, 7,   62,  56,  84,  64,  46,  254, 91,  198, 63,  173, 242, 171, 236, 173, 194, 125, 216, 95,
         159, 172, 117, 17,
     };
-    std::vector<std::uint8_t> d_ser(nil::marshalling::curve_bincode<curve_type>::gt_octets_num);
-    nil::marshalling::curve_bincode<curve_type>::field_element_to_bytes<fq12_type>(d, d_ser.begin(), d_ser.end());
+    std::vector<std::uint8_t> d_ser(nil::marshalling::bincode::curve<curve_type>::gt_octets_num);
+    nil::marshalling::bincode::curve<curve_type>::field_element_to_bytes<fq12_type>(d, d_ser.begin(), d_ser.end());
     BOOST_CHECK_EQUAL(et_d_ser, d_ser);
     fq12_value_type d_deser =
-        nil::marshalling::curve_bincode<curve_type>::field_element_from_bytes<fq12_type>(d_ser.begin(), d_ser.end())
+        nil::marshalling::bincode::curve<curve_type>::field_element_from_bytes<fq12_type>(d_ser.begin(), d_ser.end())
             .second;
     BOOST_CHECK_EQUAL(d_deser, d);
 

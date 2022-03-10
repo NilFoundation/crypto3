@@ -67,10 +67,10 @@
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_sap.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/proving_key.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/verification_key.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/proof.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/keypair.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_se_ppzksnark/proving_key.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_se_ppzksnark/verification_key.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_se_ppzksnark/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_se_ppzksnark/keypair.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -79,7 +79,7 @@ namespace nil {
                 namespace detail {
 
                     template<typename CurveType>
-                    struct r1cs_se_ppzksnark_types_policy {
+                    struct r1cs_se_ppzksnark_policy {
 
                         /******************************** Params ********************************/
 

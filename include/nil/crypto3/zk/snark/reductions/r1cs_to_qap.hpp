@@ -49,7 +49,6 @@
 #define CRYPTO3_ZK_R1CS_TO_QAP_BASIC_POLICY_HPP
 
 #include <nil/crypto3/math/coset.hpp>
-#include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/qap.hpp>

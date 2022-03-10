@@ -64,10 +64,10 @@
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark/proving_key.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark/verification_key.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark/keypair.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/uscs_ppzksnark/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/uscs_ppzksnark/proving_key.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/uscs_ppzksnark/verification_key.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/uscs_ppzksnark/keypair.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/uscs_ppzksnark/proof.hpp>
 
 namespace nil {
     namespace crypto3 {

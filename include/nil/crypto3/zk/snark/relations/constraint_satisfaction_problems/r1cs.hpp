@@ -31,13 +31,14 @@
 // Above, R1CS stands for "Rank-1 Constraint System".
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_R1CS_HPP
-#define CRYPTO3_ZK_R1CS_HPP
+#ifndef CRYPTO3_ZK_R1CS_CONSTRAINT_SYSTEM_HPP
+#define CRYPTO3_ZK_R1CS_CONSTRAINT_SYSTEM_HPP
 
 #include <cstdlib>
 #include <vector>
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
+#include <nil/crypto3/zk/snark/relations/linear_combination.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -227,4 +228,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_R1CS_HPP
+#endif    // CRYPTO3_ZK_R1CS_CONSTRAINT_SYSTEM_HPP

@@ -32,8 +32,10 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_sap.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_se_ppzksnark/detail/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_se_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,7 +50,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class r1cs_se_ppzksnark_generator {
-                    typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
+                    typedef detail::r1cs_se_ppzksnark_policy<CurveType> policy_type;
 
                     using g1_type = typename CurveType::template g1_type<>;
                     using g2_type = typename CurveType::template g2_type<>;
@@ -101,13 +103,11 @@ namespace nil {
                             alpha = algebra::random_element<typename CurveType::scalar_field_type>(),
                             beta = algebra::random_element<typename CurveType::scalar_field_type>(),
                             gamma = algebra::random_element<typename CurveType::scalar_field_type>();
-                        const typename g1_type::value_type G =
-                            algebra::random_element<g1_type>();
-                        const typename g2_type::value_type H =
-                            algebra::random_element<g2_type>();
+                        const typename g1_type::value_type G = algebra::random_element<g1_type>();
+                        const typename g2_type::value_type H = algebra::random_element<g2_type>();
 
                         std::size_t G_exp_count = sap_inst.num_inputs + 1    // verifier_query
-                                                  + non_zero_At                // A_query
+                                                  + non_zero_At              // A_query
                                                   + sap_inst.degree +
                                                   1    // G_gamma2_Z_t
                                                   // C_query_1
@@ -120,8 +120,7 @@ namespace nil {
 
                         typename g2_type::value_type H_gamma = gamma * H;
                         std::size_t H_gamma_exp_count = non_zero_At,    // B_query
-                            H_gamma_window =
-                                algebra::get_exp_window_size<g2_type>(H_gamma_exp_count);
+                            H_gamma_window = algebra::get_exp_window_size<g2_type>(H_gamma_exp_count);
                         algebra::window_table<g2_type> H_gamma_table = algebra::get_window_table<g2_type>(
                             CurveType::scalar_field_type::value_bits, H_gamma_window, H_gamma);
 

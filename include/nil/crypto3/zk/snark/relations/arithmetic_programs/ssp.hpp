@@ -236,16 +236,15 @@ namespace nil {
                         typename FieldType::value_type ans_V = this->Vt[0] + witness.d * this->Zt;
                         typename FieldType::value_type ans_H = FieldType::value_type::zero();
 
-                        ans_V = ans_V + algebra::inner_product(this->Vt.begin() + 1,
-                                                                          this->Vt.begin() + 1 + this->num_variables,
-                                                                          witness.coefficients_for_Vs.begin(),
-                                                                          witness.coefficients_for_Vs.begin() +
-                                                                              this->num_variables);
+                        ans_V =
+                            ans_V + algebra::inner_product(this->Vt.begin() + 1,
+                                                           this->Vt.begin() + 1 + this->num_variables,
+                                                           witness.coefficients_for_Vs.begin(),
+                                                           witness.coefficients_for_Vs.begin() + this->num_variables);
                         ans_H = ans_H + algebra::inner_product(this->Ht.begin(),
-                                                                          this->Ht.begin() + this->degree + 1,
-                                                                          witness.coefficients_for_H.begin(),
-                                                                          witness.coefficients_for_H.begin() +
-                                                                              this->degree + 1);
+                                                               this->Ht.begin() + this->degree + 1,
+                                                               witness.coefficients_for_H.begin(),
+                                                               witness.coefficients_for_H.begin() + this->degree + 1);
 
                         if (ans_V.squared() - FieldType::value_type::one() != ans_H * this->Zt) {
                             return false;
