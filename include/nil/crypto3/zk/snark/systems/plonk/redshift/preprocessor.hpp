@@ -122,6 +122,16 @@ namespace nil {
 
                         cycle_representation (typename policy_type::constraint_system_type &constraint_system, 
                             const plonk_table_description<FieldType> &table_description) {
+
+                            for (std::size_t i = 0; i < table_description.table_width(); i++) {
+                                for (std::size_t j = 0; j < constraint_system.rows_amount(); j++) {
+                                    key_type key(i, j);
+                                    this->_mapping[key] = key;
+                                    this->_aux[key] = key;
+                                    this->_sizes[key] = 1;
+                                }
+                            }
+
                             std::vector<plonk_copy_constraint<FieldType>> copy_constraints = 
                                                                 constraint_system.copy_constraints();
                             for (std::size_t i = 0; i < copy_constraints.size(); i++) {

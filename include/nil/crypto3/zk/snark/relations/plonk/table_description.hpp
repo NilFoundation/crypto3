@@ -53,6 +53,11 @@ namespace nil {
                             return witness_columns + selector_columns + public_input_columns + a.index;
                         }
                     }
+
+                    std::size_t table_width() const {
+                        return witness_columns + selector_columns 
+                            + public_input_columns + constant_columns;
+                    }
                 };
             }    // namespace snark
         }        // namespace zk

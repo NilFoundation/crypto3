@@ -35,6 +35,7 @@
 
 #include <nil/crypto3/zk/math/permutation.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/copy_constraint.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/variable.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/table.hpp>
@@ -65,19 +66,16 @@ namespace nil {
                     typename FieldType::value_type omega;
                     typename FieldType::value_type delta;
 
-                    math::plonk_permutation permutation;
-
                     typename policy_type::variable_assignment_type table;
 
                     std::vector<plonk_gate<FieldType>> gates;
+                    std::vector<plonk_copy_constraint<FieldType>> copy_constraints;
 
                     circuit_description() {
                         domain = math::make_evaluation_domain<FieldType>(table_rows);
 
                         omega = domain->get_domain_element(1);
                         delta = algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
-
-                        permutation = math::plonk_permutation(witness_columns + public_columns, table_rows);
                     }
 
                     void init() {
@@ -262,7 +260,11 @@ namespace nil {
                         q_add[i] = FieldType::value_type::one();
                         q_mul[i] = FieldType::value_type::zero();
 
-                        test_circuit.permutation.cells_equal(1, i, 2, i - 1);
+                        plonk_variable<FieldType> x(1, i, false, 
+                            plonk_variable<FieldType>::column_type::witness);
+                        plonk_variable<FieldType> y(2, i - 1, false, 
+                            plonk_variable<FieldType>::column_type::witness);
+                        test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x, y));
                     }
 
                     // fill rows with MUL gate
@@ -274,7 +276,11 @@ namespace nil {
                         q_add[i] = FieldType::value_type::zero();
                         q_mul[i] = FieldType::value_type::one();
 
-                        test_circuit.permutation.cells_equal(1, i, 3, 0);
+                        plonk_variable<FieldType> x(1, i, false, 
+                            plonk_variable<FieldType>::column_type::witness);
+                        plonk_variable<FieldType> y(0, 0, false, 
+                            plonk_variable<FieldType>::column_type::public_input);
+                        test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x, y));
                     }
 
                     std::array<plonk_column<FieldType>, witness_columns> private_assignment;
