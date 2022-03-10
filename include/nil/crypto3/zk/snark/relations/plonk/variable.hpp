@@ -68,7 +68,7 @@ namespace nil {
                      */
                     enum rotation_type { pre_previous = -2, previous, current, next, after_next };
                     int rotation;
-                    enum column_type { witness, selector, public_input, constant } type;
+                    enum column_type { witness, public_input, constant, selector } type;
                     std::size_t index;
                     bool relative;
 

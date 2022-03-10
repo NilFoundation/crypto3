@@ -72,8 +72,8 @@ namespace nil {
                         typename policy_type::constraint_system_type &constraint_system,
                         const typename policy_type::preprocessed_public_data_type preprocessed_data,
                         const plonk_polynomial_table<FieldType, ParamsType::witness_columns,
-                            ParamsType::selector_columns, ParamsType::public_input_columns,
-                            ParamsType::constant_columns> &column_polynomials,
+                            ParamsType::public_input_columns, ParamsType::constant_columns,
+                            ParamsType::selector_columns> &column_polynomials,
                         typename CommitmentSchemeTypePermutation::params_type fri_params,
                         transcript_type &transcript = transcript_type()) {
 

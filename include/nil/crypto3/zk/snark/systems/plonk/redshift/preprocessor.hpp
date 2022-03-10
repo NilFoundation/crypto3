@@ -294,16 +294,16 @@ namespace nil {
                         math::polynomial<typename FieldType::value_type> q_blind =
                             selector_blind(N_rows, usable_rows, basic_domain);
 
-                        plonk_public_polynomial_table<FieldType, ParamsType::selector_columns,
-                            ParamsType::public_input_columns, ParamsType::constant_columns> 
+                        plonk_public_polynomial_table<FieldType, ParamsType::public_input_columns, 
+                            ParamsType::constant_columns, ParamsType::selector_columns> 
                             public_polynomial_table =
-                            plonk_public_polynomial_table<FieldType, ParamsType::selector_columns,
-                                ParamsType::public_input_columns, ParamsType::constant_columns>(
-                                detail::column_range_polynomials<FieldType>(public_assignment.selectors(),
-                                                                            basic_domain),
+                            plonk_public_polynomial_table<FieldType, ParamsType::public_input_columns, 
+                                ParamsType::constant_columns, ParamsType::selector_columns>(
                                 detail::column_range_polynomials<FieldType>(public_assignment.public_inputs(),
                                                                             basic_domain), 
                                 detail::column_range_polynomials<FieldType>(public_assignment.constants(),
+                                                                            basic_domain),
+                                detail::column_range_polynomials<FieldType>(public_assignment.selectors(),
                                                                             basic_domain));
 
                         std::vector<typename FieldType::value_type> Z(N_rows + 1);
