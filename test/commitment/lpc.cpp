@@ -45,6 +45,7 @@
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include <nil/crypto3/zk/commitments/type_traits.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
@@ -74,6 +75,13 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type, k> lpc_type;
+
+    static_assert(zk::is_commitment<fri_type>::value);
+    static_assert(zk::is_commitment<lpc_type>::value);
+    static_assert(!zk::is_commitment<merkle_hash_type>::value);
+    static_assert(!zk::is_commitment<merkle_tree_type>::value);
+    static_assert(!zk::is_commitment<std::size_t>::value);
+
     typedef typename lpc_type::proof_type proof_type;
 
     constexpr static const std::size_t d_extended = d;

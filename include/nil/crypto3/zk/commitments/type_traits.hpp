@@ -39,16 +39,71 @@ namespace nil {
             // BOOST_TTI_HAS_TYPE(proving_key)
             // BOOST_TTI_HAS_TYPE(verification_key)
 
-            BOOST_TTI_HAS_STATIC_MEMBER_FUNCTION(commit)
-            BOOST_TTI_HAS_STATIC_MEMBER_FUNCTION(proof_eval)
-            BOOST_TTI_HAS_STATIC_MEMBER_FUNCTION(verify_eval)
-            
+            template<typename T>
+            class has_available_static_member_function_commit {
+                struct no { };
+
+            protected:
+                template<typename C>
+                static void test(std::nullptr_t) {
+                    struct t{
+                        using C::commit;
+                    };
+                }
+
+                template<typename>
+                static no test(...);
+
+            public:
+                constexpr static const bool value = !std::is_same<no, decltype(test<T>(nullptr))>::value;
+            };
+
+            template<typename T>
+            class has_available_static_member_function_proof_eval {
+                struct no { };
+
+            protected:
+                template<typename C>
+                static void test(std::nullptr_t) {
+                    struct t{
+                        using C::proof_eval;
+                    };
+                }
+
+                template<typename>
+                static no test(...);
+
+            public:
+                constexpr static const bool value = !std::is_same<no, decltype(test<T>(nullptr))>::value;
+            };
+
+            template<typename T>
+            class has_available_static_member_function_verify_eval {
+                struct no { };
+
+            protected:
+                template<typename C>
+                static void test(std::nullptr_t) {
+                    struct t{
+                        using C::verify_eval;
+                    };
+                }
+
+                template<typename>
+                static no test(...);
+
+            public:
+                constexpr static const bool value = !std::is_same<no, decltype(test<T>(nullptr))>::value;
+            };
+
             template<typename T>
             struct is_commitment {
                 using commitment_type = typename member_type_commitment_type<T>::type;
 
                 static const bool value = has_type_commitment_type<T>::value && has_type_proof_type<T>::value &&
-                                          has_static_member_function_commit<T, commitment_type>::value;
+                                          has_available_static_member_function_commit<T>::value &&
+                                          has_available_static_member_function_proof_eval<T>::value &&
+                                          has_available_static_member_function_verify_eval<T>::value;
                 typedef T type;
             };
 
