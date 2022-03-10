@@ -123,7 +123,7 @@ namespace nil {
                         cycle_representation (typename policy_type::constraint_system_type &constraint_system, 
                             const plonk_table_description<FieldType> &table_description) {
 
-                            for (std::size_t i = 0; i < table_description.table_width(); i++) {
+                            for (std::size_t i = 0; i < table_description.table_width() - table_description.selector_columns; i++) {
                                 for (std::size_t j = 0; j < constraint_system.rows_amount(); j++) {
                                     key_type key(i, j);
                                     this->_mapping[key] = key;
@@ -167,12 +167,14 @@ namespace nil {
                                 }
 
                                 _sizes[_aux[left]] = _sizes[_aux[left]] + _sizes[_aux[right]];
+                                
                                 key_type z = _aux[right];
+                                key_type exit_condition = _aux[right];
 
                                 do {
                                     _aux[z] = _aux[left];
                                     z = _mapping[z];
-                                } while (z != _aux[right]);
+                                } while (z != exit_condition);
 
                                 key_type tmp = _mapping[left];
                                 _mapping[left] = _mapping[right];
