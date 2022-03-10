@@ -33,7 +33,7 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace commitments {
                 namespace detail {
 
                     template<typename Type1, typename Type2>
@@ -202,7 +202,7 @@ namespace nil {
                         return lhs * rhs.data;
                     }
                 }    // namespace detail
-            }        // namespace snark
+            }        // namespace commitments
         }            // namespace zk
     }                // namespace crypto3
 }    // namespace nil

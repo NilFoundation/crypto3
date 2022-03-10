@@ -334,8 +334,7 @@ namespace nil {
                 bool r1cs_mp_ppzkpcd_proving_key<PCD_ppT>::is_well_formed() const {
                     const std::size_t num_predicates = compliance_predicates.size();
 
-                    bool result;
-                    result = result && (compliance_step_r1cs_pks.size() == num_predicates);
+                    bool result = (compliance_step_r1cs_pks.size() == num_predicates);
                     result = result && (translation_step_r1cs_pks.size() == num_predicates);
                     result = result && (compliance_step_r1cs_vks.size() == num_predicates);
                     result = result && (translation_step_r1cs_vks.size() == num_predicates);

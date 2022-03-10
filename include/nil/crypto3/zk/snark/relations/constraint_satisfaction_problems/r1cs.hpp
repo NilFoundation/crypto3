@@ -38,7 +38,6 @@
 #include <vector>
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
-#include <nil/crypto3/zk/snark/relations/linear_combination.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -177,7 +176,7 @@ namespace nil {
                             const typename FieldType::value_type cres =
                                 constraints[c].c.evaluate(full_variable_assignment);
 
-                            if (!(ares * bres == cres)) {
+                            if (ares * bres != cres) {
                                 return false;
                             }
                         }

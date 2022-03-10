@@ -84,9 +84,7 @@ namespace nil {
                     using commitment_type = typename CurveType::template g1_type<>::value_type;
                     using proof_type = commitment_type;
 
-                    struct params_type {
-
-                    };
+                    struct params_type { };
 
                     /// Returns both vectors scaled by the given vector entrywise.
                     /// In other words, it returns $\{v_i^{s_i}\}$
@@ -95,10 +93,10 @@ namespace nil {
                         kzg_commitment_key<group_type> result;
                         std::for_each(boost::make_zip_iterator(boost::make_tuple(s_first, a.begin())),
                                       boost::make_zip_iterator(boost::make_tuple(s_last, a.end())),
-                                      [&](const boost::tuple<const field_value_type &, const group_value_type &,
+                                      [&](const boost::tuple<const field_value_type &,
+                                                             const group_value_type &,
                                                              const group_value_type &> &t) {
                                           result.a.emplace_back(t.template get<1>() * t.template get<0>());
-                                        
                                       });
 
                         return result;
@@ -107,20 +105,19 @@ namespace nil {
                     /// Commits to a single vector of G1 elements in the following way:
                     /// $C = \prod_{i=0}^n (g^{a^i})^{f_i}$
                     /// Output is $C$
-                    static commitment_type commit(const commitment_key_type &ckey, 
-                            const math::polynomial<typename FieldType::value_type> &f,
-                            params_type params) {
+                    static commitment_type commit(const commitment_key_type &ckey,
+                                                  const math::polynomial<typename FieldType::value_type> &f,
+                                                  params_type params) {
                         BOOST_ASSERT(ckey.has_correct_len(std::distance(f_first, f_last)));
 
                         g1_value_type c = g1_value_type::one();
                         std::for_each_n(boost::make_zip_iterator(boost::make_tuple(f_first, ckey.a.begin())),
-                        std::distance(f_first, f_last),
-                        [&](const boost::tuple<const g1_value_type &, const g1_value_type &> &t) {
-                            for(size_t i = 0; i < (t.template get<0>()); i++){
-                                c = c * t.template get<1>();
-                            }
-                                      });
-                
+                                        std::distance(f_first, f_last),
+                                        [&](const boost::tuple<const g1_value_type &, const g1_value_type &> &t) {
+                                            for (size_t i = 0; i < (t.template get<0>()); i++) {
+                                                c = c * t.template get<1>();
+                                            }
+                                        });
                     }
 
                     static proof_type proof_eval(commitment_key_type commitment_key,
@@ -132,8 +129,7 @@ namespace nil {
 
                         const math::polynomial<typename FieldType::value_type> denominator_polynom = {1, -x};
 
-                        const math::polynomial<typename FieldType::value_type> q = 
-                            (f - {y})/denominator_polynom;
+                        const math::polynomial<typename FieldType::value_type> q = (f - {y}) / denominator_polynom;
                     }
 
                     static bool verify_eval(verification_key_type verification_key,
@@ -142,13 +138,11 @@ namespace nil {
                                             typename CurveType::base_field_type::value_type y,
                                             proof_type p,
                                             params_type params) {
-
                     }
-
                 };
-            } ;   // namespace snark 
-        }        // namespace zk
-    }          // namespace crypto3
+            };    // namespace snark
+        }         // namespace zk
+    }             // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_COMMITMENTS_KZG_COMMITMENT_HPP

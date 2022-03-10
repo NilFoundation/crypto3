@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_PROVING_KEY_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_PROVING_KEY_HPP
 
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>
 
@@ -48,8 +48,8 @@ namespace nil {
 
                     std::vector<typename CurveType::template g1_type<>::value_type>
                         A_query;    // this could be a sparse vector if we had multiexp for those
-                    knowledge_commitment_vector<typename CurveType::template g2_type<>,
-                                                typename CurveType::template g1_type<>>
+                    commitments::knowledge_commitment_vector<typename CurveType::template g2_type<>,
+                                                             typename CurveType::template g1_type<>>
                         B_query;
                     std::vector<typename CurveType::template g1_type<>::value_type> H_query;
                     std::vector<typename CurveType::template g1_type<>::value_type> L_query;
@@ -68,8 +68,8 @@ namespace nil {
                         const typename CurveType::template g1_type<>::value_type &delta_g1,
                         const typename CurveType::template g2_type<>::value_type &delta_g2,
                         const std::vector<typename CurveType::template g1_type<>::value_type> &A_query,
-                        const knowledge_commitment_vector<typename CurveType::template g2_type<>,
-                                                          typename CurveType::template g1_type<>> &B_query,
+                        const commitments::knowledge_commitment_vector<typename CurveType::template g2_type<>,
+                                                                       typename CurveType::template g1_type<>> &B_query,
                         const std::vector<typename CurveType::template g1_type<>::value_type> &H_query,
                         const std::vector<typename CurveType::template g1_type<>::value_type> &L_query,
                         const constraint_system_type &constraint_system) :
@@ -84,7 +84,7 @@ namespace nil {
                         typename CurveType::template g1_type<>::value_type &&delta_g1,
                         typename CurveType::template g2_type<>::value_type &&delta_g2,
                         std::vector<typename CurveType::template g1_type<>::value_type> &&A_query,
-                        knowledge_commitment_vector<typename CurveType::template g2_type<>,
+                        commitments::knowledge_commitment_vector<typename CurveType::template g2_type<>,
                                                     typename CurveType::template g1_type<>> &&B_query,
                         std::vector<typename CurveType::template g1_type<>::value_type> &&H_query,
                         std::vector<typename CurveType::template g1_type<>::value_type> &&L_query,
