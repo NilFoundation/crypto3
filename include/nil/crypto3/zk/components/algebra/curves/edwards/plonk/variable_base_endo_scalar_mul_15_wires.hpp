@@ -81,8 +81,8 @@ namespace nil {
                     W12,
                     W13,
                     W14> : public component<snark::plonk_constraint_system<BlueprintFieldType>> {
-                    typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
 
+                    typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
                     typedef blueprint<arithmetization_type> blueprint_type;
 
                     std::size_t j;
@@ -114,7 +114,10 @@ namespace nil {
                         return in_bp.allocate_rows(required_rows_amount);
                     }
 
-                    void generate_gates(blueprint_public_assignment_table<arithmetization_type> &public_assignment, 
+                    template <std::size_t SelectorColumns, std::size_t PublicInputColumns,
+                        std::size_t ConstantColumns>
+                    void generate_gates(blueprint_public_assignment_table<ArithmetizationType,
+                            SelectorColumns, PublicInputColumns, ConstantColumns> &public_assignment, 
                         std::size_t circuit_start_row = 0) {
 
                         std::size_t selector_index = public_assignment.add_selector(j, j + required_rows_amount - 2);
@@ -154,14 +157,28 @@ namespace nil {
                             constraint_6, constraint_7});
                     }
 
-                    void generate_copy_constraints(blueprint_public_assignment_table<arithmetization_type> &public_assignment,
+                    template <std::size_t SelectorColumns, std::size_t PublicInputColumns,
+                        std::size_t ConstantColumns>
+                    void generate_copy_constraints(
+                            blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
+                                PublicInputColumns, ConstantColumns> &public_assignment,
                         std::size_t circuit_start_row = 0){
+
+                        for (int z = 0; z < required_rows_amount - 2; z++){
+                            this->bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 1, false}});
+                            this->bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 1, false}});
+                        }
+
+                        // TODO: (xP , yP ) in row i are copy constrained with values from the first doubling circuit
 
                     }
 
-                    template <std::size_t WitnessColumns>
-                    void generate_assignments(blueprint_private_assignment_table<arithmetization_type, WitnessColumns> &private_assignment,
-                                              blueprint_public_assignment_table<arithmetization_type> &public_assignment,
+                    template <std::size_t WitnessColumns, std::size_t SelectorColumns,
+                        std::size_t PublicInputColumns, std::size_t ConstantColumns>
+                    void generate_assignments(
+                            blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
+                            blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
+                                PublicInputColumns, ConstantColumns> &public_assignment,
                                               const assignment_params &params,
                                               std::size_t circuit_start_row = 0) {
 
