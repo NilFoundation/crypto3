@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -29,6 +30,7 @@
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -51,6 +53,11 @@ namespace nil {
                         this->g_B = g2_type::value_type::one();
                         this->g_C = g1_type::value_type::one();
                     }
+                    r1cs_gg_ppzksnark_proof(const typename CurveType::template g1_type<>::value_type &g_A,
+                                            const typename CurveType::template g2_type<>::value_type &g_B,
+                                            const typename CurveType::template g1_type<>::value_type &g_C) :
+                        g_A(g_A),
+                        g_B(g_B), g_C(g_C) {};
                     r1cs_gg_ppzksnark_proof(typename CurveType::template g1_type<>::value_type &&g_A,
                                             typename CurveType::template g2_type<>::value_type &&g_B,
                                             typename CurveType::template g1_type<>::value_type &&g_C) :

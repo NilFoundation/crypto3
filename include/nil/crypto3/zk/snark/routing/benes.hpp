@@ -348,7 +348,7 @@ namespace nil {
 
                     benes_routing routing(num_columns, std::vector<bool>(num_packets));
 
-                    route_benes_inner(dimension, permutation, permutation.inversed(), 0, num_columns, 0, num_packets,
+                    route_benes_inner(dimension, permutation, permutation.inverse(), 0, num_columns, 0, num_packets,
                                       routing);
 
                     return routing;
@@ -369,7 +369,7 @@ namespace nil {
 
                         for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
                             std::size_t next_packet_idx =
-                                (routing[column_idx][packet_idx] == false) ? packet_idx : packet_idx ^ mask;
+                                !routing[column_idx][packet_idx] ? packet_idx : packet_idx ^ mask;
                             res[column_idx + 1][next_packet_idx] = res[column_idx][packet_idx];
                         }
                     }

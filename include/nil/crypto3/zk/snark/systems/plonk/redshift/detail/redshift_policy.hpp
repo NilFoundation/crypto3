@@ -37,7 +37,6 @@
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/proof.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 

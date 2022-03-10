@@ -37,12 +37,12 @@
 
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace commitments {
                 template<typename T1, typename T2, typename Backend,
                          multiprecision::expression_template_option ExpressionTemplates>
                 typename knowledge_commitment<T1, T2>::value_type
@@ -205,7 +205,7 @@ namespace nil {
                         return res;
                     }
                 }
-            }    // namespace snark
+            }    // namespace commitments
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

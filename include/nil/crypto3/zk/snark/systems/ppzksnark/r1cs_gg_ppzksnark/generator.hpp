@@ -45,6 +45,8 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic, typename = void>
+                class r1cs_gg_ppzksnark_generator;
 
                 /**
                  * A generator algorithm for the R1CS GG-ppzkSNARK.
@@ -53,8 +55,9 @@ namespace nil {
                  * CS.
                  */
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_generator {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> policy_type;
+                class r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Basic> {
+
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::template g1_type<> g1_type;
@@ -69,8 +72,11 @@ namespace nil {
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
+                    typedef typename policy_type::extended_verification_key_type extended_verification_key_type;
 
                     typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::processed_keypair_type processed_keypair_type;
+                    typedef typename policy_type::extended_keypair_type extended_keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
                     template<typename DistributionType =
@@ -216,6 +222,8 @@ namespace nil {
                             algebra::batch_exp<g1_type, scalar_field_type>(g1_scalar_size, g1_window_size, g1_table,
                                                                            gamma_ABC);
 
+                        typename g1_type::value_type gamma_g1 = gamma * g1_generator;
+
                         accumulation_vector<g1_type> gamma_ABC_g1(std::move(gamma_ABC_g1_0),
                                                                   std::move(gamma_ABC_g1_values));
 
@@ -223,19 +231,52 @@ namespace nil {
                                                std::move(delta_g1), std::move(delta_g2), std::move(gamma_g2),
                                                std::move(A_query), std::move(B_query), std::move(H_query),
                                                std::move(L_query), std::move(r1cs_copy), std::move(alpha_g1_beta_g2),
-                                               std::move(gamma_ABC_g1));
+                                               std::move(gamma_ABC_g1), std::move(gamma_g1));
                     }
 
-                    template<typename DistributionType =
+                    template<typename KeyPairType,
+                             typename DistributionType =
                                  boost::random::uniform_int_distribution<typename scalar_field_type::integral_type>,
                              typename GeneratorType = boost::random::mt19937>
-                    static inline keypair_type process(const constraint_system_type &constraint_system) {
+                    static inline
+                        typename std::enable_if<std::is_same<keypair_type, KeyPairType>::value, KeyPairType>::type
+                        process(const constraint_system_type &constraint_system) {
 
                         auto [alpha_g1, beta_g1, beta_g2, delta_g1, delta_g2, gamma_g2, A_query, B_query, H_query,
-                              L_query, r1cs_copy, alpha_g1_beta_g2, gamma_ABC_g1] = basic_process(constraint_system);
+                              L_query, r1cs_copy, alpha_g1_beta_g2, gamma_ABC_g1, gamma_g1] =
+                            basic_process<DistributionType, GeneratorType>(constraint_system);
 
                         verification_key_type vk =
                             verification_key_type(alpha_g1_beta_g2, gamma_g2, delta_g2, gamma_ABC_g1);
+
+                        proving_key_type pk = proving_key_type(std::move(alpha_g1),
+                                                               std::move(beta_g1),
+                                                               std::move(beta_g2),
+                                                               std::move(delta_g1),
+                                                               std::move(delta_g2),
+                                                               std::move(A_query),
+                                                               std::move(B_query),
+                                                               std::move(H_query),
+                                                               std::move(L_query),
+                                                               std::move(r1cs_copy));
+
+                        return {std::move(pk), std::move(vk)};
+                    }
+
+                    template<typename KeyPairType,
+                             typename DistributionType =
+                                 boost::random::uniform_int_distribution<typename scalar_field_type::integral_type>,
+                             typename GeneratorType = boost::random::mt19937>
+                    static inline typename std::enable_if<std::is_same<extended_keypair_type, KeyPairType>::value,
+                                                          KeyPairType>::type
+                        process(const constraint_system_type &constraint_system) {
+
+                        auto [alpha_g1, beta_g1, beta_g2, delta_g1, delta_g2, gamma_g2, A_query, B_query, H_query,
+                              L_query, r1cs_copy, alpha_g1_beta_g2, gamma_ABC_g1, gamma_g1] =
+                            basic_process<DistributionType, GeneratorType>(constraint_system);
+
+                        extended_verification_key_type vk = extended_verification_key_type(
+                            alpha_g1_beta_g2, gamma_g2, delta_g2, delta_g1, gamma_ABC_g1, gamma_g1);
 
                         proving_key_type pk = proving_key_type(std::move(alpha_g1),
                                                                std::move(beta_g1),

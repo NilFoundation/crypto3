@@ -32,8 +32,8 @@
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 
+#include <nil/crypto3/zk/math/permutation.hpp>
 #include "nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp"
-#include <nil/crypto3/zk/snark/relations/plonk/permutation.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/copy_constraint.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/table_description.hpp>
 

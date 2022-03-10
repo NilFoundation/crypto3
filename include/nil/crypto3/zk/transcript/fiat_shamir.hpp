@@ -39,7 +39,7 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace transcript {
 
                 /*!
                  * @brief Fiat–Shamir heuristic.
@@ -184,7 +184,7 @@ namespace nil {
                 private:
                     typename hash_type::digest_type state;
                 };
-            }    // namespace snark
+            }    // namespace transcript
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

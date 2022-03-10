@@ -30,6 +30,7 @@
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/verifier.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/verification_key.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/prover.hpp>
@@ -661,17 +662,18 @@ namespace nil {
                     return pc.verify();
                 }
 
-                template<typename CurveType, typename BasicVerifier>
-                class r1cs_gg_ppzksnark_aggregate_verifier {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::aggregate> policy_type;
+                template<typename CurveType>
+                class r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Aggregate> {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
+                    typedef r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Basic>
+                        basic_verifier;
+                    typedef typename basic_verifier::proof_type basic_proof_type;
 
                 public:
-                    typedef BasicVerifier basic_verifier;
                     typedef typename policy_type::primary_input_type primary_input_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
                     typedef typename policy_type::verification_srs_type verification_srs_type;
                     typedef typename policy_type::proof_type proof_type;
-                    typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
 
                     // aggregate verify
                     template<typename DistributionType, typename GeneratorType, typename Hash,
@@ -684,7 +686,7 @@ namespace nil {
                         process(const verification_srs_type &ip_verifier_srs,
                                 const verification_key_type &pvk,
                                 const InputPrimaryInputRange &public_inputs,
-                                const aggregate_proof_type &proof,
+                                const proof_type &proof,
                                 InputIterator transcript_include_first,
                                 InputIterator transcript_include_last) {
                         return verify_aggregate_proof<CurveType, DistributionType, GeneratorType, Hash>(
@@ -696,8 +698,8 @@ namespace nil {
                     template<typename VerificationKey>
                     static inline bool process(const VerificationKey &vk,
                                                const primary_input_type &primary_input,
-                                               const proof_type &proof) {
-                        return BasicVerifier::process(vk, primary_input, proof);
+                                               const basic_proof_type &proof) {
+                        return basic_verifier::process(vk, primary_input, proof);
                     }
                 };
             }    // namespace snark

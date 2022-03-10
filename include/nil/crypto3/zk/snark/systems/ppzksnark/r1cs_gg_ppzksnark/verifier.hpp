@@ -65,12 +65,21 @@ namespace nil {
 
                 using namespace algebra;
 
+                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
+                class r1cs_gg_ppzksnark_process_verification_key;
+
+                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
+                class r1cs_gg_ppzksnark_verifier_weak_input_consistency;
+
+                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
+                class r1cs_gg_ppzksnark_verifier_strong_input_consistency;
+
                 /**
                  * Convert a (non-processed) verification key into a processed verification key.
                  */
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_process_verification_key {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> policy_type;
+                class r1cs_gg_ppzksnark_process_verification_key<CurveType, ProvingMode::Basic> {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                 public:
                     typedef typename policy_type::verification_key_type verification_key_type;
@@ -106,8 +115,8 @@ namespace nil {
                 */
 
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_verifier_weak_input_consistency {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> policy_type;
+                class r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType, ProvingMode::Basic> {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::template g1_type<> g1_type;
@@ -178,8 +187,8 @@ namespace nil {
                 };
 
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_verifier_strong_input_consistency {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> policy_type;
+                class r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Basic> {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                 public:
                     typedef typename policy_type::primary_input_type primary_input_type;

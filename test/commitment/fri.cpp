@@ -42,10 +42,9 @@
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
-#include <nil/crypto3/container/merkle/tree.hpp>    // until fri inclusion
-
-#include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/snark/commitments/fri.hpp>
+#include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
+#include <nil/crypto3/zk/commitments/type_traits.hpp>
 
 using namespace nil::crypto3;
 
@@ -67,7 +66,11 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+
+    static_assert(zk::is_commitment<fri_type>::value);
+    static_assert(!zk::is_commitment<merkle_hash_type>::value);
+
     typedef typename fri_type::proof_type proof_type;
     typedef typename fri_type::params_type params_type;
 
@@ -76,7 +79,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        fri_type::calculate_domain_set(extended_log, r);
+        zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
 
     math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
     params.r = r;
@@ -91,24 +94,19 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     // commit
     math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
 
-    merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
+    merkle_tree_type commit_merkle = fri_type::precommit(f, D[0]);
     std::array<typename FieldType::value_type, 1> evaluation_points = {D[0]->get_domain_element(1).pow(5)};
 
     // eval
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    zk::snark::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
 
-    // LPC-related logic, here we "nulify" it via U = 0, V - 1
-    // TODO: Make FRI independent from LPC input
-    math::polynomial<typename FieldType::value_type> U = {0};
-    math::polynomial<typename FieldType::value_type> V = {1};
-
-    proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
+    proof_type proof = fri_type::proof_eval(f, commit_merkle, params, transcript);
 
     // verify
-    zk::snark::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(init_blob);
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(init_blob);
 
-    BOOST_CHECK(fri_type::verify_eval(proof, transcript_verifier, params, U, V));
+    BOOST_CHECK(fri_type::verify_eval(proof, params, transcript_verifier));
 
     typename FieldType::value_type verifier_next_challenge = transcript_verifier.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = transcript.template challenge<FieldType>();
@@ -130,7 +128,7 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
     typedef typename fri_type::proof_type proof_type;
     typedef typename fri_type::params_type params_type;
 
@@ -138,7 +136,8 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
     math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
     std::size_t d_log = boost::static_log2<d>::value;
-    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = fri_type::calculate_domain_set(d_log, 1);
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = 
+        zk::commitments::detail::calculate_domain_set<FieldType>(d_log, 1);
 
     params.r = r;
     params.D = D;
@@ -151,7 +150,7 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
     typename FieldType::value_type x_next = params.q.evaluate(omega);
     typename FieldType::value_type alpha = algebra::random_element<FieldType>();
 
-    math::polynomial<typename FieldType::value_type> f_next = fri_type::fold_polynomial(f, alpha);
+    math::polynomial<typename FieldType::value_type> f_next = zk::commitments::detail::fold_polynomial<FieldType>(f, alpha);
 
     BOOST_CHECK_EQUAL(f_next.degree(), f.degree() / 2);
     std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points {
@@ -181,7 +180,7 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
     typedef typename fri_type::proof_type proof_type;
     typedef typename fri_type::params_type params_type;
 
@@ -191,7 +190,7 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        fri_type::calculate_domain_set(extended_log, r);
+        zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
 
     params.r = r - 1;
     params.D = D;
@@ -199,13 +198,13 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     params.max_degree = d - 1;
 
     BOOST_CHECK(D[1]->m == D[0]->m / 2);
-    merkle_tree_type commit_merkle = fri_type::commit(f, D[0]);
+    merkle_tree_type commit_merkle = fri_type::precommit(f, D[0]);
     std::array<typename FieldType::value_type, 1> evaluation_points = {D[0]->get_domain_element(1).pow(5)};
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    zk::snark::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
 
-    proof_type proof = fri_type::proof_eval(f, f, commit_merkle, transcript, params);
+    proof_type proof = fri_type::proof_eval(f, commit_merkle, params, transcript);
 
     math::polynomial<typename FieldType::value_type> final_polynomial = proof.final_polynomial;
     BOOST_CHECK_EQUAL(proof.final_polynomial.degree(), 1);

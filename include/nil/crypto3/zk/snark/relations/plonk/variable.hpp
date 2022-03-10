@@ -35,22 +35,24 @@
 
 namespace nil {
     namespace crypto3 {
+        namespace math {
+
+            /**
+             * Forward declaration.
+             */
+            template<typename VariableType>
+            struct non_linear_term;
+
+            /**
+             * Forward declaration.
+             */
+            template<typename VariableType>
+            struct non_linear_combination;
+        }        // namespace math
         namespace zk {
             namespace snark {
 
                 /********************************* Variable **********************************/
-
-                /**
-                 * Forward declaration.
-                 */
-                template<typename VariableType>
-                struct non_linear_term;
-
-                /**
-                 * Forward declaration.
-                 */
-                template<typename VariableType>
-                struct non_linear_combination;
 
                 /**
                  * A variable represents a formal expression of the form "w^{index}_{rotation}" and type type.
@@ -76,39 +78,39 @@ namespace nil {
                         column_type type = column_type::witness) :
                         index(index), rotation(rotation), relative(relative), type(type) {};
 
-                    non_linear_term<plonk_variable<FieldType>> operator^(const std::size_t power) const {
-                        return non_linear_term<plonk_variable<FieldType>>(*this) ^ power;
+                    math::non_linear_term<plonk_variable<FieldType>> operator^(const std::size_t power) const {
+                        return math::non_linear_term<plonk_variable<FieldType>>(*this) ^ power;
                     }
 
-                    non_linear_term<plonk_variable<FieldType>> operator*(const assignment_type &field_coeff) const {
-                        return non_linear_term<plonk_variable<FieldType>>(*this) * field_coeff;
+                    math::non_linear_term<plonk_variable<FieldType>> operator*(const assignment_type &field_coeff) const {
+                        return math::non_linear_term<plonk_variable<FieldType>>(*this) * field_coeff;
                     }
 
-                    non_linear_term<plonk_variable<FieldType>> operator*(const plonk_variable &other) const {
-                        return non_linear_term<plonk_variable<FieldType>>(*this) * other;
+                    math::non_linear_term<plonk_variable<FieldType>> operator*(const plonk_variable &other) const {
+                        return math::non_linear_term<plonk_variable<FieldType>>(*this) * other;
                     }
 
-                    non_linear_combination<plonk_variable<FieldType>>
-                        operator+(const non_linear_combination<plonk_variable<FieldType>> &other) const {
-                        non_linear_combination<plonk_variable<FieldType>> result(other);
+                    math::non_linear_combination<plonk_variable<FieldType>>
+                        operator+(const math::non_linear_combination<plonk_variable<FieldType>> &other) const {
+                        math::non_linear_combination<plonk_variable<FieldType>> result(other);
 
                         result.add_term(*this);
 
                         return result;
                     }
 
-                    non_linear_combination<plonk_variable<FieldType>>
-                        operator-(const non_linear_combination<plonk_variable<FieldType>> &other) const {
+                    math::non_linear_combination<plonk_variable<FieldType>>
+                        operator-(const math::non_linear_combination<plonk_variable<FieldType>> &other) const {
                         return (*this) + (-other);
                     }
 
-                    non_linear_combination<plonk_variable<FieldType>>
+                    math::non_linear_combination<plonk_variable<FieldType>>
                         operator-(const assignment_type &field_val) const {
-                        return (*this) - non_linear_combination<plonk_variable<FieldType>>(field_val);
+                        return (*this) - math::non_linear_combination<plonk_variable<FieldType>>(field_val);
                     }
 
-                    non_linear_term<plonk_variable<FieldType>> operator-() const {
-                        return non_linear_term<plonk_variable<FieldType>>(*this) * (-assignment_type::one());
+                    math::non_linear_term<plonk_variable<FieldType>> operator-() const {
+                        return math::non_linear_term<plonk_variable<FieldType>>(*this) * (-assignment_type::one());
                     }
 
                     bool operator==(const plonk_variable &other) const {
@@ -122,19 +124,19 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                non_linear_term<plonk_variable<FieldType>> operator*(const typename FieldType::value_type &field_coeff,
+                math::non_linear_term<plonk_variable<FieldType>> operator*(const typename FieldType::value_type &field_coeff,
                                                                      const plonk_variable<FieldType> &var) {
                     return var * field_coeff;
                 }
 
                 template<typename FieldType>
-                non_linear_combination<plonk_variable<FieldType>>
+                math::non_linear_combination<plonk_variable<FieldType>>
                     operator+(const typename FieldType::value_type &field_val, const plonk_variable<FieldType> &var) {
                     return var + field_val;
                 }
 
                 template<typename FieldType>
-                non_linear_combination<plonk_variable<FieldType>>
+                math::non_linear_combination<plonk_variable<FieldType>>
                     operator-(const typename FieldType::value_type &field_val, const plonk_variable<FieldType> &var) {
                     return - (var - field_val);
                 }

@@ -36,8 +36,8 @@
 
 #include <nil/crypto3/container/merkle/tree.hpp>
 
-#include <nil/crypto3/zk/snark/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/snark/commitments/lpc.hpp>
+#include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
 
@@ -52,10 +52,9 @@ namespace nil {
                 class redshift_permutation_argument {
 
                     using transcript_hash_type = typename ParamsType::transcript_hash_type;
+                    using transcript_type = transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
 
                     typedef detail::redshift_policy<FieldType, ParamsType> policy_type;
-
-                    typedef typename CommitmentSchemeTypePermutation::fri_type fri_type;
 
                     static constexpr std::size_t argument_size = 3;
 
@@ -65,17 +64,18 @@ namespace nil {
 
                         math::polynomial<typename FieldType::value_type> permutation_polynomial;
 
-                        typename CommitmentSchemeTypePermutation::merkle_tree_type permutation_poly_commitment;
+                        typename CommitmentSchemeTypePermutation::precommitment_type 
+                            permutation_poly_precommitment;
                     };
 
                     static inline prover_result_type prove_eval(
-                        fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript,
                         typename policy_type::constraint_system_type &constraint_system,
                         const typename policy_type::preprocessed_public_data_type preprocessed_data,
                         const plonk_polynomial_table<FieldType, ParamsType::witness_columns,
                             ParamsType::selector_columns, ParamsType::public_input_columns,
                             ParamsType::constant_columns> &column_polynomials,
-                        typename fri_type::params_type fri_params) {
+                        typename CommitmentSchemeTypePermutation::params_type fri_params,
+                        transcript_type &transcript = transcript_type()) {
 
                         const std::size_t table_rows = constraint_system.rows_amount();
 
@@ -135,9 +135,10 @@ namespace nil {
                                                                              V_P_interpolation_points.end());
 
                         // 4. Compute and add commitment to $V_P$ to $\text{transcript}$.
-                        typename CommitmentSchemeTypePermutation::merkle_tree_type V_P_tree =
-                            CommitmentSchemeTypePermutation::commit(V_P, fri_params.D[0]);
-                        typename CommitmentSchemeTypePermutation::commitment_type V_P_commitment = V_P_tree.root();
+                        typename CommitmentSchemeTypePermutation::precommitment_type V_P_tree =
+                            CommitmentSchemeTypePermutation::precommit(V_P, fri_params.D[0]);
+                        typename CommitmentSchemeTypePermutation::commitment_type V_P_commitment = 
+                            CommitmentSchemeTypePermutation::commit(V_P_tree);
                         transcript(V_P_commitment);
 
                         // 5. Calculate g_perm, h_perm
@@ -178,7 +179,6 @@ namespace nil {
                     }
 
                     static inline std::array<typename FieldType::value_type, argument_size> verify_eval(
-                        fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript,
                         const typename policy_type::preprocessed_public_data_type preprocessed_data,
                         // y
                         const typename FieldType::value_type &challenge,
@@ -188,7 +188,8 @@ namespace nil {
                         const typename FieldType::value_type &perm_polynomial_value,
                         // V_P(omega * y):
                         const typename FieldType::value_type &perm_polynomial_shifted_value,
-                        const typename CommitmentSchemeTypePermutation::commitment_type &V_P_commitment) {
+                        const typename CommitmentSchemeTypePermutation::commitment_type &V_P_commitment,
+                        transcript_type &transcript = transcript_type()) {
 
                         const std::vector<math::polynomial<typename FieldType::value_type>> &S_sigma =
                             preprocessed_data.permutation_polynomials;

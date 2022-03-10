@@ -49,7 +49,7 @@
 #define CRYPTO3_ZK_USCS_TO_SSP_REDUCTION_HPP
 
 #include <nil/crypto3/math/coset.hpp>
-#include <nil/crypto3/math/evaluation_domain.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>

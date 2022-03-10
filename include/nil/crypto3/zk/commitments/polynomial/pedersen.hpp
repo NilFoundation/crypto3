@@ -31,9 +31,9 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace commitments {
                 template<typename CurveType>
-                class pedersen_commitment_scheme {
+                class pedersen {
                 public:
                     typedef typename CurveType::scalar_field_type::value_type evaluation_type;
                     typedef typename CurveType::template g1_type<>::value_type commitment_type;
@@ -47,7 +47,7 @@ namespace nil {
                     }
                 };
 
-            }    // namespace snark
+            }    // namespace commitments
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
