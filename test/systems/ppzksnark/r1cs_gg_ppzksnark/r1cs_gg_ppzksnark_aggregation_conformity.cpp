@@ -51,7 +51,6 @@
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/verifier.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/transcript.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
-
 #include <nil/crypto3/zk/snark/algorithms/prove.hpp>
 #include <nil/crypto3/zk/snark/algorithms/verify.hpp>
 
@@ -159,11 +158,11 @@ namespace boost {
 }    // namespace boost
 
 using curve_type = curves::bls12_381;
-using scheme_type = r1cs_gg_ppzksnark<
-    curve_type, r1cs_gg_ppzksnark_aggregate_generator<curve_type>,
-    r1cs_gg_ppzksnark_aggregate_prover<curve_type, r1cs_gg_ppzksnark_prover<curve_type>>,
-    r1cs_gg_ppzksnark_aggregate_verifier<curve_type, r1cs_gg_ppzksnark_verifier_strong_input_consistency<curve_type>>,
-    proving_mode::aggregate>;
+using scheme_type =
+    r1cs_gg_ppzksnark<curve_type, r1cs_gg_ppzksnark_generator<curve_type, ProvingMode::Aggregate>,
+                      r1cs_gg_ppzksnark_prover<curve_type, ProvingMode::Aggregate>,
+                      r1cs_gg_ppzksnark_verifier_strong_input_consistency<curve_type, ProvingMode::Aggregate>,
+                      ProvingMode::Aggregate>;
 
 using g1_type = typename curve_type::template g1_type<>;
 using g2_type = typename curve_type::template g2_type<>;
@@ -900,7 +899,7 @@ BOOST_AUTO_TEST_CASE(bls381_prove_commitment_test) {
             fq_value_type::one()));
 
     // setup_fake_srs
-    r1cs_gg_pp_zksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
+    r1cs_gg_ppzksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
     auto [pk, vk] = srs.specialize(n);
 
     kzg_opening<g2_type> comm_v = prove_commitment_v<curve_type>(pk.h_alpha_powers.begin(),
@@ -2030,7 +2029,7 @@ BOOST_AUTO_TEST_CASE(bls381_prove_tipp_mipp_test) {
         0x66d3bcd37b8ce4dbc7efc5bcbb6111f5593c2a173f60a2935bf958efcc099c88_cppui255;
     constexpr scalar_field_value_type beta =
         0x01f39625fe789118b73750642f16a60224a2a86a4d0487a0df75795c3269e3fd_cppui255;
-    r1cs_gg_pp_zksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
+    r1cs_gg_ppzksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
     auto [pk, vk] = srs.specialize(n);
 
     tipp_mipp_proof<curve_type> tmp =
@@ -2672,7 +2671,7 @@ BOOST_AUTO_TEST_CASE(bls381_aggregate_proofs) {
         0x57aa5df37b9bd97a5e5f84f4797eac33e5ebe0c6e2ca2fbca1b3b3d7052ce35d_cppui255;
     constexpr scalar_field_value_type beta =
         0x43131d0617d95a6fbd46c1f9055f60e8028acaae2e6e7e500a471ed47553ecfe_cppui255;
-    r1cs_gg_pp_zksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
+    r1cs_gg_ppzksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
     auto [pk, vk] = srs.specialize(n);
 
     r1cs_gg_ppzksnark_proof<curve_type> proof0 {
@@ -3581,7 +3580,7 @@ BOOST_AUTO_TEST_CASE(bls381_verification) {
         0x43131d0617d95a6fbd46c1f9055f60e8028acaae2e6e7e500a471ed47553ecfe_cppui255;
 
     // setup_fake_srs
-    r1cs_gg_pp_zksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
+    r1cs_gg_ppzksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
     auto [pk, vk] = srs.specialize(n);
 
     std::vector<G2_value_type> pk_vkey_a = {
@@ -4974,7 +4973,7 @@ BOOST_AUTO_TEST_CASE(bls381_verification_mimc) {
         0x252c17e40f6978eddcfcf95e3134923554ff29176eba269cfa22d647230b12a8_cppui255;
 
     // setup_fake_srs
-    r1cs_gg_pp_zksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
+    r1cs_gg_ppzksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
     auto [pk, vk] = srs.specialize(n);
 
     r1cs_gg_ppzksnark_proof<curve_type> proof0(

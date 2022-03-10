@@ -1,4 +1,8 @@
-Below is performance information about several preprocessing zkSNARKs in `libsnark` that work with the R1CS relation.
+# Performance # {#zk_perf}
+
+@tableofcontents
+
+Below is performance information about several preprocessing zkSNARKs in Crypto3.ZK that work with the R1CS relation.
 
 # Empirical performance
 
@@ -13,7 +17,8 @@ The prover spends almost all of its time either doing FFTs or multiexponentiatio
 given in the table.
 
 Abbreviations used: <i>PK</i> = proving key, <i>VK</i> = verifying key, <i>MB</i> = megabyte (10<sup>6</sup> bytes),
-#G<sub>1</sub>/#G<sub>2</sub> = number of elements of the respective group in a proof/key.
+
+# G<sub>1</sub>/#G<sub>2</sub> = number of elements of the respective group in a proof/key.
 
 | Proof system | Generator time, s | Prover time, s | Verifier time, ms | Prover time spent in FFTs, % | | --- | --: |
 --: | --: | --: | | [PGHR13/BCTV14a](r1cs_ppzksnark) | 104.85 | 128.60 | 4.3 | 7% | | [Groth16](r1cs_gg_ppzksnark) |

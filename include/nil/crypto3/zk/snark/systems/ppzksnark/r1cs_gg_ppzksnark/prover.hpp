@@ -43,6 +43,8 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
+                class r1cs_gg_ppzksnark_prover;
 
                 /**
                  * A prover algorithm for the R1CS GG-ppzkSNARK.
@@ -53,8 +55,8 @@ namespace nil {
                  * Above, CS is the R1CS constraint system that was given as input to the generator algorithm.
                  */
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_prover {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> policy_type;
+                class r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Basic> {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::template g1_type<> g1_type;

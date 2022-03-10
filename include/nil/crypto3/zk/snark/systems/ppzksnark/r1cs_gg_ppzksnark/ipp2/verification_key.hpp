@@ -62,9 +62,9 @@ namespace nil {
                                 this->gamma_ABC_g1 == other.gamma_ABC_g1);
                     }
 
-                    operator r1cs_gg_ppzksnark_verification_key<curve_type>() const {
+                    explicit operator r1cs_gg_ppzksnark_verification_key<curve_type>() const {
                         return r1cs_gg_ppzksnark_verification_key<curve_type>(
-                            algebra::pair_reduced<curve_type>(alpha_g1, beta_g2, gamma_g2, delta_g2, gamma_ABC_g1));
+                            algebra::pair_reduced<curve_type>(alpha_g1, beta_g2), gamma_g2, delta_g2, gamma_ABC_g1);
                     }
                 };
             }    // namespace snark

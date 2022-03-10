@@ -47,7 +47,7 @@ namespace nil {
                     typedef CurveType curve_type;
                     typedef Hash hash_type;
 
-                    typedef marshalling::bincode::curve<curve_type> bincode;
+                    typedef nil::marshalling::curve_bincode<curve_type> bincode;
 
                     std::vector<std::uint8_t> buffer;
                     ::nil::crypto3::accumulator_set<Hash> hasher_acc;

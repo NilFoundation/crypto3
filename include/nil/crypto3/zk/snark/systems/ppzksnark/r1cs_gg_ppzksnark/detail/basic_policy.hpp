@@ -77,6 +77,7 @@ namespace nil {
                     template<typename CurveType>
                     struct r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> {
                         typedef CurveType curve_type;
+                        static constexpr ProvingMode mode = ProvingMode::Basic;
 
                         /******************************** Params ********************************/
 
@@ -116,12 +117,40 @@ namespace nil {
                         typedef r1cs_gg_ppzksnark_processed_verification_key<curve_type>
                             processed_verification_key_type;
 
+                        /************************ Extended verification key *************************/
+
+                        /**
+                         * An extended verification key for the R1CS GG-ppzkSNARK.
+                         *
+                         * Compared to a (non-extended) verification key, an extended verification key
+                         * contains additional field.
+                         */
+                        typedef r1cs_gg_ppzksnark_extended_verification_key<curve_type> extended_verification_key_type;
+
                         /********************************** Key pair *********************************/
 
                         /**
                          * A key pair for the R1CS GG-ppzkSNARK, which consists of a proving key and a verification key.
                          */
                         typedef r1cs_gg_ppzksnark_keypair<proving_key_type, verification_key_type> keypair_type;
+
+                        /********************************** Key pair *********************************/
+
+                        /**
+                         * A key pair for the R1CS GG-ppzkSNARK, which consists of a proving key and a processed
+                         * verification key.
+                         */
+                        typedef r1cs_gg_ppzksnark_keypair<proving_key_type, processed_verification_key_type>
+                            processed_keypair_type;
+
+                        /********************************** Extended key pair *********************************/
+
+                        /**
+                         * A key pair for the R1CS GG-ppzkSNARK, which consists of a proving key and an extended
+                         * verification key.
+                         */
+                        typedef r1cs_gg_ppzksnark_keypair<proving_key_type, extended_verification_key_type>
+                            extended_keypair_type;
 
                         /*********************************** Proof ***********************************/
 
@@ -138,6 +167,7 @@ namespace nil {
                     template<typename CurveType>
                     struct r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::aggregate> {
                         typedef CurveType curve_type;
+                        static constexpr ProvingMode mode = ProvingMode::Aggregate;
 
                         /******************************** Params ********************************/
 
@@ -153,6 +183,7 @@ namespace nil {
 
                         /******************************** Proving key ********************************/
 
+                        // TODO: remove
                         /**
                          * A proving key for the R1CS GG-ppzkSNARK.
                          */
@@ -164,18 +195,6 @@ namespace nil {
                          * A verification key for the R1CS GG-ppzkSNARK.
                          */
                         typedef r1cs_gg_ppzksnark_aggregate_verification_key<curve_type> verification_key_type;
-
-                        /************************ Processed verification key *************************/
-
-                        /**
-                         * A processed verification key for the R1CS GG-ppzkSNARK.
-                         *
-                         * Compared to a (non-processed) verification key, a processed verification key
-                         * contains a small constant amount of additional pre-computed information that
-                         * enables a faster verification time.
-                         */
-                        typedef r1cs_gg_ppzksnark_processed_verification_key<curve_type>
-                            processed_verification_key_type;
 
                         /********************************** Key pair *********************************/
 
@@ -189,7 +208,7 @@ namespace nil {
                         /**
                          * A SRS (Structured Reference String) for the R1CS GG-ppzkSNARK aggregation scheme.
                          */
-                        typedef r1cs_gg_pp_zksnark_aggregate_srs<CurveType> srs_type;
+                        typedef r1cs_gg_ppzksnark_aggregate_srs<CurveType> srs_type;
 
                         /******************************** Proving SRS for aggregation ********************************/
 
@@ -216,24 +235,68 @@ namespace nil {
                         /*********************************** Proof ***********************************/
 
                         /**
-                         * A proof for the R1CS GG-ppzkSNARK.
-                         *
-                         * While the proof has a structure, externally one merely opaquely produces,
-                         * serializes/deserializes, and verifies proofs. We only expose some information
-                         * about the structure for statistics purposes.
-                         */
-                        typedef r1cs_gg_ppzksnark_proof<CurveType> proof_type;
-
-                        /*********************************** Aggregated proof ***********************************/
-
-                        /**
                          * A proof for the R1CS GG-ppzkSNARK aggregation scheme.
                          *
                          * While the proof has a structure, externally one merely opaquely produces,
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        typedef r1cs_gg_ppzksnark_aggregate_proof<CurveType> aggregate_proof_type;
+                        typedef r1cs_gg_ppzksnark_aggregate_proof<CurveType> proof_type;
+                    };
+
+                    template<typename CurveType>
+                    class r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::EncryptedInput> {
+                        typedef r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> basic_policy;
+
+                    public:
+                        typedef CurveType curve_type;
+                        static constexpr ProvingMode mode = ProvingMode::EncryptedInput;
+
+                        /******************************** Params ********************************/
+
+                        /**
+                         * Below are various template aliases (used for convenience).
+                         */
+
+                        typedef typename basic_policy::constraint_system_type constraint_system_type;
+
+                        typedef typename basic_policy::primary_input_type primary_input_type;
+
+                        typedef typename basic_policy::auxiliary_input_type auxiliary_input_type;
+
+                        /******************************** Proving key ********************************/
+
+                        /**
+                         * A proving key for the R1CS GG-ppzkSNARK with encrypted input.
+                         */
+                        typedef typename basic_policy::proving_key_type proving_key_type;
+
+                        /******************************* Verification key ****************************/
+
+                        /**
+                         * A verification key for the R1CS GG-ppzkSNARK with encrypted input.
+                         */
+                        typedef typename basic_policy::extended_verification_key_type verification_key_type;
+
+                        /********************************** Key pair *********************************/
+
+                        /**
+                         * A key pair for the R1CS GG-ppzkSNARK with encrypted input, which consists of proving,
+                         secret
+                         * and verification keys.
+                         */
+                        typedef typename basic_policy::extended_keypair_type keypair_type;
+
+                        /*********************************** Proof ***********************************/
+
+                        /**
+                         * A proof for the R1CS GG-ppzkSNARK.
+                         *
+                         * While the proof has a structure, externally one merely opaquely produces,
+                         * serializes/deserializes, and verifies proofs. We only expose some information
+                         * about the structure for statistics purposes.
+                         */
+                        typedef typename basic_policy::proof_type proof_type;
                     };
                 }    // namespace detail
             }        // namespace snark

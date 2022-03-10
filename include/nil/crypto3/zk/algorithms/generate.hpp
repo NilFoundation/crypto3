@@ -30,6 +30,7 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
+<<<<<<< HEAD:include/nil/crypto3/zk/algorithms/generate.hpp
             template<typename ProofSystemType>
             typename ProofSystemType::keypair_type
                 generate(const typename ProofSystemType::constraint_system_type &constraint_system) {
@@ -42,6 +43,20 @@ namespace nil {
 
                 return ProofSystemType::generate(circuit);
             }
+=======
+            namespace snark {
+                template<typename ProofSystemType, typename KeyPairType = typename ProofSystemType::keypair_type>
+                KeyPairType generate(const typename ProofSystemType::constraint_system_type &constraint_system) {
+
+                    return ProofSystemType::template generate<KeyPairType>(constraint_system);
+                }
+
+                template<typename ProofSystemType, typename KeyPairType = typename ProofSystemType::keypair_type>
+                KeyPairType generate(const typename ProofSystemType::circuit_type &circuit) {
+
+                    return ProofSystemType::template generate<KeyPairType>(circuit);
+                }
+>>>>>>> master:include/nil/crypto3/zk/snark/algorithms/generate.hpp
 
             template<typename ProofSystemType>
             typename ProofSystemType::srs_pair_type generate(std::size_t num_proofs) {

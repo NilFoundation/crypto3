@@ -47,7 +47,8 @@ namespace nil {
                  */
                 template<typename Type1, typename Type2>
                 struct knowledge_commitment {
-
+                    typedef Type1 type1;
+                    typedef Type2 type2;
                     typedef detail::element_kc<Type1, Type2> value_type;
 
                     constexpr static const std::size_t value_bits = Type1::value_bits + Type2::value_bits;

@@ -31,7 +31,8 @@
 #include <tuple>
 #include <cmath>
 
-#include <nil/crypto3/zk/snark/commitments/kzg.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 
 namespace nil {
@@ -105,7 +106,8 @@ namespace nil {
                     bool is_valid() const {
                         // 1. Check length of the proofs
                         if (tmipp.gipa.nproofs < 2 ||
-                            tmipp.gipa.nproofs > r1cs_gg_pp_zksnark_aggregate_srs<curve_type>::MAX_SRS_SIZE) {
+                            tmipp.gipa.nproofs >
+                                r1cs_gg_ppzksnark_aggregate_srs<curve_type>::MAX_SRS_SIZE) {
                             return false;
                         }
                         // 2. Check if it's a power of two

@@ -34,8 +34,9 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_aggregate_generator {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::aggregate> policy_type;
+                class r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Aggregate> {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
+                    typedef r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Basic> basic_generator;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::template g1_type<> g1_type;
@@ -66,7 +67,8 @@ namespace nil {
                               L_query,
                               r1cs_copy,
                               alpha_g1_beta_g2,
-                              gamma_ABC_g1] = std::move(basic_process(constraint_system));
+                              gamma_ABC_g1,
+                              gamma_g1] = std::move(basic_generator::basic_process(constraint_system));
 
                         verification_key_type vk(alpha_g1, beta_g2, gamma_g2, delta_g2, gamma_ABC_g1);
 

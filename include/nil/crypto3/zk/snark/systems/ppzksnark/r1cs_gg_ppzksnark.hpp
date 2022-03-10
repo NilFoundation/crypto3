@@ -38,30 +38,42 @@
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/generator.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/prover.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/verifier.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/generator.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/prover.hpp>
+#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/encrypted_input/verifier.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
-                using is_basic_mode = typename std::integral_constant<
-                    bool,
-                    std::is_same<r1cs_gg_ppzksnark_generator<CurveType>, Generator>::value &&
-                        std::is_same<r1cs_gg_ppzksnark_prover<CurveType>, Prover>::value &&
-                        (std::is_same<r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType>, Verifier>::value ||
-                         std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>, Verifier>::value
-                         // || std::is_same<r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>,
-                         //               Verifier>::value
-                         )>;
+                using is_basic_mode = typename std::bool_constant<
+                    std::is_same<r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Basic>, Generator>::value &&
+                    std::is_same<r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Basic>, Prover>::value &&
+                    (std::is_same<r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType, ProvingMode::Basic>,
+                                  Verifier>::value ||
+                     std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Basic>,
+                                  Verifier>::value
+                     // || std::is_same<r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>,
+                     //               Verifier>::value
+                     )>;
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
-                using is_aggregate_mode = typename std::integral_constant<
-                    bool,
-                    std::is_same<r1cs_gg_ppzksnark_aggregate_generator<CurveType>, Generator>::value &&
-                        std::is_same<r1cs_gg_ppzksnark_aggregate_prover<CurveType, typename Prover::basic_prover>,
-                                     Prover>::value &&
-                        std::is_same<r1cs_gg_ppzksnark_aggregate_verifier<CurveType, typename Verifier::basic_verifier>,
-                                     Verifier>::value>;
+                using is_aggregate_mode = typename std::bool_constant<
+                    std::is_same<r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Aggregate>, Generator>::value &&
+                    std::is_same<r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Aggregate>, Prover>::value &&
+                    std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Aggregate>,
+                                 Verifier>::value>;
+
+                template<typename CurveType, typename Generator, typename Prover, typename Verifier>
+                using is_encrypted_input_mode = typename std::bool_constant<
+                    std::is_same<r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::EncryptedInput>,
+                                 Generator>::value &&
+                    std::is_same<r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::EncryptedInput>, Prover>::value &&
+                    std::is_same<
+                        r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::EncryptedInput>,
+                        Verifier>::value>;
+
                 /*!
                  * @brief ppzkSNARK for R1CS with a security proof in the generic group (GG) model
                  * @tparam CurveType
@@ -93,7 +105,7 @@ namespace nil {
                 template<typename CurveType, typename Generator = r1cs_gg_ppzksnark_generator<CurveType>,
                          typename Prover = r1cs_gg_ppzksnark_prover<CurveType>,
                          typename Verifier = r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>,
-                         proving_mode mode = proving_mode::basic, typename = void>
+                         ProvingMode Mode = ProvingMode::Basic, typename = void>
                 class r1cs_gg_ppzksnark;
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
@@ -114,8 +126,9 @@ namespace nil {
                     typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
-                    static inline keypair_type generate(const constraint_system_type &constraint_system) {
-                        return Generator::process(constraint_system);
+                    template<typename KeyPairType>
+                    static inline KeyPairType generate(const constraint_system_type &constraint_system) {
+                        return Generator::template process<KeyPairType>(constraint_system);
                     }
 
                     static inline proof_type prove(const proving_key_type &pk,
@@ -138,7 +151,9 @@ namespace nil {
                     CurveType, Generator, Prover, Verifier, proving_mode::aggregate,
                     typename std::enable_if<is_aggregate_mode<CurveType, Generator, Prover, Verifier>::value>::type> {
 
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::aggregate> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> basic_policy_type;
+                    typedef typename basic_policy_type::proof_type basic_proof_type;
 
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;
@@ -156,7 +171,6 @@ namespace nil {
                     typedef typename policy_type::srs_pair_type srs_pair_type;
 
                     typedef typename policy_type::proof_type proof_type;
-                    typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
 
                     // Generate key pair
                     template<typename DistributionType = boost::random::uniform_int_distribution<
@@ -174,31 +188,33 @@ namespace nil {
                         return Generator::template process<DistributionType, GeneratorType>(num_proofs);
                     }
 
+                    // TODO: remove
                     // Basic proove
-                    static inline proof_type prove(const proving_key_type &pk,
-                                                   const primary_input_type &primary_input,
-                                                   const auxiliary_input_type &auxiliary_input) {
+                    static inline basic_proof_type prove(const proving_key_type &pk,
+                                                         const primary_input_type &primary_input,
+                                                         const auxiliary_input_type &auxiliary_input) {
 
                         return Prover::process(pk, primary_input, auxiliary_input);
                     }
 
                     // aggregate prove
                     template<typename Hash, typename InputTranscriptIncludeIterator, typename InputProofIterator>
-                    static inline aggregate_proof_type prove(const proving_srs_type &srs,
-                                                             InputTranscriptIncludeIterator transcript_include_first,
-                                                             InputTranscriptIncludeIterator transcript_include_last,
-                                                             InputProofIterator proofs_first,
-                                                             InputProofIterator proofs_last) {
+                    static inline proof_type prove(const proving_srs_type &srs,
+                                                   InputTranscriptIncludeIterator transcript_include_first,
+                                                   InputTranscriptIncludeIterator transcript_include_last,
+                                                   InputProofIterator proofs_first,
+                                                   InputProofIterator proofs_last) {
 
                         return Prover::template process<Hash>(srs, transcript_include_first, transcript_include_last,
                                                               proofs_first, proofs_last);
                     }
 
+                    // TODO: remove
                     // Basic verify
                     template<typename VerificationKey>
                     static inline bool verify(const VerificationKey &vk,
                                               const primary_input_type &primary_input,
-                                              const proof_type &proof) {
+                                              const basic_proof_type &proof) {
                         return Verifier::process(vk, primary_input, proof);
                     }
 
@@ -210,12 +226,61 @@ namespace nil {
                     static inline bool verify(const verification_srs_type &ip_verifier_srs,
                                               const verification_key_type &pvk,
                                               const InputPrimaryInputRange &public_inputs,
-                                              const aggregate_proof_type &proof,
+                                              const proof_type &proof,
                                               InputIterator transcript_include_first,
                                               InputIterator transcript_include_last) {
                         return Verifier::template process<DistributionType, GeneratorType, Hash>(
                             ip_verifier_srs, pvk, public_inputs, proof, transcript_include_first,
                             transcript_include_last);
+                    }
+                };
+
+                template<typename CurveType, typename Generator, typename Prover, typename Verifier>
+                class r1cs_gg_ppzksnark<CurveType, Generator, Prover, Verifier, ProvingMode::EncryptedInput,
+                                        typename std::enable_if<is_encrypted_input_mode<CurveType, Generator, Prover,
+                                                                                        Verifier>::value>::type> {
+
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::EncryptedInput> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> basic_policy_type;
+                    typedef typename basic_policy_type::proof_type basic_proof_type;
+
+                public:
+                    typedef typename policy_type::constraint_system_type constraint_system_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
+
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
+
+                    // Generate key pair
+                    template<typename KeyPairType,
+                             typename DistributionType = boost::random::uniform_int_distribution<
+                                 typename CurveType::scalar_field_type::integral_type>,
+                             typename GeneratorType = boost::random::mt19937>
+                    static inline KeyPairType generate(const constraint_system_type &constraint_system) {
+                        return Generator::template process<KeyPairType, DistributionType, GeneratorType>(
+                            constraint_system);
+                    }
+
+                    // Proving
+                    template<typename PublicKey>
+                    static inline proof_type prove(const proving_key_type &pk,
+                                                   const PublicKey &pubkey,
+                                                   const primary_input_type &primary_input,
+                                                   const auxiliary_input_type &auxiliary_input,
+                                                   const typename CurveType::scalar_field_type::value_type &r) {
+                        return Prover::process(pk, pubkey, primary_input, auxiliary_input, r);
+                    }
+
+                    // Verification
+                    template<typename CipherTextIterator, typename PublicKey>
+                    static inline bool verify(CipherTextIterator first, CipherTextIterator last,
+                                              const verification_key_type &vk, const PublicKey &pubkey,
+                                              const primary_input_type &unencrypted_primary_input,
+                                              const proof_type &proof) {
+                        return Verifier::process(first, last, vk, pubkey, unencrypted_primary_input, proof);
                     }
                 };
             }    // namespace snark

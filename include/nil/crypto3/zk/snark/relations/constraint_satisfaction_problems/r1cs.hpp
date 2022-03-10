@@ -59,6 +59,7 @@ namespace nil {
                  */
                 template<typename FieldType>
                 struct r1cs_constraint {
+                    typedef FieldType field_type;
 
                     linear_combination<FieldType> a, b, c;
 
@@ -122,6 +123,7 @@ namespace nil {
                  */
                 template<typename FieldType>
                 struct r1cs_constraint_system {
+                    typedef FieldType field_type;
 
                     std::size_t primary_input_size;
                     std::size_t auxiliary_input_size;
