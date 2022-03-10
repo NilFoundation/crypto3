@@ -42,15 +42,18 @@ namespace nil {
                 /// It contains all elements derived in the GIPA loop for both TIPP and MIPP at
                 /// the same time.
                 template<typename CurveType>
-                struct gipa_proof {
+                class gipa_proof {
+                    using commitment_scheme = kzg_ipp2<CurveType>;
+                public:
+
                     typedef CurveType curve_type;
 
                     std::size_t nproofs;
-                    std::vector<std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type>,
-                                          r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type>>>
+                    std::vector<std::pair<typename commitment_scheme::output_type,
+                                          typename commitment_scheme::output_type>>
                         comms_ab;
-                    std::vector<std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type>,
-                                          r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type>>>
+                    std::vector<std::pair<typename commitment_scheme::output_type,
+                                          typename commitment_scheme::output_type>>
                         comms_c;
                     std::vector<
                         std::pair<typename curve_type::gt_type::value_type, typename curve_type::gt_type::value_type>>
@@ -88,13 +91,17 @@ namespace nil {
                 /// using inner pairing product arguments. This proof can be created by any
                 /// party in possession of valid Groth16 proofs.
                 template<typename CurveType>
-                struct r1cs_gg_ppzksnark_aggregate_proof {
+                class r1cs_gg_ppzksnark_aggregate_proof {
+
+                    using commitment_scheme = kzg_ipp2<CurveType>;
+                public:
+
                     typedef CurveType curve_type;
                     /// commitment to A and B using the pair commitment scheme needed to verify
                     /// TIPP relation.
-                    r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type> com_ab;
+                    typename commitment_scheme::output_type com_ab;
                     /// commit to C separate since we use it only in MIPP
-                    r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type> com_c;
+                    typename commitment_scheme::output_type com_c;
                     /// $A^r * B = Z$ is the left value on the aggregated Groth16 equation
                     typename curve_type::gt_type::value_type ip_ab;
                     /// $C^r$ is used on the right side of the aggregated Groth16 equation
