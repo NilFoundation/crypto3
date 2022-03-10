@@ -168,7 +168,7 @@ namespace nil {
                         std::is_same<
                             typename GroupType::curve_type::scalar_field_type::value_type,
                             typename std::iterator_traits<typename InputScalarRange::iterator>::value_type>::value,
-                    kzg_opening<GroupType>>::type
+                    typename kzg_ipp2<CurveType>::template opening_type<GroupType>>::type
                     prove_commitment_key_kzg_opening(
                         InputGroupIterator srs_powers_alpha_first, InputGroupIterator srs_powers_alpha_last,
                         InputGroupIterator srs_powers_beta_first, InputGroupIterator srs_powers_beta_last,
@@ -207,7 +207,7 @@ namespace nil {
                     // on the curve we are on). that's the extra cost of the commitment scheme
                     // used which is compatible with Groth16 CRS insteaf of the original paper
                     // of Bunz'19
-                    return kzg_opening<GroupType> {
+                    return typename kzg_ipp2<CurveType>::template opening_type<GroupType> {
                         algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
                             srs_powers_alpha_first, srs_powers_alpha_last, q.begin(), q.end(), 1),
                         algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
@@ -220,7 +220,7 @@ namespace nil {
                                  typename std::iterator_traits<InputG2Iterator>::value_type>::value &&
                         std::is_same<typename CurveType::scalar_field_type::value_type,
                                      typename std::iterator_traits<InputScalarIterator>::value_type>::value,
-                    kzg_opening<typename CurveType::template g2_type<>>>::type
+                    typename kzg_ipp2<CurveType>::template opening_type<typename CurveType::template g2_type<>>>::type
                     prove_commitment_v(InputG2Iterator srs_powers_alpha_first, InputG2Iterator srs_powers_alpha_last,
                                        InputG2Iterator srs_powers_beta_first, InputG2Iterator srs_powers_beta_last,
                                        InputScalarIterator transcript_first, InputScalarIterator transcript_last,
@@ -247,7 +247,7 @@ namespace nil {
                                  typename std::iterator_traits<InputG1Iterator>::value_type>::value &&
                         std::is_same<typename CurveType::scalar_field_type::value_type,
                                      typename std::iterator_traits<InputScalarIterator>::value_type>::value,
-                    kzg_opening<typename CurveType::template g1_type<>>>::type
+                    typename kzg_ipp2<CurveType>::template opening_type<typename CurveType::template g1_type<>>>::type
                     prove_commitment_w(InputG1Iterator srs_powers_alpha_first, InputG1Iterator srs_powers_alpha_last,
                                        InputG1Iterator srs_powers_beta_first, InputG1Iterator srs_powers_beta_last,
                                        InputScalarIterator transcript_first, InputScalarIterator transcript_last,
