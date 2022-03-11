@@ -35,6 +35,10 @@ namespace nil {
                 template<typename FieldType, typename CommitmentSchemeTypeWitness,
                          typename CommitmentSchemeTypePermutation, typename CommitmentSchemeTypeQuotient>
                 struct redshift_proof {
+                    typedef FieldType field_type;
+                    typedef CommitmentSchemeTypeWitness commitment_scheme_type_witness;
+                    typedef CommitmentSchemeTypePermutation commitment_scheme_type_permutation;
+                    typedef CommitmentSchemeTypeQuotient commitment_scheme_type_quotient;
 
                     struct evaluation_proof {
                         typename FieldType::value_type challenge;
