@@ -39,7 +39,7 @@
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
 
-#include <nil/crypto3/zk/snark/commitments/fri.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,7 +48,7 @@ namespace nil {
                 template<typename TTypeBase, typename FRIScheme,
                          typename = typename std::enable_if<
                              std::is_same<FRIScheme,
-                                          nil::crypto3::zk::snark::fri_commitment_scheme<
+                                          nil::crypto3::zk::commitments::fri<
                                               typename FRIScheme::field_type, typename FRIScheme::merkle_tree_hash_type,
                                               typename FRIScheme::transcript_hash_type, FRIScheme::m>>::value,
                              bool>::type,
@@ -82,7 +82,7 @@ namespace nil {
                 template<typename TTypeBase, typename FRIScheme,
                          typename = typename std::enable_if<
                              std::is_same<FRIScheme,
-                                          nil::crypto3::zk::snark::fri_commitment_scheme<
+                                          nil::crypto3::zk::commitments::fri<
                                               typename FRIScheme::field_type, typename FRIScheme::merkle_tree_hash_type,
                                               typename FRIScheme::transcript_hash_type, FRIScheme::m>>::value,
                              bool>::type,

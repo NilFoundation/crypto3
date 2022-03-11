@@ -39,9 +39,9 @@
 
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
-#include <nil/crypto3/marshalling/zk/types/commitments/fri_commitment.hpp>
+#include <nil/crypto3/marshalling/zk/types/commitments/fri.hpp>
 
-#include <nil/crypto3/zk/snark/commitments/lpc.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -49,7 +49,7 @@ namespace nil {
             namespace types {
                 template<typename TTypeBase, typename LPCScheme,
                          typename = typename std::enable_if<
-                             std::is_same<LPCScheme, nil::crypto3::zk::snark::list_polynomial_commitment_scheme<
+                             std::is_same<LPCScheme, nil::crypto3::zk::commitments::list_polynomial_commitment<
                                                          typename LPCScheme::field_type, typename LPCScheme::lpc_params,
                                                          LPCScheme::k>>::value,
                              bool>::type,

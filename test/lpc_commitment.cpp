@@ -32,6 +32,7 @@
 #include <boost/random/uniform_int.hpp>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
@@ -42,12 +43,14 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/curves/alt_bn128.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/alt_bn128.hpp>
 
 #include <nil/crypto3/hash/sha2.hpp>
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
 
-#include <nil/crypto3/marshalling/zk/types/commitments/list_polynomial_commitment.hpp>
+#include <nil/crypto3/marshalling/zk/types/commitments/lpc.hpp>
 
 template<typename TIter>
 void print_byteblob(TIter iter_begin, TIter iter_end) {
@@ -183,8 +186,8 @@ void test_lpc(std::size_t tree_depth, std::size_t round_proofs_n,
               std::size_t degree) {
     using namespace nil::crypto3::marshalling;
 
-    using lpc_params_type = nil::crypto3::zk::snark::list_polynomial_commitment_params<Hash, Hash, Lambda, R, M>;
-    using commitment_scheme_type = nil::crypto3::zk::snark::list_polynomial_commitment_scheme<Field, lpc_params_type, K>;
+    using lpc_params_type = nil::crypto3::zk::commitments::list_polynomial_commitment_params<Hash, Hash, Lambda, R, M>;
+    using commitment_scheme_type = nil::crypto3::zk::commitments::list_polynomial_commitment<Field, lpc_params_type, K>;
     using proof_marshalling_type =
         types::lpc_proof<nil::marshalling::field_type<Endianness>, commitment_scheme_type>;
 
@@ -229,5 +232,104 @@ BOOST_AUTO_TEST_CASE(lpc_bls12_381_be) {
 
     test_lpc<field_type, hash_type, lambda, r, m, k, nil::marshalling::option::big_endian>(5, 6, 7);
 }
+
+//BOOST_AUTO_TEST_CASE(lpc_basic_test) {
+//
+//    // setup
+//    using curve_type = nil::crypto3::algebra::curves::alt_bn128_254;
+//    using FieldType = typename curve_type::scalar_field_type;
+//    using Endianness = nil::marshalling::option::big_endian;
+//
+//    typedef nil::crypto3::hashes::keccak_1600<256> merkle_hash_type;
+//    typedef nil::crypto3::hashes::keccak_1600<256> transcript_hash_type;
+//
+//    typedef typename nil::crypto3::containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
+//
+//    constexpr static const std::size_t lambda = 3;
+//    constexpr static const std::size_t k = 1;
+//
+//    constexpr static const std::size_t d = 16;
+//
+//    constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
+//    constexpr static const std::size_t m = 2;
+//
+//    typedef nil::crypto3::zk::snark::fri_commitment_scheme<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+//
+//    typedef nil::crypto3::zk::snark::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
+//    typedef nil::crypto3::zk::snark::list_polynomial_commitment_scheme<FieldType, lpc_params_type, k> lpc_type;
+//    typedef typename lpc_type::proof_type proof_type;
+//
+//    constexpr static const std::size_t d_extended = d;
+//    std::size_t extended_log = boost::static_log2<d_extended>::value;
+//    std::vector<std::shared_ptr<nil::crypto3::math::evaluation_domain<FieldType>>> D =
+//        fri_type::calculate_domain_set(extended_log, r);
+//
+//    typename fri_type::params_type fri_params;
+//
+//    nil::crypto3::math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+//    fri_params.r = r;
+//    fri_params.D = D;
+//    fri_params.q = q;
+//    fri_params.max_degree = d - 1;
+//
+//    // commit
+//
+//    nil::crypto3::math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
+//
+//    merkle_tree_type tree = lpc_type::commit(f, D[0]);
+//
+//    // TODO: take a point outside of the basic domain
+//    std::array<typename FieldType::value_type, 1> evaluation_points = {
+//        nil::crypto3::algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
+//
+//    std::vector<std::uint8_t> x_data {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+//    nil::crypto3::zk::snark::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
+//
+//    auto proof = lpc_type::proof_eval(evaluation_points, tree, f, transcript, fri_params);
+//
+//    auto filled_proof = nil::crypto3::marshalling::types::fill_lpc_proof<lpc_type, Endianness>(proof);
+//    std::vector<std::uint8_t> cv;
+//    cv.resize(filled_proof.length(), 0x00);
+//    auto write_iter = cv.begin();
+//    nil::marshalling::status_type status = filled_proof.write(write_iter, cv.size());
+//    std::cout << "lpc_params.lambda = " << lambda << ";" << std::endl;
+//    std::cout << "lpc_params.r = " << r << ";" << std::endl;
+//    std::cout << "lpc_params.k = " << k << ";" << std::endl;
+//    std::cout << "lpc_params.m = " << m << ";" << std::endl;
+//    std::cout << "fri_params.r = " << fri_params.r << ";" << std::endl;
+//    std::cout << "fri_params.max_degree = " << fri_params.max_degree << ";" << std::endl;
+//    std::size_t i = 0;
+//    for (const auto &Di : fri_params.D) {
+//        std::cout << "fri_params.D_omegas[" << i++ << "] = " << std::static_pointer_cast<nil::crypto3::math::basic_radix2_domain<FieldType>>(Di)->omega.data << ";" << std::endl;
+//    }
+//    i = 0;
+//    for (const auto &p : evaluation_points) {
+//        std::cout << "evaluation_points[" << i++ << "] = " << p.data << ";" << std::endl;
+//    }
+//    i = 0;
+//    for (const auto &Di : fri_params.D) {
+//        std::cout << "fri_params.D_omegas[" << i++ << "] = " << std::static_pointer_cast<nil::crypto3::math::basic_radix2_domain<FieldType>>(Di)->omega.data << ";" << std::endl;
+//    }
+//    std::cout << "Tr init blob (" << x_data.size() << " bytes): ";
+//    for (auto c : x_data) {
+//        std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
+//    }
+//    std::cout << std::endl;
+//    std::cout << std::dec << std::endl << std::endl;
+//    std::ofstream lpc_file;
+//    lpc_file.open ("lpc.txt");
+//    std::cout << "LPC proof (" << cv.size() << " bytes): ";
+//    for (auto c : cv) {
+////        std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
+//        lpc_file << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
+//    }
+//    std::cout << std::dec << std::endl << std::endl;
+//    lpc_file.close();
+//
+//    // verify
+//    nil::crypto3::zk::snark::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
+//
+//    BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, transcript_verifier, fri_params));
+//}
 
 BOOST_AUTO_TEST_SUITE_END()
