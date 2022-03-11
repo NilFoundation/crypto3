@@ -230,7 +230,8 @@ namespace nil {
 
                 template<typename Hash>
                 struct hash_impl<Hash,
-                                 typename std::enable_if<nil::crypto3::hashes::is_pedersen<Hash>::value ||
+                                 typename std::enable_if<nil::crypto3::hashes::is_find_group_hash<Hash>::value ||
+                                                         nil::crypto3::hashes::is_pedersen<Hash>::value ||
                                                          nil::crypto3::hashes::is_h2f<Hash>::value ||
                                                          nil::crypto3::hashes::is_h2c<Hash>::value>::type>
                     : boost::accumulators::accumulator_base {

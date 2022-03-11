@@ -136,7 +136,7 @@ namespace nil {
                         for (std::size_t j = 0; j < m; j++) {
                             auto elm_offset = L * (j + i * m);
                             // TODO: creating copy of range is a bottleneck:
-                            //  extend marshaling interface by function supporting initialization from
+                            //  extend marshalling interface by function supporting initialization from
                             //  container which length is less than modulus_octets
                             std::vector<std::uint8_t> imported_octets;
                             std::copy(std::cbegin(uniform_bytes) + elm_offset,
@@ -164,7 +164,7 @@ namespace nil {
                         for (std::size_t j = 0; j < m; j++) {
                             auto elm_offset = L * (j + i * m);
                             // TODO: creating copy of range is a bottleneck:
-                            //  extend marshaling interface by function supporting initialization from
+                            //  extend marshalling interface by function supporting initialization from
                             //  container which length is less than modulus_octets
                             std::vector<std::uint8_t> imported_octets;
                             std::copy(std::cbegin(uniform_bytes) + elm_offset,

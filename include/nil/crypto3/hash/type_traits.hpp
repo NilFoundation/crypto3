@@ -31,6 +31,12 @@
 namespace nil {
     namespace crypto3 {
         namespace hashes {
+            template<typename Params, typename Hash, typename Group>
+            struct find_group_hash;
+
+            template<typename Params, typename BasePointGeneratorHash, typename Group>
+            struct pedersen_to_point;
+
             template<typename Params, typename BasePointGeneratorHash, typename Group>
             struct pedersen;
 
@@ -41,7 +47,16 @@ namespace nil {
             struct h2c;
 
             template<typename Hash>
+            struct is_find_group_hash : std::bool_constant<false> { };
+
+            template<typename Params, typename Hash, typename Group>
+            struct is_find_group_hash<find_group_hash<Params, Hash, Group>> : std::bool_constant<true> { };
+
+            template<typename Hash>
             struct is_pedersen : std::bool_constant<false> { };
+
+            template<typename Params, typename BasePointGeneratorHash, typename Group>
+            struct is_pedersen<pedersen_to_point<Params, BasePointGeneratorHash, Group>> : std::bool_constant<true> { };
 
             template<typename Params, typename BasePointGeneratorHash, typename Group>
             struct is_pedersen<pedersen<Params, BasePointGeneratorHash, Group>> : std::bool_constant<true> { };
