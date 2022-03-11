@@ -48,7 +48,7 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace processing {
-                // TODO: add marshaling algorithm specification template parameter and specialize parameters depending
+                // TODO: add marshalling algorithm specification template parameter and specialize parameters depending
                 //  on the algorithm and curve group if needed
                 template<typename Group>
                 struct curve_element_marshalling_params {
@@ -79,12 +79,12 @@ namespace nil {
                     }
                 };
 
-                // TODO: do not specify marshaling algorithm by curve group, instead specify marshalling procedure only
+                // TODO: do not specify marshalling algorithm by curve group, instead specify marshalling procedure only
                 //  by form, coordinates and specification policy
                 template<typename Endianness, typename Group>
                 struct curve_element_writer;
 
-                // TODO: do not specify marshaling algorithm by curve group, instead specify marshalling procedure only
+                // TODO: do not specify marshalling algorithm by curve group, instead specify marshalling procedure only
                 //  by form, coordinates and specification policy
                 template<typename Endianness, typename Group>
                 struct curve_element_reader;
