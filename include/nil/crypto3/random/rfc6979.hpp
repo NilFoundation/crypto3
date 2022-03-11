@@ -167,7 +167,7 @@ namespace nil {
                         result = marshalling_integral_value_be.value();
                     } else {
                         // TODO: creating copy of input range of modulus_octets size is a bottleneck:
-                        //  extend marshaling interface by function supporting initialization from container which
+                        //  extend marshalling interface by function supporting initialization from container which
                         //  length is less than modulus_octets
                         // TODO: check need for adjust_bitstring call
                         modulus_octets_container_type range_padded;

@@ -46,7 +46,7 @@ namespace nil {
             template<typename Hash, typename ResultType, typename = void>
             struct hash;
 
-            // TODO: replace pack with marshaling
+            // TODO: replace pack with marshalling
             template<typename Hash, typename ResultType>
             struct hash<Hash,
                         ResultType,
