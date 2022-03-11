@@ -38,6 +38,7 @@
 #include <nil/marshalling/algorithms/pack.hpp>
 #include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 
+#include <nil/crypto3/hash/detail/raw_stream_processor.hpp>
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 
@@ -74,9 +75,30 @@ namespace nil {
                 using group_type = Group;
                 using curve_type = typename group_type::curve_type;
 
+                // TODO: FIXME: use marshalling method to determine bit size of serialized group_value_type
+                static constexpr std::size_t digest_bits = group_type::field_type::value_bits;
                 using group_value_type = typename group_type::value_type;
                 using internal_accumulator_type = accumulator_set<hash_type>;
                 using result_type = group_value_type;
+                using digest_type = result_type;
+
+                struct construction {
+                    struct params_type {
+                        typedef nil::marshalling::option::little_endian digest_endian;
+                    };
+                    typedef void type;
+                };
+
+                template<typename StateAccumulator, std::size_t ValueBits>
+                struct stream_processor {
+                    struct params_type {
+                        typedef typename construction::params_type::digest_endian digest_endian;
+
+                        constexpr static const std::size_t value_bits = ValueBits;
+                    };
+
+                    typedef raw_stream_processor<construction, StateAccumulator, params_type> type;
+                };
 
                 static inline std::vector<std::uint8_t> urs = {
                     0x30, 0x39, 0x36, 0x62, 0x33, 0x36, 0x61, 0x35, 0x38, 0x30, 0x34, 0x62, 0x66, 0x61, 0x63, 0x65,
