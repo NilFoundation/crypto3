@@ -81,9 +81,9 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    constexpr static const std::size_t required_rows_amount = 1;
-
                 public:
+
+                    constexpr static const std::size_t required_rows_amount = 1;
 
                     struct init_params {
                     };
@@ -110,6 +110,8 @@ namespace nil {
                             SelectorColumns, PublicInputColumns, ConstantColumns> &public_assignment, 
                         std::size_t circuit_start_row = 0) {
 
+                        public_assignment.allocate_rows(j + required_rows_amount);
+
                         std::size_t selector_index = public_assignment.add_selector(j);
 
                         this->bp.add_gate(selector_index, var(W7, 0) * (var(W2, 0) - var(W0, 0)));
@@ -134,6 +136,8 @@ namespace nil {
                                 PublicInputColumns, ConstantColumns> &public_assignment,
                         std::size_t circuit_start_row = 0){
 
+                        public_assignment.allocate_rows(j + required_rows_amount);
+
                         std::size_t public_input_column_index = 0;
                         this->bp.add_copy_constraint({{W6, j, false}, 
                             {public_input_column_index, j, false, var::column_type::public_input}});
@@ -149,6 +153,9 @@ namespace nil {
                                               const assignment_params &params,
                                               std::size_t circuit_start_row = 0) {
                         
+                        private_assignment.allocate_rows(j + required_rows_amount);
+                        public_assignment.allocate_rows(j + required_rows_amount);
+
                         const typename CurveType::template g1_type<>::value_type R = params.P + params.Q;
                         const typename CurveType::template g1_type<>::value_type &P = params.P;
                         const typename CurveType::template g1_type<>::value_type &Q = params.Q;

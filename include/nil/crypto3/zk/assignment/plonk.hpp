@@ -51,31 +51,39 @@ namespace nil {
                 snark::plonk_private_assignment_table<BlueprintFieldType, WitnessColumns>(){
                 }
 
-                snark::plonk_column<BlueprintFieldType> witness(std::size_t witness_index) {
+                snark::plonk_column<BlueprintFieldType>& witness(std::size_t witness_index) {
                     assert(witness_index < WitnessColumns);
                     return this->witness_columns[witness_index];
                 }
 
-                snark::plonk_column<BlueprintFieldType> operator[](std::size_t index) {
+                snark::plonk_column<BlueprintFieldType>& operator[](std::size_t index) {
                     if (index < WitnessColumns)
                         return this->witness_columns[index];
                     index -= WitnessColumns;
                 }
+
+                void allocate_rows(std::size_t required_total_rows_amount){
+                    for (std::size_t w_index = 0; w_index < WitnessColumns; w_index++){
+                        this->witness_columns[w_index].resize(std::max(
+                            required_total_rows_amount,
+                            this->witness_columns[w_index].size()));
+                    }
+                }
             };
 
-            template<typename BlueprintFieldType, std::size_t SelectorColumns, std::size_t PublicInputColumns,
-                    std::size_t ConstantColumns>
+            template<typename BlueprintFieldType, std::size_t PublicInputColumns,
+                    std::size_t ConstantColumns, std::size_t SelectorColumns>
             class blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
-                SelectorColumns, PublicInputColumns, ConstantColumns> :
+                PublicInputColumns, ConstantColumns, SelectorColumns> :
                 public snark::plonk_public_assignment_table<BlueprintFieldType,
-                    SelectorColumns, PublicInputColumns, ConstantColumns> {
+                    PublicInputColumns, ConstantColumns, SelectorColumns> {
 
                 typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
             public:
                 
                 blueprint_public_assignment_table() : 
                 snark::plonk_public_assignment_table<BlueprintFieldType,
-                    SelectorColumns, PublicInputColumns, ConstantColumns>(){
+                    PublicInputColumns, ConstantColumns, SelectorColumns>(){
                 }
                 
                 snark::plonk_column<BlueprintFieldType>& selector(std::size_t selector_index){
@@ -132,12 +140,35 @@ namespace nil {
                 }
 
                 snark::plonk_column<BlueprintFieldType>& operator[](std::size_t index){
-                    if (index < this->selector_columns.size())
-                        return this->selector_columns[index];
-                    index -= this->selector_columns.size();
                     if (index < this->public_input_columns.size())
                         return this->public_input_columns[index];
                     index -= this->public_input_columns.size();
+                    if (index < this->constant_columns.size())
+                        return this->constant_columns[index];
+                    index -= this->constant_columns.size();
+                    if (index < this->selector_columns.size())
+                        return this->selector_columns[index];
+                    index -= this->selector_columns.size();
+                }
+
+                void allocate_rows(std::size_t required_total_rows_amount){
+                    for (std::size_t pi_index = 0; pi_index < PublicInputColumns; pi_index++){
+                        this->public_input_columns[pi_index].resize(std::max(
+                            required_total_rows_amount,
+                            this->public_input_columns[pi_index].size()));
+                    }
+
+                    for (std::size_t c_index = 0; c_index < ConstantColumns; c_index++){
+                        this->constant_columns[c_index].resize(std::max(
+                            required_total_rows_amount,
+                            this->constant_columns[c_index].size()));
+                    }
+
+                    for (std::size_t s_index = 0; s_index < SelectorColumns; s_index++){
+                        this->selector_columns[s_index].resize(std::max(
+                            required_total_rows_amount,
+                            this->selector_columns[s_index].size()));
+                    }
                 }
             };
 
