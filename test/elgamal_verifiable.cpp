@@ -180,19 +180,19 @@ typename std::enable_if<std::is_unsigned<ValueType>::value, std::vector<std::arr
 }
 
 template<typename VerificationKey, typename PublicKey, typename Proof, typename PInput, typename CipherText>
-struct marshaling_verification_data_groth16_encrypted_input {
+struct marshalling_verification_data_groth16_encrypted_input {
     using endianness = nil::marshalling::option::big_endian;
-    using proof_marshaling_type =
+    using proof_marshalling_type =
         nil::crypto3::marshalling::types::r1cs_gg_ppzksnark_proof<nil::marshalling::field_type<endianness>, Proof>;
-    using verification_key_marshaling_type =
+    using verification_key_marshalling_type =
         nil::crypto3::marshalling::types::r1cs_gg_ppzksnark_extended_verification_key<
             nil::marshalling::field_type<endianness>, VerificationKey>;
-    using public_key_marshaling_type =
+    using public_key_marshalling_type =
         nil::crypto3::marshalling::types::elgamal_verifiable_public_key<nil::marshalling::field_type<endianness>,
                                                                         PublicKey>;
-    using ct_marshaling_type = nil::crypto3::marshalling::types::r1cs_gg_ppzksnark_encrypted_primary_input<
+    using ct_marshalling_type = nil::crypto3::marshalling::types::r1cs_gg_ppzksnark_encrypted_primary_input<
         nil::marshalling::field_type<endianness>, CipherText>;
-    using pinput_marshaling_type =
+    using pinput_marshalling_type =
         nil::crypto3::marshalling::types::r1cs_gg_ppzksnark_primary_input<nil::marshalling::field_type<endianness>,
                                                                           PInput>;
 
@@ -212,9 +212,9 @@ struct marshaling_verification_data_groth16_encrypted_input {
     static inline auto full_output_path = std::filesystem::path(full_output_path_str);
     static inline auto full_output_wrong_ct_path = std::filesystem::path(full_output_wrong_ct_path_str);
 
-    template<typename MarshalingType, typename InputObj, typename F>
+    template<typename MarshallingType, typename InputObj, typename F>
     static std::vector<std::uint8_t> serialize_obj(const InputObj &in_obj, const std::function<F> &f) {
-        MarshalingType filled_val = f(in_obj);
+        MarshallingType filled_val = f(in_obj);
         std::vector<std::uint8_t> blob(filled_val.length());
         auto it = std::begin(blob);
         nil::marshalling::status_type status = filled_val.write(it, blob.size());
@@ -234,25 +234,25 @@ struct marshaling_verification_data_groth16_encrypted_input {
 
     static void write_data(const VerificationKey &vk, const PublicKey &pubkey, const Proof &proof, const PInput &pinput,
                            const CipherText &ct) {
-        auto proof_blob = serialize_obj<proof_marshaling_type>(
+        auto proof_blob = serialize_obj<proof_marshalling_type>(
             proof, std::function(nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_proof<Proof, endianness>));
         write_obj(proof_path, {proof_blob});
 
-        auto vk_blob = serialize_obj<verification_key_marshaling_type>(
+        auto vk_blob = serialize_obj<verification_key_marshalling_type>(
             vk, std::function(nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_verification_key<VerificationKey,
                                                                                                         endianness>));
         write_obj(vk_path, {vk_blob});
 
-        auto pubkey_blob = serialize_obj<public_key_marshaling_type>(
-            pubkey, std::function(nil::crypto3::marshalling::types::fill_pubkey_key<PublicKey, endianness>));
+        auto pubkey_blob = serialize_obj<public_key_marshalling_type>(
+            pubkey, std::function(nil::crypto3::marshalling::types::fill_public_key<PublicKey, endianness>));
         write_obj(pubkey_path, {pubkey_blob});
 
-        auto pinput_blob = serialize_obj<pinput_marshaling_type>(
+        auto pinput_blob = serialize_obj<pinput_marshalling_type>(
             pinput,
             std::function(nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_primary_input<PInput, endianness>));
         write_obj(unenc_pi_path, {pinput_blob});
 
-        auto ct_blob = serialize_obj<ct_marshaling_type>(
+        auto ct_blob = serialize_obj<ct_marshalling_type>(
             ct,
             std::function(
                 nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_encrypted_primary_input<CipherText,
@@ -264,7 +264,7 @@ struct marshaling_verification_data_groth16_encrypted_input {
             d;
         auto ct_wrong = ct;
         ct_wrong[std::rand() % ct.size()] = d();
-        auto ct_wrong_blob = serialize_obj<ct_marshaling_type>(
+        auto ct_wrong_blob = serialize_obj<ct_marshalling_type>(
             ct_wrong,
             std::function(
                 nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_encrypted_primary_input<CipherText,
@@ -274,31 +274,31 @@ struct marshaling_verification_data_groth16_encrypted_input {
         write_obj(full_output_wrong_ct_path, {proof_blob, vk_blob, pubkey_blob, ct_wrong_blob, pinput_blob});
     }
 
-    template<typename ReturnType, typename MarshalingType, typename Path>
-    static ReturnType read_obj(const Path &path, ReturnType (&f)(MarshalingType)) {
+    template<typename ReturnType, typename MarshallingType, typename Path>
+    static ReturnType read_obj(const Path &path, ReturnType (&f)(MarshallingType)) {
         std::ifstream in(path, std::ios_base::binary);
         std::stringstream buffer;
         buffer << in.rdbuf();
         auto blob_str = buffer.str();
         std::vector<std::uint8_t> blob(std::cbegin(blob_str), std::cend(blob_str));
 
-        MarshalingType marshaling_obj;
+        MarshallingType marshalling_obj;
         auto it = std::cbegin(blob);
-        nil::marshalling::status_type status = marshaling_obj.read(it, blob.size());
-        return f(marshaling_obj);
+        nil::marshalling::status_type status = marshalling_obj.read(it, blob.size());
+        return f(marshalling_obj);
     }
 
     static std::tuple<Proof, VerificationKey, PublicKey, PInput, CipherText> read_data() {
-        Proof proof = read_obj<Proof, proof_marshaling_type>(
+        Proof proof = read_obj<Proof, proof_marshalling_type>(
             proof_path, nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_proof<Proof, endianness>);
-        VerificationKey vk = read_obj<VerificationKey, verification_key_marshaling_type>(
+        VerificationKey vk = read_obj<VerificationKey, verification_key_marshalling_type>(
             vk_path,
             nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_verification_key<VerificationKey, endianness>);
-        PublicKey pubkey = read_obj<PublicKey, public_key_marshaling_type>(
-            pubkey_path, nil::crypto3::marshalling::types::make_pubkey_key<PublicKey, endianness>);
-        PInput pinput = read_obj<PInput, pinput_marshaling_type>(
+        PublicKey pubkey = read_obj<PublicKey, public_key_marshalling_type>(
+            pubkey_path, nil::crypto3::marshalling::types::make_public_key<PublicKey, endianness>);
+        PInput pinput = read_obj<PInput, pinput_marshalling_type>(
             unenc_pi_path, nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_primary_input<PInput, endianness>);
-        CipherText ct = read_obj<CipherText, ct_marshaling_type>(
+        CipherText ct = read_obj<CipherText, ct_marshalling_type>(
             ct_path,
             nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_encrypted_primary_input<CipherText, endianness>);
 
@@ -323,7 +323,7 @@ struct test_policy {
     using merkle_proof_component = typename voting_component::merkle_proof_component;
     using encryption_scheme = elgamal_verifiable<pairing_curve_type>;
     using proof_system = typename encryption_scheme::proof_system_type;
-    using marshaling_data_type = marshaling_verification_data_groth16_encrypted_input<
+    using marshalling_data_type = marshalling_verification_data_groth16_encrypted_input<
         typename proof_system::verification_key_type, typename encryption_scheme::public_key_type,
         typename proof_system::proof_type, typename proof_system::primary_input_type,
         typename encryption_scheme::cipher_type::first_type>;
@@ -337,11 +337,12 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     auto secret_keys = generate_random_data<bool, test_policy::hash_type::digest_bits>(participants_number);
     std::vector<std::array<bool, test_policy::hash_type::digest_bits>> public_keys;
     for (const auto &sk : secret_keys) {
-        std::array<bool, test_policy::hash_type::digest_bits> pk;
+        std::array<bool, test_policy::hash_type::digest_bits> pk{};
         hash<test_policy::merkle_hash_type>(sk, std::begin(pk));
         public_keys.emplace_back(pk);
     }
-    containers::merkle_tree<test_policy::merkle_hash_type, test_policy::arity> tree(public_keys);
+    containers::merkle_tree<test_policy::merkle_hash_type, test_policy::arity> tree(public_keys.begin(),
+                                                                                    public_keys.end());
     std::size_t proof_idx = std::rand() % participants_number;
     containers::merkle_proof<test_policy::merkle_hash_type, test_policy::arity> proof(tree, proof_idx);
     auto tree_pk_leaf = tree[proof_idx];
@@ -398,7 +399,7 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     bp.set_input_sizes(vote_var.get_input_size());
 
     typename test_policy::proof_system::keypair_type gg_keypair =
-        snark::generate<test_policy::proof_system>(bp.get_constraint_system());
+        generate<test_policy::proof_system>(bp.get_constraint_system());
 
     algebraic_random_device<typename test_policy::pairing_curve_type::scalar_field_type> d;
     std::vector<typename test_policy::pairing_curve_type::scalar_field_type::value_type> rnd;
@@ -414,7 +415,7 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
             m_field, {d(), std::get<0>(keypair), gg_keypair, bp.primary_input(), bp.auxiliary_input()});
 
     typename test_policy::proof_system::primary_input_type pinput = bp.primary_input();
-    test_policy::marshaling_data_type::write_data(
+    test_policy::marshalling_data_type::write_data(
         gg_keypair.second, std::get<0>(keypair), cipher_text.second,
         typename test_policy::proof_system::primary_input_type {std::cbegin(pinput) + m.size(), std::cend(pinput)},
         cipher_text.first);
@@ -486,7 +487,7 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
 }
 
 BOOST_AUTO_TEST_CASE(elgamal_verifiable_restored_test) {
-    auto [proof, vk, pubkey, pinput, ct] = test_policy::marshaling_data_type::read_data();
+    auto [proof, vk, pubkey, pinput, ct] = test_policy::marshalling_data_type::read_data();
 
     bool enc_verification_ans = verify_encryption<test_policy::encryption_scheme>(ct, {pubkey, vk, proof, pinput});
     BOOST_REQUIRE(enc_verification_ans);

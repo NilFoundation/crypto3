@@ -304,7 +304,7 @@ namespace nil {
                 }
 
                 // TODO: process input data in place
-                // TODO: use marshaling module instead of custom marshaling to process input data
+                // TODO: use marshalling module instead of custom marshalling to process input data
                 template<typename InputIterator>
                 static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
                     std::copy(first, last, std::back_inserter(acc.plain_text));
@@ -376,7 +376,7 @@ namespace nil {
                 }
 
                 // TODO: process input data in place
-                // TODO: use marshaling module instead of custom marshaling to process input data
+                // TODO: use marshalling module instead of custom marshalling to process input data
                 template<typename InputIterator>
                 static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
                     std::copy(first, last, std::back_inserter(acc.cipher_text));
@@ -455,7 +455,7 @@ namespace nil {
                 }
 
                 // TODO: process input data in place
-                // TODO: use marshaling module instead of custom marshaling to process input data
+                // TODO: use marshalling module instead of custom marshalling to process input data
                 template<typename InputIterator>
                 static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
                     std::copy(first, last, std::back_inserter(acc.cipher_text));
@@ -506,7 +506,7 @@ namespace nil {
                 }
 
                 // TODO: process input data in place
-                // TODO: use marshaling module instead of custom marshaling to process input data
+                // TODO: use marshalling module instead of custom marshalling to process input data
                 template<typename InputIterator>
                 static inline typename std::enable_if<
                     std::is_same<typename scalar_field_type::value_type,
@@ -587,7 +587,7 @@ namespace nil {
                 }
 
                 // TODO: process input data in place
-                // TODO: use marshaling module instead of custom marshaling to process input data
+                // TODO: use marshalling module instead of custom marshalling to process input data
                 template<typename InputIterator>
                 static inline typename std::enable_if<
                     std::is_same<typename scalar_field_type::value_type,
