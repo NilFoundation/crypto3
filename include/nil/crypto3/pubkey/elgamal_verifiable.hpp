@@ -33,8 +33,9 @@
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
-#include <nil/crypto3/zk/snark/algorithms/prove.hpp>
-#include <nil/crypto3/zk/snark/algorithms/verify.hpp>
+#include <nil/crypto3/zk/algorithms/prove.hpp>
+#include <nil/crypto3/zk/algorithms/verify.hpp>
+
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
 
 #include <nil/crypto3/pubkey/keys/private_key.hpp>
@@ -64,11 +65,11 @@ namespace nil {
                 typedef std::tuple<public_key_type, private_key_type, verification_key_type> keypair_type;
 
                 typedef zk::snark::r1cs_gg_ppzksnark<
-                    Curve, zk::snark::r1cs_gg_ppzksnark_generator<Curve, zk::snark::ProvingMode::EncryptedInput>,
-                    zk::snark::r1cs_gg_ppzksnark_prover<Curve, zk::snark::ProvingMode::EncryptedInput>,
+                    Curve, zk::snark::r1cs_gg_ppzksnark_generator<Curve, zk::snark::proving_mode::encrypted_input>,
+                    zk::snark::r1cs_gg_ppzksnark_prover<Curve, zk::snark::proving_mode::encrypted_input>,
                     zk::snark::r1cs_gg_ppzksnark_verifier_strong_input_consistency<
-                        Curve, zk::snark::ProvingMode::EncryptedInput>,
-                    zk::snark::ProvingMode::EncryptedInput>
+                        Curve, zk::snark::proving_mode::encrypted_input>,
+                    zk::snark::proving_mode::encrypted_input>
                     proof_system_type;
 
                 typedef std::pair<std::vector<typename Curve::template g1_type<>::value_type>,
@@ -338,8 +339,8 @@ namespace nil {
                         sum_tm_g1 = sum_tm_g1 + acc.plain_text[i] * acc.pubkey.t_g1[i];
                     }
                     ct_g1.emplace_back(sum_tm_g1);
-                    auto proof = zk::snark::prove<proof_system_type>(acc.gg_keypair.first, acc.pubkey,
-                                                                     acc.primary_input, acc.auxiliary_input, acc.r);
+                    auto proof = zk::prove<proof_system_type>(acc.gg_keypair.first, acc.pubkey, acc.primary_input,
+                                                              acc.auxiliary_input, acc.r);
 
                     return {ct_g1, proof};
                 }
@@ -466,9 +467,9 @@ namespace nil {
                 }
 
                 static inline result_type process(internal_accumulator_type &acc) {
-                    return zk::snark::verify<proof_system_type>(std::cbegin(acc.cipher_text),
-                                                                std::cend(acc.cipher_text), acc.gg_vk, acc.pubkey,
-                                                                acc.unencrypted_primary_input, acc.proof);
+                    return zk::verify<proof_system_type>(std::cbegin(acc.cipher_text), std::cend(acc.cipher_text),
+                                                         acc.gg_vk, acc.pubkey, acc.unencrypted_primary_input,
+                                                         acc.proof);
                 }
             };
 
