@@ -62,28 +62,35 @@ namespace nil {
                          typename MerkleTreeHashType,
                          typename TranscriptHashType,
                          std::size_t M = 2>
-                class fri: public detail::basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M> {
-                    
+                class fri : public detail::basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M> {
+
                     using basic_fri = detail::basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M>;
 
                 public:
+                    constexpr static const std::size_t m = basic_fri::m;
 
+                    using field_type = typename basic_fri::field_type;
+                    using merkle_tree_hash_type = typename basic_fri::merkle_tree_hash_type;
+                    using transcript_hash_type = typename basic_fri::transcript_hash_type;
+                    using proof_type = typename basic_fri::proof_type;
+                    using params_type = typename basic_fri::params_type;
+                    using transcript_type = typename basic_fri::transcript_type;
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
 
-                    static typename basic_fri::proof_type proof_eval(const math::polynomial<typename FieldType::value_type> &g,
-                                                 precommitment_type &T,
-                                                 const typename basic_fri::params_type &fri_params,
-                                                 typename basic_fri::transcript_type &transcript = 
-                                                    typename basic_fri::transcript_type()) {
+                    static typename basic_fri::proof_type proof_eval(
+                        const math::polynomial<typename FieldType::value_type> &g,
+                        precommitment_type &T,
+                        const typename basic_fri::params_type &fri_params,
+                        typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {
 
                         return basic_fri::proof_eval(g, g, T, fri_params, transcript);
                     }
 
-                    static bool verify_eval(typename basic_fri::proof_type &proof,
-                                            typename basic_fri::params_type &fri_params,
-                                            typename basic_fri::transcript_type &transcript = 
-                                                typename basic_fri::transcript_type()) {
+                    static bool verify_eval(
+                        typename basic_fri::proof_type &proof,
+                        typename basic_fri::params_type &fri_params,
+                        typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {
 
                         math::polynomial<typename FieldType::value_type> U = {0};
                         math::polynomial<typename FieldType::value_type> V = {1};
