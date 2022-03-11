@@ -49,26 +49,26 @@ namespace nil {
 
             template<typename TEndian, typename Iter>
             struct range_pack_impl {
-                marshalling::status_type *status;
+                status_type *status;
                 mutable Iter iterator;
                 size_t count_elements;
 
                 template<typename SinglePassRange>
-                range_pack_impl(const SinglePassRange &range, marshalling::status_type &status) {
+                range_pack_impl(const SinglePassRange &range, status_type &status) {
                     iterator = range.begin();
                     count_elements = std::distance(range.begin(), range.end());
                     this->status = &status;
                 }
 
                 template<typename InputIterator>
-                range_pack_impl(InputIterator first, InputIterator last, marshalling::status_type &status) {
+                range_pack_impl(InputIterator first, InputIterator last, status_type &status) {
                     iterator = first;
                     count_elements = std::distance(first, last);
                     this->status = &status;
                 }
 
                 template<typename InputIterator>
-                range_pack_impl(InputIterator first, size_t len, marshalling::status_type &status) {
+                range_pack_impl(InputIterator first, size_t len, status_type &status) {
                     iterator = first;
                     count_elements = len;
                     this->status = &status;
@@ -76,8 +76,7 @@ namespace nil {
 
                 template<typename SimilarStdArray>
                 SimilarStdArray similar_std_array_marshalling() {
-                    using marshalling_type =
-                        typename marshalling::is_compatible<SimilarStdArray>::template type<TEndian>;
+                    using marshalling_type = typename is_compatible<SimilarStdArray>::template type<TEndian>;
 
                     marshalling_type m_val;
 
@@ -92,24 +91,23 @@ namespace nil {
                 }
 
                 template<typename T, size_t SizeArray,
-                         typename = typename std::enable_if<!nil::detail::is_container<
-                             typename marshalling::is_compatible<T>::template type<>>::value>::type>
+                         typename = typename std::enable_if<
+                             !nil::detail::is_container<typename is_compatible<T>::template type<>>::value>::type>
                 inline operator std::array<T, SizeArray>() {
 
                     return similar_std_array_marshalling<std::array<T, SizeArray>>();
                 }
 
                 template<typename T, size_t SizeArray,
-                         typename = typename std::enable_if<!nil::detail::is_container<
-                             typename marshalling::is_compatible<T>::template type<>>::value>::type>
+                         typename = typename std::enable_if<
+                             !nil::detail::is_container<typename is_compatible<T>::template type<>>::value>::type>
                 inline operator boost::array<T, SizeArray>() {
 
                     return similar_std_array_marshalling<boost::array<T, SizeArray>>();
                 }
 
                 template<typename TMarshallingOutnput,
-                         typename
-                         = typename std::enable_if<marshalling::is_marshalling_type<TMarshallingOutnput>::value>::type>
+                         typename = typename std::enable_if<is_marshalling_type<TMarshallingOutnput>::value>::type>
                 inline operator TMarshallingOutnput() const {
 
                     TMarshallingOutnput result;
@@ -118,12 +116,11 @@ namespace nil {
                     return result;
                 }
 
-                template<typename TOutput,
-                         typename = typename std::enable_if<marshalling::is_compatible<TOutput>::value>::type,
+                template<typename TOutput, typename = typename std::enable_if<is_compatible<TOutput>::value>::type,
                          typename = typename std::enable_if<!nil::marshalling::is_container<
-                             typename marshalling::is_compatible<TOutput>::template type<>>::value>::type>
+                             typename is_compatible<TOutput>::template type<>>::value>::type>
                 inline operator TOutput() const {
-                    using marshalling_type = typename marshalling::is_compatible<TOutput>::template type<TEndian>;
+                    using marshalling_type = typename is_compatible<TOutput>::template type<TEndian>;
 
                     TOutput x;
 
@@ -136,14 +133,12 @@ namespace nil {
 
                 template<typename OutputRange,
                          typename = typename std::enable_if<
-                             nil::detail::is_range<OutputRange>::value
-                             && !marshalling::is_marshalling_type<OutputRange>::value
-                             && !nil::marshalling::is_container<typename marshalling::is_compatible<
+                             nil::detail::is_range<OutputRange>::value && !is_marshalling_type<OutputRange>::value
+                             && !nil::marshalling::is_container<typename is_compatible<
                                  typename OutputRange::value_type>::template type<>>::value>::type>
                 inline operator OutputRange() {
                     using T = typename OutputRange::value_type;
-                    using marshalling_type =
-                        typename marshalling::is_compatible<std::vector<T>>::template type<TEndian>;
+                    using marshalling_type = typename is_compatible<std::vector<T>>::template type<TEndian>;
 
                     marshalling_type m_val;
 

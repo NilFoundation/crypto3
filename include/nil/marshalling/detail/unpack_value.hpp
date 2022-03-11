@@ -59,17 +59,19 @@ namespace nil {
 
             template<typename TInput>
             struct value_unpack_impl {
-                marshalling::status_type *status;
+                status_type *status;
                 TInput input;
 
-                value_unpack_impl(const TInput &input, marshalling::status_type &status) {
+                value_unpack_impl(const TInput &input, status_type &status) {
                     this->input = input;
                     this->status = &status;
                 }
 
-                template<typename Array, typename = typename std::enable_if<!std::is_constructible<
-                                             Array, typename std::vector<typename Array::value_type>::iterator,
-                                             typename std::vector<typename Array::value_type>::iterator>::value>::type>
+                template<typename Array,
+                         typename = typename std::enable_if<!std::is_constructible<
+                             Array,
+                             typename std::vector<typename Array::value_type>::iterator,
+                             typename std::vector<typename Array::value_type>::iterator>::value>::type>
                 inline operator Array() {
                     Array result;
                     typename Array::iterator buffer_begin = result.begin();
@@ -80,7 +82,8 @@ namespace nil {
 
                 template<typename OutputRange,
                          typename = typename std::enable_if<std::is_constructible<
-                             OutputRange, typename std::vector<typename OutputRange::value_type>::iterator,
+                             OutputRange,
+                             typename std::vector<typename OutputRange::value_type>::iterator,
                              typename std::vector<typename OutputRange::value_type>::iterator>::value>::type>
                 inline operator OutputRange() const {
                     using T = typename OutputRange::value_type;
@@ -94,44 +97,44 @@ namespace nil {
 
             template<typename TEndian, typename Iter>
             struct range_unpack_impl {
-                marshalling::status_type *status;
+                status_type *status;
                 mutable Iter iterator;
                 size_t count_elements;
                 using value_type = typename std::iterator_traits<Iter>::value_type;
 
                 template<typename SinglePassRange>
-                range_unpack_impl(const SinglePassRange &range, marshalling::status_type &status) {
+                range_unpack_impl(const SinglePassRange &range, status_type &status) {
                     iterator = range.begin();
                     count_elements = std::distance(range.begin(), range.end());
                     this->status = &status;
                 }
 
                 template<typename InputIterator>
-                range_unpack_impl(InputIterator first, InputIterator last, marshalling::status_type &status) {
+                range_unpack_impl(InputIterator first, InputIterator last, status_type &status) {
                     iterator = first;
                     count_elements = std::distance(first, last);
                     this->status = &status;
                 }
 
                 template<typename InputIterator>
-                range_unpack_impl(const InputIterator &iter, size_t len, marshalling::status_type &status) {
+                range_unpack_impl(const InputIterator &iter, size_t len, status_type &status) {
                     iterator = iter;
                     count_elements = len;
                     this->status = &status;
                 }
 
-                template<typename OutputRange,
-                         typename = typename std::enable_if<
-                             std::is_constructible<
-                                 OutputRange, typename std::vector<typename OutputRange::value_type>::iterator,
-                                 typename std::vector<typename OutputRange::value_type>::iterator>::value
-                             && (std::is_same<typename OutputRange::value_type, bool>::value
-                                 || std::is_same<typename OutputRange::value_type, std::uint8_t>::value)>::type>
+                template<
+                    typename OutputRange,
+                    typename = typename std::enable_if<
+                        std::is_constructible<OutputRange,
+                                              typename std::vector<typename OutputRange::value_type>::iterator,
+                                              typename std::vector<typename OutputRange::value_type>::iterator>::value
+                        && (std::is_same<typename OutputRange::value_type, bool>::value
+                            || std::is_same<typename OutputRange::value_type, std::uint8_t>::value)>::type>
                 inline operator OutputRange() {
                     using Toutput = typename OutputRange::value_type;
 
-                    using marshalling_type =
-                        typename marshalling::is_compatible<std::vector<value_type>>::template type<TEndian>;
+                    using marshalling_type = typename is_compatible<std::vector<value_type>>::template type<TEndian>;
                     using marshalling_internal_type = typename marshalling_type::element_type;
 
                     //                using marshalling_vector = typename
@@ -156,14 +159,14 @@ namespace nil {
 
                 template<typename Array,
                          typename = typename std::enable_if<!std::is_constructible<
-                             Array, typename std::vector<typename Array::value_type>::iterator,
+                             Array,
+                             typename std::vector<typename Array::value_type>::iterator,
                              typename std::vector<typename Array::value_type>::iterator>::value>::type,
                          typename = typename std::enable_if<
                              (std::is_same<typename Array::value_type, bool>::value
                               || std::is_same<typename Array::value_type, std::uint8_t>::value)>::type>
                 inline operator Array() {
-                    using marshalling_type =
-                        typename marshalling::is_compatible<std::vector<value_type>>::template type<TEndian>;
+                    using marshalling_type = typename is_compatible<std::vector<value_type>>::template type<TEndian>;
                     using marshalling_internal_type = typename marshalling_type::element_type;
 
                     //                using marshalling_vector = typename
