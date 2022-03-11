@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -33,27 +34,32 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_CHECK_UPDATE_COMPONENT_HPP
 #define CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_CHECK_UPDATE_COMPONENT_HPP
 
-#include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/components/component.hpp>
-#include <nil/crypto3/zk/components/hashes/knapsack/knapsack_component.hpp>
 #include <nil/crypto3/zk/components/hashes/digest_selector_component.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
-#include <nil/crypto3/zk/components/merkle_tree/authentication_path.hpp>
+#include <nil/crypto3/zk/components/merkle_tree/proof.hpp>
+#include <nil/crypto3/zk/components/packing.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
 
-                template<typename FieldType, typename Hash>
-                class merkle_tree_check_update_components : public component<FieldType> {
+                template<typename HashComponent = pedersen<>, typename FieldType = typename HashComponent::field_type,
+                         std::size_t Arity = 2>
+                class merkle_proof_update : public component<FieldType> {
+                    using hash_type = typename HashComponent::hash_type;
 
-                    std::vector<Hash> prev_hashers;
+                    static_assert(std::is_same<digest_variable<FieldType>, typename HashComponent::result_type>::value);
+                    // TODO: add support of the trees with arity more than 2
+                    static_assert(Arity == 2);
+
+                    std::vector<HashComponent> prev_hashers;
                     std::vector<block_variable<FieldType>> prev_hasher_inputs;
                     std::vector<digest_selector_component<FieldType>> prev_propagators;
                     std::vector<digest_variable<FieldType>> prev_internal_output;
 
-                    std::vector<Hash> next_hashers;
+                    std::vector<HashComponent> next_hashers;
                     std::vector<block_variable<FieldType>> next_hasher_inputs;
                     std::vector<digest_selector_component<FieldType>> next_propagators;
                     std::vector<digest_variable<FieldType>> next_internal_output;
@@ -68,29 +74,28 @@ namespace nil {
                     blueprint_variable_vector<FieldType> address_bits;
                     digest_variable<FieldType> prev_leaf_digest;
                     digest_variable<FieldType> prev_root_digest;
-                    merkle_authentication_path_variable<FieldType, Hash> prev_path;
+                    merkle_proof<HashComponent, FieldType, Arity> prev_path;
                     digest_variable<FieldType> next_leaf_digest;
                     digest_variable<FieldType> next_root_digest;
-                    merkle_authentication_path_variable<FieldType, Hash> next_path;
+                    merkle_proof<HashComponent, FieldType, Arity> next_path;
                     blueprint_linear_combination<FieldType> update_successful;
 
                     /* Note that while it is necessary to generate R1CS constraints
                        for prev_path, it is not necessary to do so for next_path. See
                        comment in the implementation of generate_r1cs_constraints() */
 
-                    merkle_tree_check_update_components(
-                        blueprint<FieldType> &bp,
-                        const std::size_t tree_depth,
-                        const blueprint_variable_vector<FieldType> &address_bits,
-                        const digest_variable<FieldType> &prev_leaf_digest,
-                        const digest_variable<FieldType> &prev_root_digest,
-                        const merkle_authentication_path_variable<FieldType, Hash> &prev_path,
-                        const digest_variable<FieldType> &next_leaf_digest,
-                        const digest_variable<FieldType> &next_root_digest,
-                        const merkle_authentication_path_variable<FieldType, Hash> &next_path,
-                        const blueprint_linear_combination<FieldType> &update_successful) :
+                    merkle_proof_update(blueprint<FieldType> &bp,
+                                        const std::size_t tree_depth,
+                                        const blueprint_variable_vector<FieldType> &address_bits,
+                                        const digest_variable<FieldType> &prev_leaf_digest,
+                                        const digest_variable<FieldType> &prev_root_digest,
+                                        const merkle_proof<HashComponent, FieldType, Arity> &prev_path,
+                                        const digest_variable<FieldType> &next_leaf_digest,
+                                        const digest_variable<FieldType> &next_root_digest,
+                                        const merkle_proof<HashComponent, FieldType, Arity> &next_path,
+                                        const blueprint_linear_combination<FieldType> &update_successful) :
                         component<FieldType>(bp),
-                        digest_size(Hash::get_digest_len()), tree_depth(tree_depth), address_bits(address_bits),
+                        digest_size(hash_type::digest_bits), tree_depth(tree_depth), address_bits(address_bits),
                         prev_leaf_digest(prev_leaf_digest), prev_root_digest(prev_root_digest), prev_path(prev_path),
                         next_leaf_digest(next_leaf_digest), next_root_digest(next_root_digest), next_path(next_path),
                         update_successful(update_successful) {
@@ -105,34 +110,33 @@ namespace nil {
                         computed_next_root.reset(new digest_variable<FieldType>(bp, digest_size));
 
                         for (std::size_t i = 0; i < tree_depth; ++i) {
-                            block_variable<FieldType> prev_inp(bp, prev_path.left_digests[i],
-                                                               prev_path.right_digests[i]);
+                            // TODO: generalize for Arity > 2
+                            block_variable<FieldType> prev_inp(bp, prev_path.path[i][0], prev_path.path[i][1]);
                             prev_hasher_inputs.emplace_back(prev_inp);
-                            prev_hashers.emplace_back(Hash(bp, 2 * digest_size, prev_inp,
-                                                           (i == 0 ? prev_root_digest : prev_internal_output[i - 1])));
+                            prev_hashers.emplace_back(
+                                HashComponent(bp, prev_inp, (i == 0 ? prev_root_digest : prev_internal_output[i - 1])));
 
-                            block_variable<FieldType> next_inp(bp, next_path.left_digests[i],
-                                                               next_path.right_digests[i]);
+                            // TODO: generalize for Arity > 2
+                            block_variable<FieldType> next_inp(bp, next_path.path[i][0], next_path.path[i][1]);
                             next_hasher_inputs.emplace_back(next_inp);
-                            next_hashers.emplace_back(
-                                Hash(bp, 2 * digest_size, next_inp,
-                                     (i == 0 ? *computed_next_root : next_internal_output[i - 1])));
+                            next_hashers.emplace_back(HashComponent(
+                                bp, next_inp, (i == 0 ? *computed_next_root : next_internal_output[i - 1])));
                         }
 
                         for (std::size_t i = 0; i < tree_depth; ++i) {
+                            // TODO: generalize for Arity > 2
                             prev_propagators.emplace_back(digest_selector_component<FieldType>(
                                 bp, digest_size, i < tree_depth - 1 ? prev_internal_output[i] : prev_leaf_digest,
-                                address_bits[tree_depth - 1 - i], prev_path.left_digests[i],
-                                prev_path.right_digests[i]));
+                                address_bits[tree_depth - 1 - i], prev_path.path[i][0], prev_path.path[i][1]));
+                            // TODO: generalize for Arity > 2
                             next_propagators.emplace_back(digest_selector_component<FieldType>(
                                 bp, digest_size, i < tree_depth - 1 ? next_internal_output[i] : next_leaf_digest,
-                                address_bits[tree_depth - 1 - i], next_path.left_digests[i],
-                                next_path.right_digests[i]));
+                                address_bits[tree_depth - 1 - i], next_path.path[i][0], next_path.path[i][1]));
                         }
 
                         check_next_root.reset(new bit_vector_copy_component<FieldType>(
                             bp, computed_next_root->bits, next_root_digest.bits, update_successful,
-                            FieldType::capacity()));
+                            FieldType::value_bits - 1));
                     }
 
                     void generate_r1cs_constraints() {
@@ -202,27 +206,6 @@ namespace nil {
                         }
 
                         check_next_root->generate_r1cs_witness();
-                    }
-
-                    static std::size_t root_size_in_bits() {
-                        return Hash::get_digest_len();
-                    }
-                    /* for debugging purposes */
-                    static std::size_t expected_constraints(const std::size_t tree_depth) {
-                        /* NB: this includes path constraints */
-                        const std::size_t prev_hasher_constraints = tree_depth * Hash::expected_constraints(false);
-                        const std::size_t next_hasher_constraints = tree_depth * Hash::expected_constraints(true);
-                        const std::size_t prev_authentication_path_constraints =
-                            2 * tree_depth * Hash::get_digest_len();
-                        const std::size_t prev_propagator_constraints = tree_depth * Hash::get_digest_len();
-                        const std::size_t next_propagator_constraints = tree_depth * Hash::get_digest_len();
-                        const std::size_t check_next_root_constraints =
-                            3 * (Hash::get_digest_len() + (FieldType::capacity()) - 1) / FieldType::capacity();
-                        const std::size_t aux_equality_constraints = tree_depth * Hash::get_digest_len();
-
-                        return (prev_hasher_constraints + next_hasher_constraints +
-                                prev_authentication_path_constraints + prev_propagator_constraints +
-                                next_propagator_constraints + check_next_root_constraints + aux_equality_constraints);
                     }
                 };
 

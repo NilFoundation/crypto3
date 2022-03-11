@@ -43,7 +43,13 @@ macro(define_blueprint_test test)
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(${full_test_name} PROPERTIES CXX_STANDARD 14)
+    set_target_properties(${full_test_name} PROPERTIES CXX_STANDARD 17)
+
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(${full_test_name} PRIVATE "-fconstexpr-steps=2147483647")
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(${full_test_name} PRIVATE "-fconstexpr-ops-limit=4294967295")
+    endif()
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
@@ -65,11 +71,18 @@ set(FIELDS_TESTS_FILES
     #"algebra/fields/exponentiation"
     )
 
+set(CURVES_TESTS_FILES
+    "algebra/curves/montgomery"
+    "algebra/curves/twisted_edwards"
+    "algebra/curves/fixed_base_mul_zcash"
+    )
+
 set(HASHES_TESTS_FILES
     "hashes/knapsack"
     "hashes/knapsack_verification"
     "hashes/sha256"
-    "hashes/sha256_verification")
+    "hashes/sha256_verification"
+    "hashes/pedersen")
 
 set(PAIRING_TESTS_FILES
     "algebra/pairing/weierstrass/miller_loop"
@@ -87,12 +100,16 @@ set(SCHEMES_TESTS_FILES
 set(MERKLE_TREE_TESTS_FILES
     "merkle_tree_components")
 
+set(VOTING_TESTS_FILES
+    "voting/encrypted_input_voting")
+
 set(BASIC_COMPONENTS_TESTS_FILES
     "basic_components"
     "basic_components_r1cs_gg_ppzksnark")
 
 SET(ALGEBRA_TESTS_FILES 
     ${FIELDS_TESTS_FILES}
+    ${CURVES_TESTS_FILES}
     ${PAIRING_TESTS_FILES})
 
 SET(ALL_TESTS_FILES 
@@ -101,6 +118,7 @@ SET(ALL_TESTS_FILES
     ${ROUTING_TESTS_FILES}
     ${SCHEMES_TESTS_FILES}
     ${MERKLE_TREE_TESTS_FILES}
+    ${VOTING_TESTS_FILES}
     ${BASIC_COMPONENTS_TESTS_FILES})
 
 foreach(TEST_FILE ${ALL_TESTS_FILES})

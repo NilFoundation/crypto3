@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(field_element_mul_component_test_mnt4_case) {
 
         BOOST_CHECK(bp.is_satisfied());
 
-        BOOST_CHECK(verify_component<typename curve_type::chained_on_curve_type>(bp));
+        BOOST_CHECK(verify_component<curves::mnt6<298>>(bp));
     }
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(field_element_squared_component_test_mnt4_case) {
 
         BOOST_CHECK(bp.is_satisfied());
 
-        BOOST_CHECK(verify_component<typename curve_type::chained_on_curve_type>(bp));
+        BOOST_CHECK(verify_component<curves::mnt6<298>>(bp));
     }
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);

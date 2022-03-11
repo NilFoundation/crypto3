@@ -130,7 +130,8 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::hash
                       ${CMAKE_WORKSPACE_NAME}::multiprecision
                       ${CMAKE_WORKSPACE_NAME}::random
-                      ${CMAKE_WORKSPACE_NAME}::zk)
+                      ${CMAKE_WORKSPACE_NAME}::zk
+                      ${CMAKE_WORKSPACE_NAME}::containers)
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
