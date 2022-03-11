@@ -46,12 +46,8 @@ namespace nil {
                 return ProofSystemType::verify(pvk, primary_input, proof);
             }
 
-            template<typename ProofSystemType,
-                     typename DistributionType,
-                     typename GeneratorType,
-                     typename Hash,
-                     typename InputPrimaryInputRange,
-                     typename InputIterator>
+            template<typename ProofSystemType, typename DistributionType, typename GeneratorType, typename Hash,
+                     typename InputPrimaryInputRange, typename InputIterator>
             bool verify(const typename ProofSystemType::verification_srs_type &ip_verifier_srs,
                         const typename ProofSystemType::verification_key_type &pvk,
                         const InputPrimaryInputRange &public_inputs,
@@ -62,8 +58,30 @@ namespace nil {
                 return ProofSystemType::template verify<DistributionType, GeneratorType, Hash>(
                     ip_verifier_srs, pvk, public_inputs, proof, transcript_include_first, transcript_include_last);
             }
-        }        // namespace zk
-    }            // namespace crypto3
+
+            template<typename ProofSystemType, typename DistributionType, typename GeneratorType, typename Hash,
+                     typename InputPrimaryInputRange, typename InputIterator>
+            bool verify(const typename ProofSystemType::verification_srs_type &ip_verifier_srs,
+                        const typename ProofSystemType::verification_key_type &pvk,
+                        const InputPrimaryInputRange &public_inputs,
+                        const typename ProofSystemType::proof_type &proof,
+                        InputIterator transcript_include_first,
+                        InputIterator transcript_include_last) {
+
+                return ProofSystemType::template verify<DistributionType, GeneratorType, Hash>(
+                    ip_verifier_srs, pvk, public_inputs, proof, transcript_include_first, transcript_include_last);
+            }
+
+            template<typename ProofSystemType, typename CipherTextIterator, typename PublicKey>
+            static inline bool verify(CipherTextIterator first, CipherTextIterator last,
+                                      const typename ProofSystemType::verification_key_type &vk,
+                                      const PublicKey &pubkey,
+                                      const typename ProofSystemType::primary_input_type &unencrypted_primary_input,
+                                      const typename ProofSystemType::proof_type &proof) {
+                return ProofSystemType::verify(first, last, vk, pubkey, unencrypted_primary_input, proof);
+            }
+        }    // namespace zk
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_SNARK_ALGORITHMS_VERIFY_HPP

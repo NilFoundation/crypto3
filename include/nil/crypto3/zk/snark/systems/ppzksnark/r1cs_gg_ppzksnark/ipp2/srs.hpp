@@ -30,8 +30,9 @@
 #include <vector>
 #include <tuple>
 
+#include <nil/crypto3/zk/commitments/polynomial/kzg_ipp2.hpp>
+
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/keypair.hpp>
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>
 
 namespace nil {
@@ -66,7 +67,7 @@ namespace nil {
                     typedef typename g1_type::value_type g1_value_type;
                     typedef typename g2_type::value_type g2_value_type;
 
-                    typedef kzg_commitment<CurveType> commitment_type;
+                    typedef commitments::kzg_ipp2<CurveType> commitment_type;
                     typedef typename commitment_type::vkey_type vkey_type;
                     typedef typename commitment_type::wkey_type wkey_type;
 
@@ -120,7 +121,7 @@ namespace nil {
                 template<typename CurveType>
                 struct r1cs_gg_ppzksnark_aggregate_srs {
                     typedef CurveType curve_type;
-                    static constexpr ProvingMode mode = ProvingMode::Aggregate;
+                    static constexpr proving_mode mode = proving_mode::aggregate;
                     typedef typename curve_type::scalar_field_type scalar_field_type;
                     typedef typename curve_type::template g1_type<> g1_type;
                     typedef typename curve_type::template g2_type<> g2_type;

@@ -77,7 +77,7 @@ namespace nil {
                     template<typename CurveType>
                     struct r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> {
                         typedef CurveType curve_type;
-                        static constexpr ProvingMode mode = ProvingMode::Basic;
+                        static constexpr proving_mode mode = proving_mode::basic;
 
                         /******************************** Params ********************************/
 
@@ -167,7 +167,7 @@ namespace nil {
                     template<typename CurveType>
                     struct r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::aggregate> {
                         typedef CurveType curve_type;
-                        static constexpr ProvingMode mode = ProvingMode::Aggregate;
+                        static constexpr proving_mode mode = proving_mode::aggregate;
 
                         /******************************** Params ********************************/
 
@@ -245,12 +245,12 @@ namespace nil {
                     };
 
                     template<typename CurveType>
-                    class r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::EncryptedInput> {
-                        typedef r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> basic_policy;
+                    class r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::encrypted_input> {
+                        typedef r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> basic_policy;
 
                     public:
                         typedef CurveType curve_type;
-                        static constexpr ProvingMode mode = ProvingMode::EncryptedInput;
+                        static constexpr proving_mode mode = proving_mode::encrypted_input;
 
                         /******************************** Params ********************************/
 

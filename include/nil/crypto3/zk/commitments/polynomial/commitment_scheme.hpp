@@ -27,18 +27,13 @@
 #ifndef CRYPTO3_ZK_POLYNOMIAL_COMMITMENT_SCHEME_HPP
 #define CRYPTO3_ZK_POLYNOMIAL_COMMITMENT_SCHEME_HPP
 
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace commitments {
 
                 template<typename FieldType>
-                struct polynomial {
-
-                    
-                    
-                };
+                struct polynomial { };
             }    // namespace commitments
         }        // namespace zk
     }            // namespace crypto3

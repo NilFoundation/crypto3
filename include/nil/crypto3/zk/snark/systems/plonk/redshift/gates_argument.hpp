@@ -61,9 +61,11 @@ namespace nil {
 
                     static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
                         prove_eval(typename policy_type::constraint_system_type &constraint_system,
-                                   const plonk_polynomial_table<FieldType, ParamsType::witness_columns,
-                                   ParamsType::selector_columns, ParamsType::public_input_columns,
-                                   ParamsType::constant_columns> &column_polynomials,
+                                   const plonk_polynomial_table<FieldType,
+                                                                ParamsType::witness_columns,
+                                                                ParamsType::selector_columns,
+                                                                ParamsType::public_input_columns,
+                                                                ParamsType::constant_columns> &column_polynomials,
                                    transcript_type &transcript = transcript_type()) {
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
@@ -93,8 +95,11 @@ namespace nil {
 
                     static inline std::array<typename FieldType::value_type, argument_size>
                         verify_eval(const std::vector<plonk_gate<FieldType>> &gates,
-                                    const plonk_public_polynomial_table<FieldType, ParamsType::selector_columns,
-                                        ParamsType::public_input_columns, ParamsType::constant_columns> public_polynomials,
+                                    const plonk_public_polynomial_table<FieldType,
+                                                                        ParamsType::selector_columns,
+                                                                        ParamsType::public_input_columns,
+                                                                        ParamsType::constant_columns>
+                                        public_polynomials,
                                     typename policy_type::evaluation_map &evaluations,
                                     typename FieldType::value_type challenge,
                                     transcript_type &transcript = transcript_type()) {
@@ -112,7 +117,8 @@ namespace nil {
                                 theta_acc *= theta;
                             }
 
-                            gate_result = gate_result * public_polynomials.selector(gates[i].selector_index).evaluate(challenge);
+                            gate_result =
+                                gate_result * public_polynomials.selector(gates[i].selector_index).evaluate(challenge);
 
                             F[0] = F[0] + gate_result;
                         }

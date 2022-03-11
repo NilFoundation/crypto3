@@ -35,9 +35,10 @@
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/accumulation_vector.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment_multiexp.hpp>
+
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
 
@@ -45,7 +46,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic, typename = void>
+                template<typename CurveType, proving_mode Mode = proving_mode::basic, typename = void>
                 class r1cs_gg_ppzksnark_generator;
 
                 /**
@@ -55,9 +56,9 @@ namespace nil {
                  * CS.
                  */
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Basic> {
+                class r1cs_gg_ppzksnark_generator<CurveType, proving_mode::basic> {
 
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> policy_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::template g1_type<> g1_type;
@@ -190,8 +191,8 @@ namespace nil {
                         algebra::batch_to_special<g1_type>(A_query);
 #endif
 
-                        knowledge_commitment_vector<g2_type, g1_type> B_query =
-                            kc_batch_exp<g2_type, g1_type, scalar_field_type>(
+                        commitments::knowledge_commitment_vector<g2_type, g1_type> B_query =
+                            commitments::kc_batch_exp<g2_type, g1_type, scalar_field_type>(
                                 scalar_field_type::value_bits, g2_window_size, g1_window_size, g2_table, g1_table,
                                 scalar_field_type::value_type::one(), scalar_field_type::value_type::one(), Bt, chunks);
 
@@ -224,8 +225,8 @@ namespace nil {
 
                         typename g1_type::value_type gamma_g1 = gamma * g1_generator;
 
-                        accumulation_vector<g1_type> gamma_ABC_g1(std::move(gamma_ABC_g1_0),
-                                                                  std::move(gamma_ABC_g1_values));
+                        commitments::accumulation_vector<g1_type> gamma_ABC_g1(std::move(gamma_ABC_g1_0),
+                                                                               std::move(gamma_ABC_g1_values));
 
                         return std::make_tuple(std::move(alpha_g1), std::move(beta_g1), std::move(beta_g2),
                                                std::move(delta_g1), std::move(delta_g2), std::move(gamma_g2),

@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_VERIFICATION_KEY_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_VERIFICATION_KEY_HPP
 
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/accumulation_vector.hpp>
 
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/verification_key.hpp>
 
@@ -43,7 +43,7 @@ namespace nil {
                     typename curve_type::template g2_type<>::value_type gamma_g2;
                     typename curve_type::template g2_type<>::value_type delta_g2;
 
-                    accumulation_vector<typename CurveType::template g1_type<>> gamma_ABC_g1;
+                    commitments::accumulation_vector<typename CurveType::template g1_type<>> gamma_ABC_g1;
 
                     r1cs_gg_ppzksnark_aggregate_verification_key() = default;
                     r1cs_gg_ppzksnark_aggregate_verification_key(
@@ -51,7 +51,7 @@ namespace nil {
                         const typename curve_type::template g2_type<>::value_type &beta_g2,
                         const typename curve_type::template g2_type<>::value_type &gamma_g2,
                         const typename curve_type::template g2_type<>::value_type &delta_g2,
-                        const accumulation_vector<typename curve_type::template g1_type<>> &gamma_ABC_g1) :
+                        const commitments::accumulation_vector<typename curve_type::template g1_type<>> &gamma_ABC_g1) :
                         alpha_g1(alpha_g1),
                         beta_g2(beta_g2), gamma_g2(gamma_g2), delta_g2(delta_g2), gamma_ABC_g1(gamma_ABC_g1) {
                     }

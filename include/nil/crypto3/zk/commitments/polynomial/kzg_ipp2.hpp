@@ -99,12 +99,11 @@ namespace nil {
 
                         /// Returns both vectors scaled by the given vector entrywise.
                         /// In other words, it returns $\{v_i^{s_i}\}$
-                        template<
-                            typename InputIterator,
-                            typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
-                            typename std::enable_if<std::is_same<field_value_type, ValueType>::value, bool>::type = true>
-                        commitment_key<group_type> scale(InputIterator s_first,
-                                                                                InputIterator s_last) const {
+                        template<typename InputIterator,
+                                 typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                                 typename std::enable_if<std::is_same<field_value_type, ValueType>::value, bool>::type =
+                                     true>
+                        commitment_key<group_type> scale(InputIterator s_first, InputIterator s_last) const {
                             BOOST_ASSERT(has_correct_len(std::distance(s_first, s_last)));
 
                             commitment_key<group_type> result;
@@ -120,8 +119,7 @@ namespace nil {
                         }
 
                         /// Returns the left and right commitment key part. It makes copy.
-                        std::pair<commitment_key<group_type>, commitment_key<group_type>>
-                            split(std::size_t at) const {
+                        std::pair<commitment_key<group_type>, commitment_key<group_type>> split(std::size_t at) const {
                             BOOST_ASSERT(a.size() == b.size());
                             BOOST_ASSERT(at > 0 && at < a.size());
 
@@ -149,9 +147,8 @@ namespace nil {
                         /// Takes a left and right commitment key and returns a commitment
                         /// key $left \circ right^{scale} = (left_i*right_i^{scale} ...)$. This is
                         /// required step during GIPA recursion.
-                        commitment_key<group_type>
-                            compress(const commitment_key<group_type> &right,
-                                     const field_value_type &scale) const {
+                        commitment_key<group_type> compress(const commitment_key<group_type> &right,
+                                                            const field_value_type &scale) const {
                             BOOST_ASSERT(a.size() == right.a.size());
                             BOOST_ASSERT(b.size() == right.b.size());
                             BOOST_ASSERT(a.size() == b.size());
@@ -161,7 +158,8 @@ namespace nil {
                             std::for_each(
                                 boost::make_zip_iterator(
                                     boost::make_tuple(a.begin(), b.begin(), right.a.begin(), right.b.begin())),
-                                boost::make_zip_iterator(boost::make_tuple(a.end(), b.end(), right.a.end(), right.b.end())),
+                                boost::make_zip_iterator(
+                                    boost::make_tuple(a.end(), b.end(), right.a.end(), right.b.end())),
                                 [&](const boost::tuple<const group_value_type &, const group_value_type &,
                                                        const group_value_type &, const group_value_type &> &t) {
                                     result.a.emplace_back(t.template get<0>() + t.template get<2>() * scale);
@@ -180,7 +178,6 @@ namespace nil {
                     };
 
                 public:
-
                     typedef CurveType curve_type;
                     typedef algebra::pairing::pairing_policy<curve_type> pairing;
 
@@ -201,13 +198,11 @@ namespace nil {
                     /// KZGOpening represents the KZG opening of a commitment key (which is a tuple
                     /// given commitment keys are a tuple).
                     template<typename GroupType>
-                    using opening_type =
-                        std::pair<typename GroupType::value_type, typename GroupType::value_type>;
+                    using opening_type = std::pair<typename GroupType::value_type, typename GroupType::value_type>;
 
                     /// Both commitment outputs a pair of $F_q^k$ element.
                     using output_type =
-                        std::pair<typename CurveType::gt_type::value_type,
-                            typename CurveType::gt_type::value_type>;
+                        std::pair<typename CurveType::gt_type::value_type, typename CurveType::gt_type::value_type>;
 
                     /// Commits to a tuple of G1 vector and G2 vector in the following way:
                     /// $T = \prod_{i=0}^n e(A_i, v_{1,i})e(B_i,w_{1,i})$

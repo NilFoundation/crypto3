@@ -34,9 +34,9 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Aggregate> {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
-                    typedef r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Basic> basic_generator;
+                class r1cs_gg_ppzksnark_generator<CurveType, proving_mode::aggregate> {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::aggregate> policy_type;
+                    typedef r1cs_gg_ppzksnark_generator<CurveType, proving_mode::basic> basic_generator;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::template g1_type<> g1_type;

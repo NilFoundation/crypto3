@@ -34,8 +34,9 @@
 #include <nil/crypto3/algebra/multiexp/policies.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment_multiexp.hpp>
+
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
 
@@ -43,7 +44,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename CurveType, ProvingMode Mode = ProvingMode::Basic>
+                template<typename CurveType, proving_mode Mode = proving_mode::basic>
                 class r1cs_gg_ppzksnark_prover;
 
                 /**
@@ -55,8 +56,8 @@ namespace nil {
                  * Above, CS is the R1CS constraint system that was given as input to the generator algorithm.
                  */
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Basic> {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
+                class r1cs_gg_ppzksnark_prover<CurveType, proving_mode::basic> {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> policy_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::template g1_type<> g1_type;
@@ -112,8 +113,8 @@ namespace nil {
                                 const_padded_assignment.begin() + qap_wit.num_variables + 1,
                                 chunks);
 
-                        typename knowledge_commitment<g2_type, g1_type>::value_type evaluation_Bt =
-                            kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
+                        typename commitments::knowledge_commitment<g2_type, g1_type>::value_type evaluation_Bt =
+                            commitments::kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
                                 proving_key.B_query,
                                 0,
                                 qap_wit.num_variables + 1,

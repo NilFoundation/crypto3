@@ -34,10 +34,11 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::EncryptedInput> {
+                class r1cs_gg_ppzksnark_generator<CurveType, proving_mode::encrypted_input> {
 
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::EncryptedInput> policy_type;
-                    typedef r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Basic> basic_generator_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::encrypted_input>
+                        policy_type;
+                    typedef r1cs_gg_ppzksnark_generator<CurveType, proving_mode::basic> basic_generator_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::template g1_type<> g1_type;

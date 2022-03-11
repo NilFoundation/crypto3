@@ -48,11 +48,11 @@ namespace nil {
             namespace snark {
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
                 using is_basic_mode = typename std::bool_constant<
-                    std::is_same<r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Basic>, Generator>::value &&
-                    std::is_same<r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Basic>, Prover>::value &&
-                    (std::is_same<r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType, ProvingMode::Basic>,
+                    std::is_same<r1cs_gg_ppzksnark_generator<CurveType, proving_mode::basic>, Generator>::value &&
+                    std::is_same<r1cs_gg_ppzksnark_prover<CurveType, proving_mode::basic>, Prover>::value &&
+                    (std::is_same<r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType, proving_mode::basic>,
                                   Verifier>::value ||
-                     std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Basic>,
+                     std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, proving_mode::basic>,
                                   Verifier>::value
                      // || std::is_same<r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>,
                      //               Verifier>::value
@@ -60,18 +60,19 @@ namespace nil {
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
                 using is_aggregate_mode = typename std::bool_constant<
-                    std::is_same<r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::Aggregate>, Generator>::value &&
-                    std::is_same<r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Aggregate>, Prover>::value &&
-                    std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Aggregate>,
-                                 Verifier>::value>;
+                    std::is_same<r1cs_gg_ppzksnark_generator<CurveType, proving_mode::aggregate>, Generator>::value &&
+                    std::is_same<r1cs_gg_ppzksnark_prover<CurveType, proving_mode::aggregate>, Prover>::value &&
+                    std::is_same<
+                        r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, proving_mode::aggregate>,
+                        Verifier>::value>;
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
                 using is_encrypted_input_mode = typename std::bool_constant<
-                    std::is_same<r1cs_gg_ppzksnark_generator<CurveType, ProvingMode::EncryptedInput>,
+                    std::is_same<r1cs_gg_ppzksnark_generator<CurveType, proving_mode::encrypted_input>,
                                  Generator>::value &&
-                    std::is_same<r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::EncryptedInput>, Prover>::value &&
+                    std::is_same<r1cs_gg_ppzksnark_prover<CurveType, proving_mode::encrypted_input>, Prover>::value &&
                     std::is_same<
-                        r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::EncryptedInput>,
+                        r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, proving_mode::encrypted_input>,
                         Verifier>::value>;
 
                 /*!
@@ -105,7 +106,7 @@ namespace nil {
                 template<typename CurveType, typename Generator = r1cs_gg_ppzksnark_generator<CurveType>,
                          typename Prover = r1cs_gg_ppzksnark_prover<CurveType>,
                          typename Verifier = r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>,
-                         ProvingMode Mode = ProvingMode::Basic, typename = void>
+                         proving_mode Mode = proving_mode::basic, typename = void>
                 class r1cs_gg_ppzksnark;
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
@@ -151,8 +152,8 @@ namespace nil {
                     CurveType, Generator, Prover, Verifier, proving_mode::aggregate,
                     typename std::enable_if<is_aggregate_mode<CurveType, Generator, Prover, Verifier>::value>::type> {
 
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> basic_policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::aggregate> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> basic_policy_type;
                     typedef typename basic_policy_type::proof_type basic_proof_type;
 
                 public:
@@ -236,12 +237,13 @@ namespace nil {
                 };
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
-                class r1cs_gg_ppzksnark<CurveType, Generator, Prover, Verifier, ProvingMode::EncryptedInput,
+                class r1cs_gg_ppzksnark<CurveType, Generator, Prover, Verifier, proving_mode::encrypted_input,
                                         typename std::enable_if<is_encrypted_input_mode<CurveType, Generator, Prover,
                                                                                         Verifier>::value>::type> {
 
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::EncryptedInput> policy_type;
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> basic_policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::encrypted_input>
+                        policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> basic_policy_type;
                     typedef typename basic_policy_type::proof_type basic_proof_type;
 
                 public:

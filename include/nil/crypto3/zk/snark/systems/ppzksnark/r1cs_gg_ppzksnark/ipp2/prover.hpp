@@ -168,7 +168,8 @@ namespace nil {
                         std::is_same<
                             typename GroupType::curve_type::scalar_field_type::value_type,
                             typename std::iterator_traits<typename InputScalarRange::iterator>::value_type>::value,
-                    typename kzg_ipp2<CurveType>::template opening_type<GroupType>>::type
+                    typename commitments::kzg_ipp2<typename GroupType::curve_type>::template opening_type<GroupType>>::
+                    type
                     prove_commitment_key_kzg_opening(
                         InputGroupIterator srs_powers_alpha_first, InputGroupIterator srs_powers_alpha_last,
                         InputGroupIterator srs_powers_beta_first, InputGroupIterator srs_powers_beta_last,
@@ -182,36 +183,37 @@ namespace nil {
                     BOOST_ASSERT(poly.size() == std::distance(srs_powers_beta_first, srs_powers_beta_last));
 
                     // f_v(X) - f_v(z) / (X - z)
-                    std::vector<typename GroupType::curve_type::scalar_field_type::value_type> f_vX_sub_f_vZ;
-                    math::polynomial::subtraction(f_vX_sub_f_vZ,
-                                                  poly,
-                                                  {{
-                                                      eval_poly,
-                                                  }});
-                    std::vector<typename GroupType::curve_type::scalar_field_type::value_type> quotient_polynomial,
+                    math::polynomial<typename GroupType::curve_type::scalar_field_type::value_type> f_vX_sub_f_vZ;
+                    math::subtraction(f_vX_sub_f_vZ,
+                                      poly,
+                                      {{
+                                          eval_poly,
+                                      }});
+                    math::polynomial<typename GroupType::curve_type::scalar_field_type::value_type> quotient_polynomial,
                         remainder_polynomial;
-                    math::polynomial::division<typename GroupType::curve_type::scalar_field_type>(
-                        quotient_polynomial, remainder_polynomial, f_vX_sub_f_vZ,
-                        {{
-                            neg_kzg_challenge,
-                            GroupType::curve_type::scalar_field_type::value_type::one(),
-                        }});
+                    math::division(quotient_polynomial, remainder_polynomial, f_vX_sub_f_vZ,
+                                   {{
+                                       neg_kzg_challenge,
+                                       GroupType::curve_type::scalar_field_type::value_type::one(),
+                                   }});
 
                     if (quotient_polynomial.size() < poly.size()) {
                         quotient_polynomial.resize(poly.size(),
                                                    GroupType::curve_type::scalar_field_type::value_type::zero());
                     }
-                    BOOST_ASSERT(q.size() == poly.size());
+                    BOOST_ASSERT(quotient_polynomial.size() == poly.size());
 
                     // we do one proof over h^a and one proof over h^b (or g^a and g^b depending
                     // on the curve we are on). that's the extra cost of the commitment scheme
                     // used which is compatible with Groth16 CRS insteaf of the original paper
                     // of Bunz'19
-                    return typename kzg_ipp2<CurveType>::template opening_type<GroupType> {
-                        algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
-                            srs_powers_alpha_first, srs_powers_alpha_last, q.begin(), q.end(), 1),
-                        algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
-                            srs_powers_beta_first, srs_powers_beta_last, q.begin(), q.end(), 1)};
+                    return typename commitments::kzg_ipp2<typename GroupType::curve_type>::template opening_type<
+                        GroupType> {algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
+                                        srs_powers_alpha_first, srs_powers_alpha_last, quotient_polynomial.begin(),
+                                        quotient_polynomial.end(), 1),
+                                    algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
+                                        srs_powers_beta_first, srs_powers_beta_last, quotient_polynomial.begin(),
+                                        quotient_polynomial.end(), 1)};
                 }
 
                 template<typename CurveType, typename InputG2Iterator, typename InputScalarIterator>
@@ -220,7 +222,8 @@ namespace nil {
                                  typename std::iterator_traits<InputG2Iterator>::value_type>::value &&
                         std::is_same<typename CurveType::scalar_field_type::value_type,
                                      typename std::iterator_traits<InputScalarIterator>::value_type>::value,
-                    typename kzg_ipp2<CurveType>::template opening_type<typename CurveType::template g2_type<>>>::type
+                    typename commitments::kzg_ipp2<CurveType>::template opening_type<
+                        typename CurveType::template g2_type<>>>::type
                     prove_commitment_v(InputG2Iterator srs_powers_alpha_first, InputG2Iterator srs_powers_alpha_last,
                                        InputG2Iterator srs_powers_beta_first, InputG2Iterator srs_powers_beta_last,
                                        InputScalarIterator transcript_first, InputScalarIterator transcript_last,
@@ -228,8 +231,8 @@ namespace nil {
                     math::polynomial<typename CurveType::scalar_field_type::value_type> vkey_poly(
                         polynomial_coefficients_from_transcript<typename CurveType::scalar_field_type>(
                             transcript_first, transcript_last, CurveType::scalar_field_type::value_type::one()));
-                    math::polynomial::condense(vkey_poly);
-                    BOOST_ASSERT(!math::polynomial::is_zero(vkey_poly));
+                    math::condense(vkey_poly);
+                    BOOST_ASSERT(!math::is_zero(vkey_poly));
 
                     typename CurveType::scalar_field_type::value_type vkey_poly_z =
                         polynomial_evaluation_product_form_from_transcript<typename CurveType::scalar_field_type>(
@@ -247,7 +250,8 @@ namespace nil {
                                  typename std::iterator_traits<InputG1Iterator>::value_type>::value &&
                         std::is_same<typename CurveType::scalar_field_type::value_type,
                                      typename std::iterator_traits<InputScalarIterator>::value_type>::value,
-                    typename kzg_ipp2<CurveType>::template opening_type<typename CurveType::template g1_type<>>>::type
+                    typename commitments::kzg_ipp2<CurveType>::template opening_type<
+                        typename CurveType::template g1_type<>>>::type
                     prove_commitment_w(InputG1Iterator srs_powers_alpha_first, InputG1Iterator srs_powers_alpha_last,
                                        InputG1Iterator srs_powers_beta_first, InputG1Iterator srs_powers_beta_last,
                                        InputScalarIterator transcript_first, InputScalarIterator transcript_last,
@@ -296,8 +300,9 @@ namespace nil {
                                std::vector<typename CurveType::scalar_field_type::value_type>>>::type
                     gipa_tipp_mipp(transcript<CurveType, Hash> &tr, InputG1Iterator1 a_first, InputG1Iterator1 a_last,
                                    InputG2Iterator b_first, InputG2Iterator b_last, InputG1Iterator2 c_first,
-                                   InputG1Iterator2 c_last, const r1cs_gg_ppzksnark_ipp2_vkey<CurveType> &vkey_input,
-                                   const r1cs_gg_ppzksnark_ipp2_wkey<CurveType> &wkey_input,
+                                   InputG1Iterator2 c_last,
+                                   const typename commitments::kzg_ipp2<CurveType>::vkey_type &vkey_input,
+                                   const typename commitments::kzg_ipp2<CurveType>::wkey_type &wkey_input,
                                    InputScalarIterator r_first, InputScalarIterator r_last) {
                     std::size_t input_len = std::distance(a_first, a_last);
                     BOOST_ASSERT(input_len >= 2);
@@ -314,15 +319,15 @@ namespace nil {
                     std::vector<typename CurveType::scalar_field_type::value_type> m_r {r_first, r_last};
 
                     // the values of the commitment keys rescaled at each step of the loop
-                    r1cs_gg_ppzksnark_ipp2_vkey<CurveType> vkey = vkey_input;
-                    r1cs_gg_ppzksnark_ipp2_wkey<CurveType> wkey = wkey_input;
+                    typename commitments::kzg_ipp2<CurveType>::vkey_type vkey = vkey_input;
+                    typename commitments::kzg_ipp2<CurveType>::wkey_type wkey = wkey_input;
 
                     // storing the values for including in the proof
-                    std::vector<std::pair<typename kzg_commitment<CurveType>::output_type,
-                                          typename kzg_commitment<CurveType>::output_type>>
+                    std::vector<std::pair<typename commitments::kzg_ipp2<CurveType>::output_type,
+                                          typename commitments::kzg_ipp2<CurveType>::output_type>>
                         comms_ab;
-                    std::vector<std::pair<typename kzg_commitment<CurveType>::output_type,
-                                          typename kzg_commitment<CurveType>::output_type>>
+                    std::vector<std::pair<typename commitments::kzg_ipp2<CurveType>::output_type,
+                                          typename commitments::kzg_ipp2<CurveType>::output_type>>
                         comms_c;
                     std::vector<
                         std::pair<typename CurveType::gt_type::value_type, typename CurveType::gt_type::value_type>>
@@ -347,10 +352,12 @@ namespace nil {
                         // TODO: parallel
                         // See section 3.3 for paper version with equivalent names
                         // TIPP part
-                        typename kzg_commitment<CurveType>::output_type tab_l = kzg_commitment<CurveType>::pair(
-                                vk_left, wk_right, m_a.begin() + split, m_a.end(), m_b.begin(), m_b.begin() + split);
-                        typename kzg_commitment<CurveType>::output_type tab_r = kzg_commitment<CurveType>::pair(
-                                vk_right, wk_left, m_a.begin(), m_a.begin() + split, m_b.begin() + split, m_b.end());
+                        typename commitments::kzg_ipp2<CurveType>::output_type tab_l =
+                            commitments::kzg_ipp2<CurveType>::pair(vk_left, wk_right, m_a.begin() + split, m_a.end(),
+                                                                   m_b.begin(), m_b.begin() + split);
+                        typename commitments::kzg_ipp2<CurveType>::output_type tab_r =
+                            commitments::kzg_ipp2<CurveType>::pair(vk_right, wk_left, m_a.begin(), m_a.begin() + split,
+                                                                   m_b.begin() + split, m_b.end());
 
                         // \prod e(A_right,B_left)
                         typename CurveType::gt_type::value_type zab_l = CurveType::gt_type::value_type::one();
@@ -382,13 +389,11 @@ namespace nil {
                             algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
                                 m_c.begin(), m_c.begin() + split, m_r.begin() + split, m_r.end(), 1);
                         // u_l = c[n':] * v[:n']
-                        typename kzg_commitment<CurveType>::output_type tuc_l =
-                            kzg_commitment<CurveType>::single(vk_left, m_c.begin() + split,
-                                                                                 m_c.end());
+                        typename commitments::kzg_ipp2<CurveType>::output_type tuc_l =
+                            commitments::kzg_ipp2<CurveType>::single(vk_left, m_c.begin() + split, m_c.end());
                         // u_r = c[:n'] * v[n':]
-                        typename kzg_commitment<CurveType>::output_type tuc_r =
-                            kzg_commitment<CurveType>::single(vk_right, m_c.begin(),
-                                                                                 m_c.begin() + split);
+                        typename commitments::kzg_ipp2<CurveType>::output_type tuc_r =
+                            commitments::kzg_ipp2<CurveType>::single(vk_right, m_c.begin(), m_c.begin() + split);
 
                         // Fiat-Shamir challenge
                         // combine both TIPP and MIPP transcript
@@ -465,7 +470,8 @@ namespace nil {
                     prove_tipp_mipp(const r1cs_gg_ppzksnark_aggregate_proving_srs<CurveType> &srs,
                                     transcript<CurveType, Hash> &tr, InputG1Iterator1 a_first, InputG1Iterator1 a_last,
                                     InputG2Iterator b_first, InputG2Iterator b_last, InputG1Iterator2 c_first,
-                                    InputG1Iterator2 c_last, const r1cs_gg_ppzksnark_ipp2_wkey<CurveType> &wkey,
+                                    InputG1Iterator2 c_last,
+                                    const typename commitments::kzg_ipp2<CurveType>::wkey_type &wkey,
                                     InputScalarIterator r_first, InputScalarIterator r_last) {
                     typename CurveType::scalar_field_type::value_type r_shift = *(r_first + 1);
                     // Run GIPA
@@ -535,11 +541,11 @@ namespace nil {
                     // A and B are committed together in this scheme
                     // we need to take the reference so the macro doesn't consume the value
                     // first
-                    typename kzg_commitment<CurveType>::output_type com_ab =
-                        kzg_commitment<CurveType>::pair(srs.vkey, srs.wkey, a.begin(), a.end(),
-                                                                           b.begin(), b.end());
-                    typename kzg_commitment<CurveType>::output_type com_c =
-                        kzg_commitment<CurveType>::single(srs.vkey, c.begin(), c.end());
+                    typename commitments::kzg_ipp2<CurveType>::output_type com_ab =
+                        commitments::kzg_ipp2<CurveType>::pair(srs.vkey, srs.wkey, a.begin(), a.end(), b.begin(),
+                                                               b.end());
+                    typename commitments::kzg_ipp2<CurveType>::output_type com_c =
+                        commitments::kzg_ipp2<CurveType>::single(srs.vkey, c.begin(), c.end());
 
                     // Derive a random scalar to perform a linear combination of proofs
                     constexpr std::array<std::uint8_t, 9> application_tag = {'s', 'n', 'a', 'r', 'k',
@@ -592,7 +598,7 @@ namespace nil {
                     tr.template write<typename CurveType::template g1_type<>>(agg_c);
 
                     // w^{r^{-1}}
-                    kzg_commitment_key<typename CurveType::template g1_type<>> wkey_r_inv =
+                    typename commitments::kzg_ipp2<CurveType>::wkey_type wkey_r_inv =
                         srs.wkey.scale(r_inv.begin(), r_inv.end());
 
                     // we prove tipp and mipp using the same recursive loop
@@ -601,16 +607,16 @@ namespace nil {
                                         wkey_r_inv, r_vec.begin(), r_vec.end());
 
                     // debug assert
-                    BOOST_ASSERT(com_ab == kzg_commitment<CurveType>::pair(
+                    BOOST_ASSERT(com_ab == typename commitments::kzg_ipp2<CurveType>::pair(
                                                srs.vkey, wkey_r_inv, a.begin(), a.end(), b_r.begin(), b_r.end()));
 
                     return {com_ab, com_c, ip_ab, agg_c, proof};
                 }
 
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Aggregate> {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
-                    typedef r1cs_gg_ppzksnark_prover<CurveType, ProvingMode::Basic> basic_prover;
+                class r1cs_gg_ppzksnark_prover<CurveType, proving_mode::aggregate> {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::aggregate> policy_type;
+                    typedef r1cs_gg_ppzksnark_prover<CurveType, proving_mode::basic> basic_prover;
                     typedef typename basic_prover::proof_type basic_proof_type;
 
                 public:

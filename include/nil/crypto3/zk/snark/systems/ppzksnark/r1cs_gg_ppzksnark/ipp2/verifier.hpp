@@ -214,7 +214,8 @@ namespace nil {
                     verify_kzg_v(const r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> &v_srs,
                                  const std::pair<typename CurveType::template g2_type<>::value_type,
                                                  typename CurveType::template g2_type<>::value_type> &final_vkey,
-                                 const typename kzg_ipp2<CurveType>::template opening_type<typename CurveType::template g2_type<>> &vkey_opening,
+                                 const typename commitments::kzg_ipp2<CurveType>::template opening_type<
+                                     typename CurveType::template g2_type<>> &vkey_opening,
                                  InputScalarIterator challenges_first, InputScalarIterator challenges_last,
                                  const typename CurveType::scalar_field_type::value_type &kzg_challenge,
                                  pairing_check<CurveType, DistributionType, GeneratorType> &pc) {
@@ -270,7 +271,8 @@ namespace nil {
                     verify_kzg_w(const r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> &v_srs,
                                  const std::pair<typename CurveType::template g1_type<>::value_type,
                                                  typename CurveType::template g1_type<>::value_type> &final_wkey,
-                                 const typename kzg_ipp2<CurveType>::template opening_type<typename CurveType::template g1_type<>> &wkey_opening,
+                                 const typename commitments::kzg_ipp2<CurveType>::template opening_type<
+                                     typename CurveType::template g1_type<>> &wkey_opening,
                                  InputScalarIterator challenges_first, InputScalarIterator challenges_last,
                                  const typename CurveType::scalar_field_type::value_type &r_shift,
                                  const typename CurveType::scalar_field_type::value_type &kzg_challenge,
@@ -344,15 +346,15 @@ namespace nil {
                         boost::make_zip_iterator(
                             boost::make_tuple(proof.tmipp.gipa.comms_ab.end(), proof.tmipp.gipa.z_ab.end(),
                                               proof.tmipp.gipa.comms_c.end(), proof.tmipp.gipa.z_c.end())),
-                        [&](const boost::tuple<const std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
-                                                               r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>> &,
-                                               const std::pair<typename CurveType::gt_type::value_type,
-                                                               typename CurveType::gt_type::value_type> &,
-                                               const std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
-                                                               r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>> &,
-                                               const std::pair<typename CurveType::template g1_type<>::value_type,
-                                                               typename CurveType::template g1_type<>::value_type> &>
-                                &t) {
+                        [&](const boost::tuple<
+                            const std::pair<typename commitments::kzg_ipp2<CurveType>::output_type,
+                                            typename commitments::kzg_ipp2<CurveType>::output_type> &,
+                            const std::pair<typename CurveType::gt_type::value_type,
+                                            typename CurveType::gt_type::value_type> &,
+                            const std::pair<typename commitments::kzg_ipp2<CurveType>::output_type,
+                                            typename commitments::kzg_ipp2<CurveType>::output_type> &,
+                            const std::pair<typename CurveType::template g1_type<>::value_type,
+                                            typename CurveType::template g1_type<>::value_type> &> &t) {
                             // .write(&zab_l)
                             tr.template write<typename CurveType::gt_type>(t.template get<1>().first);
                             // .write(&zab_r)
@@ -405,16 +407,17 @@ namespace nil {
                             boost::make_tuple(proof.tmipp.gipa.comms_ab.end(), proof.tmipp.gipa.z_ab.end(),
                                               proof.tmipp.gipa.comms_c.end(), proof.tmipp.gipa.z_c.end(),
                                               challenges.end(), challenges_inv.end())),
-                        [&](const boost::tuple<const std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
-                                                               r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>> &,
-                                               const std::pair<typename CurveType::gt_type::value_type,
-                                                               typename CurveType::gt_type::value_type> &,
-                                               const std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
-                                                               r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>> &,
-                                               const std::pair<typename CurveType::template g1_type<>::value_type,
-                                                               typename CurveType::template g1_type<>::value_type> &,
-                                               const typename CurveType::scalar_field_type::value_type &,
-                                               const typename CurveType::scalar_field_type::value_type &> &t) {
+                        [&](const boost::tuple<
+                            const std::pair<typename commitments::kzg_ipp2<CurveType>::output_type,
+                                            typename commitments::kzg_ipp2<CurveType>::output_type> &,
+                            const std::pair<typename CurveType::gt_type::value_type,
+                                            typename CurveType::gt_type::value_type> &,
+                            const std::pair<typename commitments::kzg_ipp2<CurveType>::output_type,
+                                            typename commitments::kzg_ipp2<CurveType>::output_type> &,
+                            const std::pair<typename CurveType::template g1_type<>::value_type,
+                                            typename CurveType::template g1_type<>::value_type> &,
+                            const typename CurveType::scalar_field_type::value_type &,
+                            const typename CurveType::scalar_field_type::value_type &> &t) {
                             // Op::TAB::<E>(tab_l, c_repr),
                             res.tab = res.tab * t.template get<0>().first.first.pow(t.template get<4>().data);
                             // Op::TAB(tab_r, c_inv_repr),
@@ -663,9 +666,9 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Aggregate> {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
-                    typedef r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, ProvingMode::Basic>
+                class r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, proving_mode::aggregate> {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::aggregate> policy_type;
+                    typedef r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType, proving_mode::basic>
                         basic_verifier;
                     typedef typename basic_verifier::proof_type basic_proof_type;
 

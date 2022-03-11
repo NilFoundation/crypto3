@@ -64,18 +64,19 @@ namespace nil {
 
                         math::polynomial<typename FieldType::value_type> permutation_polynomial;
 
-                        typename CommitmentSchemeTypePermutation::precommitment_type 
-                            permutation_poly_precommitment;
+                        typename CommitmentSchemeTypePermutation::precommitment_type permutation_poly_precommitment;
                     };
 
-                    static inline prover_result_type prove_eval(
-                        typename policy_type::constraint_system_type &constraint_system,
-                        const typename policy_type::preprocessed_public_data_type preprocessed_data,
-                        const plonk_polynomial_table<FieldType, ParamsType::witness_columns,
-                            ParamsType::selector_columns, ParamsType::public_input_columns,
-                            ParamsType::constant_columns> &column_polynomials,
-                        typename CommitmentSchemeTypePermutation::params_type fri_params,
-                        transcript_type &transcript = transcript_type()) {
+                    static inline prover_result_type
+                        prove_eval(typename policy_type::constraint_system_type &constraint_system,
+                                   const typename policy_type::preprocessed_public_data_type preprocessed_data,
+                                   const plonk_polynomial_table<FieldType,
+                                                                ParamsType::witness_columns,
+                                                                ParamsType::selector_columns,
+                                                                ParamsType::public_input_columns,
+                                                                ParamsType::constant_columns> &column_polynomials,
+                                   typename CommitmentSchemeTypePermutation::params_type fri_params,
+                                   transcript_type &transcript = transcript_type()) {
 
                         const std::size_t table_rows = constraint_system.rows_amount();
 
@@ -114,16 +115,16 @@ namespace nil {
                         }
 
                         // 3. Calculate $V_P$
-                        std::vector<typename FieldType::value_type> V_P_interpolation_points(
-                            table_rows);
+                        std::vector<typename FieldType::value_type> V_P_interpolation_points(table_rows);
 
                         V_P_interpolation_points[0] = FieldType::value_type::one();
                         for (std::size_t j = 1; j < table_rows; j++) {
                             typename FieldType::value_type tmp_mul_result = FieldType::value_type::one();
                             for (std::size_t i = 0; i <= j - 1; i++) {
                                 // TODO: use one division
-                                tmp_mul_result = tmp_mul_result * 
-                                    (id_binding.evaluate(domain->get_domain_element(i)) / sigma_binding.evaluate(domain->get_domain_element(i)));
+                                tmp_mul_result =
+                                    tmp_mul_result * (id_binding.evaluate(domain->get_domain_element(i)) /
+                                                      sigma_binding.evaluate(domain->get_domain_element(i)));
                             }
 
                             V_P_interpolation_points[j] = tmp_mul_result;
@@ -137,7 +138,7 @@ namespace nil {
                         // 4. Compute and add commitment to $V_P$ to $\text{transcript}$.
                         typename CommitmentSchemeTypePermutation::precommitment_type V_P_tree =
                             CommitmentSchemeTypePermutation::precommit(V_P, fri_params.D[0]);
-                        typename CommitmentSchemeTypePermutation::commitment_type V_P_commitment = 
+                        typename CommitmentSchemeTypePermutation::commitment_type V_P_commitment =
                             CommitmentSchemeTypePermutation::commit(V_P_tree);
                         transcript(V_P_commitment);
 
@@ -156,40 +157,37 @@ namespace nil {
                         math::polynomial<typename FieldType::value_type> V_P_shifted =
                             math::polynomial_shift<FieldType>(V_P, domain->get_domain_element(1));
 
-
                         F[0] = preprocessed_data.lagrange_0 * (one_polynomial - V_P);
-                        F[1] = //(one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
-                               (V_P_shifted * h - V_P * g);
+                        F[1] =    //(one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
+                            (V_P_shifted * h - V_P * g);
                         F[2] = preprocessed_data.q_last * (V_P * V_P - V_P);
 
                         for (std::size_t i = 0; i < table_rows; i++) {
                             typename FieldType::value_type omega = domain->get_domain_element(i);
                             for (std::size_t j = 0; j < 3; j++) {
                                 if (F[j].evaluate(omega) != FieldType::value_type::zero()) {
-                                    std::cout<<"Fail for i = "<<i<<", j = "<<j<<std::endl;
-                                    
+                                    std::cout << "Fail for i = " << i << ", j = " << j << std::endl;
                                 }
                             }
                         }
-
 
                         prover_result_type res = {F, V_P, V_P_tree};
 
                         return res;
                     }
 
-                    static inline std::array<typename FieldType::value_type, argument_size> verify_eval(
-                        const typename policy_type::preprocessed_public_data_type preprocessed_data,
-                        // y
-                        const typename FieldType::value_type &challenge,
-                        // f(y):
-                        const std::vector<typename FieldType::value_type> &column_polynomials_values,
-                        // V_P(y):
-                        const typename FieldType::value_type &perm_polynomial_value,
-                        // V_P(omega * y):
-                        const typename FieldType::value_type &perm_polynomial_shifted_value,
-                        const typename CommitmentSchemeTypePermutation::commitment_type &V_P_commitment,
-                        transcript_type &transcript = transcript_type()) {
+                    static inline std::array<typename FieldType::value_type, argument_size>
+                        verify_eval(const typename policy_type::preprocessed_public_data_type preprocessed_data,
+                                    // y
+                                    const typename FieldType::value_type &challenge,
+                                    // f(y):
+                                    const std::vector<typename FieldType::value_type> &column_polynomials_values,
+                                    // V_P(y):
+                                    const typename FieldType::value_type &perm_polynomial_value,
+                                    // V_P(omega * y):
+                                    const typename FieldType::value_type &perm_polynomial_shifted_value,
+                                    const typename CommitmentSchemeTypePermutation::commitment_type &V_P_commitment,
+                                    transcript_type &transcript = transcript_type()) {
 
                         const std::vector<math::polynomial<typename FieldType::value_type>> &S_sigma =
                             preprocessed_data.permutation_polynomials;

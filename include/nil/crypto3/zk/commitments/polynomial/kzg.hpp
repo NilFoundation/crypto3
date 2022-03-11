@@ -63,13 +63,118 @@
 #include <boost/accumulators/accumulators.hpp>
 
 #include <nil/crypto3/algebra/type_traits.hpp>
-
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
+
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace commitments {
+                template<typename GroupType>
+                struct kzg_commitment_key {
+                    typedef GroupType group_type;
+                    typedef typename group_type::curve_type curve_type;
+                    typedef typename curve_type::scalar_field_type field_type;
+
+                    typedef typename group_type::value_type group_value_type;
+                    typedef typename field_type::value_type field_value_type;
+
+                    /// Exponent is a
+                    std::vector<group_value_type> a;
+                    /// Exponent is b
+                    std::vector<group_value_type> b;
+
+                    /// Returns true if commitment keys have the exact required length.
+                    /// It is necessary for the IPP scheme to work that commitment
+                    /// key have the exact same number of arguments as the number of proofs to
+                    /// aggregate.
+                    inline bool has_correct_len(std::size_t n) const {
+                        return a.size() == n && n == b.size();
+                    }
+
+                    /// Returns both vectors scaled by the given vector entrywise.
+                    /// In other words, it returns $\{v_i^{s_i}\}$
+                    template<
+                        typename InputIterator,
+                        typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                        typename std::enable_if<std::is_same<field_value_type, ValueType>::value, bool>::type = true>
+                    kzg_commitment_key<group_type> scale(InputIterator s_first, InputIterator s_last) const {
+                        BOOST_ASSERT(has_correct_len(std::distance(s_first, s_last)));
+
+                        kzg_commitment_key<group_type> result;
+                        std::for_each(boost::make_zip_iterator(boost::make_tuple(s_first, a.begin(), b.begin())),
+                                      boost::make_zip_iterator(boost::make_tuple(s_last, a.end(), b.end())),
+                                      [&](const boost::tuple<const field_value_type &,
+                                                             const group_value_type &,
+                                                             const group_value_type &> &t) {
+                                          result.a.emplace_back(t.template get<1>() * t.template get<0>());
+                                          result.b.emplace_back(t.template get<2>() * t.template get<0>());
+                                      });
+
+                        return result;
+                    }
+
+                    /// Returns the left and right commitment key part. It makes copy.
+                    std::pair<kzg_commitment_key<group_type>, kzg_commitment_key<group_type>>
+                        split(std::size_t at) const {
+                        BOOST_ASSERT(a.size() == b.size());
+                        BOOST_ASSERT(at > 0 && at < a.size());
+
+                        kzg_commitment_key<group_type> result_l;
+                        kzg_commitment_key<group_type> result_r;
+
+                        auto a_it = a.begin();
+                        auto b_it = b.begin();
+                        while (a_it != a.begin() + at && b_it != b.begin() + at) {
+                            result_l.a.emplace_back(*a_it);
+                            result_l.b.emplace_back(*b_it);
+                            ++a_it;
+                            ++b_it;
+                        }
+                        while (a_it != a.end() && b_it != b.end()) {
+                            result_r.a.emplace_back(*a_it);
+                            result_r.b.emplace_back(*b_it);
+                            ++a_it;
+                            ++b_it;
+                        }
+
+                        return std::make_pair(result_l, result_r);
+                    }
+
+                    /// Takes a left and right commitment key and returns a commitment
+                    /// key $left \circ right^{scale} = (left_i*right_i^{scale} ...)$. This is
+                    /// required step during GIPA recursion.
+                    kzg_commitment_key<group_type> compress(const kzg_commitment_key<group_type> &right,
+                                                            const field_value_type &scale) const {
+                        BOOST_ASSERT(a.size() == right.a.size());
+                        BOOST_ASSERT(b.size() == right.b.size());
+                        BOOST_ASSERT(a.size() == b.size());
+
+                        kzg_commitment_key<group_type> result;
+
+                        std::for_each(
+                            boost::make_zip_iterator(
+                                boost::make_tuple(a.begin(), b.begin(), right.a.begin(), right.b.begin())),
+                            boost::make_zip_iterator(boost::make_tuple(a.end(), b.end(), right.a.end(), right.b.end())),
+                            [&](const boost::tuple<const group_value_type &,
+                                                   const group_value_type &,
+                                                   const group_value_type &,
+                                                   const group_value_type &> &t) {
+                                result.a.emplace_back(t.template get<0>() + t.template get<2>() * scale);
+                                result.b.emplace_back(t.template get<1>() + t.template get<3>() * scale);
+                            });
+
+                        return result;
+                    }
+
+                    /// Returns the first values in the vector of v1 and v2 (respectively
+                    /// w1 and w2). When commitment key is of size one, it's a proxy to get the
+                    /// final values.
+                    std::pair<group_value_type, group_value_type> first() const {
+                        return std::make_pair(a.front(), b.front());
+                    }
+                };
 
                 template<typename CurveType>
                 struct kzg_commitment {
@@ -140,7 +245,7 @@ namespace nil {
                                             params_type params) {
                     }
                 };
-            };    // namespace snark
+            };    // namespace commitments
         }         // namespace zk
     }             // namespace crypto3
 }    // namespace nil

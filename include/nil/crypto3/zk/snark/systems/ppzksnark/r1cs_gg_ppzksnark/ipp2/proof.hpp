@@ -31,7 +31,7 @@
 #include <tuple>
 #include <cmath>
 
-#include <nil/crypto3/zk/commitments/polynomial/kzg.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/kzg_ipp2.hpp>
 
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/proof.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
@@ -44,17 +44,17 @@ namespace nil {
                 /// the same time.
                 template<typename CurveType>
                 class gipa_proof {
-                    using commitment_scheme = kzg_ipp2<CurveType>;
-                public:
+                    using commitment_scheme = commitments::kzg_ipp2<CurveType>;
 
+                public:
                     typedef CurveType curve_type;
 
                     std::size_t nproofs;
-                    std::vector<std::pair<typename commitment_scheme::output_type,
-                                          typename commitment_scheme::output_type>>
+                    std::vector<
+                        std::pair<typename commitment_scheme::output_type, typename commitment_scheme::output_type>>
                         comms_ab;
-                    std::vector<std::pair<typename commitment_scheme::output_type,
-                                          typename commitment_scheme::output_type>>
+                    std::vector<
+                        std::pair<typename commitment_scheme::output_type, typename commitment_scheme::output_type>>
                         comms_c;
                     std::vector<
                         std::pair<typename curve_type::gt_type::value_type, typename curve_type::gt_type::value_type>>
@@ -85,8 +85,12 @@ namespace nil {
                     typedef CurveType curve_type;
 
                     gipa_proof<curve_type> gipa;
-                    kzg_opening<typename curve_type::template g2_type<>> vkey_opening;
-                    kzg_opening<typename curve_type::template g1_type<>> wkey_opening;
+                    typename commitments::kzg_ipp2<CurveType>::template opening_type<
+                        typename curve_type::template g2_type<>>
+                        vkey_opening;
+                    typename commitments::kzg_ipp2<CurveType>::template opening_type<
+                        typename curve_type::template g1_type<>>
+                        wkey_opening;
                 };
                 /// AggregateProof contains all elements to verify n aggregated Groth16 proofs
                 /// using inner pairing product arguments. This proof can be created by any
@@ -94,9 +98,9 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_aggregate_proof {
 
-                    using commitment_scheme = kzg_ipp2<CurveType>;
-                public:
+                    using commitment_scheme = commitments::kzg_ipp2<CurveType>;
 
+                public:
                     typedef CurveType curve_type;
                     /// commitment to A and B using the pair commitment scheme needed to verify
                     /// TIPP relation.
@@ -114,8 +118,7 @@ namespace nil {
                     bool is_valid() const {
                         // 1. Check length of the proofs
                         if (tmipp.gipa.nproofs < 2 ||
-                            tmipp.gipa.nproofs >
-                                r1cs_gg_ppzksnark_aggregate_srs<curve_type>::MAX_SRS_SIZE) {
+                            tmipp.gipa.nproofs > r1cs_gg_ppzksnark_aggregate_srs<curve_type>::MAX_SRS_SIZE) {
                             return false;
                         }
                         // 2. Check if it's a power of two

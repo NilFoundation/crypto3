@@ -94,7 +94,7 @@ namespace nil {
                     accumulation_vector<Type> accumulate_chunk(InputIterator begin, InputIterator end,
                                                                std::size_t offset) const {
                         std::pair<underlying_value_type, sparse_vector<Type>> acc_result =
-                            rest.insert(begin + offset, begin, end);
+                            rest.insert(offset, begin, end);
                         underlying_value_type new_first = first + acc_result.first;
                         return accumulation_vector<Type>(std::move(new_first), std::move(acc_result.second));
                     }

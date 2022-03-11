@@ -120,10 +120,10 @@ namespace nil {
                         std::map<key_type, key_type> _aux;
                         std::map<key_type, std::size_t> _sizes;
 
-                        cycle_representation (typename policy_type::constraint_system_type &constraint_system, 
-                            const plonk_table_description<FieldType> &table_description) {
-                            std::vector<plonk_copy_constraint<FieldType>> copy_constraints = 
-                                                                constraint_system.copy_constraints();
+                        cycle_representation(typename policy_type::constraint_system_type &constraint_system,
+                                             const plonk_table_description<FieldType> &table_description) {
+                            std::vector<plonk_copy_constraint<FieldType>> copy_constraints =
+                                constraint_system.copy_constraints();
                             for (std::size_t i = 0; i < copy_constraints.size(); i++) {
                                 std::size_t x_idx = table_description.global_index(copy_constraints[i].first);
                                 key_type x = key_type(x_idx, copy_constraints[i].first.rotation);
@@ -151,7 +151,7 @@ namespace nil {
                             if (_aux[x] != _aux[y]) {
                                 key_type &left = x;
                                 key_type &right = y;
-                                if (_sizes[_aux[left]] < _sizes[_aux[right]]){
+                                if (_sizes[_aux[left]] < _sizes[_aux[right]]) {
                                     left = y;
                                     right = x;
                                 }
@@ -254,7 +254,8 @@ namespace nil {
                         typename policy_type::constraint_system_type &constraint_system,
                         const typename policy_type::variable_assignment_type::public_table_type &public_assignment,
                         const plonk_table_description<FieldType> &table_description,
-                        std::vector<std::size_t> columns_with_copy_constraints) {
+                        std::vector<std::size_t>
+                            columns_with_copy_constraints) {
 
                         std::size_t N_rows = constraint_system.rows_amount();
                         std::size_t usable_rows = constraint_system.usable_rows_amount();
@@ -266,14 +267,13 @@ namespace nil {
                         cycle_representation permutation(constraint_system, table_description);
 
                         std::vector<math::polynomial<typename FieldType::value_type>> _permutation_polynomials =
-                            permutation_polynomials(columns_with_copy_constraints.size(),
-                                                    N_rows, basic_domain->get_domain_element(1),
-                                                    policy_type::redshift_params_type::delta, permutation,
-                                                    basic_domain);
+                            permutation_polynomials(
+                                columns_with_copy_constraints.size(), N_rows, basic_domain->get_domain_element(1),
+                                policy_type::redshift_params_type::delta, permutation, basic_domain);
 
                         std::vector<math::polynomial<typename FieldType::value_type>> _identity_polynomials =
-                            identity_polynomials(columns_with_copy_constraints.size(),
-                                                 N_rows, basic_domain->get_domain_element(1),
+                            identity_polynomials(columns_with_copy_constraints.size(), N_rows,
+                                                 basic_domain->get_domain_element(1),
                                                  policy_type::redshift_params_type::delta, basic_domain);
 
                         math::polynomial<typename FieldType::value_type> lagrange_0 =
@@ -285,16 +285,17 @@ namespace nil {
                             selector_blind(N_rows, usable_rows, basic_domain);
 
                         plonk_public_polynomial_table<FieldType, ParamsType::selector_columns,
-                            ParamsType::public_input_columns, ParamsType::constant_columns> 
+                                                      ParamsType::public_input_columns, ParamsType::constant_columns>
                             public_polynomial_table =
-                            plonk_public_polynomial_table<FieldType, ParamsType::selector_columns,
-                                ParamsType::public_input_columns, ParamsType::constant_columns>(
-                                detail::column_range_polynomials<FieldType>(public_assignment.selectors(),
-                                                                            basic_domain),
-                                detail::column_range_polynomials<FieldType>(public_assignment.public_inputs(),
-                                                                            basic_domain), 
-                                detail::column_range_polynomials<FieldType>(public_assignment.constants(),
-                                                                            basic_domain));
+                                plonk_public_polynomial_table<FieldType, ParamsType::selector_columns,
+                                                              ParamsType::public_input_columns,
+                                                              ParamsType::constant_columns>(
+                                    detail::column_range_polynomials<FieldType>(public_assignment.selectors(),
+                                                                                basic_domain),
+                                    detail::column_range_polynomials<FieldType>(public_assignment.public_inputs(),
+                                                                                basic_domain),
+                                    detail::column_range_polynomials<FieldType>(public_assignment.constants(),
+                                                                                basic_domain));
 
                         std::vector<typename FieldType::value_type> Z(N_rows + 1);
                         Z[0] = -FieldType::value_type::one();
@@ -320,10 +321,11 @@ namespace nil {
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
                             math::make_evaluation_domain<FieldType>(N_rows);
 
-                        plonk_private_polynomial_table<FieldType, ParamsType::witness_columns> private_polynomial_table =
-                            plonk_private_polynomial_table<FieldType, ParamsType::witness_columns>(
-                                detail::column_range_polynomials<FieldType>(private_assignment.witnesses(),
-                                                                            basic_domain));
+                        plonk_private_polynomial_table<FieldType, ParamsType::witness_columns>
+                            private_polynomial_table =
+                                plonk_private_polynomial_table<FieldType, ParamsType::witness_columns>(
+                                    detail::column_range_polynomials<FieldType>(private_assignment.witnesses(),
+                                                                                basic_domain));
 
                         return typename policy_type::preprocessed_private_data_type(
                             {basic_domain, private_polynomial_table});

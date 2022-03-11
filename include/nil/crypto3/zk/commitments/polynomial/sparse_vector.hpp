@@ -44,14 +44,14 @@ namespace nil {
                  * A sparse vector is a list of indices along with corresponding values.
                  * The indices are selected from the set {0,1,...,domain_size-1}.
                  */
-                template<typename Type, typename Allocator = std::allocator<Type>>
+                template<typename Type>
                 class sparse_vector {
                     using underlying_value_type = typename Type::value_type;
 
-                    template<typename T, typename A = Allocator>
-                    using container_type = std::vector<T, A>;
+                    template<typename T>
+                    using container_type = std::vector<T>;
 
-                    typedef container_type<underlying_value_type, Allocator> value_container_type;
+                    typedef container_type<underlying_value_type> value_container_type;
 
                 public:
                     using group_type = Type;
@@ -70,14 +70,12 @@ namespace nil {
                     typedef typename value_container_type::const_reverse_iterator const_reverse_iterator;
 
                     container_type<std::size_t> indices;
-                    container_type<underlying_value_type, Allocator> values;
+                    container_type<underlying_value_type> values;
                     std::size_t domain_size_;
 
                     sparse_vector() = default;
 
                     sparse_vector(const sparse_vector<Type> &other) = default;
-
-                    sparse_vector(const sparse_vector<Type> &x, const allocator_type &a) = default;
 
                     sparse_vector(sparse_vector<Type> &&other) = default;
 
@@ -224,7 +222,7 @@ namespace nil {
                      */
                     template<typename InputBaseIterator>
                     std::pair<underlying_value_type, sparse_vector<Type>>
-                        insert(const_iterator offset, InputBaseIterator first, InputBaseIterator last) const {
+                        insert(std::size_t offset, InputBaseIterator first, InputBaseIterator last) const {
 #ifdef MULTICORE
                         const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var
                                                                              // or call omp_set_num_threads()
@@ -243,8 +241,7 @@ namespace nil {
                         // guards for such cases.
 
                         for (std::size_t i = 0; i < indices.size(); ++i) {
-                            const bool matching_pos = (std::distance(values.begin(), offset) <= indices[i] &&
-                                                       indices[i] < std::distance(values.begin(), offset) + range_len);
+                            const bool matching_pos = (offset <= indices[i] && indices[i] < offset + range_len);
                             // printf("i = %zu, pos[i] = %zu, offset = %zu, w_size = %zu\n", i, indices[i], offset,
                             // w_size);
                             bool copy_over;
@@ -263,9 +260,8 @@ namespace nil {
                                         accumulated_value +
                                         algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
                                             values.begin() + first_pos, values.begin() + last_pos + 1,
-                                            first + (indices[first_pos] - std::distance(values.begin(), offset)),
-                                            last + (indices[last_pos] - std::distance(values.begin(), offset)) + 1,
-                                            chunks);
+                                            first + (indices[first_pos] - offset),
+                                            last + (indices[last_pos] - offset) + 1, chunks);
                                 }
                             } else {
                                 if (matching_pos) {
@@ -287,13 +283,12 @@ namespace nil {
 
                         if (in_block) {
                             accumulated_value =
-                                accumulated_value +
-                                algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
-                                    values.begin() + first_pos,
-                                    values.begin() + last_pos + 1,
-                                    first + (indices[first_pos] - std::distance(values.begin(), offset)),
-                                    first + (indices[last_pos] - std::distance(values.begin(), offset)) + 1,
-                                    chunks);
+                                accumulated_value + algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
+                                                        values.begin() + first_pos,
+                                                        values.begin() + last_pos + 1,
+                                                        first + (indices[first_pos] - offset),
+                                                        first + (indices[last_pos] - offset) + 1,
+                                                        chunks);
                         }
 
                         return std::make_pair(accumulated_value, resulting_vector);
