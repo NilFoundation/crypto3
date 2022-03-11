@@ -40,7 +40,7 @@
 
 #include <nil/crypto3/algebra/type_traits.hpp>
 
-#include <nil/crypto3/zk/snark/sparse_vector.hpp>
+#include <nil/crypto3/container/sparse_vector.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 #include <nil/crypto3/marshalling/zk/types/knowledge_commitment.hpp>
@@ -53,7 +53,7 @@ namespace nil {
                     typename TTypeBase,
                     typename SparseVector,
                     typename = typename std::enable_if<
-                        std::is_same<SparseVector, zk::snark::sparse_vector<typename SparseVector::group_type>>::value,
+                        std::is_same<SparseVector, container::sparse_vector<typename SparseVector::group_type>>::value,
                         bool>::type,
                     typename... TOptions>
                 using sparse_vector = nil::marshalling::types::bundle<
@@ -74,7 +74,7 @@ namespace nil {
                          typename KCSparseVector,
                          typename = typename std::enable_if<
                              std::is_same<KCSparseVector,
-                                          zk::snark::sparse_vector<typename KCSparseVector::group_type>>::value,
+                                          container::sparse_vector<typename KCSparseVector::group_type>>::value,
                              bool>::type,
                          typename... TOptions>
                 using knowledge_commitment_sparse_vector = nil::marshalling::types::bundle<

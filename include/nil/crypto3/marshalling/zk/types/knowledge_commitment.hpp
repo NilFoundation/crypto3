@@ -39,23 +39,25 @@
 
 #include <nil/crypto3/algebra/type_traits.hpp>
 
-#include <nil/crypto3/zk/snark/sparse_vector.hpp>
+#include <nil/crypto3/container/sparse_vector.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
+
+#include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                template<typename TTypeBase,
-                         typename KnowledgeCommitment,
-                         typename = typename std::enable_if<
-                             std::is_same<KnowledgeCommitment,
-                                          zk::snark::knowledge_commitment<typename KnowledgeCommitment::type1,
-                                                                          typename KnowledgeCommitment::type2>>::value,
-                             bool>::type,
-                         typename... TOptions>
+                template<
+                    typename TTypeBase,
+                    typename KnowledgeCommitment,
+                    typename = typename std::enable_if<
+                        std::is_same<KnowledgeCommitment,
+                                     zk::commitments::knowledge_commitment<typename KnowledgeCommitment::type1,
+                                                                           typename KnowledgeCommitment::type2>>::value,
+                        bool>::type,
+                    typename... TOptions>
                 using knowledge_commitment =
                     nil::marshalling::types::bundle<TTypeBase,
                                                     std::tuple<

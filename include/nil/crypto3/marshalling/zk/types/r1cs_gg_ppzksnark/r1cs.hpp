@@ -39,7 +39,7 @@
 
 #include <nil/crypto3/algebra/type_traits.hpp>
 
-#include <nil/crypto3/zk/snark/sparse_vector.hpp>
+#include <nil/crypto3/container/sparse_vector.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>

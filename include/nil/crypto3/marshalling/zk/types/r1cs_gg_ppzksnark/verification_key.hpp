@@ -41,7 +41,7 @@
 
 #include <nil/crypto3/algebra/type_traits.hpp>
 
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
+#include <nil/crypto3/container/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/verification_key.hpp>
 
 #include <nil/crypto3/pubkey/elgamal_verifiable.hpp>
@@ -75,7 +75,7 @@ namespace nil {
                         // gamma_ABC_g1
                         accumulation_vector<
                             TTypeBase,
-                            zk::snark::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>>>>;
+                            container::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>>>>;
 
                 template<typename VerificationKey, typename Endianness>
                 r1cs_gg_ppzksnark_verification_key<nil::marshalling::field_type<Endianness>, VerificationKey>
@@ -92,7 +92,7 @@ namespace nil {
 
                     using accumulation_vector_type = accumulation_vector<
                         TTypeBase,
-                        zk::snark::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>>;
+                        container::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>>;
 
                     field_gt_element_type filled_alpha_g1_beta_g2 =
                         fill_field_element<typename VerificationKey::curve_type::gt_type, Endianness>(
@@ -105,7 +105,7 @@ namespace nil {
                         curve_g2_element_type(r1cs_gg_ppzksnark_verification_key_inp.delta_g2);
 
                     accumulation_vector_type filled_gamma_ABC_g1 = fill_accumulation_vector<
-                        zk::snark::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>,
+                        container::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>,
                         Endianness>(r1cs_gg_ppzksnark_verification_key_inp.gamma_ABC_g1);
 
                     return r1cs_gg_ppzksnark_verification_key<nil::marshalling::field_type<Endianness>,
@@ -124,7 +124,7 @@ namespace nil {
                         std::move(std::get<1>(filled_r1cs_gg_ppzksnark_verification_key.value()).value()),
                         std::move(std::get<2>(filled_r1cs_gg_ppzksnark_verification_key.value()).value()),
                         std::move(
-                            make_accumulation_vector<zk::snark::accumulation_vector<
+                            make_accumulation_vector<container::accumulation_vector<
                                                          typename VerificationKey::curve_type::template g1_type<>>,
                                                      Endianness>(
                                 std::get<3>(filled_r1cs_gg_ppzksnark_verification_key.value()))));
@@ -154,7 +154,7 @@ namespace nil {
                         // gamma_ABC_g1
                         accumulation_vector<
                             TTypeBase,
-                            zk::snark::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>>>>;
+                            container::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>>>>;
 
                 template<typename VerificationKey, typename Endianness>
                 r1cs_gg_ppzksnark_extended_verification_key<nil::marshalling::field_type<Endianness>, VerificationKey>
@@ -174,7 +174,7 @@ namespace nil {
 
                     using accumulation_vector_type = accumulation_vector<
                         TTypeBase,
-                        zk::snark::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>>;
+                        container::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>>;
 
                     field_gt_element_type filled_alpha_g1_beta_g2 =
                         fill_field_element<typename VerificationKey::curve_type::gt_type, Endianness>(
@@ -190,7 +190,7 @@ namespace nil {
                         curve_g1_element_type(r1cs_gg_ppzksnark_verification_key_inp.delta_g1);
 
                     accumulation_vector_type filled_gamma_ABC_g1 = fill_accumulation_vector<
-                        zk::snark::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>,
+                        container::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>,
                         Endianness>(r1cs_gg_ppzksnark_verification_key_inp.gamma_ABC_g1);
 
                     curve_g1_element_type filled_gamma_g1 =
@@ -219,14 +219,14 @@ namespace nil {
                         std::move(std::get<2>(filled_r1cs_gg_ppzksnark_extended_verification_key.value()).value()),
                         std::move(std::get<3>(filled_r1cs_gg_ppzksnark_extended_verification_key.value()).value()),
                         std::move(
-                            make_accumulation_vector<zk::snark::accumulation_vector<
+                            make_accumulation_vector<container::accumulation_vector<
                                                          typename VerificationKey::curve_type::template g1_type<>>,
                                                      Endianness>(
                                 std::get<5>(filled_r1cs_gg_ppzksnark_extended_verification_key.value()))),
                         std::move(std::get<4>(filled_r1cs_gg_ppzksnark_extended_verification_key.value()).value()));
                 }
 
-                // TODO: move to pubkey marshaling
+                // TODO: move to pubkey marshalling
                 template<typename TTypeBase,
                          typename PublicKey,
                          typename =
@@ -264,7 +264,7 @@ namespace nil {
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
 
-                // TODO: move to pubkey marshaling
+                // TODO: move to pubkey marshalling
                 template<typename TTypeBase,
                          typename PrivateKey,
                          typename =
@@ -280,7 +280,7 @@ namespace nil {
                         // rho
                         field_element<TTypeBase, typename PrivateKey::scalar_field_type>>>;
 
-                // TODO: move to pubkey marshaling
+                // TODO: move to pubkey marshalling
                 template<typename TTypeBase,
                          typename VerificationKey,
                          typename = typename std::enable_if<
@@ -308,7 +308,7 @@ namespace nil {
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
 
-                // TODO: move to pubkey marshaling
+                // TODO: move to pubkey marshalling
                 template<typename PublicKey, typename Endianness>
                 elgamal_verifiable_public_key<nil::marshalling::field_type<Endianness>, PublicKey>
                     fill_public_key(const PublicKey &key_inp) {
@@ -334,7 +334,7 @@ namespace nil {
                             fill_curve_element_vector<typename PublicKey::g2_type, Endianness>(key_inp.t_g2)));
                 }
 
-                // TODO: move to pubkey marshaling
+                // TODO: move to pubkey marshalling
                 template<typename PublicKey, typename Endianness>
                 PublicKey make_public_key(const elgamal_verifiable_public_key<nil::marshalling::field_type<Endianness>,
                                                                               PublicKey> &filled_key_inp) {
@@ -350,7 +350,7 @@ namespace nil {
                                      std::move(std::get<2>(filled_key_inp.value()).value()));
                 }
 
-                // TODO: move to pubkey marshaling
+                // TODO: move to pubkey marshalling
                 template<typename PrivateKey, typename Endianness>
                 elgamal_verifiable_private_key<nil::marshalling::field_type<Endianness>, PrivateKey>
                     fill_private_key(const PrivateKey &key_inp) {
@@ -366,7 +366,7 @@ namespace nil {
                         std::make_tuple(filled_rho));
                 }
 
-                // TODO: move to pubkey marshaling
+                // TODO: move to pubkey marshalling
                 template<typename PrivateKey, typename Endianness>
                 PrivateKey
                     make_private_key(const elgamal_verifiable_private_key<nil::marshalling::field_type<Endianness>,
@@ -376,7 +376,7 @@ namespace nil {
                         std::get<0>(filled_key_inp.value()))));
                 }
 
-                // TODO: move to pubkey marshaling
+                // TODO: move to pubkey marshalling
                 template<typename VerificationKey, typename Endianness>
                 elgamal_verifiable_verification_key<nil::marshalling::field_type<Endianness>, VerificationKey>
                     fill_verification_key(const VerificationKey &key_inp) {
@@ -391,7 +391,7 @@ namespace nil {
                         fill_curve_element_vector<typename VerificationKey::g2_type, Endianness>(key_inp.rho_rhov_g2)));
                 }
 
-                // TODO: move to pubkey marshaling
+                // TODO: move to pubkey marshalling
                 template<typename VerificationKey, typename Endianness>
                 VerificationKey make_verification_key(
                     const elgamal_verifiable_verification_key<nil::marshalling::field_type<Endianness>, VerificationKey>

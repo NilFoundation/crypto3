@@ -43,7 +43,7 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
 
-#include <nil/crypto3/zk/snark/sparse_vector.hpp>
+#include <nil/crypto3/container/sparse_vector.hpp>
 
 #include <nil/crypto3/marshalling/zk/types/sparse_vector.hpp>
 

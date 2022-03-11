@@ -40,7 +40,7 @@
 
 #include <nil/crypto3/algebra/type_traits.hpp>
 
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
+#include <nil/crypto3/container/accumulation_vector.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 #include <nil/crypto3/marshalling/zk/types/sparse_vector.hpp>
@@ -54,14 +54,14 @@ namespace nil {
                     typename AccumulationVector,
                     typename = typename std::enable_if<
                         std::is_same<AccumulationVector,
-                                     zk::snark::accumulation_vector<typename AccumulationVector::group_type>>::value,
+                                     container::accumulation_vector<typename AccumulationVector::group_type>>::value,
                         bool>::type,
                     typename... TOptions>
                 using accumulation_vector = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
                         curve_element<TTypeBase, typename AccumulationVector::group_type>,
-                        sparse_vector<TTypeBase, zk::snark::sparse_vector<typename AccumulationVector::group_type>>>>;
+                        sparse_vector<TTypeBase, container::sparse_vector<typename AccumulationVector::group_type>>>>;
 
                 template<typename AccumulationVector, typename Endianness>
                 accumulation_vector<nil::marshalling::field_type<Endianness>, AccumulationVector>
@@ -76,7 +76,7 @@ namespace nil {
                     return accumulation_vector<nil::marshalling::field_type<Endianness>, AccumulationVector>(
                         std::make_tuple(
                             filled_first,
-                            fill_sparse_vector<zk::snark::sparse_vector<typename AccumulationVector::group_type>,
+                            fill_sparse_vector<container::sparse_vector<typename AccumulationVector::group_type>,
                                                Endianness>(accumulation_vector_inp.rest)));
                 }
 
@@ -87,7 +87,7 @@ namespace nil {
 
                     return AccumulationVector(
                         std::move(std::get<0>(filled_accumulation_vector.value()).value()),
-                        std::move(make_sparse_vector<zk::snark::sparse_vector<typename AccumulationVector::group_type>,
+                        std::move(make_sparse_vector<container::sparse_vector<typename AccumulationVector::group_type>,
                                                      Endianness>(std::get<1>(filled_accumulation_vector.value()))));
                 }
             }    // namespace types
