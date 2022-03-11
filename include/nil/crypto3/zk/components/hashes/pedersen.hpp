@@ -30,7 +30,7 @@
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/find_group_hash.hpp>
 #include <nil/crypto3/hash/pedersen.hpp>
-#include <nil/crypto3/hash/algorithm/to_curve.hpp>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
 
 #include <nil/crypto3/zk/components/algebra/curves/fixed_base_mul_zcash.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
@@ -68,7 +68,7 @@ namespace nil {
                         assert(n > 0);
                         std::vector<typename element_component::group_value_type> basepoints;
                         for (std::uint32_t i = 0; i < n; ++i) {
-                            basepoints.emplace_back(to_curve<group_hash_type>({
+                            basepoints.emplace_back(hash<group_hash_type>({
                                 i,
                             }));
                         }
@@ -430,7 +430,7 @@ namespace nil {
                                                                         typename element_component::group_type>;
 
                         hasher.generate_r1cs_witness();
-                        random_point.generate_r1cs_witness(r * to_curve<group_hash_type>(std::vector<std::uint8_t> {
+                        random_point.generate_r1cs_witness(r * hash<group_hash_type>(std::vector<std::uint8_t> {
                                                                    'r',
                                                                }));
                         adder.generate_r1cs_witness();

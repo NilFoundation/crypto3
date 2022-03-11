@@ -30,7 +30,7 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
 #define CRYPTO3_ZK_BLUEPRINT_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
 
-#include <nil/crypto3/merkle/proof.hpp>
+#include <nil/crypto3/container/merkle/proof.hpp>
 
 #include <nil/crypto3/zk/components/component.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
@@ -79,13 +79,13 @@ namespace nil {
                     void generate_r1cs_witness(const merkle_proof_container &proof, bool do_clear = false) {
                         // TODO: generalize for Arity > 2
                         assert(Arity == 2);
-                        assert(proof.path.size() == tree_depth);
+                        assert(proof.path().size() == tree_depth);
 
                         this->address = 0;
                         for (std::size_t i = 0; i < tree_depth; ++i) {
                             for (std::size_t j = 0; j < Arity - 1; ++j) {
-                                auto position = proof.path[tree_depth - 1 - i][j].position;
-                                path[i][position].generate_r1cs_witness(proof.path[tree_depth - 1 - i][j].hash);
+                                auto position = proof.path()[tree_depth - 1 - i][j].position();
+                                path[i][position].generate_r1cs_witness(proof.path()[tree_depth - 1 - i][j].hash());
                                 this->address |= (position ? 0 : 1ul << (tree_depth - 1 - i));
                                 if (do_clear) {
                                     path[i][position ? 0 : 1].generate_r1cs_witness(
@@ -112,8 +112,8 @@ namespace nil {
                     }
 
                     /// For test only
-                    static auto get_root(const merkle_proof_container &proof) {
-                        return proof.root;
+                    static auto root(const merkle_proof_container &proof) {
+                        return proof.root();
                     }
                 };
             }    // namespace components

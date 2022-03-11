@@ -279,17 +279,17 @@ void test_jubjub_pedersen_merkle_tree_container_check_validate_component() {
     /// Very important step, hidden error could appear without it. merkle_validate_component use
     /// bit_vector_copy_component to copy computed root into root_digest, so without this step internal check of the
     /// computed step will always be positive
-    root_digest.generate_r1cs_witness(merkle_proof_component::get_root(proof));
+    root_digest.generate_r1cs_witness(merkle_proof_component::root(proof));
     BOOST_REQUIRE(bp.is_satisfied());
 
-    auto root_wrong = merkle_proof_component::get_root(proof);
+    auto root_wrong = merkle_proof_component::root(proof);
     root_wrong[0] = !root_wrong[0];
     // false negative test with wrong root
     root_digest.generate_r1cs_witness(root_wrong);
     BOOST_REQUIRE(!bp.is_satisfied());
 
     // reset blueprint in the correct state
-    root_digest.generate_r1cs_witness(merkle_proof_component::get_root(proof));
+    root_digest.generate_r1cs_witness(merkle_proof_component::root(proof));
     BOOST_REQUIRE(bp.is_satisfied());
     // false negative test with wrong leaf
     auto leaf_digest_wrong = leafs_v[leaf_idx];

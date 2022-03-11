@@ -33,7 +33,8 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_CHECK_READ_COMPONENT_HPP
 #define CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_CHECK_READ_COMPONENT_HPP
 
-#include <nil/crypto3/zk/snark/merkle_tree.hpp>
+#include <nil/crypto3/container/merkle/tree.hpp>
+
 #include <nil/crypto3/zk/components/component.hpp>
 #include <nil/crypto3/zk/components/hashes/digest_selector_component.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
