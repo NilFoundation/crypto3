@@ -28,8 +28,8 @@
 
 #include <tuple>
 
-#include <nil/crypto3/hash/algorithm/to_curve.hpp>
-#include <nil/crypto3/hash/to_curve_state.hpp>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+#include <nil/crypto3/hash/hash_state.hpp>
 #include <nil/crypto3/hash/find_group_hash.hpp>
 
 #include <nil/crypto3/hash/detail/raw_stream_processor.hpp>
@@ -61,8 +61,27 @@ namespace nil {
                 using curve_type = typename group_type::curve_type;
                 using group_value_type = typename group_type::value_type;
 
+                static constexpr std::size_t digest_bits = group_type::field_type::value_bits;
                 using digest_type = group_value_type;
                 using result_type = digest_type;
+
+                struct construction {
+                    struct params_type {
+                        typedef nil::marshalling::option::little_endian digest_endian;
+                    };
+                    typedef void type;
+                };
+
+                template<typename StateAccumulator, std::size_t ValueBits>
+                struct stream_processor {
+                    struct params_type {
+                        typedef typename construction::params_type::digest_endian digest_endian;
+
+                        constexpr static const std::size_t value_bits = ValueBits;
+                    };
+
+                    typedef raw_stream_processor<construction, StateAccumulator, params_type> type;
+                };
 
                 // TODO: sync definition of the chunk_bits with circuit
                 static constexpr std::size_t chunk_bits = 3;
@@ -76,7 +95,7 @@ namespace nil {
                     typename curve_type::scalar_field_type::integral_type pow_two = 1;
                     typename curve_type::scalar_field_type::value_type encoded_segment =
                         curve_type::scalar_field_type::value_type::zero();
-                    group_value_type current_base_point = to_curve<base_point_generator>({
+                    group_value_type current_base_point = hash<base_point_generator>({
                         static_cast<std::uint32_t>(0),
                     });
 
@@ -103,7 +122,7 @@ namespace nil {
                     inline void update_new_segment() {
                         assert(bits_supplied > 0);
                         assert(is_time_to_go_to_new_segment());
-                        current_base_point = to_curve<base_point_generator>({
+                        current_base_point = hash<base_point_generator>({
                             static_cast<std::uint32_t>(supplied_chunks() / chunks_per_base_point),
                         });
                         pow_two = 1;
@@ -216,27 +235,27 @@ namespace nil {
                     typedef raw_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
-                using internal_accumulator_type = hashing_to_curve_accumulator_set<base_hash_type>;
+                using internal_accumulator_type = nil::crypto3::accumulator_set<base_hash_type>;
 
                 static inline void init_accumulator(internal_accumulator_type &acc) {
                 }
 
                 template<typename InputRange>
                 static inline void update(internal_accumulator_type &acc, const InputRange &range) {
-                    to_curve<base_hash_type>(range, acc);
+                    hash<base_hash_type>(range, acc);
                 }
 
                 template<typename InputIterator>
                 static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
-                    to_curve<base_hash_type>(first, last, acc);
+                    hash<base_hash_type>(first, last, acc);
                 }
 
                 static inline result_type process(internal_accumulator_type &acc) {
-                    auto result_point = nil::crypto3::hashes::accumulators::extract::to_curve<base_hash_type>(acc);
+                    auto result_point = nil::crypto3::accumulators::extract::hash<base_hash_type>(acc);
                     nil::marshalling::status_type status;
                     // TODO: check status
-                    result_type result = nil::marshalling::pack<typename construction::params_type::digest_endian>(
-                        result_point, status);
+                    result_type result =
+                        nil::marshalling::pack<typename construction::params_type::digest_endian>(result_point, status);
                     return result;
                 }
             };
