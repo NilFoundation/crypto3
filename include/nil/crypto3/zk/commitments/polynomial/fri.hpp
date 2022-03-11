@@ -67,6 +67,15 @@ namespace nil {
                     using basic_fri = detail::basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M>;
 
                 public:
+                    constexpr static const std::size_t m = basic_fri::m;
+
+                    using field_type = typename basic_fri::field_type;
+                    using merkle_tree_hash_type = typename basic_fri::merkle_tree_hash_type;
+                    using transcript_hash_type = typename basic_fri::transcript_hash_type;
+                    using proof_type = typename basic_fri::proof_type;
+                    using params_type = typename basic_fri::params_type;
+                    using transcript_type = typename basic_fri::transcript_type;
+
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
 

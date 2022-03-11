@@ -74,38 +74,26 @@ namespace nil {
                     }
                 };
 
-                template<typename FieldType, std::size_t SelectorColumns, std::size_t PublicInputColumns,
-                    std::size_t ConstantColumns, typename ColumnType>
+                template<typename FieldType, std::size_t PublicInputColumns, std::size_t ConstantColumns, 
+                    std::size_t SelectorColumns, typename ColumnType>
                 struct plonk_public_table {
 
                 protected:
 
-                    std::array<ColumnType, SelectorColumns> selector_columns;
                     std::array<ColumnType, PublicInputColumns> public_input_columns;
                     std::array<ColumnType, ConstantColumns> constant_columns;
+                    std::array<ColumnType, SelectorColumns> selector_columns;
 
                 public:
-                    plonk_public_table(std::array<ColumnType, SelectorColumns> selector_columns = {},
-                                       std::array<ColumnType, PublicInputColumns>
+                    plonk_public_table(std::array<ColumnType, PublicInputColumns>
                                            public_input_columns = {},
                                        std::array<ColumnType, ConstantColumns>
-                                           constant_columns = {}) :
-                        selector_columns(selector_columns),
+                                           constant_columns = {},
+                                        std::array<ColumnType, SelectorColumns> 
+                                            selector_columns = {}) :
                         public_input_columns(public_input_columns),
-                        constant_columns() {
-                    }
-
-                    ColumnType selector(std::size_t index) const {
-                        assert(index < SelectorColumns);
-                        return selector_columns[index];
-                    }
-
-                    std::array<ColumnType, SelectorColumns> selectors() const {
-                        return selector_columns;
-                    }
-
-                    std::size_t selectors_size() {
-                        return selector_columns.size();
+                        constant_columns(constant_columns),
+                        selector_columns(selector_columns) {
                     }
 
                     ColumnType public_input(std::size_t index) const {
@@ -134,31 +122,45 @@ namespace nil {
                         return constant_columns.size();
                     }
 
+                    ColumnType selector(std::size_t index) const {
+                        assert(index < SelectorColumns);
+                        return selector_columns[index];
+                    }
+
+                    std::array<ColumnType, SelectorColumns> selectors() const {
+                        return selector_columns;
+                    }
+
+                    std::size_t selectors_size() {
+                        return selector_columns.size();
+                    }
+
                     ColumnType operator[](std::size_t index) const {
-                        if (index < SelectorColumns)
-                            return selector_columns[index];
-                        index -= SelectorColumns;
                         if (index < PublicInputColumns)
                             return public_input_columns[index];
                         index -= PublicInputColumns;
                         if (index < ConstantColumns)
                             return constant_columns[index];
                         index -= ConstantColumns;
+                        if (index < SelectorColumns) {
+                            return selector_columns[index];
+                        }
+                        index -= SelectorColumns;
                     }
 
                     constexpr std::size_t size() const {
-                        return SelectorColumns + PublicInputColumns + ConstantColumns;
+                        return PublicInputColumns + ConstantColumns + SelectorColumns;
                     }
                 };
 
                 template<typename FieldType, std::size_t WitnessColumns, 
-                         std::size_t SelectorColumns, std::size_t PublicInputColumns,
-                         std::size_t ConstantColumns, typename ColumnType>
+                         std::size_t PublicInputColumns, std::size_t ConstantColumns, 
+                         std::size_t SelectorColumns, typename ColumnType>
                 struct plonk_table {
 
                     using private_table_type = plonk_private_table<FieldType, WitnessColumns, ColumnType>;
-                    using public_table_type = plonk_public_table<FieldType, SelectorColumns,
-                        PublicInputColumns, ConstantColumns, ColumnType>;
+                    using public_table_type = plonk_public_table<FieldType,
+                        PublicInputColumns, ConstantColumns, SelectorColumns, ColumnType>;
 
                 protected:
 
@@ -175,16 +177,16 @@ namespace nil {
                         return _private_table.witness(index);
                     }
 
-                    ColumnType selector(std::size_t index) const {
-                        return _public_table.selector(index);
-                    }
-
                     ColumnType public_input(std::size_t index) const {
                         return _public_table.public_input(index);
                     }
 
                     ColumnType constant(std::size_t index) const {
                         return _public_table.constant(index);
+                    }
+
+                    ColumnType selector(std::size_t index) const {
+                        return _public_table.selector(index);
                     }
 
                     ColumnType operator[](std::size_t index) const {
@@ -208,10 +210,10 @@ namespace nil {
                     }
 
                     plonk_table_description<FieldType> table_description() {
-                        return plonk_table_description<FieldType> {_private_table.size(), 
-                            _public_table.selectors_size(),
+                        return plonk_table_description<FieldType> {_private_table.size(),
                             _public_table.public_input_size(),
-                            _public_table.constant_size()};
+                            _public_table.constant_size(),
+                            _public_table.selectors_size()};
                     }
                 };
 
@@ -219,34 +221,34 @@ namespace nil {
                 using plonk_private_assignment_table =
                     plonk_private_table<FieldType, WitnessColumns, plonk_column<FieldType>>;
 
-                template<typename FieldType, std::size_t SelectorColumns, std::size_t PublicInputColumns,
-                    std::size_t ConstantColumns>
+                template<typename FieldType, std::size_t PublicInputColumns,
+                    std::size_t ConstantColumns, std::size_t SelectorColumns>
                 using plonk_public_assignment_table =
-                    plonk_public_table<FieldType, SelectorColumns, PublicInputColumns, ConstantColumns,
+                    plonk_public_table<FieldType, PublicInputColumns, ConstantColumns, SelectorColumns,
                     plonk_column<FieldType>>;
 
-                template<typename FieldType, std::size_t WitnessColumns, std::size_t SelectorColumns,
-                    std::size_t PublicInputColumns, std::size_t ConstantColumns>
+                template<typename FieldType, std::size_t WitnessColumns,
+                    std::size_t PublicInputColumns, std::size_t ConstantColumns, std::size_t SelectorColumns>
                 using plonk_assignment_table = plonk_table<FieldType, WitnessColumns, 
-                    SelectorColumns, PublicInputColumns, ConstantColumns,
+                    PublicInputColumns, ConstantColumns, SelectorColumns,
                     plonk_column<FieldType>>;
 
                 template<typename FieldType, std::size_t WitnessColumns>
                 using plonk_private_polynomial_table =
                     plonk_private_table<FieldType, WitnessColumns, math::polynomial<typename FieldType::value_type>>;
 
-                template<typename FieldType, std::size_t SelectorColumns, std::size_t PublicInputColumns,
-                    std::size_t ConstantColumns>
+                template<typename FieldType, std::size_t PublicInputColumns,
+                    std::size_t ConstantColumns, std::size_t SelectorColumns>
                 using plonk_public_polynomial_table =
-                    plonk_public_table<FieldType, SelectorColumns, PublicInputColumns,
-                    ConstantColumns, math::polynomial<typename FieldType::value_type>>;
+                    plonk_public_table<FieldType, PublicInputColumns, ConstantColumns, 
+                    SelectorColumns, math::polynomial<typename FieldType::value_type>>;
 
                 template<typename FieldType, std::size_t WitnessColumns,
-                    std::size_t SelectorColumns, std::size_t PublicInputColumns,
-                    std::size_t ConstantColumns>
+                    std::size_t PublicInputColumns, std::size_t ConstantColumns,
+                    std::size_t SelectorColumns>
                 using plonk_polynomial_table =
-                    plonk_table<FieldType, WitnessColumns, SelectorColumns, PublicInputColumns,
-                    ConstantColumns, math::polynomial<typename FieldType::value_type>>;
+                    plonk_table<FieldType, WitnessColumns, PublicInputColumns,
+                    ConstantColumns, SelectorColumns, math::polynomial<typename FieldType::value_type>>;
 
             }    // namespace snark
         }        // namespace zk

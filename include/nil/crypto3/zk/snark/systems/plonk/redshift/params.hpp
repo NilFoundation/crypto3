@@ -33,8 +33,11 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename FieldType, std::size_t WitnessColumns = 15, std::size_t SelectorColumns = 15,
-                         std::size_t PublicInputColumns = 15, std::size_t ConstantColumns = 15,
+                template<typename FieldType,
+                         std::size_t WitnessColumns = 15,
+                         std::size_t PublicInputColumns = 15,
+                         std::size_t ConstantColumns = 15,
+                         std::size_t SelectorColumns = 15,
                          typename MerkleTreeHashType = hashes::keccak_1600<512>,
                          typename TranscriptHashType = hashes::keccak_1600<512>, std::size_t Lambda = 40,
                          std::size_t R = 1, std::size_t M = 2>
@@ -44,9 +47,9 @@ namespace nil {
                     typedef TranscriptHashType transcript_hash_type;
 
                     constexpr static const std::size_t witness_columns = WitnessColumns;
-                    constexpr static const std::size_t selector_columns = SelectorColumns;
                     constexpr static const std::size_t public_input_columns = PublicInputColumns;
                     constexpr static const std::size_t constant_columns = ConstantColumns;
+                    constexpr static const std::size_t selector_columns = SelectorColumns;
 
                     constexpr static const typename FieldType::value_type delta =
                         algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;

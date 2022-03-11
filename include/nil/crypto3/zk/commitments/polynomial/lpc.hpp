@@ -35,6 +35,7 @@
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -68,10 +69,10 @@ namespace nil {
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
                 template<typename FieldType, typename LPCParams, std::size_t K = 1>
-                class list_polynomial_commitment : public detail::basic_fri<FieldType,
-                                                                            typename LPCParams::merkle_hash_type,
-                                                                            typename LPCParams::transcript_hash_type,
-                                                                            LPCParams::m> {
+                struct list_polynomial_commitment : public detail::basic_fri<FieldType,
+                                                                             typename LPCParams::merkle_hash_type,
+                                                                             typename LPCParams::transcript_hash_type,
+                                                                             LPCParams::m> {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
 
@@ -88,8 +89,11 @@ namespace nil {
                                                         typename LPCParams::merkle_hash_type,
                                                         typename LPCParams::transcript_hash_type,
                                                         m>;
+                    using fri_type = fri<FieldType,
+                                         typename LPCParams::merkle_hash_type,
+                                         typename LPCParams::transcript_hash_type,
+                                         m>;
 
-                public:
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
 

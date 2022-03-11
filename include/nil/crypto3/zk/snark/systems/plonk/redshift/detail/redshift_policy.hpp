@@ -51,8 +51,8 @@ namespace nil {
                         constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
                         constexpr static const std::size_t public_input_columns = 
                             RedshiftParams::public_input_columns;
-                        constexpr static const std::size_t selector_columns = RedshiftParams::selector_columns;
-                        constexpr static const std::size_t constant_columns = RedshiftParams::constant_columns;                        
+                        constexpr static const std::size_t constant_columns = RedshiftParams::constant_columns;
+                        constexpr static const std::size_t selector_columns = RedshiftParams::selector_columns;                       
 
                         /******************************** Params ********************************/
 
@@ -65,7 +65,7 @@ namespace nil {
                         typedef RedshiftParams redshift_params_type;
 
                         typedef plonk_assignment_table<FieldType, witness_columns,
-                            selector_columns, public_input_columns, constant_columns> variable_assignment_type;
+                            public_input_columns, constant_columns, selector_columns> variable_assignment_type;
 
                         typedef detail::plonk_evaluation_map<plonk_variable<FieldType>> evaluation_map;
 
@@ -89,8 +89,8 @@ namespace nil {
 
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
-                            plonk_public_polynomial_table<FieldType, selector_columns,
-                                public_input_columns, constant_columns> public_polynomial_table;
+                            plonk_public_polynomial_table<FieldType, public_input_columns, 
+                                constant_columns, selector_columns> public_polynomial_table;
 
                             // S_sigma
                             std::vector<math::polynomial<typename FieldType::value_type>> permutation_polynomials;

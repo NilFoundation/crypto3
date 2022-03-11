@@ -95,9 +95,9 @@ struct redshift_test_params {
     using transcript_hash_type = hashes::keccak_1600<512>;
 
     constexpr static const std::size_t witness_columns = 3;
-    constexpr static const std::size_t selector_columns = 2;
     constexpr static const std::size_t public_input_columns = 1;
     constexpr static const std::size_t constant_columns = 0;
+    constexpr static const std::size_t selector_columns = 2;
 
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t r = table_rows_log - 1;
@@ -111,8 +111,9 @@ typedef commitments::fri<FieldType, redshift_test_params::merkle_hash_type,
                               redshift_test_params::transcript_hash_type, m>
     fri_type;
 
-typedef redshift_params<FieldType, redshift_test_params::witness_columns, redshift_test_params::selector_columns, 
-    redshift_test_params::public_input_columns, redshift_test_params::constant_columns> circuit_2_params;
+typedef redshift_params<FieldType, redshift_test_params::witness_columns, 
+    redshift_test_params::public_input_columns, redshift_test_params::constant_columns,
+    redshift_test_params::selector_columns> circuit_2_params;
 
 BOOST_AUTO_TEST_CASE(redshift_split_polynomial_test) {
 
@@ -150,7 +151,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_polynomials_test) {
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, table_rows, usable_rows);
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, table_rows, usable_rows);
     typename policy_type::variable_assignment_type assigments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
@@ -165,8 +166,9 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_polynomials_test) {
 
     auto polynomial_table =
                             plonk_polynomial_table<FieldType, redshift_test_params::witness_columns,
-                                redshift_test_params::selector_columns, redshift_test_params::public_input_columns, 
-                                redshift_test_params::constant_columns>(
+                                redshift_test_params::public_input_columns, 
+                                redshift_test_params::constant_columns,
+                                redshift_test_params::selector_columns>(
                                 preprocessed_private_data.private_polynomial_table,
                                 preprocessed_public_data.public_polynomial_table);
 
@@ -222,7 +224,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, table_rows, usable_rows);
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, table_rows, usable_rows);
     typename policy_type::variable_assignment_type assigments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
@@ -237,8 +239,9 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
 
     auto polynomial_table =
                             plonk_polynomial_table<FieldType, redshift_test_params::witness_columns,
-                                redshift_test_params::selector_columns, redshift_test_params::public_input_columns, 
-                                redshift_test_params::constant_columns>(
+                                redshift_test_params::public_input_columns, 
+                                redshift_test_params::constant_columns,
+                                redshift_test_params::selector_columns>(
                                 preprocessed_private_data.private_polynomial_table,
                                 preprocessed_public_data.public_polynomial_table);
 
@@ -296,7 +299,7 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, table_rows, usable_rows);
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, table_rows, usable_rows);
     typename policy_type::variable_assignment_type assigments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
@@ -311,8 +314,9 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
 
     auto polynomial_table =
                             plonk_polynomial_table<FieldType, redshift_test_params::witness_columns,
-                                redshift_test_params::selector_columns, redshift_test_params::public_input_columns, 
-                                redshift_test_params::constant_columns>(
+                                redshift_test_params::public_input_columns, 
+                                redshift_test_params::constant_columns,
+                                redshift_test_params::selector_columns>(
                                 preprocessed_private_data.private_polynomial_table,
                                 preprocessed_public_data.public_polynomial_table);
 
@@ -356,7 +360,7 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, table_rows, usable_rows);
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, table_rows, usable_rows);
     typename policy_type::variable_assignment_type assigments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};

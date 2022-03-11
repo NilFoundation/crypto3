@@ -148,16 +148,12 @@ namespace nil {
                                                                   commitment_scheme_quotient_type>
                             proof;
 
-                        plonk_polynomial_table<FieldType,
-                                               ParamsType::witness_columns,
-                                               ParamsType::selector_columns,
-                                               ParamsType::public_input_columns,
-                                               ParamsType::constant_columns>
-                            polynomial_table = plonk_polynomial_table<FieldType,
-                                                                      ParamsType::witness_columns,
-                                                                      ParamsType::selector_columns,
-                                                                      ParamsType::public_input_columns,
-                                                                      ParamsType::constant_columns>(
+                        plonk_polynomial_table<FieldType, ParamsType::witness_columns,
+                            ParamsType::public_input_columns, ParamsType::constant_columns,
+                            ParamsType::selector_columns> polynomial_table =
+                            plonk_polynomial_table<FieldType, ParamsType::witness_columns,
+                                ParamsType::public_input_columns, ParamsType::constant_columns,
+                                ParamsType::selector_columns>(
                                 preprocessed_private_data.private_polynomial_table,
                                 preprocessed_public_data.public_polynomial_table);
 
