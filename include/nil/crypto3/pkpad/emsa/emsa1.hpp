@@ -103,7 +103,7 @@ namespace nil {
                             typename hash_type::digest_type digest =
                                 ::nil::crypto3::accumulators::extract::hash<hash_type>(acc);
                             // TODO: creating copy of digest range of modulus_octets size is a bottleneck:
-                            //  extend marshaling interface by function supporting initialization from container which
+                            //  extend marshalling interface by function supporting initialization from container which
                             //  length is less than modulus_octets
                             modulus_octets_container_type modulus_octets_container;
                             modulus_octets_container.fill(0);
