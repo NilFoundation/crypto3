@@ -3949,7 +3949,7 @@ BOOST_AUTO_TEST_CASE(bls381_verification) {
             0x1422e269997071400763b3e7482ffe2a53b0a5a42f745a9abad0a85df129a21996f09f831c7dc405c50a37eda3939d9a_cppui381,
             fq_value_type::one()),
     };
-    commitments::accumulation_vector<g1_type> vk_acc_ic(std::forward<G1_value_type>(vk_ic[0]),
+    container::accumulation_vector<g1_type> vk_acc_ic(std::forward<G1_value_type>(vk_ic[0]),
                                                         std::vector<G1_value_type>(vk_ic.begin() + 1, vk_ic.end()));
     r1cs_gg_ppzksnark_aggregate_verification_key<curve_type> pvk(vk_alpha_g1, vk_beta_g2, vk_gamma_g2, vk_delta_g2,
                                                                  vk_acc_ic);
@@ -5280,7 +5280,7 @@ BOOST_AUTO_TEST_CASE(bls381_verification_mimc) {
             0x0e41380a7c46a9245def32d330144cd99d8516ee38fb021555843f1e0fa2b4e3a4f9b12ad1af0f4727d23b108c72ccbc_cppui381,
             fq_value_type::one()),
     };
-    commitments::accumulation_vector<g1_type> vk_acc_ic(std::forward<G1_value_type>(vk_ic[0]),
+    container::accumulation_vector<g1_type> vk_acc_ic(std::forward<G1_value_type>(vk_ic[0]),
                                                         std::vector<G1_value_type>(vk_ic.begin() + 1, vk_ic.end()));
     r1cs_gg_ppzksnark_aggregate_verification_key<curve_type> pvk(vk_alpha_g1, vk_beta_g2, vk_gamma_g2, vk_delta_g2,
                                                                  vk_acc_ic);

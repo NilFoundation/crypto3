@@ -35,7 +35,7 @@
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/zk/commitments/polynomial/accumulation_vector.hpp>
+#include <nil/crypto3/container/accumulation_vector.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment_multiexp.hpp>
 
@@ -225,7 +225,7 @@ namespace nil {
 
                         typename g1_type::value_type gamma_g1 = gamma * g1_generator;
 
-                        commitments::accumulation_vector<g1_type> gamma_ABC_g1(std::move(gamma_ABC_g1_0),
+                        container::accumulation_vector<g1_type> gamma_ABC_g1(std::move(gamma_ABC_g1_0),
                                                                                std::move(gamma_ABC_g1_values));
 
                         return std::make_tuple(std::move(alpha_g1), std::move(beta_g1), std::move(beta_g2),

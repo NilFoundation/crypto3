@@ -89,7 +89,7 @@ namespace nil {
                     }
 
                     set_commitment get_commitment() const {
-                        return tree->get_root();
+                        return tree->root();
                     }
 
                     set_membership_proof get_membership_proof(const std::vector<bool> &value) const {

@@ -29,7 +29,7 @@
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
-#include <nil/crypto3/zk/commitments/polynomial/accumulation_vector.hpp>
+#include <nil/crypto3/container/accumulation_vector.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
@@ -51,14 +51,14 @@ namespace nil {
                     typename CurveType::template g2_type<>::value_type gamma_g2;
                     typename CurveType::template g2_type<>::value_type delta_g2;
 
-                    commitments::accumulation_vector<typename CurveType::template g1_type<>> gamma_ABC_g1;
+                    container::accumulation_vector<typename CurveType::template g1_type<>> gamma_ABC_g1;
 
                     r1cs_gg_ppzksnark_verification_key() = default;
                     r1cs_gg_ppzksnark_verification_key(
                         const typename CurveType::gt_type::value_type &alpha_g1_beta_g2,
                         const typename CurveType::template g2_type<>::value_type &gamma_g2,
                         const typename CurveType::template g2_type<>::value_type &delta_g2,
-                        const commitments::accumulation_vector<typename CurveType::template g1_type<>> &gamma_ABC_g1) :
+                        const container::accumulation_vector<typename CurveType::template g1_type<>> &gamma_ABC_g1) :
                         alpha_g1_beta_g2(alpha_g1_beta_g2),
                         gamma_g2(gamma_g2), delta_g2(delta_g2), gamma_ABC_g1(gamma_ABC_g1) {
                     }
@@ -107,7 +107,7 @@ namespace nil {
                     typename pairing_policy::g2_precomputed_type vk_gamma_g2_precomp;
                     typename pairing_policy::g2_precomputed_type vk_delta_g2_precomp;
 
-                    commitments::accumulation_vector<typename CurveType::template g1_type<>> gamma_ABC_g1;
+                    container::accumulation_vector<typename CurveType::template g1_type<>> gamma_ABC_g1;
 
                     bool operator==(const r1cs_gg_ppzksnark_processed_verification_key &other) const {
                         return (this->vk_alpha_g1_beta_g2 == other.vk_alpha_g1_beta_g2 &&
@@ -129,7 +129,7 @@ namespace nil {
                     typename g2_type::value_type gamma_g2;
                     typename g2_type::value_type delta_g2;
                     typename g1_type::value_type delta_g1;
-                    commitments::accumulation_vector<g1_type> gamma_ABC_g1;
+                    container::accumulation_vector<g1_type> gamma_ABC_g1;
                     typename g1_type::value_type gamma_g1;
 
                     r1cs_gg_ppzksnark_extended_verification_key() = default;
@@ -138,7 +138,7 @@ namespace nil {
                         const typename g2_type::value_type &gamma_g2,
                         const typename g2_type::value_type &delta_g2,
                         const typename g1_type::value_type &delta_g1,
-                        const commitments::accumulation_vector<g1_type> &gamma_ABC_g1,
+                        const container::accumulation_vector<g1_type> &gamma_ABC_g1,
                         const typename g1_type::value_type &gamma_g1) :
                         alpha_g1_beta_g2(alpha_g1_beta_g2),
                         gamma_g2(gamma_g2), delta_g2(delta_g2), delta_g1(delta_g1), gamma_ABC_g1(gamma_ABC_g1),

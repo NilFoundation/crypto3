@@ -40,7 +40,7 @@
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
-#include "nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp"
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
 
 namespace nil {
     namespace crypto3 {

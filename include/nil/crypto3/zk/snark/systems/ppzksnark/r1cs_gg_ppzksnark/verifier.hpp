@@ -52,7 +52,7 @@
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
-#include <nil/crypto3/zk/commitments/polynomial/accumulation_vector.hpp>
+#include <nil/crypto3/container/accumulation_vector.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
@@ -154,7 +154,7 @@ namespace nil {
 
                         assert(processed_verification_key.gamma_ABC_g1.domain_size() >= primary_input.size());
 
-                        const commitments::accumulation_vector<g1_type> accumulated_IC =
+                        const container::accumulation_vector<g1_type> accumulated_IC =
                             processed_verification_key.gamma_ABC_g1.accumulate_chunk(primary_input.begin(),
                                                                                      primary_input.end(), 0);
 

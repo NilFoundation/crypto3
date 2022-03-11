@@ -48,7 +48,7 @@
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/gates_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
-#include "nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp"
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>

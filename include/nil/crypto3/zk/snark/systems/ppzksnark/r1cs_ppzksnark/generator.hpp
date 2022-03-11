@@ -32,7 +32,7 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
+#include <nil/crypto3/container/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>

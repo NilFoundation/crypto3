@@ -64,8 +64,8 @@
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/sparse_vector.hpp>
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
+#include <nil/crypto3/container/sparse_vector.hpp>
+#include <nil/crypto3/container/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
 #include <nil/crypto3/zk/snark/commitments/detail/element_knowledge_commitment.hpp>

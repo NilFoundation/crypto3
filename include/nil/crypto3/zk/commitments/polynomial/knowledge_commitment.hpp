@@ -26,8 +26,9 @@
 #ifndef CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP
 #define CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP
 
+#include <nil/crypto3/container/sparse_vector.hpp>
+
 #include <nil/crypto3/zk/commitments/detail/polynomial/element_knowledge_commitment.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/sparse_vector.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -60,7 +61,7 @@ namespace nil {
                  * A knowledge commitment vector is a sparse vector of knowledge commitments.
                  */
                 template<typename Type1, typename Type2>
-                using knowledge_commitment_vector = sparse_vector<knowledge_commitment<Type1, Type2>>;
+                using knowledge_commitment_vector = container::sparse_vector<knowledge_commitment<Type1, Type2>>;
 
             }    // namespace commitments
         }        // namespace zk
