@@ -131,7 +131,7 @@ namespace nil {
 
                                 term_value = term_value * assignment;
                             }
-                            acc = acc + term_value * nlt.coeff;
+                            acc = acc + term_value;
                         }
                         return acc;
                     }
@@ -148,7 +148,7 @@ namespace nil {
                                     key = std::make_tuple(var.index, var.rotation, var.type);
                                 term_value = term_value * assignments[key];
                             }
-                            acc = acc + term_value * nlt.coeff;
+                            acc = acc + term_value;
                         }
                         return acc;
                     }
