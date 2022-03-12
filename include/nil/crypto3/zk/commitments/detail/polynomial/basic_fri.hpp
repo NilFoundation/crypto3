@@ -154,7 +154,6 @@ namespace nil {
                             bool operator!=(const proof_type &rhs) const {
                                 return !(rhs == *this);
                             }
-                            typedef round_proof_type round_proof_type;
 
                             std::vector<round_proof_type> round_proofs;    // 0..r-2
 
