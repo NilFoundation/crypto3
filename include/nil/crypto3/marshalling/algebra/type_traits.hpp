@@ -29,7 +29,6 @@
 #include <boost/type_traits/is_same.hpp>
 
 #include <nil/marshalling/type_traits.hpp>
-#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -37,6 +36,20 @@ namespace nil {
             namespace types {
                 template<typename TTypeBase, typename CurveGroupType, typename... TOptions>
                 class curve_element;
+
+                template<typename TTypeBase, typename FieldValueType, typename... TOptions>
+                class extended_field_element;
+
+                template<typename TTypeBase, typename FieldValueType, typename... TOptions>
+                class pure_field_element;
+
+                template<typename TTypeBase,
+                         typename FieldValueType,
+                         typename... TOptions>
+                using field_element =
+                    typename std::conditional<algebra::is_extended_field_element<FieldValueType>::value,
+                                              extended_field_element<TTypeBase, FieldValueType, TOptions...>,
+                                              pure_field_element<TTypeBase, FieldValueType, TOptions...>>::type;
             }    // namespace types
         }        // namespace marshalling
     }            // namespace crypto3
@@ -60,11 +73,36 @@ namespace nil {
             static const bool value = true;
         };
 
+        template<typename T>
+        struct is_field_element {
+
+            static const bool value = false;
+        };
+
+        template<typename TTypeBase, typename FieldValueType, typename... TOptions>
+        struct is_field_element<nil::crypto3::marshalling::types::extended_field_element<TTypeBase, 
+            FieldValueType, TOptions...>> {
+
+            static const bool value = true;
+        };
+
+        template<typename TTypeBase, typename FieldValueType, typename... TOptions>
+        struct is_field_element<nil::crypto3::marshalling::types::pure_field_element<TTypeBase, 
+            FieldValueType, TOptions...>> {
+
+            static const bool value = true;
+        };
+
         template<typename T, typename Enabled>
         struct is_container;
 
         template<typename T>
         struct is_container <T, typename std::enable_if<is_curve_element<T>::value>::type> {
+            static const bool value = false;
+        };
+
+        template<typename T>
+        struct is_container <T, typename std::enable_if<is_field_element<T>::value>::type> {
             static const bool value = false;
         };
 

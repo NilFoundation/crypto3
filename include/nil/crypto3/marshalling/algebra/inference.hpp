@@ -30,7 +30,6 @@
 #include <boost/type_traits/is_same.hpp>
 
 #include <nil/crypto3/algebra/type_traits.hpp>
-#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -38,6 +37,20 @@ namespace nil {
             namespace types {
                 template<typename TTypeBase, typename CurveGroupType, typename... TOptions>
                 class curve_element;
+
+                template<typename TTypeBase, typename FieldValueType, typename... TOptions>
+                class extended_field_element;
+
+                template<typename TTypeBase, typename FieldValueType, typename... TOptions>
+                class pure_field_element;
+
+                template<typename TTypeBase,
+                         typename FieldValueType,
+                         typename... TOptions>
+                using field_element =
+                    typename std::conditional<algebra::is_extended_field_element<FieldValueType>::value,
+                                              extended_field_element<TTypeBase, FieldValueType, TOptions...>,
+                                              pure_field_element<TTypeBase, FieldValueType, TOptions...>>::type;
             }    // namespace types
         }        // namespace marshalling
     }            // namespace crypto3
@@ -51,18 +64,19 @@ namespace nil {
             using default_endianness = option::big_endian;
         public:
             template <typename TEndian = default_endianness>
-            using type = typename nil::crypto3::marshalling::types::curve_element<field_type<TEndian>, typename T::group_type>;
+            using type = typename nil::crypto3::marshalling::types::curve_element<field_type<TEndian>,
+                typename T::group_type>;
             static const bool value = true;
             static const bool fixed_size = true;
         };
 
         template<typename T>
-        class is_compatible <T, typename std::enable_if<nil::crypto3::algebra::is_field<T>::value>::type> {
+        class is_compatible <T, typename std::enable_if<nil::crypto3::algebra::is_field_element<T>::value>::type> {
             using default_endianness = option::big_endian;
         public:
             template <typename TEndian = default_endianness>
             using type = nil::crypto3::marshalling::types::field_element<
-                nil::marshalling::field_type<TEndian>, 
+                nil::marshalling::field_type<TEndian>,
                 T>;
             static const bool value = true;
             static const bool fixed_size = true;

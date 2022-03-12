@@ -43,9 +43,8 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
 
+#include <nil/marshalling/algorithms/pack.hpp>
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
-#include <nil/crypto3/marshalling/algebra/inference.hpp>
-#include <nil/crypto3/marshalling/algebra/type_traits.hpp>
 
 template<typename TIter>
 void print_byteblob(TIter iter_begin, TIter iter_end) {
@@ -54,34 +53,33 @@ void print_byteblob(TIter iter_begin, TIter iter_end) {
     }
 }
 
-template<typename FieldType, typename Endianness>
-void test_field_element(typename FieldType::value_type val) {
+template<typename T, typename Endianness>
+void test_field_element(T val) {
 
     using namespace nil::crypto3::marshalling;
 
     std::size_t units_bits = 8;
     using unit_type = unsigned char;
-    using field_element_type = types::field_element<nil::marshalling::field_type<Endianness>, FieldType>;
+    using field_element_type = types::field_element<nil::marshalling::field_type<Endianness>,
+        T>;
 
-    field_element_type test_val(val);
+    static_assert(nil::crypto3::algebra::is_field_element<T>::value);
+    static_assert(nil::marshalling::is_field_element<field_element_type>::value);
+    static_assert(nil::marshalling::is_compatible<T>::value);
+    
+    using inferenced_type = typename nil::marshalling::is_compatible<T>::template type<Endianness>;
 
-    std::size_t unitblob_size = test_val.length();
+    static_assert(std::is_same<inferenced_type, field_element_type>::value);
 
-    std::vector<unit_type> cv;
-    cv.resize(unitblob_size, 0x00);
+    nil::marshalling::status_type status;
+    std::vector<unit_type> cv = nil::marshalling::pack<Endianness>(val, status);
 
-    auto write_iter = cv.begin();
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    nil::marshalling::status_type status = test_val.write(write_iter, cv.size());
+    T test_val = nil::marshalling::pack<Endianness>(cv, status);
 
-    field_element_type test_val_read;
-
-    auto read_iter = cv.begin();
-    status = test_val_read.read(read_iter, cv.size());
-
-    typename FieldType::value_type read_val = test_val_read.value();
-
-    BOOST_CHECK(val == read_val);
+    BOOST_CHECK(val == test_val);
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 }
 
 template<typename FieldType, typename Endianness>
@@ -93,7 +91,7 @@ void test_field_element() {
             std::cout << std::dec << i << " tested" << std::endl;
         }
         typename FieldType::value_type val = nil::crypto3::algebra::random_element<FieldType>();
-        test_field_element<FieldType, Endianness>(val);
+        test_field_element<typename FieldType::value_type, Endianness>(val);
     }
 }
 

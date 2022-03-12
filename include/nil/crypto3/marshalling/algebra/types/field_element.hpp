@@ -39,7 +39,7 @@
 #include <nil/marshalling/types/detail/adapt_basic_field.hpp>
 
 #include <nil/crypto3/marshalling/multiprecision/types/integral.hpp>
-
+#include <nil/crypto3/marshalling/algebra/inference.hpp>
 #include <nil/crypto3/marshalling/algebra/type_traits.hpp>
 
 namespace nil {
@@ -48,78 +48,84 @@ namespace nil {
             namespace types {
                 namespace detail {
 
-                    template<typename FieldType>
-                    typename std::enable_if<!(algebra::is_extended_field<FieldType>::value),
-                                            std::array<typename FieldType::integral_type, FieldType::arity>>::type
-                        fill_field_data(const typename FieldType::value_type &field_elem) {
+                    template<typename FieldValueType>
+                    typename std::enable_if<!(algebra::is_extended_field_element<FieldValueType>::value),
+                                            std::array<typename FieldValueType::field_type::integral_type,
+                                                FieldValueType::field_type::arity>>::type
+                        fill_field_data(const FieldValueType &field_elem) {
 
-                        std::array<typename FieldType::integral_type, FieldType::arity> result;
-                        result[0] = typename FieldType::integral_type(field_elem.data);
+                        std::array<typename FieldValueType::field_type::integral_type,
+                            FieldValueType::field_type::arity> result;
+                        result[0] = typename FieldValueType::field_type::integral_type(field_elem.data);
                         return result;
                     }
 
-                    template<typename FieldType>
-                    typename std::enable_if<algebra::is_extended_field<FieldType>::value,
-                                            std::array<typename FieldType::integral_type, FieldType::arity>>::type
-                        fill_field_data(const typename FieldType::value_type &field_elem) {
+                    template<typename FieldValueType>
+                    typename std::enable_if<algebra::is_extended_field_element<FieldValueType>::value,
+                                            std::array<typename FieldValueType::field_type::integral_type,
+                                                FieldValueType::field_type::arity>>::type
+                        fill_field_data(const FieldValueType &field_elem) {
 
-                        std::array<typename FieldType::integral_type, FieldType::arity> result;
+                        std::array<typename FieldValueType::field_type::integral_type,
+                            FieldValueType::field_type::arity> result;
 
-                        for (std::size_t i = 0; i < FieldType::arity / FieldType::underlying_field_type::arity; i++) {
-                            std::array<typename FieldType::integral_type, FieldType::underlying_field_type::arity>
+                        for (std::size_t i = 0; i < FieldValueType::field_type::arity /
+                                FieldValueType::underlying_type::field_type::arity; i++) {
+                            std::array<typename FieldValueType::field_type::integral_type,
+                                FieldValueType::underlying_type::field_type::arity>
                                 intermediate_res =
-                                    fill_field_data<typename FieldType::underlying_field_type>(field_elem.data[i]);
+                                    fill_field_data(field_elem.data[i]);
                             std::copy(intermediate_res.begin(),
                                       intermediate_res.end(),
-                                      result.begin() + i * FieldType::underlying_field_type::arity);
+                                      result.begin() + i * FieldValueType::underlying_type::field_type::arity);
                         }
 
                         return result;
                     }
 
-                    template<typename FieldType>
-                    typename std::enable_if<algebra::is_field<FieldType>::value &&
-                                                !(algebra::is_extended_field<FieldType>::value),
-                                            typename FieldType::value_type>::type
-                        make_field_element(typename std::array<typename FieldType::integral_type,
-                                                               FieldType::arity>::iterator field_elem_data_iter) {
+                    template<typename FieldValueType>
+                    typename std::enable_if<algebra::is_field_element<FieldValueType>::value &&
+                                                !(algebra::is_extended_field_element<FieldValueType>::value),
+                                            FieldValueType>::type
+                        make_field_element(typename std::array<typename FieldValueType::field_type::integral_type,
+                                                               FieldValueType::field_type::arity>::iterator field_elem_data_iter) {
 
-                        return typename FieldType::value_type(*field_elem_data_iter);
+                        return FieldValueType(*field_elem_data_iter);
                     }
 
-                    template<typename FieldType>
-                    typename std::enable_if<algebra::is_extended_field<FieldType>::value,
-                                            typename FieldType::value_type>::type
-                        make_field_element(typename std::array<typename FieldType::integral_type,
-                                                               FieldType::arity>::iterator field_elem_data_iter) {
+                    template<typename FieldValueType>
+                    typename std::enable_if<algebra::is_extended_field_element<FieldValueType>::value,
+                                            FieldValueType>::type
+                        make_field_element(typename std::array<typename FieldValueType::field_type::integral_type,
+                                                               FieldValueType::field_type::arity>::iterator field_elem_data_iter) {
 
                         constexpr static const std::size_t cur_arity =
-                            FieldType::arity / FieldType::underlying_field_type::arity;
+                            FieldValueType::field_type::arity / FieldValueType::underlying_type::field_type::arity;
 
-                        std::array<typename FieldType::underlying_field_type::value_type, cur_arity> data;
+                        std::array<typename FieldValueType::underlying_type, cur_arity> data;
 
                         for (std::size_t i = 0; i < cur_arity; i++) {
 
-                            data[i] = make_field_element<typename FieldType::underlying_field_type>(
-                                field_elem_data_iter + i * FieldType::underlying_field_type::arity);
+                            data[i] = make_field_element<typename FieldValueType::underlying_type>(
+                                field_elem_data_iter + i * FieldValueType::underlying_type::field_type::arity);
                         }
-                        return typename FieldType::value_type(data);
+                        return FieldValueType(data);
                     }
                 }    // namespace detail
 
                 template<typename TTypeBase, 
-                         typename FieldType, 
+                         typename FieldValueType, 
                          typename... TOptions>
                 class pure_field_element
                     : private ::nil::marshalling::types::detail::adapt_basic_field_type<
-                          integral<TTypeBase, typename FieldType::integral_type>,
+                          integral<TTypeBase, typename FieldValueType::field_type::integral_type>,
                           TOptions...> {
 
-                    static_assert(algebra::is_field<FieldType>::value);
-                    static_assert(!algebra::is_extended_field<FieldType>::value);
+                    static_assert(algebra::is_field_element<FieldValueType>::value);
+                    static_assert(!algebra::is_extended_field_element<FieldValueType>::value);
 
                     using base_impl_type = ::nil::marshalling::types::detail::adapt_basic_field_type<
-                        integral<TTypeBase, typename FieldType::integral_type>,
+                        integral<TTypeBase, typename FieldValueType::field_type::integral_type>,
                         TOptions...>;
 
                 public:
@@ -141,8 +147,8 @@ namespace nil {
                     pure_field_element() = default;
 
                     /// @brief Constructor
-                    explicit pure_field_element(const typename FieldType::value_type &field_elem) 
-                    : base_impl_type(typename FieldType::integral_type(field_elem.data)){
+                    explicit pure_field_element(const FieldValueType &field_elem) 
+                    : base_impl_type(typename FieldValueType::field_type::integral_type(field_elem.data)){
                     }
 
                     /// @brief Copy constructor
@@ -155,13 +161,13 @@ namespace nil {
                     pure_field_element &operator=(const pure_field_element &) = default;
 
                     /// @brief Get access to pure_field_element value storage.
-                    typename FieldType::value_type const value() const {
-                        return typename FieldType::value_type(base_impl_type::value());
+                    FieldValueType const value() const {
+                        return FieldValueType(base_impl_type::value());
                     }
 
                     /// @brief Get access to field_element value storage.
-                    typename FieldType::value_type value() {
-                        return typename FieldType::value_type(base_impl_type::value());
+                    FieldValueType value() {
+                        return FieldValueType(base_impl_type::value());
                     }
 
                     /// @brief Get length required to serialise the current field value.
@@ -333,24 +339,26 @@ namespace nil {
                 };
 
                 template<typename TTypeBase, 
-                         typename FieldType, 
+                         typename FieldValueType, 
                          typename... TOptions>
                 class extended_field_element
                     : private ::nil::marshalling::types::detail::adapt_basic_field_type<
                             nil::marshalling::types::array_list<
                                 nil::marshalling::field_type<nil::marshalling::option::little_endian>,
-                                integral<TTypeBase, typename FieldType::integral_type>,
-                                nil::marshalling::option::fixed_size_storage<FieldType::arity>>,
+                                integral<TTypeBase, typename FieldValueType::field_type::integral_type>,
+                                nil::marshalling::option::fixed_size_storage<
+                                    FieldValueType::field_type::arity>>,
                           TOptions...> {
 
-                    static_assert(algebra::is_field<FieldType>::value);
-                    static_assert(algebra::is_extended_field<FieldType>::value);
+                    static_assert(algebra::is_field_element<FieldValueType>::value);
+                    static_assert(algebra::is_extended_field_element<FieldValueType>::value);
 
                     using base_impl_type = ::nil::marshalling::types::detail::adapt_basic_field_type<
                         typename nil::marshalling::types::array_list<
                                                   nil::marshalling::field_type<nil::marshalling::option::little_endian>,
-                                                  integral<TTypeBase, typename FieldType::integral_type>,
-                                                  nil::marshalling::option::fixed_size_storage<FieldType::arity>>,
+                                                  integral<TTypeBase, typename FieldValueType::field_type::integral_type>,
+                                                  nil::marshalling::option::fixed_size_storage<
+                                                    FieldValueType::field_type::arity>>,
                         TOptions...>;
 
                 public:
@@ -372,11 +380,11 @@ namespace nil {
                     extended_field_element() = default;
 
                     /// @brief Constructor
-                    explicit extended_field_element(const typename FieldType::value_type &field_elem) {
+                    explicit extended_field_element(const FieldValueType &field_elem) {
 
-                        std::array<typename FieldType::integral_type, FieldType::arity> val_container =
-                            detail::fill_field_data<FieldType>(field_elem);
-                        for (std::size_t i = 0; i < FieldType::arity; i++) {
+                        std::array<typename FieldValueType::field_type::integral_type, FieldValueType::field_type::arity> val_container =
+                            detail::fill_field_data(field_elem);
+                        for (std::size_t i = 0; i < FieldValueType::field_type::arity; i++) {
                             (base_impl_type::value()).emplace_back(val_container[i]);
                         }
                     }
@@ -391,27 +399,27 @@ namespace nil {
                     extended_field_element &operator=(const extended_field_element &) = default;
 
                     /// @brief Get access to field_element value storage.
-                    typename FieldType::value_type const value() const {
+                    FieldValueType const value() const {
 
-                        std::array<typename FieldType::integral_type, FieldType::arity> field_elem_data;
+                        std::array<typename FieldValueType::field_type::integral_type, FieldValueType::field_type::arity> field_elem_data;
 
-                        for (std::size_t i = 0; i < FieldType::arity; i++) {
+                        for (std::size_t i = 0; i < FieldValueType::field_type::arity; i++) {
                             field_elem_data[i] = base_impl_type::value()[i].value();
                         }
 
-                        return detail::make_field_element<FieldType>(field_elem_data.begin());
+                        return detail::make_field_element<FieldValueType>(field_elem_data.begin());
                     }
 
                     /// @brief Get access to field_element value storage.
-                    typename FieldType::value_type value() {
+                    FieldValueType value() {
 
-                        std::array<typename FieldType::integral_type, FieldType::arity> field_elem_data;
+                        std::array<typename FieldValueType::field_type::integral_type, FieldValueType::field_type::arity> field_elem_data;
 
-                        for (std::size_t i = 0; i < FieldType::arity; i++) {
+                        for (std::size_t i = 0; i < FieldValueType::field_type::arity; i++) {
                             field_elem_data[i] = base_impl_type::value()[i].value();
                         }
 
-                        return detail::make_field_element<FieldType>(field_elem_data.begin());
+                        return detail::make_field_element<FieldValueType>(field_elem_data.begin());
                     }
 
                     /// @brief Get length required to serialise the current field value.
@@ -583,13 +591,12 @@ namespace nil {
                 };
 
                 template<typename TTypeBase,
-                         typename FieldType,
-                         typename = typename std::enable_if<algebra::is_field<FieldType>::value, bool>::type,
+                         typename FieldValueType,
                          typename... TOptions>
                 using field_element =
-                    typename std::conditional<algebra::is_extended_field<FieldType>::value,
-                                              extended_field_element<TTypeBase, FieldType, TOptions...>,
-                                              pure_field_element<TTypeBase, FieldType, TOptions...>>::type;
+                    typename std::conditional<algebra::is_extended_field_element<FieldValueType>::value,
+                                              extended_field_element<TTypeBase, FieldValueType, TOptions...>,
+                                              pure_field_element<TTypeBase, FieldValueType, TOptions...>>::type;
 
                 // /// @brief Equality comparison operator.
                 // /// @param[in] field1 First field.
@@ -613,22 +620,22 @@ namespace nil {
                 //     return field1.value() != field2.value();
                 // }
 
-                // template<typename FieldType>
-                // typename std::enable_if<algebra::is_field<FieldType>::value &&
-                //                             !(algebra::is_extended_field<FieldType>::value),
+                // template<typename FieldValueType>
+                // typename std::enable_if<algebra::is_field_element<FieldValueType>::value &&
+                //                             !(algebra::is_extended_field_element<FieldValueType>::value),
                 //                         int>::type
-                //     compare_field_data(const typename FieldType::value_type &field_elem1,
-                //                        const typename FieldType::value_type &field_elem2) {
+                //     compare_field_data(const FieldValueType &field_elem1,
+                //                        const FieldValueType &field_elem2) {
                 //     return (field_elem1.data < field_elem2.data) ? -1 : ((field_elem1.data > field_elem2.data) ? 1 : 0);
                 // }
 
-                // template<typename FieldType>
-                // typename std::enable_if<algebra::is_extended_field<FieldType>::value, bool>::type
-                //     compare_field_data(const typename FieldType::value_type &field_elem1,
-                //                        const typename FieldType::value_type &field_elem2) {
-                //     for (std::size_t i = 0; i < FieldType::arity; i++) {
+                // template<typename FieldValueType>
+                // typename std::enable_if<algebra::is_extended_field_element<FieldValueType>::value, bool>::type
+                //     compare_field_data(const FieldValueType &field_elem1,
+                //                        const FieldValueType &field_elem2) {
+                //     for (std::size_t i = 0; i < FieldValueType::field_type::arity; i++) {
 
-                //         int compare_result = compare_field_data<typename FieldType::underlying_field_type>(
+                //         int compare_result = compare_field_data<typename FieldValueType::underlying_type>(
                 //             field_elem1.data[i], field_elem2.data[i]);
                 //         if (compare_result != 0) {
                 //             return compare_result;
@@ -679,17 +686,17 @@ namespace nil {
                 //     return field;
                 // }
 
-                // template<typename FieldType, typename Endianness>
+                // template<typename FieldValueType, typename Endianness>
                 // nil::marshalling::types::array_list<
                 //     nil::marshalling::field_type<Endianness>,
-                //     field_element<nil::marshalling::field_type<Endianness>, FieldType>,
+                //     field_element<nil::marshalling::field_type<Endianness>, FieldValueType>,
                 //     nil::marshalling::option::sequence_size_field_prefix<
                 //         nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>
-                //     fill_field_element_vector(const std::vector<typename FieldType::value_type> &field_elem_vector) {
+                //     fill_field_element_vector(const std::vector<FieldValueType> &field_elem_vector) {
 
                 //     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-                //     using field_element_type = field_element<TTypeBase, FieldType>;
+                //     using field_element_type = field_element<TTypeBase, FieldValueType>;
 
                 //     using field_element_vector_type = nil::marshalling::types::array_list<
                 //         TTypeBase,
@@ -701,27 +708,27 @@ namespace nil {
 
                 //     std::vector<field_element_type> &val = result.value();
                 //     for (std::size_t i = 0; i < field_elem_vector.size(); i++) {
-                //         val.push_back(fill_field_element<FieldType, Endianness>(field_elem_vector[i]));
+                //         val.push_back(fill_field_element<FieldValueType, Endianness>(field_elem_vector[i]));
                 //     }
                 //     return result;
                 // }
 
-                // template<typename FieldType, typename Endianness>
-                // std::vector<typename FieldType::value_type> make_field_element_vector(
+                // template<typename FieldValueType, typename Endianness>
+                // std::vector<FieldValueType> make_field_element_vector(
                 //     const nil::marshalling::types::array_list<
                 //         nil::marshalling::field_type<Endianness>,
-                //         field_element<nil::marshalling::field_type<Endianness>, FieldType>,
+                //         field_element<nil::marshalling::field_type<Endianness>, FieldValueType>,
                 //         nil::marshalling::option::sequence_size_field_prefix<
                 //             nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>
                 //         &field_elem_vector) {
 
-                //     std::vector<typename FieldType::value_type> result;
-                //     const std::vector<field_element<nil::marshalling::field_type<Endianness>, FieldType>> &values =
+                //     std::vector<FieldValueType> result;
+                //     const std::vector<field_element<nil::marshalling::field_type<Endianness>, FieldValueType>> &values =
                 //         field_elem_vector.value();
                 //     std::size_t size = values.size();
 
                 //     for (std::size_t i = 0; i < size; i++) {
-                //         result.push_back(make_field_element<FieldType, Endianness>(values[i]));
+                //         result.push_back(make_field_element<FieldValueType, Endianness>(values[i]));
                 //     }
                 //     return result;
                 // }
