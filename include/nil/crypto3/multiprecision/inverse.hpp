@@ -25,21 +25,23 @@ namespace nil {
 
             template<typename Backend, expression_template_option ExpressionTemplates>
             constexpr number<Backend, ExpressionTemplates>
-                inverse_extended_euclidean_algorithm(const number<Backend, ExpressionTemplates>& n,
-                                                     const number<Backend, ExpressionTemplates>& mod) {
+                inverse_extended_euclidean_algorithm(const number<Backend, ExpressionTemplates> &n,
+                                                     const number<Backend, ExpressionTemplates> &mod) {
                 number<Backend, ExpressionTemplates> result;
                 backends::eval_inverse_extended_euclidean_algorithm(result.backend(), n.backend(), mod.backend());
                 return result;
             }
 
-            template<typename Backend, typename SafeType, expression_template_option ExpressionTemplates>
-            constexpr number<modular_adaptor<Backend, SafeType>, ExpressionTemplates> inverse_extended_euclidean_algorithm(
-                const number<modular_adaptor<Backend, SafeType>, ExpressionTemplates>& modular) {
+            template<typename Backend, typename StorageType, expression_template_option ExpressionTemplates>
+            constexpr number<modular_adaptor<Backend, StorageType>, ExpressionTemplates>
+                inverse_extended_euclidean_algorithm(
+                    const number<modular_adaptor<Backend, StorageType>, ExpressionTemplates> &modular) {
                 number<Backend, ExpressionTemplates> new_base, res;
-                number<modular_adaptor<Backend, SafeType>, ExpressionTemplates> res_mod;
+                number<modular_adaptor<Backend, StorageType>, ExpressionTemplates> res_mod;
 
                 modular.backend().mod_data().adjust_regular(new_base.backend(), modular.backend().base_data());
-                backends::eval_inverse_extended_euclidean_algorithm(res.backend(), new_base.backend(), modular.backend().mod_data().get_mod().backend());
+                backends::eval_inverse_extended_euclidean_algorithm(
+                    res.backend(), new_base.backend(), modular.backend().mod_data().get_mod().backend());
                 assign_components(res_mod.backend(), res.backend(), modular.backend().mod_data().get_mod().backend());
 
                 return res_mod;
@@ -47,27 +49,26 @@ namespace nil {
 
             template<typename Backend, expression_template_option ExpressionTemplates>
             constexpr number<Backend, ExpressionTemplates>
-                monty_inverse(const number<Backend, ExpressionTemplates>& a,
-                              const number<Backend, ExpressionTemplates>& p,
-                              const number<Backend, ExpressionTemplates>& k) {
+                monty_inverse(const number<Backend, ExpressionTemplates> &a,
+                              const number<Backend, ExpressionTemplates> &p,
+                              const number<Backend, ExpressionTemplates> &k) {
                 number<Backend, ExpressionTemplates> res;
                 backends::eval_monty_inverse(res.backend(), a.backend(), p.backend(), k.backend());
                 return res;
             }
 
             template<typename Backend, expression_template_option ExpressionTemplates>
-            constexpr number<Backend, ExpressionTemplates>
-            inverse_mod(const number<Backend, ExpressionTemplates>& a,
-                          const number<Backend, ExpressionTemplates>& p) {
+            constexpr number<Backend, ExpressionTemplates> inverse_mod(const number<Backend, ExpressionTemplates> &a,
+                                                                       const number<Backend, ExpressionTemplates> &p) {
                 number<Backend, ExpressionTemplates> res;
                 backends::eval_inverse_mod(res.backend(), a.backend(), p.backend());
                 return res;
             }
 
-            template<typename Backend, typename SafeType, expression_template_option ExpressionTemplates>
-            constexpr number<modular_adaptor<Backend, SafeType>, ExpressionTemplates>
-            inverse_mod(const number<modular_adaptor<Backend, SafeType>, ExpressionTemplates>& modular) {
-                number<modular_adaptor<Backend, SafeType>, ExpressionTemplates> res;
+            template<typename Backend, typename StorageType, expression_template_option ExpressionTemplates>
+            constexpr number<modular_adaptor<Backend, StorageType>, ExpressionTemplates>
+                inverse_mod(const number<modular_adaptor<Backend, StorageType>, ExpressionTemplates> &modular) {
+                number<modular_adaptor<Backend, StorageType>, ExpressionTemplates> res;
                 backends::eval_inverse_mod(res.backend(), modular.backend());
                 return res;
             }

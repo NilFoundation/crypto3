@@ -158,8 +158,8 @@ namespace nil {
 
                 template<unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked>
                 constexpr cpp_int_backend<MinBits, MaxBits, SignType, Checked, void>
-                eval_ressol(const cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> &a,
-                            const cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> &p) {
+                    eval_ressol(const cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> &a,
+                                const cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> &p) {
                     using Backend = cpp_int_backend<MinBits, MaxBits, SignType, Checked, void>;
                     using Backend_padded = cpp_int_backend<MinBits + 1, MaxBits + 1, SignType, Checked, void>;
                     using default_ops::eval_add;
@@ -294,7 +294,7 @@ namespace nil {
 
                     return res;
                 }
-            }
+            }    // namespace backends
             /**
              * Compute the square root of x modulo a prime using the
              * Shanks-Tonnelli algorithm
@@ -305,8 +305,8 @@ namespace nil {
              *
              */
             template<typename Backend, expression_template_option ExpressionTemplates>
-            constexpr number<Backend, ExpressionTemplates> ressol(const number<Backend, ExpressionTemplates>& a,
-                                                                  const number<Backend, ExpressionTemplates>& p) {
+            constexpr number<Backend, ExpressionTemplates> ressol(const number<Backend, ExpressionTemplates> &a,
+                                                                  const number<Backend, ExpressionTemplates> &p) {
                 return number<Backend, ExpressionTemplates>(backends::eval_ressol(a.backend(), p.backend()));
             }
 
@@ -318,17 +318,19 @@ namespace nil {
              * @return y such that (y*y)%p == x, or p - 1 if no such integer
              */
 
-            template<typename Backend, typename SafeType, expression_template_option ExpressionTemplates>
-            constexpr number<modular_adaptor<Backend, SafeType>, ExpressionTemplates>
-                ressol(const number<modular_adaptor<Backend, SafeType>, ExpressionTemplates>& modular) {
+            template<typename Backend, typename StorageType, expression_template_option ExpressionTemplates>
+            constexpr number<modular_adaptor<Backend, StorageType>, ExpressionTemplates>
+                ressol(const number<modular_adaptor<Backend, StorageType>, ExpressionTemplates> &modular) {
 
-                return number<modular_adaptor<Backend, SafeType>, ExpressionTemplates>(backends::eval_ressol(modular.backend()));
+                return number<modular_adaptor<Backend, StorageType>, ExpressionTemplates>(
+                    backends::eval_ressol(modular.backend()));
             }
 
             /*
              * For tommath:
              * The implementation is split for two different cases:
-                1. if p mod 4 == 3 we apply Handbook of Applied Cryptography algorithm 3.36 and compute r directly as r = n(p+1)/4 mod p
+                1. if p mod 4 == 3 we apply Handbook of Applied Cryptography algorithm 3.36 and compute r directly as r
+             = n(p+1)/4 mod p
                 2. otherwise we use Tonelli-Shanks algorithm
              */
 

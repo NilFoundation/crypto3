@@ -169,7 +169,7 @@ BOOST_DATA_TEST_CASE(pow_test, numbers_size * (boost::unit_test::data::make(even
 }
 
 BOOST_DATA_TEST_CASE(mod_assigment, boost::unit_test::data::make(even_mod) + boost::unit_test::data::make(odd_mod), exp) {
-    typedef number<modular_adaptor<Backend>> modular_number;
+    typedef number<modular_adaptor<Backend, backends::modular_params_rt<Backend>>> modular_number;
     typedef modular_params<Backend> params_number;
     typedef number<Backend> standart_number;
 

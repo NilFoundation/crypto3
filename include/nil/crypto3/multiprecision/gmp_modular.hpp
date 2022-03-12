@@ -18,7 +18,7 @@ namespace nil {
     namespace crypto3 {
         namespace multiprecision {
             typedef modular_params<gmp_int> mpz_int_mod_params;
-            typedef number<modular_adaptor<gmp_int>> mpz_int_mod;
+            typedef number<modular_adaptor<gmp_int, backends::modular_params_rt<gmp_int>>> mpz_int_mod;
         }    // namespace multiprecision
     }        // namespace crypto3
 }    // namespace nil

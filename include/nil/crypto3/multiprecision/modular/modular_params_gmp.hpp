@@ -32,7 +32,7 @@ namespace nil {
                 constexpr explicit modular_params(const Number& p) : backends::base_params<gmp_int>(number_type(p)) {
                 }
 
-                constexpr modular_params& operator=(const modular_params<gmp_int>& v) {
+                modular_params& operator=(const modular_params<gmp_int>& v) {
                     backends::base_params<gmp_int>::m_mod = v.get_mod();
                     return *this;
                 }
