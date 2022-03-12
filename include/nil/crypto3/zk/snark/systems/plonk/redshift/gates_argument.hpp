@@ -64,7 +64,7 @@ namespace nil {
                                    const plonk_polynomial_table<FieldType, ParamsType::witness_columns,
                                    ParamsType::public_input_columns, ParamsType::constant_columns,
                                    ParamsType::selector_columns> &column_polynomials,
-                                   transcript_type &transcript = transcript_type()) {
+                                   transcript_type &transcript = transcript_type()) { //TODO: remove fri_params 
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 

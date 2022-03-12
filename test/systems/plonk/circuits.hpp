@@ -253,10 +253,11 @@ namespace nil {
                     }
 
                     // init values
+                    typename FieldType::value_type one = FieldType::value_type::one();
                     table[0][0] = algebra::random_element<FieldType>();
-                    table[0][1] = algebra::random_element<FieldType>();
-                    table[0][2] = algebra::random_element<FieldType>();
-                    table[0][3] = algebra::random_element<FieldType>();
+                    table[1][0] = algebra::random_element<FieldType>();
+                    table[2][0] = algebra::random_element<FieldType>();
+                    table[3][0] = algebra::random_element<FieldType>();
                     q_add[0] = FieldType::value_type::zero();
                     q_mul[0] = FieldType::value_type::zero();
 
@@ -266,7 +267,7 @@ namespace nil {
                         table[1][i] = table[2][i - 1];
                         table[2][i] = table[0][i] + table[1][i];
                         table[3][i] = FieldType::value_type::zero();
-                        q_add[i] = FieldType::value_type::one();
+                        q_add[i] = one;
                         q_mul[i] = FieldType::value_type::zero();
 
                         plonk_variable<FieldType> x(1, i, false, 
@@ -283,7 +284,7 @@ namespace nil {
                         table[2][i] = table[0][i] * table[1][i];
                         table[3][i] = FieldType::value_type::zero();
                         q_add[i] = FieldType::value_type::zero();
-                        q_mul[i] = FieldType::value_type::one();
+                        q_mul[i] = one;
 
                         plonk_variable<FieldType> x(1, i, false, 
                             plonk_variable<FieldType>::column_type::witness);
@@ -316,25 +317,27 @@ namespace nil {
 
                     test_circuit.init();
 
-                    plonk_variable<FieldType> w0(0, plonk_variable<FieldType>::rotation_type::current,
+                    plonk_variable<FieldType> w0(0, plonk_variable<FieldType>::rotation_type::current, true,
                                                  plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w1(0, plonk_variable<FieldType>::rotation_type::current,
+                    plonk_variable<FieldType> w1(1, plonk_variable<FieldType>::rotation_type::current, true,
                                                  plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w2(0, plonk_variable<FieldType>::rotation_type::current,
+                    plonk_variable<FieldType> w2(2, plonk_variable<FieldType>::rotation_type::current, true,
                                                  plonk_variable<FieldType>::column_type::witness);
 
                     plonk_constraint<FieldType> add_constraint;
                     add_constraint.add_term(w0);
                     add_constraint.add_term(w1);
-                    add_constraint.add_term(-w2);
+                    add_constraint.add_term(w2, -one);
 
                     std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
                     plonk_gate<FieldType> add_gate(0, add_gate_costraints);
                     test_circuit.gates.push_back(add_gate);
 
                     plonk_constraint<FieldType> mul_constraint;
-                    add_constraint.add_term(w0 * w1);
-                    add_constraint.add_term(-w2);
+                    typename plonk_constraint<FieldType>::term_type w0_term(w0);
+                    typename plonk_constraint<FieldType>::term_type w1_term(w1); 
+                    mul_constraint.add_term(w0_term * w1_term);
+                    mul_constraint.add_term(w2, -one);
 
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
                     plonk_gate<FieldType> mul_gate(1, mul_gate_costraints);
