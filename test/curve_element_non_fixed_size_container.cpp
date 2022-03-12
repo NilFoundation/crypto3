@@ -53,9 +53,11 @@ void print_byteblob(TIter iter_begin, TIter iter_end) {
     }
 }
 
-template<typename Endianness, class T, std::size_t TSize>
+template<typename Endianness, class T>
 void test_curve_element_non_fixed_size_container(std::vector<T> val_container) {
+
     using namespace nil::crypto3::marshalling;
+    
     std::size_t units_bits = 8;
     using unit_type = unsigned char;
 
@@ -69,47 +71,6 @@ void test_curve_element_non_fixed_size_container(std::vector<T> val_container) {
 
     BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), test_val.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
-
-    // using CurveGroup = typename T::group_type;
-
-    // using curve_element_type = types::curve_element<nil::marshalling::field_type<Endianness>, CurveGroup>;
-    // using curve_type = typename CurveGroup::curve_type;
-
-    // using container_type = nil::marshalling::types::array_list<
-    //     nil::marshalling::field_type<Endianness>,
-    //     curve_element_type,
-    //     nil::marshalling::option::sequence_size_field_prefix<
-    //         nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>;
-
-    // std::size_t unitblob_size =
-    //     curve_element_type::bit_length() / units_bits + ((curve_element_type::bit_length() % units_bits) ? 1 : 0);
-    // std::vector<unit_type> cv;
-    // cv.resize(unitblob_size * TSize + sizeof(std::size_t), 0x00);
-
-    // std::vector<curve_element_type> container_data;
-
-    // for (std::size_t i = 0; i < TSize; i++) {
-    //     container_data.push_back(curve_element_type(val_container[i]));
-    // }
-
-    // container_type test_val = container_type(container_data);
-
-    // container_type filled_val = types::fill_curve_element_vector<CurveGroup, Endianness>(val_container);
-
-    // std::vector<typename CurveGroup::value_type> constructed_val =
-    //     types::make_curve_element_vector<CurveGroup, Endianness>(filled_val);
-    // BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), constructed_val.begin()));
-
-    // auto write_iter = cv.begin();
-
-    // nil::marshalling::status_type status = test_val.write(write_iter, cv.size());
-
-    // container_type test_val_read;
-
-    // auto read_iter = cv.begin();
-    // status = test_val_read.read(read_iter, cv.size());
-
-    // BOOST_CHECK(std::equal(test_val.value().begin(), test_val.value().end(), test_val_read.value().begin()));
 }
 
 template<typename Endianness, class CurveGroup, std::size_t TSize>
@@ -124,7 +85,7 @@ void test_curve_element_non_fixed_size_container() {
         for (std::size_t i = 0; i < TSize; i++) {
             val_container[i] = nil::crypto3::algebra::random_element<CurveGroup>();
         }
-        test_curve_element_non_fixed_size_container<Endianness, typename CurveGroup::value_type, TSize>(val_container);
+        test_curve_element_non_fixed_size_container<Endianness, typename CurveGroup::value_type>(val_container);
     }
 }
 

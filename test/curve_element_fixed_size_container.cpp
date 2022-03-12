@@ -76,9 +76,9 @@ void test_curve_element_fixed_size_container_big_endian(std::array<T, TSize> val
 
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-//    std::array<T, TSize> test_val = nil::marshalling::pack<Endianness>(cv, status);
+   std::array<T, TSize> test_val = nil::marshalling::pack<Endianness>(cv, status);
 
-//    BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), test_val.begin()));
+   BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), test_val.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 }
 
