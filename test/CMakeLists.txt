@@ -21,6 +21,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        crypto3::zk
                        crypto3::blueprint
                        crypto3::pubkey
+                       crypto3::pkpad
                        crypto3::hash
                        crypto3::random
                        crypto3::math
@@ -64,7 +65,8 @@ set(TESTS_NAMES
     "r1cs_gg_ppzksnark"
     "fri_commitment"
     "lpc_commitment"
-    "redshift_proof")
+    "redshift_proof"
+    "eddsa")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_marshalling_test(${TEST_NAME})

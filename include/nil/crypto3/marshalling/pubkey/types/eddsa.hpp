@@ -42,6 +42,7 @@
 
 #include <nil/crypto3/pubkey/eddsa.hpp>
 
+#include <nil/crypto3/marshalling/multiprecision/types/integral.hpp>
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 #include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 
@@ -52,18 +53,12 @@ namespace nil {
 
                 template<typename TTypeBase,
                          typename PublicKey,
-                         typename =
-                             typename std::enable_if<std::is_same<PublicKey,
-                                                                  pubkey::public_key<pubkey::eddsa<
-                                                                      typename PublicKey::scheme_type::curve_type,
-                                                                      PublicKey::scheme_type::block_bits>>>::value,
-                                                     bool>::type,
                          typename... TOptions>
                 using eddsa_public_key = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
                         // pubkey_point
-                        curve_element<TTypeBase, typename PublicKey::group_value_type>,
+                        curve_element<TTypeBase, typename PublicKey::group_type>,
                         // pubkey
                         nil::marshalling::types::array_list<
                             TTypeBase,
@@ -73,12 +68,6 @@ namespace nil {
 
                 template<typename TTypeBase,
                          typename PrivateKey,
-                         typename =
-                             typename std::enable_if<std::is_same<PrivateKey,
-                                                                  pubkey::private_key<pubkey::eddsa<
-                                                                      typename PrivateKey::scheme_type::curve_type,
-                                                                      PrivateKey::scheme_type::block_bits>>>::value,
-                                                     bool>::type,
                          typename... TOptions>
                 using eddsa_private_key = nil::marshalling::types::bundle<
                     TTypeBase,
@@ -96,8 +85,38 @@ namespace nil {
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
                         // s_reduced
-                        nil::marshalling::types::field_element<TTypeBase,
+                        nil::crypto3::marshalling::types::field_element<TTypeBase,
                             typename PrivateKey::scalar_field_value_type>>>;
+
+                template<typename PublicKey, typename Endianness>
+                eddsa_public_key<nil::marshalling::field_type<Endianness>, PublicKey>
+                    fill_eddsa_public_key(const PublicKey &key_inp) {
+
+                    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+                    using curve_element_type = curve_element<TTypeBase, typename PublicKey::g1_type>;
+
+                    curve_element_type filled_pubkey_point = curve_element_type(key_inp.pubkey_point);
+
+                    using integral_vector_type = nil::marshalling::types::array_list<
+                            TTypeBase,
+                            integral<TTypeBase, typename PublicKey::public_key_type::value_type>,
+                            nil::marshalling::option::sequence_size_field_prefix<
+                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>;
+
+                    integral_vector_type pubkey_data;
+
+                    std::vector<field_element_type> &val = pubkey_data.value();
+                    for (std::size_t i = 0; i < key_inp.pubkey.size(); i++) {
+                        val.push_back(integral<TTypeBase,
+                            typename PublicKey::public_key_type::value_type>(key_inp.pubkey[i]));
+                    }
+
+                    return eddsa_public_key<nil::marshalling::field_type<Endianness>, PublicKey>(
+                        std::make_tuple(
+                            filled_pubkey_point,
+                            pubkey_data));
+                }
             }    // namespace types
         }        // namespace marshalling
     }            // namespace crypto3
