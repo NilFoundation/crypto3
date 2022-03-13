@@ -30,10 +30,11 @@
 #include <nil/crypto3/hash/detail/keccak/keccak_impl.hpp>
 
 #define keccak_1600_armv8_step(c)    \
+    "sub  sp, sp, #16 \n"            \
+                                     \
     "eor	x25,x0,x5 \n"            \
                                      \
-    "str   x4, [sp, #-8]!\n"         \
-    "str   x9, [sp, #-16]!\n"        \
+    "stp  x4, x9, [sp] \n"           \
                                      \
     "eor	x26,x1,x6 \n"            \
     "eor	x27,x2,x7 \n"            \
@@ -48,7 +49,7 @@
     "eor	x25,x25,x15 \n"          \
     "eor	x26,x26,x16 \n"          \
     "eor	x27,x27,x17 \n"          \
-    "eor	x28,x28,x18 \n"          \
+    "eor	x28,x28,x30 \n"          \
     "eor	x4,x4,x19 \n"            \
     "eor	x25,x25,x20 \n"          \
     "eor	x27,x27,x22 \n"          \
@@ -76,13 +77,13 @@
     "eor	x15,x15,x4 \n"           \
     "eor	x20,x20,x4 \n"           \
                                      \
-    "ldr   x9, [sp], #16\n"          \
-    "ldr   x4, [sp], #8\n"           \
+    "ldp  x4, x9, [sp]\n"            \
+    "add  sp, sp, #16 \n"            \
                                      \
     "eor	x25,x3,x27 \n"           \
     "eor	x8,x8,x27 \n"            \
     "eor	x13,x13,x27 \n"          \
-    "eor	x18,x18,x27 \n"          \
+    "eor	x30,x30,x27 \n"          \
     "eor	x23,x23,x27 \n"          \
     "eor	x27,x4,x28 \n"           \
     "eor	x9,x9,x28 \n"            \
@@ -93,12 +94,12 @@
     "mov	x28,x1\n"                \
     "ror	x1,x6,#20\n"             \
     "ror	x2,x12,#21\n"            \
-    "ror	x3,x18,#43\n"            \
+    "ror	x3,x30,#43\n"            \
     "ror	x4,x24,#50\n"            \
                                      \
     "ror	x6,x9,#44\n"             \
     "ror	x12,x13,#39\n"           \
-    "ror	x18,x17,#49\n"           \
+    "ror	x30,x17,#49\n"           \
     "ror	x24,x21,#62\n"           \
                                      \
     "ror	x9,x22,#3\n"             \
@@ -156,13 +157,13 @@
     "eor	x14,x14,x28 \n"          \
     "eor	x12,x12,x25 \n"          \
     "bic	x25,x17,x16 \n"          \
-    "bic	x26,x18,x17 \n"          \
+    "bic	x26,x30,x17 \n"          \
     "bic	x27,x15,x19 \n"          \
     "bic	x28,x16,x15 \n"          \
     "eor	x15,x15,x25 \n"          \
-    "bic	x25,x19,x18 \n"          \
+    "bic	x25,x19,x30 \n"          \
     "eor	x16,x16,x26 \n"          \
-    "eor	x18,x18,x27 \n"          \
+    "eor	x30,x30,x27 \n"          \
     "eor	x19,x19,x28 \n"          \
     "eor	x17,x17,x25 \n"          \
     "bic	x25,x22,x21 \n"          \
@@ -223,7 +224,7 @@ namespace nil {
                             "ldr x15, [%[A], #120]\n"
                             "ldr x16, [%[A], #128]\n"
                             "ldr x17, [%[A], #136]\n"
-                            "ldr x18, [%[A], #144]\n"
+                            "ldr x30, [%[A], #144]\n"
                             "ldr x19, [%[A], #152]\n"
                             "ldr x20, [%[A], #160]\n"
                             "ldr x21, [%[A], #168]\n"
@@ -274,7 +275,7 @@ namespace nil {
                             "str x15, [%[A], #120]\n"
                             "str x16, [%[A], #128]\n"
                             "str x17, [%[A], #136]\n"
-                            "str x18, [%[A], #144]\n"
+                            "str x30, [%[A], #144]\n"
                             "str x19, [%[A], #152]\n"
                             "str x20, [%[A], #160]\n"
                             "str x21, [%[A], #168]\n"
@@ -285,7 +286,7 @@ namespace nil {
                             : [A] "r"(A.begin())
                             : "cc", "memory", "x25", "x26", "x27", "x28",    // C0, C1, C2, C3
                               "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13",
-                              "x14", "x15", "x16", "x17", "x18", "x19", "x20", "x21", "x22", "x23", "x24");
+                              "x14", "x15", "x16", "x17", "x30", "x19", "x20", "x21", "x22", "x23", "x24");
                     }
                 };
 
