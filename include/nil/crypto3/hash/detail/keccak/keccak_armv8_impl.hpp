@@ -32,10 +32,10 @@
 #define keccak_1600_armv8_step(c)    \
     "sub  sp, sp, #32 \n"            \
                                      \
-    "str   x1, [sp, #-16]!\n"        \
-    "ldr x1, [%[A], #0]\n"                                 \
-    "eor  x25,x1,x5 \n"      \
-    "ldr   x1, [sp], #16 \n" \
+    "str   x1, x2 [sp, #16]\n"        \
+    "ldr x1, [%[A], #0]\n"           \
+    "eor  x25,x1,x5 \n"              \
+    "ldr   x1, x2, [sp, #16] \n"         \
                                      \
     "stp  x4, x9, [sp] \n"           \
                                      \
@@ -73,13 +73,13 @@
     "eor	x7,x7,x9 \n"             \
     "eor	x12,x12,x9 \n"           \
     "eor	x17,x17,x9 \n"           \
-    "eor	x22,x22,x9 \n"              \
+    "eor	x22,x22,x9 \n"           \
                                      \
-    "str   x1, [sp, #-16]!\n"           \
-    "ldr x1, [%[A], #0]\n"          \
-    "eor	x1,x1,x4 \n"               \
-    "str x1, [%[A], #0] \n"           \
-    "ldr   x1, [sp], #16 \n"         \
+    "str   x1, x2 [sp, #16]\n"        \
+    "ldr x1, [%[A], #0]\n"           \
+    "eor	x1,x1,x4 \n"             \
+    "str x1, [%[A], #0] \n"          \
+    "ldr   x1, x2 [sp, #16]\n"        \
                                      \
     "eor	x5,x5,x4 \n"             \
     "eor	x10,x10,x4 \n"           \
@@ -131,15 +131,15 @@
     "ror	x20,x26,#2\n"            \
                                      \
     "bic	x25,x2,x1 \n"            \
-    "bic	x26,x3,x2 \n"               \
+    "bic	x26,x3,x2 \n"            \
                                      \
-    "str   x2, [sp, #-16]!\n"                                 \
-    "ldr x2, [%[A], #0]\n"                                 \
+    "str   x2, x3 [sp, #16]\n"        \
+    "ldr    x2, [%[A], #0]\n"           \
     "bic	x27,x2,x4 \n"            \
     "bic	x28,x1,x2 \n"            \
-    "eor	x2,x2,x25 \n"               \
-    "str x2, [%[A], #0]\n"                                                                \
-    "ldr   x2, [sp], #16 \n"                                       \
+    "eor	x2,x2,x25 \n"            \
+    "str    x2, [%[A], #0]\n"           \
+    "ldr   x1, x2 [sp, #16]\n"        \
                                      \
     "bic	x25,x4,x3 \n"            \
     "eor	x1,x1,x26 \n"            \
@@ -192,11 +192,11 @@
     "eor	x22,x22,x25 \n"          \
     "ldr x25, =" #c " \n"            \
                                      \
-"str   x1, [sp, #-16]!\n"                                 \
-"ldr x1, [%[A], #0]\n"                                 \
-"eor x1, x1, x25 \n"             \
-"str x1, [%[A], #0]\n"                                                                \
-"ldr   x1, [sp], #16 \n"                         \
+    "str   x1, x2 [sp, #16]\n"        \
+    "ldr x1, [%[A], #0]\n"           \
+    "eor x1, x1, x25 \n"             \
+    "str x1, [%[A], #0]\n"           \
+    "ldr   x1, x2 [sp, #16]\n"        \
                                      \
     "add  sp, sp, #32 \n"
 
