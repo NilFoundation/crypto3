@@ -40,9 +40,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                         typename CurveType,
-                         std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class element_g1_variable_base_scalar_mul;
 
                 template<typename BlueprintFieldType,
@@ -57,16 +55,16 @@ namespace nil {
                          std::size_t W7,
                          std::size_t W8>
                 class element_g1_variable_base_scalar_mul<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                       CurveType,
-                                                       W0,
-                                                       W1,
-                                                       W2,
-                                                       W3,
-                                                       W4,
-                                                       W5,
-                                                       W6,
-                                                       W7,
-                                                       W8>
+                                                          CurveType,
+                                                          W0,
+                                                          W1,
+                                                          W2,
+                                                          W3,
+                                                          W4,
+                                                          W5,
+                                                          W6,
+                                                          W7,
+                                                          W8>
                     : public detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>,
                                                     W0,
                                                     W1,
@@ -83,24 +81,22 @@ namespace nil {
 
                     std::size_t j;
 
-                    using n_wires_helper =
-                        detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>,
-                                               W0,
-                                               W1,
-                                               W2,
-                                               W3,
-                                               W4,
-                                               W5,
-                                               W6,
-                                               W7,
-                                               W8>;
+                    using n_wires_helper = detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>,
+                                                                  W0,
+                                                                  W1,
+                                                                  W2,
+                                                                  W3,
+                                                                  W4,
+                                                                  W5,
+                                                                  W6,
+                                                                  W7,
+                                                                  W8>;
 
                     using n_wires_helper::w;
                     enum indices { m2 = 0, m1, cur, p1, p2 };
 
                 public:
-                    element_g1_variable_base_scalar_mul(blueprint_type &bp) : 
-                        n_wires_helper(bp) {
+                    element_g1_variable_base_scalar_mul(blueprint_type &bp) : n_wires_helper(bp) {
 
                         j = bp.allocate_rows(213);
                     }

@@ -36,9 +36,10 @@
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 // #include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/plonk/variable_base_scalar_mul_5_wires.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/plonk/variable_base_scalar_mul_9_wires.hpp>
+#include <nil/crypto3/zk/blueprint/plonk.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/edwards/plonk/variable_base_scalar_mul_5_wires.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/edwards/plonk/variable_base_scalar_mul_9_wires.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/edwards/plonk/variable_base_scalar_mul_15_wires.hpp>
 
 using namespace nil::crypto3;
 
@@ -55,7 +56,7 @@ BOOST_AUTO_TEST_CASE(variable_base_scalar_mul_5_wires_test_case) {
 
 	using component_type = zk::components::element_g1_variable_base_scalar_mul<ArithmetizationType, curve_type, 0, 1, 2, 3, 4>;
 
-	component_type scalar_mul_component = component_type(bp);
+	component_type scalar_mul_component(bp);
 
 	scalar_mul_component.generate_gates();
 
