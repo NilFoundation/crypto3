@@ -254,29 +254,29 @@
                             "ldr x24, [%[A], #192]\n"
 
                             keccak_1600_armv8_step(0x0000000000000001)
-                            keccak_1600_armv8_step(0x0000000000008082)
-                            keccak_1600_armv8_step(0x800000000000808a)
-                            keccak_1600_armv8_step(0x8000000080008000)
-                            keccak_1600_armv8_step(0x000000000000808b)
-                            keccak_1600_armv8_step(0x0000000080000001)
-                            keccak_1600_armv8_step(0x8000000080008081)
-                            keccak_1600_armv8_step(0x8000000000008009)
-                            keccak_1600_armv8_step(0x000000000000008a)
-                            keccak_1600_armv8_step(0x0000000000000088)
-                            keccak_1600_armv8_step(0x0000000080008009)
-                            keccak_1600_armv8_step(0x000000008000000a)
-                            keccak_1600_armv8_step(0x000000008000808b)
-                            keccak_1600_armv8_step(0x800000000000008b)
-                            keccak_1600_armv8_step(0x8000000000008089)
-                            keccak_1600_armv8_step(0x8000000000008003)
-                            keccak_1600_armv8_step(0x8000000000008002)
-                            keccak_1600_armv8_step(0x8000000000000080)
-                            keccak_1600_armv8_step(0x000000000000800a)
-                            keccak_1600_armv8_step(0x800000008000000a)
-                            keccak_1600_armv8_step(0x8000000080008081)
-                            keccak_1600_armv8_step(0x8000000000008080)
-                            keccak_1600_armv8_step(0x0000000080000001)
-                            keccak_1600_armv8_step(0x8000000080008008)
+//                            keccak_1600_armv8_step(0x0000000000008082)
+//                            keccak_1600_armv8_step(0x800000000000808a)
+//                            keccak_1600_armv8_step(0x8000000080008000)
+//                            keccak_1600_armv8_step(0x000000000000808b)
+//                            keccak_1600_armv8_step(0x0000000080000001)
+//                            keccak_1600_armv8_step(0x8000000080008081)
+//                            keccak_1600_armv8_step(0x8000000000008009)
+//                            keccak_1600_armv8_step(0x000000000000008a)
+//                            keccak_1600_armv8_step(0x0000000000000088)
+//                            keccak_1600_armv8_step(0x0000000080008009)
+//                            keccak_1600_armv8_step(0x000000008000000a)
+//                            keccak_1600_armv8_step(0x000000008000808b)
+//                            keccak_1600_armv8_step(0x800000000000008b)
+//                            keccak_1600_armv8_step(0x8000000000008089)
+//                            keccak_1600_armv8_step(0x8000000000008003)
+//                            keccak_1600_armv8_step(0x8000000000008002)
+//                            keccak_1600_armv8_step(0x8000000000000080)
+//                            keccak_1600_armv8_step(0x000000000000800a)
+//                            keccak_1600_armv8_step(0x800000008000000a)
+//                            keccak_1600_armv8_step(0x8000000080008081)
+//                            keccak_1600_armv8_step(0x8000000000008080)
+//                            keccak_1600_armv8_step(0x0000000080000001)
+//                            keccak_1600_armv8_step(0x8000000080008008)
 
 
 //                            "str x0, [%[A], #0]\n"
@@ -310,7 +310,9 @@
                               //"x0",
                               "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13",
                               "x14", "x15", "x16", "x17", "x30", "x19", "x20", "x21", "x22", "x23", "x24");
-
+                        for (int i = 0; i < 25; ++i) {
+                            std::cout << "i=" << i << " " << A[i] << std::endl;
+                        }
                     }
 
                 };
