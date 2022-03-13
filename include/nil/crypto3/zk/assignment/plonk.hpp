@@ -40,63 +40,72 @@ namespace nil {
             class blueprint_public_assignment_table;
 
             template<typename BlueprintFieldType, std::size_t WitnessColumns>
-            class blueprint_private_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
-                WitnessColumns> :
-                public snark::plonk_private_assignment_table<BlueprintFieldType, WitnessColumns> {
+            class blueprint_private_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>, WitnessColumns>
+                : public snark::plonk_private_assignment_table<BlueprintFieldType, WitnessColumns> {
 
                 typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+
             public:
-                
-                blueprint_private_assignment_table() : 
-                snark::plonk_private_assignment_table<BlueprintFieldType, WitnessColumns>(){
+                blueprint_private_assignment_table() :
+                    snark::plonk_private_assignment_table<BlueprintFieldType, WitnessColumns>() {
                 }
 
-                snark::plonk_column<BlueprintFieldType>& witness(std::size_t witness_index) {
+                snark::plonk_column<BlueprintFieldType> &witness(std::size_t witness_index) {
                     assert(witness_index < WitnessColumns);
                     return this->witness_columns[witness_index];
                 }
 
-                snark::plonk_column<BlueprintFieldType>& operator[](std::size_t index) {
-                    if (index < WitnessColumns)
+                snark::plonk_column<BlueprintFieldType> &operator[](std::size_t index) {
+                    if (index < WitnessColumns) {
                         return this->witness_columns[index];
+                    } else {
+#error Undefined reference being returned
+                    }
                     index -= WitnessColumns;
                 }
 
-                void allocate_rows(std::size_t required_total_rows_amount){
-                    for (std::size_t w_index = 0; w_index < WitnessColumns; w_index++){
-                        this->witness_columns[w_index].resize(std::max(
-                            required_total_rows_amount,
-                            this->witness_columns[w_index].size()));
+                void allocate_rows(std::size_t required_total_rows_amount) {
+                    for (std::size_t w_index = 0; w_index < WitnessColumns; w_index++) {
+                        this->witness_columns[w_index].resize(
+                            std::max(required_total_rows_amount, this->witness_columns[w_index].size()));
                     }
                 }
             };
 
-            template<typename BlueprintFieldType, std::size_t PublicInputColumns,
-                    std::size_t ConstantColumns, std::size_t SelectorColumns>
+            template<typename BlueprintFieldType,
+                     std::size_t PublicInputColumns,
+                     std::size_t ConstantColumns,
+                     std::size_t SelectorColumns>
             class blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
-                PublicInputColumns, ConstantColumns, SelectorColumns> :
-                public snark::plonk_public_assignment_table<BlueprintFieldType,
-                    PublicInputColumns, ConstantColumns, SelectorColumns> {
+                                                    PublicInputColumns,
+                                                    ConstantColumns,
+                                                    SelectorColumns>
+                : public snark::plonk_public_assignment_table<BlueprintFieldType,
+                                                              PublicInputColumns,
+                                                              ConstantColumns,
+                                                              SelectorColumns> {
 
                 typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+
             public:
-                
-                blueprint_public_assignment_table() : 
-                snark::plonk_public_assignment_table<BlueprintFieldType,
-                    PublicInputColumns, ConstantColumns, SelectorColumns>(){
+                blueprint_public_assignment_table() :
+                    snark::plonk_public_assignment_table<BlueprintFieldType,
+                                                         PublicInputColumns,
+                                                         ConstantColumns,
+                                                         SelectorColumns>() {
                 }
-                
-                snark::plonk_column<BlueprintFieldType>& selector(std::size_t selector_index){
+
+                snark::plonk_column<BlueprintFieldType> &selector(std::size_t selector_index) {
                     if (selector_index >= this->selector_columns.size()) {
                         this->selector_columns.resize(selector_index + 1);
                     }
                     return this->selector_columns[selector_index];
                 }
 
-                std::size_t add_selector(std::size_t row_index){
+                std::size_t add_selector(std::size_t row_index) {
                     static std::size_t selector_index = 0;
-                    snark::plonk_column<BlueprintFieldType> selector_column(
-                        row_index + 1, BlueprintFieldType::value_type::zero());
+                    snark::plonk_column<BlueprintFieldType> selector_column(row_index + 1,
+                                                                            BlueprintFieldType::value_type::zero());
 
                     selector_column[row_index] = BlueprintFieldType::value_type::one();
                     this->selector_columns[selector_index] = selector_column;
@@ -104,12 +113,12 @@ namespace nil {
                     return selector_index - 1;
                 }
 
-                std::size_t add_selector(const std::initializer_list<std::size_t> &&row_indices){
+                std::size_t add_selector(const std::initializer_list<std::size_t> &&row_indices) {
                     static std::size_t selector_index = 0;
                     std::size_t max_row_index = std::max(row_indices);
-                    snark::plonk_column<BlueprintFieldType> selector_column(
-                        max_row_index + 1, BlueprintFieldType::value_type::zero());
-                    for (std::size_t row_index : row_indices){
+                    snark::plonk_column<BlueprintFieldType> selector_column(max_row_index + 1,
+                                                                            BlueprintFieldType::value_type::zero());
+                    for (std::size_t row_index : row_indices) {
                         selector_column[row_index] = BlueprintFieldType::value_type::one();
                     }
                     this->selector_columns[selector_index] = selector_column;
@@ -117,16 +126,13 @@ namespace nil {
                     return selector_index - 1;
                 }
 
-                std::size_t add_selector(std::size_t begin_row_index, 
-                                         std::size_t end_row_index,
-                                         std::size_t index_step = 1){
-                    
+                std::size_t
+                    add_selector(std::size_t begin_row_index, std::size_t end_row_index, std::size_t index_step = 1) {
+
                     static std::size_t selector_index = 0;
-                    snark::plonk_column<BlueprintFieldType> selector_column(
-                        end_row_index + 1, BlueprintFieldType::value_type::zero());
-                    for (std::size_t row_index = begin_row_index;
-                         row_index <= end_row_index;
-                         row_index += index_step){
+                    snark::plonk_column<BlueprintFieldType> selector_column(end_row_index + 1,
+                                                                            BlueprintFieldType::value_type::zero());
+                    for (std::size_t row_index = begin_row_index; row_index <= end_row_index; row_index += index_step) {
                         selector_column[row_index] = BlueprintFieldType::value_type::one();
                     }
                     this->selector_columns[selector_index] = selector_column;
@@ -134,45 +140,47 @@ namespace nil {
                     return selector_index - 1;
                 }
 
-                snark::plonk_column<BlueprintFieldType>& public_input(std::size_t public_input_index){
+                snark::plonk_column<BlueprintFieldType> &public_input(std::size_t public_input_index) {
                     assert(public_input_index < this->public_input_columns.size());
                     return this->public_input_columns[public_input_index];
                 }
 
-                snark::plonk_column<BlueprintFieldType>& operator[](std::size_t index){
-                    if (index < this->public_input_columns.size())
+                snark::plonk_column<BlueprintFieldType> &operator[](std::size_t index) {
+                    if (index < this->public_input_columns.size()) {
                         return this->public_input_columns[index];
+                    }
                     index -= this->public_input_columns.size();
-                    if (index < this->constant_columns.size())
+                    if (index < this->constant_columns.size()) {
                         return this->constant_columns[index];
+                    }
                     index -= this->constant_columns.size();
-                    if (index < this->selector_columns.size())
+                    if (index < this->selector_columns.size()) {
                         return this->selector_columns[index];
+                    } else {
+#error Undefined reference being returned
+                    }
                     index -= this->selector_columns.size();
                 }
 
-                void allocate_rows(std::size_t required_total_rows_amount){
-                    for (std::size_t pi_index = 0; pi_index < PublicInputColumns; pi_index++){
-                        this->public_input_columns[pi_index].resize(std::max(
-                            required_total_rows_amount,
-                            this->public_input_columns[pi_index].size()));
+                void allocate_rows(std::size_t required_total_rows_amount) {
+                    for (std::size_t pi_index = 0; pi_index < PublicInputColumns; pi_index++) {
+                        this->public_input_columns[pi_index].resize(
+                            std::max(required_total_rows_amount, this->public_input_columns[pi_index].size()));
                     }
 
-                    for (std::size_t c_index = 0; c_index < ConstantColumns; c_index++){
-                        this->constant_columns[c_index].resize(std::max(
-                            required_total_rows_amount,
-                            this->constant_columns[c_index].size()));
+                    for (std::size_t c_index = 0; c_index < ConstantColumns; c_index++) {
+                        this->constant_columns[c_index].resize(
+                            std::max(required_total_rows_amount, this->constant_columns[c_index].size()));
                     }
 
-                    for (std::size_t s_index = 0; s_index < SelectorColumns; s_index++){
-                        this->selector_columns[s_index].resize(std::max(
-                            required_total_rows_amount,
-                            this->selector_columns[s_index].size()));
+                    for (std::size_t s_index = 0; s_index < SelectorColumns; s_index++) {
+                        this->selector_columns[s_index].resize(
+                            std::max(required_total_rows_amount, this->selector_columns[s_index].size()));
                     }
                 }
             };
 
-        }        // namespace zk
-    }            // namespace crypto3
+        }    // namespace zk
+    }        // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ZK_BLUEPRINT_ASSIGNMENT_PLONK_HPP

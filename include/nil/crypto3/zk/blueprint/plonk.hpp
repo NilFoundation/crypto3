@@ -39,13 +39,13 @@ namespace nil {
             class blueprint;
 
             template<typename BlueprintFieldType>
-            class blueprint<snark::plonk_constraint_system<BlueprintFieldType>> :
-                public snark::plonk_constraint_system<BlueprintFieldType> {
+            class blueprint<snark::plonk_constraint_system<BlueprintFieldType>>
+                : public snark::plonk_constraint_system<BlueprintFieldType> {
 
                 typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+
             public:
-                
-                blueprint() : ArithmetizationType(){
+                blueprint() : ArithmetizationType() {
                     this->_rows_amount = 0;
                 }
 
@@ -60,12 +60,13 @@ namespace nil {
                 }
 
                 // TODO: should put constraint in some storage and return its index
-                snark::plonk_constraint<BlueprintFieldType> add_constraint(
-                    const snark::plonk_constraint<BlueprintFieldType> &constraint) {
+                snark::plonk_constraint<BlueprintFieldType>
+                    add_constraint(const snark::plonk_constraint<BlueprintFieldType> &constraint) {
                     return constraint;
                 }
 
-                void add_gate(std::size_t selector_index, const snark::plonk_constraint<BlueprintFieldType> &constraint) {
+                void add_gate(std::size_t selector_index,
+                              const snark::plonk_constraint<BlueprintFieldType> &constraint) {
                     this->_gates.emplace_back(selector_index, constraint);
                 }
 
@@ -87,7 +88,7 @@ namespace nil {
                     this->_lookup_constraints.emplace_back({});
                 }
             };
-        }        // namespace zk
-    }            // namespace crypto3
+        }    // namespace zk
+    }        // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_PLONK_HPP

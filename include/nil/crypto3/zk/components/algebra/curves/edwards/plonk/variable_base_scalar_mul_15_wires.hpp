@@ -41,9 +41,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                         typename CurveType,
-                         std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class curve_element_variable_base_scalar_mul;
 
                 template<typename BlueprintFieldType,
@@ -63,24 +61,24 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class curve_element_variable_base_scalar_mul<
-                    snark::plonk_constraint_system<BlueprintFieldType>,
-                    CurveType,
-                    W0,
-                    W1,
-                    W2,
-                    W3,
-                    W4,
-                    W5,
-                    W6,
-                    W7,
-                    W8,
-                    W9,
-                    W10,
-                    W11,
-                    W12,
-                    W13,
-                    W14> : public component<snark::plonk_constraint_system<BlueprintFieldType>> {
+                class curve_element_variable_base_scalar_mul<snark::plonk_constraint_system<BlueprintFieldType>,
+                                                             CurveType,
+                                                             W0,
+                                                             W1,
+                                                             W2,
+                                                             W3,
+                                                             W4,
+                                                             W5,
+                                                             W6,
+                                                             W7,
+                                                             W8,
+                                                             W9,
+                                                             W10,
+                                                             W11,
+                                                             W12,
+                                                             W13,
+                                                             W14>
+                    : public component<snark::plonk_constraint_system<BlueprintFieldType>> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
                     typedef blueprint<arithmetization_type> blueprint_type;
@@ -92,33 +90,34 @@ namespace nil {
                     constexpr static const std::size_t required_rows_amount = 102;
 
                 public:
-
-                    struct init_params {
-                    };
+                    struct init_params { };
 
                     struct assignment_params {
                         typename CurveType::template g1_type<>::value_type P;
                         typename CurveType::scalar_field_type::value_type b;
                     };
 
-                    curve_element_variable_base_scalar_mul(blueprint_type &bp,
-                        const init_params &params) :
+                    curve_element_variable_base_scalar_mul(blueprint_type &bp, const init_params &params) :
                         component<arithmetization_type>(bp) {
 
                         j = this->bp.allocate_rows(required_rows_amount);
                     }
 
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
+                    static std::size_t
+                        allocate_rows(blueprint<snark::plonk_constraint_system<BlueprintFieldType>> &in_bp) {
                         return in_bp.allocate_rows(required_rows_amount);
                     }
 
-                    template <std::size_t SelectorColumns, std::size_t PublicInputColumns,
-                        std::size_t ConstantColumns>
-                    void generate_gates(blueprint_public_assignment_table<ArithmetizationType,
-                            SelectorColumns, PublicInputColumns, ConstantColumns> &public_assignment, 
+                    template<std::size_t SelectorColumns, std::size_t PublicInputColumns, std::size_t ConstantColumns>
+                    void generate_gates(
+                        blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
+                                                          SelectorColumns,
+                                                          PublicInputColumns,
+                                                          ConstantColumns> &public_assignment,
                         std::size_t circuit_start_row = 0) {
 
-                        std::size_t vbsm_selector_index = public_assignment.add_selector(j, j + required_rows_amount - 1, 2);
+                        std::size_t vbsm_selector_index =
+                            public_assignment.add_selector(j, j + required_rows_amount - 1, 2);
 
                         auto bit_check_1 = this->bp.add_bit_check(var(W2, +1));
                         auto bit_check_2 = this->bp.add_bit_check(var(W3, +1));
@@ -127,107 +126,112 @@ namespace nil {
                         auto bit_check_5 = this->bp.add_bit_check(var(W6, +1));
 
                         auto constraint_1 = this->bp.add_constraint((var(W2, 0) - var(W0, 0)) * var(W7, +1) -
-                            (var(W3, 0) - (2 * var(W2, +1) - 1) * var(W1, 0)));
+                                                                    (var(W3, 0) - (2 * var(W2, +1) - 1) * var(W1, 0)));
                         auto constraint_2 = this->bp.add_constraint((var(W7, 0) - var(W0, 0)) * var(W8, +1) -
-                            (var(W8, 0) - (2 * var(W3, +1) - 1) * var(W1, 0)));
+                                                                    (var(W8, 0) - (2 * var(W3, +1) - 1) * var(W1, 0)));
                         auto constraint_3 = this->bp.add_constraint((var(W10, 0) - var(W0, 0)) * var(W9, +1) -
-                            (var(W11, 0) - (2 * var(W4, +1) - 1) * var(W1, 0)));
+                                                                    (var(W11, 0) - (2 * var(W4, +1) - 1) * var(W1, 0)));
                         auto constraint_4 = this->bp.add_constraint((var(W12, 0) - var(W0, 0)) * var(W10, +1) -
-                            (var(W13, 0) - (2 * var(W5, +1) - 1) * var(W1, 0)));
+                                                                    (var(W13, 0) - (2 * var(W5, +1) - 1) * var(W1, 0)));
                         auto constraint_5 = this->bp.add_constraint((var(W0, +1) - var(W0, 0)) * var(W11, +1) -
-                            (var(W1, +1) - (2 * var(W6, +1) - 1) * var(W1, 0)));
+                                                                    (var(W1, +1) - (2 * var(W6, +1) - 1) * var(W1, 0)));
 
-                        auto constraint_6 = this->bp.add_constraint((2 * var(W3, 0) -
-                            var(W7, 1) * (2  * var(W2, 0) - var(W7, 1)^2 + var(W0, 0)))^2 -
-                            ((2  * var(W2, 0) - var(W7, 1)^2 + var(W0, 0))^2  * (var(W7, 0) -
-                            var(W0, 0) + var(W7, 1)^2)));
-                        auto constraint_7 = this->bp.add_constraint((2 * var(W8, 0) -
-                            var(W8, 1) * (2  * var(W7, 0) - var(W8, 1)^2 + var(W0, 0)))^2 -
-                            ((2  * var(W7, 0) - var(W8, 1)^2 + var(W0, 0))^2  * (var(W9, 0) -
-                            var(W0, 0) + var(W8, 1)^2)));
-                        auto constraint_8 = this->bp.add_constraint((2 * var(W10, 0) -
-                            var(W9, 1) * (2  * var(W9, 0) - var(W9, 1)^2 + var(W0, 0)))^2 -
-                            ((2  * var(W9, 0) - var(W9, 1)^2 + var(W0, 0))^2  * (var(W11, 0) -
-                            var(W0, 0) + var(W9, 1)^2)));
-                        auto constraint_9 = this->bp.add_constraint((2 * var(W12, 0) - 
-                            var(W10, +1)  * (2  * var(W11, 0) - var(W10, +1)^2 + var(W0, 0)))^2 -
-                            ((2  * var(W11, 0) - var(W10, +1)^2 + var(W0, 0))^2  * 
-                            (var(W13, 0) - var(W0, 0) + var(W10, +1)^2)));
-                        auto constraint_10 = this->bp.add_constraint((2 * var(W14, 0) -
-                            var(W11, +1)  * (2  * var(W13, 0) - var(W11, +1)^2 + var(W0, 0)))^2 -
-                            (2  * var(W13, 0) - var(W11, +1)^2 + var(W0, 0))^2  * 
-                            (var(W0, 1) - var(W0, 0) + var(W11, +1)^2));
+                        auto constraint_6 = this->bp.add_constraint(
+                            (2 * var(W3, 0) - var(W7, 1) * (2 * var(W2, 0) - var(W7, 1) ^ 2 + var(W0, 0))) ^
+                            2 - ((2 * var(W2, 0) - var(W7, 1) ^ 2 + var(W0, 0)) ^
+                                 2 * (var(W7, 0) - var(W0, 0) + var(W7, 1) ^ 2)));
+                        auto constraint_7 = this->bp.add_constraint(
+                            (2 * var(W8, 0) - var(W8, 1) * (2 * var(W7, 0) - var(W8, 1) ^ 2 + var(W0, 0))) ^
+                            2 - ((2 * var(W7, 0) - var(W8, 1) ^ 2 + var(W0, 0)) ^
+                                 2 * (var(W9, 0) - var(W0, 0) + var(W8, 1) ^ 2)));
+                        auto constraint_8 = this->bp.add_constraint(
+                            (2 * var(W10, 0) - var(W9, 1) * (2 * var(W9, 0) - var(W9, 1) ^ 2 + var(W0, 0))) ^
+                            2 - ((2 * var(W9, 0) - var(W9, 1) ^ 2 + var(W0, 0)) ^
+                                 2 * (var(W11, 0) - var(W0, 0) + var(W9, 1) ^ 2)));
+                        auto constraint_9 = this->bp.add_constraint(
+                            (2 * var(W12, 0) - var(W10, +1) * (2 * var(W11, 0) - var(W10, +1) ^ 2 + var(W0, 0))) ^
+                            2 - ((2 * var(W11, 0) - var(W10, +1) ^ 2 + var(W0, 0)) ^
+                                 2 * (var(W13, 0) - var(W0, 0) + var(W10, +1) ^ 2)));
+                        auto constraint_10 = this->bp.add_constraint(
+                            (2 * var(W14, 0) - var(W11, +1) * (2 * var(W13, 0) - var(W11, +1) ^ 2 + var(W0, 0))) ^
+                            2 - (2 * var(W13, 0) - var(W11, +1) ^ 2 + var(W0, 0)) ^
+                            2 * (var(W0, 1) - var(W0, 0) + var(W11, +1) ^ 2));
 
-                        auto constraint_11 = this->bp.add_constraint((var(W8, 0) + var(W3, 0)) *
-                            (2 * var(W2, 0) - var(W7, +1)^2 + var(W0, 0)) -
-                            ((var(W2, 0) - var(W7, 0)) * (2* var(W3, 0) - var(W7, +1) *
-                            (2 * var(W2, 0) - var(W7, +1)^2 + var(W0, 0)))));
-                        auto constraint_12 = this->bp.add_constraint((var(W10, 0) + var(W8, 0)) *
-                            (2 * var(W7, 0) - var(W8, +1)^2 + var(W0, 0)) -
-                            ((var(W7, 0) - var(W9, 0)) * (2* var(W8, 0) - var(W8, +1) *
-                            (2 * var(W7, 0) - var(W8, +1)^2 + var(W0, 0)))));
-                        auto constraint_13 = this->bp.add_constraint((var(W12, 0) + var(W10, 0)) *
-                            (2 * var(W9, 0) - var(W9, +1)^2 + var(W0, 0)) -
-                            ((var(W9, 0) - var(W11, 0)) * (2* var(W10, 0) - var(W9, +1) * 
-                            (2 * var(W9, 0) - var(W9, +1)^2 + var(W0, 0)))));
-                        auto constraint_14 = this->bp.add_constraint((var(W14, 0) + var(W10, 0)) *
-                            (2 * var(W11, 0) - var(W10, +1)^2 + var(W0, 0)) -
-                            ((var(W11, 0) - var(W13, 0)) * (2* var(W12, 0) - var(W10, +1) * 
-                            (2 * var(W11, 0) - var(W10, +1)^2 + var(W0, 0)))));
-                        auto constraint_15 = this->bp.add_constraint((var(W1, +1) + var(W14, 0)) *
-                            (2 * var(W13, 0) - var(W11, +1)^2 + var(W0, 0)) -
-                            ((var(W13, 0) - var(W0, +1)) * (2* var(W14, 0) - var(W11, +1) * 
-                            (2 * var(W13, 0) - var(W11, +1)^2 + var(W0, 0)))));
-                        
-                        auto constraint_16 = this->bp.add_constraint(var(W5, 0) - (32 * (var(W4, 0)) + 
-                            16 * var(W2, +1) + 8 * var(W3, +1) + 4 * var(W4, +1) + 
-                            2 * var(W5, +1) + var(W6, +1)));
-                        this->bp.add_gate(vbsm_selector_index, 
-                            {bit_check_1, bit_check_2, bit_check_3, bit_check_4, bit_check_5,
-                            constraint_1, constraint_2, constraint_3, constraint_4, constraint_5,
-                            constraint_6, constraint_7, constraint_8, constraint_9, constraint_10,
-                            constraint_11, constraint_12, constraint_13, constraint_14, constraint_15,
-                            constraint_16});
+                        auto constraint_11 = this->bp.add_constraint(
+                            (var(W8, 0) + var(W3, 0)) * (2 * var(W2, 0) - var(W7, +1) ^ 2 + var(W0, 0)) -
+                            ((var(W2, 0) - var(W7, 0)) *
+                             (2 * var(W3, 0) - var(W7, +1) * (2 * var(W2, 0) - var(W7, +1) ^ 2 + var(W0, 0)))));
+                        auto constraint_12 = this->bp.add_constraint(
+                            (var(W10, 0) + var(W8, 0)) * (2 * var(W7, 0) - var(W8, +1) ^ 2 + var(W0, 0)) -
+                            ((var(W7, 0) - var(W9, 0)) *
+                             (2 * var(W8, 0) - var(W8, +1) * (2 * var(W7, 0) - var(W8, +1) ^ 2 + var(W0, 0)))));
+                        auto constraint_13 = this->bp.add_constraint(
+                            (var(W12, 0) + var(W10, 0)) * (2 * var(W9, 0) - var(W9, +1) ^ 2 + var(W0, 0)) -
+                            ((var(W9, 0) - var(W11, 0)) *
+                             (2 * var(W10, 0) - var(W9, +1) * (2 * var(W9, 0) - var(W9, +1) ^ 2 + var(W0, 0)))));
+                        auto constraint_14 = this->bp.add_constraint(
+                            (var(W14, 0) + var(W10, 0)) * (2 * var(W11, 0) - var(W10, +1) ^ 2 + var(W0, 0)) -
+                            ((var(W11, 0) - var(W13, 0)) *
+                             (2 * var(W12, 0) - var(W10, +1) * (2 * var(W11, 0) - var(W10, +1) ^ 2 + var(W0, 0)))));
+                        auto constraint_15 = this->bp.add_constraint(
+                            (var(W1, +1) + var(W14, 0)) * (2 * var(W13, 0) - var(W11, +1) ^ 2 + var(W0, 0)) -
+                            ((var(W13, 0) - var(W0, +1)) *
+                             (2 * var(W14, 0) - var(W11, +1) * (2 * var(W13, 0) - var(W11, +1) ^ 2 + var(W0, 0)))));
+
+                        auto constraint_16 = this->bp.add_constraint(
+                            var(W5, 0) - (32 * (var(W4, 0)) + 16 * var(W2, +1) + 8 * var(W3, +1) + 4 * var(W4, +1) +
+                                          2 * var(W5, +1) + var(W6, +1)));
+                        this->bp.add_gate(vbsm_selector_index,
+                                          {bit_check_1,   bit_check_2,   bit_check_3,   bit_check_4,   bit_check_5,
+                                           constraint_1,  constraint_2,  constraint_3,  constraint_4,  constraint_5,
+                                           constraint_6,  constraint_7,  constraint_8,  constraint_9,  constraint_10,
+                                           constraint_11, constraint_12, constraint_13, constraint_14, constraint_15,
+                                           constraint_16});
                     }
 
-                    template <std::size_t SelectorColumns, std::size_t PublicInputColumns,
-                        std::size_t ConstantColumns>
+                    template<std::size_t SelectorColumns, std::size_t PublicInputColumns, std::size_t ConstantColumns>
                     void generate_copy_constraints(
-                            blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
-                                PublicInputColumns, ConstantColumns> &public_assignment,
-                        std::size_t circuit_start_row = 0){
+                        blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
+                                                          SelectorColumns,
+                                                          PublicInputColumns,
+                                                          ConstantColumns> &public_assignment,
+                        std::size_t circuit_start_row = 0) {
 
-                        for (int z = 0; z < required_rows_amount - 2; z+=2){
+                        for (int z = 0; z < required_rows_amount - 2; z += 2) {
                             this->bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 2, false}});
                             this->bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 2, false}});
                         }
 
                         // TODO: (x0, y0) in row i are copy constrained with values from the first doubling circuit
 
-                        for (int z = 2; z < required_rows_amount; z+=2){
+                        for (int z = 2; z < required_rows_amount; z += 2) {
                             this->bp.add_copy_constraint({{W2, j + z, false}, {W0, j + z - 1, false}});
                             this->bp.add_copy_constraint({{W3, j + z, false}, {W1, j + z - 1, false}});
                         }
 
                         std::size_t public_input_column_index = 0;
-                        this->bp.add_copy_constraint({{W4, j, false}, 
-                            {public_input_column_index, j, false, var::column_type::public_input}});
+                        this->bp.add_copy_constraint(
+                            {{W4, j, false}, {public_input_column_index, j, false, var::column_type::public_input}});
                         public_assignment.public_input(public_input_column_index)[j] = 0;
 
-                        for (int z = 2; z < required_rows_amount; z+=2){
+                        for (int z = 2; z < required_rows_amount; z += 2) {
                             this->bp.add_copy_constraint({{W5, j + z, false}, {W4, j + z - 2, false}});
                         }
                     }
 
-                    template <std::size_t WitnessColumns, std::size_t SelectorColumns,
-                        std::size_t PublicInputColumns, std::size_t ConstantColumns>
+                    template<std::size_t WitnessColumns,
+                             std::size_t SelectorColumns,
+                             std::size_t PublicInputColumns,
+                             std::size_t ConstantColumns>
                     void generate_assignments(
-                            blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
-                                PublicInputColumns, ConstantColumns> &public_assignment,
-                                              const assignment_params &params,
-                                              std::size_t circuit_start_row = 0) {
-
+                        blueprint_private_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
+                                                           WitnessColumns> &private_assignment,
+                        blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
+                                                          SelectorColumns,
+                                                          PublicInputColumns,
+                                                          ConstantColumns> &public_assignment,
+                        const assignment_params &params,
+                        std::size_t circuit_start_row = 0) {
                     }
                 };
             }    // namespace components
