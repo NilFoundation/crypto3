@@ -165,7 +165,7 @@ namespace nil {
                                                                         group_type>
                     marshalling_group_value_type;
                 typedef nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<endianness>,
-                                                                        scalar_field_type>
+                                                                        scalar_field_value_type>
                     marshalling_scalar_field_value_type;
                 typedef nil::crypto3::marshalling::types::integral<nil::marshalling::field_type<endianness>,
                                                                    base_integral_type>
@@ -255,7 +255,7 @@ namespace nil {
                     return pubkey;
                 }
 
-            protected:
+            // protected:
                 static inline group_value_type read_pubkey(const public_key_type &pubkey) {
                     marshalling_group_value_type marshalling_group_value_1;
                     auto pubkey_iter = std::cbegin(pubkey);
@@ -423,7 +423,7 @@ namespace nil {
                     return signature;
                 }
 
-            protected:
+            // protected:
                 // https://datatracker.ietf.org/doc/html/rfc8032#section-5.1.5
                 static inline base_integral_type construct_scalar(const typename hash_type::digest_type &h) {
                     // 3.
