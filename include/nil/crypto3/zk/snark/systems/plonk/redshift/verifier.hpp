@@ -104,12 +104,14 @@ namespace nil {
                         std::vector<std::size_t> rotation_gates = {0};
                         std::vector<typename FieldType::value_type> f(preprocessed_public_data.identity_polynomials.size());
 
-                        for (std::size_t i = 0; i < proof.eval_proof.witness.size(); i++) {
+                        std::size_t witness_columns_amount = proof.eval_proof.witness.size();
+
+                        for (std::size_t i = 0; i < witness_columns_amount; i++) {
                             f[i] = proof.eval_proof.witness[i].z[0]; // TODO: organize permutation evaluations inside the proof
                         }
 
-                        for (std::size_t i = 0; i < preprocessed_public_data.public_polynomial_table.size(); i++) {
-                            f[i] = preprocessed_public_data.public_polynomial_table[i].evaluate(proof.eval_proof.challenge); // TODO: add public evaluations to the proof
+                        for (std::size_t i = witness_columns_amount; i < preprocessed_public_data.identity_polynomials.size(); i++) {
+                            f[i] = preprocessed_public_data.public_polynomial_table[i - witness_columns_amount].evaluate(proof.eval_proof.challenge); // TODO: add public evaluations to the proof
                         }
 
                         // 5. permutation argument
@@ -151,7 +153,6 @@ namespace nil {
                         typename FieldType::value_type challenge = transcript.template challenge<FieldType>();
 
                         if (challenge != proof.eval_proof.challenge) {
-                            std::cout<<"Challenge verification failed"<<std::endl;
                             return false;
                         }
 
@@ -217,7 +218,6 @@ namespace nil {
                         typename FieldType::value_type Z_at_challenge = preprocessed_public_data.Z.evaluate(challenge);
 
                         if (F_consolidated != Z_at_challenge * T_consolidated) {
-                            std::cout<<"F = Z * T failed"<<std::endl;
                             return false;
                         }
 

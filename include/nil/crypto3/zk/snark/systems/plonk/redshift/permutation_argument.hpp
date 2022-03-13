@@ -91,20 +91,6 @@ namespace nil {
                         typename FieldType::value_type gamma = transcript.template challenge<FieldType>();
 
                         // 2. Calculate id_binding, sigma_binding for j from 1 to N_rows
-                        /*std::vector<typename FieldType::value_type> id_binding(table_rows);
-                        std::vector<typename FieldType::value_type> sigma_binding(table_rows);
-
-                        for (std::size_t j = 0; j < table_rows; j++) {
-                            id_binding[j] = FieldType::value_type::one();
-                            sigma_binding[j] = FieldType::value_type::one();
-                            for (std::size_t i = 0; i < S_id.size(); i++) {
-
-                                id_binding[j] *= (column_polynomials[i].evaluate(domain->get_domain_element(j)) +
-                                                  beta * S_id[i].evaluate(domain->get_domain_element(j)) + gamma);
-                                sigma_binding[j] *= (column_polynomials[i].evaluate(domain->get_domain_element(j)) +
-                                                     beta * S_sigma[i].evaluate(domain->get_domain_element(j)) + gamma);
-                            }
-                        }*/
                         math::polynomial<typename FieldType::value_type> id_binding = {1};
                         math::polynomial<typename FieldType::value_type> sigma_binding = {1};
 
@@ -158,20 +144,9 @@ namespace nil {
 
 
                         F[0] = preprocessed_data.lagrange_0 * (one_polynomial - V_P);
-                        F[1] = //(one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
+                        F[1] = (one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
                                (V_P_shifted * h - V_P * g);
                         F[2] = preprocessed_data.q_last * (V_P * V_P - V_P);
-
-                        for (std::size_t i = 0; i < table_rows; i++) {
-                            typename FieldType::value_type omega = domain->get_domain_element(i);
-                            for (std::size_t j = 0; j < 3; j++) {
-                                if (F[j].evaluate(omega) != FieldType::value_type::zero()) {
-                                    std::cout<<"Fail for i = "<<i<<", j = "<<j<<std::endl;
-                                    
-                                }
-                            }
-                        }
-
 
                         prover_result_type res = {F, V_P, V_P_tree};
 
