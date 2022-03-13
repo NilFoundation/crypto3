@@ -106,7 +106,8 @@ namespace nil {
 
                     integral_vector_type pubkey_data;
 
-                    std::vector<field_element_type> &val = pubkey_data.value();
+                    std::vector<integral<TTypeBase, typename PublicKey::public_key_type::value_type>> &val
+                        = pubkey_data.value();
                     for (std::size_t i = 0; i < key_inp.pubkey.size(); i++) {
                         val.push_back(integral<TTypeBase,
                             typename PublicKey::public_key_type::value_type>(key_inp.pubkey[i]));
@@ -117,6 +118,59 @@ namespace nil {
                             filled_pubkey_point,
                             pubkey_data));
                 }
+
+                template<typename PublicKey, typename Endianness>
+                PublicKey make_public_key(const eddsa_public_key<nil::marshalling::field_type<Endianness>,
+                                                                              PublicKey> &filled_key_inp) {
+
+                    using TTypeBase = nil::marshalling::field_type<Endianness>;
+                    typename PublicKey::public_key_type result;
+
+                    const std::vector<integral<TTypeBase,
+                        typename PublicKey::public_key_type::value_type>> &values =
+                        std::get<1>(filled_key_inp.value()).value();
+
+                    std::size_t size = values.size();
+
+                    for (std::size_t i = 0; i < size; i++) {
+                        result.push_back(values[i].value());
+                    }
+
+                    return PublicKey(std::move(std::get<0>(filled_key_inp.value()).value()),
+                                     std::move(result));
+                }
+
+                // template<typename Private, typename Endianness>
+                // eddsa_public_key<nil::marshalling::field_type<Endianness>, Private>
+                //     fill_eddsa_private_key(const Private &key_inp) {
+
+                //     using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+                //     using curve_element_type = curve_element<TTypeBase, typename PublicKey::g1_type>;
+
+                //     curve_element_type filled_pubkey_point = curve_element_type(key_inp.pubkey_point);
+
+                //     using integral_vector_type = nil::marshalling::types::array_list<
+                //             TTypeBase,
+                //             integral<TTypeBase, typename PublicKey::public_key_type::value_type>,
+                //             nil::marshalling::option::sequence_size_field_prefix<
+                //                 nil::marshalling::types::integral<TTypeBase, std::size_t>>>;
+
+                //     integral_vector_type pubkey_data;
+
+                //     std::vector<integral<TTypeBase, typename PublicKey::public_key_type::value_type>> &val
+                //         = pubkey_data.value();
+                //     for (std::size_t i = 0; i < key_inp.pubkey.size(); i++) {
+                //         val.push_back(integral<TTypeBase,
+                //             typename PublicKey::public_key_type::value_type>(key_inp.pubkey[i]));
+                //     }
+
+                //     return eddsa_public_key<nil::marshalling::field_type<Endianness>, PublicKey>(
+                //         std::make_tuple(
+                //             filled_pubkey_point,
+                //             pubkey_data));
+                // }
+
             }    // namespace types
         }        // namespace marshalling
     }            // namespace crypto3
