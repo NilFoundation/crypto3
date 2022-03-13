@@ -176,12 +176,12 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_polynomials_test) {
     typename FieldType::value_type id_res = FieldType::value_type::one();
     typename FieldType::value_type sigma_res = FieldType::value_type::one();
     for (std::size_t i = 0; i < table_rows; i++) {
-        for (std::size_t j = 0; j < preprocessed_public_data.identity_polynomials.size(); j++) {
-            id_res = id_res * preprocessed_public_data.identity_polynomials[j].evaluate(domain->get_domain_element(i));
+        for (auto & identity_polynomial : preprocessed_public_data.identity_polynomials) {
+            id_res = id_res * identity_polynomial.evaluate(domain->get_domain_element(i));
         }
 
-        for (std::size_t j = 0; j < preprocessed_public_data.permutation_polynomials.size(); j++) {
-            sigma_res = sigma_res * preprocessed_public_data.permutation_polynomials[j].evaluate(domain->get_domain_element(i));
+        for (auto & permutation_polynomial : preprocessed_public_data.permutation_polynomials) {
+            sigma_res = sigma_res * permutation_polynomial.evaluate(domain->get_domain_element(i));
         }
     }
     BOOST_CHECK_MESSAGE(id_res == sigma_res, "Simple check");
