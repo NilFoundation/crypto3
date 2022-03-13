@@ -32,10 +32,10 @@
 #define keccak_1600_armv8_step(c)    \
     "sub  sp, sp, #32 \n"            \
                                      \
-    "str   x1, x2 [sp, #16]\n"        \
+    "stp   x1, x2, [sp, #16]\n"      \
     "ldr x1, [%[A], #0]\n"           \
     "eor  x25,x1,x5 \n"              \
-    "ldr   x1, x2, [sp, #16] \n"         \
+    "ldp   x1, x2, [sp, #16] \n"     \
                                      \
     "stp  x4, x9, [sp] \n"           \
                                      \
@@ -75,11 +75,11 @@
     "eor	x17,x17,x9 \n"           \
     "eor	x22,x22,x9 \n"           \
                                      \
-    "str   x1, x2 [sp, #16]\n"        \
+    "stp   x1, x2, [sp, #16]\n"      \
     "ldr x1, [%[A], #0]\n"           \
     "eor	x1,x1,x4 \n"             \
     "str x1, [%[A], #0] \n"          \
-    "ldr   x1, x2 [sp, #16]\n"        \
+    "ldp   x1, x2, [sp, #16]\n"      \
                                      \
     "eor	x5,x5,x4 \n"             \
     "eor	x10,x10,x4 \n"           \
@@ -133,13 +133,13 @@
     "bic	x25,x2,x1 \n"            \
     "bic	x26,x3,x2 \n"            \
                                      \
-    "str   x2, x3 [sp, #16]\n"        \
-    "ldr    x2, [%[A], #0]\n"           \
+    "stp    x2, x3, [sp, #16]\n"     \
+    "ldr    x2, [%[A], #0]\n"        \
     "bic	x27,x2,x4 \n"            \
     "bic	x28,x1,x2 \n"            \
     "eor	x2,x2,x25 \n"            \
-    "str    x2, [%[A], #0]\n"           \
-    "ldr   x1, x2 [sp, #16]\n"        \
+    "str    x2, [%[A], #0]\n"        \
+    "ldp    x2, x3, [sp, #16]\n"     \
                                      \
     "bic	x25,x4,x3 \n"            \
     "eor	x1,x1,x26 \n"            \
@@ -192,11 +192,11 @@
     "eor	x22,x22,x25 \n"          \
     "ldr x25, =" #c " \n"            \
                                      \
-    "str   x1, x2 [sp, #16]\n"        \
+    "stp   x1, x2, [sp, #16]\n"      \
     "ldr x1, [%[A], #0]\n"           \
     "eor x1, x1, x25 \n"             \
     "str x1, [%[A], #0]\n"           \
-    "ldr   x1, x2 [sp, #16]\n"        \
+    "ldp   x1, x2, [sp, #16]\n"      \
                                      \
     "add  sp, sp, #32 \n"
 
@@ -253,30 +253,30 @@
                             "ldr x23, [%[A], #184]\n"
                             "ldr x24, [%[A], #192]\n"
 
-                            keccak_1600_armv8_step(0x0000000000000001)
-//                            keccak_1600_armv8_step(0x0000000000008082)
-//                            keccak_1600_armv8_step(0x800000000000808a)
-//                            keccak_1600_armv8_step(0x8000000080008000)
-//                            keccak_1600_armv8_step(0x000000000000808b)
-//                            keccak_1600_armv8_step(0x0000000080000001)
-//                            keccak_1600_armv8_step(0x8000000080008081)
-//                            keccak_1600_armv8_step(0x8000000000008009)
-//                            keccak_1600_armv8_step(0x000000000000008a)
-//                            keccak_1600_armv8_step(0x0000000000000088)
-//                            keccak_1600_armv8_step(0x0000000080008009)
-//                            keccak_1600_armv8_step(0x000000008000000a)
-//                            keccak_1600_armv8_step(0x000000008000808b)
-//                            keccak_1600_armv8_step(0x800000000000008b)
-//                            keccak_1600_armv8_step(0x8000000000008089)
-//                            keccak_1600_armv8_step(0x8000000000008003)
-//                            keccak_1600_armv8_step(0x8000000000008002)
-//                            keccak_1600_armv8_step(0x8000000000000080)
-//                            keccak_1600_armv8_step(0x000000000000800a)
-//                            keccak_1600_armv8_step(0x800000008000000a)
-//                            keccak_1600_armv8_step(0x8000000080008081)
-//                            keccak_1600_armv8_step(0x8000000000008080)
-//                            keccak_1600_armv8_step(0x0000000080000001)
-//                            keccak_1600_armv8_step(0x8000000080008008)
+                            keccak_1600_armv8_step(1)
+                            keccak_1600_armv8_step(32898)
+                            keccak_1600_armv8_step(9223372036854808714)
+                            keccak_1600_armv8_step(9223372039002292224)
+                            keccak_1600_armv8_step(32907)
+                            keccak_1600_armv8_step(2147483649)
+                            keccak_1600_armv8_step(9223372039002292353)
+                            keccak_1600_armv8_step(9223372036854808585)
+                            keccak_1600_armv8_step(138)
+                            keccak_1600_armv8_step(136)
+                            keccak_1600_armv8_step(2147516425)
+                            keccak_1600_armv8_step(2147483658)
+                            keccak_1600_armv8_step(2147516555)
+                            keccak_1600_armv8_step(9223372036854775947)
+                            keccak_1600_armv8_step(9223372036854808713)
+                            keccak_1600_armv8_step(9223372036854808579)
+                            keccak_1600_armv8_step(9223372036854808578)
+                            keccak_1600_armv8_step(9223372036854775936)
+                            keccak_1600_armv8_step(32778)
+                            keccak_1600_armv8_step(9223372039002259466)
+                            keccak_1600_armv8_step(9223372039002292353)
+                            keccak_1600_armv8_step(9223372036854808704)
+                            keccak_1600_armv8_step(2147483649)
+                            keccak_1600_armv8_step(9223372039002292232)
 
 
 //                            "str x0, [%[A], #0]\n"
@@ -310,9 +310,9 @@
                               //"x0",
                               "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13",
                               "x14", "x15", "x16", "x17", "x30", "x19", "x20", "x21", "x22", "x23", "x24");
-                        for (int i = 0; i < 25; ++i) {
-                            std::cout << "i=" << i << " " << A[i] << std::endl;
-                        }
+//                        for (int i = 0; i < 25; ++i) {
+//                            std::cout << "i=" << i << " " << A[i] << std::endl;
+//                        }
                     }
 
                 };
