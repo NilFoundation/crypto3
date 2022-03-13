@@ -30,9 +30,12 @@
 #include <nil/crypto3/hash/detail/keccak/keccak_impl.hpp>
 
 #define keccak_1600_armv8_step(c)    \
-    "sub  sp, sp, #16 \n"            \
+    "sub  sp, sp, #32 \n"            \
                                      \
-    "eor	x25,x0,x5 \n"            \
+    "str   x1, [sp, #-16]!\n"        \
+    "ldr x1, [%[A], #0]\n"                                 \
+    "eor  x25,x1,x5 \n"      \
+    "ldr   x1, [sp], #16 \n" \
                                      \
     "stp  x4, x9, [sp] \n"           \
                                      \
@@ -70,15 +73,20 @@
     "eor	x7,x7,x9 \n"             \
     "eor	x12,x12,x9 \n"           \
     "eor	x17,x17,x9 \n"           \
-    "eor	x22,x22,x9 \n"           \
-    "eor	x0,x0,x4 \n"             \
+    "eor	x22,x22,x9 \n"              \
+                                     \
+    "str   x1, [sp, #-16]!\n"           \
+    "ldr x1, [%[A], #0]\n"          \
+    "eor	x1,x1,x4 \n"               \
+    "str x1, [%[A], #0] \n"           \
+    "ldr   x1, [sp], #16 \n"         \
+                                     \
     "eor	x5,x5,x4 \n"             \
     "eor	x10,x10,x4 \n"           \
     "eor	x15,x15,x4 \n"           \
     "eor	x20,x20,x4 \n"           \
                                      \
     "ldp  x4, x9, [sp]\n"            \
-    "add  sp, sp, #16 \n"            \
                                      \
     "eor	x25,x3,x27 \n"           \
     "eor	x8,x8,x27 \n"            \
@@ -123,10 +131,16 @@
     "ror	x20,x26,#2\n"            \
                                      \
     "bic	x25,x2,x1 \n"            \
-    "bic	x26,x3,x2 \n"            \
-    "bic	x27,x0,x4 \n"            \
-    "bic	x28,x1,x0 \n"            \
-    "eor	x0,x0,x25 \n"            \
+    "bic	x26,x3,x2 \n"               \
+                                     \
+    "str   x2, [sp, #-16]!\n"                                 \
+    "ldr x2, [%[A], #0]\n"                                 \
+    "bic	x27,x2,x4 \n"            \
+    "bic	x28,x1,x2 \n"            \
+    "eor	x2,x2,x25 \n"               \
+    "str x2, [%[A], #0]\n"                                                                \
+    "ldr   x2, [sp], #16 \n"                                       \
+                                     \
     "bic	x25,x4,x3 \n"            \
     "eor	x1,x1,x26 \n"            \
                                      \
@@ -177,9 +191,16 @@
     "eor	x24,x24,x28 \n"          \
     "eor	x22,x22,x25 \n"          \
     "ldr x25, =" #c " \n"            \
-    "eor x0, x0, x25 \n"
+                                     \
+"str   x1, [sp, #-16]!\n"                                 \
+"ldr x1, [%[A], #0]\n"                                 \
+"eor x1, x1, x25 \n"             \
+"str x1, [%[A], #0]\n"                                                                \
+"ldr   x1, [sp], #16 \n"                         \
+                                     \
+    "add  sp, sp, #32 \n"
 
-namespace nil {
+    namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
@@ -206,7 +227,7 @@ namespace nil {
 
                     static inline void permute(state_type &A) {
                         __asm__ volatile(
-                            "ldr x0, [%[A], #0]\n"
+//                            "ldr x0, [%[A], #0]\n"
                             "ldr x1, [%[A], #8]\n"
                             "ldr x2, [%[A], #16]\n"
                             "ldr x3, [%[A], #24]\n"
@@ -257,7 +278,8 @@ namespace nil {
                             keccak_1600_armv8_step(0x0000000080000001)
                             keccak_1600_armv8_step(0x8000000080008008)
 
-                            "str x0, [%[A], #0]\n"
+
+//                            "str x0, [%[A], #0]\n"
                             "str x1, [%[A], #8]\n"
                             "str x2, [%[A], #16]\n"
                             "str x3, [%[A], #24]\n"
@@ -285,9 +307,12 @@ namespace nil {
                             :
                             : [A] "r"(A.begin())
                             : "cc", "memory", "x25", "x26", "x27", "x28",    // C0, C1, C2, C3
-                              "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13",
+                              //"x0",
+                              "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13",
                               "x14", "x15", "x16", "x17", "x30", "x19", "x20", "x21", "x22", "x23", "x24");
+
                     }
+
                 };
 
                 template<typename PolicyType>
