@@ -10,27 +10,63 @@ include(CheckCSourceCompiles)
 include(CheckCXXSourceCompiles)
 
 set(AVX_CODE "
-  #include <immintrin.h>
+#include <immintrin.h>
+int main()
+{
+    __m256 a, b, c;
+    const float src[8] = { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f };
+    float dst[8];
+    a = _mm256_loadu_ps( src );
+    b = _mm256_loadu_ps( src );
+    c = _mm256_add_ps( a, b );
+    _mm256_storeu_ps( dst, c );
 
-  int main()
-  {
-    __m256 a;
-    a = _mm256_set1_ps(0);
+    for( int i = 0; i < 8; i++ ){
+        if( ( src[i] + src[i] ) != dst[i] ){
+            return -1;
+        }
+    }
     return 0;
-  }
+}
 ")
 
 set(AVX2_CODE "
-  #include <immintrin.h>
+#include <immintrin.h>
+int main()
+{
+    __m256i a, b, c;
+    const int src[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    int dst[8];
+    a =  _mm256_loadu_si256( (__m256i*)src );
+    b =  _mm256_loadu_si256( (__m256i*)src );
+    c = _mm256_add_epi32( a, b );
+    _mm256_storeu_si256( (__m256i*)dst, c );
 
-  int main()
-  {
-    __m256i a = {0};
-    a = _mm256_abs_epi16(a);
-    __m256i x;
-    _mm256_extract_epi64(x, 0); // we rely on this in our AVX2 code
+    for( int i = 0; i < 8; i++ ){
+        if( ( src[i] + src[i] ) != dst[i] ){
+            return -1;
+        }
+    }
+
     return 0;
-  }
+}
+")
+
+set(AVX512_CODE "
+#include <immintrin.h>
+
+int main()
+{
+    __m512i a = {0};
+    __m512i b = _mm512_set_epi64(1, 1, 1, 1, 1, 1, 1, 1);
+    __m512i c = _mm256_add_ps( a, b );
+    for( int i = 0; i < 8; i++ ){
+        if( ( a[i] + b[i] ) != с[i] ){
+            return -1;
+        }
+    }
+    return 0;
+}
 ")
 
 macro(check_avx_lang lang type flags)
@@ -40,7 +76,7 @@ macro(check_avx_lang lang type flags)
         if(NOT ${lang}_${type}_FOUND)
             set(CMAKE_REQUIRED_FLAGS ${__FLAG})
             if(lang STREQUAL "CXX")
-                check_cxx_source_compiles("${${type}_CODE}" ${lang}_HAS_${type}_${__FLAG_I})
+                check_cxx_source_runs("${${type}_CODE}" ${lang}_HAS_${type}_${__FLAG_I})
             else()
                 check_c_source_compiles("${${type}_CODE}" ${lang}_HAS_${type}_${__FLAG_I})
             endif()
@@ -63,9 +99,11 @@ macro(check_avx_lang lang type flags)
 endmacro()
 
 macro(check_avx)
-    check_avx_lang(C "AVX" " ;-mavx;/arch:AVX")
-    check_avx_lang(C "AVX2" " ;-mavx2 -mfma;/arch:AVX2")
+    check_avx_lang(C "AVX" "-mavx;/arch:AVX")
+    check_avx_lang(C "AVX2" "-mavx2 -mfma;/arch:AVX2")
+    check_avx_lang(C "AVX512" "-mavx512f -mfma;/arch:AVX512")
 
-    check_avx_lang(CXX "AVX" " ;-mavx;/arch:AVX")
-    check_avx_lang(CXX "AVX2" " ;-mavx2 -mfma;/arch:AVX2")
+    check_avx_lang(CXX "AVX" "-mavx;/arch:AVX")
+    check_avx_lang(CXX "AVX2" "-mavx2 -mfma;/arch:AVX2")
+    check_avx_lang(CXX "AVX512" "-mavx512f -mfma;/arch:AVX512")
 endmacro()

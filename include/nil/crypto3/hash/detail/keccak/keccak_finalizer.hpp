@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
+// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
 //
 // MIT License
 //
@@ -56,6 +57,8 @@ namespace nil {
 
                     typedef typename policy_type::digest_type digest_type;
                     typedef keccak_1600_functions<digest_bits> policy_func_type;
+                    typedef typename policy_func_type::impl_type impl_type;
+                    typedef typename policy_func_type::const_impl_type const_impl_type;
 
                 public:
                     void operator()(state_type &state) {
@@ -69,7 +72,11 @@ namespace nil {
                             for (std::size_t i = 0; i != state_words; ++i)
                                 boost::endian::endian_reverse_inplace(state[i]);
 
-                            policy_func_type::permute(state);
+                            if (!CRYPTO3_IS_CONST_EVALUATED(state)) {
+                                impl_type::permute(state);
+                            } else {
+                                const_impl_type::permute(state);
+                            }
 
                             for (std::size_t i = 0; i != state_words; ++i)
                                 boost::endian::endian_reverse_inplace(state[i]);

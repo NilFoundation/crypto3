@@ -65,7 +65,7 @@ public:
     }
 };
 
-const char *test_data = "data/sha1.json";
+const char *test_data = TEST_DATA;
 
 boost::property_tree::ptree string_data() {
     boost::property_tree::ptree string_data;
