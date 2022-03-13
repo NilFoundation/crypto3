@@ -110,16 +110,6 @@ namespace nil {
                         std::array<typename FieldType::value_type, f_parts> alphas =
                             transcript.template challenges<FieldType, f_parts>();
 
-                        for (std::size_t i = 0; i < f_parts; i++) {
-                            math::polynomial<typename FieldType::value_type> T0 = F[i] / preprocessed_public_data.Z;
-                            math::polynomial<typename FieldType::value_type> F0_restored =
-                                T0 * preprocessed_public_data.Z;
-                            typename FieldType::value_type F0_at_y = F[i].evaluate(alphas[0]);
-                            typename FieldType::value_type F0_restored_at_y = F0_restored.evaluate(alphas[0]);
-                            std::cout << "F_" << i << ": " << F0_at_y.data << std::endl;
-                            std::cout << "F_" << i << "(R): " << F0_restored_at_y.data << std::endl;
-                        }
-
                         // 7.2. Compute F_consolidated
                         math::polynomial<typename FieldType::value_type> F_consolidated = {0};
                         for (std::size_t i = 0; i < f_parts; i++) {
@@ -211,6 +201,7 @@ namespace nil {
                         // 7. Aggregate quotient polynomial
                         math::polynomial<typename FieldType::value_type> T =
                             quotient_polynomial(preprocessed_public_data, F, transcript);
+                        
                         std::vector<math::polynomial<typename FieldType::value_type>> T_splitted =
                             detail::split_polynomial<FieldType>(T, fri_params.max_degree);
                         std::vector<typename commitment_scheme_quotient_type::precommitment_type> T_precommitments(
