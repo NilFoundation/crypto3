@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
+// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@nil.foundation>
 //
 // MIT License
 //
@@ -107,11 +107,11 @@ namespace nil {
                           static_cast<long long>(round_constants[23]), static_cast<long long>(round_constants[23])}}};
 
                     constexpr static const std::array<__m256i, 6> rho_l = {{{3, 18, 36, 41},
-                                                                                               {1, 62, 28, 27},
-                                                                                               {45, 6, 56, 39},
-                                                                                               {10, 61, 55, 8},
-                                                                                               {2, 15, 25, 20},
-                                                                                               {44, 43, 21, 14}}};
+                                                                            {1, 62, 28, 27},
+                                                                            {45, 6, 56, 39},
+                                                                            {10, 61, 55, 8},
+                                                                            {2, 15, 25, 20},
+                                                                            {44, 43, 21, 14}}};
 
                     constexpr static const std::array<__m256i, 6> rho_r = {
                         {{word_bits - 3, word_bits - 18, word_bits - 36, word_bits - 41},
@@ -131,7 +131,7 @@ namespace nil {
                         register __m256i A5 asm("ymm5") = _mm256_set_epi64x(A[9], A[13], A[17], A[21]);
                         register __m256i A6 asm("ymm6") = _mm256_set_epi64x(A[24], A[18], A[12], A[6]);
 
-                        __asm__(
+                        __asm__ volatile(
                             "lea %[rho_l], %%r8;"
                             "lea %[rho_r], %%r9;"
                             "lea %[c], %%r10;"

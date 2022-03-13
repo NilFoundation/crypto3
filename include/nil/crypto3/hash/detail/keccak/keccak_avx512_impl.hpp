@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
+// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@nil.foundation>
 //
 // MIT License
 //
@@ -110,7 +110,7 @@ namespace nil {
                         register __m512i rho13 asm("zmm30") = rho_1[3];
                         register __m512i rho14 asm("zmm31") = rho_1[4];
 
-                        __asm__(
+                        __asm__ volatile(
                             "lea %[c], %%r10\n"
                             "mov $12,%eax\n"
                             "1:"
