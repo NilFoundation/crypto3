@@ -98,7 +98,8 @@ namespace nil {
                         typename CurveType::scalar_field_type::value_type b;
                     };
 
-                    curve_element_variable_base_endo_scalar_mul(blueprint_type &bp, const init_params &params) :
+                    curve_element_variable_base_endo_scalar_mul(blueprint_type &bp,
+                                                                const init_params &params = init_params()) :
                         component<arithmetization_type>(bp) {
 
                         // the last row is only for the n
@@ -110,12 +111,11 @@ namespace nil {
                     }
 
                     template<std::size_t SelectorColumns, std::size_t PublicInputColumns, std::size_t ConstantColumns>
-                    void generate_gates(
-                        blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                          SelectorColumns,
-                                                          PublicInputColumns,
-                                                          ConstantColumns> &public_assignment,
-                        std::size_t circuit_start_row = 0) {
+                    void generate_gates(blueprint_public_assignment_table<arithmetization_type,
+                                                                          SelectorColumns,
+                                                                          PublicInputColumns,
+                                                                          ConstantColumns> &public_assignment,
+                                        std::size_t circuit_start_row = 0) {
 
                         std::size_t selector_index = public_assignment.add_selector(j, j + required_rows_amount - 2);
 
@@ -157,12 +157,12 @@ namespace nil {
                     }
 
                     template<std::size_t SelectorColumns, std::size_t PublicInputColumns, std::size_t ConstantColumns>
-                    void generate_copy_constraints(
-                        blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                          SelectorColumns,
-                                                          PublicInputColumns,
-                                                          ConstantColumns> &public_assignment,
-                        std::size_t circuit_start_row = 0) {
+                    void
+                        generate_copy_constraints(blueprint_public_assignment_table<arithmetization_type,
+                                                                                    SelectorColumns,
+                                                                                    PublicInputColumns,
+                                                                                    ConstantColumns> &public_assignment,
+                                                  std::size_t circuit_start_row = 0) {
 
                         for (int z = 0; z < required_rows_amount - 2; z++) {
                             this->bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 1, false}});
@@ -177,9 +177,8 @@ namespace nil {
                              std::size_t PublicInputColumns,
                              std::size_t ConstantColumns>
                     void generate_assignments(
-                        blueprint_private_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                           WitnessColumns> &private_assignment,
-                        blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
+                        blueprint_private_assignment_table<arithmetization_type, WitnessColumns> &private_assignment,
+                        blueprint_public_assignment_table<arithmetization_type,
                                                           SelectorColumns,
                                                           PublicInputColumns,
                                                           ConstantColumns> &public_assignment,

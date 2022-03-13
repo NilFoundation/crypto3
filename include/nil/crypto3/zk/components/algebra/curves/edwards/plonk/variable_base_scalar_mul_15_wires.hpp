@@ -103,18 +103,16 @@ namespace nil {
                         j = this->bp.allocate_rows(required_rows_amount);
                     }
 
-                    static std::size_t
-                        allocate_rows(blueprint<snark::plonk_constraint_system<BlueprintFieldType>> &in_bp) {
+                    static std::size_t allocate_rows(blueprint<arithmetization_type> &in_bp) {
                         return in_bp.allocate_rows(required_rows_amount);
                     }
 
                     template<std::size_t SelectorColumns, std::size_t PublicInputColumns, std::size_t ConstantColumns>
-                    void generate_gates(
-                        blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                          SelectorColumns,
-                                                          PublicInputColumns,
-                                                          ConstantColumns> &public_assignment,
-                        std::size_t circuit_start_row = 0) {
+                    void generate_gates(blueprint_public_assignment_table<arithmetization_type,
+                                                                          SelectorColumns,
+                                                                          PublicInputColumns,
+                                                                          ConstantColumns> &public_assignment,
+                                        std::size_t circuit_start_row = 0) {
 
                         std::size_t vbsm_selector_index =
                             public_assignment.add_selector(j, j + required_rows_amount - 1, 2);
@@ -190,12 +188,12 @@ namespace nil {
                     }
 
                     template<std::size_t SelectorColumns, std::size_t PublicInputColumns, std::size_t ConstantColumns>
-                    void generate_copy_constraints(
-                        blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                          SelectorColumns,
-                                                          PublicInputColumns,
-                                                          ConstantColumns> &public_assignment,
-                        std::size_t circuit_start_row = 0) {
+                    void
+                        generate_copy_constraints(blueprint_public_assignment_table<arithmetization_type,
+                                                                                    SelectorColumns,
+                                                                                    PublicInputColumns,
+                                                                                    ConstantColumns> &public_assignment,
+                                                  std::size_t circuit_start_row = 0) {
 
                         for (int z = 0; z < required_rows_amount - 2; z += 2) {
                             this->bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 2, false}});
@@ -224,9 +222,8 @@ namespace nil {
                              std::size_t PublicInputColumns,
                              std::size_t ConstantColumns>
                     void generate_assignments(
-                        blueprint_private_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                           WitnessColumns> &private_assignment,
-                        blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
+                        blueprint_private_assignment_table<arithmetization_type, WitnessColumns> &private_assignment,
+                        blueprint_public_assignment_table<arithmetization_type,
                                                           SelectorColumns,
                                                           PublicInputColumns,
                                                           ConstantColumns> &public_assignment,
