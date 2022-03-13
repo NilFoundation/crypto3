@@ -56,7 +56,7 @@ namespace nil {
                 using fri_round_proof = nil::marshalling::types::bundle<
                     TTypeBase, std::tuple<
                                    // typename FieldType::value_type colinear_value;
-                                   field_element<TTypeBase, typename FRIScheme::field_type>,
+                                   field_element<TTypeBase, typename FRIScheme::field_type::value_type>,
                                    // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                                    // TODO: review std::uint8_t type usage (for example, pedersen outputs array of bits)
                                    // typename merkle_tree_type::value_type T_root;
@@ -67,7 +67,7 @@ namespace nil {
                                    // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                                    // std::array<typename FieldType::value_type, m> y;
                                    nil::marshalling::types::array_list<
-                                       TTypeBase, field_element<TTypeBase, typename FRIScheme::field_type>,
+                                       TTypeBase, field_element<TTypeBase, typename FRIScheme::field_type::value_type>,
                                        nil::marshalling::option::sequence_size_field_prefix<
                                            nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
                                    // merkle_proof_type colinear_path;
@@ -91,7 +91,7 @@ namespace nil {
                     TTypeBase, std::tuple<
                                    // math::polynomial<typename FieldType::value_type> final_polynomial;
                                    nil::marshalling::types::array_list<
-                                       TTypeBase, field_element<TTypeBase, typename FRIScheme::field_type>,
+                                       TTypeBase, field_element<TTypeBase, typename FRIScheme::field_type::value_type>,
                                        nil::marshalling::option::sequence_size_field_prefix<
                                            nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
                                    // std::vector<round_proof_type> round_proofs;    // 0..r-2
@@ -118,7 +118,7 @@ namespace nil {
                 //                                   // math::polynomial<typename FieldType::value_type> q;
                 //                                   nil::marshalling::types::array_list<
                 //                                       TTypeBase, field_element<TTypeBase, typename
-                //                                       FRIScheme::field_type>,
+                //                                       FRIScheme::field_type::value_type>,
                 //                                       nil::marshalling::option::sequence_size_field_prefix<
                 //                                           nil::marshalling::types::integral<TTypeBase,
                 //                                           std::size_t>>>,
@@ -127,7 +127,7 @@ namespace nil {
                 //                                   // basic_radix2_domain by default, vectors of omegas will be
                 //                                   nil::marshalling::types::array_list<
                 //                                       TTypeBase, field_element<TTypeBase, typename
-                //                                       FRIScheme::field_type>,
+                //                                       FRIScheme::field_type::value_type>,
                 //                                       nil::marshalling::option::sequence_size_field_prefix<
                 //                                           nil::marshalling::types::integral<TTypeBase,
                 //                                           std::size_t>>>>>;
@@ -147,7 +147,7 @@ namespace nil {
                     using merkle_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, merkle_proof_marshalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
-                    using field_marhsalling_type = field_element<TTypeBase, typename FRIScheme::field_type>;
+                    using field_marhsalling_type = field_element<TTypeBase, typename FRIScheme::field_type::value_type>;
                     using field_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, field_marhsalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
@@ -224,7 +224,8 @@ namespace nil {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using size_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
-                    using field_marhsalling_type = field_element<TTypeBase, typename FRIScheme::field_type>;
+                    using field_marhsalling_type = field_element<TTypeBase,
+                        typename FRIScheme::field_type::value_type>;
                     using field_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, field_marhsalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
