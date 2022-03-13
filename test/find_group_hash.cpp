@@ -102,6 +102,7 @@ BOOST_AUTO_TEST_CASE(jubjub_sha256_default_params_manual_test) {
     using hash_type = hashes::find_group_hash<>;
 
     std::vector<std::uint8_t> input = {0, 0, 0, 0};
+    std::cout << "HERE" << std::endl;
     typename hash_type::group_value_type expected = typename hash_type::group_value_type(
         typename hash_type::group_value_type::field_type::integral_type(
             "14821992026951101352906249207585330645531160601076441869339940926000353872705"),

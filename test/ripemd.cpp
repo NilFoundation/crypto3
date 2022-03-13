@@ -69,7 +69,7 @@ public:
     }
 };
 
-const char *test_data = "data/ripemd.json";
+const char *test_data = TEST_DATA;
 
 boost::property_tree::ptree string_data(const char *child_name) {
     boost::property_tree::ptree root_data;

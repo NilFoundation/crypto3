@@ -58,7 +58,7 @@ namespace boost {
 }    // namespace boost
 
 // if target == check-hash just data/curves.json
-const char *test_data = "../../../../libs/hash/test/data/poseidon.json";
+const char *test_data = TEST_DATA;
 
 boost::property_tree::ptree string_data(const std::string &interface_type, const std::string &strength,
                                         const std::string &arity) {
