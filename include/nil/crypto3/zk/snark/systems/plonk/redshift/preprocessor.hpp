@@ -98,10 +98,10 @@ namespace nil {
                 class redshift_public_preprocessor {
                     typedef detail::redshift_policy<FieldType, ParamsType> policy_type;
 
-                    typedef typename policy_type::preprocessed_public_data_type<CommitmentSchemeTypePublic>::public_precommitments 
+                    typedef typename policy_type::template preprocessed_public_data_type<CommitmentSchemeTypePublic>::public_precommitments
                         public_precommitments_type;
 
-                    typedef typename policy_type::preprocessed_public_data_type<CommitmentSchemeTypePublic>::public_commitments 
+                    typedef typename policy_type::template preprocessed_public_data_type<CommitmentSchemeTypePublic>::public_commitments
                         public_commitments_type;
 
                     static math::polynomial<typename FieldType::value_type>
@@ -370,7 +370,7 @@ namespace nil {
                         };
                     }
 
-                    static inline typename policy_type::preprocessed_public_data_type<CommitmentSchemeTypePublic> process(
+                    static inline typename policy_type::template preprocessed_public_data_type<CommitmentSchemeTypePublic> process(
                         typename policy_type::constraint_system_type &constraint_system,
                         const typename policy_type::variable_assignment_type::public_table_type &public_assignment,
                         const plonk_table_description<FieldType> &table_description,
@@ -429,10 +429,10 @@ namespace nil {
                         public_commitments_type public_commitments =
                             commitments(public_precommitments);
                         
-                        typename policy_type::preprocessed_public_data_type<CommitmentSchemeTypePublic>::common_data_type
+                        typename policy_type::template preprocessed_public_data_type<CommitmentSchemeTypePublic>::common_data_type
                             common_data {basic_domain, Z, lagrange_0, public_commitments};
 
-                        return typename policy_type::preprocessed_public_data_type<CommitmentSchemeTypePublic>(
+                        return typename policy_type::template preprocessed_public_data_type<CommitmentSchemeTypePublic>(
                             {public_polynomial_table, _permutation_polynomials, _identity_polynomials,
                              q_last, q_blind, public_precommitments, common_data});
                     }
