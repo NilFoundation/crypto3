@@ -108,6 +108,11 @@ BOOST_AUTO_TEST_CASE(lpc_bls12_381_be) {
     auto filled_key = nil::crypto3::marshalling::types::fill_eddsa_public_key<
         public_key_type, endianness>(pub_k);
 
+    auto made_key = nil::crypto3::marshalling::types::make_eddsa_public_key<
+        public_key_type, endianness>(filled_key);
+
+    BOOST_CHECK(made_key.pubkey_point == pub_k.pubkey_point);
+    BOOST_CHECK(std::equal(made_key.pubkey.begin(), made_key.pubkey.end(), pub_k.pubkey.begin()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
