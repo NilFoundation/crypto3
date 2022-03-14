@@ -153,17 +153,17 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_polynomials_test) {
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, table_rows, usable_rows);
-    typename policy_type::variable_assignment_type assigments = circuit.table;
+    typename policy_type::variable_assignment_type assignments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
     typename policy_type::preprocessed_public_data_type preprocessed_public_data =
         redshift_public_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints.size());
+            constraint_system, assignments.public_table(), assignments.table_description(), fri_params, columns_with_copy_constraints.size());
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
         redshift_private_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assigments.private_table());
+            constraint_system, assignments.private_table());
 
     auto polynomial_table =
                             plonk_polynomial_table<FieldType, redshift_test_params::witness_columns,
@@ -226,17 +226,17 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, table_rows, usable_rows);
-    typename policy_type::variable_assignment_type assigments = circuit.table;
+    typename policy_type::variable_assignment_type assignments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
     typename policy_type::preprocessed_public_data_type preprocessed_public_data =
         redshift_public_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints.size());
+            constraint_system, assignments.public_table(), assignments.table_description(), fri_params, columns_with_copy_constraints.size());
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
         redshift_private_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assigments.private_table());
+            constraint_system, assignments.private_table());
 
     auto polynomial_table =
                             plonk_polynomial_table<FieldType, redshift_test_params::witness_columns,
@@ -301,17 +301,17 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, table_rows, usable_rows);
-    typename policy_type::variable_assignment_type assigments = circuit.table;
+    typename policy_type::variable_assignment_type assignments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
     typename policy_type::preprocessed_public_data_type preprocessed_public_data =
         redshift_public_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints.size());
+            constraint_system, assignments.public_table(), assignments.table_description(), fri_params, columns_with_copy_constraints.size());
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
         redshift_private_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assigments.private_table());
+            constraint_system, assignments.private_table());
 
     auto polynomial_table =
                             plonk_polynomial_table<FieldType, redshift_test_params::witness_columns,
@@ -362,21 +362,21 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, table_rows, usable_rows);
-    typename policy_type::variable_assignment_type assigments = circuit.table;
+    typename policy_type::variable_assignment_type assignments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
     typename policy_type::preprocessed_public_data_type preprocessed_public_data =
         redshift_public_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints.size());
+            constraint_system, assignments.public_table(), assignments.table_description(), fri_params, columns_with_copy_constraints.size());
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
         redshift_private_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assigments.private_table());
+            constraint_system, assignments.private_table());
     
     auto proof = redshift_prover<FieldType, circuit_2_params>::process(preprocessed_public_data,
                                                                        preprocessed_private_data, constraint_system,
-                                                                       assigments, fri_params);
+                                                                       assignments, fri_params);
 
     bool verifier_res = redshift_verifier<FieldType, circuit_2_params>::process(preprocessed_public_data, proof, 
                                                                         constraint_system, fri_params);
