@@ -101,9 +101,9 @@ BOOST_AUTO_TEST_CASE(lpc_bls12_381_be) {
         0x5f, 0xb8, 0x82, 0x15, 0x90, 0xa3, 0x3b, 0xac, 0xc6, 0x1e, 0x39, 0x70, 0x1c, 0xf9, 0xb4, 0x6b,
         0xd2, 0x5b, 0xf5, 0xf0, 0x59, 0x5b, 0xbe, 0x24, 0x65, 0x51, 0x41, 0x43, 0x8e, 0x7a, 0x10, 0x0b};
     
-    public_key_type pub_k(etalon_pubkey1);
-
     using endianness = nil::marshalling::option::big_endian;
+    public_key_type pub_k(etalon_pubkey1);
+    private_key_type priv_k(privkey1);
 
     auto filled_key = nil::crypto3::marshalling::types::fill_eddsa_public_key<
         public_key_type, endianness>(pub_k);
@@ -113,6 +113,16 @@ BOOST_AUTO_TEST_CASE(lpc_bls12_381_be) {
 
     BOOST_CHECK(made_key.pubkey_point == pub_k.pubkey_point);
     BOOST_CHECK(std::equal(made_key.pubkey.begin(), made_key.pubkey.end(), pub_k.pubkey.begin()));
+
+    auto filled_priv_key = nil::crypto3::marshalling::types::fill_eddsa_private_key<
+        private_key_type, endianness>(priv_k);
+
+    auto made_priv_key = nil::crypto3::marshalling::types::make_eddsa_private_key<
+        private_key_type, endianness>(filled_priv_key);
+
+    BOOST_CHECK(made_priv_key.s_reduced == priv_k.s_reduced);
+    BOOST_CHECK(std::equal(made_priv_key.privkey.begin(), made_priv_key.privkey.end(), priv_k.privkey.begin()));
+    BOOST_CHECK(std::equal(made_priv_key.h_privkey.begin(), made_priv_key.h_privkey.end(), priv_k.h_privkey.begin()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

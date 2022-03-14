@@ -77,7 +77,7 @@ namespace nil {
                         nil::marshalling::types::array_list<
                             TTypeBase,
                             nil::marshalling::types::integral<
-                                TTypeBase, typename PrivateKey::public_key_type::value_type>,
+                                TTypeBase, typename PrivateKey::private_key_type::value_type>,
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
                         // h_privkey
@@ -147,36 +147,86 @@ namespace nil {
                     return res;
                 }
 
-                // template<typename Private, typename Endianness>
-                // eddsa_public_key<nil::marshalling::field_type<Endianness>, Private>
-                //     fill_eddsa_private_key(const Private &key_inp) {
+                template<typename PrivateKey, typename Endianness>
+                eddsa_private_key<nil::marshalling::field_type<Endianness>, PrivateKey>
+                    fill_eddsa_private_key(const PrivateKey &key_inp) {
 
-                //     using TTypeBase = nil::marshalling::field_type<Endianness>;
+                    using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-                //     using curve_element_type = curve_element<TTypeBase, typename PublicKey::g1_type>;
+                    using integral_vector_type = nil::marshalling::types::array_list<
+                            TTypeBase,
+                            nil::marshalling::types::integral<
+                                TTypeBase, typename PrivateKey::private_key_type::value_type>,
+                            nil::marshalling::option::sequence_size_field_prefix<
+                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>;
 
-                //     curve_element_type filled_pubkey_point = curve_element_type(key_inp.pubkey_point);
+                    integral_vector_type privkey_data;
 
-                //     using integral_vector_type = nil::marshalling::types::array_list<
-                //             TTypeBase,
-                //             integral<TTypeBase, typename PublicKey::public_key_type::value_type>,
-                //             nil::marshalling::option::sequence_size_field_prefix<
-                //                 nil::marshalling::types::integral<TTypeBase, std::size_t>>>;
+                    std::vector<nil::marshalling::types::integral<
+                        TTypeBase, typename PrivateKey::private_key_type::value_type>> &val
+                        = privkey_data.value();
+                    for (std::size_t i = 0; i < key_inp.privkey.size(); i++) {
+                        val.push_back(nil::marshalling::types::integral<TTypeBase,
+                            typename PrivateKey::private_key_type::value_type>(key_inp.privkey[i]));
+                    }
 
-                //     integral_vector_type pubkey_data;
+                    integral_vector_type h_privkey_data;
 
-                //     std::vector<integral<TTypeBase, typename PublicKey::public_key_type::value_type>> &val
-                //         = pubkey_data.value();
-                //     for (std::size_t i = 0; i < key_inp.pubkey.size(); i++) {
-                //         val.push_back(integral<TTypeBase,
-                //             typename PublicKey::public_key_type::value_type>(key_inp.pubkey[i]));
-                //     }
+                    std::vector<nil::marshalling::types::integral<
+                        TTypeBase, typename PrivateKey::private_key_type::value_type>> &h_val
+                        = h_privkey_data.value();
+                    for (std::size_t i = 0; i < key_inp.privkey.size(); i++) {
+                        h_val.push_back(nil::marshalling::types::integral<TTypeBase,
+                            typename PrivateKey::private_key_type::value_type>(key_inp.h_privkey[i]));
+                    }
 
-                //     return eddsa_public_key<nil::marshalling::field_type<Endianness>, PublicKey>(
-                //         std::make_tuple(
-                //             filled_pubkey_point,
-                //             pubkey_data));
-                // }
+                    using field_element_type = field_element<TTypeBase,
+                        typename PrivateKey::scalar_field_value_type>;
+
+                    field_element_type s_reduced_data = field_element_type(key_inp.s_reduced);
+
+                    return eddsa_private_key<nil::marshalling::field_type<Endianness>, PrivateKey>(
+                        std::make_tuple(
+                            privkey_data,
+                            h_privkey_data,
+                            s_reduced_data));
+                }
+
+                template<typename PrivateKey, typename Endianness>
+                PrivateKey make_eddsa_private_key(const eddsa_private_key<nil::marshalling::field_type<Endianness>,
+                                                                              PrivateKey> &filled_key_inp) {
+
+                    using TTypeBase = nil::marshalling::field_type<Endianness>;
+                    typename PrivateKey::private_key_type privkey;
+
+                    const std::vector<nil::marshalling::types::integral<TTypeBase,
+                        typename PrivateKey::private_key_type::value_type>> &values =
+                        std::get<0>(filled_key_inp.value()).value();
+
+                    std::size_t size = values.size();
+
+                    for (std::size_t i = 0; i < size; i++) {
+                        privkey[i] = values[i].value();
+                    }
+
+                    typename PrivateKey::hash_type::digest_type h_privkey;
+
+                    const std::vector<nil::marshalling::types::integral<TTypeBase,
+                        typename PrivateKey::private_key_type::value_type>> &h_values =
+                        std::get<1>(filled_key_inp.value()).value();
+
+                    std::size_t h_size = h_values.size();
+
+                    for (std::size_t i = 0; i < h_size; i++) {
+                        h_privkey[i] = h_values[i].value();
+                    }
+
+                    PrivateKey res(privkey);
+                    res.h_privkey = h_privkey;
+                    res.s_reduced = std::get<2>(filled_key_inp.value()).value();
+
+                    return res;
+                }
 
             }    // namespace types
         }        // namespace marshalling
