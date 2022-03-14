@@ -29,16 +29,26 @@
 #include <nil/crypto3/hash/detail/keccak/keccak_policy.hpp>
 #include <nil/crypto3/hash/detail/keccak/keccak_impl.hpp>
 
-#define keccak_1600_armv8_step(c)    \
-    "eor	x25,x0,x5 \n"            \
-                                     \
-    "str   x4, [sp, #-8]!\n"         \
-    "str   x9, [sp, #-16]!\n"        \
-                                     \
-    "eor	x26,x1,x6 \n"            \
-    "eor	x27,x2,x7 \n"            \
-    "eor	x28,x3,x8 \n"            \
-                                     \
+#define MOVQ(Xn, imm)                                       \
+    "movz    " #Xn ",  " #imm  " & 0xFFFF \n"                \
+    "movk    " #Xn ", (" #imm  " >> 16) & 0xFFFF, lsl 16\n" \
+    "movk    " #Xn ", (" #imm  " >> 32) & 0xFFFF, lsl 32\n" \
+    "movk    " #Xn ", (" #imm " >> 48) & 0xFFFF, lsl 48\n"
+
+#define keccak_1600_armv8_step(c) \
+    "sub  sp, sp, #32 \n"         \
+                                  \
+    "stp   x1, x2, [sp, #16]\n"   \
+    "ldr x1, [%[A], #0]\n"        \
+    "eor  x25,x1,x5 \n"           \
+    "ldp   x1, x2, [sp, #16] \n"  \
+                                  \
+    "stp  x4, x9, [sp] \n"        \
+                                  \
+    "eor	x26,x1,x6 \n"         \
+    "eor	x27,x2,x7 \n"         \
+    "eor	x28,x3,x8 \n"         \
+                                  \
     "eor	x4,x4,x9 \n"             \
     "eor	x25,x25,x10 \n"          \
     "eor	x26,x26,x11 \n"          \
@@ -48,7 +58,7 @@
     "eor	x25,x25,x15 \n"          \
     "eor	x26,x26,x16 \n"          \
     "eor	x27,x27,x17 \n"          \
-    "eor	x28,x28,x18 \n"          \
+    "eor	x28,x28,x30 \n"          \
     "eor	x4,x4,x19 \n"            \
     "eor	x25,x25,x20 \n"          \
     "eor	x27,x27,x22 \n"          \
@@ -70,74 +80,85 @@
     "eor	x12,x12,x9 \n"           \
     "eor	x17,x17,x9 \n"           \
     "eor	x22,x22,x9 \n"           \
-    "eor	x0,x0,x4 \n"             \
+                                  \
+    "stp   x1, x2, [sp, #16]\n"   \
+    "ldr x1, [%[A], #0]\n"        \
+    "eor	x1,x1,x4 \n"             \
+    "str x1, [%[A], #0] \n"       \
+    "ldp   x1, x2, [sp, #16]\n"   \
+                                  \
     "eor	x5,x5,x4 \n"             \
     "eor	x10,x10,x4 \n"           \
     "eor	x15,x15,x4 \n"           \
     "eor	x20,x20,x4 \n"           \
-                                     \
-    "ldr   x9, [sp], #16\n"          \
-    "ldr   x4, [sp], #8\n"           \
-                                     \
+                                  \
+    "ldp  x4, x9, [sp]\n"         \
+                                  \
     "eor	x25,x3,x27 \n"           \
     "eor	x8,x8,x27 \n"            \
     "eor	x13,x13,x27 \n"          \
-    "eor	x18,x18,x27 \n"          \
+    "eor	x30,x30,x27 \n"          \
     "eor	x23,x23,x27 \n"          \
     "eor	x27,x4,x28 \n"           \
     "eor	x9,x9,x28 \n"            \
     "eor	x14,x14,x28 \n"          \
     "eor	x19,x19,x28 \n"          \
     "eor	x24,x24,x28 \n"          \
-                                     \
+                                  \
     "mov	x28,x1\n"                \
     "ror	x1,x6,#20\n"             \
     "ror	x2,x12,#21\n"            \
-    "ror	x3,x18,#43\n"            \
+    "ror	x3,x30,#43\n"            \
     "ror	x4,x24,#50\n"            \
-                                     \
+                                  \
     "ror	x6,x9,#44\n"             \
     "ror	x12,x13,#39\n"           \
-    "ror	x18,x17,#49\n"           \
+    "ror	x30,x17,#49\n"           \
     "ror	x24,x21,#62\n"           \
-                                     \
+                                  \
     "ror	x9,x22,#3\n"             \
     "ror	x13,x19,#56\n"           \
     "ror	x17,x11,#54\n"           \
     "ror	x21,x8,#9\n"             \
-                                     \
+                                  \
     "ror	x22,x14,#25\n"           \
     "ror	x19,x23,#8\n"            \
     "ror	x11,x7,#58\n"            \
     "ror	x8,x16,#19\n"            \
-                                     \
+                                  \
     "ror	x14,x20,#46\n"           \
     "ror	x23,x15,#23\n"           \
     "ror	x7,x10,#61\n"            \
     "ror	x16,x5,#28\n"            \
-                                     \
+                                  \
     "ror	x5,x25,#36\n"            \
     "ror	x10,x28,#63\n"           \
     "ror	x15,x27,#37\n"           \
     "ror	x20,x26,#2\n"            \
-                                     \
+                                  \
     "bic	x25,x2,x1 \n"            \
     "bic	x26,x3,x2 \n"            \
-    "bic	x27,x0,x4 \n"            \
-    "bic	x28,x1,x0 \n"            \
-    "eor	x0,x0,x25 \n"            \
+                                  \
+    "stp    x2, x3, [sp, #16]\n"  \
+    "ldr    x2, [%[A], #0]\n"     \
+    "bic	x27,x2,x4 \n"            \
+    "bic	x28,x1,x2 \n"            \
+    "eor	x2,x2,x25 \n"            \
+    "str    x2, [%[A], #0]\n"     \
+    "ldp    x2, x3, [sp, #16]\n"  \
+                                  \
     "bic	x25,x4,x3 \n"            \
     "eor	x1,x1,x26 \n"            \
-                                     \
+                                  \
     "eor	x3,x3,x27 \n"            \
     "eor	x4,x4,x28 \n"            \
     "eor	x2,x2,x25 \n"            \
-                                     \
+                                  \
     "bic	x25,x7,x6 \n"            \
-                                     \
+                                  \
     "bic	x26,x8,x7 \n"            \
     "bic	x27,x5,x9 \n"            \
-                                     \
+                                  \
     "bic	x28,x6,x5 \n"            \
     "eor	x5,x5,x25 \n"            \
     "bic	x25,x9,x8 \n"            \
@@ -156,13 +177,13 @@
     "eor	x14,x14,x28 \n"          \
     "eor	x12,x12,x25 \n"          \
     "bic	x25,x17,x16 \n"          \
-    "bic	x26,x18,x17 \n"          \
+    "bic	x26,x30,x17 \n"          \
     "bic	x27,x15,x19 \n"          \
     "bic	x28,x16,x15 \n"          \
     "eor	x15,x15,x25 \n"          \
-    "bic	x25,x19,x18 \n"          \
+    "bic	x25,x19,x30 \n"          \
     "eor	x16,x16,x26 \n"          \
-    "eor	x18,x18,x27 \n"          \
+    "eor	x30,x30,x27 \n"          \
     "eor	x19,x19,x28 \n"          \
     "eor	x17,x17,x25 \n"          \
     "bic	x25,x22,x21 \n"          \
@@ -175,8 +196,15 @@
     "eor	x23,x23,x27 \n"          \
     "eor	x24,x24,x28 \n"          \
     "eor	x22,x22,x25 \n"          \
-    "ldr x25, =" #c " \n"            \
-    "eor x0, x0, x25 \n"
+    MOVQ(x25, c)                   \
+                                  \
+    "stp   x1, x2, [sp, #16]\n"   \
+    "ldr x1, [%[A], #0]\n"        \
+    "eor x1, x1, x25 \n"          \
+    "str x1, [%[A], #0]\n"        \
+    "ldp   x1, x2, [sp, #16]\n"   \
+                                  \
+    "add  sp, sp, #32 \n"
 
 namespace nil {
     namespace crypto3 {
@@ -205,7 +233,7 @@ namespace nil {
 
                     static inline void permute(state_type &A) {
                         __asm__ volatile(
-                            "ldr x0, [%[A], #0]\n"
+                            //                            "ldr x0, [%[A], #0]\n"
                             "ldr x1, [%[A], #8]\n"
                             "ldr x2, [%[A], #16]\n"
                             "ldr x3, [%[A], #24]\n"
@@ -223,7 +251,7 @@ namespace nil {
                             "ldr x15, [%[A], #120]\n"
                             "ldr x16, [%[A], #128]\n"
                             "ldr x17, [%[A], #136]\n"
-                            "ldr x18, [%[A], #144]\n"
+                            "ldr x30, [%[A], #144]\n"
                             "ldr x19, [%[A], #152]\n"
                             "ldr x20, [%[A], #160]\n"
                             "ldr x21, [%[A], #168]\n"
@@ -231,32 +259,32 @@ namespace nil {
                             "ldr x23, [%[A], #184]\n"
                             "ldr x24, [%[A], #192]\n"
 
-                            keccak_1600_armv8_step(0x0000000000000001)
-                            keccak_1600_armv8_step(0x0000000000008082)
-                            keccak_1600_armv8_step(0x800000000000808a)
-                            keccak_1600_armv8_step(0x8000000080008000)
-                            keccak_1600_armv8_step(0x000000000000808b)
-                            keccak_1600_armv8_step(0x0000000080000001)
-                            keccak_1600_armv8_step(0x8000000080008081)
-                            keccak_1600_armv8_step(0x8000000000008009)
-                            keccak_1600_armv8_step(0x000000000000008a)
-                            keccak_1600_armv8_step(0x0000000000000088)
-                            keccak_1600_armv8_step(0x0000000080008009)
-                            keccak_1600_armv8_step(0x000000008000000a)
-                            keccak_1600_armv8_step(0x000000008000808b)
-                            keccak_1600_armv8_step(0x800000000000008b)
-                            keccak_1600_armv8_step(0x8000000000008089)
-                            keccak_1600_armv8_step(0x8000000000008003)
-                            keccak_1600_armv8_step(0x8000000000008002)
-                            keccak_1600_armv8_step(0x8000000000000080)
-                            keccak_1600_armv8_step(0x000000000000800a)
-                            keccak_1600_armv8_step(0x800000008000000a)
-                            keccak_1600_armv8_step(0x8000000080008081)
-                            keccak_1600_armv8_step(0x8000000000008080)
-                            keccak_1600_armv8_step(0x0000000080000001)
-                            keccak_1600_armv8_step(0x8000000080008008)
+                            keccak_1600_armv8_step(1)
+                            keccak_1600_armv8_step(32898)
+                            keccak_1600_armv8_step(9223372036854808714)
+                            keccak_1600_armv8_step(9223372039002292224)
+                            keccak_1600_armv8_step(32907)
+                            keccak_1600_armv8_step(2147483649)
+                            keccak_1600_armv8_step(9223372039002292353)
+                            keccak_1600_armv8_step(9223372036854808585)
+                            keccak_1600_armv8_step(138)
+                            keccak_1600_armv8_step(136)
+                            keccak_1600_armv8_step(2147516425)
+                            keccak_1600_armv8_step(2147483658)
+                            keccak_1600_armv8_step(2147516555)
+                            keccak_1600_armv8_step(9223372036854775947)
+                            keccak_1600_armv8_step(9223372036854808713)
+                            keccak_1600_armv8_step(9223372036854808579)
+                            keccak_1600_armv8_step(9223372036854808578)
+                            keccak_1600_armv8_step(9223372036854775936)
+                            keccak_1600_armv8_step(32778)
+                            keccak_1600_armv8_step(9223372039002259466)
+                            keccak_1600_armv8_step(9223372039002292353)
+                            keccak_1600_armv8_step(9223372036854808704)
+                            keccak_1600_armv8_step(2147483649)
+                            keccak_1600_armv8_step(9223372039002292232)
 
-                            "str x0, [%[A], #0]\n"
+                            //                            "str x0, [%[A], #0]\n"
                             "str x1, [%[A], #8]\n"
                             "str x2, [%[A], #16]\n"
                             "str x3, [%[A], #24]\n"
@@ -274,7 +302,7 @@ namespace nil {
                             "str x15, [%[A], #120]\n"
                             "str x16, [%[A], #128]\n"
                             "str x17, [%[A], #136]\n"
-                            "str x18, [%[A], #144]\n"
+                            "str x30, [%[A], #144]\n"
                             "str x19, [%[A], #152]\n"
                             "str x20, [%[A], #160]\n"
                             "str x21, [%[A], #168]\n"
@@ -284,8 +312,12 @@ namespace nil {
                             :
                             : [A] "r"(A.begin())
                             : "cc", "memory", "x25", "x26", "x27", "x28",    // C0, C1, C2, C3
-                              "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13",
-                              "x14", "x15", "x16", "x17", "x18", "x19", "x20", "x21", "x22", "x23", "x24");
+                                                                             //"x0",
+                              "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14",
+                              "x15", "x16", "x17", "x30", "x19", "x20", "x21", "x22", "x23", "x24");
+                        //                        for (int i = 0; i < 25; ++i) {
+                        //                            std::cout << "i=" << i << " " << A[i] << std::endl;
+                        //                        }
                     }
                 };
 
