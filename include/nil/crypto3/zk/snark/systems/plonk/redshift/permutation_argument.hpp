@@ -70,7 +70,7 @@ namespace nil {
 
                     static inline prover_result_type prove_eval(
                         typename policy_type::constraint_system_type &constraint_system,
-                        const typename policy_type::preprocessed_public_data_type preprocessed_data,
+                        const typename policy_type::preprocessed_public_data_type<CommitmentSchemeTypePublic> preprocessed_data,
                         const plonk_polynomial_table<FieldType, ParamsType::witness_columns,
                             ParamsType::public_input_columns, ParamsType::constant_columns,
                             ParamsType::selector_columns> &column_polynomials,
@@ -154,7 +154,7 @@ namespace nil {
                     }
 
                     static inline std::array<typename FieldType::value_type, argument_size> verify_eval(
-                        const typename policy_type::preprocessed_public_data_type preprocessed_data,
+                        const typename policy_type::preprocessed_public_data_type<CommitmentSchemeTypePublic> preprocessed_data,
                         // y
                         const typename FieldType::value_type &challenge,
                         // f(y):

@@ -115,6 +115,14 @@ typedef redshift_params<FieldType, redshift_test_params::witness_columns,
     redshift_test_params::public_input_columns, redshift_test_params::constant_columns,
     redshift_test_params::selector_columns> circuit_2_params;
 
+
+constexpr static const std::size_t opening_points_public = 1;
+typedef commitments::list_polynomial_commitment<FieldType,
+                                                              typename circuit_2_params::commitment_params_type,
+                                                              opening_points_public>
+                        commitment_scheme_public_input_type;
+
+
 BOOST_AUTO_TEST_CASE(redshift_split_polynomial_test) {
 
     math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
@@ -156,12 +164,12 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_polynomials_test) {
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-    typename policy_type::preprocessed_public_data_type preprocessed_public_data =
-        redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(
-            constraint_system, assigments.public_table(), assigments.table_description(), columns_with_copy_constraints);
+    typename policy_type::preprocessed_public_data_type<commitment_scheme_public_input_type> preprocessed_public_data =
+        redshift_public_preprocessor<FieldType, circuit_2_params, commitment_scheme_public_input_type>::process(
+            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints);
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
-        redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(
+        redshift_private_preprocessor<FieldType, circuit_2_params>::process(
             constraint_system, assigments.private_table());
 
     auto polynomial_table =
@@ -229,12 +237,12 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-    typename policy_type::preprocessed_public_data_type preprocessed_public_data =
-        redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(
-            constraint_system, assigments.public_table(), assigments.table_description(), columns_with_copy_constraints);
+    typename policy_type::preprocessed_public_data_type<commitment_scheme_public_input_type> preprocessed_public_data =
+        redshift_public_preprocessor<FieldType, circuit_2_params, commitment_scheme_public_input_type>::process(
+            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints);
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
-        redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(
+        redshift_private_preprocessor<FieldType, circuit_2_params>::process(
             constraint_system, assigments.private_table());
 
     auto polynomial_table =
@@ -304,12 +312,12 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-    typename policy_type::preprocessed_public_data_type preprocessed_public_data =
-        redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(
-            constraint_system, assigments.public_table(), assigments.table_description(), columns_with_copy_constraints);
+    typename policy_type::preprocessed_public_data_type<commitment_scheme_public_input_type> preprocessed_public_data =
+        redshift_public_preprocessor<FieldType, circuit_2_params, commitment_scheme_public_input_type>::process(
+            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints);
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
-        redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(
+        redshift_private_preprocessor<FieldType, circuit_2_params>::process(
             constraint_system, assigments.private_table());
 
     auto polynomial_table =
@@ -365,12 +373,12 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-    typename policy_type::preprocessed_public_data_type preprocessed_public_data =
-        redshift_public_preprocessor<FieldType, circuit_2_params, k>::process(
-            constraint_system, assigments.public_table(), assigments.table_description(), columns_with_copy_constraints);
+    typename policy_type::preprocessed_public_data_type<commitment_scheme_public_input_type> preprocessed_public_data =
+        redshift_public_preprocessor<FieldType, circuit_2_params, commitment_scheme_public_input_type>::process(
+            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints);
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
-        redshift_private_preprocessor<FieldType, circuit_2_params, k>::process(
+        redshift_private_preprocessor<FieldType, circuit_2_params>::process(
             constraint_system, assigments.private_table());
     
     auto proof = redshift_prover<FieldType, circuit_2_params>::process(preprocessed_public_data,

@@ -93,9 +93,16 @@ namespace nil {
 
                 }    // namespace detail
 
-                template<typename FieldType, typename ParamsType, std::size_t k>
+                template<typename FieldType, typename ParamsType, 
+                    typename CommitmentSchemeTypePublic>
                 class redshift_public_preprocessor {
                     typedef detail::redshift_policy<FieldType, ParamsType> policy_type;
+
+                    typedef typename policy_type::preprocessed_public_data_type<CommitmentSchemeTypePublic>::public_precommitments 
+                        public_precommitments_type;
+
+                    typedef typename policy_type::preprocessed_public_data_type<CommitmentSchemeTypePublic>::public_commitments 
+                        public_commitments_type;
 
                     static math::polynomial<typename FieldType::value_type>
                         lagrange_polynomial(std::shared_ptr<math::evaluation_domain<FieldType>> domain,
@@ -262,10 +269,95 @@ namespace nil {
                         return q_last;
                     }
 
-                    static inline typename policy_type::preprocessed_public_data_type process(
+                    static inline public_precommitments_type precommitments(
+                        const plonk_public_polynomial_table<FieldType, ParamsType::public_input_columns, 
+                            ParamsType::constant_columns, ParamsType::selector_columns> &public_table,
+                        std::vector<math::polynomial<typename FieldType::value_type>> id_perm_polys,
+                        std::vector<math::polynomial<typename FieldType::value_type>> sigma_perm_polys,
+                        const typename CommitmentSchemeTypePublic::params_type &commitment_params
+                    ) {
+
+                        std::vector<typename CommitmentSchemeTypePublic::precommitment_type> id_permutation(id_perm_polys.size());
+                        for(std::size_t i = 0; i < id_permutation.size(); i++) {
+                            id_permutation[i] = CommitmentSchemeTypePublic::precommit(
+                                id_perm_polys[i], commitment_params.D[0]);
+                        }
+
+                        std::vector<typename CommitmentSchemeTypePublic::precommitment_type> sigma_permutation(sigma_perm_polys.size());
+                        for(std::size_t i = 0; i < sigma_permutation.size(); i++) {
+                            sigma_permutation[i] = CommitmentSchemeTypePublic::precommit(
+                                sigma_perm_polys[i], commitment_params.D[0]);
+                        }
+
+                        std::array<typename CommitmentSchemeTypePublic::precommitment_type, ParamsType::public_input_columns>
+                            public_input_precommitments = CommitmentSchemeTypePublic::template precommit<ParamsType::public_input_columns>(
+                                public_table.public_inputs(), commitment_params.D[0]);
+
+                        std::array<typename CommitmentSchemeTypePublic::precommitment_type, ParamsType::constant_columns>
+                            constant_precommitments = CommitmentSchemeTypePublic::template precommit<ParamsType::constant_columns>(
+                                public_table.constants(), commitment_params.D[0]);
+
+                        std::array<typename CommitmentSchemeTypePublic::precommitment_type, ParamsType::selector_columns>
+                            selector_precommitments = CommitmentSchemeTypePublic::template precommit<ParamsType::selector_columns>(
+                                public_table.selectors(), commitment_params.D[0]);
+
+                        return public_precommitments_type {
+                            id_permutation,
+                            sigma_permutation,
+                            public_input_precommitments,
+                            constant_precommitments,
+                            selector_precommitments
+                        };
+                    }
+
+                    static inline public_commitments_type commitments(
+                        const public_precommitments_type &precommitments
+                    ) {
+
+                        std::vector<typename CommitmentSchemeTypePublic::commitment_type> id_permutation(precommitments.id_permutation.size());
+                        for(std::size_t i = 0; i < id_permutation.size(); i++) {
+                            id_permutation[i] = CommitmentSchemeTypePublic::commit(
+                                precommitments.id_permutation[i]);
+                        }
+
+                        std::vector<typename CommitmentSchemeTypePublic::commitment_type> sigma_permutation(precommitments.sigma_permutation.size());
+                        for(std::size_t i = 0; i < sigma_permutation.size(); i++) {
+                            sigma_permutation[i] = CommitmentSchemeTypePublic::commit(
+                                precommitments.sigma_permutation[i]);
+                        }
+
+                        std::array<typename CommitmentSchemeTypePublic::commitment_type, ParamsType::public_input_columns>
+                            public_input_commitments;
+                        for (std::size_t i = 0; i < ParamsType::public_input_columns; i++) {
+                            public_input_commitments[i] = CommitmentSchemeTypePublic::commit(precommitments.public_input[i]);
+                        }
+
+                        std::array<typename CommitmentSchemeTypePublic::commitment_type, ParamsType::constant_columns>
+                            constant_commitments;
+                        for (std::size_t i = 0; i < ParamsType::constant_columns; i++) {
+                            constant_commitments[i] = CommitmentSchemeTypePublic::commit(precommitments.constant[i]);
+                        }
+
+                        std::array<typename CommitmentSchemeTypePublic::commitment_type, ParamsType::selector_columns>
+                            selector_commitments;
+                        for (std::size_t i = 0; i < ParamsType::selector_columns; i++) {
+                            selector_commitments[i] = CommitmentSchemeTypePublic::commit(precommitments.selector[i]);
+                        }
+
+                        return public_commitments_type {
+                            id_permutation,
+                            sigma_permutation,
+                            public_input_commitments,
+                            constant_commitments,
+                            selector_commitments
+                        };
+                    }
+
+                    static inline typename policy_type::preprocessed_public_data_type<CommitmentSchemeTypePublic> process(
                         typename policy_type::constraint_system_type &constraint_system,
                         const typename policy_type::variable_assignment_type::public_table_type &public_assignment,
                         const plonk_table_description<FieldType> &table_description,
+                        const typename CommitmentSchemeTypePublic::params_type &commitment_params,
                         std::vector<std::size_t> columns_with_copy_constraints) {
 
                         std::size_t N_rows = constraint_system.rows_amount();
@@ -312,13 +404,22 @@ namespace nil {
                         Z[0] = -FieldType::value_type::one();
                         Z[N_rows] = FieldType::value_type::one();
 
-                        return typename policy_type::preprocessed_public_data_type(
+                        // prepare commitments for short verifier
+                        public_precommitments_type public_precommitments =
+                            precommitments(public_polynomial_table, _identity_polynomials, 
+                            _permutation_polynomials, commitment_params);
+
+                        public_commitments_type public_commitments =
+                            commitments(public_precommitments);
+                        
+
+                        return typename policy_type::preprocessed_public_data_type<CommitmentSchemeTypePublic>(
                             {basic_domain, public_polynomial_table, _permutation_polynomials, _identity_polynomials,
-                             lagrange_0, q_last, q_blind, Z});
+                             lagrange_0, q_last, q_blind, Z, public_precommitments, public_commitments});
                     }
                 };
 
-                template<typename FieldType, typename ParamsType, std::size_t k>
+                template<typename FieldType, typename ParamsType>
                 class redshift_private_preprocessor {
                     using policy_type = detail::redshift_policy<FieldType, ParamsType>;
 

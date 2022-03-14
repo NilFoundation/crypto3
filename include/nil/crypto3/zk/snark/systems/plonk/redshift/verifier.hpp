@@ -82,10 +82,11 @@ namespace nil {
                     constexpr static const std::size_t f_parts = 4;
 
                 public:
-                    static inline bool process(const typename policy_type::preprocessed_public_data_type preprocessed_public_data,
+                    static inline bool process(const typename policy_type::preprocessed_public_data_type<commitment_scheme_public_input_type> preprocessed_public_data,
                         typename policy_type::template proof_type<commitment_scheme_witness_type,
                                                                         commitment_scheme_permutation_type,
-                                                                        commitment_scheme_quotient_type> &proof,
+                                                                        commitment_scheme_quotient_type,
+                                                                        commitment_scheme_public_input_type> &proof,
                         typename policy_type::constraint_system_type &constraint_system,
                         const typename commitment_scheme_witness_type::params_type
                                     &fri_params) {

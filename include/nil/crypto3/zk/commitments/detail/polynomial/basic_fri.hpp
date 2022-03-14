@@ -161,7 +161,7 @@ namespace nil {
                         };
 
                         static precommitment_type
-                            precommit(math::polynomial<typename FieldType::value_type> &f,
+                            precommit(const math::polynomial<typename FieldType::value_type> &f,
                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
                             std::vector<std::array<std::uint8_t, field_element_type::length()>> y_data;
@@ -180,7 +180,7 @@ namespace nil {
 
                         template<std::size_t list_size>
                         static std::array<precommitment_type, list_size>
-                            precommit(std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
+                            precommit(const std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
                             std::array<precommitment_type, list_size> precommits;
                             for (std::size_t i = 0; i < list_size; i++) {
