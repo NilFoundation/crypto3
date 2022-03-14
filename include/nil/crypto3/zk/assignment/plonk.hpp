@@ -59,7 +59,8 @@ namespace nil {
                     if (index < WitnessColumns) {
                         return this->witness_columns[index];
                     } else {
-#error Undefined reference being returned
+                        // Usupposed input
+                        return this->witness_columns[0];
                     }
                     index -= WitnessColumns;
                 }
@@ -157,7 +158,8 @@ namespace nil {
                     if (index < this->selector_columns.size()) {
                         return this->selector_columns[index];
                     } else {
-#error Undefined reference being returned
+                        // Usupposed input
+                        return this->public_input_columns[0];
                     }
                     index -= this->selector_columns.size();
                 }
