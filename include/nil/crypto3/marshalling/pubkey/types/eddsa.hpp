@@ -175,7 +175,7 @@ namespace nil {
                     std::vector<nil::marshalling::types::integral<
                         TTypeBase, typename PrivateKey::private_key_type::value_type>> &h_val
                         = h_privkey_data.value();
-                    for (std::size_t i = 0; i < key_inp.privkey.size(); i++) {
+                    for (std::size_t i = 0; i < key_inp.h_privkey.size(); i++) {
                         h_val.push_back(nil::marshalling::types::integral<TTypeBase,
                             typename PrivateKey::private_key_type::value_type>(key_inp.h_privkey[i]));
                     }
