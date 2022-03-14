@@ -377,7 +377,7 @@ namespace nil {
                         const typename policy_type::variable_assignment_type::public_table_type &public_assignment,
                         const plonk_table_description<FieldType> &table_description,
                         const typename commitment_scheme_public_type::params_type &commitment_params,
-                        std::vector<std::size_t> columns_with_copy_constraints) {
+                        std::size_t columns_with_copy_constraints) {
 
                         std::size_t N_rows = constraint_system.rows_amount();
                         std::size_t usable_rows = constraint_system.usable_rows_amount();
@@ -389,13 +389,13 @@ namespace nil {
                         cycle_representation permutation(constraint_system, table_description);
 
                         std::vector<math::polynomial<typename FieldType::value_type>> _permutation_polynomials =
-                            permutation_polynomials(columns_with_copy_constraints.size(),
+                            permutation_polynomials(columns_with_copy_constraints,
                                                     N_rows, basic_domain->get_domain_element(1),
                                                     policy_type::redshift_params_type::delta, permutation,
                                                     basic_domain);
 
                         std::vector<math::polynomial<typename FieldType::value_type>> _identity_polynomials =
-                            identity_polynomials(columns_with_copy_constraints.size(),
+                            identity_polynomials(columns_with_copy_constraints,
                                                  N_rows, basic_domain->get_domain_element(1),
                                                  policy_type::redshift_params_type::delta, basic_domain);
 

@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_polynomials_test) {
 
     typename policy_type::preprocessed_public_data_type preprocessed_public_data =
         redshift_public_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints);
+            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints.size());
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
         redshift_private_preprocessor<FieldType, circuit_2_params>::process(
@@ -232,7 +232,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
 
     typename policy_type::preprocessed_public_data_type preprocessed_public_data =
         redshift_public_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints);
+            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints.size());
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
         redshift_private_preprocessor<FieldType, circuit_2_params>::process(
@@ -307,7 +307,7 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
 
     typename policy_type::preprocessed_public_data_type preprocessed_public_data =
         redshift_public_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints);
+            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints.size());
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
         redshift_private_preprocessor<FieldType, circuit_2_params>::process(
@@ -368,7 +368,7 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 
     typename policy_type::preprocessed_public_data_type preprocessed_public_data =
         redshift_public_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints);
+            constraint_system, assigments.public_table(), assigments.table_description(), fri_params, columns_with_copy_constraints.size());
 
     typename policy_type::preprocessed_private_data_type preprocessed_private_data =
         redshift_private_preprocessor<FieldType, circuit_2_params>::process(
