@@ -33,6 +33,7 @@
 #include <nil/crypto3/hash/detail/keccak/keccak_policy.hpp>
 #include <nil/crypto3/hash/detail/keccak/keccak_finalizer.hpp>
 #include <nil/crypto3/hash/detail/keccak/keccak_padding.hpp>
+#include <nil/crypto3/hash/type_traits.hpp>
 
 #include <boost/endian/conversion.hpp>
 
