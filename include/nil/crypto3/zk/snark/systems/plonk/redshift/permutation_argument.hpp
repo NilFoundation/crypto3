@@ -83,7 +83,7 @@ namespace nil {
                             preprocessed_data.permutation_polynomials;
                         const std::vector<math::polynomial<typename FieldType::value_type>> &S_id =
                             preprocessed_data.identity_polynomials;
-                        std::shared_ptr<math::evaluation_domain<FieldType>> domain = preprocessed_data.basic_domain;
+                        std::shared_ptr<math::evaluation_domain<FieldType>> domain = preprocessed_data.common_data.basic_domain;
 
                         // 1. $\beta_1, \gamma_1 = \challenge$
                         typename FieldType::value_type beta = transcript.template challenge<FieldType>();
@@ -143,7 +143,7 @@ namespace nil {
                             math::polynomial_shift<FieldType>(V_P, domain->get_domain_element(1));
 
 
-                        F[0] = preprocessed_data.lagrange_0 * (one_polynomial - V_P);
+                        F[0] = preprocessed_data.common_data.lagrange_0 * (one_polynomial - V_P);
                         F[1] = (one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
                                (V_P_shifted * h - V_P * g);
                         F[2] = preprocessed_data.q_last * (V_P * V_P - V_P);
@@ -189,7 +189,7 @@ namespace nil {
 
                         std::array<typename FieldType::value_type, argument_size> F;
                         typename FieldType::value_type one = FieldType::value_type::one();
-                        F[0] = preprocessed_data.lagrange_0.evaluate(challenge) * (one - perm_polynomial_value);
+                        F[0] = preprocessed_data.common_data.lagrange_0.evaluate(challenge) * (one - perm_polynomial_value);
                         F[1] = (one - preprocessed_data.q_last.evaluate(challenge) -
                                 preprocessed_data.q_blind.evaluate(challenge)) *
                                (perm_polynomial_shifted_value * h - perm_polynomial_value * g);

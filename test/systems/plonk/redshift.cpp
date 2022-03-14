@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_polynomials_test) {
                                 preprocessed_private_data.private_polynomial_table,
                                 preprocessed_public_data.public_polynomial_table);
 
-    std::shared_ptr<math::evaluation_domain<FieldType>> domain = preprocessed_public_data.basic_domain;
+    std::shared_ptr<math::evaluation_domain<FieldType>> domain = preprocessed_public_data.common_data.basic_domain;
     typename FieldType::value_type id_res = FieldType::value_type::one();
     typename FieldType::value_type sigma_res = FieldType::value_type::one();
     for (std::size_t i = 0; i < table_rows; i++) {

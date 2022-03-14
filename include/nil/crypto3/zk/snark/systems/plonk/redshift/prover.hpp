@@ -118,7 +118,7 @@ namespace nil {
                         }
 
                         math::polynomial<typename FieldType::value_type> T_consolidated =
-                            F_consolidated / preprocessed_public_data.Z;
+                            F_consolidated / preprocessed_public_data.common_data.Z;
 
                         return T_consolidated;
                     }
@@ -220,7 +220,7 @@ namespace nil {
                         proof.eval_proof.challenge = challenge;
 
                         typename FieldType::value_type omega =
-                            preprocessed_public_data.basic_domain->get_domain_element(1);
+                            preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
                         // witness polynomials (table columns)
                         std::array<typename commitment_scheme_witness_type::proof_type, witness_columns>
@@ -306,6 +306,15 @@ namespace nil {
                                     preprocessed_public_data.public_polynomial_table.selectors()[i], fri_params, transcript);
                         }
                         proof.eval_proof.selector = selector_evals;
+
+                        std::vector<typename commitment_scheme_public_input_type::proof_type> special_selector_evals(2);
+                        special_selector_evals[0] = commitment_scheme_quotient_type::proof_eval(
+                                evaluation_points_public, preprocessed_public_data.precommitments.special_selectors[0], 
+                                    preprocessed_public_data.q_last, fri_params, transcript);
+                        special_selector_evals[1] = commitment_scheme_quotient_type::proof_eval(
+                                evaluation_points_public, preprocessed_public_data.precommitments.special_selectors[1], 
+                                    preprocessed_public_data.q_blind, fri_params, transcript);
+                        proof.eval_proof.special_selectors = special_selector_evals;
 
                         return proof;
                     }

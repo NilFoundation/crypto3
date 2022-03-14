@@ -93,6 +93,7 @@ namespace nil {
                                 std::array<typename CommitmentSchemeTypePublic::precommitment_type, public_input_columns> public_input;
                                 std::array<typename CommitmentSchemeTypePublic::precommitment_type, constant_columns> constant;
                                 std::array<typename CommitmentSchemeTypePublic::precommitment_type, selector_columns> selector;
+                                std::array<typename CommitmentSchemeTypePublic::precommitment_type, 2> special_selectors;
                             };
 
                             struct public_commitments {
@@ -101,9 +102,19 @@ namespace nil {
                                 std::array<typename CommitmentSchemeTypePublic::commitment_type, public_input_columns> public_input;
                                 std::array<typename CommitmentSchemeTypePublic::commitment_type, constant_columns> constant;
                                 std::array<typename CommitmentSchemeTypePublic::commitment_type, selector_columns> selector;
+                                std::array<typename CommitmentSchemeTypePublic::commitment_type, 2> special_selectors;
                             };
 
-                            std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
+                            // both prover and verifier use this data
+                            // fields outside of the common_data_type are used by prover
+                            struct common_data_type {
+                                std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
+
+                                math::polynomial<typename FieldType::value_type> Z;
+                                math::polynomial<typename FieldType::value_type> lagrange_0;
+
+                                public_commitments commitments;
+                            };
 
                             plonk_public_polynomial_table<FieldType, public_input_columns, 
                                 constant_columns, selector_columns> public_polynomial_table;
@@ -113,15 +124,12 @@ namespace nil {
                             // S_id
                             std::vector<math::polynomial<typename FieldType::value_type>> identity_polynomials;
 
-                            math::polynomial<typename FieldType::value_type> lagrange_0;
-
-                            math::polynomial<typename FieldType::value_type> q_last;
+                            math::polynomial<typename FieldType::value_type> q_last; // TODO: move to common data
                             math::polynomial<typename FieldType::value_type> q_blind;
 
-                            math::polynomial<typename FieldType::value_type> Z;
-
                             public_precommitments precommitments;
-                            public_commitments commitments;
+
+                            common_data_type common_data;
                         };
 
                         struct preprocessed_private_data_type {

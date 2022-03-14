@@ -53,11 +53,13 @@ namespace nil {
                         std::vector<typename commitment_scheme_type_public::proof_type> public_input;
                         std::vector<typename commitment_scheme_type_public::proof_type> constant;
                         std::vector<typename commitment_scheme_type_public::proof_type> selector;
+                        std::vector<typename commitment_scheme_type_public::proof_type> special_selectors;
 
                         bool operator==(const evaluation_proof &rhs) const {
                         return witness == rhs.witness && permutation == rhs.permutation &&
                                    quotient == rhs.quotient && public_input == rhs.public_input &&
-                                   constant == rhs.constant && selector == rhs.selector;
+                                   constant == rhs.constant && selector == rhs.selector &&
+                                   special_selectors == rhs.special_selectors;
                         }
                         bool operator!=(const evaluation_proof &rhs) const {
                             return !(rhs == *this);
