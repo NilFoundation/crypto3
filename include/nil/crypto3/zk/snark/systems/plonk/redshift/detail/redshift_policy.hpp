@@ -84,25 +84,26 @@ namespace nil {
                             redshift_proof<FieldType, CommitmentSchemeTypeWitness, CommitmentSchemeTypePermutation,
                                            CommitmentSchemeTypeQuotient, CommitmentSchemeTypePublic>;
 
-                        template<typename CommitmentSchemeTypePublic>
                         struct preprocessed_public_data_type {
+                            typedef typename RedshiftParams::commitment_scheme_public_type
+                                commitment_scheme_public_type;
 
                             struct public_precommitments {
-                                std::vector<typename CommitmentSchemeTypePublic::precommitment_type> id_permutation;
-                                std::vector<typename CommitmentSchemeTypePublic::precommitment_type> sigma_permutation;
-                                std::array<typename CommitmentSchemeTypePublic::precommitment_type, public_input_columns> public_input;
-                                std::array<typename CommitmentSchemeTypePublic::precommitment_type, constant_columns> constant;
-                                std::array<typename CommitmentSchemeTypePublic::precommitment_type, selector_columns> selector;
-                                std::array<typename CommitmentSchemeTypePublic::precommitment_type, 2> special_selectors;
+                                std::vector<typename commitment_scheme_public_type::precommitment_type> id_permutation;
+                                std::vector<typename commitment_scheme_public_type::precommitment_type> sigma_permutation;
+                                std::array<typename commitment_scheme_public_type::precommitment_type, public_input_columns> public_input;
+                                std::array<typename commitment_scheme_public_type::precommitment_type, constant_columns> constant;
+                                std::array<typename commitment_scheme_public_type::precommitment_type, selector_columns> selector;
+                                std::array<typename commitment_scheme_public_type::precommitment_type, 2> special_selectors;
                             };
 
                             struct public_commitments {
-                                std::vector<typename CommitmentSchemeTypePublic::commitment_type> id_permutation;
-                                std::vector<typename CommitmentSchemeTypePublic::commitment_type> sigma_permutation;
-                                std::array<typename CommitmentSchemeTypePublic::commitment_type, public_input_columns> public_input;
-                                std::array<typename CommitmentSchemeTypePublic::commitment_type, constant_columns> constant;
-                                std::array<typename CommitmentSchemeTypePublic::commitment_type, selector_columns> selector;
-                                std::array<typename CommitmentSchemeTypePublic::commitment_type, 2> special_selectors;
+                                std::vector<typename commitment_scheme_public_type::commitment_type> id_permutation;
+                                std::vector<typename commitment_scheme_public_type::commitment_type> sigma_permutation;
+                                std::array<typename commitment_scheme_public_type::commitment_type, public_input_columns> public_input;
+                                std::array<typename commitment_scheme_public_type::commitment_type, constant_columns> constant;
+                                std::array<typename commitment_scheme_public_type::commitment_type, selector_columns> selector;
+                                std::array<typename commitment_scheme_public_type::commitment_type, 2> special_selectors;
                             };
 
                             // both prover and verifier use this data

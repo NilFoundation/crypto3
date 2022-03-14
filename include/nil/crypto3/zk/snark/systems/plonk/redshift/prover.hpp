@@ -102,7 +102,7 @@ namespace nil {
                     constexpr static const std::size_t f_parts = 4;
 
                     static inline math::polynomial<typename FieldType::value_type> quotient_polynomial(
-                        const typename policy_type::preprocessed_public_data_type<commitment_scheme_public_input_type> preprocessed_public_data,
+                        const typename policy_type::preprocessed_public_data_type preprocessed_public_data,
                         std::array<math::polynomial<typename FieldType::value_type>, f_parts>
                             F,
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>
@@ -129,7 +129,7 @@ namespace nil {
                                                                             commitment_scheme_permutation_type,
                                                                             commitment_scheme_quotient_type, 
                                                                             commitment_scheme_public_input_type>
-                        process(typename policy_type::preprocessed_public_data_type<commitment_scheme_public_input_type> preprocessed_public_data,
+                        process(typename policy_type::preprocessed_public_data_type preprocessed_public_data,
                                 const typename policy_type::preprocessed_private_data_type preprocessed_private_data,
                                 typename policy_type::constraint_system_type &constraint_system,
                                 const typename policy_type::variable_assignment_type &assignments,
