@@ -112,8 +112,9 @@ namespace nil {
                                                                           ConstantColumns> &public_assignment,
                                         std::size_t circuit_start_row = 0) {
 
-                        std::size_t selector_index_j_0 = public_assignment.add_selector(j + 0);
                         // For $j + 0$:
+                        std::size_t selector_index_j_0 = public_assignment.add_selector(j + 0);
+
                         auto constraint_j_0_0 = this->bp.add_constraint(var(W4, 0) -
                             (var(W1, 0) ^ 5 * M[0][0] + var(W2, 0) ^ 5 * M[0][1] + var(W3, 0) ^
                                                  5 * M[0][2] + RC[0]));
@@ -138,9 +139,9 @@ namespace nil {
                                               {constraint_j_0_0, constraint_j_0_1, constraint_j_0_2,
                                                constraint_j_0_3, constraint_j_0_4, constraint_j_0_5});
 
+                        // For $j + 1$:
                         std::size_t selector_index_j_1 = public_assignment.add_selector(j + 1);
 
-                        // For $j + 1$:
                         auto constraint_j_1_0 = this->bp.add_constraint(var(W1, 0) -
                             (var(W3, 0) ^ 5 * M[0][0] + var(W8, 0) ^ 5 * M[0][1] + var(W9, 0) ^
                                                  5 * M[0][2] + RC[0]));
@@ -170,102 +171,134 @@ namespace nil {
 
                         this->bp.add_gate(selector_index_j_1,
                                               {constraint_j_1_0, constraint_j_1_1, constraint_j_1_2,
-                                               constraint_j_1_3, constraint_j_1_4, constraint_j_1_5});
+                                               constraint_j_1_3, constraint_j_1_4, constraint_j_1_5,
+                                               constraint_j_1_6, constraint_j_1_7, constraint_j_1_8});
 
                         // For $j + k$, $k \in \{2, 19\}$:
-                        for (std::size_t z = 2; z <= 19; z++) {
-                            this->bp.add_gate(j + z,
-                                        var(W1, 0) -
-                                            (var(W7, -1) * M[0][0] + var(W8, -1) * M[0][1] + var(W9, -1) ^ 5 * M[0][2] + RC[0]));
-                            this->bp.add_gate(j + z,
-                                        var(W2, 0) -
-                                            (var(W7, -1) * M[1][0] + var(W8, -1) * M[1][1] + var(W9, -1) ^ 5 * M[1][2] + RC[1]));
-                            this->bp.add_gate(j + z,
-                                        var(W3, 0) -
-                                            (var(W7, -1) * M[2][0] + var(W8, -1) * M[2][1] + var(W9, -1) ^ 5 * M[2][2] + RC[2]));
+                        std::size_t selector_index_j_2 = public_assignment.add_selector(j + 2, j + 19);
+                        
+                        auto constraint_j_2_0 = this->bp.add_constraint(var(W1, 0) -
+                                            (var(W7, -1) * M[0][0] + var(W8, -1) * M[0][1] +
+                                                var(W9, -1) ^ 5 * M[0][2] + RC[0]));
+                        auto constraint_j_2_1 = this->bp.add_constraint(var(W2, 0) -
+                                            (var(W7, -1) * M[1][0] + var(W8, -1) * M[1][1] +
+                                                var(W9, -1) ^ 5 * M[1][2] + RC[1]));
+                        auto constraint_j_2_2 = this->bp.add_constraint(var(W3, 0) -
+                                            (var(W7, -1) * M[2][0] + var(W8, -1) * M[2][1] +
+                                                var(W9, -1) ^ 5 * M[2][2] + RC[2]));
 
-                            this->bp.add_gate(j + z,
-                                        var(W4, 0) - (var(W1, 0) * M[0][0] + var(W2, 0) * M[0][1] + var(W3, 0) ^
-                                                     5 * M[0][2] + RC[0]));
-                            this->bp.add_gate(j + z,
-                                        var(W5, 0) - (var(W1, 0) * M[1][0] + var(W2, 0) * M[1][1] + var(W3, 0) ^
-                                                     5 * M[1][2] + RC[1]));
-                            this->bp.add_gate(j + z,
-                                        var(W6, 0) - (var(W1, 0) * M[2][0] + var(W2, 0) * M[2][1] + var(W3, 0) ^
-                                                     5 * M[2][2] + RC[2]));
+                        auto constraint_j_2_3 = this->bp.add_constraint(var(W4, 0) -
+                                            (var(W1, 0) * M[0][0] + var(W2, 0) * M[0][1] +
+                                                var(W3, 0) ^ 5 * M[0][2] + RC[0]));
+                        auto constraint_j_2_4 = this->bp.add_constraint(var(W5, 0) -
+                                            (var(W1, 0) * M[1][0] + var(W2, 0) * M[1][1] +
+                                                var(W3, 0) ^ 5 * M[1][2] + RC[1]));
+                        auto constraint_j_2_5 = this->bp.add_constraint(var(W6, 0) -
+                                            (var(W1, 0) * M[2][0] + var(W2, 0) * M[2][1] +
+                                                var(W3, 0) ^ 5 * M[2][2] + RC[2]));
 
-                            this->bp.add_gate(j + z,
-                                        var(W7, 0) - (var(W4, 0) * M[0][0] + var(W5, 0) * M[0][1] + var(W6, 0) ^
-                                                     5 * M[0][2] + RC[0]));
-                            this->bp.add_gate(j + z,
-                                        var(W8, 0) - (var(W4, 0) * M[1][0] + var(W5, 0) * M[1][1] + var(W6, 0) ^
-                                                     5 * M[1][2] + RC[1]));
-                            this->bp.add_gate(j + z,
-                                        var(W9, 0) - (var(W4, 0) * M[2][0] + var(W5, 0) * M[2][1] + var(W6, 0) ^
-                                                     5 * M[2][2] + RC[2]));
-                        }
+                        auto constraint_j_2_6 = this->bp.add_constraint(var(W7, 0) -
+                                            (var(W4, 0) * M[0][0] + var(W5, 0) * M[0][1] +
+                                                var(W6, 0) ^ 5 * M[0][2] + RC[0]));
+                        auto constraint_j_2_7 = this->bp.add_constraint(var(W8, 0) -
+                                            (var(W4, 0) * M[1][0] + var(W5, 0) * M[1][1] +
+                                                var(W6, 0) ^ 5 * M[1][2] + RC[1]));
+                        auto constraint_j_2_8 = this->bp.add_constraint(var(W9, 0) -
+                                            (var(W4, 0) * M[2][0] + var(W5, 0) * M[2][1] +
+                                                var(W6, 0) ^ 5 * M[2][2] + RC[2]));
+
+                        this->bp.add_gate(selector_index_j_2,
+                                              {constraint_j_2_0, constraint_j_2_1, constraint_j_2_2,
+                                               constraint_j_2_3, constraint_j_2_4, constraint_j_2_5,
+                                               constraint_j_2_6, constraint_j_2_7, constraint_j_2_8});
 
                         // For $j + 20$:
-                        this->bp.add_gate(j + 20,
-                                    var(W1, 0) -
-                                        (var(W7, -1) * M[0][0] + var(W8, -1) * M[0][1] + var(W9, -1) ^ 5 * M[0][2] + RC[0]));
-                        this->bp.add_gate(j + 20,
-                                    var(W2, 0) -
-                                        (var(W7, -1) * M[1][0] + var(W8, -1) * M[1][1] + var(W9, -1) ^ 5 * M[1][2] + RC[1]));
-                        this->bp.add_gate(j + 20,
-                                    var(W3, 0) -
-                                        (var(W7, -1) * M[2][0] + var(W8, -1) * M[2][1] + var(W9, -1) ^ 5 * M[2][2] + RC[2]));
+                        std::size_t selector_index_j_20 = public_assignment.add_selector(j + 20);
 
-                        this->bp.add_gate(j + 20,
-                                    var(W4, 0) -
-                                        (var(W1, 0) * M[0][0] + var(W2, 0) * M[0][1] + var(W3, 0) ^ 5 * M[0][2] + RC[0]));
-                        this->bp.add_gate(j + 20,
-                                    var(W5, 0) -
-                                        (var(W1, 0) * M[1][0] + var(W2, 0) * M[1][1] + var(W3, 0) ^ 5 * M[1][2] + RC[1]));
-                        this->bp.add_gate(j + 20,
-                                    var(W6, 0) -
-                                        (var(W1, 0) * M[2][0] + var(W2, 0) * M[2][1] + var(W3, 0) ^ 5 * M[2][2] + RC[2]));
+                        auto constraint_j_20_0 = this->bp.add_constraint(var(W1, 0) -
+                                        (var(W7, -1) * M[0][0] + var(W8, -1) * M[0][1] +
+                                            var(W9, -1) ^ 5 * M[0][2] + RC[0]));
+                        auto constraint_j_20_1 = this->bp.add_constraint(var(W2, 0) -
+                                        (var(W7, -1) * M[1][0] + var(W8, -1) * M[1][1] +
+                                            var(W9, -1) ^ 5 * M[1][2] + RC[1]));
+                        auto constraint_j_20_2 = this->bp.add_constraint(var(W3, 0) -
+                                        (var(W7, -1) * M[2][0] + var(W8, -1) * M[2][1] +
+                                            var(W9, -1) ^ 5 * M[2][2] + RC[2]));
 
-                        this->bp.add_gate(j + 20,
-                                    var(W7, 0) - (var(W3, 0) ^ 5 * M[0][0] + var(W4, 0) ^ 5 * M[0][1] + var(W5, 0) ^
-                                                 5 * M[0][2] + RC[0]));
-                        this->bp.add_gate(j + 20,
-                                    var(W8, 0) - (var(W3, 0) ^ 5 * M[1][0] + var(W4, 0) ^ 5 * M[1][1] + var(W5, 0) ^
-                                                 5 * M[1][2] + RC[1]));
-                        this->bp.add_gate(j + 20,
-                                    var(W9, 0) - (var(W3, 0) ^ 5 * M[2][0] + var(W4, 0) ^ 5 * M[2][1] + var(W5, 0) ^
-                                                 5 * M[2][2] + RC[2]));
+                        auto constraint_j_20_3 = this->bp.add_constraint(var(W4, 0) -
+                                        (var(W1, 0) * M[0][0] + var(W2, 0) * M[0][1] +
+                                            var(W3, 0) ^ 5 * M[0][2] + RC[0]));
+                        auto constraint_j_20_4 = this->bp.add_constraint(var(W5, 0) -
+                                        (var(W1, 0) * M[1][0] + var(W2, 0) * M[1][1] +
+                                            var(W3, 0) ^ 5 * M[1][2] + RC[1]));
+                        auto constraint_j_20_5 = this->bp.add_constraint(var(W6, 0) -
+                                        (var(W1, 0) * M[2][0] + var(W2, 0) * M[2][1] +
+                                            var(W3, 0) ^ 5 * M[2][2] + RC[2]));
+
+                        auto constraint_j_20_6 = this->bp.add_constraint(var(W7, 0) -
+                                        (var(W3, 0) ^ 5 * M[0][0] +
+                                         var(W4, 0) ^ 5 * M[0][1] +
+                                         var(W5, 0) ^ 5 * M[0][2] + RC[0]));
+                        auto constraint_j_20_7 = this->bp.add_constraint(var(W8, 0) -
+                                        (var(W3, 0) ^ 5 * M[1][0] +
+                                         var(W4, 0) ^ 5 * M[1][1] +
+                                         var(W5, 0) ^ 5 * M[1][2] + RC[1]));
+                        auto constraint_j_20_8 = this->bp.add_constraint(var(W9, 0) -
+                                        (var(W3, 0) ^ 5 * M[2][0] +
+                                         var(W4, 0) ^ 5 * M[2][1] +
+                                         var(W5, 0) ^ 5 * M[2][2] + RC[2]));
+
+                        this->bp.add_gate(selector_index_j_20,
+                                              {constraint_j_20_0, constraint_j_20_1, constraint_j_20_2,
+                                               constraint_j_20_3, constraint_j_20_4, constraint_j_20_5,
+                                               constraint_j_20_6, constraint_j_20_7, constraint_j_20_8});
 
                         // For $j + 21$:
-                        this->bp.add_gate(j + 21,
-                                    var(W1, 0) - (var(W3, -1) ^ 5 * M[0][0] + var(W8, -1) ^ 5 * M[0][1] + var(W9, -1) ^
-                                                 5 * M[0][2] + RC[0]));
-                        this->bp.add_gate(j + 21,
-                                    var(W2, 0) - (var(W3, -1) ^ 5 * M[1][0] + var(W8, -1) ^ 5 * M[1][1] + var(W9, -1) ^
-                                                 5 * M[1][2] + RC[1]));
-                        this->bp.add_gate(j + 21,
-                                    var(W3, 0) - (var(W3, -1) ^ 5 * M[2][0] + var(W8, -1) ^ 5 * M[2][1] + var(W9, -1) ^
-                                                 5 * M[2][2] + RC[2]));
+                        std::size_t selector_index_j_21 = public_assignment.add_selector(j + 21);
 
-                        this->bp.add_gate(j + 21,
-                                    var(W4, 0) - (var(W1, 0) ^ 5 * M[0][0] + var(W2, 0) ^ 5 * M[0][1] + var(W3, 0) ^
-                                                 5 * M[0][2] + RC[0]));
-                        this->bp.add_gate(j + 21,
-                                    var(W5, 0) - (var(W1, 0) ^ 5 * M[1][0] + var(W2, 0) ^ 5 * M[1][1] + var(W3, 0) ^
-                                                 5 * M[1][2] + RC[1]));
-                        this->bp.add_gate(j + 21,
-                                    var(W6, 0) - (var(W1, 0) ^ 5 * M[2][0] + var(W2, 0) ^ 5 * M[2][1] + var(W3, 0) ^
-                                                 5 * M[2][2] + RC[2]));
+                        auto constraint_j_21_0 = this->bp.add_constraint(var(W1, 0) -
+                                        (var(W3, -1) ^ 5 * M[0][0] +
+                                         var(W8, -1) ^ 5 * M[0][1] +
+                                         var(W9, -1) ^ 5 * M[0][2] + RC[0]));
+                        auto constraint_j_21_1 = this->bp.add_constraint(var(W2, 0) -
+                                        (var(W3, -1) ^ 5 * M[1][0] +
+                                         var(W8, -1) ^ 5 * M[1][1] +
+                                         var(W9, -1) ^ 5 * M[1][2] + RC[1]));
+                        auto constraint_j_21_2 = this->bp.add_constraint(var(W3, 0) -
+                                        (var(W3, -1) ^ 5 * M[2][0] +
+                                         var(W8, -1) ^ 5 * M[2][1] +
+                                         var(W9, -1) ^ 5 * M[2][2] + RC[2]));
 
-                        this->bp.add_gate(j + 21,
-                                    var(W7, 0) - (var(W3, 0) ^ 5 * M[0][0] + var(W4, 0) ^ 5 * M[0][1] + var(W5, 0) ^
-                                                 5 * M[0][2] + RC[0]));
-                        this->bp.add_gate(j + 21,
-                                    var(W8, 0) - (var(W3, 0) ^ 5 * M[1][0] + var(W4, 0) ^ 5 * M[1][1] + var(W5, 0) ^
-                                                 5 * M[1][2] + RC[1]));
-                        this->bp.add_gate(j + 21,
-                                    var(W9, 0) - (var(W3, 0) ^ 5 * M[2][0] + var(W4, 0) ^ 5 * M[2][1] + var(W5, 0) ^
-                                                 5 * M[2][2] + RC[2]));
+                        auto constraint_j_21_3 = this->bp.add_constraint(var(W4, 0) -
+                                        (var(W1, 0) ^ 5 * M[0][0] +
+                                         var(W2, 0) ^ 5 * M[0][1] +
+                                         var(W3, 0) ^ 5 * M[0][2] + RC[0]));
+                        auto constraint_j_21_4 = this->bp.add_constraint(var(W5, 0) -
+                                        (var(W1, 0) ^ 5 * M[1][0] +
+                                         var(W2, 0) ^ 5 * M[1][1] +
+                                         var(W3, 0) ^ 5 * M[1][2] + RC[1]));
+                        auto constraint_j_21_5 = this->bp.add_constraint(var(W6, 0) -
+                                        (var(W1, 0) ^ 5 * M[2][0] +
+                                         var(W2, 0) ^ 5 * M[2][1] +
+                                         var(W3, 0) ^ 5 * M[2][2] + RC[2]));
+
+                        auto constraint_j_21_6 = this->bp.add_constraint(var(W7, 0) -
+                                        (var(W3, 0) ^ 5 * M[0][0] +
+                                         var(W4, 0) ^ 5 * M[0][1] +
+                                         var(W5, 0) ^ 5 * M[0][2] + RC[0]));
+                        auto constraint_j_21_7 = this->bp.add_constraint(var(W8, 0) -
+                                        (var(W3, 0) ^ 5 * M[1][0] +
+                                         var(W4, 0) ^ 5 * M[1][1] +
+                                         var(W5, 0) ^ 5 * M[1][2] + RC[1]));
+                        auto constraint_j_21_8 = this->bp.add_constraint(var(W9, 0) -
+                                        (var(W3, 0) ^ 5 * M[2][0] +
+                                         var(W4, 0) ^ 5 * M[2][1] +
+                                         var(W5, 0) ^ 5 * M[2][2] + RC[2]));
+
+                        this->bp.add_gate(selector_index_j_21,
+                                              {constraint_j_21_0, constraint_j_21_1, constraint_j_21_2,
+                                               constraint_j_21_3, constraint_j_21_4, constraint_j_21_5,
+                                               constraint_j_21_6, constraint_j_21_7, constraint_j_21_8});
                     }
 
                     template<std::size_t SelectorColumns, std::size_t PublicInputColumns, std::size_t ConstantColumns>
