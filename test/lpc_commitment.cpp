@@ -46,6 +46,7 @@
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/alt_bn128.hpp>
 
+#include <nil/crypto3/hash/type_traits.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
@@ -217,7 +218,7 @@ void test_lpc(std::size_t tree_depth, std::size_t round_proofs_n,
     BOOST_CHECK(proof == constructed_val_read);
 }
 
-BOOST_AUTO_TEST_SUITE(lpc_test_suite)
+BOOST_AUTO_TEST_SUITE(lpc_marshalling_test_suite)
 
 BOOST_AUTO_TEST_CASE(lpc_bls12_381_be) {
     using curve_type = nil::crypto3::algebra::curves::bls12<381>;
