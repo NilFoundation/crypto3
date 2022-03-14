@@ -358,7 +358,7 @@ namespace nil {
 
                         std::array<typename commitment_scheme_public_type::commitment_type, 2>
                             special_selector_commitments;
-                        for (std::size_t i = 0; i < ParamsType::selector_columns; i++) {
+                        for (std::size_t i = 0; i < 2; i++) {
                             special_selector_commitments[i] = commitment_scheme_public_type::commit(precommitments.special_selectors[i]);
                         }
 
