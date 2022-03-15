@@ -52,9 +52,9 @@ namespace nil {
                 struct plonk_constraint_system {
 
                 protected:
-                    std::vector<plonk_gate<FieldType>> _gates;
+                    std::vector<plonk_gate<FieldType, plonk_constraint>> _gates;
                     std::vector<plonk_copy_constraint<FieldType>> _copy_constraints;
-                    std::vector<plonk_lookup_constraint<FieldType>> _lookup_constraints;
+                    std::vector<lookup_plonk_gate<FieldType, plonk_lookup_constraint>> _lookup_gates;
                     std::size_t _rows_amount;
                     std::size_t _usable_rows_amount;
 
@@ -63,7 +63,7 @@ namespace nil {
                     plonk_constraint_system() {
                     }
 
-                    plonk_constraint_system(std::vector<plonk_gate<FieldType>> gates, std::size_t rows_amount, std::size_t usable_rows_amount): 
+                    plonk_constraint_system(std::vector<plonk_gate<FieldType, plonk_constraint>> gates, std::size_t rows_amount, std::size_t usable_rows_amount): 
                         _gates(gates), _rows_amount(rows_amount), _usable_rows_amount(usable_rows_amount) {
                     }
 
@@ -92,7 +92,7 @@ namespace nil {
                     //     return true;
                     // }
 
-                    std::vector<plonk_gate<FieldType>> gates() const {
+                    std::vector<plonk_gate<FieldType, plonk_constraint>> gates() const {
                         return _gates;
                     }
 
@@ -100,8 +100,8 @@ namespace nil {
                         return _copy_constraints;
                     }
 
-                    std::vector<math::polynomial<typename FieldType::value_type>> lookup_constraints() const {
-                        return _lookup_constraints;
+                    std::vector<plonk_gate<FieldType, plonk_lookup_constraint>> lookup_gates() const {
+                        return _lookup_gates;
                     }
                 };
             }    // namespace snark
