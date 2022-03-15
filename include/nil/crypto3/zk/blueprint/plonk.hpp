@@ -45,6 +45,8 @@ namespace nil {
                 typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
 
             public:
+                typedef BlueprintFieldType blueprint_field_type;
+
                 blueprint() : ArithmetizationType() {
                     this->_rows_amount = 0;
                 }
@@ -57,6 +59,10 @@ namespace nil {
 
                 std::size_t allocate_row() {
                     return allocate_rows(1);
+                }
+
+                void fix_usable_rows() {
+                    this->_usable_rows_amount = this->_rows_amount;
                 }
 
                 // TODO: should put constraint in some storage and return its index

@@ -140,8 +140,7 @@ namespace nil {
 
                         std::size_t public_input_column_index = 0;
                         this->bp.add_copy_constraint({{W6, j, false}, 
-                            {public_input_column_index, j, false, var::column_type::public_input}});
-                        public_assignment.public_input(public_input_column_index)[j] = 0;
+                            {public_input_column_index, 0, false, var::column_type::public_input}});
                     }
 
                     template <std::size_t WitnessColumns, std::size_t SelectorColumns,
@@ -155,6 +154,8 @@ namespace nil {
                         
                         private_assignment.allocate_rows(j + required_rows_amount);
                         public_assignment.allocate_rows(j + required_rows_amount);
+
+                        public_assignment.public_input(0)[0] = ArithmetizationType::field_type::value_type::zero();
 
                         const typename CurveType::template g1_type<>::value_type R = params.P + params.Q;
                         const typename CurveType::template g1_type<>::value_type &P = params.P;
@@ -170,27 +171,33 @@ namespace nil {
                         // TODO: check, if this one correct:
                         private_assignment.witness(W6)[j] = R.is_zero();
 
-                        if (P == Q){
-                            private_assignment.witness(W7)[j] = (P.X == Q.X);
+                        if (P.X != Q.X){
+                            private_assignment.witness(W7)[j] = 0;
+                            private_assignment.witness(W8)[j] = (P.Y - Q.Y)/(P.X - Q.X);
 
-                            if (private_assignment.witness(W7)[j].is_zero()){
-                                private_assignment.witness(W8)[j] = 0;
+                            if (P.Y != Q.Y) {
+                                private_assignment.witness(W9)[j] = (Q.Y - P.Y).inversed();
                             } else {
-                                private_assignment.witness(W8)[j] = (P.Y - Q.Y)/(P.X - Q.X);
+                                private_assignment.witness(W9)[j] = 0;
                             }
 
-                            private_assignment.witness(W9)[j] = (Q.Y - P.Y).inversed();
                             private_assignment.witness(W10)[j] = (Q.X - P.X).inversed();
                         } else {
                             private_assignment.witness(W7)[j] = 1;
 
-                            if (P.Y.is_zero()){
+                            if (P.Y != Q.Y) {
                                 private_assignment.witness(W8)[j] = 0;
-                            } else {
-                                private_assignment.witness(W8)[j] = (3 * P.X.pow(2))/(2 * P.Y);
+                                private_assignment.witness(W9)[j] = (Q.Y - P.Y).inversed();
+                            } else { // doubling
+                                if (P.Y != 0) {
+                                    private_assignment.witness(W8)[j] = (3 * P.X.pow(2))/(2 * P.Y);
+                                } else {
+                                    private_assignment.witness(W8)[j] = 0;
+                                }
+                                
+                                private_assignment.witness(W9)[j] = 0;
                             }
 
-                            private_assignment.witness(W9)[j] = 0;
                             private_assignment.witness(W10)[j] = 0;
                         }
                     }

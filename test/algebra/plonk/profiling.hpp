@@ -75,7 +75,6 @@ namespace nil {
             }
         }
 
-
     }            // namespace crypto3
 }    // namespace nil
 

@@ -27,10 +27,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
-#include <nil/crypto3/algebra/curves/params/multiexp/bls12.hpp>
-#include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
@@ -50,22 +48,38 @@
 
 using namespace nil::crypto3;
 
+template<typename fri_type, typename FieldType>
+typename fri_type::params_type create_fri_params(std::size_t degree_log) {
+    typename fri_type::params_type params;
+    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
+        zk::commitments::detail::calculate_domain_set<FieldType>(degree_log, degree_log - 1);
+
+    params.r = degree_log - 1;
+    params.D = domain_set;
+    params.q = q;
+    params.max_degree = (1 << degree_log) - 1;
+
+    return params;
+}
+
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_allocat_rows_test_case) {
 
-    using curve_type = algebra::curves::bls12<381>;
+    using curve_type = algebra::curves::mnt4<298>;
     using BlueprintFieldType = typename curve_type::base_field_type;
-    constexpr std::size_t WitnessColumns = 15;
-    constexpr std::size_t SelectorColumns = 15;
-    constexpr std::size_t PublicInputColumns = 5;
-    constexpr std::size_t ConstantColumns = 5;
+    constexpr std::size_t WitnessColumns = 11;
+    constexpr std::size_t SelectorColumns = 1;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 0;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
 
     zk::blueprint<ArithmetizationType> bp;
     zk::blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> private_assignment;
-    zk::blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
-    	PublicInputColumns, ConstantColumns> public_assignment;
+    zk::blueprint_public_assignment_table<ArithmetizationType, PublicInputColumns, ConstantColumns,
+        SelectorColumns> public_assignment;
 
     using component_type = zk::components::curve_element_unified_addition<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10>;
@@ -74,34 +88,45 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_allocat_rows_test_case) {
         curve_type::template g1_type<>>()};
     component_type unified_addition_component(bp, {});
 
-    // unified_addition_component.generate_gates(public_assignment);
-    // unified_addition_component.generate_copy_constraints(public_assignment);
+    unified_addition_component.generate_gates(public_assignment);
+    unified_addition_component.generate_copy_constraints(public_assignment);
     unified_addition_component.generate_assignments(private_assignment, public_assignment, a_params);
 
-    zk::snark::plonk_assignment_table<BlueprintFieldType, WitnessColumns, SelectorColumns,
-    	PublicInputColumns, ConstantColumns> assignments(
+    private_assignment.allocate_rows(4);
+    public_assignment.allocate_rows(4);
+    bp.fix_usable_rows();
+    bp.allocate_rows(3);
+
+    zk::snark::plonk_assignment_table<BlueprintFieldType, WitnessColumns, PublicInputColumns, 
+        ConstantColumns, SelectorColumns> assignments(
     	private_assignment, public_assignment);
 
-    // using params = zk::snark::redshift_params<BlueprintFieldType, WitnessColumns, SelectorColumns,
-    //     PublicInputColumns, ConstantColumns>;
-    // using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
+    using params = zk::snark::redshift_params<BlueprintFieldType, WitnessColumns,
+         PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
 
-    // typename types::preprocessed_public_data_type public_preprocessed_data =
-    //     zk::snark::redshift_public_preprocessor<BlueprintFieldType, params, 5>::process(bp, public_assignment, {});
-    // typename types::preprocessed_private_data_type private_preprocessed_data =
-    //     zk::snark::redshift_private_preprocessor<BlueprintFieldType, params, 5>::process(bp, private_assignment);
+    using fri_type = typename zk::commitments::fri<BlueprintFieldType, params::merkle_hash_type,
+                              params::transcript_hash_type, 2>;
+    std::size_t table_rows_log = bp.rows_amount();
 
-    // auto proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(public_preprocessed_data, private_preprocessed_data,
-    //     bp, assignments, {});
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, BlueprintFieldType>(table_rows_log);
 
-    // bool verified = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data,
-    //     proof, bp, {});
+    std::size_t permutation_size = 12;
 
+    typename types::preprocessed_public_data_type public_preprocessed_data =
+         zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, 
+            assignments.table_description(), fri_params, permutation_size);
+    typename types::preprocessed_private_data_type private_preprocessed_data =
+         zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment);
+
+    auto proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(public_preprocessed_data,
+                                                                       private_preprocessed_data, bp,
+                                                                       assignments, fri_params);
+
+    bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data, proof, 
+                                                                        bp, fri_params);
     profiling(assignments);
-
-    BOOST_CHECK_EQUAL(component_type::required_rows_amount + 0, bp.allocate_rows());
-    BOOST_CHECK_EQUAL(component_type::required_rows_amount + 1, bp.allocate_rows(5));
-    BOOST_CHECK_EQUAL(component_type::required_rows_amount + 6, bp.allocate_row());
+    BOOST_CHECK(verifier_res);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
