@@ -60,6 +60,8 @@ namespace nil {
 
                 public:
 
+                    typedef FieldType field_type;
+
                     plonk_constraint_system() {
                     }
 
