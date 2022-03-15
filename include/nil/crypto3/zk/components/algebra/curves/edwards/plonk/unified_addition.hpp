@@ -114,19 +114,31 @@ namespace nil {
 
                         std::size_t selector_index = public_assignment.add_selector(j);
 
-                        this->bp.add_gate(selector_index, var(W7, 0) * (var(W2, 0) - var(W0, 0)));
-                        this->bp.add_gate(selector_index, (var(W2, 0) - var(W0, 0)) * var(W10, 0) - 
+                        auto constraint_1 = this->bp.add_constraint(
+                            var(W7, 0) * (var(W2, 0) - var(W0, 0)));
+                        auto constraint_2 = this->bp.add_constraint(
+                            (var(W2, 0) - var(W0, 0)) * var(W10, 0) - 
                             (1 - var(W7, 0)));
-                        this->bp.add_gate(selector_index, var(W7, 0) * (2*var(W8, 0) * var(W1, 0) - 
+                        auto constraint_3 = this->bp.add_constraint(
+                            var(W7, 0) * (2*var(W8, 0) * var(W1, 0) - 
                             3*(var(W0, 0)^2)) + (1 - var(W7, 0)) * 
                             (var(W2, 0) - var(W0, 0) * var(W8, 0) - 
                             (var(W3, 0) - var(W1, 0))));
-                        this->bp.add_gate(selector_index, (var(W8, 0)^2) - (var(W0, 0) + var(W2, 0) + var(W4, 0)));
-                        this->bp.add_gate(selector_index, var(W5, 0) - (var(W8, 0) * (var(W0, 0) - 
+                        auto constraint_4 = this->bp.add_constraint(
+                            (var(W8, 0)^2) - (var(W0, 0) + var(W2, 0) + var(W4, 0)));
+                        auto constraint_5 = this->bp.add_constraint(
+                            var(W5, 0) - (var(W8, 0) * (var(W0, 0) - 
                             var(W4, 0)) - var(W1, 0)));
-                        this->bp.add_gate(selector_index, (var(W3, 0) - var(W1, 0)) * (var(W7, 0) - var(W6, 0)));
-                        this->bp.add_gate(selector_index, (var(W3, 0) - var(W1, 0)) * var(W9, 0) - var(W6, 0));
+                        auto constraint_6 = this->bp.add_constraint(
+                            (var(W3, 0) - var(W1, 0)) * (var(W7, 0) - var(W6, 0)));
+                        auto constraint_7 = this->bp.add_constraint(
+                            (var(W3, 0) - var(W1, 0)) * var(W9, 0) - var(W6, 0));
 
+                        this->bp.add_gate(selector_index, 
+                            { constraint_1, constraint_2, constraint_3,
+                            constraint_4, constraint_5, constraint_6,
+                            constraint_7
+                        });
                     }
 
                     template <std::size_t SelectorColumns, std::size_t PublicInputColumns,
@@ -161,12 +173,16 @@ namespace nil {
                         const typename CurveType::template g1_type<>::value_type &P = params.P;
                         const typename CurveType::template g1_type<>::value_type &Q = params.Q;
 
-                        private_assignment.witness(W0)[j] = P.X;
-                        private_assignment.witness(W1)[j] = P.Y;
-                        private_assignment.witness(W2)[j] = Q.X;
-                        private_assignment.witness(W3)[j] = Q.Y;
-                        private_assignment.witness(W4)[j] = R.X;
-                        private_assignment.witness(W5)[j] = R.Y;
+                        auto P_affine = P.to_affine();
+                        auto Q_affine = Q.to_affine();
+                        auto R_affine = R.to_affine();
+
+                        private_assignment.witness(W0)[j] = P_affine.X;
+                        private_assignment.witness(W1)[j] = P_affine.Y;
+                        private_assignment.witness(W2)[j] = Q_affine.X;
+                        private_assignment.witness(W3)[j] = Q_affine.Y;
+                        private_assignment.witness(W4)[j] = R_affine.X;
+                        private_assignment.witness(W5)[j] = R_affine.Y;
 
                         // TODO: check, if this one correct:
                         private_assignment.witness(W6)[j] = R.is_zero();
@@ -185,8 +201,7 @@ namespace nil {
                         } else {
                             private_assignment.witness(W7)[j] = 1;
 
-                            if (P.Y != Q.Y) {
-                                private_assignment.witness(W8)[j] = 0;
+                            if (P.Y != Q.Y) { 
                                 private_assignment.witness(W9)[j] = (Q.Y - P.Y).inversed();
                             } else { // doubling
                                 if (P.Y != 0) {

@@ -28,6 +28,7 @@
 
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/constraint.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/copy_constraint.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/lookup_constraint.hpp>
 
@@ -79,6 +80,10 @@ namespace nil {
                 void add_gate(std::size_t selector_index,
                               const std::initializer_list<snark::plonk_constraint<BlueprintFieldType>> &constraints) {
                     this->_gates.emplace_back(selector_index, constraints);
+                }
+
+                void add_gate(snark::plonk_gate<BlueprintFieldType> &gate) {
+                    this->_gates.emplace_back(gate);
                 }
 
                 snark::plonk_constraint<BlueprintFieldType>
