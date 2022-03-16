@@ -36,6 +36,8 @@ namespace nil {
 
                 template<typename FieldType>
                 struct plonk_gate {
+                    typedef FieldType field_type;
+
                     std::size_t selector_index;
                     std::vector<plonk_constraint<FieldType>> constraints;
 

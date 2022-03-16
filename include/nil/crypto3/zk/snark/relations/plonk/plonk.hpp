@@ -60,11 +60,14 @@ namespace nil {
 
                 public:
 
+                    typedef FieldType field_type;
+
                     plonk_constraint_system() {
                     }
 
-                    plonk_constraint_system(std::vector<plonk_gate<FieldType, plonk_constraint>> gates, std::size_t rows_amount, std::size_t usable_rows_amount): 
-                        _gates(gates), _rows_amount(rows_amount), _usable_rows_amount(usable_rows_amount) {
+                    plonk_constraint_system(std::vector<plonk_gate<FieldType>> &gates, 
+                        std::vector<plonk_copy_constraint<FieldType>> &copy_constraints, std::size_t rows_amount, std::size_t usable_rows_amount): 
+                        _gates(gates), _copy_constraints(copy_constraints), _rows_amount(rows_amount), _usable_rows_amount(usable_rows_amount) {
                     }
 
                     std::size_t num_gates() const {

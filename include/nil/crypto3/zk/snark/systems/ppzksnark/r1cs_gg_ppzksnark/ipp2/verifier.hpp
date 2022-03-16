@@ -214,7 +214,7 @@ namespace nil {
                     verify_kzg_v(const r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> &v_srs,
                                  const std::pair<typename CurveType::template g2_type<>::value_type,
                                                  typename CurveType::template g2_type<>::value_type> &final_vkey,
-                                 const kzg_opening<typename CurveType::template g2_type<>> &vkey_opening,
+                                 const typename kzg_ipp2<CurveType>::template opening_type<typename CurveType::template g2_type<>> &vkey_opening,
                                  InputScalarIterator challenges_first, InputScalarIterator challenges_last,
                                  const typename CurveType::scalar_field_type::value_type &kzg_challenge,
                                  pairing_check<CurveType, DistributionType, GeneratorType> &pc) {
@@ -270,7 +270,7 @@ namespace nil {
                     verify_kzg_w(const r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> &v_srs,
                                  const std::pair<typename CurveType::template g1_type<>::value_type,
                                                  typename CurveType::template g1_type<>::value_type> &final_wkey,
-                                 const kzg_opening<typename CurveType::template g1_type<>> &wkey_opening,
+                                 const typename kzg_ipp2<CurveType>::template opening_type<typename CurveType::template g1_type<>> &wkey_opening,
                                  InputScalarIterator challenges_first, InputScalarIterator challenges_last,
                                  const typename CurveType::scalar_field_type::value_type &r_shift,
                                  const typename CurveType::scalar_field_type::value_type &kzg_challenge,

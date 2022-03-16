@@ -35,6 +35,7 @@
 
 #include <nil/crypto3/zk/math/permutation.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
+#include <nil/crypto3/zk/snark/relations/plonk/copy_constraint.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/variable.hpp>
 #include <nil/crypto3/zk/snark/relations/plonk/table.hpp>
@@ -65,19 +66,16 @@ namespace nil {
                     typename FieldType::value_type omega;
                     typename FieldType::value_type delta;
 
-                    math::plonk_permutation permutation;
-
                     typename policy_type::variable_assignment_type table;
 
                     std::vector<plonk_gate<FieldType>> gates;
+                    std::vector<plonk_copy_constraint<FieldType>> copy_constraints;
 
                     circuit_description() {
                         domain = math::make_evaluation_domain<FieldType>(table_rows);
 
                         omega = domain->get_domain_element(1);
                         delta = algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
-
-                        permutation = math::plonk_permutation(witness_columns + public_columns, table_rows);
                     }
 
                     void init() {
@@ -97,23 +95,26 @@ namespace nil {
                 // MUL: x * y = z
                 //---------------------------------------------------------------------------//
                 constexpr static const std::size_t witness_columns_1 = 3;
-                constexpr static const std::size_t selector_columns_1 = 2;
                 constexpr static const std::size_t public_columns_1 = 0;
                 constexpr static const std::size_t constant_columns_1 = 0;
+                constexpr static const std::size_t selector_columns_1 = 2;
 
                 template<typename FieldType>
-                circuit_description<FieldType, redshift_params<FieldType, witness_columns_1, selector_columns_1, public_columns_1, constant_columns_1>, 4, 3, 16> circuit_test_1() {
+                circuit_description<FieldType, redshift_params<FieldType, witness_columns_1, 
+                    public_columns_1, constant_columns_1, selector_columns_1>, 4, 3, 16> circuit_test_1() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t permutation = 3;
                     constexpr static const std::size_t usable = 1 << rows_log;
 
                     constexpr static const std::size_t witness_columns = witness_columns_1;
-                    constexpr static const std::size_t selector_columns = selector_columns_1;
                     constexpr static const std::size_t public_columns = public_columns_1;
                     constexpr static const std::size_t constant_columns = constant_columns_1;
-                    constexpr static const std::size_t table_columns = witness_columns + public_columns + constant_columns;
+                    constexpr static const std::size_t selector_columns = selector_columns_1;
+                    constexpr static const std::size_t table_columns = 
+                        witness_columns + public_columns + constant_columns;
 
-                    typedef redshift_params<FieldType, witness_columns, selector_columns, public_columns, constant_columns> circuit_params;
+                    typedef redshift_params<FieldType, witness_columns, public_columns, 
+                        constant_columns, selector_columns> circuit_params;
 
                     circuit_description<FieldType, circuit_params, rows_log, permutation, usable> test_circuit;
 
@@ -159,6 +160,7 @@ namespace nil {
 
                     std::vector<plonk_column<FieldType>> selectors_assignment(selector_columns);
                     std::vector<plonk_column<FieldType>> public_input_assignment(public_columns);
+                    std::array<plonk_column<FieldType>, constant_columns> constant_assignment = {};
                     for (std::size_t j = 0; j < test_circuit.table_rows; j++) {
                         selectors_assignment[0][j] = q_add[j];
                         selectors_assignment[1][j] = q_mul[j];
@@ -170,10 +172,12 @@ namespace nil {
                         }
                     }
 
-                    test_circuit.table = plonk_assignment_table<FieldType, witness_columns, selector_columns, public_columns, constant_columns>(
+                    test_circuit.table = plonk_assignment_table<FieldType, witness_columns, public_columns, 
+                        constant_columns, selector_columns>(
                         plonk_private_assignment_table<FieldType, witness_columns>(private_assignment),
-                        plonk_public_assignment_table<FieldType, selector_columns, public_columns, constant_columns>(selectors_assignment,
-                                                                                   public_input_assignment));
+                        plonk_public_assignment_table<FieldType, public_columns, 
+                            constant_columns, selector_columns>(public_input_assignment, constant_assignment,
+                                                            selectors_assignment));
 
                     test_circuit.init();
 
@@ -217,23 +221,26 @@ namespace nil {
                 // MUL: x * y = z, copy(p1, y)
                 //---------------------------------------------------------------------------//
                 constexpr static const std::size_t witness_columns_2 = 3;
-                constexpr static const std::size_t selector_columns_2 = 2;
                 constexpr static const std::size_t public_columns_2 = 1;
                 constexpr static const std::size_t constant_columns_2 = 0;
+                constexpr static const std::size_t selector_columns_2 = 2;
 
                 template<typename FieldType>
-                circuit_description<FieldType, redshift_params<FieldType, witness_columns_2, selector_columns_2, public_columns_2, constant_columns_2>, 4, 4, 16> circuit_test_2() {
+                circuit_description<FieldType, redshift_params<FieldType, witness_columns_2, public_columns_2, 
+                    constant_columns_2, selector_columns_2>, 4, 4, 16> circuit_test_2() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t permutation = 4;
                     constexpr static const std::size_t usable = 1 << rows_log;
 
                     constexpr static const std::size_t witness_columns = witness_columns_2;
-                    constexpr static const std::size_t selector_columns = selector_columns_2;
                     constexpr static const std::size_t public_columns = public_columns_2;
                     constexpr static const std::size_t constant_columns = constant_columns_2;
-                    constexpr static const std::size_t table_columns = witness_columns + public_columns + constant_columns;
+                    constexpr static const std::size_t selector_columns = selector_columns_2;
+                    constexpr static const std::size_t table_columns = 
+                            witness_columns + public_columns + constant_columns;
 
-                    typedef redshift_params<FieldType, witness_columns, selector_columns, public_columns, constant_columns> circuit_params;
+                    typedef redshift_params<FieldType, witness_columns, 
+                            public_columns, constant_columns, selector_columns> circuit_params;
 
                     circuit_description<FieldType, circuit_params, rows_log, permutation, usable> test_circuit;
 
@@ -246,10 +253,11 @@ namespace nil {
                     }
 
                     // init values
+                    typename FieldType::value_type one = FieldType::value_type::one();
                     table[0][0] = algebra::random_element<FieldType>();
-                    table[0][1] = algebra::random_element<FieldType>();
-                    table[0][2] = algebra::random_element<FieldType>();
-                    table[0][3] = algebra::random_element<FieldType>();
+                    table[1][0] = algebra::random_element<FieldType>();
+                    table[2][0] = algebra::random_element<FieldType>();
+                    table[3][0] = algebra::random_element<FieldType>();
                     q_add[0] = FieldType::value_type::zero();
                     q_mul[0] = FieldType::value_type::zero();
 
@@ -259,10 +267,14 @@ namespace nil {
                         table[1][i] = table[2][i - 1];
                         table[2][i] = table[0][i] + table[1][i];
                         table[3][i] = FieldType::value_type::zero();
-                        q_add[i] = FieldType::value_type::one();
+                        q_add[i] = one;
                         q_mul[i] = FieldType::value_type::zero();
 
-                        test_circuit.permutation.cells_equal(1, i, 2, i - 1);
+                        plonk_variable<FieldType> x(1, i, false, 
+                            plonk_variable<FieldType>::column_type::witness);
+                        plonk_variable<FieldType> y(2, i - 1, false, 
+                            plonk_variable<FieldType>::column_type::witness);
+                        test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x, y));
                     }
 
                     // fill rows with MUL gate
@@ -272,9 +284,13 @@ namespace nil {
                         table[2][i] = table[0][i] * table[1][i];
                         table[3][i] = FieldType::value_type::zero();
                         q_add[i] = FieldType::value_type::zero();
-                        q_mul[i] = FieldType::value_type::one();
+                        q_mul[i] = one;
 
-                        test_circuit.permutation.cells_equal(1, i, 3, 0);
+                        plonk_variable<FieldType> x(1, i, false, 
+                            plonk_variable<FieldType>::column_type::witness);
+                        plonk_variable<FieldType> y(0, 0, false, 
+                            plonk_variable<FieldType>::column_type::public_input);
+                        test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x, y));
                     }
 
                     std::array<plonk_column<FieldType>, witness_columns> private_assignment;
@@ -284,7 +300,7 @@ namespace nil {
 
                     std::array<plonk_column<FieldType>, selector_columns> selectors_assignment;
                     std::array<plonk_column<FieldType>, public_columns> public_input_assignment;
-                    std::array<plonk_column<FieldType>, constant_columns> constant_assignment;
+                    std::array<plonk_column<FieldType>, constant_columns> constant_assignment = {};
 
                     selectors_assignment[0] = q_add;
                     selectors_assignment[1] = q_mul;
@@ -292,32 +308,36 @@ namespace nil {
                     for (std::size_t i = 0; i < public_columns; i++) {
                         public_input_assignment[i] = table[witness_columns + i];
                     }
-                    test_circuit.table = plonk_assignment_table<FieldType, witness_columns, selector_columns, public_columns, constant_columns>(
+                    test_circuit.table = plonk_assignment_table<FieldType, witness_columns, 
+                        public_columns, constant_columns, selector_columns>(
                         plonk_private_assignment_table<FieldType, witness_columns>(private_assignment),
-                        plonk_public_assignment_table<FieldType, selector_columns, public_columns, constant_columns>(selectors_assignment,
-                                                                                   public_input_assignment, constant_assignment));
+                        plonk_public_assignment_table<FieldType, public_columns, 
+                            constant_columns, selector_columns>(public_input_assignment, constant_assignment,
+                                                                selectors_assignment));
 
                     test_circuit.init();
 
-                    plonk_variable<FieldType> w0(0, plonk_variable<FieldType>::rotation_type::current,
+                    plonk_variable<FieldType> w0(0, plonk_variable<FieldType>::rotation_type::current, true,
                                                  plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w1(0, plonk_variable<FieldType>::rotation_type::current,
+                    plonk_variable<FieldType> w1(1, plonk_variable<FieldType>::rotation_type::current, true,
                                                  plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w2(0, plonk_variable<FieldType>::rotation_type::current,
+                    plonk_variable<FieldType> w2(2, plonk_variable<FieldType>::rotation_type::current, true,
                                                  plonk_variable<FieldType>::column_type::witness);
 
                     plonk_constraint<FieldType> add_constraint;
                     add_constraint.add_term(w0);
                     add_constraint.add_term(w1);
-                    add_constraint.add_term(-w2);
+                    add_constraint.add_term(w2, -one);
 
                     std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
                     plonk_gate<FieldType> add_gate(0, add_gate_costraints);
                     test_circuit.gates.push_back(add_gate);
 
                     plonk_constraint<FieldType> mul_constraint;
-                    add_constraint.add_term(w0 * w1);
-                    add_constraint.add_term(-w2);
+                    typename plonk_constraint<FieldType>::term_type w0_term(w0);
+                    typename plonk_constraint<FieldType>::term_type w1_term(w1); 
+                    mul_constraint.add_term(w0_term * w1_term);
+                    mul_constraint.add_term(w2, -one);
 
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
                     plonk_gate<FieldType> mul_gate(1, mul_gate_costraints);

@@ -45,7 +45,7 @@ namespace nil {
             namespace commitments {
                 namespace detail {
 
-                    template <typename FieldType>
+                    template<typename FieldType>
                     math::polynomial<typename FieldType::value_type>
                         fold_polynomial(math::polynomial<typename FieldType::value_type> &f,
                                         typename FieldType::value_type alpha) {
@@ -64,10 +64,10 @@ namespace nil {
                         return f_folded;
                     }
 
-                    template <typename FieldType>
+                    template<typename FieldType>
                     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>>
                         calculate_domain_set(const std::size_t max_domain_degree, const std::size_t set_size) {
-                        
+
                         std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set(set_size);
                         for (std::size_t i = 0; i < set_size; i++) {
                             const std::size_t domain_size = std::pow(2, max_domain_degree - i);
@@ -109,8 +109,8 @@ namespace nil {
                         using Endianness = nil::marshalling::option::big_endian;
                         using field_element_type =
                             nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
-                                                                            FieldType>;
-                        
+                                                                            typename FieldType::value_type>;
+
                         using precommitment_type = merkle_tree_type;
                         using commitment_type = typename precommitment_type::value_type;
                         using transcript_type = transcript::fiat_shamir_heuristic_sequential<TranscriptHashType>;
@@ -160,8 +160,9 @@ namespace nil {
                             math::polynomial<typename FieldType::value_type> final_polynomial;
                         };
 
-                        static precommitment_type precommit(math::polynomial<typename FieldType::value_type> &f,
-                                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
+                        static precommitment_type
+                            precommit(const math::polynomial<typename FieldType::value_type> &f,
+                                      const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
                             std::vector<std::array<std::uint8_t, field_element_type::length()>> y_data;
                             y_data.resize(D->m);
@@ -179,8 +180,8 @@ namespace nil {
 
                         template<std::size_t list_size>
                         static std::array<precommitment_type, list_size>
-                            precommit(std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
-                                   const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
+                            precommit(const std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
+                                      const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
                             std::array<precommitment_type, list_size> precommits;
                             for (std::size_t i = 0; i < list_size; i++) {
                                 precommits[i] = precommit(poly[i], domain);
@@ -193,7 +194,7 @@ namespace nil {
                         }
 
                         static commitment_type commit(math::polynomial<typename FieldType::value_type> &f,
-                                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
+                                                      const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
                             return commit(precommit(f, D));
                         }
 
@@ -238,8 +239,8 @@ namespace nil {
 
                                 typename FieldType::value_type x_next = fri_params.q.evaluate(x);    // == x^2
 
-                                math::polynomial<typename FieldType::value_type> f_next =
-                                    fold_polynomial<FieldType>(f, alpha);    // create polynomial of degree (degree(f) / 2)
+                                math::polynomial<typename FieldType::value_type> f_next = fold_polynomial<FieldType>(
+                                    f, alpha);    // create polynomial of degree (degree(f) / 2)
 
                                 // m = 2, so:
                                 std::array<typename FieldType::value_type, m> s;
@@ -402,9 +403,9 @@ namespace nil {
                         }
                     };
                 }    // namespace detail
-            }    // namespace commitments
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace commitments
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_COMMITMENTS_BASIC_FRI_HPP
