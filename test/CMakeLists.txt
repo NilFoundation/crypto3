@@ -66,6 +66,7 @@ set(TESTS_NAMES
     "fri_commitment"
     "lpc_commitment"
     "redshift_proof"
+    "plonk_gates"
     "eddsa")
 
 foreach(TEST_NAME ${TESTS_NAMES})
