@@ -50,6 +50,9 @@ namespace nil {
                 template<typename FieldType, typename VariableType = plonk_variable<FieldType>>
                 class plonk_constraint : public math::non_linear_combination<VariableType> {
                 public:
+                    typedef FieldType field_type;
+                    typedef VariableType variable_type;
+
                     plonk_constraint() : math::non_linear_combination<VariableType>() {};
 
                     plonk_constraint(const VariableType &var) : math::non_linear_combination<VariableType>(var) {
