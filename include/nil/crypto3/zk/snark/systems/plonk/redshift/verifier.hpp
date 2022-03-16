@@ -78,13 +78,14 @@ namespace nil {
                     constexpr static const std::size_t f_parts = 4;
 
                 public:
-                    static inline bool
-                        process(const typename policy_type::preprocessed_public_data_type preprocessed_public_data,
-                                typename policy_type::template proof_type<commitment_scheme_witness_type,
-                                                                          commitment_scheme_permutation_type,
-                                                                          commitment_scheme_quotient_type> &proof,
-                                typename policy_type::constraint_system_type &constraint_system,
-                                const typename commitment_scheme_witness_type::params_type &fri_params) {
+                    static inline bool process(const typename policy_type::preprocessed_public_data_type preprocessed_public_data,
+                        typename policy_type::template proof_type<commitment_scheme_witness_type,
+                                                                        commitment_scheme_permutation_type,
+                                                                        commitment_scheme_quotient_type,
+                                                                        commitment_scheme_public_input_type> &proof,
+                        typename policy_type::constraint_system_type &constraint_system,
+                        const typename commitment_scheme_witness_type::params_type
+                                    &fri_params) {
 
                         // 1. Add circuit definition to transcript
                         // transcript(short_description);
@@ -98,17 +99,20 @@ namespace nil {
 
                         // 4. prepare evaluaitons of the polynomials that are copy-constrained
                         std::vector<std::size_t> rotation_gates = {0};
-                        std::vector<typename FieldType::value_type> f(
-                            preprocessed_public_data.identity_polynomials.size());
+                        std::size_t permutation_size = preprocessed_public_data.common_data.commitments.id_permutation.size();
+                        std::vector<typename FieldType::value_type> f(permutation_size);
 
                         std::size_t witness_columns_amount = proof.eval_proof.witness.size();
 
-                        for (std::size_t i = 0; i < witness_columns_amount; i++) {
-                            f[i] = proof.eval_proof.witness[i].z[0]; // TODO: organize permutation evaluations inside the proof
-                        }
-
-                        for (std::size_t i = witness_columns_amount; i < preprocessed_public_data.identity_polynomials.size(); i++) {
-                            f[i] = preprocessed_public_data.public_polynomial_table[i - witness_columns_amount].evaluate(proof.eval_proof.challenge); // TODO: add public evaluations to the proof
+                        for (std::size_t i = 0; i < permutation_size; i++) {
+                            if (i < witness_columns_amount) {
+                                f[i] = proof.eval_proof.witness[i].z[0]; // TODO: organize permutation evaluations inside the proof
+                            } else if (i < witness_columns_amount + proof.eval_proof.public_input.size()) {
+                                f[i] = proof.eval_proof.public_input[i - witness_columns_amount].z[0];
+                            } else {
+                                std::size_t idx = i - witness_columns_amount - proof.eval_proof.public_input.size();
+                                f[i] = proof.eval_proof.constant[idx].z[0];
+                            }
                         }
 
                         // 5. permutation argument
@@ -153,7 +157,7 @@ namespace nil {
                         }
 
                         typename FieldType::value_type omega =
-                            preprocessed_public_data.basic_domain->get_domain_element(1);
+                            preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
                         // witnesses
                         for (std::size_t i = 0; i < proof.eval_proof.witness.size(); i++) {
@@ -183,9 +187,62 @@ namespace nil {
 
                         // quotient
                         std::array<typename FieldType::value_type, 1> evaluation_points_quotient = {challenge};
-                        for (std::size_t i = 0; i < proof.eval_proof.permutation.size(); i++) {
-                            if (!commitment_scheme_quotient_type::verify_eval(
-                                    evaluation_points_quotient, proof.eval_proof.quotient[i], fri_params, transcript)) {
+                        for (std::size_t i = 0; i < proof.eval_proof.quotient.size(); i++) {
+                            if (!commitment_scheme_quotient_type::verify_eval(evaluation_points_quotient,
+                                    proof.eval_proof.quotient[i],
+                                    fri_params,
+                                    transcript)) {
+                                return false;
+                            }
+                        }
+
+                        // public data
+                        std::array<typename FieldType::value_type, 1> evaluation_points_public = {challenge};
+                        for (std::size_t i = 0; i < proof.eval_proof.id_permutation.size(); i++) {
+                            if (!commitment_scheme_public_input_type::verify_eval(evaluation_points_public,
+                                    proof.eval_proof.id_permutation[i],
+                                    fri_params,
+                                    transcript)) {
+                                return false;
+                            }
+                        }
+                        for (std::size_t i = 0; i < proof.eval_proof.sigma_permutation.size(); i++) {
+                            if (!commitment_scheme_public_input_type::verify_eval(evaluation_points_public,
+                                    proof.eval_proof.sigma_permutation[i],
+                                    fri_params,
+                                    transcript)) {
+                                return false;
+                            }
+                        }
+                        for (std::size_t i = 0; i < proof.eval_proof.public_input.size(); i++) {
+                            if (!commitment_scheme_public_input_type::verify_eval(evaluation_points_public,
+                                    proof.eval_proof.public_input[i],
+                                    fri_params,
+                                    transcript)) {
+                                return false;
+                            }
+                        }
+                        for (std::size_t i = 0; i < proof.eval_proof.constant.size(); i++) {
+                            if (!commitment_scheme_public_input_type::verify_eval(evaluation_points_public,
+                                    proof.eval_proof.constant[i],
+                                    fri_params,
+                                    transcript)) {
+                                return false;
+                            }
+                        }
+                        for (std::size_t i = 0; i < proof.eval_proof.selector.size(); i++) {
+                            if (!commitment_scheme_public_input_type::verify_eval(evaluation_points_public,
+                                    proof.eval_proof.selector[i],
+                                    fri_params,
+                                    transcript)) {
+                                return false;
+                            }
+                        }
+                        for (std::size_t i = 0; i < proof.eval_proof.special_selectors.size(); i++) {
+                            if (!commitment_scheme_public_input_type::verify_eval(evaluation_points_public,
+                                    proof.eval_proof.special_selectors[i],
+                                    fri_params,
+                                    transcript)) {
                                 return false;
                             }
                         }
@@ -208,7 +265,7 @@ namespace nil {
                                                                   challenge.pow((fri_params.max_degree + 1) * i);
                         }
 
-                        typename FieldType::value_type Z_at_challenge = preprocessed_public_data.Z.evaluate(challenge);
+                        typename FieldType::value_type Z_at_challenge = preprocessed_public_data.common_data.Z.evaluate(challenge);
 
                         if (F_consolidated != Z_at_challenge * T_consolidated) {
                             return false;

@@ -79,15 +79,43 @@ namespace nil {
                          * about the structure for statistics purposes.
                          */
                         template<typename CommitmentSchemeTypeWitness, typename CommitmentSchemeTypePermutation,
-                                 typename CommitmentSchemeTypeQuotient>
+                                 typename CommitmentSchemeTypeQuotient, typename CommitmentSchemeTypePublic>
                         using proof_type =
                             redshift_proof<FieldType, CommitmentSchemeTypeWitness, CommitmentSchemeTypePermutation,
-                                           CommitmentSchemeTypeQuotient>;
+                                           CommitmentSchemeTypeQuotient, CommitmentSchemeTypePublic>;
 
-                        // template<typename CommitmentSchemeType>
                         struct preprocessed_public_data_type {
+                            typedef typename RedshiftParams::commitment_scheme_public_type
+                                commitment_scheme_public_type;
 
-                            std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
+                            struct public_precommitments {
+                                std::vector<typename commitment_scheme_public_type::precommitment_type> id_permutation;
+                                std::vector<typename commitment_scheme_public_type::precommitment_type> sigma_permutation;
+                                std::array<typename commitment_scheme_public_type::precommitment_type, public_input_columns> public_input;
+                                std::array<typename commitment_scheme_public_type::precommitment_type, constant_columns> constant;
+                                std::array<typename commitment_scheme_public_type::precommitment_type, selector_columns> selector;
+                                std::array<typename commitment_scheme_public_type::precommitment_type, 2> special_selectors;
+                            };
+
+                            struct public_commitments {
+                                std::vector<typename commitment_scheme_public_type::commitment_type> id_permutation;
+                                std::vector<typename commitment_scheme_public_type::commitment_type> sigma_permutation;
+                                std::array<typename commitment_scheme_public_type::commitment_type, public_input_columns> public_input;
+                                std::array<typename commitment_scheme_public_type::commitment_type, constant_columns> constant;
+                                std::array<typename commitment_scheme_public_type::commitment_type, selector_columns> selector;
+                                std::array<typename commitment_scheme_public_type::commitment_type, 2> special_selectors;
+                            };
+
+                            // both prover and verifier use this data
+                            // fields outside of the common_data_type are used by prover
+                            struct common_data_type {
+                                std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
+
+                                math::polynomial<typename FieldType::value_type> Z;
+                                math::polynomial<typename FieldType::value_type> lagrange_0;
+
+                                public_commitments commitments;
+                            };
 
                             plonk_public_polynomial_table<FieldType, public_input_columns, 
                                 constant_columns, selector_columns> public_polynomial_table;
@@ -97,16 +125,12 @@ namespace nil {
                             // S_id
                             std::vector<math::polynomial<typename FieldType::value_type>> identity_polynomials;
 
-                            math::polynomial<typename FieldType::value_type> lagrange_0;
-
-                            math::polynomial<typename FieldType::value_type> q_last;
+                            math::polynomial<typename FieldType::value_type> q_last; // TODO: move to common data
                             math::polynomial<typename FieldType::value_type> q_blind;
 
-                            math::polynomial<typename FieldType::value_type> Z;
+                            public_precommitments precommitments;
 
-                            // std::vector<typename CommitmentSchemeType::commitment_type> selectors_commits;
-                            // std::vector<typename CommitmentSchemeType::commitment_type> id_polys_commits;
-                            // std::vector<typename CommitmentSchemeType::commitment_type> perm_polys_commits;
+                            common_data_type common_data;
                         };
 
                         struct preprocessed_private_data_type {
