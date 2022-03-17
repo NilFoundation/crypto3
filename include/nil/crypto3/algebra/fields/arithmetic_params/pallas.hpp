@@ -60,6 +60,15 @@ namespace nil {
                 constexpr typename arithmetic_params<pallas_scalar_field>::integral_type const
                 arithmetic_params<pallas_scalar_field>::root_of_unity;
 
+                constexpr typename arithmetic_params<pallas_scalar_field>::integral_type const
+                    arithmetic_params<pallas_scalar_field>::arithmetic_generator;
+
+                constexpr typename arithmetic_params<pallas_scalar_field>::integral_type const
+                    arithmetic_params<pallas_scalar_field>::geometric_generator;
+                
+                constexpr typename arithmetic_params<pallas_scalar_field>::integral_type const
+                    arithmetic_params<pallas_scalar_field>::multiplicative_generator;
+                
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3
