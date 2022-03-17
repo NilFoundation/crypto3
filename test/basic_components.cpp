@@ -43,7 +43,7 @@ using namespace nil::crypto3::algebra;
 
 template<typename FieldType>
 void test_disjunction_component(size_t n) {
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
     components::blueprint_variable_vector<FieldType> inputs;
     inputs.allocate(bp, n);
 
@@ -70,7 +70,7 @@ void test_disjunction_component(size_t n) {
 
 template<typename FieldType>
 void test_conjunction_component(size_t n) {
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
     components::blueprint_variable_vector<FieldType> inputs;
     inputs.allocate(bp, n);
 
@@ -98,7 +98,7 @@ void test_conjunction_component(size_t n) {
 
 template<typename FieldType>
 void test_comparison_component(size_t n) {
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
 
     components::blueprint_variable<FieldType> A, B, less, less_or_eq;
     A.allocate(bp);
@@ -125,7 +125,7 @@ void test_comparison_component(size_t n) {
 
 template<typename FieldType>
 void test_inner_product_component(size_t n) {
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
     components::blueprint_variable_vector<FieldType> A;
     A.allocate(bp, n);
     components::blueprint_variable_vector<FieldType> B;
@@ -159,7 +159,7 @@ void test_inner_product_component(size_t n) {
 
 template<typename FieldType>
 void test_loose_multiplexing_component(size_t n) {
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
 
     components::blueprint_variable_vector<FieldType> arr;
     arr.allocate(bp, 1ul << n);

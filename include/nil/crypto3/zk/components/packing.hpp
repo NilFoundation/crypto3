@@ -29,7 +29,7 @@
 #include <cassert>
 #include <memory>
 
-#include <nil/crypto3/zk/components/component.hpp>
+#include <nil/crypto3/zk/component.hpp>
 
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>

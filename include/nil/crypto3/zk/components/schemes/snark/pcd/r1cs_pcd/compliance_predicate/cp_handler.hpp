@@ -33,7 +33,7 @@
 
 #include <numeric>
 
-#include <nil/crypto3/zk/components/component.hpp>
+#include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/blueprint.hpp>
 
 #include <nil/crypto3/zk/snark/schemes/pcd/r1cs_pcd/compliance_predicate.hpp>

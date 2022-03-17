@@ -43,7 +43,7 @@ void print_fp_curve_group_element(FpCurveGroupElement e) {
 }
 
 template<typename CurveType>
-void verify_component(components::blueprint<typename CurveType::scalar_field_type> bp){
+void verify_component(blueprint<typename CurveType::scalar_field_type> bp){
     using field_type = typename CurveType::scalar_field_type;
     using curve_type = CurveType;
 
@@ -62,7 +62,7 @@ void verify_component(components::blueprint<typename CurveType::scalar_field_typ
 }
 
 template <typename CurveType>
-components::blueprint<typename CurveType::scalar_field_type> addition_example(
+blueprint<typename CurveType::scalar_field_type> addition_example(
     typename CurveType::pairing::chained_curve_type::template g1_type<>::value_type p1,
     typename CurveType::pairing::chained_curve_type::template g1_type<>::value_type p2){
 
@@ -70,9 +70,9 @@ components::blueprint<typename CurveType::scalar_field_type> addition_example(
     using chained_curve_type = typename CurveType::pairing::chained_curve_type;
     using scalar_field_type = typename CurveType::scalar_field_type;
 
-    // Create components::blueprint
+    // Create blueprint
 
-    components::blueprint<scalar_field_type> bp;
+    blueprint<scalar_field_type> bp;
 
     components::blueprint_variable<scalar_field_type> a;
     components::blueprint_variable<scalar_field_type> d;
@@ -133,7 +133,7 @@ int main(){
     typename chained_curve_type::template g1_type<>::value_type p2 = 
         random_element<typename chained_curve_type::g1_type>();
 
-    components::blueprint<scalar_field_type> bp = addition_example<main_curve_type>(p1, p2);
+    blueprint<scalar_field_type> bp = addition_example<main_curve_type>(p1, p2);
 
     assert(bp.is_satisfied());
 

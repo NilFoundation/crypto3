@@ -26,20 +26,22 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_COMPONENT_HPP
 #define CRYPTO3_ZK_BLUEPRINT_COMPONENT_HPP
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
+
+            template<typename ArithmetizationType, std::size_t... BlueprintParams>
+            class blueprint;
+
             namespace components {
 
-                template<typename FieldType>
+                template<typename ArithmetizationType>
                 class component {
                 protected:
-                    blueprint<FieldType> &bp;
+                    blueprint<ArithmetizationType> &bp;
 
                 public:
-                    component(blueprint<FieldType> &bp) : bp(bp) {
+                    component(blueprint<ArithmetizationType> &bp) : bp(bp) {
                     }
                 };
 

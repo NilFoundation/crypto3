@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(field_element_mul_component_test_mnt4_case) {
         typename field_type::value_type a_value = random_element<field_type>();
         typename field_type::value_type b_value = random_element<field_type>();
 
-        components::blueprint<base_field_type> bp = test_field_element_mul<field_type, 
+        blueprint<base_field_type> bp = test_field_element_mul<field_type, 
             components::element_fp4, 
             components::element_fp4_mul>(a_value, b_value);
 
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(field_element_squared_component_test_mnt4_case) {
     for (std::size_t i = 0; i < tries_quantity; i++){
         typename field_type::value_type a_value = random_element<field_type>();
 
-        components::blueprint<base_field_type> bp = test_field_element_squared<field_type, 
+        blueprint<base_field_type> bp = test_field_element_squared<field_type, 
             components::element_fp4, 
             components::element_fp4_squared>(a_value);
 

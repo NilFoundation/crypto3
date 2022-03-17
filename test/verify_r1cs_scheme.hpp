@@ -43,7 +43,7 @@ using namespace nil::crypto3::algebra;
 
 template<typename CurveType, 
          typename SchemeType = snark::r1cs_gg_ppzksnark<CurveType>>
-bool verify_component(components::blueprint<typename CurveType::scalar_field_type> bp){
+bool verify_component(blueprint<typename CurveType::scalar_field_type> bp){
 
     if (bp.num_variables() == 0x00){
         std::cout << "Empty blueprint!" << std::endl;
@@ -81,7 +81,7 @@ bool verify_component(components::blueprint<typename CurveType::scalar_field_typ
 
 template<>
 bool verify_component<curves::edwards<183>,
-                      snark::r1cs_gg_ppzksnark<curves::edwards<183>>>(components::blueprint<typename curves::edwards<183>::scalar_field_type> bp){
+                      snark::r1cs_gg_ppzksnark<curves::edwards<183>>>(blueprint<typename curves::edwards<183>::scalar_field_type> bp){
     std::cout << "Warning! r1cs_gg_ppzksnark for Edwards-183 is not implemented yet" << std::endl;
 
     return false;

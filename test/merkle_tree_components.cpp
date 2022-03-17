@@ -368,7 +368,7 @@ void test_jubjub_pedersen_merkle_tree_check_validate_component() {
     ml.generate_r1cs_constraints();
 
     address_bits_va.fill_with_bits(bp, address_bits);
-    BOOST_REQUIRE(address_bits_va.get_field_element_from_bits(bp) == address);
+    BOOST_REQUIRE(address_bits_va.field_element_from_bits(bp) == address);
     leaf_digest.generate_r1cs_witness(leaf);
     path_var.generate_r1cs_witness(address, path);
     ml.generate_r1cs_witness();

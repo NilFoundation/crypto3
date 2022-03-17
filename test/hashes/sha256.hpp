@@ -38,8 +38,8 @@ using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::zk;
 
 template<typename FieldType>
-components::blueprint<FieldType> sha2_two_to_one_bp() {
-    components::blueprint<FieldType> bp;
+blueprint<FieldType> sha2_two_to_one_bp() {
+    blueprint<FieldType> bp;
 
     components::digest_variable<FieldType> left(bp, hashes::sha2<256>::digest_bits);
     components::digest_variable<FieldType> right(bp, hashes::sha2<256>::digest_bits);

@@ -30,9 +30,9 @@ int main(){
         
     // Create blueprint
 
-    components::blueprint<field_type> bp;
-    components::blueprint_variable<field_type> out;
-    components::blueprint_variable<field_type> x;
+    blueprint<field_type> bp;
+    blueprint::value_type<field_type> out;
+    blueprint::value_type<field_type> x;
 
     // Allocate variables
 

@@ -30,7 +30,7 @@
 #define CRYPTO3_ZK_BLUEPRINT_SET_MEMBERSHIP_PROOF_VARIABLE_HPP
 
 #include <nil/crypto3/zk/snark/set_commitment.hpp>
-#include <nil/crypto3/zk/components/component.hpp>
+#include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
 #include <nil/crypto3/zk/components/merkle_tree/merkle_authentication_path_variable.hpp>
 

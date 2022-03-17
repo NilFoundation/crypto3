@@ -29,7 +29,7 @@
 #define CRYPTO3_ZK_BLUEPRINT_SHA256_AUX_HPP
 
 #include <nil/crypto3/zk/components/packing.hpp>
-#include <nil/crypto3/zk/components/blueprint_variable.hpp>
+#include <nil/crypto3/zk/blueprint/r1cs.hpp>
 
 namespace nil {
     namespace crypto3 {

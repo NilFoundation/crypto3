@@ -54,7 +54,7 @@ template<typename FpkT, template<class> class Fpk_variableT, template<class> cla
 void test_exponentiation_component(const typename FpkT::integral_type &power) {
     typedef typename FpkT::base_field_type FieldType;
 
-    components::blueprint<FieldType> bp;
+    blueprint<FieldType> bp;
     Fpk_variableT<FpkT> x(bp);
     Fpk_variableT<FpkT> x_to_power(bp);
     components::exponentiation_component<FpkT, Fpk_variableT, Fpk_mul_componentT, Fpk_sqr_componentT,

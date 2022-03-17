@@ -59,6 +59,20 @@ macro(define_blueprint_test test)
     endif()
 endmacro()
 
+set(NON_NATIVE_TESTS_FILES
+    "non_native/plonk_field_mul"
+    )
+
+set(BLUEPRINT_TESTS_FILES
+    "blueprint/plonk"
+    )
+
+set(PLONK_TESTS_FILES
+    "algebra/plonk/fixed_base_scalar_mul"
+    "algebra/plonk/variable_base_scalar_mul"
+    "algebra/plonk/unified_addition"
+    )
+
 set(FIELDS_TESTS_FILES
     "algebra/fields/fp2"
     "algebra/fields/fp2_verification"
@@ -112,7 +126,10 @@ SET(ALGEBRA_TESTS_FILES
     ${CURVES_TESTS_FILES}
     ${PAIRING_TESTS_FILES})
 
-SET(ALL_TESTS_FILES 
+SET(ALL_TESTS_FILES
+    ${NON_NATIVE_TESTS_FILES}
+    ${BLUEPRINT_TESTS_FILES}
+    ${PLONK_TESTS_FILES}
     ${ALGEBRA_TESTS_FILES}
     ${HASHES_TESTS_FILES}
     ${ROUTING_TESTS_FILES}

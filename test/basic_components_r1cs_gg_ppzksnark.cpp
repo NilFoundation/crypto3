@@ -70,7 +70,7 @@ void test_disjunction_component(std::size_t w) {
     std::size_t n = std::log2(w) + 
         ((w > (1ul << std::size_t(std::log2(w))))? 1 : 0);
 
-    components::blueprint<field_type> bp;
+    blueprint<field_type> bp;
     components::blueprint_variable<field_type> output;
     output.allocate(bp);
 
@@ -103,7 +103,7 @@ void test_conjunction_component(std::size_t w) {
     std::size_t n = std::log2(w) + 
         ((w > (1ul << std::size_t(std::log2(w))))? 1 : 0);
 
-    components::blueprint<field_type> bp;
+    blueprint<field_type> bp;
 
     components::blueprint_variable<field_type> output;
     output.allocate(bp);
@@ -135,7 +135,7 @@ void test_comparison_component(std::size_t a, std::size_t b) {
     using field_type = typename CurveType::scalar_field_type;
     using curve_type = CurveType;
 
-    components::blueprint<field_type> bp;
+    blueprint<field_type> bp;
 
     components::blueprint_variable<field_type> A, B, less, less_or_eq;
     A.allocate(bp);

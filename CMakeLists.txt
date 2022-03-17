@@ -14,6 +14,8 @@ list(APPEND CMAKE_MODULE_PATH
 include(CMConfig)
 include(CMSetupVersion)
 
+message(${CMAKE_CXX_COMPILER})
+
 if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"))
     cm_workspace(crypto3)
 endif()
@@ -95,10 +97,9 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
     include/nil/crypto3/zk/components/inner_product.hpp
     include/nil/crypto3/zk/components/loose_multiplexing.hpp
     include/nil/crypto3/zk/components/component_from_r1cs.hpp
-    include/nil/crypto3/zk/components/component.hpp
-    include/nil/crypto3/zk/components/blueprint_variable.hpp
-    include/nil/crypto3/zk/components/blueprint_linear_combination.hpp
-    include/nil/crypto3/zk/components/blueprint.hpp
+    include/nil/crypto3/zk/component.hpp
+    include/nil/crypto3/zk/blueprint/r1cs.hpp
+    include/nil/crypto3/zk/blueprint/plonk.hpp
     
     include/nil/crypto3/zk/merkle_tree.hpp)
 

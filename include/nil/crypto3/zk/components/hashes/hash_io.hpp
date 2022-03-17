@@ -30,9 +30,8 @@
 #include <vector>
 
 #include <nil/crypto3/zk/components/packing.hpp>
-#include <nil/crypto3/zk/components/component.hpp>
-#include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/components/blueprint_variable.hpp>
+#include <nil/crypto3/zk/component.hpp>
+#include <nil/crypto3/zk/blueprint/r1cs.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -76,7 +75,7 @@ namespace nil {
                     }
 
                     std::vector<bool> get_digest() const {
-                        return bits.get_bits(this->bp);
+                        return bits.bits(this->bp);
                     }
                 };
 
@@ -124,7 +123,7 @@ namespace nil {
                     }
 
                     std::vector<bool> get_block() const {
-                        return bits.get_bits(this->bp);
+                        return bits.bits(this->bp);
                     }
                 };
 
