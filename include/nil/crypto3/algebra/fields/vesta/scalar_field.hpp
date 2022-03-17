@@ -52,7 +52,7 @@ namespace nil {
                     typedef typename policy_type::modular_type modular_type;
 
                     constexpr static const integral_type modulus =
-                        0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000001_cppui255;
+                        0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui255;
 
                     typedef typename detail::element_fp<params<vesta_scalar_field>> value_type;
 
