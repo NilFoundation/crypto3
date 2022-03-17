@@ -25,8 +25,8 @@
 // @file Declaration of interfaces for auxiliary components for the SHA256 component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_TOCK_COMPONENT_15_WIRES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_TOCK_COMPONENT_15_WIRES_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_BASE_FIELD_COMPONENT_15_WIRES_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_BASE_FIELD_COMPONENT_15_WIRES_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -44,7 +44,7 @@ namespace nil {
                 template<typename ArithmetizationType,
                          typename CurveType,
                          std::size_t... WireIndexes>
-                class pickles_verifier_tock;
+                class pickles_verifier_base_field;
 
                 template<typename BlueprintFieldType,
                          typename CurveType,
@@ -63,7 +63,7 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class pickles_verifier_tock<
+                class pickles_verifier_base_field<
                     snark::plonk_constraint_system<BlueprintFieldType>,
                     CurveType,
                     W0,
@@ -90,7 +90,7 @@ namespace nil {
                     constexpr static const std::size_t endo = 3;
 
                 public:
-                    pickles_verifier_tock(blueprint_type &bp) :
+                    pickles_verifier_base_field(blueprint_type &bp) :
                         component<arithmetization_type>(bp) {
 
                         j = this->bp.allocate_rows();
@@ -108,4 +108,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_TOCK_COMPONENT_15_WIRES_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_BASE_FIELD_COMPONENT_15_WIRES_HPP
