@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Ekaterina Chukavina <kate@nil.foundation>
 //
 // MIT License
 //
@@ -39,9 +40,9 @@ namespace nil {
             namespace fields {
                 
                 template<>
-                struct arithmetic_params<vesta_scalar_field<255>> : public params<vesta_scalar_field<255>> {
+                struct arithmetic_params<vesta_scalar_field> : public params<vesta_scalar_field> {
                 private:
-                    typedef params<vesta_scalar_field<255>> policy_type;
+                    typedef params<vesta_scalar_field> policy_type;
 
                 public:
                     typedef typename policy_type::modular_type modular_type;
@@ -52,13 +53,10 @@ namespace nil {
                         0x39579430a0535caa2072a2239079f02b4c5b0caa29bfe9396f80d8a28434208f_cppui255;
                 };
 
-                //  constexpr std::size_t const arithmetic_params<vesta_base_field<255>>::s;
-                constexpr std::size_t const arithmetic_params<vesta_scalar_field<255>>::s;
+                constexpr std::size_t const arithmetic_params<vesta_scalar_field>::s;
 
-                // constexpr typename arithmetic_params<vesta_base_field<255>>::integral_type const
-                // arithmetic_params<vesta_base_field<255>>::root_of_unity;
-                constexpr typename arithmetic_params<vesta_scalar_field<255>>::integral_type const
-                    arithmetic_params<vesta_scalar_field<255>>::root_of_unity;
+                constexpr typename arithmetic_params<vesta_scalar_field>::integral_type const
+                    arithmetic_params<vesta_scalar_field>::root_of_unity;
 
            
             }    // namespace fields
