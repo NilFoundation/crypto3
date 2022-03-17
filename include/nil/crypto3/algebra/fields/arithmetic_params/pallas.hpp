@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Ekaterina Chukavina <kate@nil.foundation>
 //
 // MIT License
 //
@@ -37,42 +38,24 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace fields {
-
-                // template<>
-                // struct arithmetic_params<pallas_base_field<255>> : public params<pallas_base_field<254>> {
-                // private:
-                //     typedef params<pallas_base_field<255>> policy_type;
-
-                // public:
-                //     typedef typename policy_type::modular_type modular_type;
-                //     typedef typename policy_type::integral_type integral_type;
-
-                //     constexpr static const std::size_t s = 0x20;
-                //     constexpr static const integral_type root_of_unity =
-                //         0x1ea14637cbe1870c65d520c6cd47d259883000713dc3c2a1adf8b071592f247a_cppui255;
-                // };
-
                 template<>
-                struct arithmetic_params<pallas_scalar_field<255>> : public params<pallas_scalar_field<255>> {
+                struct arithmetic_params<pallas_scalar_field> : public params<pallas_scalar_field> {
                 private:
-                    typedef params<pallas_scalar_field<255>> policy_type;
+                    typedef params<pallas_scalar_field> policy_type;
 
                 public:
                     typedef typename policy_type::modular_type modular_type;
                     typedef typename policy_type::integral_type integral_type;
-
+                    typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const std::size_t s = 0x20;
                     constexpr static const integral_type root_of_unity =
                         0x1ea14637cbe1870c65d520c6cd47d259883000713dc3c2a1adf8b071592f247a_cppui255;
                 };
 
-                //  constexpr std::size_t const arithmetic_params<pallas_base_field<255>>::s;
-                constexpr std::size_t const arithmetic_params<pallas_scalar_field<255>>::s;
+                constexpr std::size_t const arithmetic_params<pallas_scalar_field>::s;
 
-                // constexpr typename arithmetic_params<pallas_base_field<255>>::integral_type const
-                // arithmetic_params<pallas_base_field<255>>::root_of_unity;
-                constexpr typename arithmetic_params<pallas_scalar_field<255>>::integral_type const
-                arithmetic_params<pallas_scalar_field<255>>::root_of_unity;
+                constexpr typename arithmetic_params<pallas_scalar_field>::integral_type const
+                arithmetic_params<pallas_scalar_field>::root_of_unity;
 
             }    // namespace fields
         }        // namespace algebra
