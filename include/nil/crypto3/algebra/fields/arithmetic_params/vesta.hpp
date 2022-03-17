@@ -51,7 +51,7 @@ namespace nil {
                     constexpr static const integral_type multiplicative_generator = 0x05;
                     constexpr static const std::size_t s = 0x20;
                     constexpr static const integral_type root_of_unity =
-                        0x1ea14637cbe1870c65d520c6cd47d259883000713dc3c2a1adf8b071592f247a_cppui255;
+                        0x39579430a0535caa2072a2239079f02b4c5b0caa29bfe9396f80d8a28434208f_cppui255;
                 };
 
                 constexpr std::size_t const arithmetic_params<vesta_base_field>::s;
