@@ -47,6 +47,9 @@ namespace nil {
                     typedef typename policy_type::modular_type modular_type;
                     typedef typename policy_type::integral_type integral_type;
                     typedef typename policy_type::modular_backend modular_backend;
+                    constexpr static const integral_type arithmetic_generator = 0x01;
+                    constexpr static const integral_type geometric_generator = 0x02;
+                    constexpr static const integral_type multiplicative_generator = 0x05;
                     constexpr static const std::size_t s = 0x20;
                     constexpr static const integral_type root_of_unity =
                         0x1ea14637cbe1870c65d520c6cd47d259883000713dc3c2a1adf8b071592f247a_cppui255;
