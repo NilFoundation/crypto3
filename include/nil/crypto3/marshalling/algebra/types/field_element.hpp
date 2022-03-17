@@ -113,8 +113,8 @@ namespace nil {
                     }
                 }    // namespace detail
 
-                template<typename TTypeBase, 
-                         typename FieldValueType, 
+                template<typename TTypeBase,
+                         typename FieldValueType,
                          typename... TOptions>
                 class pure_field_element
                     : private ::nil::marshalling::types::detail::adapt_basic_field_type<
@@ -147,7 +147,7 @@ namespace nil {
                     pure_field_element() = default;
 
                     /// @brief Constructor
-                    explicit pure_field_element(const FieldValueType &field_elem) 
+                    explicit pure_field_element(const FieldValueType &field_elem)
                     : base_impl_type(typename FieldValueType::field_type::integral_type(field_elem.data)){
                     }
 
@@ -338,8 +338,8 @@ namespace nil {
                         "crypto3::field_element type");
                 };
 
-                template<typename TTypeBase, 
-                         typename FieldValueType, 
+                template<typename TTypeBase,
+                         typename FieldValueType,
                          typename... TOptions>
                 class extended_field_element
                     : private ::nil::marshalling::types::detail::adapt_basic_field_type<
@@ -686,52 +686,44 @@ namespace nil {
                 //     return field;
                 // }
 
-                // template<typename FieldValueType, typename Endianness>
-                // nil::marshalling::types::array_list<
-                //     nil::marshalling::field_type<Endianness>,
-                //     field_element<nil::marshalling::field_type<Endianness>, FieldValueType>,
-                //     nil::marshalling::option::sequence_size_field_prefix<
-                //         nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>
-                //     fill_field_element_vector(const std::vector<FieldValueType> &field_elem_vector) {
+                template<typename FieldValueType, typename Endianness>
+                nil::marshalling::types::array_list<
+                    nil::marshalling::field_type<Endianness>,
+                    field_element<nil::marshalling::field_type<Endianness>, FieldValueType>,
+                    nil::marshalling::option::sequence_size_field_prefix<
+                        nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>
+                    fill_field_element_vector(const std::vector<FieldValueType> &field_elem_vector) {
 
-                //     using TTypeBase = nil::marshalling::field_type<Endianness>;
+                    using TTypeBase = nil::marshalling::field_type<Endianness>;
+                    using field_element_type = field_element<TTypeBase, FieldValueType>;
+                    using field_element_vector_type = nil::marshalling::types::array_list<
+                        TTypeBase,
+                        field_element_type,
+                        nil::marshalling::option::sequence_size_field_prefix<
+                            nil::marshalling::types::integral<TTypeBase, std::size_t>>>;
 
-                //     using field_element_type = field_element<TTypeBase, FieldValueType>;
+                    field_element_vector_type result;
+                    for (std::size_t i = 0; i < field_elem_vector.size(); i++) {
+                        result.value().push_back(field_element_type(field_elem_vector[i]));
+                    }
+                    return result;
+                }
 
-                //     using field_element_vector_type = nil::marshalling::types::array_list<
-                //         TTypeBase,
-                //         field_element_type,
-                //         nil::marshalling::option::sequence_size_field_prefix<
-                //             nil::marshalling::types::integral<TTypeBase, std::size_t>>>;
+                template<typename FieldValueType, typename Endianness>
+                std::vector<FieldValueType> make_field_element_vector(
+                    const nil::marshalling::types::array_list<
+                        nil::marshalling::field_type<Endianness>,
+                        field_element<nil::marshalling::field_type<Endianness>, FieldValueType>,
+                        nil::marshalling::option::sequence_size_field_prefix<
+                            nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>
+                        &field_elem_vector) {
 
-                //     field_element_vector_type result;
-
-                //     std::vector<field_element_type> &val = result.value();
-                //     for (std::size_t i = 0; i < field_elem_vector.size(); i++) {
-                //         val.push_back(fill_field_element<FieldValueType, Endianness>(field_elem_vector[i]));
-                //     }
-                //     return result;
-                // }
-
-                // template<typename FieldValueType, typename Endianness>
-                // std::vector<FieldValueType> make_field_element_vector(
-                //     const nil::marshalling::types::array_list<
-                //         nil::marshalling::field_type<Endianness>,
-                //         field_element<nil::marshalling::field_type<Endianness>, FieldValueType>,
-                //         nil::marshalling::option::sequence_size_field_prefix<
-                //             nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>
-                //         &field_elem_vector) {
-
-                //     std::vector<FieldValueType> result;
-                //     const std::vector<field_element<nil::marshalling::field_type<Endianness>, FieldValueType>> &values =
-                //         field_elem_vector.value();
-                //     std::size_t size = values.size();
-
-                //     for (std::size_t i = 0; i < size; i++) {
-                //         result.push_back(make_field_element<FieldValueType, Endianness>(values[i]));
-                //     }
-                //     return result;
-                // }
+                    std::vector<FieldValueType> result;
+                    for (std::size_t i = 0; i < field_elem_vector.value().size(); i++) {
+                        result.push_back(field_elem_vector.value()[i].value());
+                    }
+                    return result;
+                }
             }    // namespace types
         }        // namespace marshalling
     }            // namespace crypto3
