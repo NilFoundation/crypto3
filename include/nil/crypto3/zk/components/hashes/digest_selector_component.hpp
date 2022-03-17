@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -67,9 +68,9 @@ namespace nil {
                     void generate_r1cs_witness() {
                         is_right.evaluate(this->bp);
 
-                        assert(this->bp.lc_val(is_right) == FieldType::value_type::zero() ||
+                        assert(this->bp.lc_val(is_right) == FieldType::value_type::one() ||
                                this->bp.lc_val(is_right) == FieldType::value_type::zero());
-                        if (this->bp.lc_val(is_right) == FieldType::value_type::zero()) {
+                        if (this->bp.lc_val(is_right) == FieldType::value_type::one()) {
                             for (std::size_t i = 0; i < digest_size; ++i) {
                                 this->bp.val(right.bits[i]) = this->bp.val(input.bits[i]);
                             }
