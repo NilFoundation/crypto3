@@ -30,7 +30,6 @@
 #include <nil/crypto3/algebra/fields/params.hpp>
 
 #include <nil/crypto3/algebra/fields/vesta/base_field.hpp>
-#include <nil/crypto3/algebra/fields/vesta/scalar_field.hpp>
 
 #include <nil/crypto3/detail/literals.hpp>
 
@@ -38,38 +37,37 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace fields {
-                
                 template<>
-                struct arithmetic_params<vesta_scalar_field> : public params<vesta_scalar_field> {
+                struct arithmetic_params<vesta_base_field> : public params<vesta_base_field> {
                 private:
-                    typedef params<vesta_scalar_field> policy_type;
+                    typedef params<vesta_base_field> policy_type;
 
                 public:
                     typedef typename policy_type::modular_type modular_type;
                     typedef typename policy_type::integral_type integral_type;
-
-                    constexpr static const std::size_t s = 0x20;
+                    typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const integral_type arithmetic_generator = 0x01;
                     constexpr static const integral_type geometric_generator = 0x02;
                     constexpr static const integral_type multiplicative_generator = 0x05;
+                    constexpr static const std::size_t s = 0x20;
                     constexpr static const integral_type root_of_unity =
-                        0x39579430a0535caa2072a2239079f02b4c5b0caa29bfe9396f80d8a28434208f_cppui255;
+                        0x1ea14637cbe1870c65d520c6cd47d259883000713dc3c2a1adf8b071592f247a_cppui255;
                 };
 
-                constexpr std::size_t const arithmetic_params<vesta_scalar_field>::s;
+                constexpr std::size_t const arithmetic_params<vesta_base_field>::s;
 
-                constexpr typename arithmetic_params<vesta_scalar_field>::integral_type const
-                    arithmetic_params<vesta_scalar_field>::root_of_unity;
+                constexpr typename arithmetic_params<vesta_base_field>::integral_type const
+                arithmetic_params<vesta_base_field>::root_of_unity;
 
-                constexpr typename arithmetic_params<vesta_scalar_field>::integral_type const
-                    arithmetic_params<vesta_scalar_field>::arithmetic_generator;
+                constexpr typename arithmetic_params<vesta_base_field>::integral_type const
+                    arithmetic_params<vesta_base_field>::arithmetic_generator;
 
-                constexpr typename arithmetic_params<vesta_scalar_field>::integral_type const
-                    arithmetic_params<vesta_scalar_field>::geometric_generator;
+                constexpr typename arithmetic_params<vesta_base_field>::integral_type const
+                    arithmetic_params<vesta_base_field>::geometric_generator;
                 
-                constexpr typename arithmetic_params<vesta_scalar_field>::integral_type const
-                    arithmetic_params<vesta_scalar_field>::multiplicative_generator;
-           
+                constexpr typename arithmetic_params<vesta_base_field>::integral_type const
+                    arithmetic_params<vesta_base_field>::multiplicative_generator;
+                
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3

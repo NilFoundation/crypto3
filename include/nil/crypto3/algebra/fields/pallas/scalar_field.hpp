@@ -30,6 +30,7 @@
 
 #include <nil/crypto3/algebra/fields/params.hpp>
 #include <nil/crypto3/algebra/fields/field.hpp>
+#include <nil/crypto3/algebra/fields/vesta/base_field.hpp>
 
 #include <nil/crypto3/detail/literals.hpp>
 
@@ -40,29 +41,7 @@ namespace nil {
                 /**
                  * @brief A struct representing a pallas curve.
                  */
-                struct pallas_scalar_field : public field<255> {
-                    typedef field<255> policy_type;
-
-                    constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::integral_type integral_type;
-
-                    typedef typename policy_type::extended_integral_type extended_integral_type;
-
-                    constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::modular_type modular_type;
-
-                    constexpr static const integral_type modulus =
-                        0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000001_cppui255;
-
-                    typedef typename detail::element_fp<params<pallas_scalar_field>> value_type;
-
-                    constexpr static const std::size_t value_bits = modulus_bits;
-                    constexpr static const std::size_t arity = 1;
-                };
-                constexpr typename std::size_t const pallas_scalar_field::modulus_bits;
-                constexpr typename std::size_t const pallas_scalar_field::number_bits;
-                constexpr typename std::size_t const pallas_scalar_field::value_bits;
-                constexpr typename pallas_scalar_field::integral_type const pallas_scalar_field::modulus;
+                using pallas_scalar_field = vesta_base_field;
 
                 using pallas_fr = pallas_scalar_field;
             }    // namespace fields
