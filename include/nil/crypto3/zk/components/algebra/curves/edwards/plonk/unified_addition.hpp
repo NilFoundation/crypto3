@@ -121,11 +121,11 @@ namespace nil {
                             (1 - var(W7, 0)));
                         auto constraint_3 = this->bp.add_constraint(
                             var(W7, 0) * (2*var(W8, 0) * var(W1, 0) - 
-                            3*(var(W0, 0)^2)) + (1 - var(W7, 0)) * 
-                            (var(W2, 0) - var(W0, 0) * var(W8, 0) - 
+                            3*(var(W0, 0) * var(W0, 0))) + (1 - var(W7, 0)) * 
+                            ((var(W2, 0) - var(W0, 0)) * var(W8, 0) - 
                             (var(W3, 0) - var(W1, 0))));
                         auto constraint_4 = this->bp.add_constraint(
-                            (var(W8, 0)^2) - (var(W0, 0) + var(W2, 0) + var(W4, 0)));
+                            (var(W8, 0) * var(W8, 0)) - (var(W0, 0) + var(W2, 0) + var(W4, 0)));
                         auto constraint_5 = this->bp.add_constraint(
                             var(W5, 0) - (var(W8, 0) * (var(W0, 0) - 
                             var(W4, 0)) - var(W1, 0)));
@@ -189,23 +189,19 @@ namespace nil {
 
                         if (P.X != Q.X){
                             private_assignment.witness(W7)[j] = 0;
-                            private_assignment.witness(W8)[j] = (P.Y - Q.Y)/(P.X - Q.X);
+                            private_assignment.witness(W8)[j] = (P_affine.Y - Q_affine.Y)/(P_affine.X - Q_affine.X);
 
-                            if (P.Y != Q.Y) {
-                                private_assignment.witness(W9)[j] = (Q.Y - P.Y).inversed();
-                            } else {
-                                private_assignment.witness(W9)[j] = 0;
-                            }
+                            private_assignment.witness(W9)[j] = 0;
 
-                            private_assignment.witness(W10)[j] = (Q.X - P.X).inversed();
+                            private_assignment.witness(W10)[j] = (Q_affine.X - P_affine.X).inversed();
                         } else {
                             private_assignment.witness(W7)[j] = 1;
 
                             if (P.Y != Q.Y) { 
-                                private_assignment.witness(W9)[j] = (Q.Y - P.Y).inversed();
+                                private_assignment.witness(W9)[j] = (Q_affine.Y - P_affine.Y).inversed();
                             } else { // doubling
                                 if (P.Y != 0) {
-                                    private_assignment.witness(W8)[j] = (3 * P.X.pow(2))/(2 * P.Y);
+                                    private_assignment.witness(W8)[j] = (3 * (P_affine.X * P_affine.X))/(2 * P_affine.Y);
                                 } else {
                                     private_assignment.witness(W8)[j] = 0;
                                 }
