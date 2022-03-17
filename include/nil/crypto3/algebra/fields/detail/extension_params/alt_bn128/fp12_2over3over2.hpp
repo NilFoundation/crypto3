@@ -37,6 +37,10 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace fields {
+
+                template<typename BaseField>
+                struct fp12_2over3over2;
+
                 namespace detail {
 
                     template<typename BaseField>
@@ -55,6 +59,7 @@ namespace nil {
                         typedef params<base_field_type> policy_type;
 
                     public:
+                        using field_type = fields::fp12_2over3over2<base_field_type>;
                         typedef typename policy_type::integral_type integral_type;
 
                         constexpr static const integral_type modulus = policy_type::modulus;
