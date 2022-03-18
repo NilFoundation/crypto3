@@ -86,10 +86,10 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
     include/nil/crypto3/zk/components/routing/as_waksman_routing_component.hpp
     include/nil/crypto3/zk/components/routing/benes_routing_component.hpp
 
-    include/nil/crypto3/zk/components/schemes/set_commitment/set_commitment_component.hpp
-    include/nil/crypto3/zk/components/schemes/set_commitment/set_membership_proof_variable.hpp
+     include/nil/crypto3/zk/components/systems/set_commitment/set_commitment_component.hpp
+     include/nil/crypto3/zk/components/systems/set_commitment/set_membership_proof_variable.hpp
 
-    include/nil/crypto3/zk/components/schemes/snark/r1cs_pp_zksnark/verifier.hpp
+     include/nil/crypto3/zk/components/systems/snark/r1cs_pp_zksnark/verifier.hpp
     include/nil/crypto3/zk/components/packing.hpp
     include/nil/crypto3/zk/components/comparison.hpp
     include/nil/crypto3/zk/components/conjunction.hpp
