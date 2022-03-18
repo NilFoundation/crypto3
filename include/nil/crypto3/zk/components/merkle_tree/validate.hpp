@@ -33,12 +33,10 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_CHECK_READ_COMPONENT_HPP
 #define CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_CHECK_READ_COMPONENT_HPP
 
-#include <nil/crypto3/container/merkle/tree.hpp>
-
-#include <nil/crypto3/zk/components/component.hpp>
+#include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/hashes/digest_selector_component.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
-#include <nil/crypto3/zk/components/merkle_tree/proof.hpp>
+#include <nil/crypto3/zk/components/merkle_tree/prove.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -70,19 +68,19 @@ namespace nil {
                 public:
                     const std::size_t digest_size;
                     const std::size_t tree_depth;
-                    blueprint_linear_combination_vector<field_type> address_bits;
+                    detail::blueprint_linear_combination_vector<field_type> address_bits;
                     digest_variable<field_type> leaf;
                     digest_variable<field_type> root;
                     merkle_proof_component path;
-                    blueprint_linear_combination<field_type> read_successful;
+                    detail::blueprint_linear_combination<field_type> read_successful;
 
                     merkle_proof_validate(blueprint<field_type> &bp,
                                           const std::size_t tree_depth,
-                                          const blueprint_linear_combination_vector<field_type> &address_bits,
+                                          const detail::blueprint_linear_combination_vector<field_type> &address_bits,
                                           const digest_variable<field_type> &leaf,
                                           const digest_variable<field_type> &root,
                                           const merkle_proof_component &path,
-                                          const blueprint_linear_combination<field_type> &read_successful) :
+                                          const detail::blueprint_linear_combination<field_type> &read_successful) :
                         component<field_type>(bp),
                         digest_size(HashComponent::digest_bits), tree_depth(tree_depth), address_bits(address_bits),
                         leaf(leaf), root(root), path(path), read_successful(read_successful) {

@@ -37,7 +37,7 @@
 #include <nil/crypto3/zk/components/component.hpp>
 #include <nil/crypto3/zk/components/hashes/digest_selector_component.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
-#include <nil/crypto3/zk/components/merkle_tree/proof.hpp>
+#include <nil/crypto3/zk/components/merkle_tree/prove.hpp>
 #include <nil/crypto3/zk/components/packing.hpp>
 
 namespace nil {

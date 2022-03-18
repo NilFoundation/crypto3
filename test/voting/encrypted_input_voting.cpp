@@ -63,7 +63,8 @@ void test_jubjub_pedersen_encrypted_input_voting_component() {
     using merkle_hash_type = typename merkle_hash_component::hash_type;
     using field_type = typename hash_component::field_type;
     constexpr std::size_t arity = 2;
-    using voting_component = components::encrypted_input_voting<arity, hash_component, merkle_hash_component, field_type>;
+    using voting_component =
+        components::encrypted_input_voting<arity, hash_component, merkle_hash_component, field_type>;
     using merkle_proof_component = typename voting_component::merkle_proof_component;
     using merkle_validate_component = typename voting_component::merkle_proof_validating_component;
 
@@ -226,7 +227,8 @@ void test_jubjub_merkle_container_pedersen_encrypted_input_voting_component() {
     using merkle_hash_type = typename merkle_hash_component::hash_type;
     using field_type = typename hash_component::field_type;
     constexpr std::size_t arity = 2;
-    using voting_component = components::encrypted_input_voting<arity, hash_component, merkle_hash_component, field_type>;
+    using voting_component =
+        components::encrypted_input_voting<arity, hash_component, merkle_hash_component, field_type>;
     using merkle_proof_component = typename voting_component::merkle_proof_component;
     using merkle_validate_component = typename voting_component::merkle_proof_validating_component;
 
@@ -240,10 +242,11 @@ void test_jubjub_merkle_container_pedersen_encrypted_input_voting_component() {
         hash<merkle_hash_type>(sk, std::begin(pk));
         public_keys.emplace_back(pk);
     }
-    merkle_tree<merkle_hash_type, arity> tree(public_keys);
+    nil::crypto3::containers::merkle_tree<merkle_hash_type, arity> tree(std::cbegin(public_keys),
+                                                                        std::cend(public_keys));
     std::size_t proof_idx = std::rand() % leafs_number;
-    merkle_proof<merkle_hash_type, arity> proof(tree, proof_idx);
-    merkle_proof<merkle_hash_type, arity> proof_wrong(tree, (proof_idx + 1) % leafs_number);
+    nil::crypto3::containers::merkle_proof<merkle_hash_type, arity> proof(tree, proof_idx);
+    nil::crypto3::containers::merkle_proof<merkle_hash_type, arity> proof_wrong(tree, (proof_idx + 1) % leafs_number);
 
     auto tree_pk_leaf = tree[proof_idx];
     std::vector<bool> pk_leaf = hash<merkle_hash_type>(public_keys[proof_idx]);
