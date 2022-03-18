@@ -38,7 +38,7 @@ namespace nil {
                 }
 
                 template<typename Limb1, typename Limb2, typename Limb3>
-                bool reduce_limb_asm(size_t n, const size_t &shift, Limb1 *res, const Limb2 *x, const Limb3 &inv) {
+                bool reduce_limb_asm(const size_t &n, Limb1 *res, const Limb2 *x, const Limb3 &inv) {
                     bool carry = false;
                     __asm__ volatile(
                         // Else check result with mod
@@ -85,7 +85,7 @@ namespace nil {
                         "cmpq %[limbs], %%r12                  \n\t"
                         "jne 0b                                \n\t"
                         : [carry] "+r"(carry)
-                        : [limbs] "r"(n), [shift] "r"(shift), [res] "r"(res), [x] "r"(x), [inv] "r"(inv)
+                        : [limbs] "r"(n), [res] "r"(res), [x] "r"(x), [inv] "r"(inv)
                         : "cc", "memory", "%rax", "%rbx", "%rdx", "%r8", "%r9", "%r10", "%r11", "%r12");
                     // r8, r9 - tmp1, tmp2
                     // r10 - k
