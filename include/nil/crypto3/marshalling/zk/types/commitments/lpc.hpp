@@ -66,8 +66,7 @@ namespace nil {
                                    // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                                    // std::array<typename FieldType::value_type, k> z;
                                    nil::marshalling::types::array_list<
-                                       TTypeBase, field_element<TTypeBase,
-                                        typename LPCScheme::field_type::value_type>,
+                                       TTypeBase, field_element<TTypeBase, typename LPCScheme::field_type::value_type>,
                                        nil::marshalling::option::sequence_size_field_prefix<
                                            nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
                                    // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
@@ -87,8 +86,7 @@ namespace nil {
                     using digest_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, octet_marshalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
-                    using field_marhsalling_type = field_element<TTypeBase,
-                        typename LPCScheme::field_type::value_type>;
+                    using field_marhsalling_type = field_element<TTypeBase, typename LPCScheme::field_type::value_type>;
                     using field_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, field_marhsalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;

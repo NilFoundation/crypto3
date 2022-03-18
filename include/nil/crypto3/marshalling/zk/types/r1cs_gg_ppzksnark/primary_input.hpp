@@ -58,17 +58,17 @@ namespace nil {
                                  zk::snark::r1cs_primary_input<typename PrimaryInput::value_type::field_type>>::value,
                              bool>::type,
                          typename... TOptions>
-                using r1cs_gg_ppzksnark_primary_input = nil::marshalling::types::array_list<
-                    TTypeBase,
-                    field_element<TTypeBase, typename PrimaryInput::value_type::field_type>,
-                    nil::marshalling::option::sequence_size_field_prefix<
-                        nil::marshalling::types::integral<TTypeBase, std::size_t>>>;
+                using r1cs_gg_ppzksnark_primary_input =
+                    nil::marshalling::types::array_list<TTypeBase,
+                                                        field_element<TTypeBase, typename PrimaryInput::value_type>,
+                                                        nil::marshalling::option::sequence_size_field_prefix<
+                                                            nil::marshalling::types::integral<TTypeBase, std::size_t>>>;
 
                 template<typename PrimaryInput, typename Endianness>
                 r1cs_gg_ppzksnark_primary_input<nil::marshalling::field_type<Endianness>, PrimaryInput>
                     fill_r1cs_gg_ppzksnark_primary_input(const PrimaryInput &r1cs_gg_ppzksnark_primary_input_inp) {
 
-                    return fill_field_element_vector<typename PrimaryInput::value_type::field_type, Endianness>(
+                    return fill_field_element_vector<typename PrimaryInput::value_type, Endianness>(
                         r1cs_gg_ppzksnark_primary_input_inp);
                 }
 
@@ -77,7 +77,7 @@ namespace nil {
                     const r1cs_gg_ppzksnark_primary_input<nil::marshalling::field_type<Endianness>, PrimaryInput>
                         &filled_r1cs_gg_ppzksnark_primary_input) {
 
-                    return make_field_element_vector<typename PrimaryInput::value_type::field_type, Endianness>(
+                    return make_field_element_vector<typename PrimaryInput::value_type, Endianness>(
                         filled_r1cs_gg_ppzksnark_primary_input);
                 }
 

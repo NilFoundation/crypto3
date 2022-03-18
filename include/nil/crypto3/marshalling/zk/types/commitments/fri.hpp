@@ -224,8 +224,7 @@ namespace nil {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using size_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
-                    using field_marhsalling_type = field_element<TTypeBase,
-                        typename FRIScheme::field_type::value_type>;
+                    using field_marhsalling_type = field_element<TTypeBase, typename FRIScheme::field_type::value_type>;
                     using field_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, field_marhsalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;

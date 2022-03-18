@@ -43,9 +43,9 @@
 #include <nil/crypto3/zk/components/blueprint.hpp>
 #include <nil/crypto3/zk/components/blueprint_variable.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/algorithms/generate.hpp>
-#include <nil/crypto3/zk/snark/algorithms/verify.hpp>
-#include <nil/crypto3/zk/snark/algorithms/prove.hpp>
+#include <nil/crypto3/zk/algorithms/generate.hpp>
+#include <nil/crypto3/zk/algorithms/verify.hpp>
+#include <nil/crypto3/zk/algorithms/prove.hpp>
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/crypto3/marshalling/zk/types/r1cs_gg_ppzksnark/primary_input.hpp>
@@ -76,12 +76,12 @@ bool test_r1cs_gg_ppzksnark() {
 
     std::cout << "Starting generator" << std::endl;
 
-    typename scheme_type::keypair_type keypair = zk::snark::generate<scheme_type>(example.constraint_system);
+    typename scheme_type::keypair_type keypair = zk::generate<scheme_type>(example.constraint_system);
 
     std::cout << "Starting prover" << std::endl;
 
     const typename scheme_type::proof_type proof =
-        zk::snark::prove<scheme_type>(keypair.first, example.primary_input, example.auxiliary_input);
+        zk::prove<scheme_type>(keypair.first, example.primary_input, example.auxiliary_input);
 
     using verification_key_marshalling_type =
         types::r1cs_gg_ppzksnark_verification_key<nil::marshalling::field_type<Endianness>,
@@ -157,7 +157,7 @@ bool test_r1cs_gg_ppzksnark() {
         types::make_r1cs_gg_ppzksnark_primary_input<typename scheme_type::primary_input_type, Endianness>(
             val_primary_input_read);
 
-    bool ans = zk::snark::verify<scheme_type>(constructed_val_verification_key_read, constructed_val_primary_input_read,
+    bool ans = zk::verify<scheme_type>(constructed_val_verification_key_read, constructed_val_primary_input_read,
                                               constructed_val_proof_read);
 
     return ans;

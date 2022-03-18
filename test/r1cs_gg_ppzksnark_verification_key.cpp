@@ -51,6 +51,7 @@
 #include <nil/crypto3/container/accumulation_vector.hpp>
 
 #include <nil/crypto3/marshalling/zk/types/r1cs_gg_ppzksnark/verification_key.hpp>
+#include <nil/crypto3/marshalling/pubkey/types/elgamal_verifiable.hpp>
 
 template<typename TIter>
 void print_byteblob(TIter iter_begin, TIter iter_end) {
@@ -166,7 +167,7 @@ typename std::enable_if<
             nil::crypto3::algebra::random_element<gt_type>(),
             nil::crypto3::algebra::random_element<g2_type>(),
             nil::crypto3::algebra::random_element<g2_type>(),
-            std::move(nil::crypto3::zk::snark::accumulation_vector<g1_type>(std::move(first), std::move(rest)))));
+            std::move(nil::crypto3::container::accumulation_vector<g1_type>(std::move(first), std::move(rest)))));
     }
 }
 
@@ -195,7 +196,7 @@ typename std::enable_if<std::is_same<nil::crypto3::zk::snark::r1cs_gg_ppzksnark_
             nil::crypto3::algebra::random_element<g2_type>(),
             nil::crypto3::algebra::random_element<g2_type>(),
             nil::crypto3::algebra::random_element<g1_type>(),
-            std::move(nil::crypto3::zk::snark::accumulation_vector<g1_type>(std::move(first), std::move(rest))),
+            std::move(nil::crypto3::container::accumulation_vector<g1_type>(std::move(first), std::move(rest))),
             nil::crypto3::algebra::random_element<g1_type>()));
     }
 }
@@ -282,18 +283,15 @@ BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_extended_verification_key_bls12_381_be_er
     using gt_type = typename curve_type::gt_type;
 
     using gt_marshalling_type =
-        nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<endianness>, gt_type>;
+        nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<endianness>, typename gt_type::value_type>;
     using g2_marshalling_type =
         nil::crypto3::marshalling::types::curve_element<nil::marshalling::field_type<endianness>, g2_type>;
     using g1_marshalling_type =
         nil::crypto3::marshalling::types::curve_element<nil::marshalling::field_type<endianness>, g1_type>;
     using accumulation_vector_marshalling_type =
         nil::crypto3::marshalling::types::accumulation_vector<nil::marshalling::field_type<endianness>,
-                                                              nil::crypto3::zk::snark::accumulation_vector<g1_type>>;
-    gt_marshalling_type gt_marshalling;
-    std::cout << "Not ok: " << gt_marshalling.length() << std::endl;
-    gt_marshalling_type filled_gt = nil::crypto3::marshalling::types::fill_field_element<gt_type, endianness>(
-        nil::crypto3::algebra::random_element<gt_type>());
+                                                              nil::crypto3::container::accumulation_vector<g1_type>>;
+    gt_marshalling_type filled_gt(nil::crypto3::algebra::random_element<gt_type>());
     std::cout << "Ok only after initialization: " << filled_gt.length() << std::endl;
 
     g2_marshalling_type g2_marshalling;
@@ -310,9 +308,9 @@ BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_extended_verification_key_bls12_381_be_er
     for (std::size_t i = 0; i < 5; i++) {
         rest.push_back(nil::crypto3::algebra::random_element<g1_type>());
     }
-    nil::crypto3::zk::snark::accumulation_vector<g1_type> acc_vec(std::move(first), std::move(rest));
+    nil::crypto3::container::accumulation_vector<g1_type> acc_vec(std::move(first), std::move(rest));
     accumulation_vector_marshalling_type filled_acc_vec = nil::crypto3::marshalling::types::fill_accumulation_vector<
-        nil::crypto3::zk::snark::accumulation_vector<g1_type>, endianness>(acc_vec);
+        nil::crypto3::container::accumulation_vector<g1_type>, endianness>(acc_vec);
     std::cout << "Ok: " << filled_acc_vec.length() << std::endl;
 
     // key_type key(nil::crypto3::algebra::random_element<gt_type>(),

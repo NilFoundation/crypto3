@@ -67,7 +67,7 @@ namespace nil {
                     TTypeBase,
                     std::tuple<
                         // alpha_g1_beta_g2
-                        field_element<TTypeBase, typename VerificationKey::curve_type::gt_type>,
+                        field_element<TTypeBase, typename VerificationKey::curve_type::gt_type::value_type>,
                         // gamma_g2
                         curve_element<TTypeBase, typename VerificationKey::curve_type::template g2_type<>>,
                         // delta_g2
@@ -83,20 +83,16 @@ namespace nil {
                         const VerificationKey &r1cs_gg_ppzksnark_verification_key_inp) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-
                     using field_gt_element_type =
-                        field_element<TTypeBase, typename VerificationKey::curve_type::gt_type>;
-
+                        field_element<TTypeBase, typename VerificationKey::curve_type::gt_type::value_type>;
                     using curve_g2_element_type =
                         curve_element<TTypeBase, typename VerificationKey::curve_type::template g2_type<>>;
-
                     using accumulation_vector_type = accumulation_vector<
                         TTypeBase,
                         container::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>>;
 
-                    field_gt_element_type filled_alpha_g1_beta_g2 =
-                        fill_field_element<typename VerificationKey::curve_type::gt_type, Endianness>(
-                            r1cs_gg_ppzksnark_verification_key_inp.alpha_g1_beta_g2);
+                    field_gt_element_type filled_alpha_g1_beta_g2(
+                        r1cs_gg_ppzksnark_verification_key_inp.alpha_g1_beta_g2);
 
                     curve_g2_element_type filled_gamma_g2 =
                         curve_g2_element_type(r1cs_gg_ppzksnark_verification_key_inp.gamma_g2);
@@ -119,8 +115,7 @@ namespace nil {
                         &filled_r1cs_gg_ppzksnark_verification_key) {
 
                     return VerificationKey(
-                        std::move(make_field_element<typename VerificationKey::curve_type::gt_type, Endianness>(
-                            std::get<0>(filled_r1cs_gg_ppzksnark_verification_key.value()))),
+                        std::move(std::get<0>(filled_r1cs_gg_ppzksnark_verification_key.value()).value()),
                         std::move(std::get<1>(filled_r1cs_gg_ppzksnark_verification_key.value()).value()),
                         std::move(std::get<2>(filled_r1cs_gg_ppzksnark_verification_key.value()).value()),
                         std::move(
@@ -142,7 +137,7 @@ namespace nil {
                     TTypeBase,
                     std::tuple<
                         // alpha_g1_beta_g2
-                        field_element<TTypeBase, typename VerificationKey::curve_type::gt_type>,
+                        field_element<TTypeBase, typename VerificationKey::curve_type::gt_type::value_type>,
                         // gamma_g2
                         curve_element<TTypeBase, typename VerificationKey::curve_type::template g2_type<>>,
                         // delta_g2
@@ -162,23 +157,18 @@ namespace nil {
                         const VerificationKey &r1cs_gg_ppzksnark_verification_key_inp) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-
                     using field_gt_element_type =
-                        field_element<TTypeBase, typename VerificationKey::curve_type::gt_type>;
-
+                        field_element<TTypeBase, typename VerificationKey::curve_type::gt_type::value_type>;
                     using curve_g1_element_type =
                         curve_element<TTypeBase, typename VerificationKey::curve_type::template g1_type<>>;
-
                     using curve_g2_element_type =
                         curve_element<TTypeBase, typename VerificationKey::curve_type::template g2_type<>>;
-
                     using accumulation_vector_type = accumulation_vector<
                         TTypeBase,
                         container::accumulation_vector<typename VerificationKey::curve_type::template g1_type<>>>;
 
-                    field_gt_element_type filled_alpha_g1_beta_g2 =
-                        fill_field_element<typename VerificationKey::curve_type::gt_type, Endianness>(
-                            r1cs_gg_ppzksnark_verification_key_inp.alpha_g1_beta_g2);
+                    field_gt_element_type filled_alpha_g1_beta_g2(
+                        r1cs_gg_ppzksnark_verification_key_inp.alpha_g1_beta_g2);
 
                     curve_g2_element_type filled_gamma_g2 =
                         curve_g2_element_type(r1cs_gg_ppzksnark_verification_key_inp.gamma_g2);
@@ -213,8 +203,7 @@ namespace nil {
                         &filled_r1cs_gg_ppzksnark_extended_verification_key) {
 
                     return VerificationKey(
-                        std::move(make_field_element<typename VerificationKey::curve_type::gt_type, Endianness>(
-                            std::get<0>(filled_r1cs_gg_ppzksnark_extended_verification_key.value()))),
+                        std::move(std::get<0>(filled_r1cs_gg_ppzksnark_extended_verification_key.value()).value()),
                         std::move(std::get<1>(filled_r1cs_gg_ppzksnark_extended_verification_key.value()).value()),
                         std::move(std::get<2>(filled_r1cs_gg_ppzksnark_extended_verification_key.value()).value()),
                         std::move(std::get<3>(filled_r1cs_gg_ppzksnark_extended_verification_key.value()).value()),

@@ -66,20 +66,20 @@ void print_fp2_curve_group_element(Fp2CurveGroupElement e) {
 }
 
 template<typename Endianness, typename GroupType>
-void test_sparse_vector(nil::crypto3::zk::snark::sparse_vector<GroupType> val) {
+void test_sparse_vector(nil::crypto3::container::sparse_vector<GroupType> val) {
 
     using namespace nil::crypto3::marshalling;
 
     std::size_t units_bits = 8;
     using unit_type = unsigned char;
     using sparse_vector_type = types::sparse_vector<nil::marshalling::field_type<Endianness>,
-                                                    nil::crypto3::zk::snark::sparse_vector<GroupType>>;
+                                                    nil::crypto3::container::sparse_vector<GroupType>>;
 
     sparse_vector_type filled_val =
-        types::fill_sparse_vector<nil::crypto3::zk::snark::sparse_vector<GroupType>, Endianness>(val);
+        types::fill_sparse_vector<nil::crypto3::container::sparse_vector<GroupType>, Endianness>(val);
 
-    nil::crypto3::zk::snark::sparse_vector<GroupType> constructed_val =
-        types::make_sparse_vector<nil::crypto3::zk::snark::sparse_vector<GroupType>, Endianness>(filled_val);
+    nil::crypto3::container::sparse_vector<GroupType> constructed_val =
+        types::make_sparse_vector<nil::crypto3::container::sparse_vector<GroupType>, Endianness>(filled_val);
     BOOST_CHECK(val == constructed_val);
 
     std::size_t unitblob_size = filled_val.length();
@@ -96,8 +96,8 @@ void test_sparse_vector(nil::crypto3::zk::snark::sparse_vector<GroupType> val) {
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
 
-    nil::crypto3::zk::snark::sparse_vector<GroupType> constructed_val_read =
-        types::make_sparse_vector<nil::crypto3::zk::snark::sparse_vector<GroupType>, Endianness>(test_val_read);
+    nil::crypto3::container::sparse_vector<GroupType> constructed_val_read =
+        types::make_sparse_vector<nil::crypto3::container::sparse_vector<GroupType>, Endianness>(test_val_read);
 
     BOOST_CHECK(val == constructed_val_read);
 }
@@ -114,7 +114,7 @@ void test_sparse_vector() {
         for (std::size_t i = 0; i < TSize; i++) {
             val_container.push_back(nil::crypto3::algebra::random_element<GroupType>());
         }
-        test_sparse_vector<Endianness>(nil::crypto3::zk::snark::sparse_vector<GroupType>(std::move(val_container)));
+        test_sparse_vector<Endianness>(nil::crypto3::container::sparse_vector<GroupType>(std::move(val_container)));
     }
 }
 

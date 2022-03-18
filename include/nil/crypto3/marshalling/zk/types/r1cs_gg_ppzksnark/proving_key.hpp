@@ -83,7 +83,7 @@ namespace nil {
                                 nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
                         // B_query
                         knowledge_commitment_sparse_vector<TTypeBase,
-                                                           zk::snark::knowledge_commitment_vector<
+                                                           nil::crypto3::zk::commitments::knowledge_commitment_vector<
                                                                typename ProvingKey::curve_type::template g2_type<>,
                                                                typename ProvingKey::curve_type::template g1_type<>>>,
                         // H_query
@@ -121,7 +121,7 @@ namespace nil {
                             fill_curve_element_vector<typename ProvingKey::curve_type::template g1_type<>, Endianness>(
                                 proving_key.A_query)),
                         std::move(fill_knowledge_commitment_sparse_vector<
-                                  zk::snark::knowledge_commitment_vector<
+                                  nil::crypto3::zk::commitments::knowledge_commitment_vector<
                                       typename ProvingKey::curve_type::template g2_type<>,
                                       typename ProvingKey::curve_type::template g1_type<>>,
                                   Endianness>(proving_key.B_query)),
@@ -150,7 +150,7 @@ namespace nil {
                             make_curve_element_vector<typename ProvingKey::curve_type::template g1_type<>, Endianness>(
                                 std::get<5>(filled_proving_key.value()))),
                         std::move(
-                            make_knowledge_commitment_vector<zk::snark::knowledge_commitment_vector<
+                            make_knowledge_commitment_vector<nil::crypto3::zk::commitments::knowledge_commitment_vector<
                                                                  typename ProvingKey::curve_type::template g2_type<>,
                                                                  typename ProvingKey::curve_type::template g1_type<>>,
                                                              Endianness>(std::get<6>(filled_proving_key.value()))),
