@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Aleksei Moskvin <alalmoskvin@nil.foundation>
 //
 // MIT License
 //
@@ -23,7 +24,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE polynomial_arithmetic_test
+#define BOOST_TEST_MODULE polynomial_test
 
 #include <vector>
 #include <cstdint>
@@ -39,7 +40,7 @@
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::math;
 
-typedef fields::bls12<381> FieldType;
+typedef fields::bls12_fr<381> FieldType;
 
 BOOST_AUTO_TEST_SUITE(polynomial_constructor_test_suite)
 

@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@nil.foundation>
 //
 // MIT License
 //
@@ -516,7 +517,6 @@ namespace nil {
                     FieldValueType c = other.back().inversed(); /* Inverse of Leading Coefficient of B */
 
                     polynomial r(*this);
-                    polynomial q = polynomial(r.size(), FieldValueType::zero());
 
                     std::size_t r_deg = r.size() - 1;
                     std::size_t shift;
@@ -529,8 +529,6 @@ namespace nil {
                         }
 
                         FieldValueType lead_coeff = r.back() * c;
-
-                        q[shift] += lead_coeff;
 
                         if (other.size() + shift + 1 > r.size()) {
                             r.resize(other.size() + shift + 1);
