@@ -39,7 +39,7 @@
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 
-#include <nil/crypto3/math/polynomial/polynomial.hpp>
+#include <nil/crypto3/math/polynomial/polynom.hpp>
 #include <nil/crypto3/math/polynomial/basic_operations.hpp>
 
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
@@ -176,26 +176,30 @@ namespace nil {
                         const InputScalarRange &poly,
                         const typename GroupType::curve_type::scalar_field_type::value_type &eval_poly,
                         const typename GroupType::curve_type::scalar_field_type::value_type &kzg_challenge) {
-                    typedef math::polynomial<typename GroupType::curve_type::scalar_field_type::value_type> poly_type;
+                    // TODO: check correctness after updating math module
+                    typedef math::polynomial::polynom<typename GroupType::curve_type::scalar_field_type::value_type>
+                        poly_type;
                     typename GroupType::curve_type::scalar_field_type::value_type neg_kzg_challenge = -kzg_challenge;
 
                     BOOST_ASSERT(poly.size() == std::distance(srs_powers_alpha_first, srs_powers_alpha_last));
                     BOOST_ASSERT(poly.size() == std::distance(srs_powers_beta_first, srs_powers_beta_last));
 
                     // f_v(X) - f_v(z) / (X - z)
-                    math::polynomial<typename GroupType::curve_type::scalar_field_type::value_type> f_vX_sub_f_vZ;
-                    math::subtraction(f_vX_sub_f_vZ,
-                                      poly,
-                                      {{
-                                          eval_poly,
-                                      }});
-                    math::polynomial<typename GroupType::curve_type::scalar_field_type::value_type> quotient_polynomial,
-                        remainder_polynomial;
-                    math::division(quotient_polynomial, remainder_polynomial, f_vX_sub_f_vZ,
-                                   {{
-                                       neg_kzg_challenge,
-                                       GroupType::curve_type::scalar_field_type::value_type::one(),
-                                   }});
+                    // TODO: check correctness after updating math module
+                    math::polynomial::polynom<typename GroupType::curve_type::scalar_field_type::value_type>
+                        f_vX_sub_f_vZ =
+                            poly -
+                            math::polynomial::polynom<typename GroupType::curve_type::scalar_field_type::value_type>({{
+                                eval_poly,
+                            }});
+                    // TODO: check correctness after updating math module
+                    math::polynomial::polynom<typename GroupType::curve_type::scalar_field_type::value_type>
+                        quotient_polynomial =
+                            f_vX_sub_f_vZ /
+                            math::polynomial::polynom<typename GroupType::curve_type::scalar_field_type::value_type>({{
+                                neg_kzg_challenge,
+                                GroupType::curve_type::scalar_field_type::value_type::one(),
+                            }});
 
                     if (quotient_polynomial.size() < poly.size()) {
                         quotient_polynomial.resize(poly.size(),
@@ -228,11 +232,13 @@ namespace nil {
                                        InputG2Iterator srs_powers_beta_first, InputG2Iterator srs_powers_beta_last,
                                        InputScalarIterator transcript_first, InputScalarIterator transcript_last,
                                        const typename CurveType::scalar_field_type::value_type &kzg_challenge) {
-                    math::polynomial<typename CurveType::scalar_field_type::value_type> vkey_poly(
+                    // TODO: check correctness after updating math module
+                    math::polynomial::polynom<typename CurveType::scalar_field_type::value_type> vkey_poly(
                         polynomial_coefficients_from_transcript<typename CurveType::scalar_field_type>(
                             transcript_first, transcript_last, CurveType::scalar_field_type::value_type::one()));
-                    math::condense(vkey_poly);
-                    BOOST_ASSERT(!math::is_zero(vkey_poly));
+                    // TODO: check correctness after updating math module
+                    vkey_poly.condense();
+                    BOOST_ASSERT(!vkey_poly.is_zero());
 
                     typename CurveType::scalar_field_type::value_type vkey_poly_z =
                         polynomial_evaluation_product_form_from_transcript<typename CurveType::scalar_field_type>(
@@ -261,7 +267,8 @@ namespace nil {
                     BOOST_ASSERT(2 * n == std::distance(srs_powers_alpha_first, srs_powers_alpha_last));
 
                     // this computes f(X) = \prod (1 + x (rX)^{2^j})
-                    math::polynomial<typename CurveType::scalar_field_type::value_type> fcoeffs(
+                    // TODO: check correctness after updating math module
+                    math::polynomial::polynom<typename CurveType::scalar_field_type::value_type> fcoeffs(
                         polynomial_coefficients_from_transcript<typename CurveType::scalar_field_type>(
                             transcript_first, transcript_last, r_shift));
                     // this computes f_w(X) = X^n * f(X) - it simply shifts all coefficients to by n
