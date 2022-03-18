@@ -61,7 +61,7 @@ namespace nil {
                         nil::marshalling::types::
                             integral<TTypeBase, typename zk::snark::variable<typename LT::field_type>::index_type>,
                         // coeff
-                        field_element<TTypeBase, typename LT::field_type>>>;
+                        field_element<TTypeBase, typename LT::field_type::value_type>>>;
 
                 template<typename TTypeBase,
                          typename LC,
@@ -118,13 +118,10 @@ namespace nil {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using integral_type = nil::marshalling::types::
                         integral<TTypeBase, typename zk::snark::variable<typename LT::field_type>::index_type>;
-                    using field_element_type = field_element<TTypeBase, typename LT::field_type>;
+                    using field_element_type = field_element<TTypeBase, typename LT::field_type::value_type>;
 
-                    field_element_type filled_alpha_g1_beta_g2 =
-                        fill_field_element<typename LT::field_type, Endianness>(lt.coeff);
-
-                    return linear_term<nil::marshalling::field_type<Endianness>, LT>(
-                        std::make_tuple(integral_type(lt.index), filled_alpha_g1_beta_g2));
+                    return linear_term<TTypeBase, LT>(
+                        std::make_tuple(integral_type(lt.index), field_element_type(lt.coeff)));
                 }
 
                 template<typename LT, typename Endianness>

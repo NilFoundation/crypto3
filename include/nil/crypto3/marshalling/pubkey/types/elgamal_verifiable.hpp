@@ -101,7 +101,7 @@ namespace nil {
                     TTypeBase,
                     std::tuple<
                         // rho
-                        field_element<TTypeBase, typename PrivateKey::scalar_field_type>>>;
+                        field_element<TTypeBase, typename PrivateKey::scalar_field_type::value_type>>>;
 
                 template<typename TTypeBase,
                          typename VerificationKey,
@@ -175,23 +175,19 @@ namespace nil {
                     fill_private_key(const PrivateKey &key_inp) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
+                    using field_element_marshalling_type =
+                        field_element<TTypeBase, typename PrivateKey::scalar_field_type::value_type>;
 
-                    using scalar_field_element_type = field_element<TTypeBase, typename PrivateKey::scalar_field_type>;
+                    field_element_marshalling_type filled_rho(key_inp.rho);
 
-                    scalar_field_element_type filled_rho =
-                        fill_field_element<typename PrivateKey::scalar_field_type, Endianness>(key_inp.rho);
-
-                    return elgamal_verifiable_private_key<nil::marshalling::field_type<Endianness>, PrivateKey>(
-                        std::make_tuple(filled_rho));
+                    return elgamal_verifiable_private_key<TTypeBase, PrivateKey>(std::make_tuple(filled_rho));
                 }
 
                 template<typename PrivateKey, typename Endianness>
                 PrivateKey
                     make_private_key(const elgamal_verifiable_private_key<nil::marshalling::field_type<Endianness>,
                                                                           PrivateKey> &filled_key_inp) {
-
-                    return PrivateKey(std::move(make_field_element<typename PrivateKey::scalar_field_type, Endianness>(
-                        std::get<0>(filled_key_inp.value()))));
+                    return PrivateKey(std::move(std::get<0>(filled_key_inp.value()).value()));
                 }
 
                 template<typename VerificationKey, typename Endianness>
