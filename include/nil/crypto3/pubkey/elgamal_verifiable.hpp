@@ -31,6 +31,8 @@
 #include <iterator>
 #include <vector>
 
+#include <boost/assert.hpp>
+
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
 #include <nil/crypto3/zk/algorithms/prove.hpp>
@@ -197,7 +199,8 @@ namespace nil {
 
                 static inline internal_accumulator_type init_accumulator(const init_params_type &init_params) {
                     // TODO: check
-                    assert(init_params.gg_keypair.second.gamma_ABC_g1.rest.size() > init_params.msg_size);
+                    BOOST_ASSERT_MSG(init_params.gg_keypair.second.gamma_ABC_g1.rest.size() > init_params.msg_size,
+                                     "Array of gammas in vk should be longer than the message.");
                     return {init_params.gg_keypair, init_params.msg_size,
                             std::vector<typename scalar_field_type::value_type> {}};
                 }
@@ -214,7 +217,8 @@ namespace nil {
 
                 static inline result_type process(internal_accumulator_type &acc) {
                     // TODO: check
-                    assert(acc.rnd.size() >= 3 * acc.msg_size + 2);
+                    BOOST_ASSERT_MSG(acc.rnd.size() >= 3 * acc.msg_size + 2,
+                                     "Too few numbers in the source of randomness.");
                     auto rnd_iter = std::cbegin(acc.rnd);
 
                     typename scalar_field_type::value_type s_sum = scalar_field_type::value_type::zero();
@@ -317,14 +321,21 @@ namespace nil {
 
                 static inline result_type process(internal_accumulator_type &acc) {
                     // TODO: check
-                    assert(acc.gg_keypair.second.gamma_ABC_g1.rest.size() > acc.plain_text.size());
-                    assert(acc.primary_input.size() > acc.plain_text.size());
-                    assert(acc.gg_keypair.second.gamma_ABC_g1.rest.size() == acc.primary_input.size());
-                    assert(acc.plain_text.size() == acc.pubkey.delta_s_g1.size());
-                    assert(acc.plain_text.size() == acc.pubkey.t_g1.size());
-                    assert(acc.plain_text.size() == acc.pubkey.t_g2.size() - 1);
+                    BOOST_ASSERT_MSG(acc.gg_keypair.second.gamma_ABC_g1.rest.size() > acc.plain_text.size(),
+                                     "Array of gammas in vk should be longer than the plain text.");
+                    BOOST_ASSERT_MSG(acc.primary_input.size() > acc.plain_text.size(),
+                                     "Primary input should be longer than plain text.");
+                    BOOST_ASSERT_MSG(acc.gg_keypair.second.gamma_ABC_g1.rest.size() == acc.primary_input.size(),
+                                     "Number of gammas should be equal to the primary input size.");
+                    BOOST_ASSERT_MSG(acc.plain_text.size() == acc.pubkey.delta_s_g1.size(),
+                                     "Plain text size should be equal to the delta_s array size from pk.");
+                    BOOST_ASSERT_MSG(acc.plain_text.size() == acc.pubkey.t_g1.size(),
+                                     "Plain text size should be equal to the t_g1 array size from pk.");
+                    BOOST_ASSERT_MSG(acc.plain_text.size() == acc.pubkey.t_g2.size() - 1,
+                                     "Plain text size should be equal to the t_g2 array size from pk.");
                     for (std::size_t i = 0; i < acc.plain_text.size(); ++i) {
-                        assert(acc.primary_input[i] == acc.plain_text[i]);
+                        BOOST_ASSERT_MSG(acc.primary_input[i] == acc.plain_text[i],
+                                         "Plain text should be a prefix of primary input.");
                     }
 
                     typename result_type::first_type ct_g1;
@@ -389,9 +400,15 @@ namespace nil {
 
                 static inline result_type process(internal_accumulator_type &acc) {
                     // TODO: check
-                    assert(acc.gg_keypair.second.gamma_ABC_g1.rest.size() > acc.cipher_text.size() - 2);
-                    assert(acc.cipher_text.size() - 2 == acc.vk.rho_sv_g2.size());
-                    assert(acc.cipher_text.size() - 2 == acc.vk.rho_rhov_g2.size());
+                    BOOST_ASSERT_MSG(
+                        acc.gg_keypair.second.gamma_ABC_g1.rest.size() > acc.cipher_text.size() - 2,
+                        "Array of gammas in vk should be longer than the cipher text (exclusive of 2 element in CT).");
+                    BOOST_ASSERT_MSG(acc.cipher_text.size() - 2 == acc.vk.rho_sv_g2.size(),
+                                     "Cipher text size should be equal to the rho_sv_g2 array size from vk (exclusive "
+                                     "of 2 element in CT).");
+                    BOOST_ASSERT_MSG(acc.cipher_text.size() - 2 == acc.vk.rho_rhov_g2.size(),
+                                     "Cipher text size should be equal to the rho_rhov_g2 array size from vk "
+                                     "(exclusive of 2 element in CT).");
                     std::vector<typename scalar_field_type::value_type> m_new;
                     m_new.reserve(acc.cipher_text.size() - 2);
 
@@ -415,7 +432,7 @@ namespace nil {
                             }
                             discrete_log = discrete_log * bruteforce;
                         } while (exp++ < 1 << scheme_type::block_bits);
-                        assert(deciphered);
+                        BOOST_ASSERT_MSG(deciphered, "Decryption failed.");
                     }
 
                     typename g1_type::value_type verify_c0 = acc.privkey.rho * acc.cipher_text[0];
@@ -529,8 +546,11 @@ namespace nil {
                 }
 
                 static inline result_type process(internal_accumulator_type &acc) {
-                    assert(acc.plain_text.size() + 2 == acc.cipher_text.size());
-                    assert(acc.gg_keypair.second.gamma_ABC_g1.rest.size() > acc.plain_text.size());
+                    BOOST_ASSERT_MSG(
+                        acc.plain_text.size() + 2 == acc.cipher_text.size(),
+                        "Cipher text size should be equal to the plain text size (exclusive of 2 element in CT).");
+                    BOOST_ASSERT_MSG(acc.gg_keypair.second.gamma_ABC_g1.rest.size() > acc.plain_text.size(),
+                                     "Array of gammas in vk should be longer than the plain text.");
                     typename gt_type::value_type vm_gt =
                         algebra::pair_reduced<Curve>(acc.proof, g2_type::value_type::one());
                     typename gt_type::value_type new_c0_v0_gt =
@@ -610,10 +630,16 @@ namespace nil {
                 }
 
                 static inline result_type process(internal_accumulator_type &acc) {
-                    assert(acc.rnd.size() >= 3);
-                    assert(acc.pubkey.delta_s_g1.size() == acc.cipher_text.size() - 2);
-                    assert(acc.pubkey.t_g1.size() == acc.cipher_text.size() - 2);
-                    assert(acc.pubkey.t_g2.size() - 1 == acc.cipher_text.size() - 2);
+                    BOOST_ASSERT_MSG(acc.rnd.size() >= 3, "Too few numbers in the source of randomness (at least 3).");
+                    BOOST_ASSERT_MSG(acc.pubkey.delta_s_g1.size() == acc.cipher_text.size() - 2,
+                                     "Cipher text size should be equal to the delta_s_g1 array size from pk (exclusive "
+                                     "of 2 element in CT).");
+                    BOOST_ASSERT_MSG(acc.pubkey.t_g1.size() == acc.cipher_text.size() - 2,
+                                     "Cipher text size should be equal to the t_g1 array size from pk (exclusive of 2 "
+                                     "element in CT).");
+                    BOOST_ASSERT_MSG(acc.pubkey.t_g2.size() - 1 == acc.cipher_text.size() - 2,
+                                     "Cipher text size should be equal to the t_g2 array size from pk (exclusive of 2 "
+                                     "element in CT).");
                     std::vector<typename g1_type::value_type> ct_g1;
                     ct_g1.reserve(acc.cipher_text.size());
 

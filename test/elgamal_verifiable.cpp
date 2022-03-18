@@ -69,6 +69,7 @@
 #include <nil/crypto3/marshalling/zk/types/r1cs_gg_ppzksnark/primary_input.hpp>
 #include <nil/crypto3/marshalling/zk/types/r1cs_gg_ppzksnark/proof.hpp>
 #include <nil/crypto3/marshalling/zk/types/r1cs_gg_ppzksnark/verification_key.hpp>
+#include <nil/crypto3/marshalling/pubkey/types/elgamal_verifiable.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::algebra;
@@ -108,6 +109,19 @@ void print_curve_point(std::ostream &os,
     print_field_element(os, p.X);
     os << "], Y: [";
     print_field_element(os, p.Y);
+    os << "] )" << std::endl;
+}
+
+template<typename CurveParams, typename Form>
+void print_curve_point(
+    std::ostream &os,
+    const curves::detail::curve_element<CurveParams, Form, curves::coordinates::jacobian_with_a4_0> &p) {
+    os << "( X: [";
+    print_field_element(os, p.X);
+    os << "], Y: [";
+    print_field_element(os, p.Y);
+    os << "], Z: [";
+    print_field_element(os, p.Z);
     os << "] )" << std::endl;
 }
 
@@ -274,8 +288,8 @@ struct marshalling_verification_data_groth16_encrypted_input {
         write_obj(full_output_wrong_ct_path, {proof_blob, vk_blob, pubkey_blob, ct_wrong_blob, pinput_blob});
     }
 
-    template<typename ReturnType, typename MarshallingType, typename Path>
-    static ReturnType read_obj(const Path &path, ReturnType (&f)(MarshallingType)) {
+    template<typename ReturnType, typename MarshallingType, typename Path, typename F>
+    static ReturnType read_obj(const Path &path, const std::function<F> &f) {
         std::ifstream in(path, std::ios_base::binary);
         std::stringstream buffer;
         buffer << in.rdbuf();
@@ -290,17 +304,22 @@ struct marshalling_verification_data_groth16_encrypted_input {
 
     static std::tuple<Proof, VerificationKey, PublicKey, PInput, CipherText> read_data() {
         Proof proof = read_obj<Proof, proof_marshalling_type>(
-            proof_path, nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_proof<Proof, endianness>);
+            proof_path,
+            std::function(nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_proof<Proof, endianness>));
         VerificationKey vk = read_obj<VerificationKey, verification_key_marshalling_type>(
             vk_path,
-            nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_verification_key<VerificationKey, endianness>);
+            std::function(nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_verification_key<VerificationKey,
+                                                                                                    endianness>));
         PublicKey pubkey = read_obj<PublicKey, public_key_marshalling_type>(
-            pubkey_path, nil::crypto3::marshalling::types::make_public_key<PublicKey, endianness>);
+            pubkey_path, std::function(nil::crypto3::marshalling::types::make_public_key<PublicKey, endianness>));
         PInput pinput = read_obj<PInput, pinput_marshalling_type>(
-            unenc_pi_path, nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_primary_input<PInput, endianness>);
+            unenc_pi_path,
+            std::function(nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_primary_input<PInput, endianness>));
         CipherText ct = read_obj<CipherText, ct_marshalling_type>(
             ct_path,
-            nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_encrypted_primary_input<CipherText, endianness>);
+            std::function(
+                nil::crypto3::marshalling::types::make_r1cs_gg_ppzksnark_encrypted_primary_input<CipherText,
+                                                                                                 endianness>));
 
         return std::tuple {proof, vk, pubkey, pinput, ct};
     }
@@ -329,7 +348,7 @@ struct test_policy {
         typename encryption_scheme::cipher_type::first_type>;
 };
 
-BOOST_AUTO_TEST_SUITE(pubkey_elgamal_verifiable_auto_test_suite)
+BOOST_AUTO_TEST_SUITE(pubkey_elgamal_verifiable_test_suite)
 
 BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     /* prepare test */
@@ -337,7 +356,7 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     auto secret_keys = generate_random_data<bool, test_policy::hash_type::digest_bits>(participants_number);
     std::vector<std::array<bool, test_policy::hash_type::digest_bits>> public_keys;
     for (const auto &sk : secret_keys) {
-        std::array<bool, test_policy::hash_type::digest_bits> pk{};
+        std::array<bool, test_policy::hash_type::digest_bits> pk {};
         hash<test_policy::merkle_hash_type>(sk, std::begin(pk));
         public_keys.emplace_back(pk);
     }
@@ -378,21 +397,21 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     path_var.generate_r1cs_constraints();
     vote_var.generate_r1cs_constraints();
 
-    BOOST_REQUIRE(!bp.is_satisfied());
+    BOOST_CHECK(!bp.is_satisfied());
     path_var.generate_r1cs_witness(proof);
-    BOOST_REQUIRE(!bp.is_satisfied());
+    BOOST_CHECK(!bp.is_satisfied());
     address_bits_va.fill_with_bits_of_ulong(bp, path_var.address);
-    BOOST_REQUIRE(!bp.is_satisfied());
+    BOOST_CHECK(!bp.is_satisfied());
     auto address = path_var.address;
-    BOOST_REQUIRE(address_bits_va.get_field_element_from_bits(bp) == path_var.address);
+    BOOST_CHECK(address_bits_va.get_field_element_from_bits(bp) == path_var.address);
     m_block.generate_r1cs_witness(m);
-    BOOST_REQUIRE(!bp.is_satisfied());
+    BOOST_CHECK(!bp.is_satisfied());
     eid_block.generate_r1cs_witness(eid);
-    BOOST_REQUIRE(!bp.is_satisfied());
+    BOOST_CHECK(!bp.is_satisfied());
     sk_block.generate_r1cs_witness(secret_keys[proof_idx]);
-    BOOST_REQUIRE(!bp.is_satisfied());
+    BOOST_CHECK(!bp.is_satisfied());
     vote_var.generate_r1cs_witness(tree.root(), sn);
-    BOOST_REQUIRE(bp.is_satisfied());
+    BOOST_CHECK(bp.is_satisfied());
 
     std::cout << "Constraints number: " << bp.num_constraints() << std::endl;
 
@@ -423,20 +442,20 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     typename test_policy::encryption_scheme::decipher_type decipher_text =
         decrypt<test_policy::encryption_scheme, modes::verifiable_encryption<test_policy::encryption_scheme>>(
             cipher_text.first, {std::get<1>(keypair), std::get<2>(keypair), gg_keypair});
-    BOOST_REQUIRE(decipher_text.first.size() == m_field.size());
+    BOOST_CHECK(decipher_text.first.size() == m_field.size());
     for (std::size_t i = 0; i < m_field.size(); ++i) {
-        BOOST_REQUIRE(decipher_text.first[i] == m_field[i]);
+        BOOST_CHECK(decipher_text.first[i] == m_field[i]);
     }
 
     bool enc_verification_ans = verify_encryption<test_policy::encryption_scheme>(
         cipher_text.first,
         {std::get<0>(keypair), gg_keypair.second, cipher_text.second,
          typename test_policy::proof_system::primary_input_type {std::cbegin(pinput) + m.size(), std::cend(pinput)}});
-    BOOST_REQUIRE(enc_verification_ans);
+    BOOST_CHECK(enc_verification_ans);
 
     bool dec_verification_ans = verify_decryption<test_policy::encryption_scheme>(
         cipher_text.first, decipher_text.first, {std::get<2>(keypair), gg_keypair, decipher_text.second});
-    BOOST_REQUIRE(dec_verification_ans);
+    BOOST_CHECK(dec_verification_ans);
 
     /// Rerandomized cipher text
     std::vector<typename test_policy::pairing_curve_type::scalar_field_type::value_type> rnd_rerandomization;
@@ -451,9 +470,9 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     typename test_policy::encryption_scheme::decipher_type decipher_rerand_text =
         decrypt<test_policy::encryption_scheme, modes::verifiable_encryption<test_policy::encryption_scheme>>(
             rerand_cipher_text.first, {std::get<1>(keypair), std::get<2>(keypair), gg_keypair});
-    BOOST_REQUIRE(decipher_rerand_text.first.size() == m_field.size());
+    BOOST_CHECK(decipher_rerand_text.first.size() == m_field.size());
     for (std::size_t i = 0; i < m_field.size(); ++i) {
-        BOOST_REQUIRE(decipher_rerand_text.first[i] == m_field[i]);
+        BOOST_CHECK(decipher_rerand_text.first[i] == m_field[i]);
     }
 
     /// Encryption verification of the rerandomized cipher text
@@ -461,13 +480,13 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
         rerand_cipher_text.first,
         {std::get<0>(keypair), gg_keypair.second, rerand_cipher_text.second,
          typename test_policy::proof_system::primary_input_type {std::cbegin(pinput) + m.size(), std::cend(pinput)}});
-    BOOST_REQUIRE(enc_verification_ans);
+    BOOST_CHECK(enc_verification_ans);
 
     /// Decryption verification of the rerandomized cipher text
     dec_verification_ans = verify_decryption<test_policy::encryption_scheme>(
         rerand_cipher_text.first, decipher_rerand_text.first,
         {std::get<2>(keypair), gg_keypair, decipher_rerand_text.second});
-    BOOST_REQUIRE(dec_verification_ans);
+    BOOST_CHECK(dec_verification_ans);
 
     // TODO: add status return
     // /// False-positive tests
@@ -478,19 +497,19 @@ BOOST_AUTO_TEST_CASE(elgamal_verifiable_auto_test) {
     // typename encryption_scheme::decipher_type decipher_text_wrong =
     //     decrypt<encryption_scheme, modes::verifiable_encryption<encryption_scheme>>(
     //         cipher_text_wrong, {std::get<1>(keypair), std::get<2>(keypair), gg_keypair});
-    // BOOST_REQUIRE(decipher_text.first.size() == m_field.size());
+    // BOOST_CHECK(decipher_text.first.size() == m_field.size());
     // bool wrong_decryption_ans = true;
     // for (std::size_t i = 0; i < m_field.size(); ++i) {
     //     wrong_decryption_ans &= (decipher_text.first[i] == m_field[i]);
     // }
-    // BOOST_REQUIRE(!wrong_decryption_ans);
+    // BOOST_CHECK(!wrong_decryption_ans);
 }
 
 BOOST_AUTO_TEST_CASE(elgamal_verifiable_restored_test) {
     auto [proof, vk, pubkey, pinput, ct] = test_policy::marshalling_data_type::read_data();
 
     bool enc_verification_ans = verify_encryption<test_policy::encryption_scheme>(ct, {pubkey, vk, proof, pinput});
-    BOOST_REQUIRE(enc_verification_ans);
+    BOOST_CHECK(enc_verification_ans);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
