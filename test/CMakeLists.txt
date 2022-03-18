@@ -44,7 +44,9 @@ set(TESTS_NAMES
     "kronecker_substitution"
     "polynomial_arithmetic"
     "polynomial"
+    "polynomial_view"
     "polynomial_dfs"
+    "polynomial_dfs_view"
     "lagrange_interpolation")
 
 foreach(TEST_NAME ${TESTS_NAMES})

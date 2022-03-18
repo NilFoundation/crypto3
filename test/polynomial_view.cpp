@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@nil.foundation>
+// Copyright (c) 2022 Aleksei Moskvin <alalmoskvin@nil.foundation>
 //
 // MIT License
 //
@@ -24,7 +24,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE polynomial_view_arithmetic_test
+#define BOOST_TEST_MODULE polynomial_view_test
 
 #include <vector>
 #include <cstdint>
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_equal) {
     polynomial_view<typename FieldType::value_type> a(a_v);
     polynomial_view<typename FieldType::value_type> b(b_v);
 
-    a.add(b);
+    a += b;
 
     std::vector<typename FieldType::value_type> a_ans = {10, 6, 15, 39, 13, 8, 12, 10};
 
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_long_a) {
     polynomial_view<typename FieldType::value_type> a(a_v);
     polynomial_view<typename FieldType::value_type> b(b_v);
 
-    a.add(b);
+    a += b;
 
     std::vector<typename FieldType::value_type> a_ans = {10, 6, 15, 39, 13, 7, 7, 2};
 
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_long_b) {
     polynomial_view<typename FieldType::value_type> a(a_v);
     polynomial_view<typename FieldType::value_type> b(b_v);
 
-    a.add(b);
+    a += b;
 
     std::vector<typename FieldType::value_type> a_ans = {10, 6, 15, 39, 13, 1, 5, 8};
 
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_zero_a) {
     polynomial_view<typename FieldType::value_type> a(a_v);
     polynomial_view<typename FieldType::value_type> b(b_v);
 
-    a.add(b);
+    a += b;
 
     std::vector<typename FieldType::value_type> a_ans = {1, 3, 4, 25, 6, 7, 7, 2};
 
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_zero_b) {
     polynomial_view<typename FieldType::value_type> a(a_v);
     polynomial_view<typename FieldType::value_type> b(b_v);
 
-    a.add(b);
+    a += b;
 
     std::vector<typename FieldType::value_type> a_ans = {1, 3, 4, 25, 6, 7, 7, 2};
 
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_equal) {
     polynomial_view<typename FieldType::value_type> a(a_v);
     polynomial_view<typename FieldType::value_type> b(b_v);
 
-    a.sub(b);
+    a -= b;
 
     std::vector<typename FieldType::value_type> a_ans = {-8, 0, -7, 11, -1, 6, 2, -6};
 
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_a) {
     polynomial_view<typename FieldType::value_type> a(a_v);
     polynomial_view<typename FieldType::value_type> b(b_v);
 
-    a.sub(b);
+    a -= b;
 
     std::vector<typename FieldType::value_type> a_ans = {-8, 0, -7, 11, -1, 7, 7, 2};
 
@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_b) {
     polynomial_view<typename FieldType::value_type> a(a_v);
     polynomial_view<typename FieldType::value_type> b(b_v);
 
-    a.sub(b);
+    a -= b;
 
     std::vector<typename FieldType::value_type> a_ans = {-8, 0, -7, 11, -1, -1, -5, -8};
 
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_a) {
     polynomial_view<typename FieldType::value_type> a(a_v);
     polynomial_view<typename FieldType::value_type> b(b_v);
 
-    a.sub(b);
+    a -= b;
 
     std::vector<typename FieldType::value_type> a_ans = {-1, -3, -4, -25, -6, -7, -7, -2};
 
@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_b) {
     polynomial_view<typename FieldType::value_type> a(a_v);
     polynomial_view<typename FieldType::value_type> b(b_v);
 
-    a.sub(b);
+    a -= b;
 
     std::vector<typename FieldType::value_type> a_ans = {1, 3, 4, 25, 6, 7, 7, 2};
 
@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_long_a) {
     polynomial_view<typename FieldType::value_type> a(a_v);
     polynomial_view<typename FieldType::value_type> b(b_v);
 
-    a.mul(b);
+    a *= b;
 
     std::vector<typename FieldType::value_type> a_ans = {65, 0, 5, 169, 0, 26, 0, 1};
 
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_long_b) {
     polynomial_view<typename FieldType::value_type> a(a_v);
     polynomial_view<typename FieldType::value_type> b(b_v);
 
-    a.mul(b);
+    a *= b;
 
     std::vector<typename FieldType::value_type> a_ans = {65, 0, 5, 169, 0, 26, 0, 1};
 
@@ -277,7 +277,7 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_a) {
     polynomial_view<typename FieldType::value_type> a(a_v);
     polynomial_view<typename FieldType::value_type> b(b_v);
 
-    a.mul(b);
+    a *= b;
 
     std::vector<typename FieldType::value_type> a_ans = {0};
 
@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_b) {
     polynomial_view<typename FieldType::value_type> a(a_v);
     polynomial_view<typename FieldType::value_type> b(b_v);
 
-    a.mul(b);
+    a *= b;
 
     std::vector<typename FieldType::value_type> a_ans = {0};
 
@@ -317,7 +317,7 @@ BOOST_AUTO_TEST_CASE(polynomial_div) {
 
     std::vector<typename FieldType::value_type> q_ans = {0, 0, 0, 1};
 
-    a.div(b);
+    a /= b;
 
     for (std::size_t i = 0; i < q_ans.size(); ++i) {
         BOOST_CHECK_EQUAL(q_ans[i].data, a[i].data);
@@ -334,7 +334,7 @@ BOOST_AUTO_TEST_CASE(polynomial_mod) {
 
     std::vector<typename FieldType::value_type> r_ans = {5};
 
-    a.mod(b);
+    a %= b;
 
     for (std::size_t i = 0; i < r_ans.size(); ++i) {
         BOOST_CHECK_EQUAL(r_ans[i].data, a[i].data);

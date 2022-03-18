@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@nil.foundation>
+// Copyright (c) 2022 Aleksei Moskvin <alalmoskvin@nil.foundation>
 //
 // MIT License
 //
@@ -57,10 +57,11 @@ namespace nil {
                 typedef typename container_type::reverse_iterator reverse_iterator;
                 typedef typename container_type::const_reverse_iterator const_reverse_iterator;
 
-                std::vector<element_type> *it;
+                std::vector<element_type> &it;
                 size_t _d;
 
-                polynomial_dfs_view(size_t d, std::vector<element_type> &vec) : it(&vec), _d(d) {}
+                polynomial_dfs_view(size_t d, std::vector<element_type>& vec) : it(vec), _d(d) {
+                }
 
                 polynomial_dfs_view(polynomial_dfs_view&& x)
                     BOOST_NOEXCEPT(std::is_nothrow_move_constructible<allocator_type>::value) :
@@ -109,11 +110,11 @@ namespace nil {
 
                 template<typename InputIterator>
                 void assign(InputIterator first, InputIterator last) {
-                    it->assign(first, last);
+                    it.assign(first, last);
                 }
 
                 void assign(size_type n, const_reference u) {
-                    it->assign(n, u);
+                    it.assign(n, u);
                 }
 
                 void assign(std::initializer_list<value_type> il) {
@@ -121,25 +122,25 @@ namespace nil {
                 }
 
                 iterator begin() BOOST_NOEXCEPT {
-                    return it->begin();
+                    return it.begin();
                 }
 
                 const_iterator begin() const BOOST_NOEXCEPT {
-                    return it->begin();
+                    return it.begin();
                 }
                 iterator end() BOOST_NOEXCEPT {
-                    return it->end();
+                    return it.end();
                 }
                 const_iterator end() const BOOST_NOEXCEPT {
-                    return it->end();
+                    return it.end();
                 }
 
                 reverse_iterator rbegin() BOOST_NOEXCEPT {
-                    return it->rbegin();
+                    return it.rbegin();
                 }
 
                 const_reverse_iterator rbegin() const BOOST_NOEXCEPT {
-                    return it->rbegin();
+                    return it.rbegin();
                 }
 
                 reverse_iterator rend() BOOST_NOEXCEPT {
@@ -167,7 +168,7 @@ namespace nil {
                 }
 
                 size_type size() const BOOST_NOEXCEPT {
-                    return it->size();
+                    return it.size();
                 }
 
                 size_type degree() const BOOST_NOEXCEPT {
@@ -179,91 +180,91 @@ namespace nil {
                 }
 
                 size_type capacity() const BOOST_NOEXCEPT {
-                    return it->capacity();
+                    return it.capacity();
                 }
                 bool empty() const BOOST_NOEXCEPT {
-                    return it->empty();
+                    return it.empty();
                 }
                 size_type max_size() const BOOST_NOEXCEPT {
-                    return it->max_size();
+                    return it.max_size();
                 }
                 void reserve(size_type _n) {
-                    return it->reserve(_n);
+                    return it.reserve(_n);
                 }
                 void shrink_to_fit() BOOST_NOEXCEPT {
-                    return it->shrink_to_fit();
+                    return it.shrink_to_fit();
                 }
 
                 reference operator[](size_type _n) BOOST_NOEXCEPT {
-                    return (*it)[_n];
+                    return it[_n];
                 }
                 const_reference operator[](size_type _n) const BOOST_NOEXCEPT {
-                    return (*it)[_n];
+                    return it[_n];
                 }
                 reference at(size_type _n) {
-                    return it->at(_n);
+                    return it.at(_n);
                 }
                 const_reference at(size_type _n) const {
-                    return it->at(_n);
+                    return it.at(_n);
                 }
 
                 reference front() BOOST_NOEXCEPT {
-                    return it->front();
+                    return it.front();
                 }
                 const_reference front() const BOOST_NOEXCEPT {
-                    return it->front();
+                    return it.front();
                 }
                 reference back() BOOST_NOEXCEPT {
-                    return it->back();
+                    return it.back();
                 }
                 const_reference back() const BOOST_NOEXCEPT {
-                    return it->back();
+                    return it.back();
                 }
 
                 value_type* data() BOOST_NOEXCEPT {
-                    return it->data();
+                    return it.data();
                 }
 
                 const value_type* data() const BOOST_NOEXCEPT {
-                    return it->data();
+                    return it.data();
                 }
 
                 void push_back(const_reference _x) {
-                    it->push_back(_x);
+                    it.push_back(_x);
                 }
 
                 void push_back(value_type&& _x) {
-                    it->push_back(_x);
+                    it.push_back(_x);
                 }
 
                 template<class... Args>
                 reference emplace_back(Args&&... _args) {
-                    return it->template emplace_back(_args...);
+                    return it.template emplace_back(_args...);
                 }
 
                 void pop_back() {
-                    it->pop_back();
+                    it.pop_back();
                 }
 
                 iterator insert(const_iterator _position, const_reference _x) {
-                    return it->insert(_position, _x);
+                    return it.insert(_position, _x);
                 }
 
                 iterator insert(const_iterator _position, value_type&& _x) {
-                    return it->insert(_position, _x);
+                    return it.insert(_position, _x);
                 }
                 template<class... Args>
                 iterator emplace(const_iterator _position, Args&&... _args) {
-                    return it->template emplace(_position, _args...);
+                    return it.template emplace(_position, _args...);
                 }
 
                 iterator insert(const_iterator _position, size_type _n, const_reference _x) {
-                    return it->insert(_position, _n, _x);
+                    return it.insert(_position, _n, _x);
                 }
 
                 template<class InputIterator>
                 iterator insert(const_iterator _position, InputIterator _first, InputIterator _last) {
-                    return it->insert(_position, _first, _last);
+                    return it.insert(_position, _first, _last);
                 }
 
                 iterator insert(const_iterator _position, std::initializer_list<value_type> _il) {
@@ -271,15 +272,15 @@ namespace nil {
                 }
 
                 iterator erase(const_iterator _position) {
-                    return it->erase(_position);
+                    return it.erase(_position);
                 }
 
                 iterator erase(const_iterator _first, const_iterator _last) {
-                    return it->erase(_first, _last);
+                    return it.erase(_first, _last);
                 }
 
                 void clear() BOOST_NOEXCEPT {
-                    it->clear();
+                    it.clear();
                 }
 
                 void resize(size_type _sz) {
@@ -290,20 +291,20 @@ namespace nil {
 #ifdef MULTICORE
                     detail::basic_parallel_radix2_fft<FieldType>(val, omega.inversed());
 #else
-                    detail::basic_serial_radix2_fft<FieldType>(*it, omega.inversed());
+                    detail::basic_serial_radix2_fft<FieldType>(it, omega.inversed());
 #endif
                     const value_type sconst = value_type(this->size()).inversed();
-                    std::transform(it->begin(),
-                                   it->end(),
-                                   it->begin(),
+                    std::transform(it.begin(),
+                                   it.end(),
+                                   it.begin(),
                                    std::bind(std::multiplies<value_type>(), sconst, std::placeholders::_1));
 
                     value_type omega_new = unity_root<FieldType>(_sz);
-                    it->resize(_sz);
+                    it.resize(_sz);
 #ifdef MULTICORE
                     detail::basic_parallel_radix2_fft<FieldType>(val, omega_new);
 #else
-                    detail::basic_serial_radix2_fft<FieldType>(*it, omega_new);
+                    detail::basic_serial_radix2_fft<FieldType>(it, omega_new);
 #endif
                 }
 
@@ -313,7 +314,7 @@ namespace nil {
                 //                }
 
                 void swap(polynomial_dfs_view& other) {
-                    it->swap(other.val);
+                    it.swap(other.val);
                     std::swap(_d, other._d);
                 }
 
@@ -370,8 +371,8 @@ namespace nil {
                  * Computes the standard polynomial addition, polynomial A + polynomial B, and stores result in
                  * polynomial C.
                  */
-                void add(const polynomial_dfs_view& other) const {
-//                    polynomial_dfs_view result(std::max(this->_d, other._d), this->begin(), this->end());
+                polynomial_dfs_view operator+=(const polynomial_dfs_view& other) {
+                    this->_d = std::max(this->_d, other._d);
                     if (other.size() > this->size()) {
                         this->resize(other.size());
                     }
@@ -380,10 +381,11 @@ namespace nil {
                         tmp.resize(this->size());
                         std::transform(tmp.begin(), tmp.end(), this->begin(), this->begin(),
                                        std::plus<FieldValueType>());
-                        return;
+                        return *this;
                     }
                     std::transform(other.begin(), other.end(), this->begin(), this->begin(),
                                    std::plus<FieldValueType>());
+                    return *this;
                 }
 
                 void neg() const {
@@ -394,7 +396,8 @@ namespace nil {
                  * Computes the standard polynomial subtraction, polynomial A - polynomial B, and stores result in
                  * polynomial C.
                  */
-                void sub(const polynomial_dfs_view& other) const {
+                polynomial_dfs_view operator-=(const polynomial_dfs_view& other) {
+                    this->_d = std::max(this->_d, other._d);
                     if (other.size() > this->size()) {
                         this->resize(other.size());
                     }
@@ -403,17 +406,19 @@ namespace nil {
                         tmp.resize(this->size());
                         std::transform(this->begin(), this->end(), tmp.begin(), this->begin(),
                                        std::minus<FieldValueType>());
-                        return;
+                        return *this;
                     }
                     std::transform(this->begin(), this->end(), other.begin(), this->begin(),
                                    std::minus<FieldValueType>());
+                    return *this;
                 }
 
                 /**
                  * Perform the multiplication of two polynomials, polynomial A * polynomial B, and stores result in
                  * polynomial C.
                  */
-                void mul(const polynomial_dfs_view& other) const {
+                polynomial_dfs_view operator*=(const polynomial_dfs_view& other) {
+                    this->_d = this->_d + other._d;
                     size_t polynomial_s =
                         detail::power_of_two(std::max({this->size(), other.size(), this->_d + other._d + 1}));
                     if (this->size() < polynomial_s) {
@@ -424,10 +429,11 @@ namespace nil {
                         tmp.resize(polynomial_s);
                         std::transform(this->begin(), this->end(), tmp.begin(), this->begin(),
                                        std::multiplies<FieldValueType>());
-                        return;
+                        return *this;
                     }
                     std::transform(other.begin(), other.end(), this->begin(), this->begin(),
                                    std::multiplies<FieldValueType>());
+                    return *this;
                 }
 
                 /**
@@ -435,7 +441,7 @@ namespace nil {
                  * Input: Polynomial A, Polynomial B, where A / B
                  * Output: Polynomial Q, such that A = (Q * B) + R.
                  */
-                void div(const polynomial_dfs_view& other) const {
+                polynomial_dfs_view operator/=(const polynomial_dfs_view& other) {
                     std::vector<FieldValueType> x = this->coefficients();
                     std::vector<FieldValueType> y = other.coefficients();
 
@@ -486,7 +492,9 @@ namespace nil {
                     value_type omega = unity_root<FieldType>(n);
                     q.resize(n);
                     detail::basic_serial_radix2_fft<FieldType>(q, omega);
-                    return polynomial_dfs(new_s - 1, q);
+                    this->_d = new_s - 1;
+                    this->assign(q.begin(), q.end());
+                    return *this;
                 }
 
                 /**
@@ -494,7 +502,7 @@ namespace nil {
                  * Input: Polynomial A, Polynomial B, where A / B
                  * Output: Polynomial R, such that A = (Q * B) + R.
                  */
-                void mod(const polynomial_dfs_view& other) const {
+                polynomial_dfs_view operator%=(const polynomial_dfs_view& other) {
                     std::vector<FieldValueType> x = this->coefficients();
                     std::vector<FieldValueType> y = other.coefficients();
 
@@ -540,7 +548,19 @@ namespace nil {
                     value_type omega = unity_root<FieldType>(n);
                     r.resize(n);
                     detail::basic_serial_radix2_fft<FieldType>(r, omega);
-                    return polynomial_dfs(r_deg, r);
+                    this->_d = r_deg;
+                    this->assign(r.begin(), r.end());
+                    return *this;
+                }
+
+                void from_coefficients(const container_type &tmp) {
+                    typedef typename value_type::field_type FieldType;
+                    size_t n = detail::power_of_two(tmp.size());
+                    value_type omega = unity_root<FieldType>(n);
+                    _d = tmp.size() - 1;
+                    it.assign(tmp.begin(), tmp.end());
+                    it.resize(n, FieldValueType::zero());
+                    detail::basic_serial_radix2_fft<FieldType>(it, omega);
                 }
 
                 std::vector<FieldValueType> coefficients() const {

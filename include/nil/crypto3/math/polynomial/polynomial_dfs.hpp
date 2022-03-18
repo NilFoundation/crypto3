@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@nil.foundation>
+// Copyright (c) 2022 Aleksei Moskvin <alalmoskvin@nil.foundation>
 //
 // MIT License
 //
@@ -62,24 +62,33 @@ namespace nil {
                 }
 
                 explicit polynomial_dfs(size_t d, size_type n) : val(n), _d(d) {
+                    BOOST_ASSERT_MSG(n == detail::power_of_two(n), "DFS optimal polynom size must be power of two");
                 }
 
                 explicit polynomial_dfs(size_t d, size_type n, const allocator_type& a) : val(n, a), _d(d) {
+                    BOOST_ASSERT_MSG(n == detail::power_of_two(n), "DFS optimal polynom size must be power of two");
                 }
 
                 polynomial_dfs(size_t d, size_type n, const value_type& x) : val(n, x), _d(d) {
+                    BOOST_ASSERT_MSG(n == detail::power_of_two(n), "DFS optimal polynom size must be power of two");
                 }
 
                 polynomial_dfs(size_t d, size_type n, const value_type& x, const allocator_type& a) :
                     val(n, x, a), _d(d) {
+                    BOOST_ASSERT_MSG(n == detail::power_of_two(n), "DFS optimal polynom size must be power of two");
                 }
 
                 template<typename InputIterator>
                 polynomial_dfs(size_t d, InputIterator first, InputIterator last) : val(first, last), _d(d) {
+                    BOOST_ASSERT_MSG(std::distance(first, last) == detail::power_of_two(std::distance(first, last)),
+                                     "DFS optimal polynom size must be power of two");
                 }
+
                 template<typename InputIterator>
                 polynomial_dfs(size_t d, InputIterator first, InputIterator last, const allocator_type& a) :
                     val(first, last, a), _d(d) {
+                    BOOST_ASSERT_MSG(std::distance(first, last) == detail::power_of_two(std::distance(first, last)),
+                                     "DFS optimal polynom size must be power of two");
                 }
 
                 ~polynomial_dfs() = default;
@@ -95,6 +104,8 @@ namespace nil {
 
                 polynomial_dfs(size_t d, std::initializer_list<value_type> il, const allocator_type& a) :
                     val(il, a), _d(d) {
+                    BOOST_ASSERT_MSG(val.size() == detail::power_of_two(val.size()),
+                                     "DFS optimal polynom size must be power of two");
                 }
                 // TODO: add constructor with omega
 
@@ -113,9 +124,13 @@ namespace nil {
                 //                }
 
                 polynomial_dfs(size_t d, const container_type& c) : val(c), _d(d) {
+                    BOOST_ASSERT_MSG(val.size() == detail::power_of_two(val.size()),
+                                     "DFS optimal polynom size must be power of two");
                 }
 
                 polynomial_dfs(size_t d, container_type&& c) : val(c), _d(d) {
+                    BOOST_ASSERT_MSG(val.size() == detail::power_of_two(val.size()),
+                                     "DFS optimal polynom size must be power of two");
                 }
 
                 polynomial_dfs& operator=(const polynomial_dfs& x) {
@@ -596,6 +611,16 @@ namespace nil {
                     r.resize(n);
                     detail::basic_serial_radix2_fft<FieldType>(r, omega);
                     return polynomial_dfs(r_deg, r);
+                }
+
+                void from_coefficients(const container_type &tmp) {
+                    typedef typename value_type::field_type FieldType;
+                    size_t n = detail::power_of_two(tmp.size());
+                    value_type omega = unity_root<FieldType>(n);
+                    _d = tmp.size() - 1;
+                    val.assign(tmp.begin(), tmp.end());
+                    val.resize(n, FieldValueType::zero());
+                    detail::basic_serial_radix2_fft<FieldType>(val, omega);
                 }
 
                 std::vector<FieldValueType> coefficients() const {

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@nil.foundation>
+// Copyright (c) 2022 Aleksei Moskvin <alalmoskvin@nil.foundation>
 //
 // MIT License
 //
@@ -39,7 +39,7 @@ namespace nil {
             class polynomial_view {
                 typedef std::vector<FieldValueType, Allocator> container_type;
 
-                container_type *it;
+                container_type &it;
 
             public:
                 typedef typename container_type::value_type value_type;
@@ -55,9 +55,9 @@ namespace nil {
                 typedef typename container_type::reverse_iterator reverse_iterator;
                 typedef typename container_type::const_reverse_iterator const_reverse_iterator;
 
-                polynomial_view(container_type &c) : it(&c) {}
+                polynomial_view(container_type &c) : it(c) {}
 
-                polynomial_view(const container_type &c) : it(&c) {
+                polynomial_view(const container_type &c) : it(c) {
 
                 }
 
@@ -103,11 +103,11 @@ namespace nil {
 
                 template<typename InputIterator>
                 void assign(InputIterator first, InputIterator last) {
-                    it->assign(first, last);
+                    it.assign(first, last);
                 }
 
                 void assign(size_type n, const_reference u) {
-                    it->assign(n, u);
+                    it.assign(n, u);
                 }
 
                 void assign(std::initializer_list<value_type> il) {
@@ -115,29 +115,29 @@ namespace nil {
                 }
 
                 allocator_type get_allocator() const BOOST_NOEXCEPT {
-                    return it->__alloc();
+                    return it.__alloc();
                 }
 
                 iterator begin() BOOST_NOEXCEPT {
-                    return it->begin();
+                    return it.begin();
                 }
 
                 const_iterator begin() const BOOST_NOEXCEPT {
-                    return it->begin();
+                    return it.begin();
                 }
                 iterator end() BOOST_NOEXCEPT {
-                    return it->end();
+                    return it.end();
                 }
                 const_iterator end() const BOOST_NOEXCEPT {
-                    return it->end();
+                    return it.end();
                 }
 
                 reverse_iterator rbegin() BOOST_NOEXCEPT {
-                    return it->rbegin();
+                    return it.rbegin();
                 }
 
                 const_reverse_iterator rbegin() const BOOST_NOEXCEPT {
-                    return it->rbegin();
+                    return it.rbegin();
                 }
 
                 reverse_iterator rend() BOOST_NOEXCEPT {
@@ -165,7 +165,7 @@ namespace nil {
                 }
 
                 size_type size() const BOOST_NOEXCEPT {
-                    return it->size();
+                    return it.size();
                 }
 
                 size_type degree() const BOOST_NOEXCEPT {
@@ -173,91 +173,91 @@ namespace nil {
                 }
 
                 size_type capacity() const BOOST_NOEXCEPT {
-                    return it->capacity();
+                    return it.capacity();
                 }
                 bool empty() const BOOST_NOEXCEPT {
-                    return it->empty();
+                    return it.empty();
                 }
                 size_type max_size() const BOOST_NOEXCEPT {
-                    return it->max_size();
+                    return it.max_size();
                 }
                 void reserve(size_type _n) {
-                    return it->reserve(_n);
+                    return it.reserve(_n);
                 }
                 void shrink_to_fit() BOOST_NOEXCEPT {
-                    return it->shrink_to_fit();
+                    return it.shrink_to_fit();
                 }
 
                 reference operator[](size_type _n) BOOST_NOEXCEPT {
-                    return (*it)[_n];
+                    return it[_n];
                 }
                 const_reference operator[](size_type _n) const BOOST_NOEXCEPT {
-                    return (*it)[_n];
+                    return it[_n];
                 }
                 reference at(size_type _n) {
-                    return it->at(_n);
+                    return it.at(_n);
                 }
                 const_reference at(size_type _n) const {
-                    return it->at(_n);
+                    return it.at(_n);
                 }
 
                 reference front() BOOST_NOEXCEPT {
-                    return it->front();
+                    return it.front();
                 }
                 const_reference front() const BOOST_NOEXCEPT {
-                    return it->front();
+                    return it.front();
                 }
                 reference back() BOOST_NOEXCEPT {
-                    return it->back();
+                    return it.back();
                 }
                 const_reference back() const BOOST_NOEXCEPT {
-                    return it->back();
+                    return it.back();
                 }
 
                 value_type* data() BOOST_NOEXCEPT {
-                    return it->data();
+                    return it.data();
                 }
 
                 const value_type* data() const BOOST_NOEXCEPT {
-                    return it->data();
+                    return it.data();
                 }
 
                 void push_back(const_reference _x) {
-                    it->push_back(_x);
+                    it.push_back(_x);
                 }
 
                 void push_back(value_type&& _x) {
-                    it->push_back(_x);
+                    it.push_back(_x);
                 }
 
                 template<class... Args>
                 reference emplace_back(Args&&... _args) {
-                    return it->template emplace_back(_args...);
+                    return it.template emplace_back(_args...);
                 }
 
                 void pop_back() {
-                    it->pop_back();
+                    it.pop_back();
                 }
 
                 iterator insert(const_iterator _position, const_reference _x) {
-                    return it->insert(_position, _x);
+                    return it.insert(_position, _x);
                 }
 
                 iterator insert(const_iterator _position, value_type&& _x) {
-                    return it->insert(_position, _x);
+                    return it.insert(_position, _x);
                 }
                 template<class... Args>
                 iterator emplace(const_iterator _position, Args&&... _args) {
-                    return it->template emplace(_position, _args...);
+                    return it.template emplace(_position, _args...);
                 }
 
                 iterator insert(const_iterator _position, size_type _n, const_reference _x) {
-                    return it->insert(_position, _n, _x);
+                    return it.insert(_position, _n, _x);
                 }
 
                 template<class InputIterator>
                 iterator insert(const_iterator _position, InputIterator _first, InputIterator _last) {
-                    return it->insert(_position, _first, _last);
+                    return it.insert(_position, _first, _last);
                 }
 
                 iterator insert(const_iterator _position, std::initializer_list<value_type> _il) {
@@ -265,27 +265,27 @@ namespace nil {
                 }
 
                 iterator erase(const_iterator _position) {
-                    return it->erase(_position);
+                    return it.erase(_position);
                 }
 
                 iterator erase(const_iterator _first, const_iterator _last) {
-                    return it->erase(_first, _last);
+                    return it.erase(_first, _last);
                 }
 
                 void clear() BOOST_NOEXCEPT {
-                    it->clear();
+                    it.clear();
                 }
 
                 void resize(size_type _sz) {
-                    return it->resize(_sz);
+                    return it.resize(_sz);
                 }
 
                 void resize(size_type _sz, const_reference _x) {
-                    return it->resize(_sz, _x);
+                    return it.resize(_sz, _x);
                 }
 
                 void swap(polynomial_view& other) {
-                    it->swap(other.val);
+                    it.swap(other.val);
                 }
 
                 template<typename Range>
@@ -345,13 +345,12 @@ namespace nil {
                  * Computes the standard polynomial addition, polynomial A + polynomial B, and stores result in
                  * polynomial C.
                  */
-//                polynomial_view operator+=(const polynomial_view& other) {
-                void add(const polynomial_view& other) {
+                polynomial_view operator+=(const polynomial_view& other) {
                     if (this->is_zero()) {
                         this->assign(other.begin(), other.end());
-                        return;
+                        return *this;
                     } else if (other.is_zero()) {
-                        return;
+                        return *this;
                     } else {
                         std::size_t a_size = std::distance(this->begin(), this->end());
                         std::size_t b_size = std::distance(other.begin(), other.end());
@@ -370,6 +369,7 @@ namespace nil {
 
                         this->condense();
                     }
+                    return *this;
                 }
 
 //                polynomial_view operator-() const {
@@ -381,13 +381,13 @@ namespace nil {
                  * Computes the standard polynomial subtraction, polynomial A - polynomial B, and stores result in
                  * polynomial C.
                  */
-//                polynomial_view operator-=(const polynomial_view& other) {
-                void sub(const polynomial_view& other) {
+                polynomial_view operator-=(const polynomial_view& other) {
                     if (this->is_zero()) {
                         this->assign(other.begin(), other.end());
                         this->neg();
+                        return *this;
                     } else if (other.is_zero()) {
-                        return;
+                        return *this;
                     } else {
                         std::size_t a_size = std::distance(this->begin(), this->end());
                         std::size_t b_size = std::distance(other.begin(), other.end());
@@ -407,13 +407,14 @@ namespace nil {
 
                         this->condense();
                     }
+                    return *this;
                 }
 
                 /**
                  * Perform the multiplication of two polynomials, polynomial A * polynomial B, and stores result in
                  * polynomial C.
                  */
-                void mul(polynomial_view other) {
+                polynomial_view operator*=(polynomial_view other) {
                     typedef typename value_type::field_type FieldType;
 
                     BOOST_STATIC_ASSERT(algebra::is_field<FieldType>::value);
@@ -429,7 +430,7 @@ namespace nil {
                     detail::basic_parallel_radix2_fft<FieldType>(this, omega);
                     detail::basic_parallel_radix2_fft<FieldType>(v, omega);
 #else
-                    detail::basic_serial_radix2_fft<FieldType>(*it, omega);
+                    detail::basic_serial_radix2_fft<FieldType>(it, omega);
                     detail::basic_serial_radix2_fft<FieldType>(other, omega);
 #endif
 
@@ -438,7 +439,7 @@ namespace nil {
 #ifdef MULTICORE
                     detail::basic_parallel_radix2_fft<FieldType>(this, omega.inversed());
 #else
-                    detail::basic_serial_radix2_fft<FieldType>(*it, omega.inversed());
+                    detail::basic_serial_radix2_fft<FieldType>(it, omega.inversed());
 #endif
 
                     const value_type sconst = value_type(n).inversed();
@@ -447,9 +448,10 @@ namespace nil {
                                    this->begin(),
                                    std::bind(std::multiplies<value_type>(), sconst, std::placeholders::_1));
                     this->condense();
+                    return *this;
                 }
 
-                void div(const polynomial_view& other) {
+                polynomial_view operator/=(const polynomial_view& other) {
                     std::size_t d = other.size() - 1;           /* Degree of B */
                     FieldValueType c = other.back().inversed(); /* Inverse of Leading Coefficient of B */
 
@@ -484,9 +486,10 @@ namespace nil {
                     nil::crypto3::math::condense(q);
 
                     this->template assign(q.begin(), q.end());
+                    return *this;
                 }
 
-                void mod(const polynomial_view& other) {
+                polynomial_view operator%=(const polynomial_view& other) {
                     std::size_t d = other.size() - 1;           /* Degree of B */
                     FieldValueType c = other.back().inversed(); /* Inverse of Leading Coefficient of B */
 
@@ -513,6 +516,7 @@ namespace nil {
 
                         r_deg = this->size() - 1;
                     }
+                    return *this;
                 }
             };
         }    // namespace math
