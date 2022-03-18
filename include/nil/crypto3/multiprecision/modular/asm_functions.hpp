@@ -17,13 +17,13 @@ namespace nil {
 #if BOOST_ARCH_X86_64
                 template<typename Limb1, typename Limb2>
                 void sub_asm(size_t n, Limb1 *x, const Limb2 *y) {
-                    __asm__(
+                    __asm__ volatile(
                         "movq    (%[y]), %%rax           \n\t"
                         "subq    %%rax, (%[x])           \n\t"
                         "pushf                           \n\t"
                         "movq $1, %%rbx                  \n\t"
-                    // Loop for sub
-                    "4:                                  \n\t"
+                        // Loop for sub
+                        "4:                              \n\t"
                         "popf                            \n\t"
                         "movq (%[y], %%rbx, 8), %%rax    \n\t"
                         "sbbq %%rax, (%[x], %%rbx, 8)    \n\t"
@@ -38,56 +38,64 @@ namespace nil {
                 }
 
                 template<typename Limb1, typename Limb2, typename Limb3>
-                bool reduce_limb_asm(size_t n, size_t shift, Limb1 *res, const Limb2 *x, Limb3 inv) {
-                    Limb1 k, tmp1, tmp2, tmp3;
+                bool reduce_limb_asm(size_t n, const size_t &shift, Limb1 *res, const Limb2 *x, const Limb3 &inv) {
                     bool carry = false;
-                    __asm__(
+                    __asm__ volatile(
                         // Else check result with mod
-                        "movq   (%[res], %[shift], 8), %%rax   \n\t"
+                        "movq $0, %%r12                        \n\t"
+                    "0:                                        \n\t"
+                        "movq %%r12, %%r11                     \n\t"
+
+                        "movq   (%[res], %%r11, 8), %%rax      \n\t"
                         "mulq   %[inv]                         \n\t"
-                        "movq   %%rax, %[k]                    \n\t"
+                        "movq   %%rax, %%r10                   \n\t"
 
                         "movq   (%[x]), %%rax                  \n\t"
-                        "mulq   %[k]                           \n\t"
-                        "movq   %%rax, %[tmp1]                 \n\t"
-                        "movq   %%rdx, %[tmp2]                 \n\t"
+                        "mulq   %%r10                          \n\t"
+                        "movq   %%rax, %%r8                    \n\t"
+                        "movq   %%rdx, %%r9                    \n\t"
 
                         "mov $1, %%rbx                         \n\t"
                     "1:                                        \n\t"
                         "movq   (%[x], %%rbx, 8), %%rax        \n\t"
-                        "mulq   %[k]                           \n\t"
-                        "addq   %[tmp1], (%[res], %[shift], 8) \n\t"
-                        "movq   $0, %[tmp1]                    \n\t"
-                        "adcq   %%rax, %[tmp2]                 \n\t"
-                        "adcq   %%rdx, %[tmp1]                 \n\t"
+                        "mulq   %%r10                          \n\t"
+                        "addq   %%r8, (%[res], %%r11, 8)       \n\t"
+                        "movq   $0, %%r8                       \n\t"
+                        "adcq   %%rax, %%r9                    \n\t"
+                        "adcq   %%rdx, %%r8                    \n\t"
                         // swap tmp2, tmp1
-                        "movq %[tmp2], %%rax                   \n\t"
-                        "movq %[tmp1], %[tmp2]                 \n\t"
-                        "movq %%rax, %[tmp1]                   \n\t"
+                        "movq %%r9, %%rax                      \n\t"
+                        "movq %%r8, %%r9                       \n\t"
+                        "movq %%rax, %%r8                      \n\t"
                         // swap end
                         "movq $1, %%rdx                        \n\t"
-                        "addq %%rdx, %[shift]                  \n\t"
+                        "addq %%rdx, %%r11                     \n\t"
                         "inc %%rbx                             \n\t"
                         "cmp %%rbx, %[limbs]                   \n\t"
                         "jne 1b                                \n\t"
-                        "mov %[shift], %%rbx                   \n\t"
-                        "addq   %[tmp1], (%[res], %%rbx, 8)    \n\t"
-                        "adcq   %[tmp2], 8(%[res], %%rbx, 8)   \n\t"
+                        "mov  %%r11, %%rbx                     \n\t"
+                        "addq   %%r8, (%[res], %%rbx, 8)       \n\t"
+                        "adcq   %%r9, 8(%[res], %%rbx, 8)      \n\t"
                         "movb $0, %[carry]                     \n\t"
                         "jnc 2f                                \n\t"
                         "adcq   $0, 16(%[res], %%rbx, 8)       \n\t"
                         "movb $1, %[carry]                     \n\t"
                     "2:                                        \n\t"
-                        : [k] "=&r"(k), [tmp1] "=&r"(tmp1), [tmp2] "=&r"(tmp2), [carry] "=&r" (carry)
+                        "inc %%r12                             \n\t"
+                        "cmpq %[limbs], %%r12                  \n\t"
+                        "jne 0b                                \n\t"
+                        : [carry] "+r"(carry)
                         : [limbs] "r"(n), [shift] "r"(shift), [res] "r"(res), [x] "r"(x), [inv] "r"(inv)
-                        : "cc", "memory", "%rax", "%rbx", "%rdx");
+                        : "cc", "memory", "%rax", "%rbx", "%rdx", "%r8", "%r9", "%r10", "%r11", "%r12");
+                    // r8, r9 - tmp1, tmp2
+                    // r10 - k
                     return carry;
                 }
 
                 template<typename Limb1, typename Limb2>
                 int cmp_asm(size_t n, const Limb1 *x, const Limb2 *y) {
                     int result = 0;
-                    __asm__(
+                    __asm__ volatile(
                         // Else check result with mod
                         "mov $0, %[res]                  \n\t"
                         "movq %[limbs], %%rbx            \n\t"
@@ -114,7 +122,7 @@ namespace nil {
 
                 template<typename Limb1, typename Limb2, typename Limb3>
                 void sub_mod_asm(size_t n, Limb1 *x, const Limb2 *y, const Limb3 *mod) {
-                    __asm__(
+                    __asm__ volatile(
                         "movq    $1, %%rbx              \n\t"
                         "movq    (%[y]), %%rax          \n\t"
                         "subq    %%rax, (%[x])          \n\t"
@@ -153,7 +161,7 @@ namespace nil {
 
                 template<typename Limb1, typename Limb2, typename Limb3>
                 void add_mod_asm(size_t n, Limb1 *x, const Limb2 *y, const Limb3 *mod) {
-                    __asm__(
+                    __asm__ volatile(
                         "movq    (%[y]), %%rax              \n\t"
                         "addq    %%rax, (%[x])              \n\t"
                         "movq    $1, %%rbx                  \n\t"
@@ -175,7 +183,7 @@ namespace nil {
                         "movq %[limbs], %%rbx               \n\t"
                     "2:                                     \n\t"
                         "movq    -8(%[mod], %%rbx, 8), %%rax  \n\t"
-                        "cmpq    %%rax, -8(%[x], %%rbx, 8)    \n\t"
+                        "cmpq    %%rax, -8(%[x], %%rbx, 8)  \n\t"
                         "jb  5f                             \n\t"
                         "ja  3f                             \n\t"
                         "dec %%rbx                          \n\t"

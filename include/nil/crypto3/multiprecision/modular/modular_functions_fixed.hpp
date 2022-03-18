@@ -303,7 +303,7 @@ namespace nil {
                         initialize(m);
                     }
 
-                    constexpr modular_functions_fixed(const number_type& m) {
+                    constexpr modular_functions_fixed(const number_type &m) {
                         initialize(m);
                     }
 
@@ -403,13 +403,10 @@ namespace nil {
                         Backend_doubled_padded_limbs accum(result);
                         Backend_doubled_padded_limbs prod;
 #if BOOST_ARCH_X86_64
-                        if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && m_mod.backend().size() >= 2) {
-                            bool carry = false;
-                            for (size_t i = 0; i < m_mod.backend().size(); ++i) {
-                                carry =
-                                    reduce_limb_asm(m_mod.backend().size(), i, accum.limbs(), m_mod.backend().limbs(),
-                                                    static_cast<double_limb_type>(m_montgomery_p_dash));
-                            }
+                        if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && m_mod.backend().size() > 1) {
+                            bool carry =
+                                reduce_limb_asm(m_mod.backend().size(), 0, accum.limbs(), m_mod.backend().limbs(),
+                                                static_cast<double_limb_type>(m_montgomery_p_dash));
                             if (carry || cmp_asm(m_mod.backend().size(), accum.limbs() + m_mod.backend().size(),
                                                  m_mod.backend().limbs()) >= 0) {
                                 sub_asm(m_mod.backend().size(), accum.limbs() + m_mod.backend().size(),
