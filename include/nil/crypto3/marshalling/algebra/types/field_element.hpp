@@ -719,6 +719,7 @@ namespace nil {
                         &field_elem_vector) {
 
                     std::vector<FieldValueType> result;
+                    result.reserve(field_elem_vector.value().size());
                     for (std::size_t i = 0; i < field_elem_vector.value().size(); i++) {
                         result.push_back(field_elem_vector.value()[i].value());
                     }
