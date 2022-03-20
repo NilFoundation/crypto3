@@ -35,6 +35,7 @@
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 
+#include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/verifier.hpp>
@@ -42,7 +43,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/edwards/plonk/unified_addition.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
 
 #include "profiling.hpp"
 
@@ -86,9 +87,9 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
     typename component_type::assignment_params a_params = {2 * curve_type::template g1_type<>::value_type::one(), 2 * curve_type::template g1_type<>::value_type::one()};
     component_type unified_addition_component(bp, {});
 
-    unified_addition_component.generate_gates(public_assignment);
-    unified_addition_component.generate_copy_constraints(public_assignment);
-    unified_addition_component.generate_assignments(private_assignment, public_assignment, a_params);
+    component_type::generate_gates(bp, public_assignment);
+    component_type::generate_copy_constraints(bp, public_assignment);
+    component_type::generate_assignments(bp, private_assignment, public_assignment, a_params);
 
     private_assignment.allocate_rows(4);
     public_assignment.allocate_rows(4);
@@ -132,38 +133,39 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 11;
-    constexpr std::size_t SelectorColumns = 1;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    constexpr std::size_t SelectorColumns = 1;
+    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
+        PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
+        ArithmetizationParams>;
 
-    zk::blueprint<ArithmetizationType> bp;
-    zk::blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> private_assignment;
-    zk::blueprint_public_assignment_table<ArithmetizationType, PublicInputColumns, ConstantColumns,
-        SelectorColumns> public_assignment;
+    zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
+
+    zk::blueprint<ArithmetizationType> bp(desc);
+    zk::blueprint_private_assignment_table<ArithmetizationType> private_assignment(desc);
+    zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
 
     using component_type = zk::components::curve_element_unified_addition<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10>;
-    typename component_type::assignment_params a_params = {algebra::random_element<
+    typename component_type::assignment_params_type a_params = {algebra::random_element<
         curve_type::template g1_type<>>(), algebra::random_element<
         curve_type::template g1_type<>>()};
-    component_type unified_addition_component(bp, {});
+    // component_type unified_addition_component(bp, {});
 
-    unified_addition_component.generate_gates(public_assignment);
-    unified_addition_component.generate_copy_constraints(public_assignment);
-    unified_addition_component.generate_assignments(private_assignment, public_assignment, a_params);
+    std::size_t start_row = component_type::allocate_rows(bp);
+    component_type::generate_gates(bp, public_assignment, {}, start_row);
+    component_type::generate_copy_constraints(bp, public_assignment, {}, start_row);
+    component_type::generate_assignments(private_assignment, public_assignment, {}, a_params, start_row);
 
-    private_assignment.allocate_rows(4);
-    public_assignment.allocate_rows(4);
     bp.fix_usable_rows();
     bp.allocate_rows(3);
 
-    zk::snark::plonk_assignment_table<BlueprintFieldType, WitnessColumns, PublicInputColumns, 
-        ConstantColumns, SelectorColumns> assignments(
+    zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(
     	private_assignment, public_assignment);
 
-    using params = zk::snark::redshift_params<BlueprintFieldType, WitnessColumns,
-         PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams>;
     using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
 
     using fri_type = typename zk::commitments::fri<BlueprintFieldType, params::merkle_hash_type,
@@ -176,12 +178,15 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
 
     typename types::preprocessed_public_data_type public_preprocessed_data =
          zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, 
-            assignments.table_description(), fri_params, permutation_size);
+            desc, fri_params, permutation_size);
     typename types::preprocessed_private_data_type private_preprocessed_data =
-         zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment);
+         zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment,
+            desc);
 
     auto proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(public_preprocessed_data,
-                                                                       private_preprocessed_data, bp,
+                                                                       private_preprocessed_data,
+                                                                       desc,
+                                                                       bp,
                                                                        assignments, fri_params);
 
     bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data, proof, 

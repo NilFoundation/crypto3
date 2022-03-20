@@ -32,7 +32,7 @@
 #include <nil/crypto3/zk/component.hpp>
 
 #include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 
 namespace nil {
     namespace crypto3 {

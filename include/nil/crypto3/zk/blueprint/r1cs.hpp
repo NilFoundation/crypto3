@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/zk/blueprint/detail/r1cs/blueprint_variable.hpp>
 #include <nil/crypto3/zk/blueprint/detail/r1cs/blueprint_linear_combination.hpp>

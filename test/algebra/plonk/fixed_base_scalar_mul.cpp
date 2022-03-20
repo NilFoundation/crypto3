@@ -34,7 +34,7 @@
 
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
-// #include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
+// #include <nil/crypto3/zk/snark/arithmetization/non_linear_combination.hpp>
 
 #include <nil/crypto3/zk/components/blueprint.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/plonk/fixed_base_scalar_mul_5_wires.hpp>

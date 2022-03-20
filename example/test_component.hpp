@@ -30,7 +30,7 @@
 
 #include <nil/crypto3/zk/blueprint/r1cs.hpp>
 
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
