@@ -27,7 +27,7 @@
 #ifndef CRYPTO3_ZK_PLONK_GATE_HPP
 #define CRYPTO3_ZK_PLONK_GATE_HPP
 
-#include <nil/crypto3/zk/snark/relations/plonk/constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -34,8 +34,8 @@
 
 #include <nil/crypto3/zk/math/permutation.hpp>
 #include "nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp"
-#include <nil/crypto3/zk/snark/relations/plonk/copy_constraint.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/table_description.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 
 using namespace nil::crypto3;
 
@@ -130,10 +130,11 @@ namespace nil {
                         std::map<key_type, std::size_t> _sizes;
 
                         cycle_representation (typename policy_type::constraint_system_type &constraint_system, 
-                            const plonk_table_description<FieldType> &table_description) {
+                            const plonk_table_description<FieldType,
+                                typename ParamsType::arithmetization_params> &table_description) {
 
                             for (std::size_t i = 0; i < table_description.table_width() - table_description.selector_columns; i++) {
-                                for (std::size_t j = 0; j < constraint_system.rows_amount(); j++) {
+                                for (std::size_t j = 0; j < table_description.rows_amount; j++) {
                                     key_type key(i, j);
                                     this->_mapping[key] = key;
                                     this->_aux[key] = key;
@@ -272,8 +273,8 @@ namespace nil {
                     }
 
                     static inline public_precommitments_type precommitments(
-                        const plonk_public_polynomial_table<FieldType, ParamsType::public_input_columns, 
-                            ParamsType::constant_columns, ParamsType::selector_columns> &public_table,
+                        const plonk_public_polynomial_table<FieldType,
+                            typename ParamsType::arithmetization_params> &public_table,
                         std::vector<math::polynomial<typename FieldType::value_type>> &id_perm_polys,
                         std::vector<math::polynomial<typename FieldType::value_type>> &sigma_perm_polys,
                         math::polynomial<typename FieldType::value_type> &q_last,
@@ -375,11 +376,12 @@ namespace nil {
                     static inline typename policy_type::preprocessed_public_data_type process(
                         typename policy_type::constraint_system_type &constraint_system,
                         const typename policy_type::variable_assignment_type::public_table_type &public_assignment,
-                        const plonk_table_description<FieldType> &table_description,
+                        const plonk_table_description<FieldType,
+                            typename ParamsType::arithmetization_params> &table_description,
                         const typename commitment_scheme_public_type::params_type &commitment_params,
                         std::size_t columns_with_copy_constraints) {
 
-                        std::size_t N_rows = constraint_system.rows_amount();
+                        std::size_t N_rows = table_description.rows_amount;
                         std::size_t usable_rows = constraint_system.usable_rows_amount();
 
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
@@ -407,11 +409,9 @@ namespace nil {
                         math::polynomial<typename FieldType::value_type> q_blind =
                             selector_blind(N_rows, usable_rows, basic_domain);
 
-                        plonk_public_polynomial_table<FieldType, ParamsType::public_input_columns, 
-                            ParamsType::constant_columns, ParamsType::selector_columns> 
+                        plonk_public_polynomial_table<FieldType, typename ParamsType::arithmetization_params> 
                             public_polynomial_table =
-                            plonk_public_polynomial_table<FieldType, ParamsType::public_input_columns, 
-                                ParamsType::constant_columns, ParamsType::selector_columns>(
+                            plonk_public_polynomial_table<FieldType, typename ParamsType::arithmetization_params>(
                                 detail::column_range_polynomials<FieldType>(public_assignment.public_inputs(),
                                                                             basic_domain), 
                                 detail::column_range_polynomials<FieldType>(public_assignment.constants(),
@@ -447,15 +447,19 @@ namespace nil {
                 public:
                     static inline typename policy_type::preprocessed_private_data_type process(
                         const typename policy_type::constraint_system_type &constraint_system,
-                        const typename policy_type::variable_assignment_type::private_table_type &private_assignment) {
+                        const typename policy_type::variable_assignment_type::private_table_type &private_assignment,
+                        const plonk_table_description<FieldType,
+                            typename ParamsType::arithmetization_params> &table_description) {
 
-                        std::size_t N_rows = constraint_system.rows_amount();
+                        std::size_t N_rows = table_description.rows_amount;
 
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
                             math::make_evaluation_domain<FieldType>(N_rows);
 
-                        plonk_private_polynomial_table<FieldType, ParamsType::witness_columns> private_polynomial_table =
-                            plonk_private_polynomial_table<FieldType, ParamsType::witness_columns>(
+                        plonk_private_polynomial_table<FieldType,
+                            typename ParamsType::arithmetization_params> private_polynomial_table =
+                            plonk_private_polynomial_table<FieldType,
+                                typename ParamsType::arithmetization_params>(
                                 detail::column_range_polynomials<FieldType>(private_assignment.witnesses(),
                                                                             basic_domain));
 

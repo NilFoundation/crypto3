@@ -34,10 +34,7 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename FieldType,
-                         std::size_t WitnessColumns = 15,
-                         std::size_t PublicInputColumns = 15,
-                         std::size_t ConstantColumns = 15,
-                         std::size_t SelectorColumns = 15,
+                         typename ArithmetizationParams,
                          typename MerkleTreeHashType = hashes::keccak_1600<512>,
                          typename TranscriptHashType = hashes::keccak_1600<512>, std::size_t Lambda = 40,
                          std::size_t R = 1, std::size_t M = 2>
@@ -46,10 +43,16 @@ namespace nil {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;
 
-                    constexpr static const std::size_t witness_columns = WitnessColumns;
-                    constexpr static const std::size_t public_input_columns = PublicInputColumns;
-                    constexpr static const std::size_t constant_columns = ConstantColumns;
-                    constexpr static const std::size_t selector_columns = SelectorColumns;
+                    constexpr static const std::size_t witness_columns =
+                        ArithmetizationParams::WitnessColumns;
+                    constexpr static const std::size_t public_input_columns =
+                        ArithmetizationParams::PublicInputColumns;
+                    constexpr static const std::size_t constant_columns =
+                        ArithmetizationParams::ConstantColumns;
+                    constexpr static const std::size_t selector_columns =
+                        ArithmetizationParams::SelectorColumns;
+
+                    using arithmetization_params = ArithmetizationParams;
 
                     constexpr static const typename FieldType::value_type delta = algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
 

@@ -27,7 +27,7 @@
 #define CRYPTO3_R1CS_GG_PPZKSNARK_PROVING_KEY_HPP
 
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>
 
 namespace nil {
