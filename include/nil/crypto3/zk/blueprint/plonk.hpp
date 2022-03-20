@@ -26,11 +26,12 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_PLONK_HPP
 #define CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_PLONK_HPP
 
-#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/constraint.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/copy_constraint.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/lookup_constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -39,22 +40,29 @@ namespace nil {
             template<typename ArithmetizationType, std::size_t... BlueprintParams>
             class blueprint;
 
-            template<typename BlueprintFieldType>
-            class blueprint<snark::plonk_constraint_system<BlueprintFieldType>>
-                : public snark::plonk_constraint_system<BlueprintFieldType> {
+            template<typename BlueprintFieldType,
+                     typename ArithmetizationParams>
+            class blueprint<snark::plonk_constraint_system<BlueprintFieldType,
+                                                           ArithmetizationParams>>
+                : public snark::plonk_constraint_system<BlueprintFieldType,
+                                                        ArithmetizationParams> {
 
-                typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+                typedef snark::plonk_constraint_system<BlueprintFieldType,
+                                                       ArithmetizationParams> ArithmetizationType;
 
+                snark::plonk_table_description<BlueprintFieldType,
+                        ArithmetizationParams> &_table_description;
             public:
                 typedef BlueprintFieldType blueprint_field_type;
 
-                blueprint() : ArithmetizationType() {
-                    this->_rows_amount = 0;
+                blueprint(snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> &table_description) :
+                    ArithmetizationType(), _table_description(table_description) {
+                    _table_description.rows_amount = 0;
                 }
 
                 std::size_t allocate_rows(std::size_t required_amount = 1) {
-                    std::size_t result = this->_rows_amount;
-                    this->_rows_amount += required_amount;
+                    std::size_t result = _table_description.rows_amount;
+                    _table_description.rows_amount += required_amount;
                     return result;
                 }
 
@@ -63,7 +71,7 @@ namespace nil {
                 }
 
                 void fix_usable_rows() {
-                    this->_usable_rows_amount = this->_rows_amount;
+                    this->_usable_rows_amount = _table_description.rows_amount;
                 }
 
                 // TODO: should put constraint in some storage and return its index

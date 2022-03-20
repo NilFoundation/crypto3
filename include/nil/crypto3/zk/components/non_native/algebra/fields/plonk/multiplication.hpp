@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_FIELDS_EDDSA_MULTIPLICATION_COMPONENT_9_WIRES_HPP
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_FIELDS_EDDSA_MULTIPLICATION_COMPONENT_9_WIRES_HPP
 
-#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>

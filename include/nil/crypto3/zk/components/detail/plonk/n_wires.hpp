@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_N_WIRES_HELPER_HPP
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_N_WIRES_HELPER_HPP
 
-#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>

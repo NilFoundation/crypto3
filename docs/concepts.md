@@ -8,7 +8,7 @@ A ```circuit``` is defined by ```Blueprint```, ```Blueprint public assignment ta
 
 ### PLONK Component interface ###
 
-A ```Component``` ```X``` is a state-less object with following static functions to operate with it:
+A ```Component``` ```X``` is a state-less type with following static functions to operate with it:
 
 * ```X::allocate_rows``` - allocates required amount of rows in the given ```Arithmetization table```. The amount of required rows amount is constexpr for the particular component;
 * ```X::generate_gates``` - generates gate expressions and puts these on the given ```Blueprint```;

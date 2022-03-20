@@ -28,7 +28,7 @@
 #ifndef CRYPTO3_PROFILING_HPP
 #define CRYPTO3_PROFILING_HPP
 
-#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
@@ -43,32 +43,28 @@ namespace nil {
             }
         }
         
-        template <typename FieldType, std::size_t WitnessColumns, std::size_t SelectorColumns,
-                        std::size_t PublicInputColumns, std::size_t ConstantColumns>
-        void profiling(zk::snark::plonk_assignment_table<FieldType, WitnessColumns, SelectorColumns,
-        PublicInputColumns, ConstantColumns> assignments){
+        template <typename FieldType, typename ArithmetizationParams>
+        void profiling(zk::snark::plonk_assignment_table<FieldType, ArithmetizationParams> assignments){
 
-            zk::snark::plonk_table_description<FieldType> description = assignments.table_description();
-
-            for (std::size_t w_index = 0; w_index < description.witness_columns; w_index++){
+            for (std::size_t w_index = 0; w_index < ArithmetizationParams::WitnessColumns; w_index++){
                 std::cout << "W" << w_index << ":";
                 profiling(assignments.witness(w_index));
                 std::cout << std::endl;
             }
 
-            for (std::size_t pi_index = 0; pi_index < description.public_input_columns; pi_index++){
+            for (std::size_t pi_index = 0; pi_index < ArithmetizationParams::PublicInputColumns; pi_index++){
                 std::cout << "PI" << pi_index << ":";
                 profiling(assignments.public_input(pi_index));
                 std::cout << std::endl;
             }
 
-            for (std::size_t c_index = 0; c_index < description.constant_columns; c_index++){
+            for (std::size_t c_index = 0; c_index < ArithmetizationParams::ConstantColumns; c_index++){
                 std::cout << "C" << c_index << ":";
                 profiling(assignments.constant(c_index));
                 std::cout << std::endl;
             }
 
-            for (std::size_t s_index = 0; s_index < description.selector_columns; s_index++){
+            for (std::size_t s_index = 0; s_index < ArithmetizationParams::SelectorColumns; s_index++){
                 std::cout << "S" << s_index << ":";
                 profiling(assignments.selector(s_index));
                 std::cout << std::endl;
