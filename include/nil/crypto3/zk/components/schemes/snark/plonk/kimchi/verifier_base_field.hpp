@@ -89,7 +89,30 @@ namespace nil {
 
                     constexpr static const std::size_t endo = 3;
 
+                    struct batched_values {
+
+                    }
+
+                    batched_values generate_gates_to_batch(blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
+                        blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
+                            PublicInputColumns, ConstantColumns> &public_assignment,
+                        assignment_params &input) {
+
+                    }
+
+                    void generate_gates_final_check(blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
+                        blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
+                            PublicInputColumns, ConstantColumns> &public_assignment,
+                            std::vector<batched_values> batch) {
+
+                    }
+
                 public:
+                    struct assignment_params {
+                        std::vector<kimchi_proof_type> proofs;
+                        std::vector<verifier_index> indexes;
+                    };
+
                     pickles_verifier_base_field(blueprint_type &bp) :
                         component<arithmetization_type>(bp) {
 
@@ -99,8 +122,19 @@ namespace nil {
                     void generate_gates() {
                     }
 
-                public:
-                    void generate_assignments() {
+                    void generate_assignments(
+                        blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
+                        blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
+                            PublicInputColumns, ConstantColumns> &public_assignment,
+                        assignment_params &input,
+                        std::size_t circuit_start_row = 0) {
+                            std::vector<batched_values> batch(input.proofs.size());
+                            for (std::size_t i = 0; i < input.proofs.size(); i++) {
+                                batched_values[i] = generate_gates_to_batch(private_assigment,
+                                    public_assigment, input);
+                            }
+
+                            generate_gates_final_check()
                     }
                 };
             }    // namespace components
