@@ -53,7 +53,7 @@
 #include <nil/crypto3/zk/snark/systems/ppzksnark/tbcs_ppzksnark/proving_key.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/tbcs_ppzksnark/keypair.hpp>
 
-#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/circuit_satisfaction_problems/tbcs.hpp>
 #include <nil/crypto3/zk/snark/reductions/tbcs_to_uscs.hpp>
 
 namespace nil {

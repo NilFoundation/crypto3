@@ -106,32 +106,32 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
 
      include/nil/crypto3/zk/snark/reductions/uscs_to_ssp.hpp
 
-     include/nil/crypto3/zk/snark/relations/arithmetic_programs/qap.hpp
+     include/nil/crypto3/zk/snark/arithmetization/arithmetic_programs/qap.hpp
 
-     include/nil/crypto3/zk/snark/relations/arithmetic_programs/sap.hpp
+     include/nil/crypto3/zk/snark/arithmetization/arithmetic_programs/sap.hpp
 
-     include/nil/crypto3/zk/snark/relations/arithmetic_programs/ssp.hpp
+     include/nil/crypto3/zk/snark/arithmetization/arithmetic_programs/ssp.hpp
 
-     include/nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp
+     include/nil/crypto3/zk/snark/arithmetization/circuit_satisfaction_problems/bacs.hpp
 
-     include/nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp
+     include/nil/crypto3/zk/snark/arithmetization/circuit_satisfaction_problems/tbcs.hpp
 
-     include/nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp
+     include/nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp
 
-     include/nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp
+     include/nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/uscs.hpp
 
-     include/nil/crypto3/zk/snark/relations/ram_computations/memory/delegated_ra_memory.hpp
-     include/nil/crypto3/zk/snark/relations/ram_computations/memory/memory_interface.hpp
-     include/nil/crypto3/zk/snark/relations/ram_computations/memory/memory_store_trace.hpp
-     include/nil/crypto3/zk/snark/relations/ram_computations/memory/ra_memory.hpp
+     include/nil/crypto3/zk/snark/arithmetization/ram_computations/memory/delegated_ra_memory.hpp
+     include/nil/crypto3/zk/snark/arithmetization/ram_computations/memory/memory_interface.hpp
+     include/nil/crypto3/zk/snark/arithmetization/ram_computations/memory/memory_store_trace.hpp
+     include/nil/crypto3/zk/snark/arithmetization/ram_computations/memory/ra_memory.hpp
 
-     include/nil/crypto3/zk/snark/relations/ram_computations/rams/fooram/fooram_aux.hpp
-     include/nil/crypto3/zk/snark/relations/ram_computations/rams/fooram/fooram_params.hpp
+     include/nil/crypto3/zk/snark/arithmetization/ram_computations/rams/fooram/fooram_aux.hpp
+     include/nil/crypto3/zk/snark/arithmetization/ram_computations/rams/fooram/fooram_params.hpp
 
-     include/nil/crypto3/zk/snark/relations/ram_computations/rams/tinyram/tinyram_aux.hpp
-     include/nil/crypto3/zk/snark/relations/ram_computations/rams/tinyram/tinyram_params.hpp
-     include/nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp
-     include/nil/crypto3/zk/snark/relations/variable.hpp
+     include/nil/crypto3/zk/snark/arithmetization/ram_computations/rams/tinyram/tinyram_aux.hpp
+     include/nil/crypto3/zk/snark/arithmetization/ram_computations/rams/tinyram/tinyram_params.hpp
+     include/nil/crypto3/zk/snark/arithmetization/ram_computations/rams/ram_params.hpp
+     include/nil/crypto3/zk/snark/arithmetization/variable.hpp
      include/nil/crypto3/zk/snark/routing/as_waksman.hpp
      include/nil/crypto3/zk/snark/routing/benes.hpp
      include/nil/crypto3/zk/snark/constraint_profiling.hpp

@@ -1,7 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
+// Copyright (c) 2022 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2022 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -24,44 +23,31 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_GATE_HPP
-#define CRYPTO3_ZK_PLONK_GATE_HPP
-
-#include <nil/crypto3/zk/snark/relations/plonk/constraint.hpp>
+#ifndef CRYPTO3_ZK_PLONK_ARITHMETIZATION_PARAMS_HPP
+#define CRYPTO3_ZK_PLONK_ARITHMETIZATION_PARAMS_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType>
-                struct plonk_gate {
-                    typedef FieldType field_type;
-
-                    std::size_t selector_index;
-                    std::vector<plonk_constraint<FieldType>> constraints;
-
-                    plonk_gate(std::size_t selector_index, const snark::plonk_constraint<FieldType> &constraint) :
-                        constraints(std::vector<plonk_constraint<FieldType>>({constraint})),
-                        selector_index(selector_index) {
-                    }
-
-                    plonk_gate(std::size_t selector_index,
-                               const std::initializer_list<snark::plonk_constraint<FieldType>> &&constraints) :
-                        constraints(constraints),
-                        selector_index(selector_index) {
-                    }
-
-                    plonk_gate(std::size_t selector_index,
-                                  const std::vector<plonk_constraint<FieldType>> &constraints): 
-                        constraints(constraints),
-                        selector_index(selector_index){
-                    }
+                template<std::size_t _WitnessColumns, std::size_t _PublicInputColumns,
+                    std::size_t _ConstantColumns, std::size_t _SelectorColumns>
+                struct plonk_arithmetization_params {
+                    constexpr static const std::size_t WitnessColumns = _WitnessColumns;
+                    constexpr static const std::size_t PublicInputColumns = _PublicInputColumns;
+                    constexpr static const std::size_t ConstantColumns = _ConstantColumns;
+                    constexpr static const std::size_t SelectorColumns = _SelectorColumns;
                 };
 
+#ifdef ZK_RUNTIME_CIRCUIT_DEFINITION
+
+                struct plonk_arithmetization_params {
+                };
+#endif
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_GATE_HPP
+#endif    // CRYPTO3_ZK_PLONK_ARITHMETIZATION_PARAMS_HPP

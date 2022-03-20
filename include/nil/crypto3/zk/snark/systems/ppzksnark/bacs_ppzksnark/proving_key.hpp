@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_BACS_PPZKSNARK_PROVING_KEY_HPP
 #define CRYPTO3_ZK_BACS_PPZKSNARK_PROVING_KEY_HPP
 
-#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/circuit_satisfaction_problems/bacs.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_ppzksnark.hpp>
 
 namespace nil {

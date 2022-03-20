@@ -29,7 +29,7 @@
 #ifndef CRYPTO3_ZK_RAM_EXAMPLES_HPP
 #define CRYPTO3_ZK_RAM_EXAMPLES_HPP
 
-#include <nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/ram_computations/rams/ram_params.hpp>
 
 namespace nil {
     namespace crypto3 {

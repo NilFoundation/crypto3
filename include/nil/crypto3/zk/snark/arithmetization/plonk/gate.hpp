@@ -24,10 +24,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_COPY_CONSTRAINT_HPP
-#define CRYPTO3_ZK_PLONK_COPY_CONSTRAINT_HPP
+#ifndef CRYPTO3_ZK_PLONK_GATE_HPP
+#define CRYPTO3_ZK_PLONK_GATE_HPP
 
-#include <nil/crypto3/zk/snark/relations/plonk/variable.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -35,11 +35,34 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                using plonk_copy_constraint = std::pair<plonk_variable<FieldType>, plonk_variable<FieldType>>;
+                struct plonk_gate {
+                    typedef FieldType field_type;
+                    typedef plonk_constraint<FieldType> constraint_type;
+
+                    std::size_t selector_index;
+                    std::vector<constraint_type> constraints;
+
+                    plonk_gate(std::size_t selector_index, const constraint_type &constraint) :
+                        constraints(std::vector<constraint_type>({constraint})),
+                        selector_index(selector_index) {
+                    }
+
+                    plonk_gate(std::size_t selector_index,
+                               const std::initializer_list<constraint_type> &&constraints) :
+                        constraints(constraints),
+                        selector_index(selector_index) {
+                    }
+
+                    plonk_gate(std::size_t selector_index,
+                                  const std::vector<constraint_type> &constraints):
+                        constraints(constraints),
+                        selector_index(selector_index){
+                    }
+                };
 
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_COPY_CONSTRAINT_HPP
+#endif    // CRYPTO3_ZK_PLONK_GATE_HPP

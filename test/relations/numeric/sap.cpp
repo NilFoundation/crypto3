@@ -34,7 +34,7 @@
 #include <vector>
 
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_sap.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>

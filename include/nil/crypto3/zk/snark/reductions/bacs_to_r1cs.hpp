@@ -34,8 +34,8 @@
 #ifndef CRYPTO3_ZK_BACS_TO_R1CS_BASIC_POLICY_HPP
 #define CRYPTO3_ZK_BACS_TO_R1CS_BASIC_POLICY_HPP
 
-#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/circuit_satisfaction_problems/bacs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 
 namespace nil {
     namespace crypto3 {

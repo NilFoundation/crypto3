@@ -61,6 +61,7 @@ namespace nil {
                 class plonk_variable {
 
                 public:
+                    using field_type = FieldType;
                     using assignment_type = typename FieldType::value_type;
 
                     /**

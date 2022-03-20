@@ -36,7 +36,7 @@
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
-#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/proof.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
@@ -54,18 +54,20 @@ namespace nil {
                         constexpr static const std::size_t constant_columns = RedshiftParams::constant_columns;
                         constexpr static const std::size_t selector_columns = RedshiftParams::selector_columns;                       
 
+                        using arithmetization_params = typename RedshiftParams::arithmetization_params;
                         /******************************** Params ********************************/
 
                         /**
                          * Below are various template aliases (used for convenience).
                          */
 
-                        typedef plonk_constraint_system<FieldType> constraint_system_type;
+                        typedef plonk_constraint_system<FieldType, arithmetization_params>
+                            constraint_system_type;
 
                         typedef RedshiftParams redshift_params_type;
 
-                        typedef plonk_assignment_table<FieldType, witness_columns,
-                            public_input_columns, constant_columns, selector_columns> variable_assignment_type;
+                        typedef plonk_assignment_table<FieldType, arithmetization_params>
+                            variable_assignment_type;
 
                         typedef detail::plonk_evaluation_map<plonk_variable<FieldType>> evaluation_map;
 
@@ -117,8 +119,7 @@ namespace nil {
                                 public_commitments commitments;
                             };
 
-                            plonk_public_polynomial_table<FieldType, public_input_columns, 
-                                constant_columns, selector_columns> public_polynomial_table;
+                            plonk_public_polynomial_table<FieldType, arithmetization_params> public_polynomial_table;
 
                             // S_sigma
                             std::vector<math::polynomial<typename FieldType::value_type>> permutation_polynomials;
@@ -137,7 +138,7 @@ namespace nil {
 
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
-                            plonk_private_polynomial_table<FieldType, RedshiftParams::witness_columns> private_polynomial_table;
+                            plonk_private_polynomial_table<FieldType, arithmetization_params> private_polynomial_table;
                         };
                     };
                 }    // namespace detail
