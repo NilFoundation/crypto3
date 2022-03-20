@@ -68,7 +68,7 @@ namespace nil {
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
                         // Construct the input lookup compression and table compression values
-                        for (std::size_t i = 0; i < lookup_gates.size(); i++) {
+                        /*for (std::size_t i = 0; i < lookup_gates.size(); i++) {
                             std::vector<typename FieldType::value_type> lookup_input_gate_result = {0};
                             std::vector<typename FieldType::value_type> lookup_value_gate_result = {0};
 
@@ -79,7 +79,7 @@ namespace nil {
                             }
                             F_compr_value = F_compr_value + lookup_value_gate_result * column_polynomials.selector(lookup_gates[i].selector_index);
                             F_compr_input = F_compr_input + lookup_input_gate_result * column_polynomials.selector(lookup_gates[i].selector_index);
-                        }
+                        }*/
                         
                         //Produce the permutation polynomials $S_{\texttt{perm}}(X)$ and $A_{\texttt{perm}}(X)$
 

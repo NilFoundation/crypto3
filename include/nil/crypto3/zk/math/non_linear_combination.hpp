@@ -54,9 +54,10 @@ namespace nil {
 
             template<typename VariableType>
             class non_linear_term {
+            public:
+                typedef VariableType variable_type;
                 typedef typename VariableType::assignment_type assignment_type;
 
-            public:
                 std::vector<VariableType> vars;
                 assignment_type coeff;
 

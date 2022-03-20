@@ -52,9 +52,9 @@ namespace nil {
                 struct plonk_constraint_system {
 
                 protected:
-                    std::vector<plonk_gate<FieldType, plonk_constraint>> _gates;
+                    std::vector<plonk_gate<FieldType>> _gates;
                     std::vector<plonk_copy_constraint<FieldType>> _copy_constraints;
-                    std::vector<lookup_plonk_gate<FieldType, plonk_lookup_constraint>> _lookup_gates;
+                    //std::vector<lookup_plonk_gate<FieldType>> _lookup_gates;
                     std::size_t _rows_amount;
                     std::size_t _usable_rows_amount;
 
@@ -95,7 +95,7 @@ namespace nil {
                     //     return true;
                     // }
 
-                    std::vector<plonk_gate<FieldType, plonk_constraint>> gates() const {
+                    std::vector<plonk_gate<FieldType>> gates() const {
                         return _gates;
                     }
 
@@ -103,9 +103,9 @@ namespace nil {
                         return _copy_constraints;
                     }
 
-                    std::vector<plonk_gate<FieldType, plonk_lookup_constraint>> lookup_gates() const {
+                    /*std::vector<plonk_gate<FieldType>> lookup_gates() const {
                         return _lookup_gates;
-                    }
+                    }*/
                 };
             }    // namespace snark
         }        // namespace zk

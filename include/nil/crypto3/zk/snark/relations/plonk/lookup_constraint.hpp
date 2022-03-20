@@ -34,20 +34,20 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, typename VariableType = plonk_variable<FieldType>, std::size_t k>
+                template<typename FieldType, typename VariableType = plonk_variable<FieldType>, std::size_t k = 1>
                 class plonk_lookup_constraint {
                 public:
                     std::array<VariableType, k> lookup_input;
                     std::array<VariableType, k> lookup_value;
 
-                    template<std::size_t WitnessColumns, std::size_t SelectorColumns, 
+ /*                   template<std::size_t WitnessColumns, std::size_t SelectorColumns, 
                         std::size_t PublicInputColumns, std::size_t ConstantColumns>
                     std::array<math::polynomial<typename VariableType::assignment_type>, k>
                     evaluate_lookup_input(const plonk_polynomial_table<FieldType, WitnessColumns,
                                 SelectorColumns, PublicInputColumns, ConstantColumns> &assignments) const {
                         std::array<math::polynomial<typename VariableType::assignment_type>, k> acc;
-                        for (std::size_t i = 0; i < k, i++) {
-                            typename VariableType::assignment_type assignment;
+                        for (std::size_t i = 0; i < k; i++) {
+                            typename math::polynomial<typename VariableType::assignment_type> assignment;
                                 switch (lookup_input[i].type) {
                                     case VariableType::column_type::witness:
                                         assignment = math::polynomial_shift<FieldType>(assignments.witness(lookup_input[i].index), domain->get_domain_element(lookup_input[i].rotation));
@@ -73,7 +73,7 @@ namespace nil {
                     evaluate_lookup_value(const plonk_polynomial_table<FieldType, WitnessColumns,
                                 SelectorColumns, PublicInputColumns, ConstantColumns> &assignments) const {
                         std::array<math::polynomial<typename VariableType::assignment_type>, k> acc;
-                        for (std::size_t i = 0; i < k, i++) {
+                        for (std::size_t i = 0; i < k; i++) {
                             typename VariableType::assignment_type assignment;
                                 switch (lookup_value[i].type) {
                                     case VariableType::column_type::witness:
@@ -148,8 +148,8 @@ namespace nil {
                             acc[i] = assignment;
                         }
                         return acc;
-                    }
-                }
+                    }*/
+                };
 
             }    // namespace snark
         }        // namespace zk

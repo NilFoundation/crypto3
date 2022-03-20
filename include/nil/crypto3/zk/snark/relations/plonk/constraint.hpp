@@ -52,6 +52,7 @@ namespace nil {
                 public:
                     typedef FieldType field_type;
                     typedef VariableType variable_type;
+                    typedef math::non_linear_combination<VariableType> base_type;
 
                     plonk_constraint() : math::non_linear_combination<VariableType>() {};
 
