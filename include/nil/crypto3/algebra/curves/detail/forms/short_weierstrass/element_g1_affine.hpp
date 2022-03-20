@@ -223,7 +223,7 @@ namespace nil {
                             field_value_type X2mX1squared = X2mX1.squared();
 
                             field_value_type X3 = Y2mY1squared * X2mX1squared.inversed() - this->X - other.X;
-                            field_value_type Y3 = ((this - X).doubled() + other.X) * Y2mY1 * X2mX1.inversed() -
+                            field_value_type Y3 = ((this -> X).doubled() + other.X) * Y2mY1 * X2mX1.inversed() -
                                                   Y2mY1 * Y2mY1squared * (X2mX1 * X2mX1squared).inversed() - this->Y;
 
                             return curve_element(X3, Y3);
