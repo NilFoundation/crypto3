@@ -34,6 +34,8 @@
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/pallas.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
@@ -53,7 +55,7 @@ BOOST_AUTO_TEST_SUITE(fri_test_suite)
 BOOST_AUTO_TEST_CASE(fri_basic_test) {
 
     // setup
-    using curve_type = algebra::curves::mnt4<298>;
+    using curve_type = algebra::curves::pallas;
     using FieldType = typename curve_type::base_field_type;
 
     typedef hashes::sha2<256> merkle_hash_type;

@@ -34,6 +34,8 @@
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
+#include <nil/crypto3/algebra/curves/pallas.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
@@ -78,8 +80,9 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log) {
 
 BOOST_AUTO_TEST_SUITE(redshift_prover_test_suite)
 
-using curve_type = algebra::curves::bls12<381>;
-using FieldType = typename curve_type::scalar_field_type;
+//using curve_type = algebra::curves::bls12<381>;
+using curve_type = algebra::curves::pallas;
+using FieldType = typename curve_type::base_field_type;
 
 // lpc params
 constexpr static const std::size_t m = 2;
