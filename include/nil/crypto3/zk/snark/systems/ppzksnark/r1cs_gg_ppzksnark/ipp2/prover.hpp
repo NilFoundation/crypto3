@@ -193,10 +193,10 @@ namespace nil {
                     math::polynomial<typename GroupType::curve_type::scalar_field_type::value_type>
                         quotient_polynomial =
                             f_vX_sub_f_vZ /
-                            math::polynomial<typename GroupType::curve_type::scalar_field_type::value_type>({{
+                            math::polynomial<typename GroupType::curve_type::scalar_field_type::value_type>({
                                 neg_kzg_challenge,
                                 GroupType::curve_type::scalar_field_type::value_type::one(),
-                            }});
+                            });
 
                     if (quotient_polynomial.size() < poly.size()) {
                         quotient_polynomial.resize(poly.size(),
