@@ -28,6 +28,8 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_UNIFIED_ADDITION_COMPONENT_15_WIRES_HPP
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_UNIFIED_ADDITION_COMPONENT_15_WIRES_HPP
 
+#include <cmath>
+
 #include <nil/marshalling/algorithms/pack.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>

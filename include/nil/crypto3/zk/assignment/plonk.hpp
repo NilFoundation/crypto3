@@ -77,8 +77,28 @@ namespace nil {
                 }
 
                 snark::plonk_table_description<BlueprintFieldType,
-                        ArithmetizationParams> table_description(){
+                        ArithmetizationParams> table_description() const {
                     return _table_description;
+                }
+
+                std::size_t padding(){
+
+                    if (_table_description.usable_rows_amount == 0) {
+                        _table_description.usable_rows_amount =
+                            _table_description.rows_amount;
+                        _table_description.rows_amount = std::pow(2,
+                            std::ceil(std::log2(_table_description.rows_amount)));
+
+                        _table_description.rows_amount = 4;
+
+                        for (std::size_t w_index = 0; w_index <
+                            ArithmetizationParams::WitnessColumns; w_index++){
+
+                            this->witness_columns[w_index].resize(_table_description.rows_amount);
+                        }
+                    }
+
+                    return _table_description.rows_amount;
                 }
             };
 
@@ -180,8 +200,42 @@ namespace nil {
                 }
 
                 snark::plonk_table_description<BlueprintFieldType,
-                        ArithmetizationParams> table_description(){
+                        ArithmetizationParams> table_description() const {
                     return _table_description;
+                }
+
+                std::size_t padding(){
+                    if (_table_description.usable_rows_amount == 0) {
+
+                        _table_description.usable_rows_amount =
+                            _table_description.rows_amount;
+
+                        _table_description.rows_amount = std::pow(2,
+                            std::ceil(std::log2(_table_description.rows_amount)));
+
+                        _table_description.rows_amount = 4;
+
+                        for (std::size_t pi_index = 0; pi_index <
+                            this->public_input_columns.size(); pi_index++) {
+
+                            this->public_input_columns[pi_index].resize(_table_description.rows_amount);
+                        }
+
+                        for (std::size_t c_index = 0; c_index <
+                            this->constant_columns.size(); c_index++) {
+
+                            this->constant_columns[c_index].resize(_table_description.rows_amount);
+                        }
+
+                        for (std::size_t s_index = 0; s_index <
+                            this->selector_columns.size(); s_index++) {
+
+                            this->selector_columns[s_index].resize(_table_description.rows_amount);
+                        }
+
+                    }
+
+                    return _table_description.rows_amount;
                 }
             };
 

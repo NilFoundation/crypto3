@@ -70,10 +70,6 @@ namespace nil {
                     return allocate_rows(1);
                 }
 
-                void fix_usable_rows() {
-                    this->_usable_rows_amount = _table_description.rows_amount;
-                }
-
                 // TODO: should put constraint in some storage and return its index
                 snark::plonk_constraint<BlueprintFieldType>
                     add_constraint(const snark::plonk_constraint<BlueprintFieldType> &constraint) {
