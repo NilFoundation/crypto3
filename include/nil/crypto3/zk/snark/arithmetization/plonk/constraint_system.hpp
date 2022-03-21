@@ -64,8 +64,7 @@ namespace nil {
 
                     plonk_constraint_system(
                         std::vector<plonk_gate<FieldType>> &gates,
-                        std::vector<plonk_copy_constraint<FieldType>> &copy_constraints,
-                        size_t usable_rows_amount):
+                        std::vector<plonk_copy_constraint<FieldType>> &copy_constraints):
                         _gates(gates), _copy_constraints(copy_constraints){
                     }
 
