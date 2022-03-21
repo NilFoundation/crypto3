@@ -56,10 +56,6 @@ namespace nil {
                     std::vector<plonk_copy_constraint<FieldType>> _copy_constraints;
                     std::vector<plonk_lookup_constraint<FieldType>> _lookup_constraints;
 
-                    // plonk_table_description<FieldType, ArithmetizationParams> &table_description;
-
-                    std::size_t _usable_rows_amount;
-
                 public:
 
                     typedef FieldType field_type;
@@ -70,20 +66,11 @@ namespace nil {
                         std::vector<plonk_gate<FieldType>> &gates,
                         std::vector<plonk_copy_constraint<FieldType>> &copy_constraints,
                         size_t usable_rows_amount):
-                        _gates(gates), _copy_constraints(copy_constraints),
-                        _usable_rows_amount(usable_rows_amount) {
+                        _gates(gates), _copy_constraints(copy_constraints){
                     }
 
                     std::size_t num_gates() const {
                         return _gates.size();
-                    }
-
-                    // std::size_t rows_amount() const {
-                    //     return table_description.rows_amount;
-                    // }
-
-                    std::size_t usable_rows_amount() const {
-                        return _usable_rows_amount;
                     }
 
                     // bool
