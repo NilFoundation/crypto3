@@ -27,7 +27,7 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_PROOF_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_PROOF_HPP
 
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>

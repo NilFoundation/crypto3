@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_PROVING_KEY_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_PROVING_KEY_HPP
 
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>
 
@@ -85,7 +85,7 @@ namespace nil {
                         typename CurveType::template g2_type<>::value_type &&delta_g2,
                         std::vector<typename CurveType::template g1_type<>::value_type> &&A_query,
                         commitments::knowledge_commitment_vector<typename CurveType::template g2_type<>,
-                                                    typename CurveType::template g1_type<>> &&B_query,
+                                                                 typename CurveType::template g1_type<>> &&B_query,
                         std::vector<typename CurveType::template g1_type<>::value_type> &&H_query,
                         std::vector<typename CurveType::template g1_type<>::value_type> &&L_query,
                         constraint_system_type &&constraint_system) :

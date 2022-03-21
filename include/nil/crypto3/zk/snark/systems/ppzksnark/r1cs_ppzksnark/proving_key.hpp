@@ -34,7 +34,7 @@
 #include <nil/crypto3/algebra/multiexp/policies.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
 
 namespace nil {
     namespace crypto3 {

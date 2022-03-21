@@ -52,8 +52,8 @@
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
+#include <nil/crypto3/container/accumulation_vector.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>

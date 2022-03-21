@@ -39,7 +39,7 @@
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 
-#include <nil/crypto3/math/polynomial/polynom.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/basic_operations.hpp>
 
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
@@ -177,8 +177,7 @@ namespace nil {
                         const typename GroupType::curve_type::scalar_field_type::value_type &eval_poly,
                         const typename GroupType::curve_type::scalar_field_type::value_type &kzg_challenge) {
                     // TODO: check correctness after updating math module
-                    typedef math::polynomial::polynom<typename GroupType::curve_type::scalar_field_type::value_type>
-                        poly_type;
+                    typedef math::polynomial<typename GroupType::curve_type::scalar_field_type::value_type> poly_type;
                     typename GroupType::curve_type::scalar_field_type::value_type neg_kzg_challenge = -kzg_challenge;
 
                     BOOST_ASSERT(poly.size() == std::distance(srs_powers_alpha_first, srs_powers_alpha_last));
@@ -186,17 +185,15 @@ namespace nil {
 
                     // f_v(X) - f_v(z) / (X - z)
                     // TODO: check correctness after updating math module
-                    math::polynomial::polynom<typename GroupType::curve_type::scalar_field_type::value_type>
-                        f_vX_sub_f_vZ =
-                            poly -
-                            math::polynomial::polynom<typename GroupType::curve_type::scalar_field_type::value_type>({{
-                                eval_poly,
-                            }});
+                    math::polynomial<typename GroupType::curve_type::scalar_field_type::value_type> f_vX_sub_f_vZ =
+                        poly - math::polynomial<typename GroupType::curve_type::scalar_field_type::value_type>({{
+                                   eval_poly,
+                               }});
                     // TODO: check correctness after updating math module
-                    math::polynomial::polynom<typename GroupType::curve_type::scalar_field_type::value_type>
+                    math::polynomial<typename GroupType::curve_type::scalar_field_type::value_type>
                         quotient_polynomial =
                             f_vX_sub_f_vZ /
-                            math::polynomial::polynom<typename GroupType::curve_type::scalar_field_type::value_type>({{
+                            math::polynomial<typename GroupType::curve_type::scalar_field_type::value_type>({{
                                 neg_kzg_challenge,
                                 GroupType::curve_type::scalar_field_type::value_type::one(),
                             }});
@@ -233,7 +230,7 @@ namespace nil {
                                        InputScalarIterator transcript_first, InputScalarIterator transcript_last,
                                        const typename CurveType::scalar_field_type::value_type &kzg_challenge) {
                     // TODO: check correctness after updating math module
-                    math::polynomial::polynom<typename CurveType::scalar_field_type::value_type> vkey_poly(
+                    math::polynomial<typename CurveType::scalar_field_type::value_type> vkey_poly(
                         polynomial_coefficients_from_transcript<typename CurveType::scalar_field_type>(
                             transcript_first, transcript_last, CurveType::scalar_field_type::value_type::one()));
                     // TODO: check correctness after updating math module
@@ -268,7 +265,7 @@ namespace nil {
 
                     // this computes f(X) = \prod (1 + x (rX)^{2^j})
                     // TODO: check correctness after updating math module
-                    math::polynomial::polynom<typename CurveType::scalar_field_type::value_type> fcoeffs(
+                    math::polynomial<typename CurveType::scalar_field_type::value_type> fcoeffs(
                         polynomial_coefficients_from_transcript<typename CurveType::scalar_field_type>(
                             transcript_first, transcript_last, r_shift));
                     // this computes f_w(X) = X^n * f(X) - it simply shifts all coefficients to by n
