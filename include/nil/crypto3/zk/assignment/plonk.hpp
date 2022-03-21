@@ -89,7 +89,8 @@ namespace nil {
                         _table_description.rows_amount = std::pow(2,
                             std::ceil(std::log2(_table_description.rows_amount)));
 
-                        _table_description.rows_amount = 4;
+                        if (_table_description.rows_amount == 1)
+                            _table_description.rows_amount = 2;
 
                         for (std::size_t w_index = 0; w_index <
                             ArithmetizationParams::WitnessColumns; w_index++){
@@ -213,7 +214,8 @@ namespace nil {
                         _table_description.rows_amount = std::pow(2,
                             std::ceil(std::log2(_table_description.rows_amount)));
 
-                        _table_description.rows_amount = 4;
+                        if (_table_description.rows_amount == 1)
+                            _table_description.rows_amount = 2;
 
                         for (std::size_t pi_index = 0; pi_index <
                             this->public_input_columns.size(); pi_index++) {
