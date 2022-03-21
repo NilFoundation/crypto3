@@ -49,8 +49,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename FieldType, typename ParamsType, std::size_t rows_log, std::size_t permutation_size,
-                         std::size_t usable_rows>
+                template<typename FieldType, typename ParamsType, std::size_t rows_log, std::size_t permutation_size>
                 class circuit_description {
                     typedef zk::snark::detail::redshift_policy<FieldType, ParamsType> policy_type;
 
@@ -104,10 +103,9 @@ namespace nil {
                     public_columns_1, constant_columns_1, selector_columns_1>;
 
                 template<typename FieldType>
-                circuit_description<FieldType, redshift_params<FieldType, arithmetization_params_1>, 4, 3, 16> circuit_test_1() {
+                circuit_description<FieldType, redshift_params<FieldType, arithmetization_params_1>, 4, 3> circuit_test_1() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t permutation = 3;
-                    constexpr static const std::size_t usable = 1 << rows_log;
 
                     constexpr static const std::size_t witness_columns = witness_columns_1;
                     constexpr static const std::size_t public_columns = public_columns_1;
@@ -118,7 +116,7 @@ namespace nil {
 
                     typedef redshift_params<FieldType, arithmetization_params_1> circuit_params;
 
-                    circuit_description<FieldType, circuit_params, rows_log, permutation, usable> test_circuit;
+                    circuit_description<FieldType, circuit_params, rows_log, permutation> test_circuit;
 
                     std::array<std::vector<typename FieldType::value_type>, table_columns> table;
 
@@ -230,10 +228,9 @@ namespace nil {
 
                 template<typename FieldType>
                 circuit_description<FieldType, redshift_params<FieldType,
-                    arithmetization_params_2>, 4, 4, 16> circuit_test_2() {
+                    arithmetization_params_2>, 4, 4> circuit_test_2() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t permutation = 4;
-                    constexpr static const std::size_t usable = 1 << rows_log;
 
                     constexpr static const std::size_t witness_columns = witness_columns_2;
                     constexpr static const std::size_t public_columns = public_columns_2;
@@ -244,7 +241,7 @@ namespace nil {
 
                     typedef redshift_params<FieldType, arithmetization_params_2> circuit_params;
 
-                    circuit_description<FieldType, circuit_params, rows_log, permutation, usable> test_circuit;
+                    circuit_description<FieldType, circuit_params, rows_log, permutation> test_circuit;
 
                     std::array<std::vector<typename FieldType::value_type>, table_columns> table;
 
