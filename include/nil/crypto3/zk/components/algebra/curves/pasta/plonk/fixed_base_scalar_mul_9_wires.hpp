@@ -65,7 +65,8 @@ namespace nil {
                     W0, W1, W2, W3, W4,
                     W5, W6, W7, W8>{
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams> ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
