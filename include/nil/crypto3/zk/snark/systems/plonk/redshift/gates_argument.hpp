@@ -63,7 +63,8 @@ namespace nil {
                         prove_eval(typename policy_type::constraint_system_type &constraint_system,
                                    const plonk_polynomial_table<FieldType,
                                         typename ParamsType::arithmetization_params> &column_polynomials,
-                                   transcript_type &transcript = transcript_type()) { //TODO: remove fri_params 
+                                        std::shared_ptr<math::evaluation_domain<FieldType>> domain,
+                                   transcript_type &transcript = transcript_type()) { //TODO: remove domain 
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
@@ -78,7 +79,7 @@ namespace nil {
 
                             for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
                                 gate_result =
-                                    gate_result + gates[i].constraints[j].evaluate(column_polynomials) * theta_acc;
+                                    gate_result + gates[i].constraints[j].evaluate(column_polynomials, domain) * theta_acc;
                                 theta_acc *= theta;
                             }
 

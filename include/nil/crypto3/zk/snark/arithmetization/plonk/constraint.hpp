@@ -28,6 +28,7 @@
 #define CRYPTO3_ZK_PLONK_CONSTRAINT_HPP
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
+#include <nil/crypto3/math/polynomial/shift.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/assignment.hpp>
@@ -106,7 +107,8 @@ namespace nil {
 
                     template<typename ArithmetizationParams>
                     math::polynomial<typename VariableType::assignment_type>
-                        evaluate(const plonk_polynomial_table<FieldType, ArithmetizationParams> &assignments) const {
+                        evaluate(const plonk_polynomial_table<FieldType, ArithmetizationParams> &assignments,
+                            std::shared_ptr<math::evaluation_domain<FieldType>> domain) const {
                         math::polynomial<typename VariableType::assignment_type> acc = {0};
                         for (const math::non_linear_term<VariableType> &nlt : this->terms) {
                             math::polynomial<typename VariableType::assignment_type> term_value = {nlt.coeff};
@@ -127,6 +129,10 @@ namespace nil {
                                     case VariableType::column_type::selector:
                                         assignment = assignments.selector(var.index);
                                         break;
+                                }
+
+                                if (var.rotation != 0) {
+                                    assignment = math::polynomial_shift<FieldType>(assignment, domain->get_domain_element(var.rotation));
                                 }
 
                                 term_value = term_value * assignment;

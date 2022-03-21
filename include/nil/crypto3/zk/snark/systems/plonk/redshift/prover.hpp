@@ -196,7 +196,7 @@ namespace nil {
                         // 6. circuit-satisfability
                         std::array<math::polynomial<typename FieldType::value_type>, gate_parts> prover_res =
                             redshift_gates_argument<FieldType, ParamsType>::prove_eval(
-                                constraint_system, polynomial_table, transcript);
+                                constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain, transcript);
 
                         F[3] = prover_res[0];
 
@@ -214,7 +214,7 @@ namespace nil {
                         for (std::size_t i = 0; i < gates.size(); i++) {
                             for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
                                 math::polynomial<typename FieldType::value_type> constraint_result =
-                                    gates[i].constraints[j].evaluate(polynomial_table);
+                                    gates[i].constraints[j].evaluate(polynomial_table, preprocessed_public_data.common_data.basic_domain);
                                 if (constraint_result.evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(0)) != FieldType::value_type::zero()) {
                                     std::cout<<"constraint "<<j<<" from gate "<<i<<std::endl;
                                 }

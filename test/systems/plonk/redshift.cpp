@@ -342,7 +342,7 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     transcript::fiat_shamir_heuristic_sequential<redshift_test_params::transcript_hash_type> verifier_transcript(init_blob);
 
     std::array<math::polynomial<typename FieldType::value_type>, 1> prover_res =
-        redshift_gates_argument<FieldType, circuit_2_params>::prove_eval(constraint_system, polynomial_table,
+        redshift_gates_argument<FieldType, circuit_2_params>::prove_eval(constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain,
                                                                          prover_transcript);
 
     // Challenge phase
