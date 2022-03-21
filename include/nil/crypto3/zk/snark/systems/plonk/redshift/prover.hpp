@@ -200,7 +200,7 @@ namespace nil {
 
                         F[3] = prover_res[0];
 
-                        
+                        /////TEST
                         for (std::size_t i = 0; i < f_parts; i++) {
                             for (std::size_t j = 0; j < table_description.rows_amount; j++) {
                                 if (F[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) != FieldType::value_type::zero()) {
@@ -208,6 +208,19 @@ namespace nil {
                                 }
                             }
                         }
+
+                        const std::vector<plonk_gate<FieldType>> gates = constraint_system.gates();
+
+                        for (std::size_t i = 0; i < gates.size(); i++) {
+                            for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
+                                math::polynomial<typename FieldType::value_type> constraint_result =
+                                    gates[i].constraints[j].evaluate(polynomial_table);
+                                if (constraint_result.evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(0)) != FieldType::value_type::zero()) {
+                                    std::cout<<"constraint "<<j<<" from gate "<<i<<std::endl;
+                                }
+                            }
+                        }
+                        /////
 
                         // 7. Aggregate quotient polynomial
                         math::polynomial<typename FieldType::value_type> T =
