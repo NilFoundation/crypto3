@@ -36,15 +36,15 @@
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 // #include <nil/crypto3/zk/snark/relations/non_linear_combination.hpp>
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/plonk/fixed_base_scalar_mul_5_wires.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/plonk/fixed_base_scalar_mul_9_wires.hpp>
+#include <nil/crypto3/zk/blueprint/plonk.hpp>
+//#include <nil/crypto3/zk/components/algebra/curves/plonk/fixed_base_scalar_mul_5_wires.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/edwards/plonk/fixed_base_scalar_mul_9_wires.hpp>
 
 using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(fixed_base_scalar_mul_5_wires_test_suite)
 
-BOOST_AUTO_TEST_CASE(fixed_base_scalar_mul_5_wires_test_case) {
+/*BOOST_AUTO_TEST_CASE(fixed_base_scalar_mul_5_wires_test_case) {
 
 	using curve_type = algebra::curves::bls12<381>;
 	using BlueprintFieldType = typename curve_type::base_field_type;
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(fixed_base_scalar_mul_5_wires_test_case) {
     auto preprocessed_data = preprocess_type::process(cs, assignments);
 	typedef zk::snark::redshift_prover <typename curve_type::base_field_type, 5, 5, 1, 5> prove_type;
 	auto proof = prove_type::process(preprocessed_data, cs, assignments);
-}
+}*/
 
 BOOST_AUTO_TEST_CASE(fixed_base_scalar_mul_9_wires_test_case) {
 
