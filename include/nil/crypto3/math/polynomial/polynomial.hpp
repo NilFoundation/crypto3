@@ -87,7 +87,8 @@ namespace nil {
                 polynomial(std::initializer_list<value_type> il, const allocator_type& a) : val(il, a) {
                 }
 
-                polynomial(polynomial&& x) BOOST_NOEXCEPT(std::is_nothrow_move_constructible<allocator_type>::value) :
+                polynomial(polynomial&& x) BOOST_NOEXCEPT
+                    (std::is_nothrow_move_constructible<allocator_type>::value) :
                     val(x.val) {
                 }
 
@@ -98,11 +99,11 @@ namespace nil {
                     this->operator[](power) = value;
                 }
 
-                polynomial(const container_type &c) : val(c) {
+                explicit polynomial(const container_type &c) : val(c) {
 
                 }
 
-                polynomial(container_type &&c) : val(c) {
+                explicit polynomial(container_type &&c) : val(c) {
 
                 }
 
