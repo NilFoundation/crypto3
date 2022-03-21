@@ -159,8 +159,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     component_type::generate_copy_constraints(bp, public_assignment, {}, start_row);
     component_type::generate_assignments(private_assignment, public_assignment, {}, a_params, start_row);
 
-    bp.fix_usable_rows();
-    bp.allocate_rows(3);
+    // bp.fix_usable_rows();
+    private_assignment.padding();
+    public_assignment.padding();
+    std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
+    std::cout << "Padded rows: " << desc.rows_amount << std::endl;
 
     zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(
     	private_assignment, public_assignment);
