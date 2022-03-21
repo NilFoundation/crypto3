@@ -71,6 +71,7 @@ set(PLONK_TESTS_FILES
     "algebra/plonk/fixed_base_scalar_mul"
     "algebra/plonk/variable_base_scalar_mul"
     "algebra/plonk/unified_addition"
+    "algebra/plonk/variable_base_endo_scalar_mul"
     )
 
 set(FIELDS_TESTS_FILES
