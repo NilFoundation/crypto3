@@ -146,6 +146,18 @@ namespace nil {
                 return non_linear_combination<VariableType>(A) - non_linear_combination<VariableType>(B);
             }
 
+            template<typename VariableType>
+            non_linear_combination<VariableType> operator+(const non_linear_term<VariableType> &A,
+                                                           const VariableType &B) {
+                return non_linear_combination<VariableType>(A) + non_linear_combination<VariableType>(B);
+            }
+
+            template<typename VariableType>
+            non_linear_combination<VariableType> operator-(const non_linear_term<VariableType> &A,
+                                                           const VariableType &B) {
+                return non_linear_combination<VariableType>(A) - non_linear_combination<VariableType>(B);
+            }
+
             /***************************** Linear combination ****************************/
 
             /**

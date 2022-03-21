@@ -51,9 +51,9 @@
 
 using namespace nil::crypto3;
 
-BOOST_AUTO_TEST_SUITE(fri_test_suite)
+BOOST_AUTO_TEST_SUITE(plonk_constraint_test_suite)
 
-BOOST_AUTO_TEST_CASE(fri_basic_test) {
+BOOST_AUTO_TEST_CASE(plonk_constraint_basic_test) {
 
     // setup
     using curve_type = algebra::curves::pallas;
@@ -66,12 +66,23 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     using arithmetization_params = zk::snark::plonk_arithmetization_params<5,5,5,5>;
 
     constraint_type constraint = var(0,0) + var(1,0) - var(2,0);
+    constraint_type constraint1 = var(0,0) + var(1,0) - 2;
+    constraint_type constraint2 = 2 - (var(0,0) + var(1,0));
+    constraint_type constraint3 = 2 - var(0,0);
+    constraint_type constraint4 = 2 - var(0,0)*var(0,0);
+    constraint_type constraint5 = var(0,0) - var(0,0)*var(0,0);
+    constraint_type constraint6 = var(0,0)*var(0,0) + var(0,0);
+    constraint_type constraint7 = var(0,0)*var(0,0) - var(0,0);
 
     std::array<zk::snark::plonk_column<FieldType>,
         arithmetization_params::WitnessColumns> witness_columns;
-    witness_columns[0] = {typename FieldType::value_type(1)};
-    witness_columns[1] = {typename FieldType::value_type(2)};
-    witness_columns[2] = {typename FieldType::value_type(3)};
+    witness_columns[0] = {algebra::random_element<FieldType>()};
+    witness_columns[1] = {algebra::random_element<FieldType>()};
+    witness_columns[2] = {algebra::random_element<FieldType>()};
+
+    std::cout << witness_columns[0][0].data << std::endl;
+    std::cout << witness_columns[1][0].data << std::endl;
+    std::cout << witness_columns[2][0].data << std::endl;
 
     zk::snark::plonk_private_assignment_table<FieldType,
         arithmetization_params> private_assignment(witness_columns);
@@ -81,6 +92,28 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
 
     BOOST_CHECK((witness_columns[0][0] + witness_columns[1][0] - witness_columns[2][0]) ==
         constraint.evaluate(0, assignment));
+
+    BOOST_CHECK((witness_columns[0][0] + witness_columns[1][0] - typename FieldType::value_type(2)) ==
+        constraint1.evaluate(0, assignment));
+
+    BOOST_CHECK((typename FieldType::value_type(2) - (witness_columns[0][0] + witness_columns[1][0])) ==
+        constraint2.evaluate(0, assignment));
+
+    BOOST_CHECK((typename FieldType::value_type(2) - witness_columns[0][0]) ==
+        constraint3.evaluate(0, assignment));
+
+    BOOST_CHECK((typename FieldType::value_type(2) - witness_columns[0][0]*witness_columns[0][0]) ==
+        constraint4.evaluate(0, assignment));
+
+    BOOST_CHECK((witness_columns[0][0] - witness_columns[0][0]*witness_columns[0][0]) ==
+        constraint5.evaluate(0, assignment));
+
+    BOOST_CHECK((witness_columns[0][0]*witness_columns[0][0] + witness_columns[0][0]) ==
+        constraint6.evaluate(0, assignment));
+
+    BOOST_CHECK((witness_columns[0][0]*witness_columns[0][0] - witness_columns[0][0]) ==
+        constraint7.evaluate(0, assignment));
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()
