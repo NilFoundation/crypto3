@@ -60,7 +60,7 @@ macro(define_blueprint_test test)
 endmacro()
 
 set(NON_NATIVE_TESTS_FILES
-    "non_native/plonk_field_mul"
+    "non_native/plonk/field_mul"
     )
 
 set(BLUEPRINT_TESTS_FILES
@@ -68,36 +68,37 @@ set(BLUEPRINT_TESTS_FILES
     )
 
 set(PLONK_TESTS_FILES
-    "algebra/plonk/fixed_base_scalar_mul"
-    "algebra/plonk/variable_base_scalar_mul"
-    "algebra/plonk/unified_addition"
-    "algebra/plonk/variable_base_endo_scalar_mul"
+    "algebra/curves/plonk/fixed_base_scalar_mul"
+    "algebra/curves/plonk/variable_base_scalar_mul"
+    "algebra/curves/plonk/unified_addition"
+    "algebra/curves/plonk/variable_base_endo_scalar_mul"
+    "hashes/plonk/poseidon"
     )
 
 set(FIELDS_TESTS_FILES
-    "algebra/fields/fp2"
-    "algebra/fields/fp2_verification"
-    "algebra/fields/fp3"
-    "algebra/fields/fp3_verification"
-    "algebra/fields/fp4"
-    "algebra/fields/fp4_verification"
-    "algebra/fields/fp6_2over3"
-    "algebra/fields/fp6_2over3_verification"
-    #"algebra/fields/exponentiation"
+    "algebra/fields/r1cs/fp2"
+    "algebra/fields/r1cs/fp2_verification"
+    "algebra/fields/r1cs/fp3"
+    "algebra/fields/r1cs/fp3_verification"
+    "algebra/fields/r1cs/fp4"
+    "algebra/fields/r1cs/fp4_verification"
+    "algebra/fields/r1cs/fp6_2over3"
+    "algebra/fields/r1cs/fp6_2over3_verification"
+    #"algebra/fields/r1cs/exponentiation"
     )
 
 set(CURVES_TESTS_FILES
-    "algebra/curves/montgomery"
-    "algebra/curves/twisted_edwards"
-    "algebra/curves/fixed_base_mul_zcash"
+    "algebra/curves/r1cs/montgomery"
+    "algebra/curves/r1cs/twisted_edwards"
+    "algebra/curves/r1cs/fixed_base_mul_zcash"
     )
 
 set(HASHES_TESTS_FILES
-    "hashes/knapsack"
-    "hashes/knapsack_verification"
-    "hashes/sha256"
-    "hashes/sha256_verification"
-    "hashes/pedersen")
+    "hashes/r1cs/knapsack"
+    "hashes/r1cs/knapsack_verification"
+    "hashes/r1cs/sha256"
+    "hashes/r1cs/sha256_verification"
+    "hashes/r1cs/pedersen")
 
 set(PAIRING_TESTS_FILES
     "algebra/pairing/weierstrass/miller_loop"
