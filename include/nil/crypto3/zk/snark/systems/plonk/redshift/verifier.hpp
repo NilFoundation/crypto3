@@ -30,7 +30,7 @@
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>

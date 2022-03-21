@@ -33,7 +33,7 @@
 #ifndef CRYPTO3_ZK_TBCS_HPP
 #define CRYPTO3_ZK_TBCS_HPP
 
-#include <nil/crypto3/zk/snark/relations/variable.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/variable.hpp>
 
 namespace nil {
     namespace crypto3 {

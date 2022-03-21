@@ -37,8 +37,8 @@
 #include <nil/crypto3/container/merkle/tree.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
 
@@ -61,9 +61,8 @@ namespace nil {
 
                     static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
                         prove_eval(typename policy_type::constraint_system_type &constraint_system,
-                                   const plonk_polynomial_table<FieldType, ParamsType::witness_columns,
-                                   ParamsType::public_input_columns, ParamsType::constant_columns,
-                                   ParamsType::selector_columns> &column_polynomials,
+                                   const plonk_polynomial_table<FieldType,
+                                        typename ParamsType::arithmetization_params> &column_polynomials,
                                    transcript_type &transcript = transcript_type()) { //TODO: remove fri_params 
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
@@ -94,8 +93,7 @@ namespace nil {
                     static inline std::array<typename FieldType::value_type, argument_size>
                         verify_eval(const std::vector<plonk_gate<FieldType>> &gates,
                                     const plonk_public_polynomial_table<FieldType,
-                                        ParamsType::public_input_columns, ParamsType::constant_columns,
-                                        ParamsType::selector_columns> public_polynomials,
+                                        typename ParamsType::arithmetization_params> public_polynomials,
                                     typename policy_type::evaluation_map &evaluations,
                                     typename FieldType::value_type challenge,
                                     transcript_type &transcript = transcript_type()) {

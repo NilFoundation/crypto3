@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_BASIC_PROVER_HPP
 #define CRYPTO3_ZK_TBCS_PPZKSNARK_BASIC_PROVER_HPP
 
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/uscs.hpp>
 #include <nil/crypto3/zk/snark/reductions/tbcs_to_uscs.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/uscs_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/tbcs_ppzksnark/detail/basic_policy.hpp>

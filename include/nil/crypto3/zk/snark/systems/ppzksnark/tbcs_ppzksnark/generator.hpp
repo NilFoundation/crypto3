@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_BASIC_GENERATOR_HPP
 #define CRYPTO3_ZK_TBCS_PPZKSNARK_BASIC_GENERATOR_HPP
 
-#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/circuit_satisfaction_problems/tbcs.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/uscs_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/reductions/tbcs_to_uscs.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/tbcs_ppzksnark/detail/basic_policy.hpp>

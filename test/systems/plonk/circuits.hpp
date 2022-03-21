@@ -34,11 +34,12 @@
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/math/permutation.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/copy_constraint.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/variable.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/table.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/assignment.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
@@ -99,9 +100,11 @@ namespace nil {
                 constexpr static const std::size_t constant_columns_1 = 0;
                 constexpr static const std::size_t selector_columns_1 = 2;
 
+                using arithmetization_params_1 = plonk_arithmetization_params<witness_columns_1,
+                    public_columns_1, constant_columns_1, selector_columns_1>;
+
                 template<typename FieldType>
-                circuit_description<FieldType, redshift_params<FieldType, witness_columns_1, 
-                    public_columns_1, constant_columns_1, selector_columns_1>, 4, 3, 16> circuit_test_1() {
+                circuit_description<FieldType, redshift_params<FieldType, arithmetization_params_1>, 4, 3, 16> circuit_test_1() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t permutation = 3;
                     constexpr static const std::size_t usable = 1 << rows_log;
@@ -113,8 +116,7 @@ namespace nil {
                     constexpr static const std::size_t table_columns = 
                         witness_columns + public_columns + constant_columns;
 
-                    typedef redshift_params<FieldType, witness_columns, public_columns, 
-                        constant_columns, selector_columns> circuit_params;
+                    typedef redshift_params<FieldType, arithmetization_params_1> circuit_params;
 
                     circuit_description<FieldType, circuit_params, rows_log, permutation, usable> test_circuit;
 
@@ -172,12 +174,10 @@ namespace nil {
                         }
                     }
 
-                    test_circuit.table = plonk_assignment_table<FieldType, witness_columns, public_columns, 
-                        constant_columns, selector_columns>(
-                        plonk_private_assignment_table<FieldType, witness_columns>(private_assignment),
-                        plonk_public_assignment_table<FieldType, public_columns, 
-                            constant_columns, selector_columns>(public_input_assignment, constant_assignment,
-                                                            selectors_assignment));
+                    test_circuit.table = plonk_assignment_table<FieldType, arithmetization_params_1>(
+                        plonk_private_assignment_table<FieldType, arithmetization_params_1>(private_assignment),
+                        plonk_public_assignment_table<FieldType, arithmetization_params_1>(
+                            public_input_assignment, constant_assignment, selectors_assignment));
 
                     test_circuit.init();
 
@@ -225,9 +225,12 @@ namespace nil {
                 constexpr static const std::size_t constant_columns_2 = 0;
                 constexpr static const std::size_t selector_columns_2 = 2;
 
+                using arithmetization_params_2 = plonk_arithmetization_params<witness_columns_2,
+                    public_columns_2, constant_columns_2, selector_columns_2>;
+
                 template<typename FieldType>
-                circuit_description<FieldType, redshift_params<FieldType, witness_columns_2, public_columns_2, 
-                    constant_columns_2, selector_columns_2>, 4, 4, 16> circuit_test_2() {
+                circuit_description<FieldType, redshift_params<FieldType,
+                    arithmetization_params_2>, 4, 4, 16> circuit_test_2() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t permutation = 4;
                     constexpr static const std::size_t usable = 1 << rows_log;
@@ -239,8 +242,7 @@ namespace nil {
                     constexpr static const std::size_t table_columns = 
                             witness_columns + public_columns + constant_columns;
 
-                    typedef redshift_params<FieldType, witness_columns, 
-                            public_columns, constant_columns, selector_columns> circuit_params;
+                    typedef redshift_params<FieldType, arithmetization_params_2> circuit_params;
 
                     circuit_description<FieldType, circuit_params, rows_log, permutation, usable> test_circuit;
 
@@ -308,12 +310,10 @@ namespace nil {
                     for (std::size_t i = 0; i < public_columns; i++) {
                         public_input_assignment[i] = table[witness_columns + i];
                     }
-                    test_circuit.table = plonk_assignment_table<FieldType, witness_columns, 
-                        public_columns, constant_columns, selector_columns>(
-                        plonk_private_assignment_table<FieldType, witness_columns>(private_assignment),
-                        plonk_public_assignment_table<FieldType, public_columns, 
-                            constant_columns, selector_columns>(public_input_assignment, constant_assignment,
-                                                                selectors_assignment));
+                    test_circuit.table = plonk_assignment_table<FieldType, arithmetization_params_2>(
+                        plonk_private_assignment_table<FieldType, arithmetization_params_2>(private_assignment),
+                        plonk_public_assignment_table<FieldType, arithmetization_params_2>(
+                            public_input_assignment, constant_assignment, selectors_assignment));
 
                     test_circuit.init();
 

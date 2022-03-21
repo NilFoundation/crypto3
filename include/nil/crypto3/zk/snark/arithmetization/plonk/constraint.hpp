@@ -29,8 +29,8 @@
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
-#include <nil/crypto3/zk/snark/relations/plonk/variable.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/table.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/assignment.hpp>
 #include <nil/crypto3/zk/math/non_linear_combination.hpp>
 
 namespace nil {
@@ -71,12 +71,10 @@ namespace nil {
                         math::non_linear_combination<VariableType>(terms) {
                     }
 
-                    template<std::size_t WitnessColumns, std::size_t PublicInputColumns,
-                         std::size_t ConstantColumns, std::size_t SelectorColumns>
+                    template<typename ArithmetizationParams>
                     typename VariableType::assignment_type
                         evaluate(std::size_t row_index,
-                                 const plonk_assignment_table<FieldType, WitnessColumns, 
-                                    PublicInputColumns, ConstantColumns, SelectorColumns> &assignments) const {
+                                 const plonk_assignment_table<FieldType, ArithmetizationParams> &assignments) const {
                         typename VariableType::assignment_type acc = VariableType::assignment_type::zero();
                         for (const math::non_linear_term<VariableType> &nlt : this->terms) {
                             typename VariableType::assignment_type term_value = nlt.coeff;
@@ -106,11 +104,9 @@ namespace nil {
                         return acc;
                     }
 
-                    template<std::size_t WitnessColumns, std::size_t PublicInputColumns, 
-                            std::size_t ConstantColumns, std::size_t SelectorColumns>
+                    template<typename ArithmetizationParams>
                     math::polynomial<typename VariableType::assignment_type>
-                        evaluate(const plonk_polynomial_table<FieldType, WitnessColumns,
-                                    PublicInputColumns, ConstantColumns, SelectorColumns> &assignments) const {
+                        evaluate(const plonk_polynomial_table<FieldType, ArithmetizationParams> &assignments) const {
                         math::polynomial<typename VariableType::assignment_type> acc = {0};
                         for (const math::non_linear_term<VariableType> &nlt : this->terms) {
                             math::polynomial<typename VariableType::assignment_type> term_value = {nlt.coeff};

@@ -129,6 +129,8 @@ namespace nil {
                                                                             commitment_scheme_public_input_type>
                         process(typename policy_type::preprocessed_public_data_type preprocessed_public_data,
                                 const typename policy_type::preprocessed_private_data_type preprocessed_private_data,
+                                const plonk_table_description<FieldType,
+                                    typename ParamsType::arithmetization_params> &table_description,
                                 typename policy_type::constraint_system_type &constraint_system,
                                 const typename policy_type::variable_assignment_type &assignments,
                                 const typename commitment_scheme_witness_type::params_type
@@ -140,12 +142,9 @@ namespace nil {
                                                                   commitment_scheme_public_input_type>
                             proof;
 
-                        plonk_polynomial_table<FieldType, ParamsType::witness_columns,
-                            ParamsType::public_input_columns, ParamsType::constant_columns,
-                            ParamsType::selector_columns> polynomial_table =
-                            plonk_polynomial_table<FieldType, ParamsType::witness_columns,
-                                ParamsType::public_input_columns, ParamsType::constant_columns,
-                                ParamsType::selector_columns>(
+                        plonk_polynomial_table<FieldType, typename ParamsType::arithmetization_params>
+                            polynomial_table =
+                            plonk_polynomial_table<FieldType, typename ParamsType::arithmetization_params>(
                                 preprocessed_private_data.private_polynomial_table,
                                 preprocessed_public_data.public_polynomial_table);
 
@@ -177,6 +176,7 @@ namespace nil {
                                                           commitment_scheme_permutation_type,
                                                           ParamsType>::prove_eval(constraint_system,
                                                                                   preprocessed_public_data,
+                                                                                  table_description,
                                                                                   polynomial_table,
                                                                                   fri_params,
                                                                                   transcript);
@@ -199,6 +199,15 @@ namespace nil {
                                 constraint_system, polynomial_table, transcript);
 
                         F[3] = prover_res[0];
+
+                        
+                        for (std::size_t i = 0; i < f_parts; i++) {
+                            for (std::size_t j = 0; j < table_description.rows_amount; j++) {
+                                if (F[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) != FieldType::value_type::zero()) {
+                                    std::cout<<"F["<<i<<"] != 0 at j = "<<j<<std::endl;
+                                }
+                            }
+                        }
 
                         // 7. Aggregate quotient polynomial
                         math::polynomial<typename FieldType::value_type> T =

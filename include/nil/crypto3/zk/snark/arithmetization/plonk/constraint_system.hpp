@@ -37,9 +37,9 @@
 #include <cstdlib>
 #include <vector>
 
-#include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/copy_constraint.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/lookup_constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,38 +48,29 @@ namespace nil {
 
                 /************************* PLONK constraint system ****************************/
 
-                template<typename FieldType>
+                template<typename FieldType, typename ArithmetizationParams>
                 struct plonk_constraint_system {
 
                 protected:
                     std::vector<plonk_gate<FieldType>> _gates;
                     std::vector<plonk_copy_constraint<FieldType>> _copy_constraints;
                     std::vector<plonk_lookup_constraint<FieldType>> _lookup_constraints;
-                    std::size_t _rows_amount;
-                    std::size_t _usable_rows_amount;
 
                 public:
 
                     typedef FieldType field_type;
 
-                    plonk_constraint_system() {
-                    }
+                    plonk_constraint_system(){}
 
-                    plonk_constraint_system(std::vector<plonk_gate<FieldType>> &gates, 
-                        std::vector<plonk_copy_constraint<FieldType>> &copy_constraints, std::size_t rows_amount, std::size_t usable_rows_amount): 
-                        _gates(gates), _copy_constraints(copy_constraints), _rows_amount(rows_amount), _usable_rows_amount(usable_rows_amount) {
+                    plonk_constraint_system(
+                        std::vector<plonk_gate<FieldType>> &gates,
+                        std::vector<plonk_copy_constraint<FieldType>> &copy_constraints,
+                        size_t usable_rows_amount):
+                        _gates(gates), _copy_constraints(copy_constraints){
                     }
 
                     std::size_t num_gates() const {
                         return _gates.size();
-                    }
-
-                    std::size_t rows_amount() const {
-                        return _rows_amount;
-                    }
-
-                    std::size_t usable_rows_amount() const {
-                        return _usable_rows_amount;
                     }
 
                     // bool

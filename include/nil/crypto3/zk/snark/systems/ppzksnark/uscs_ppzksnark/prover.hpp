@@ -34,8 +34,8 @@
 #include <nil/crypto3/algebra/multiexp/policies.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/arithmetic_programs/ssp.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/uscs.hpp>
 #include <nil/crypto3/zk/snark/reductions/uscs_to_ssp.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/uscs_ppzksnark/detail/basic_policy.hpp>
 

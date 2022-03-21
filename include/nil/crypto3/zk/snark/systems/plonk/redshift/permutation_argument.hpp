@@ -70,13 +70,14 @@ namespace nil {
                     static inline prover_result_type prove_eval(
                         typename policy_type::constraint_system_type &constraint_system,
                         const typename policy_type::preprocessed_public_data_type preprocessed_data,
-                        const plonk_polynomial_table<FieldType, ParamsType::witness_columns,
-                            ParamsType::public_input_columns, ParamsType::constant_columns,
-                            ParamsType::selector_columns> &column_polynomials,
+                        const plonk_table_description<FieldType,
+                                typename ParamsType::arithmetization_params> &table_description,
+                        const plonk_polynomial_table<FieldType,
+                            typename ParamsType::arithmetization_params> &column_polynomials,
                         typename CommitmentSchemeTypePermutation::params_type fri_params,
                         transcript_type &transcript = transcript_type()) {
 
-                        const std::size_t table_rows = constraint_system.rows_amount();
+                        const std::size_t table_rows = table_description.rows_amount;
 
                         const std::vector<math::polynomial<typename FieldType::value_type>> &S_sigma =
                             preprocessed_data.permutation_polynomials;

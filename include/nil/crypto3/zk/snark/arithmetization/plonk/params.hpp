@@ -1,7 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
+// Copyright (c) 2022 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2022 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -24,22 +23,31 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_COPY_CONSTRAINT_HPP
-#define CRYPTO3_ZK_PLONK_COPY_CONSTRAINT_HPP
-
-#include <nil/crypto3/zk/snark/relations/plonk/variable.hpp>
+#ifndef CRYPTO3_ZK_PLONK_ARITHMETIZATION_PARAMS_HPP
+#define CRYPTO3_ZK_PLONK_ARITHMETIZATION_PARAMS_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType>
-                using plonk_copy_constraint = std::pair<plonk_variable<FieldType>, plonk_variable<FieldType>>;
+                template<std::size_t _WitnessColumns, std::size_t _PublicInputColumns,
+                    std::size_t _ConstantColumns, std::size_t _SelectorColumns>
+                struct plonk_arithmetization_params {
+                    constexpr static const std::size_t WitnessColumns = _WitnessColumns;
+                    constexpr static const std::size_t PublicInputColumns = _PublicInputColumns;
+                    constexpr static const std::size_t ConstantColumns = _ConstantColumns;
+                    constexpr static const std::size_t SelectorColumns = _SelectorColumns;
+                };
 
+#ifdef ZK_RUNTIME_CIRCUIT_DEFINITION
+
+                struct plonk_arithmetization_params {
+                };
+#endif
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_COPY_CONSTRAINT_HPP
+#endif    // CRYPTO3_ZK_PLONK_ARITHMETIZATION_PARAMS_HPP

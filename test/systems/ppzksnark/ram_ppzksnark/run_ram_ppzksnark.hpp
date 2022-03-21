@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_RUN_RAM_PPZKSNARK_HPP
 #define CRYPTO3_RUN_RAM_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/relations/ram_computations/rams/examples/ram_examples.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/ram_computations/rams/examples/ram_examples.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/ram_ppzksnark/ram_ppzksnark_params.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/ram_ppzksnark.hpp>
 

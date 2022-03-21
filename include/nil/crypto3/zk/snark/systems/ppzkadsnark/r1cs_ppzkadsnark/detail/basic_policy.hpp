@@ -64,7 +64,7 @@
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
 
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/zk/snark/systems/ppzkadsnark/r1cs_ppzkadsnark/prf.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzkadsnark/r1cs_ppzkadsnark/signature.hpp>

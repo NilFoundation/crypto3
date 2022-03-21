@@ -45,8 +45,8 @@
 #ifndef CRYPTO3_ZK_TBCS_TO_USCS_BASIC_POLICY_HPP
 #define CRYPTO3_ZK_TBCS_TO_USCS_BASIC_POLICY_HPP
 
-#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/circuit_satisfaction_problems/tbcs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/uscs.hpp>
 
 namespace nil {
     namespace crypto3 {
