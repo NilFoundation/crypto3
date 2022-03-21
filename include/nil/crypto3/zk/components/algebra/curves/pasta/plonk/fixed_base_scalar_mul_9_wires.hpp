@@ -48,6 +48,7 @@ namespace nil {
                 class element_g1_fixed_base_scalar_mul;
 
                 template<typename BlueprintFieldType,
+                         typename ArithmetizationParams,
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,

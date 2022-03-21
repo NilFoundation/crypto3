@@ -30,7 +30,6 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/detail/plonk/n_wires.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -39,46 +38,53 @@ namespace nil {
 
                 template<typename ArithmetizationType,
                          typename CurveType,
-                         std::size_t W0 = 4,
-                         std::size_t W1 = 0,
-                         std::size_t W2 = 1,
-                         std::size_t W3 = 2,
-                         std::size_t W4 = 3>
-                class poseidon_plonk;
+                         std::size_t... WireIndexes>
+                class poseidon;
 
                 template<typename BlueprintFieldType,
+                         typename ArithmetizationParams,
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
                          std::size_t W3,
                          std::size_t W4>
-                class poseidon_plonk<snark::plonk_constraint_system<BlueprintFieldType>, CurveType, W0, W1, W2, W3, W4>
-                    : public detail::
-                          n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>, W0, W1, W2, W3, W4> {
+                class poseidon<
+                    snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams>,
+                    CurveType,
+                    W0, W1, W2, W3, W4> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
-                    typedef blueprint<ArithmetizationType> blueprint_type;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams> ArithmetizationType;
 
                     constexpr static const algebra::matrix<typename CurveType::scalar_field_type::value_type, 3, 3> M;
                     constexpr static const algebra::vector<typename CurveType::scalar_field_type::value_type, 3> RC;
 
-                    std::size_t j;
-
-                    using n_wires_helper =
-                        detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>, W0, W1, W2, W3, W4>;
-
-                    using n_wires_helper::w;
-                    enum indices { m2 = 0, m1, cur, p1, p2 };
-
                 public:
-                    poseidon_plonk(blueprint_type &bp) :
-                        detail::n_wires_helper<ArithmetizationType, W0, W1, W2, W3, W4>(bp) {
+                    constexpr static const std::size_t required_rows_amount = ;
 
-                        j = bp.allocate_rows();
+                    struct init_params_type {
+                        typename CurveType::template g1_type<>::value_type B;
+                    };
+
+                    struct assignment_params_type {
+                        typename CurveType::scalar_field_type::value_type a;
+                        typename CurveType::scalar_field_type::value_type s;
+                        typename CurveType::template g1_type<>::value_type P;
+                    };
+
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
+                        return bp.allocate_rows(required_rows_amount);
                     }
 
-                    void generate_gates() {
+                    static void generate_gates(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const std::size_t &component_start_row) {
+
+                        const std::size_t &j = component_start_row;
 
                         for (std::size_t z = 0; z < 4; z++) {
                             this->bp.add_gate(j + z,
@@ -115,7 +121,22 @@ namespace nil {
                                                       5 * M[2][2] + RC[2]));
                     }
 
-                    void generate_assignments() {
+                    static void generate_copy_constraints(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const std::size_t &component_start_row) {
+
+                    }
+
+                    static void generate_assignments(
+                        blueprint_private_assignment_table<ArithmetizationType>
+                            &private_assignment,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const assignment_params_type &params,
+                        const std::size_t &component_start_row) {
+
                     }
                 };
 

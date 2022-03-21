@@ -47,6 +47,7 @@ namespace nil {
                 class pickles_verifier_scalar_field;
 
                 template<typename BlueprintFieldType,
+                         typename ArithmetizationParams,
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
@@ -64,43 +65,59 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class pickles_verifier_scalar_field<
-                    snark::plonk_constraint_system<BlueprintFieldType>,
+                    snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams>,
                     CurveType,
-                    W0,
-                    W1,
-                    W2,
-                    W3,
-                    W4,
-                    W5,
-                    W6,
-                    W7,
-                    W8,
-                    W9,
-                    W10,
-                    W11,
-                    W12,
-                    W13,
-                    W14> : public component<snark::plonk_constraint_system<BlueprintFieldType>> {
-                    typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
+                    W0, W1, W2, W3, W4,
+                    W5, W6, W7, W8, W9,
+                    W10, W11, W12, W13, W14> {
 
-                    typedef blueprint<arithmetization_type> blueprint_type;
-
-                    std::size_t j;
-
-                    constexpr static const std::size_t endo = 3;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams> ArithmetizationType;
 
                 public:
-                    pickles_verifier_scalar_field(blueprint_type &bp) :
-                        component<arithmetization_type>(bp) {
 
-                        j = this->bp.allocate_rows();
+                    constexpr static const std::size_t required_rows_amount = ;
+
+                    struct init_params_type {
+                        typename CurveType::template g1_type<>::value_type B;
+                    };
+
+                    struct assignment_params_type {
+                        typename CurveType::scalar_field_type::value_type a;
+                        typename CurveType::scalar_field_type::value_type s;
+                        typename CurveType::template g1_type<>::value_type P;
+                    };
+
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
+                        return bp.allocate_rows(required_rows_amount);
                     }
 
-                    void generate_gates() {
+                    static void generate_gates(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const std::size_t &component_start_row) {
+
+                        const std::size_t &j = component_start_row;
                     }
 
-                public:
-                    void generate_assignments() {
+                    static void generate_copy_constraints(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const std::size_t &component_start_row) {
+
+                    }
+
+                    static void generate_assignments(
+                        blueprint_private_assignment_table<ArithmetizationType>
+                            &private_assignment,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const assignment_params_type &params,
+                        const std::size_t &component_start_row) {
+
                     }
                 };
             }    // namespace components

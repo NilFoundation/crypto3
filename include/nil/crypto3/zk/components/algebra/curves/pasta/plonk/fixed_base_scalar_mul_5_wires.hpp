@@ -47,6 +47,7 @@ namespace nil {
                 class element_g1_fixed_base_scalar_mul;
 
                 template<typename BlueprintFieldType,
+                         typename ArithmetizationParams,
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
@@ -54,11 +55,13 @@ namespace nil {
                          std::size_t W3,
                          std::size_t W4>
                 class element_g1_fixed_base_scalar_mul<
-                    snark::plonk_constraint_system<BlueprintFieldType>,
+                    snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams>,
                     CurveType,
                     W0, W1, W2, W3, W4>{
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams> ArithmetizationType;
 
                 public:
                     

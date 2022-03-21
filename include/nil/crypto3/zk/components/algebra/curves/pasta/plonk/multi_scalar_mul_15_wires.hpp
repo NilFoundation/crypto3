@@ -75,8 +75,6 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
-                    constexpr static const std::size_t endo = 3;
-
                 public:
                     constexpr static const std::size_t required_rows_amount = ;
 

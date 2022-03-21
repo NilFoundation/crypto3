@@ -47,6 +47,7 @@ namespace nil {
                 class pickles_verifier_base_field;
 
                 template<typename BlueprintFieldType,
+                         typename ArithmetizationParams,
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
@@ -64,30 +65,15 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class pickles_verifier_base_field<
-                    snark::plonk_constraint_system<BlueprintFieldType>,
+                    snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams>,
                     CurveType,
-                    W0,
-                    W1,
-                    W2,
-                    W3,
-                    W4,
-                    W5,
-                    W6,
-                    W7,
-                    W8,
-                    W9,
-                    W10,
-                    W11,
-                    W12,
-                    W13,
-                    W14> : public component<snark::plonk_constraint_system<BlueprintFieldType>> {
-                    typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
+                    W0, W1, W2, W3, W4,
+                    W5, W6, W7, W8, W9,
+                    W10, W11, W12, W13, W14> {
 
-                    typedef blueprint<arithmetization_type> blueprint_type;
-
-                    std::size_t j;
-
-                    constexpr static const std::size_t endo = 3;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams> ArithmetizationType;
 
                     struct batched_values {
 
@@ -108,30 +94,49 @@ namespace nil {
                     }
 
                 public:
-                    struct assignment_params {
-                        std::vector<kimchi_proof_type> proofs;
+
+                    struct init_params_type {
+                        typename CurveType::template g1_type<>::value_type B;
+                    };
+
+                    struct assignment_params_type {
+                        std::vector<typename snark::kimchi_proof_type> proofs;
                         std::vector<verifier_index> indexes;
                     };
 
-                    pickles_verifier_base_field(blueprint_type &bp) :
-                        component<arithmetization_type>(bp) {
-
-                        j = this->bp.allocate_rows();
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
+                        return bp.allocate_rows(required_rows_amount);
                     }
 
-                    void generate_gates() {
+                    static void generate_gates(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const std::size_t &component_start_row) {
+
+                        const std::size_t &j = component_start_row;
                     }
 
-                    void generate_assignments(
-                        blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
-                        blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
-                            PublicInputColumns, ConstantColumns> &public_assignment,
-                        assignment_params &input,
-                        std::size_t circuit_start_row = 0) {
-                            std::vector<batched_values> batch(input.proofs.size());
-                            for (std::size_t i = 0; i < input.proofs.size(); i++) {
+                    static void generate_copy_constraints(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const std::size_t &component_start_row) {
+
+                    }
+
+                    static void generate_assignments(
+                        blueprint_private_assignment_table<ArithmetizationType>
+                            &private_assignment,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const assignment_params_type &params,
+                        const std::size_t &component_start_row) {
+                        
+                            std::vector<batched_values> batch(params.proofs.size());
+                            for (std::size_t i = 0; i < params.proofs.size(); i++) {
                                 batched_values[i] = generate_gates_to_batch(private_assigment,
-                                    public_assigment, input);
+                                    public_assigment, params);
                             }
 
                             generate_gates_final_check()
