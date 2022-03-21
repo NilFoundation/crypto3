@@ -34,7 +34,7 @@
 
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 
-#include <nil/crypto3/math/polynomial/polynom.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/expressions/expression.hpp>
 
 using namespace nil::crypto3::algebra;
