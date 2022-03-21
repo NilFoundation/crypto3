@@ -99,7 +99,7 @@ namespace nil {
 
                                 term_value = term_value * assignment;
                             }
-                            acc = acc + term_value * nlt.coeff;
+                            acc = acc + term_value;
                         }
                         return acc;
                     }

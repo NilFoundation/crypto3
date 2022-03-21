@@ -74,7 +74,9 @@ set(TESTS_NAMES
     "systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark"
     "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity"
 
-    "transcript/transcript")
+    "transcript/transcript"
+
+    "systems/plonk/plonk_constraint")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_zk_test(${TEST_NAME})
