@@ -87,11 +87,11 @@ namespace nil {
                     return result;
                 }
 
-                non_linear_term operator^(const std::size_t power) const {
+                non_linear_term pow(const std::size_t power) const {
                     
                     non_linear_term result(this->vars);
 
-                    for (std::size_t i = 0; i < power; i++){
+                    for (std::size_t i = 0; i < power - 1; i++){
                         std::copy(this->vars.begin(), this->vars.end(), std::back_inserter(result.vars));
                     }
 

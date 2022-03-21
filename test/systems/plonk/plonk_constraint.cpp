@@ -73,6 +73,8 @@ BOOST_AUTO_TEST_CASE(plonk_constraint_basic_test) {
     constraint_type constraint5 = var(0,0) - var(0,0)*var(0,0);
     constraint_type constraint6 = var(0,0)*var(0,0) + var(0,0);
     constraint_type constraint7 = var(0,0)*var(0,0) - var(0,0);
+    constraint_type constraint8 = var(0,0).pow(2) - var(0,0);
+    constraint_type constraint9 = var(0,0).pow(1) - var(0,0);
 
     std::array<zk::snark::plonk_column<FieldType>,
         arithmetization_params::WitnessColumns> witness_columns;
@@ -114,6 +116,11 @@ BOOST_AUTO_TEST_CASE(plonk_constraint_basic_test) {
     BOOST_CHECK((witness_columns[0][0]*witness_columns[0][0] - witness_columns[0][0]) ==
         constraint7.evaluate(0, assignment));
 
+    BOOST_CHECK((witness_columns[0][0].pow(2) - witness_columns[0][0]) ==
+        constraint8.evaluate(0, assignment));
+
+    BOOST_CHECK((witness_columns[0][0] - witness_columns[0][0]) ==
+        constraint9.evaluate(0, assignment));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
