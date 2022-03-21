@@ -79,8 +79,8 @@ namespace nil {
                         column_type type = column_type::witness) :
                         index(index), rotation(rotation), relative(relative), type(type) {};
 
-                    math::non_linear_term<plonk_variable<FieldType>> operator^(const std::size_t power) const {
-                        return math::non_linear_term<plonk_variable<FieldType>>(*this) ^ power;
+                    math::non_linear_term<plonk_variable<FieldType>> pow(const std::size_t power) const {
+                        return math::non_linear_term<plonk_variable<FieldType>>(*this).pow(power);
                     }
 
                     math::non_linear_term<plonk_variable<FieldType>> operator*(const assignment_type &field_coeff) const {
