@@ -38,24 +38,11 @@ namespace nil {
 
                 template<typename ArithmetizationType,
                          typename CurveType,
-                         std::size_t W0 = 0,
-                         std::size_t W1 = 1,
-                         std::size_t W2 = 2,
-                         std::size_t W3 = 3,
-                         std::size_t W4 = 4,
-                         std::size_t W5 = 5,
-                         std::size_t W6 = 6,
-                         std::size_t W7 = 7,
-                         std::size_t W8 = 8,
-                         std::size_t W9 = 9,
-                         std::size_t W10 = 10,
-                         std::size_t W11 = 11,
-                         std::size_t W12 = 12,
-                         std::size_t W13 = 13,
-                         std::size_t W14 = 14>
+                         std::size_t... WireIndexes>
                 class poseidon;
 
                 template<typename BlueprintFieldType,
+                         typename ArithmetizationParams,
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
@@ -72,32 +59,18 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class poseidon<snark::plonk_constraint_system<BlueprintFieldType>,
-                                     CurveType,
-                                     W0,
-                                     W1,
-                                     W2,
-                                     W3,
-                                     W4,
-                                     W5,
-                                     W6,
-                                     W7,
-                                     W8,
-                                     W9,
-                                     W10,
-                                     W11,
-                                     W12,
-                                     W13,
-                                     W14> : public component<snark::plonk_constraint_system<BlueprintFieldType>> {
+                class poseidon<
+                    snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams>,
+                    CurveType,
+                    W0, W1, W2, W3, W4,
+                    W5, W6, W7, W8, W9,
+                    W10, W11, W12, W13, W14> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
-                    typedef blueprint<arithmetization_type> blueprint_type;
-
-                    std::size_t j;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams> ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
-
-                    constexpr static const std::size_t required_rows_amount = 12;
 
                     const algebra::matrix<typename CurveType::scalar_field_type::value_type, 3, 3> M =
                         {{12035446894107573964500871153637039653510326950134440362813193268448863222019,
@@ -338,98 +311,95 @@ namespace nil {
 
                  public:
 
-                    struct init_params { };
+                    constexpr static const std::size_t required_rows_amount = 12;
 
-                    struct assignment_params {
+                    struct init_params_type { };
+
+                    struct assignment_params_type {
                     };
 
-                    poseidon(blueprint_type &bp, const init_params &params) :
-                        component<arithmetization_type>(bp) {
-
-                        j = bp.allocate_rows(required_rows_amount);
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
+                        return bp.allocate_rows(required_rows_amount);
                     }
 
-                    static std::size_t allocate_rows(blueprint<arithmetization_type> &in_bp) {
-                        return in_bp.allocate_rows(required_rows_amount);
-                    }
+                    static void generate_gates(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const std::size_t &component_start_row) {
 
-                    template<std::size_t SelectorColumns, std::size_t PublicInputColumns, std::size_t ConstantColumns>
-                    void generate_gates(blueprint_public_assignment_table<arithmetization_type,
-                                                                          SelectorColumns,
-                                                                          PublicInputColumns,
-                                                                          ConstantColumns> &public_assignment,
-                                        std::size_t circuit_start_row = 0) {
+                        const std::size_t &j = component_start_row;
 
                         for (std::size_t z = 0; z < 55; z+=5){
                             std::size_t selector_index =
                                 public_assignment.add_selector(j + z);
 
-                            auto constraint_1 = this->bp.add_constraint(var(W6, 0) -
+                            auto constraint_1 = bp.add_constraint(var(W6, 0) -
                                 (var(W0, 0) ^ 5 * M[0][0] +
                                  var(W1, 0) ^ 5 * M[0][1] +
                                  var(W2, 0) ^ 5 * M[0][2] + RC[z][0]));
-                            auto constraint_2 = this->bp.add_constraint(var(W7, 0) -
+                            auto constraint_2 = bp.add_constraint(var(W7, 0) -
                                 (var(W0, 0) ^ 5 * M[1][0] +
                                  var(W1, 0) ^ 5 * M[1][1] +
                                  var(W2, 0) ^ 5 * M[1][2] + RC[z][1]));
-                            auto constraint_3 = this->bp.add_constraint(var(W8, 0) -
+                            auto constraint_3 = bp.add_constraint(var(W8, 0) -
                                 (var(W0, 0) ^ 5 * M[2][0] +
                                  var(W1, 0) ^ 5 * M[2][1] +
                                  var(W2, 0) ^ 5 * M[2][2] + RC[z][2]));
 
-                            auto constraint_4 = this->bp.add_constraint(var(W9, 0) -
+                            auto constraint_4 = bp.add_constraint(var(W9, 0) -
                                 (var(W6, 0) ^ 5 * M[0][0] +
                                  var(W7, 0) ^ 5 * M[0][1] +
                                  var(W8, 0) ^ 5 * M[0][2] + RC[z + 1][0]));
-                            auto constraint_5 = this->bp.add_constraint(var(W10, 0) -
+                            auto constraint_5 = bp.add_constraint(var(W10, 0) -
                                 (var(W6, 0) ^ 5 * M[1][0] +
                                  var(W7, 0) ^ 5 * M[1][1] +
                                  var(W8, 0) ^ 5 * M[1][2] + RC[z + 1][1]));
-                            auto constraint_6 = this->bp.add_constraint(var(W11, 0) -
+                            auto constraint_6 = bp.add_constraint(var(W11, 0) -
                                 (var(W6, 0) ^ 5 * M[2][0] +
                                  var(W7, 0) ^ 5 * M[2][1] +
                                  var(W8, 0) ^ 5 * M[2][2] + RC[z + 1][2]));
 
-                            auto constraint_7 = this->bp.add_constraint(var(W12, 0) -
+                            auto constraint_7 = bp.add_constraint(var(W12, 0) -
                                 (var(W9, 0) ^ 5 * M[0][0] +
                                  var(W10, 0) ^ 5 * M[0][1] +
                                  var(W11, 0) ^ 5 * M[0][2] + RC[z + 2][0]));
-                            auto constraint_8 = this->bp.add_constraint(var(W13, 0) -
+                            auto constraint_8 = bp.add_constraint(var(W13, 0) -
                                 (var(W9, 0) ^ 5 * M[1][0] +
                                  var(W10, 0) ^ 5 * M[1][1] +
                                  var(W11, 0) ^ 5 * M[1][2] + RC[z + 2][1]));
-                            auto constraint_9 = this->bp.add_constraint(var(W14, 0) -
+                            auto constraint_9 = bp.add_constraint(var(W14, 0) -
                                 (var(W9, 0) ^ 5 * M[2][0] +
                                  var(W10, 0) ^ 5 * M[2][1] +
                                  var(W11, 0) ^ 5 * M[2][2] + RC[z + 2][2]));
 
-                            auto constraint_10 = this->bp.add_constraint(var(W3, 0) -
+                            auto constraint_10 = bp.add_constraint(var(W3, 0) -
                                 (var(W12, 0) ^ 5 * M[0][0] +
                                  var(W13, 0) ^ 5 * M[0][1] +
                                  var(W14, 0) ^ 5 * M[0][2] + RC[z + 3][0]));
-                            auto constraint_11 = this->bp.add_constraint(var(W4, 0) -
+                            auto constraint_11 = bp.add_constraint(var(W4, 0) -
                                 (var(W12, 0) ^ 5 * M[1][0] +
                                  var(W13, 0) ^ 5 * M[1][1] +
                                  var(W14, 0) ^ 5 * M[1][2] + RC[z + 3][1]));
-                            auto constraint_12 = this->bp.add_constraint(var(W5, 0) -
+                            auto constraint_12 = bp.add_constraint(var(W5, 0) -
                                 (var(W12, 0) ^ 5 * M[2][0] +
                                  var(W13, 0) ^ 5 * M[2][1] +
                                  var(W14, 0) ^ 5 * M[2][2] + RC[z + 3][2]));
 
-                            auto constraint_13 = this->bp.add_constraint(var(W0, +1) -
+                            auto constraint_13 = bp.add_constraint(var(W0, +1) -
                                 (var(W3, 0) ^ 5 * M[0][0] +
                                  var(W4, 0) ^ 5 * M[0][1] +
                                  var(W5, 0) ^ 5 * M[0][2] + RC[z + 4][0]));
-                            auto constraint_14 = this->bp.add_constraint(var(W1, +1) -
+                            auto constraint_14 = bp.add_constraint(var(W1, +1) -
                                 (var(W3, 0) ^ 5 * M[1][0] +
                                  var(W4, 0) ^ 5 * M[1][1] +
                                  var(W5, 0) ^ 5 * M[1][2] + RC[z + 4][1]));
-                            auto constraint_15 = this->bp.add_constraint(var(W2, +1) -
+                            auto constraint_15 = bp.add_constraint(var(W2, +1) -
                                 (var(W3, 0) ^ 5 * M[2][0] +
                                  var(W4, 0) ^ 5 * M[2][1] +
                                  var(W5, 0) ^ 5 * M[2][2] + RC[z + 4][2]));
 
-                            this->bp.add_gate(selector_index,
+                            bp.add_gate(selector_index,
                                               {constraint_1, constraint_2, constraint_3,
                                                constraint_4, constraint_5, constraint_6,
                                                constraint_7, constraint_8, constraint_9,
@@ -438,28 +408,22 @@ namespace nil {
                         }
                     }
 
-                    template<std::size_t SelectorColumns, std::size_t PublicInputColumns, std::size_t ConstantColumns>
-                    void
-                        generate_copy_constraints(blueprint_public_assignment_table<arithmetization_type,
-                                                                                    SelectorColumns,
-                                                                                    PublicInputColumns,
-                                                                                    ConstantColumns> &public_assignment,
-                                                  std::size_t circuit_start_row = 0) {
+                    static void generate_copy_constraints(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const std::size_t &component_start_row) {
 
                     }
 
-                    template<std::size_t WitnessColumns,
-                             std::size_t SelectorColumns,
-                             std::size_t PublicInputColumns,
-                             std::size_t ConstantColumns>
-                    void generate_assignments(
-                        blueprint_private_assignment_table<arithmetization_type, WitnessColumns> &private_assignment,
-                        blueprint_public_assignment_table<arithmetization_type,
-                                                          SelectorColumns,
-                                                          PublicInputColumns,
-                                                          ConstantColumns> &public_assignment,
-                        const assignment_params &params,
-                        std::size_t circuit_start_row = 0) {
+                    static void generate_assignments(
+                        blueprint_private_assignment_table<ArithmetizationType>
+                            &private_assignment,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const assignment_params_type &params,
+                        const std::size_t &component_start_row) {
+
                     }
                 };
 

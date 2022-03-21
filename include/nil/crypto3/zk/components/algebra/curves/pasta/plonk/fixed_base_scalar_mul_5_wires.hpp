@@ -30,12 +30,11 @@
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
-#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
-#include <nil/crypto3/zk/components/detail/plonk/n_wires.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,60 +47,58 @@ namespace nil {
                 class element_g1_fixed_base_scalar_mul;
 
                 template<typename BlueprintFieldType,
+                         typename ArithmetizationParams,
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
                          std::size_t W3,
                          std::size_t W4>
-                class element_g1_fixed_base_scalar_mul<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                       CurveType,
-                                                       W0,
-                                                       W1,
-                                                       W2,
-                                                       W3,
-                                                       W4>
-                    : public detail::
-                          n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>, W0, W1, W2, W3, W4> {
+                class element_g1_fixed_base_scalar_mul<
+                    snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams>,
+                    CurveType,
+                    W0, W1, W2, W3, W4>{
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
-                    typedef blueprint<ArithmetizationType> blueprint_type;
-
-                    std::size_t j;
-                    typename CurveType::template g1_type<>::value_type B;
-
-                    using n_wires_helper =
-                        detail::n_wires_helper<ArithmetizationType, W0, W1, W2, W3, W4>;
-
-                    using n_wires_helper::w;
-                    enum indices { m2 = 0, m1, cur, p1, p2 };
+                    typedef snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams> ArithmetizationType;
 
                 public:
-                    element_g1_fixed_base_scalar_mul(blueprint_type &bp,
-                                                     typename CurveType::template g1_type<>::value_type B) :
-                        n_wires_helper(bp),
-                        B(B) {
+                    
+                    constexpr static const std::size_t required_rows_amount = 85;
 
-                        j = this->bp.allocate_rows(85);
+                    struct init_params_type {
+                        typename CurveType::template g1_type<>::value_type B;
+                    };
+
+                    struct assignment_params_type {
+                        typename CurveType::scalar_field_type::value_type a;
+                        typename CurveType::scalar_field_type::value_type s;
+                        typename CurveType::template g1_type<>::value_type P;
+                    };
+
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
+                        return bp.allocate_rows(required_rows_amount);
                     }
 
                 private:
-                    typename CurveType::template g1_type<>::value_type get_omega(std::size_t s, std::size_t i) {
+                    
+                    static typename CurveType::template g1_type<>::value_type
+                        get_omega(typename CurveType::template g1_type<>::value_type B,
+                            std::size_t s, std::size_t i) {
 
-                        std::size_t coef = i * math::detail::power_of_two(3 * s);
+                        std::size_t coef = i * std::pow(2, 3 * s);
 
                         return coef * B;
                     }
 
-                    void generate_phi1_gate(std::size_t row_index,
-                                            typename blueprint_type::value_type x_1,
-                                            typename blueprint_type::value_type x_2,
-                                            typename blueprint_type::value_type x_3,
-                                            typename blueprint_type::value_type x_4,
+                    static snark::plonk_constraint<BlueprintFieldType>
+                        generate_phi1_constraint(blueprint<ArithmetizationType> &bp,
+                                            var x_1, var x_2, var x_3, var x_4,
                                             std::array<typename CurveType::base_field_type::value_type, 8>
                                                 u) {
 
-                        this->bp.add_gate(row_index,
+                        return bp.add_constraint(
                                           x_3 * (-u[0] * x_2 * x_1 + u[0] * x_1 + u[0] * x_2 - u[0] + u[2] * x_1 * x_2 -
                                                  u[2] * x_2 + u[4] * x_1 * x_2 - u[4] * x_2 - u[6] * x_1 * x_2 +
                                                  u[1] * x_2 * x_1 - u[1] * x_1 - u[1] * x_2 + u[1] - u[3] * x_1 * x_2 +
@@ -111,15 +108,13 @@ namespace nil {
                                                u[6] * x_1 * x_2));
                     }
 
-                    void generate_phi2_gate(std::size_t row_index,
-                                            typename blueprint_type::value_type x_1,
-                                            typename blueprint_type::value_type x_2,
-                                            typename blueprint_type::value_type x_3,
-                                            typename blueprint_type::value_type x_4,
+                    static snark::plonk_constraint<BlueprintFieldType>
+                        generate_phi2_constraint(blueprint<ArithmetizationType> &bp,
+                                            var x_1, var x_2, var x_3, var x_4,
                                             std::array<typename CurveType::base_field_type::value_type, 8>
                                                 v) {
 
-                        this->bp.add_gate(row_index,
+                        return bp.add_constraint(
                                           x_3 * (-v[0] * x_2 * x_1 + v[0] * x_1 + v[0] * x_2 - v[0] + v[2] * x_1 * x_2 -
                                                  v[2] * x_2 + v[4] * x_1 * x_2 - v[4] * x_2 - v[6] * x_1 * x_2 +
                                                  v[1] * x_2 * x_1 - v[1] * x_1 - v[1] * x_2 + v[1] - v[3] * x_1 * x_2 +
@@ -129,42 +124,41 @@ namespace nil {
                                                v[6] * x_1 * x_2));
                     }
 
-                    void generate_phi3_gate(std::size_t row_index,
-                                            typename blueprint_type::value_type x_1,
-                                            typename blueprint_type::value_type x_2,
-                                            typename blueprint_type::value_type x_3,
-                                            typename blueprint_type::value_type x_4,
-                                            typename blueprint_type::value_type x_5,
-                                            typename blueprint_type::value_type x_6) {
-                        this->bp.add_gate(
-                            row_index,
+                    static snark::plonk_constraint<BlueprintFieldType>
+                        generate_phi3_gate(blueprint<ArithmetizationType> &bp,
+                                            var x_1, var x_2, var x_3,
+                                            var x_4, var x_5, var x_6) {
+                        return bp.add_constraint(
                             x_1 * (1 + CurveType::template g1_type<>::params_type::b * x_3 * x_4 * x_5 * x_6) -
                                 (x_3 * x_6 + x_4 * x_5));
                     }
 
-                    void generate_phi4_gate(std::size_t row_index,
-                                            typename blueprint_type::value_type x_1,
-                                            typename blueprint_type::value_type x_2,
-                                            typename blueprint_type::value_type x_3,
-                                            typename blueprint_type::value_type x_4,
-                                            typename blueprint_type::value_type x_5,
-                                            typename blueprint_type::value_type x_6) {
-                        this->bp.add_gate(
-                            row_index,
+                    static snark::plonk_constraint<BlueprintFieldType>
+                        generate_phi4_gate(blueprint<ArithmetizationType> &bp,
+                                            var x_1, var x_2, var x_3,
+                                            var x_4, var x_5, var x_6) {
+                        return bp.add_constraint(
                             x_2 * (1 - CurveType::template g1_type<>::params_type::b * x_3 * x_4 * x_5 * x_6) -
                                 (x_3 * x_5 + x_4 * x_6));
                     }
 
                 public:
-                    void generate_gates() {
+                    
+                    static void generate_gates(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment, 
+                        const init_params_type &init_params,
+                        const std::size_t &component_start_row) {
 
-                        this->bp.add_gate({j, j + 2}, w[1][cur] * (w[1][cur] - 1));
-                        this->bp.add_gate({j, j + 2}, w[2][cur] * (w[2][cur] - 1));
-                        this->bp.add_gate({j, j + 1, j + 3}, w[3][cur] * (w[3][cur] - 1));
-                        this->bp.add_gate({j + 2, j + 3}, w[4][cur] * (w[4][cur] - 1));
+                        const std::size_t &j = component_start_row;
+
+                        bp.add_bit_check({j, j + 2}, w[1][cur]);
+                        bp.add_bit_check({j, j + 2}, w[2][cur]);
+                        bp.add_bit_check({j, j + 1, j + 3}, w[3][cur]);
+                        bp.add_bit_check({j + 2, j + 3}, w[4][cur]);
 
                         // j=0
-                        this->bp.add_gate(j, w[0][cur] - (w[1][cur] * 4 + w[2][cur] * 2 + w[3][cur]));
+                        bp.add_gate(j, w[0][cur] - (w[1][cur] * 4 + w[2][cur] * 2 + w[3][cur]));
 
                         generate_phi3_gate(j, w[1][p1], w[2][p1], w[4][cur], w[0][p1], w[4][p1], w[3][p2]);
                         generate_phi4_gate(j, w[1][p1], w[2][p1], w[4][cur], w[0][p1], w[4][p1], w[3][p2]);
@@ -172,7 +166,7 @@ namespace nil {
                         // j+z, z=0 mod 5, z!=0
                         for (std::size_t z = 5; z <= 84; z += 5) {
 
-                            this->bp.add_gate(j + z,
+                            bp.add_gate(j + z,
                                               w[0][cur] - (w[1][cur] * 4 + w[2][cur] * 2 + w[3][cur] + w[0][m1] * 8));
 
                             std::array<typename CurveType::base_field_type::value_type, 8> u;
@@ -193,7 +187,7 @@ namespace nil {
                         // j+z, z=2 mod 5
                         for (std::size_t z = 2; z <= 84; z += 5) {
 
-                            this->bp.add_gate(j + z,
+                            bp.add_gate(j + z,
                                               w[0][cur] - (w[1][cur] * 4 + w[2][cur] * 2 + w[3][m1] + w[0][m2] * 8));
 
                             std::array<typename CurveType::base_field_type::value_type, 8> u;
@@ -230,7 +224,7 @@ namespace nil {
                         // j+z, z=4 mod 5
                         for (std::size_t z = 4; z <= 84; z += 5) {
 
-                            this->bp.add_gate(j + z - 1,
+                            bp.add_gate(j + z - 1,
                                               w[0][p1] - (w[4][m1] * 4 + w[3][m2] * 2 + w[4][m2] + w[0][m1] * 8));
 
                             generate_phi3_gate(j + z, w[1][m2], w[2][cur], w[1][m1], w[2][m1], w[4][p1], w[0][p2]);
@@ -238,26 +232,39 @@ namespace nil {
                         }
                     }
 
-                    void generate_assignments(const typename CurveType::scalar_field_type::value_type &a,
-                                              const typename CurveType::template g1_type<>::value_type &P) {
+                    static void generate_copy_constraints(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const std::size_t &component_start_row) {
+
+                    }
+
+                    static void generate_assignments(
+                        blueprint_private_assignment_table<ArithmetizationType>
+                            &private_assignment,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const assignment_params_type &params,
+                        const std::size_t &component_start_row) {
 
                         std::array<bool, 9> b{};
                         // = marshalling::unpack(a);
 
-                        this->bp.assignment(W1, j) = b[0];
-                        this->bp.assignment(W2, j) = b[1];
-                        this->bp.assignment(W3, j) = b[2];
+                        bp.assignment(W1, j) = b[0];
+                        bp.assignment(W2, j) = b[1];
+                        bp.assignment(W3, j) = b[2];
 
-                        this->bp.assignment(W1, j + 1) = P.X;
-                        this->bp.assignment(W2, j + 1) = P.Y;
-                        this->bp.assignment(W3, j + 1) = b[3];
+                        bp.assignment(W1, j + 1) = params.P.X;
+                        bp.assignment(W2, j + 1) = params.P.Y;
+                        bp.assignment(W3, j + 1) = b[3];
 
-                        this->bp.assignment(W1, j + 2) = b[4];
-                        this->bp.assignment(W2, j + 2) = b[5];
-                        this->bp.assignment(W4, j + 2) = b[6];
+                        bp.assignment(W1, j + 2) = b[4];
+                        bp.assignment(W2, j + 2) = b[5];
+                        bp.assignment(W4, j + 2) = b[6];
 
-                        this->bp.assignment(W3, j + 3) = b[7];
-                        this->bp.assignment(W4, j + 3) = b[8];
+                        bp.assignment(W3, j + 3) = b[7];
+                        bp.assignment(W4, j + 3) = b[8];
                     }
                 };
 

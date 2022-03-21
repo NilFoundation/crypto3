@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/zk/blueprint/detail/r1cs/blueprint_variable.hpp>
 #include <nil/crypto3/zk/blueprint/detail/r1cs/blueprint_linear_combination.hpp>
@@ -42,7 +42,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
 
-            template<typename ArithmetizationType>
+            template<typename ArithmetizationType, std::size_t... BlueprintParams>
             class blueprint;
 
             template<typename BlueprintFieldType>
@@ -55,7 +55,7 @@ namespace nil {
                 typename BlueprintFieldType::value_type constant_term;
 
                 typename snark::variable<BlueprintFieldType>::index_type next_free_var;
-                typename blueprint_linear_combination<ArithmetizationType>::index_type next_free_lc;
+                typename detail::blueprint_linear_combination<ArithmetizationType>::index_type next_free_lc;
                 std::vector<typename BlueprintFieldType::value_type> lc_values;
                 snark::r1cs_constraint_system<BlueprintFieldType> constraint_system;
 
@@ -86,7 +86,7 @@ namespace nil {
                 }
 
                 typename BlueprintFieldType::value_type &
-                    lc_val(const blueprint_linear_combination<ArithmetizationType> &lc) {
+                    lc_val(const detail::blueprint_linear_combination<ArithmetizationType> &lc) {
                     if (lc.is_variable) {
                         return this->val(value_type(lc.index));
                     } else {
@@ -96,7 +96,7 @@ namespace nil {
                 }
 
                 typename BlueprintFieldType::value_type
-                    lc_val(const blueprint_linear_combination<ArithmetizationType> &lc) const {
+                    lc_val(const detail::blueprint_linear_combination<ArithmetizationType> &lc) const {
                     if (lc.is_variable) {
                         return this->val(value_type(lc.index));
                     } else {
@@ -136,13 +136,11 @@ namespace nil {
                 }
 
                 snark::r1cs_primary_input<BlueprintFieldType> primary_input() const {
-                    return snark::r1cs_primary_input<BlueprintFieldType>(values.begin(),
-                                                                      values.begin() + num_inputs());
+                    return snark::r1cs_primary_input<BlueprintFieldType>(values.begin(), values.begin() + num_inputs());
                 }
 
                 snark::r1cs_auxiliary_input<BlueprintFieldType> auxiliary_input() const {
-                    return snark::r1cs_auxiliary_input<BlueprintFieldType>(values.begin() + num_inputs(),
-                                                                        values.end());
+                    return snark::r1cs_auxiliary_input<BlueprintFieldType>(values.begin() + num_inputs(), values.end());
                 }
 
                 snark::r1cs_constraint_system<BlueprintFieldType> get_constraint_system() const {
@@ -159,12 +157,12 @@ namespace nil {
                     return next_free_var++;
                 }
 
-                typename blueprint_linear_combination<ArithmetizationType>::index_type allocate_lc_index() {
+                typename detail::blueprint_linear_combination<ArithmetizationType>::index_type allocate_lc_index() {
                     lc_values.emplace_back(BlueprintFieldType::value_type::zero());
                     return next_free_lc++;
                 }
             };
-        }        // namespace zk
-    }            // namespace crypto3
+        }    // namespace zk
+    }        // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_R1CS_HPP

@@ -26,8 +26,9 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_ASSIGNMENT_PLONK_HPP
 #define CRYPTO3_ZK_BLUEPRINT_ASSIGNMENT_PLONK_HPP
 
-#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
-#include <nil/crypto3/zk/snark/relations/plonk/table.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/assignment.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -39,67 +40,95 @@ namespace nil {
             template<typename ArithmetizationType, std::size_t... BlueprintParams>
             class blueprint_public_assignment_table;
 
-            template<typename BlueprintFieldType, std::size_t WitnessColumns>
-            class blueprint_private_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>, WitnessColumns>
-                : public snark::plonk_private_assignment_table<BlueprintFieldType, WitnessColumns> {
+            template<typename BlueprintFieldType,
+                     typename ArithmetizationParams>
+            class blueprint_private_assignment_table<snark::plonk_constraint_system<BlueprintFieldType,
+                                                        ArithmetizationParams>>
+                : public snark::plonk_private_assignment_table<BlueprintFieldType,
+                                                               ArithmetizationParams> {
 
-                typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+                typedef snark::plonk_constraint_system<BlueprintFieldType,
+                                                       ArithmetizationParams> ArithmetizationType;
 
+                snark::plonk_table_description<BlueprintFieldType,
+                        ArithmetizationParams> &_table_description;
             public:
-                blueprint_private_assignment_table() :
-                    snark::plonk_private_assignment_table<BlueprintFieldType, WitnessColumns>() {
+                blueprint_private_assignment_table(
+                    snark::plonk_table_description<BlueprintFieldType,
+                        ArithmetizationParams> &table_description) :
+                    snark::plonk_private_assignment_table<BlueprintFieldType,
+                        ArithmetizationParams>(), _table_description(table_description) {
                 }
 
                 snark::plonk_column<BlueprintFieldType> &witness(std::size_t witness_index) {
-                    assert(witness_index < WitnessColumns);
+                    assert(witness_index < ArithmetizationParams::WitnessColumns);
+                    this->witness_columns[witness_index].resize(_table_description.rows_amount);
                     return this->witness_columns[witness_index];
                 }
 
                 snark::plonk_column<BlueprintFieldType> &operator[](std::size_t index) {
-                    if (index < WitnessColumns) {
-                        return this->witness_columns[index];
-                    } else {
-                        // Usupposed input
-                        return this->witness_columns[0];
+                    if (index < ArithmetizationParams::WitnessColumns) {
+                        return witness(index);
                     }
-                    index -= WitnessColumns;
+                    index -= ArithmetizationParams::WitnessColumns;
+
+                    // Usupposed input
+                    return this->witness(0);
                 }
 
-                void allocate_rows(std::size_t required_total_rows_amount) {
-                    for (std::size_t w_index = 0; w_index < WitnessColumns; w_index++) {
-                        this->witness_columns[w_index].resize(
-                            std::max(required_total_rows_amount, this->witness_columns[w_index].size()));
+                snark::plonk_table_description<BlueprintFieldType,
+                        ArithmetizationParams> table_description() const {
+                    return _table_description;
+                }
+
+                std::size_t padding(){
+
+                    if (_table_description.usable_rows_amount == 0) {
+                        _table_description.usable_rows_amount =
+                            _table_description.rows_amount;
+                        _table_description.rows_amount = std::pow(2,
+                            std::ceil(std::log2(_table_description.rows_amount)));
+
+                        if (_table_description.rows_amount == 1)
+                            _table_description.rows_amount = 2;
+
+                        for (std::size_t w_index = 0; w_index <
+                            ArithmetizationParams::WitnessColumns; w_index++){
+
+                            this->witness_columns[w_index].resize(_table_description.rows_amount);
+                        }
                     }
+
+                    return _table_description.rows_amount;
                 }
             };
 
             template<typename BlueprintFieldType,
-                     std::size_t PublicInputColumns,
-                     std::size_t ConstantColumns,
-                     std::size_t SelectorColumns>
-            class blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                    PublicInputColumns,
-                                                    ConstantColumns,
-                                                    SelectorColumns>
+                     typename ArithmetizationParams>
+            class blueprint_public_assignment_table<snark::plonk_constraint_system<BlueprintFieldType,
+                                                        ArithmetizationParams>>
                 : public snark::plonk_public_assignment_table<BlueprintFieldType,
-                                                              PublicInputColumns,
-                                                              ConstantColumns,
-                                                              SelectorColumns> {
+                                                              ArithmetizationParams> {
 
-                typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+                typedef snark::plonk_constraint_system<BlueprintFieldType,
+                    ArithmetizationParams> ArithmetizationType;
 
+                snark::plonk_table_description<BlueprintFieldType,
+                        ArithmetizationParams> &_table_description;
             public:
-                blueprint_public_assignment_table() :
+                blueprint_public_assignment_table(
+                    snark::plonk_table_description<BlueprintFieldType,
+                        ArithmetizationParams> &table_description) :
                     snark::plonk_public_assignment_table<BlueprintFieldType,
-                                                         PublicInputColumns,
-                                                         ConstantColumns,
-                                                         SelectorColumns>() {
+                                                         ArithmetizationParams>(),
+                    _table_description(table_description) {
                 }
 
                 snark::plonk_column<BlueprintFieldType> &selector(std::size_t selector_index) {
                     if (selector_index >= this->selector_columns.size()) {
                         this->selector_columns.resize(selector_index + 1);
                     }
+                    this->selector_columns[selector_index].resize(_table_description.rows_amount);
                     return this->selector_columns[selector_index];
                 }
 
@@ -143,42 +172,72 @@ namespace nil {
 
                 snark::plonk_column<BlueprintFieldType> &public_input(std::size_t public_input_index) {
                     assert(public_input_index < this->public_input_columns.size());
+                    this->public_input_columns[public_input_index].resize(_table_description.rows_amount);
                     return this->public_input_columns[public_input_index];
+                }
+
+                snark::plonk_column<BlueprintFieldType> &constant(std::size_t constant_index) {
+                    assert(constant_index < this->constant_columns.size());
+                    this->constant_columns[constant_index].resize(_table_description.rows_amount);
+                    return this->constant_columns[constant_index];
                 }
 
                 snark::plonk_column<BlueprintFieldType> &operator[](std::size_t index) {
                     if (index < this->public_input_columns.size()) {
-                        return this->public_input_columns[index];
+                        return public_input(index);
                     }
                     index -= this->public_input_columns.size();
                     if (index < this->constant_columns.size()) {
-                        return this->constant_columns[index];
+                        return constant(index);
                     }
                     index -= this->constant_columns.size();
                     if (index < this->selector_columns.size()) {
-                        return this->selector_columns[index];
-                    } else {
-                        // Usupposed input
-                        return this->public_input_columns[0];
+                        return this->selector(index);
                     }
                     index -= this->selector_columns.size();
+
+                    // Usupposed input
+                    return this->public_input(0);
                 }
 
-                void allocate_rows(std::size_t required_total_rows_amount) {
-                    for (std::size_t pi_index = 0; pi_index < PublicInputColumns; pi_index++) {
-                        this->public_input_columns[pi_index].resize(
-                            std::max(required_total_rows_amount, this->public_input_columns[pi_index].size()));
+                snark::plonk_table_description<BlueprintFieldType,
+                        ArithmetizationParams> table_description() const {
+                    return _table_description;
+                }
+
+                std::size_t padding(){
+                    if (_table_description.usable_rows_amount == 0) {
+
+                        _table_description.usable_rows_amount =
+                            _table_description.rows_amount;
+
+                        _table_description.rows_amount = std::pow(2,
+                            std::ceil(std::log2(_table_description.rows_amount)));
+
+                        if (_table_description.rows_amount == 1)
+                            _table_description.rows_amount = 2;
+
+                        for (std::size_t pi_index = 0; pi_index <
+                            this->public_input_columns.size(); pi_index++) {
+
+                            this->public_input_columns[pi_index].resize(_table_description.rows_amount);
+                        }
+
+                        for (std::size_t c_index = 0; c_index <
+                            this->constant_columns.size(); c_index++) {
+
+                            this->constant_columns[c_index].resize(_table_description.rows_amount);
+                        }
+
+                        for (std::size_t s_index = 0; s_index <
+                            this->selector_columns.size(); s_index++) {
+
+                            this->selector_columns[s_index].resize(_table_description.rows_amount);
+                        }
+
                     }
 
-                    for (std::size_t c_index = 0; c_index < ConstantColumns; c_index++) {
-                        this->constant_columns[c_index].resize(
-                            std::max(required_total_rows_amount, this->constant_columns[c_index].size()));
-                    }
-
-                    for (std::size_t s_index = 0; s_index < SelectorColumns; s_index++) {
-                        this->selector_columns[s_index].resize(
-                            std::max(required_total_rows_amount, this->selector_columns[s_index].size()));
-                    }
+                    return _table_description.rows_amount;
                 }
             };
 

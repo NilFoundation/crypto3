@@ -28,24 +28,24 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_EDDSA_9_WIRES_HPP
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_EDDSA_9_WIRES_HPP
 
-#include <nil/crypto3/math/detail/field_utils.hpp>
-
-#include <nil/crypto3/zk/snark/relations/plonk/plonk.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
-#include <nil/crypto3/zk/components/detail/plonk/n_wires.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
-                class eddsa_verifier_plonk;
+                template<typename ArithmetizationType,
+                         typename CurveType,
+                         std::size_t... WireIndexes>
+                class eddsa_verifier;
 
                 template<typename BlueprintFieldType,
+                         typename ArithmetizationParams,
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
@@ -56,65 +56,60 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class eddsa_verifier_plonk<snark::plonk_constraint_system<BlueprintFieldType>,
-                                           CurveType,
-                                           W0,
-                                           W1,
-                                           W2,
-                                           W3,
-                                           W4,
-                                           W5,
-                                           W6,
-                                           W7,
-                                           W8>
-                    : public detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                    W0,
-                                                    W1,
-                                                    W2,
-                                                    W3,
-                                                    W4,
-                                                    W5,
-                                                    W6,
-                                                    W7,
-                                                    W8> {
+                class eddsa_verifier<
+                    snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams>,
+                    CurveType,
+                    W0, W1, W2, W3, W4,
+                    W5, W6, W7, W8> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
-                    typedef blueprint<ArithmetizationType> blueprint_type;
-
-                    std::size_t j;
-                    typename CurveType::template g1_type<>::value_type B;
-
-                    using n_wires_helper = detail::n_wires_helper<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                                  W0,
-                                                                  W1,
-                                                                  W2,
-                                                                  W3,
-                                                                  W4,
-                                                                  W5,
-                                                                  W6,
-                                                                  W7,
-                                                                  W8>;
-
-                    using n_wires_helper::w;
-                    enum indices { m2 = 0, m1, cur, p1, p2 };
-
+                    typedef snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams> ArithmetizationType;
+                    
                     constexpr static const std::size_t L =
-                        math::detail::power_of_two(252) + 27742317777372353535851937790883648493;
+                        std::pow(2, 252) + 27742317777372353535851937790883648493;
 
                 public:
-                    eddsa_verifier_plonk(blueprint_type &bp,
-                                         std::pair<typename CurveType::value_type, typename CurveType>
-                                             signature,
-                                         typename CurveType::value_type M,
-                                         typename CurveType::value_type A,
-                                         typename CurveType::value_type B) :
-                    {
+
+                    constexpr static const std::size_t required_rows_amount = ;
+
+                    struct init_params_type {
+                        
+                    };
+
+                    struct assignment_params_type {
+                        
+                    };
+
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
+                        return bp.allocate_rows(required_rows_amount);
                     }
 
-                    void generate_gates() {
+                    static void generate_gates(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const std::size_t &component_start_row) {
+
+                        const std::size_t &j = component_start_row;
                     }
 
-                    void generate_assignments() {
+                    static void generate_copy_constraints(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const std::size_t &component_start_row) {
+
+                    }
+
+                    static void generate_assignments(
+                        blueprint_private_assignment_table<ArithmetizationType>
+                            &private_assignment,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const assignment_params_type &params,
+                        const std::size_t &component_start_row) {
+
                     }
 
                 }    // namespace components
