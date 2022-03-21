@@ -382,7 +382,7 @@ namespace nil {
                         std::size_t columns_with_copy_constraints) {
 
                         std::size_t N_rows = table_description.rows_amount;
-                        std::size_t usable_rows = constraint_system.usable_rows_amount();
+                        std::size_t usable_rows = table_description.usable_rows_amount;
 
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
                             math::make_evaluation_domain<FieldType>(N_rows);

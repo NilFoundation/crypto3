@@ -46,6 +46,7 @@ namespace nil {
                         ArithmetizationParams::SelectorColumns;
 
                     std::size_t rows_amount = 0;
+                    std::size_t usable_rows_amount = 0;
 
                     std::size_t global_index(const plonk_variable<FieldType> &a) const {
                         switch (a.type)
@@ -81,6 +82,7 @@ namespace nil {
                     std::size_t selector_columns;
 
                     std::size_t rows_amount = 0;
+                    std::size_t usable_rows_amount = 0;
 
                     std::size_t global_index(const plonk_variable<FieldType> &a) const {
                         switch (a.type)
