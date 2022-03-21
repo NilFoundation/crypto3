@@ -25,8 +25,8 @@
 // @file Declaration of interfaces for PLONK unified addition component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_UNIFIED_ADDITION_COMPONENT_15_WIRES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_UNIFIED_ADDITION_COMPONENT_15_WIRES_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_UNIFIED_ADDITION_COMPONENT_11_WIRES_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_UNIFIED_ADDITION_COMPONENT_11_WIRES_HPP
 
 #include <cmath>
 
@@ -66,21 +66,12 @@ namespace nil {
                     snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams>,
                     CurveType,
-                    W0,
-                    W1,
-                    W2,
-                    W3,
-                    W4,
-                    W5,
-                    W6,
-                    W7,
-                    W8,
-                    W9,
+                    W0, W1, W2, W3, W4,
+                    W5, W6, W7, W8, W9,
                     W10>{
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
-                    typedef blueprint<ArithmetizationType> blueprint_type;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
                 public:
@@ -211,4 +202,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_UNIFIED_ADDITION_COMPONENT_15_WIRES_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_UNIFIED_ADDITION_COMPONENT_11_WIRES_HPP

@@ -36,34 +36,14 @@
 #include <nil/crypto3/hash/keccak.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/verifier.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
 
-#include "profiling.hpp"
+#include "test_plonk_component.hpp"
 
 using namespace nil::crypto3;
-
-template<typename fri_type, typename FieldType>
-typename fri_type::params_type create_fri_params(std::size_t degree_log) {
-    typename fri_type::params_type params;
-    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
-
-    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
-        zk::commitments::detail::calculate_domain_set<FieldType>(degree_log, degree_log - 1);
-
-    params.r = degree_log - 1;
-    params.D = domain_set;
-    params.q = q;
-    params.max_degree = (1 << degree_log) - 1;
-
-    return params;
-}
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
@@ -98,7 +78,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
     zk::snark::plonk_assignment_table<BlueprintFieldType, WitnessColumns, PublicInputColumns, 
         ConstantColumns, SelectorColumns> assignments(
-    	private_assignment, public_assignment);
+        private_assignment, public_assignment);
 
     using params = zk::snark::redshift_params<BlueprintFieldType, WitnessColumns,
          PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -139,63 +119,17 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
-        ArithmetizationParams>;
-
-    zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
-
-    zk::blueprint<ArithmetizationType> bp(desc);
-    zk::blueprint_private_assignment_table<ArithmetizationType> private_assignment(desc);
-    zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
+                ArithmetizationParams>;
 
     using component_type = zk::components::curve_element_unified_addition<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10>;
-    typename component_type::assignment_params_type a_params = {algebra::random_element<
-        curve_type::template g1_type<>>(), algebra::random_element<
-        curve_type::template g1_type<>>()};
-    // component_type unified_addition_component(bp, {});
 
-    std::size_t start_row = component_type::allocate_rows(bp);
-    component_type::generate_gates(bp, public_assignment, {}, start_row);
-    component_type::generate_copy_constraints(bp, public_assignment, {}, start_row);
-    component_type::generate_assignments(private_assignment, public_assignment, {}, a_params, start_row);
+    typename component_type::init_params_type init_params = {};
+    typename component_type::assignment_params_type assignment_params = {
+        algebra::random_element<curve_type::template g1_type<>>(),
+        algebra::random_element<curve_type::template g1_type<>>()};
 
-    // bp.fix_usable_rows();
-    private_assignment.padding();
-    public_assignment.padding();
-    std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
-    std::cout << "Padded rows: " << desc.rows_amount << std::endl;
-
-    zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(
-    	private_assignment, public_assignment);
-
-    using params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams>;
-    using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
-
-    using fri_type = typename zk::commitments::fri<BlueprintFieldType, params::merkle_hash_type,
-                              params::transcript_hash_type, 2>;
-    std::size_t table_rows_log = 2;
-
-    typename fri_type::params_type fri_params = create_fri_params<fri_type, BlueprintFieldType>(table_rows_log);
-
-    std::size_t permutation_size = 12;
-
-    typename types::preprocessed_public_data_type public_preprocessed_data =
-         zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, 
-            desc, fri_params, permutation_size);
-    typename types::preprocessed_private_data_type private_preprocessed_data =
-         zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment,
-            desc);
-
-    auto proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(public_preprocessed_data,
-                                                                       private_preprocessed_data,
-                                                                       desc,
-                                                                       bp,
-                                                                       assignments, fri_params);
-
-    bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data, proof, 
-                                                                        bp, fri_params);
-    profiling(assignments);
-    BOOST_CHECK(verifier_res);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams> (init_params, assignment_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
