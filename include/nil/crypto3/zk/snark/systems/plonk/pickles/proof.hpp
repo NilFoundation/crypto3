@@ -30,7 +30,7 @@
 #include <tuple>
 #include <vector>
 
-#include <nil/crypto3/zk/snark/commitments/pedersen.hpp>
+#include <nil/crypto3/zk/snark/commitments/polynmomial/pedersen.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -47,35 +47,43 @@ namespace nil {
 
                     typename commitment_scheme::commitment_type z_comm;
 
-                    // N_perm
-                    std::vector<typename commitment_scheme::commitment_type> t_comm;
+                    typename commitment_scheme::commitment_type t_comm;
+
+                    // TODO: Lookup comm?
 
                     // Evaluations:
-                    std::array<typename commitment_scheme::evaluation_type, WiresAmount + 1> w_zeta;
-                    std::array<typename commitment_scheme::evaluation_type, WiresAmount + 1> w_zeta_omega;
+                    std::array<typename commitment_scheme::evaluation_type, WiresAmount + 1> w_zeta;    // evals[0]
+                    std::array<typename commitment_scheme::evaluation_type, WiresAmount + 1>
+                        w_zeta_omega;    // evals[1]
 
-                    typename commitment_scheme::evaluation_type z_zeta;
-                    typename commitment_scheme::evaluation_type z_zeta_omega;
+                    typename commitment_scheme::evaluation_type z_zeta;          // evals[0]
+                    typename commitment_scheme::evaluation_type z_zeta_omega;    // evals[1]
 
                     // N_perm + 1
-                    std::vector<typename commitment_scheme::commitment_type> S_sigma_zeta;
+                    std::vector<typename commitment_scheme::commitment_type> S_sigma_zeta;    // evals[0]
                     // N_perm + 1
-                    std::vector<typename commitment_scheme::commitment_type> S_sigma_zeta_omega;
+                    std::vector<typename commitment_scheme::commitment_type> S_sigma_zeta_omega;    // evals[1]
 
-                    typename commitment_scheme::evaluation_type L_zeta_omega;
+                    //typename commitment_scheme::evaluation_type L_zeta_omega; // TODO: what is it?
 
                     // Opening proof
                     std::vector<typename CurveType::template g1_type<>::value_type> L;
-                    std::vector<typename CurveType::template g1_type<>::value_type> R;
+                    std::vector<typename CurveType::template g1_type<>::value_type> R;    // L + R using as lr in kimchi
 
-                    typename CurveType::template g1_type<>::value_type sigma;
-                    typename CurveType::template g1_type<>::value_type G;
+                    typename CurveType::template g1_type<>::value_type sigma;    // using as sg in kimchi
+                    typename CurveType::template g1_type<>::value_type delta;
 
                     typename CurveType::scalar_field_type::value_type z1, z2;
 
+                    // ft_eval1
+                    typename CurveType::scalar_field_type::value_type ft_eval1;
+
+                    // public
+                    std::vector<typename CurveType::scalar_field_type::value_type> public_p;
+
                     // Previous challenges
-                    std::vector<std::tuple<std::vector<typename CurveType::scalar_field_type::value_type>,
-                                           typename commitment_scheme::commitment_type>>
+                    std::vector<
+                        std::tuple<std::vector<typename CurveType::scalar_field_type::value_type>, commitment_scheme>>
                         prev_challenges;
                 };
             }    // namespace snark
