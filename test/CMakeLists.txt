@@ -50,6 +50,7 @@ set(TESTS_NAMES
     "commitment/lpc"
     "commitment/fri"
     "commitment/lpc_performance"
+    "commitment/pedersen"
 
     "routing_algorithms/test_routing_algorithms"
 
