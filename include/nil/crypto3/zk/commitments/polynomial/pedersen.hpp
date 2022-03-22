@@ -23,11 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PICKLES_COMMITMENT_SCHEME_HPP
-#define CRYPTO3_ZK_PICKLES_COMMITMENT_SCHEME_HPP
+#ifndef CRYPTO3_ZK_PEDERSEN_COMMITMENT_SCHEME_HPP
+#define CRYPTO3_ZK_PEDERSEN_COMMITMENT_SCHEME_HPP
 
 #include <vector>
-#include <iostream>
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
@@ -39,6 +38,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace commitments {
+                
                 template<typename CurveType>
                 class pedersen {
                 public:
@@ -184,4 +184,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PICKLES_COMMITMENT_SCHEME_HPP
+#endif    // CRYPTO3_ZK_PEDERSEN_COMMITMENT_SCHEME_HPP
