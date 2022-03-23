@@ -72,6 +72,7 @@ set(PLONK_TESTS_FILES
     "algebra/curves/plonk/variable_base_scalar_mul"
     "algebra/curves/plonk/unified_addition"
     "algebra/curves/plonk/variable_base_endo_scalar_mul"
+    "algebra/curves/plonk/endo_scalar"
     "hashes/plonk/poseidon"
     )
 

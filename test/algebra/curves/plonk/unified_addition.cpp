@@ -124,12 +124,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     using component_type = zk::components::curve_element_unified_addition<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10>;
 
-    typename component_type::init_params_type init_params = {};
-    typename component_type::assignment_params_type assignment_params = {
+    typename component_type::public_params_type public_params = {};
+    typename component_type::private_params_type private_params = {
         algebra::random_element<curve_type::template g1_type<>>(),
         algebra::random_element<curve_type::template g1_type<>>()};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams> (init_params, assignment_params);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams> (public_params, private_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -77,10 +77,10 @@ namespace nil {
                 public:
                     constexpr static const std::size_t required_rows_amount = 1;
 
-                    struct init_params_type {
+                    struct public_params_type {
                     };
 
-                    struct assignment_params_type {
+                    struct private_params_type {
                         typename CurveType::template g1_type<>::value_type P;
                         typename CurveType::template g1_type<>::value_type Q;
                     };
@@ -92,7 +92,7 @@ namespace nil {
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment, 
-                        const init_params_type &init_params,
+                        const public_params_type &init_params,
                         const std::size_t &component_start_row) {
 
                         const std::size_t &j = component_start_row;
@@ -131,7 +131,7 @@ namespace nil {
                     static void generate_copy_constraints(
                             blueprint<ArithmetizationType> &bp,
                             blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                            const init_params_type &init_params,
+                            const public_params_type &init_params,
                             const std::size_t &component_start_row){
 
                         const std::size_t &j = component_start_row;
@@ -145,8 +145,8 @@ namespace nil {
                             blueprint_private_assignment_table<ArithmetizationType>
                                 &private_assignment,
                             blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                            const init_params_type &init_params,
-                            const assignment_params_type &params,
+                            const public_params_type &init_params,
+                            const private_params_type &params,
                             const std::size_t &component_start_row) {
 
                         const std::size_t &j = component_start_row;

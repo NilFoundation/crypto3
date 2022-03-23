@@ -51,7 +51,7 @@ namespace nil {
             std::size_t r = degree_log - 1;
 
             std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
-                zk::commitments::detail::calculate_domain_set<FieldType>(degree_log + expand_factor, degree_log - r);
+                zk::commitments::detail::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
 
             params.r = r;
             params.D = domain_set;
@@ -63,8 +63,8 @@ namespace nil {
         
         template <typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams>
         void test_component(
-            typename ComponentType::init_params_type init_params,
-            typename ComponentType::assignment_params_type assignment_params){
+            typename ComponentType::public_params_type init_params,
+            typename ComponentType::private_params_type assignment_params){
 
             using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
