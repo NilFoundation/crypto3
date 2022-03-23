@@ -28,8 +28,8 @@
 #define CRYPTO3_ALGEBRA_CURVES_PALLAS_G1_HPP
 
 #include <nil/crypto3/algebra/curves/detail/pallas/params.hpp>
-// #include <nil/crypto3/algebra/curves/detail/forms/montgomery/xz/element_g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/jacobian_with_a4_0/element_g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/element_g1_affine.hpp>
 
 namespace nil {
     namespace crypto3 {

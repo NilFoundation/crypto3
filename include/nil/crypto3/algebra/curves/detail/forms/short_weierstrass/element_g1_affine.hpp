@@ -199,14 +199,14 @@ namespace nil {
                             if (this->is_zero()) {
                                 return (*this);
                             } else {
-                                field_value_type Xsquared = X.squared();
-                                field_value_type Xsquared3pa = Xsquared.doubled() + Xsquared + params_type::a;
-                                field_value_type Xsquared3pasquared = Xsquared3pa.squared();
+                                field_value_type Xsquared3pa = 3 * X.squared() + params_type::a;
                                 field_value_type Y2squared = Y.doubled().squared();
 
-                                field_value_type X3 = Xsquared3pasquared * Y2squared.inversed() - X - X;
-                                field_value_type Y3 = (X.doubled() + X) * Xsquared3pa * Y.doubled().inversed() -
-                                                      Xsquared3pasquared * Xsquared3pa * Y2squared * (Y.doubled()) - Y;
+                                field_value_type X3 = Xsquared3pa.squared() / Y2squared - X - X;
+                                field_value_type Y3 = (X.doubled() + X) * Xsquared3pa / Y.doubled() -
+                                                      Xsquared3pa.pow(3) / (Y.doubled()).pow(3) - Y;
+
+                                return curve_element(X3, Y3);
                             }
                         }
 
