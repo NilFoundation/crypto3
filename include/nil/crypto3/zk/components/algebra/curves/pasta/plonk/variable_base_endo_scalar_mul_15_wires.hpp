@@ -28,15 +28,15 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_15_WIRES_HPP
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_15_WIRES_HPP
 
+#include <cmath>
+
 #include <nil/marshalling/algorithms/pack.hpp>
-#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -84,12 +84,13 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams> ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
-
-                    constexpr static const typename BlueprintFieldType::value_type endo = typename BlueprintFieldType::value_type(algebra::fields::arithmetic_params<BlueprintFieldType>::multiplicative_generator).pow(typename BlueprintFieldType::integral_type( ( (BlueprintFieldType::value_type::zero() - BlueprintFieldType::value_type::one()) * ( typename BlueprintFieldType::value_type(3) ).inversed() ).data));
                 public:
 
+                    //constexpr static const typename BlueprintFieldType::value_type endo = 0x2D33357CB532458ED3552A23A8554E5005270D29D19FC7D27B7FD22F0201B547_cppui255;
+                    constexpr static const typename BlueprintFieldType::value_type endo = typename BlueprintFieldType::value_type(algebra::fields::arithmetic_params<BlueprintFieldType>::multiplicative_generator).pow(typename BlueprintFieldType::integral_type( ( (BlueprintFieldType::value_type::zero() - BlueprintFieldType::value_type::one()) * ( typename BlueprintFieldType::value_type(3) ).inversed() ).data));
+
                     constexpr static const std::size_t required_rows_amount = 65;
-                    struct init_params { };
+                    struct init_params_type { };
 
                     struct assignment_params_type {
                         typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type T;
@@ -110,40 +111,38 @@ namespace nil {
 
                         std::size_t selector_index = public_assignment.add_selector(j, j + required_rows_amount - 2);
 
-                        auto bit_check_1 = this->bp.add_bit_check(var(W11, 0));
-                        auto bit_check_2 = this->bp.add_bit_check(var(W12, 0));
-                        auto bit_check_3 = this->bp.add_bit_check(var(W13, 0));
-                        auto bit_check_4 = this->bp.add_bit_check(var(W14, 0));
+                        auto bit_check_1 = bp.add_bit_check(var(W11, 0));
+                        auto bit_check_2 = bp.add_bit_check(var(W12, 0));
+                        auto bit_check_3 = bp.add_bit_check(var(W13, 0));
+                        auto bit_check_4 = bp.add_bit_check(var(W14, 0));
 
-                        auto constraint_1 = this->bp.add_constraint(
-                            ((1 + (endo - 1) * var(W12, 0)) * var(W0, 0) - var(W4, 0)) * var(W9, 0) -
-                            2 * var(W11, 0)* var(W1, 0) + var(W1, 0) + var(W5, 0));
-                        auto constraint_2 = this->bp.add_constraint(
-                            (2 * var(W4, 0) - var(W9, 0) * var(W9, 0) + (1 + (endo - 1) * var(W12, 0)) * var(W0, 0)) *
+                        auto constraint_1 = bp.add_constraint(
+                            ((1 + (endo - 1) * var(W11, 0)) * var(W0, 0) - var(W4, 0)) * var(W9, 0) -
+                            2 * var(W12, 0)* var(W1, 0) + var(W1, 0) + var(W5, 0));
+                        auto constraint_2 = bp.add_constraint(
+                            (2 * var(W4, 0) - var(W9, 0) * var(W9, 0) + (1 + (endo - 1) * var(W11, 0)) * var(W0, 0)) *
                                 ((var(W4, 0) - var(W7, 0)) * var(W9, 0) + var(W8, 0) + var(W5, 0)) -
                             ((var(W4, 0) - var(W7, 0)) * 2 * var(W5, 0)));
-                        auto constraint_3 = this->bp.add_constraint(
+                        auto constraint_3 = bp.add_constraint(
                             (var(W8, 0) + var(W5, 0)) * (var(W8, 0) + var(W5, 0))
-                            - ((var(W4, 0) - var(W7, 0)) * (var(W4, 0) - var(W7, 0)) * (var(W9, 0) * (var(W9, 0) - (1 + (endo - 1) * var(W12, 0)) * var(W0, 0) + var(W7, 0)))));
-                        auto constraint_4 = this->bp.add_constraint(
-                            ((1 + (endo - 1) * var(W12, 0)) * var(W0, 0) - var(W7, 0)) * var(W10, 0) -
-                            2 * var(W13, 0)* var(W1, 0) + var(W1, 0) + var(W8, 0));
-                        auto constraint_5 = this->bp.add_constraint(
-                            (2 * var(W7, 0) - var(W10, 0) * var(W10, 0) + (1 + (endo - 1) * var(W14, 0)) * var(W0, 0)) *
+                            - ((var(W4, 0) - var(W7, 0)) * (var(W4, 0) - var(W7, 0)) * (var(W9, 0) * var(W9, 0) - (1 + (endo - 1) * var(W11, 0)) * var(W0, 0) + var(W7, 0))));
+                        auto constraint_4 = bp.add_constraint(
+                            ((1 + (endo - 1) * var(W13, 0)) * var(W0, 0) - var(W7, 0)) * var(W10, 0) -
+                            2 * var(W14, 0)* var(W1, 0) + var(W1, 0) + var(W8, 0));
+                        auto constraint_5 = bp.add_constraint(
+                            (2 * var(W7, 0) - var(W10, 0) * var(W10, 0) + (1 + (endo - 1) * var(W13, 0)) * var(W0, 0)) *
                                 ((var(W7, 0) - var(W4, +1)) * var(W10, 0) + var(W5, +1) + var(W8, 0)) -
                             ((var(W7, 0) - var(W4, +1)) * 2 * var(W8, 0)));
-                        auto constraint_6 = this->bp.add_constraint(
-                            (var(W4, +1) + var(W8, 0)) * (var(W4, +1) + var(W8, 0))
+                        auto constraint_6 = bp.add_constraint(
+                            (var(W5, +1) + var(W8, 0)) * (var(W5, +1) + var(W8, 0))
                             - ((var(W7, 0) - var(W4, +1)) * (var(W7, 0) - var(W4, +1))
-                                * (var(W10, 0) * (var(W10, 0)  - (1 + (endo - 1) * var(W14, 0)) * var(W0, 0) + var(W4, +1)))));
+                                * (var(W10, 0) * var(W10, 0)  - (1 + (endo - 1) * var(W13, 0)) * var(W0, 0) + var(W4, +1))));
                         auto constraint_7 =
-                            this->bp.add_constraint(var(W6, +1) - (16 * var(W6, 0) + 8 * var(W11, 0) + 4 * var(W12, 0) +
+                            bp.add_constraint(var(W6, +1) - (16 * var(W6, 0) + 8 * var(W11, 0) + 4 * var(W12, 0) +
                                                                    2 * var(W13, 0) + var(W14, 0)));
-                        this->bp.add_gate(selector_index,
-                                          {bit_check_1, bit_check_2, bit_check_3, bit_check_4, constraint_1, constraint_2});
-                        /*this->bp.add_gate(selector_index,
-                                          {bit_check_1, bit_check_2, bit_check_3, bit_check_4, constraint_1,
-                                           constraint_4});*/
+                        bp.add_gate(selector_index,
+                                          {bit_check_1, bit_check_2, bit_check_3, bit_check_4, constraint_1, constraint_2, constraint_3,
+                                          constraint_4, constraint_5, constraint_6, constraint_7});
                     }
 
 
@@ -155,17 +154,16 @@ namespace nil {
                         const std::size_t &j = component_start_row;
 
                         for (int z = 0; z < required_rows_amount - 2; z++) {
-                            this->bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 1, false}});
-                            this->bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 1, false}});
+                            bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 1, false}});
+                            bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 1, false}});
                         }
+                        bp.add_copy_constraint({{W6, j + 0, false}, {0, j + 0, false, var::column_type::public_input}});
+
+                        //TODO link to params.b
 
                         // TODO: (xP , yP ) in row i are copy constrained with values from the first doubling circuit
                     }
 
-                    template<std::size_t WitnessColumns,
-                             std::size_t SelectorColumns,
-                             std::size_t PublicInputColumns,
-                             std::size_t ConstantColumns>
                     static void generate_assignments(
                         blueprint_private_assignment_table<ArithmetizationType>
                             &private_assignment,
@@ -174,10 +172,7 @@ namespace nil {
                         const assignment_params_type &params,
                         const std::size_t &component_start_row) {
                             const std::size_t &j = component_start_row;
-                            private_assignment.allocate_rows(j + required_rows_amount);
-                            public_assignment.allocate_rows(j + required_rows_amount);
-                            public_assignment.public_input(0)[0] = arithmetization_type::field_type::value_type::zero();
-                            //public_assignment.public_input(0)[1] = params.b;
+                            public_assignment.public_input(0)[j + 0] = ArithmetizationType::field_type::value_type::zero();
 
                             const typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type &T = params.T;
 
@@ -185,58 +180,73 @@ namespace nil {
 
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type R;
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type Q;
-
-                            std::array<bool, CurveType::scalar_field_type::modulus_bits> b = {false};
-
+                            std::array<bool, CurveType::scalar_field_type::modulus_bits + 1> b = {false};
                             typename CurveType::scalar_field_type::integral_type integral_b = typename CurveType::scalar_field_type::integral_type(params.b.data);
-                            for (std::size_t i = 0; i < CurveType::scalar_field_type::modulus_bits; ++i) {
-                                b[i]= multiprecision::bit_test(integral_b, i);
+                            for (std::size_t i = 0; i < CurveType::scalar_field_type::modulus_bits; i++) {
+                                b[CurveType::scalar_field_type::modulus_bits - i] = multiprecision::bit_test(integral_b, i);
                             }
-
+                            b[0] = 0;
+                            typename ArithmetizationType::field_type::value_type n = 0;
+                            typename ArithmetizationType::field_type::value_type n_next = 0;
+                            typename ArithmetizationType::field_type::value_type s1 = 0;
+                            typename ArithmetizationType::field_type::value_type s3 = 0;
                             for (std::size_t i = j; i < j + required_rows_amount - 1; i++) {
                                 private_assignment.witness(W0)[i] = T.X;
                                 private_assignment.witness(W1)[i] = T.Y;
                                 if (i == j) {
                                     Q.X = endo * T.X;
                                     Q.Y = T.Y;
-                                    P = 2 * (T + Q);
+                                    P = T + (T + Q) + Q;
                                     private_assignment.witness(W4)[i] = P.X;
                                     private_assignment.witness(W5)[i] = P.Y;
-                                    private_assignment.witness(W6)[i] = 0;
+                                    private_assignment.witness(W6)[i] = n;
                                 }
                                 else {
-                                    Q.X = (1 + (endo - 1) * b[(i - j)*4 - 1]) * T.X;
-                                    Q.Y = (2* b[(i - j)*4 - 2] - 1) * T.Y;
-                                    P = 2 * R + Q;
+                                    Q.X = (1 + (endo - 1) * b[(i - j)*4 - 2]) * T.X;
+                                    Q.Y = (2* b[(i - j)*4 - 1] - 1) * T.Y;
+                                    /*s4 = 2 * R.Y * (2*R.X + Q.X - s3 * s3).inversed() - s3;
+                                    P.X = Q.X + s4*s4 - s3*s3;
+                                    P.Y = (R.X - P.X)*s4 -R.Y;*/
+                                    P = R + Q + R;                   
                                     private_assignment.witness(W4)[i] = P.X;
                                     private_assignment.witness(W5)[i] = P.Y;
-                                    private_assignment.witness(W6)[i] = private_assignment.witness(W6)[i - 1] * 16 + private_assignment.witness(W11)[i - 1] * 8 
-                                    + private_assignment.witness(W12)[i - 1] * 4 + private_assignment.witness(W13)[i - 1] * 2 + private_assignment.witness(W14)[i - 1];
+                                    n_next = n * 16 + b[(i - j) * 4 - 4] * 8 
+                                    + b[(i - j) * 4 - 3]  * 4 + b[(i - j) * 4 - 2]  * 2 + b[(i - j) * 4 - 1] ;
+                                    private_assignment.witness(W6)[i] = n_next;
+                                    n = n_next;
                                 }
-                                Q.X = (1 + (endo - 1) * b[(i - j)*4 + 1]) * T.X;
-                                Q.Y = (2* b[(i - j)*4] - 1) * T.Y;
-                                R = 2 * P + Q;
-                                private_assignment.witness(W7)[i] = R.X;
-                                private_assignment.witness(W8)[i] = R.Y;
                                 private_assignment.witness(W11)[i] = b[(i - j)*4];
                                 private_assignment.witness(W12)[i] = b[(i - j)*4 + 1];
                                 private_assignment.witness(W13)[i] = b[(i - j)*4 + 2];
                                 private_assignment.witness(W14)[i] = b[(i - j)*4 + 3];
-                                private_assignment.witness(W9)[i] = ((2 * b[(i - j)*4] - 1) * T.Y - P.Y) * ((1 + (endo - 1)*
-                                b[(i - j)*4 + 1]) * T.X - P.X).inversed();
+                                Q.X = (1 + (endo - 1) * b[(i - j)*4]) * T.X;
+                                Q.Y = (2* b[(i - j)*4 + 1] - 1) * T.Y;
+                                s1 = (Q.Y- P.Y) * (Q.X - P.X).inversed();
+                                //s2 = 2 * P.Y * (2*P.X + Q.X - s1 * s1).inversed() - s1;
 
-                                private_assignment.witness(W10)[i] = ((2 * b[(i - j)*4 + 2] - 1) * T.Y - R.Y) * ((1 + (endo - 1)*
-                                b[(i - j)*4 + 3]) * T.X - R.X).inversed();
+                                private_assignment.witness(W9)[i] = s1;
+                                /*R.X = Q.X + s2*s2 - s1*s1;
+                                R.Y = (P.X - R.X)*s2 -P.Y;*/
+                                R = P + Q + P;
+                                s3 = ((2 * b[(i - j)*4 + 3] - 1) * T.Y - R.Y) * ((1 + (endo - 1)*
+                                b[(i - j)*4 + 2]) * T.X - R.X).inversed();
+                                private_assignment.witness(W10)[i] = s3;
+                                private_assignment.witness(W7)[i] = R.X;
+                                private_assignment.witness(W8)[i] = R.Y;
                             }
 
-                            Q.X = (1 + (endo - 1) * b[255]) * T.X;
-                            Q.Y = (2* b[254] - 1) * T.Y;
-                            P = 2 * R + Q;
+                            Q.X = (1 + (endo - 1) * b[254]) * T.X;
+                            Q.Y = (2* b[255] - 1) * T.Y;
+                            /*s4 = 2 * R.Y * (2*R.X + Q.X - s3 * s3).inversed() - s3;
+                            P.X = Q.X + s4*s4 - s3*s3;
+                            P.Y = (R.X - P.X)*s4 -R.Y; */
+                            P = R + Q + R;
                             private_assignment.witness(W4)[j + 64] = P.X;
                             private_assignment.witness(W5)[j + 64] = P.Y;
-                            private_assignment.witness(W6)[j + 64] = private_assignment.witness(W6)[j + 63] * 16 + private_assignment.witness(W11)[j + 63] * 8 
-                            + private_assignment.witness(W12)[j + 63] * 4 + private_assignment.witness(W13)[j + 63] * 2 + private_assignment.witness(W14)[j + 63];
-
+                            n_next = n * 16 + b[252] * 8 
+                            + b[253] * 4 + b[254] * 2 + b[255];
+                            private_assignment.witness(W6)[j + 64] = n_next;
+                             std::cout<<"circuit result "<< P.X.data<< " "<< P.Y.data<<std::endl;
 
                     }
                 };

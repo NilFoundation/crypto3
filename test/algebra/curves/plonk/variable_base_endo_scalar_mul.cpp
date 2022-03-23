@@ -35,20 +35,20 @@
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/verifier.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/edwards/plonk/variable_base_endo_scalar_mul_15_wires.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/variable_base_endo_scalar_mul_15_wires.hpp>
+#include "test_plonk_component.hpp"
 
 #include "../../../profiling.hpp"
 
 using namespace nil::crypto3;
 
-template<typename fri_type, typename FieldType>
+BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
+
+/*template<typename fri_type, typename FieldType>
 typename fri_type::params_type create_fri_params(std::size_t degree_log) {
     typename fri_type::params_type params;
     math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
@@ -127,6 +127,48 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_allocat_rows_test_case) {
                                                                         bp, fri_params);
     profiling(assignments);
     BOOST_CHECK(verifier_res);
+}*/
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_base_endo_scalar_mul) {
+
+    using curve_type = algebra::curves::pallas;
+    using BlueprintFieldType = typename curve_type::base_field_type;
+    using BlueprintScalarType = typename curve_type::scalar_field_type;
+    constexpr std::size_t WitnessColumns = 15;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t SelectorColumns = 1;
+    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
+        PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
+                ArithmetizationParams>;
+    using component_type = zk::components::curve_element_variable_base_endo_scalar_mul<ArithmetizationType, curve_type,
+                                                            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+
+    typename component_type::init_params_type init_params = {};
+    curve_type::scalar_field_type::value_type b = algebra::random_element<BlueprintScalarType>();
+    curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
+    typename component_type::assignment_params_type assignment_params = {T,b};
+    constexpr static const typename BlueprintFieldType::value_type endo  = component_type::endo;
+    std::array<bool, curve_type::scalar_field_type::modulus_bits + 1> bits = {false};
+    typename curve_type::scalar_field_type::integral_type integral_b = typename curve_type::scalar_field_type::integral_type(b.data);
+    for (std::size_t i = 0; i < curve_type::scalar_field_type::modulus_bits; i++) {
+        bits[curve_type::scalar_field_type::modulus_bits - i] = multiprecision::bit_test(integral_b, i);
+    }
+    bits[0] = 0;
+    typename curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type testQ;
+    testQ.X = endo * T.X;
+    testQ.Y = T.Y;
+    typename curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type acc = T + (T + testQ) + testQ;
+    for (std::size_t i = 0; i < curve_type::scalar_field_type::modulus_bits + 1; i = i + 2) {
+        auto b1 = bits[i];
+        auto b2 = bits[i + 1];
+        testQ.X = (1 + (endo - 1) * b1)*T.X;
+        testQ.Y = (b2 + b2 - 1) * T.Y;
+        acc = acc + testQ + acc;
+    }
+    std::cout<<"Expected result: "<<acc.X.data<<" "<< acc.Y.data<<std::endl;
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams> (init_params, assignment_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
