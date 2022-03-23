@@ -311,6 +311,13 @@ namespace nil {
 
             template<typename VariableType>
             non_linear_combination<VariableType>
+                operator+(const non_linear_term<VariableType> &nlt,
+                          const non_linear_combination<VariableType> &lc) {
+                return non_linear_combination<VariableType>(nlt) + lc;
+            }
+
+            template<typename VariableType>
+            non_linear_combination<VariableType>
                 operator+(const non_linear_combination<VariableType> &lc,
                           const typename VariableType::assignment_type &field_coeff) {
 
