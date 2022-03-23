@@ -133,7 +133,7 @@ namespace nil {
                          * @return true if element from group G1 is the point at infinity
                          */
                         constexpr bool is_zero() const {
-                            return X == params_type::zero_fill[0] && Y == params_type::zero_fill[0];
+                            return X == params_type::zero_fill[0] && Y == params_type::zero_fill[1];
                         }
 
                         /*************************  Reducing operations  ***********************************/
@@ -217,14 +217,12 @@ namespace nil {
                          * y3 = (2*x1+x2)*(y2-y1)/(x2-x1)-(y2-y1)3/(x2-x1)3-y1
                          */
                         curve_element add(const curve_element &other) const {
-                            field_value_type Y2mY1 = other.Y - this->Y;
-                            field_value_type Y2mY1squared = Y2mY1.squared();
-                            field_value_type X2mX1 = other.X - this->X;
-                            field_value_type X2mX1squared = X2mX1.squared();
+                            field_value_type Y2mY1 = other.Y - Y;
+                            field_value_type X2mX1 = other.X - X;
 
-                            field_value_type X3 = Y2mY1squared * X2mX1squared.inversed() - this->X - other.X;
-                            field_value_type Y3 = ((this -> X).doubled() + other.X) * Y2mY1 * X2mX1.inversed() -
-                                                  Y2mY1 * Y2mY1squared * (X2mX1 * X2mX1squared).inversed() - this->Y;
+                            field_value_type X3 = Y2mY1.squared() / X2mX1.squared() - X - other.X;
+                            field_value_type Y3 = (2 * X + other.X) * Y2mY1 / X2mX1 -
+                                                  (Y2mY1.pow(3)) / (X2mX1.pow(3)) - Y;
 
                             return curve_element(X3, Y3);
                         }
