@@ -47,7 +47,7 @@ namespace nil {
             typename fri_type::params_type params;
             math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
-            constexpr std::size_t expand_factor = 4;
+            constexpr std::size_t expand_factor = 0;
             std::size_t r = degree_log - 1;
 
             std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =

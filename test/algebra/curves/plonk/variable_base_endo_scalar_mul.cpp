@@ -145,10 +145,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_base_endo_scalar_mul) {
     using component_type = zk::components::curve_element_variable_base_endo_scalar_mul<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
-    typename component_type::init_params_type init_params = {};
+    typename component_type::public_params_type init_params = {};
     curve_type::scalar_field_type::value_type b = algebra::random_element<BlueprintScalarType>();
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
-    typename component_type::assignment_params_type assignment_params = {T,b};
+    typename component_type::private_params_type assignment_params = {T,b};
     constexpr static const typename BlueprintFieldType::value_type endo  = component_type::endo;
     std::array<bool, curve_type::scalar_field_type::modulus_bits + 1> bits = {false};
     typename curve_type::scalar_field_type::integral_type integral_b = typename curve_type::scalar_field_type::integral_type(b.data);
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_base_endo_scalar_mul) {
     testQ.X = endo * T.X;
     testQ.Y = T.Y;
     typename curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type acc = T + (T + testQ) + testQ;
-    for (std::size_t i = 0; i < curve_type::scalar_field_type::modulus_bits + 1; i = i + 2) {
+    for (std::size_t i = 0; i < curve_type::scalar_field_type::modulus_bits; i = i + 2) {
         auto b1 = bits[i];
         auto b2 = bits[i + 1];
         testQ.X = (1 + (endo - 1) * b1)*T.X;

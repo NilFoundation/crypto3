@@ -90,9 +90,9 @@ namespace nil {
                     constexpr static const typename BlueprintFieldType::value_type endo = typename BlueprintFieldType::value_type(algebra::fields::arithmetic_params<BlueprintFieldType>::multiplicative_generator).pow(typename BlueprintFieldType::integral_type( ( (BlueprintFieldType::value_type::zero() - BlueprintFieldType::value_type::one()) * ( typename BlueprintFieldType::value_type(3) ).inversed() ).data));
 
                     constexpr static const std::size_t required_rows_amount = 65;
-                    struct init_params_type { };
+                    struct public_params_type { };
 
-                    struct assignment_params_type {
+                    struct private_params_type {
                         typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type T;
                         typename CurveType::scalar_field_type::value_type b;
                     };
@@ -104,7 +104,7 @@ namespace nil {
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
+                        const public_params_type &init_params,
                         const std::size_t &component_start_row) {
 
                         const std::size_t &j = component_start_row;
@@ -149,7 +149,7 @@ namespace nil {
                     static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
+                        const public_params_type &init_params,
                         const std::size_t &component_start_row) {
                         const std::size_t &j = component_start_row;
 
@@ -157,7 +157,7 @@ namespace nil {
                             bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 1, false}});
                             bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 1, false}});
                         }
-                        bp.add_copy_constraint({{W6, j + 0, false}, {0, j + 0, false, var::column_type::public_input}});
+                        //bp.add_copy_constraint({{W6, j + 0, false}, {0, 0, false, var::column_type::public_input}});
 
                         //TODO link to params.b
 
@@ -168,11 +168,11 @@ namespace nil {
                         blueprint_private_assignment_table<ArithmetizationType>
                             &private_assignment,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
-                        const assignment_params_type &params,
+                        const public_params_type &init_params,
+                        const private_params_type &params,
                         const std::size_t &component_start_row) {
                             const std::size_t &j = component_start_row;
-                            public_assignment.public_input(0)[j + 0] = ArithmetizationType::field_type::value_type::zero();
+                            public_assignment.public_input(0)[0] = ArithmetizationType::field_type::value_type::zero();
 
                             const typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type &T = params.T;
 
@@ -207,7 +207,7 @@ namespace nil {
                                     /*s4 = 2 * R.Y * (2*R.X + Q.X - s3 * s3).inversed() - s3;
                                     P.X = Q.X + s4*s4 - s3*s3;
                                     P.Y = (R.X - P.X)*s4 -R.Y;*/
-                                    P = R + Q + R;                   
+                                    P = 2*R + Q;                   
                                     private_assignment.witness(W4)[i] = P.X;
                                     private_assignment.witness(W5)[i] = P.Y;
                                     n_next = n * 16 + b[(i - j) * 4 - 4] * 8 
@@ -227,7 +227,7 @@ namespace nil {
                                 private_assignment.witness(W9)[i] = s1;
                                 /*R.X = Q.X + s2*s2 - s1*s1;
                                 R.Y = (P.X - R.X)*s2 -P.Y;*/
-                                R = P + Q + P;
+                                R = 2*P + Q;
                                 s3 = ((2 * b[(i - j)*4 + 3] - 1) * T.Y - R.Y) * ((1 + (endo - 1)*
                                 b[(i - j)*4 + 2]) * T.X - R.X).inversed();
                                 private_assignment.witness(W10)[i] = s3;
