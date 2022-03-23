@@ -283,7 +283,6 @@ namespace nil {
                     }
                 }
 
-
                 template<class Backend, typename StorageType>
                 constexpr void eval_subtract(modular_adaptor<Backend, StorageType> &result,
                                              const modular_adaptor<Backend, StorageType> &o) {
@@ -296,16 +295,20 @@ namespace nil {
                     }
                 }
 
-                template<unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, typename StorageType>
-                constexpr void eval_subtract(modular_adaptor<cpp_int_backend<MinBits, MaxBits, SignType, Checked>, StorageType> &result,
-                                             const modular_adaptor<cpp_int_backend<MinBits, MaxBits, SignType, Checked>, StorageType> &o) {
-                                        BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
-                    using ui_type = typename std::tuple_element<0, typename cpp_int_backend<MinBits, MaxBits, SignType, Checked>::unsigned_types>::type;
+                template<unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
+                         typename StorageType>
+                constexpr void eval_subtract(
+                    modular_adaptor<cpp_int_backend<MinBits, MaxBits, SignType, Checked>, StorageType> &result,
+                    const modular_adaptor<cpp_int_backend<MinBits, MaxBits, SignType, Checked>, StorageType> &o) {
+                    BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
+                    using ui_type = typename std::tuple_element<
+                        0, typename cpp_int_backend<MinBits, MaxBits, SignType, Checked>::unsigned_types>::type;
                     using default_ops::eval_lt;
 #if BOOST_ARCH_X86_64
                     auto limbs_count = get_limbs_count<cpp_int_backend<MinBits, MaxBits, SignType, Checked>>();
-                    if (!BOOST_MP_IS_CONST_EVALUATED(result.base_data().limbs()) && (result.base_data().size() > 1) &&
-                        (o.base_data().size() > 1)) {
+                    if (!BOOST_MP_IS_CONST_EVALUATED(result.base_data().limbs()) &&
+                        result.base_data().size() == o.base_data().size() &&
+                        result.base_data().size() == result.mod_data().get_mod().backend().size()) {
                         sub_mod_asm(limbs_count, result.base_data().limbs(), o.base_data().limbs(),
                                     result.mod_data().get_mod().backend().limbs());
                         result.base_data().resize(limbs_count, limbs_count);
