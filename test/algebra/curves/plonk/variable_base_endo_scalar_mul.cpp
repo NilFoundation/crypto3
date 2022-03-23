@@ -42,6 +42,7 @@
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/variable_base_endo_scalar_mul_15_wires.hpp>
 #include "test_plonk_component.hpp"
 
+#include "../../../profiling.hpp"
 
 using namespace nil::crypto3;
 
@@ -166,7 +167,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_base_endo_scalar_mul) {
         testQ.Y = (b2 + b2 - 1) * T.Y;
         acc = acc + testQ + acc;
     }
-    std::cout<<"Acc: "<<acc.X.data<<" "<< acc.Y.data<<std::endl;
+    std::cout<<"Expected result: "<<acc.X.data<<" "<< acc.Y.data<<std::endl;
     test_component<component_type, BlueprintFieldType, ArithmetizationParams> (init_params, assignment_params);
 }
 

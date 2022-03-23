@@ -41,7 +41,7 @@
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
 
-#include "test_plonk_component.hpp"
+#include "../../../test_plonk_component.hpp"
 
 using namespace nil::crypto3;
 

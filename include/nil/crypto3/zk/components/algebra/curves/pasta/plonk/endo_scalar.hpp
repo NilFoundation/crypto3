@@ -90,6 +90,12 @@ namespace nil {
                     constexpr static const std::size_t required_rows_amount = 16;
 
                 public:
+                    struct public_params_type {
+                    };
+
+                    struct private_params_type {
+                    };
+
                     element_g1_endo_scalar(blueprint_type &bp,
                         const init_params &params) :
                         component<arithmetization_type>(bp) {
@@ -164,7 +170,8 @@ namespace nil {
                             blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
                             blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
                                 PublicInputColumns, ConstantColumns> &public_assignment,
-                                              const assignment_params &params,
+                                              const private_params_type &private_params,
+                                              const public_params_type &public_params,
                                               std::size_t circuit_start_row = 0) {
 
                     }
