@@ -69,10 +69,12 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log) {
 
     constexpr std::size_t expand_factor = 4;
 
-    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
-        zk::commitments::detail::calculate_domain_set<FieldType>(degree_log + expand_factor, degree_log - 1);
+    std::size_t r = degree_log - 1;
 
-    params.r = degree_log - 1;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
+        zk::commitments::detail::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
+
+    params.r = r;
     params.D = domain_set;
     params.q = q;
     params.max_degree = (1 << degree_log) - 1;
