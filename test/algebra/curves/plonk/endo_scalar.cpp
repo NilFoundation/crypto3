@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
 
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
-    constexpr std::size_t WitnessColumns = 14;
+    constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 0;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
@@ -61,14 +61,19 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
 
-    using component_type = zk::components::curve_element_unified_addition<ArithmetizationType, curve_type,
+    using component_type = zk::components::endo_scalar<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
-    typename component_type::init_params_type init_params = {};
-    typename component_type::private_params_type private_params = {};
-    typename component_type::public_params_type public_params = {};
+    
+    typename BlueprintFieldType::value_type challenge = 0x00000000000000000000000000000000FC93536CAE0C612C18FBE5F6D8E8EEF2_cppui255;
+    typename BlueprintFieldType::value_type endo_factor = 0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
+    typename BlueprintFieldType::value_type result = 0x004638173549A4C55A118327904B54E5F6F6314225C8C862F5AFA2506C77AC65_cppui255;
+    std::size_t num_bits = 128;
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams> (init_params, assignment_params, private_params, public_params);
+    typename component_type::private_params_type private_params = {challenge};
+    typename component_type::public_params_type public_params = {endo_factor, num_bits};
+
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams> (public_params, private_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
