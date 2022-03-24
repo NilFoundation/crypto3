@@ -79,284 +79,229 @@ namespace nil {
                     Fr ft_eval0;
                 };
 
-                    /// This function runs the random oracle argument
-                    template <typename CurveType, typename EFqSponge>
-                OraclesResult<CurveType, EFqSponge> oracles(verifier_index<CurveType> index,
+                /// This function runs the random oracle argument
+                template<typename CurveType, typename EFqSponge, size_t WiresAmount>
+                OraclesResult<CurveType, EFqSponge> oracles(pickles_proof<CurveType, WiresAmount> proof,
+                                                            verifier_index<CurveType> index,
                                                             pedersen_commitment_scheme<CurveType> p_comm) {
-        //~
-        //~ #### Fiat-Shamir argument
-        //~
-        //~ We run the following algorithm:
-        //~
-        size_t n = index.domain.size;
+                    typedef pedersen_commitment_scheme<CurveType> commitment_scheme;
+                    using Fr = typename CurveType::scalar_field_type;
+                    using Fq = typename CurveType::base_field_type;
+                    //~
+                    //~ #### Fiat-Shamir argument
+                    //~
+                    //~ We run the following algorithm:
+                    //~
+                    size_t n = index.domain.size;
 
-        //~ 1. Setup the Fq-Sponge.
-        let mut fq_sponge = EFqSponge::new(index.fq_sponge_params.clone());
+                    //~typename CurveType::scalar_field_type; 1. Setup the Fq-Sponge.
+                    EFqSponge fq_sponge = EFqSponge(index.fq_sponge_params);
 
-        //~ 2. Absorb the commitment of the public input polynomial with the Fq-Sponge.
-        fq_sponge.absorb_g(&p_comm.unshifted);
+                    //~ 2. Absorb the commitment of the public input polynomial with the Fq-Sponge.
+                    fq_sponge.absorb_g(&p_comm.unshifted);
 
-        //~ 3. Absorb the commitments to the registers / witness columns with the Fq-Sponge.
-        self.commitments
-            .w_comm
-            .iter()
-            .for_each(|c| fq_sponge.absorb_g(&c.unshifted));
+                    //~ 3. Absorb the commitments to the registers / witness columns with the Fq-Sponge.
+                    for (size_t i = 0; i < proof.w_comm.size(); ++i) {
+                        proof.w_comm[i] = fq_sponge.absorb_g(proof.w_comm[i]);
+                    }
 
-        //~ 4. TODO: lookup (joint combiner challenge)
-        let joint_combiner = {
-            let s = match index.lookup_index {
-                None
-                | Some(LookupVerifierIndex {
-                    lookup_used: LookupsUsed::Single,
-                    ..
-                }) => ScalarChallenge(Fr::<G>::zero()),
-                Some(LookupVerifierIndex {
-                    lookup_used: LookupsUsed::Joint,
-                    ..
-                }) => ScalarChallenge(fq_sponge.challenge()),
-            };
-            (s, s.to_field(&index.srs.endo_r))
-        };
+                    //~ 4. TODO: lookup (joint combiner challenge)
+                    ScalarChallenge<typename CurveType::scalar_field_type> s;
+                    if (index.lookup_index.lookup_used == lookup_verifier_index::lookups_used::Single) {
+                        s = ScalarChallenge(typename CurveType::scalar_field_type::zero());
+                    }
+                    if (index.lookup_index.lookup_used == lookup_verifier_index::lookups_used::Joint) {
+                        s = ScalarChallenge(fq_sponge.challenge());
+                    }
+                    std::tuple<ScalarChallenge<typename CurveType::scalar_field_type>,
+                               typename CurveType::scalar_field_type>
+                        joint_combiner = (s, s.to_field(&index.srs.endo_r));
 
-        //~ 5. TODO: lookup (absorb)
-        self.commitments.lookup.iter().for_each(|l| {
-            l.sorted
-                .iter()
-                .for_each(|c| fq_sponge.absorb_g(&c.unshifted));
-        });
+                    //~ 5. TODO: lookup (absorb)
 
-        //~ 6. Sample $\beta$ with the Fq-Sponge.
-        let beta = fq_sponge.challenge();
+                    for (size_t i = 0; i < proof.commitments.lookup.size(); ++i) {
+                        proof.commitments.lookup[i] = fq_sponge.absorb_g(proof.commitments.lookup[i].unshifted);
+                    }
 
-        //~ 7. Sample $\gamma$ with the Fq-Sponge.
-        let gamma = fq_sponge.challenge();
+                    //~ 6. Sample $\beta$ with the Fq-Sponge.
+                    Fq beta = fq_sponge.challenge();
 
-        //~ 8. TODO: lookup
-        self.commitments.lookup.iter().for_each(|l| {
-            fq_sponge.absorb_g(&l.aggreg.unshifted);
-        });
+                    //~ 7. Sample $\gamma$ with the Fq-Sponge.
+                    Fq gamma = fq_sponge.challenge();
 
-        //~ 9. Absorb the commitment to the permutation trace with the Fq-Sponge.
-        fq_sponge.absorb_g(&self.commitments.z_comm.unshifted);
+                    //~ 8. TODO: lookup
+                    for (size_t i = 0; i < proof.commitments.lookup.size(); ++i) {
+                        proof.commitments.lookup[i] = fq_sponge.absorb_g(proof.commitments.lookup[i].aggreg.unshifted);
+                    }
 
-        //~ 10. Sample $\alpha'$ with the Fq-Sponge.
-        let alpha_chal = ScalarChallenge(fq_sponge.challenge());
+                    //~ 9. Absorb the commitment to the permutation trace with the Fq-Sponge.
+                    fq_sponge.absorb_g(proof.commitments.z_comm.unshifted);
 
-        //~ 11. Derive $\alpha$ from $\alpha'$ using the endomorphism (TODO: details).
-        let alpha = alpha_chal.to_field(&index.srs.endo_r);
+                    //~ 10. Sample $\alpha'$ with the Fq-Sponge.
+                    ScalarChallenge<Fq> alpha_chal = ScalarChallenge(fq_sponge.challenge());
 
-        //~ 12. Enforce that the length of the $t$ commitment is of size `PERMUTS`.
-        if self.commitments.t_comm.unshifted.len() != PERMUTS {
-            return Err(VerifyError::IncorrectCommitmentLength("t"));
-        }
+                    //~ 11. Derive $\alpha$ from $\alpha'$ using the endomorphism (TODO: details).
+                    Fq alpha = alpha_chal.to_field(index.srs.endo_r);
 
-        //~ 13. Absorb the commitment to the quotient polynomial $t$ into the argument.
-        fq_sponge.absorb_g(&self.commitments.t_comm.unshifted);
+                    //~ 12. Enforce that the length of the $t$ commitment is of size `PERMUTS`.
+                    BOOST_ASSERT_MSG(proof.commitments.t_comm.unshifted.size() == PERMUTS,
+                                     "IncorrectCommitmentLength(t)")
 
-        //~ 14. Sample $\zeta'$ with the Fq-Sponge.
-        let zeta_chal = ScalarChallenge(fq_sponge.challenge());
+                    //~ 13. Absorb the commitment to the quotient polynomial $t$ into the argument.
+                    fq_sponge.absorb_g(proof.commitments.t_comm.unshifted);
 
-        //~ 15. Derive $\zeta$ from $\zeta'$ using the endomorphism (TODO: specify).
-        let zeta = zeta_chal.to_field(&index.srs.endo_r);
+                    //~ 14. Sample $\zeta'$ with the Fq-Sponge.
+                    ScalarChallenge<Fq> zeta_chal = ScalarChallenge(fq_sponge.challenge());
 
-        //~ 16. Setup the Fr-Sponge.
-        let digest = fq_sponge.clone().digest();
-        let mut fr_sponge = EFrSponge::new(index.fr_sponge_params.clone());
+                    //~ 15. Derive $\zeta$ from $\zeta'$ using the endomorphism (TODO: specify).
+                    Fq zeta = zeta_chal.to_field(index.srs.endo_r);
 
-        //~ 17. Squeeze the Fq-sponge and absorb the result with the Fr-Sponge.
-        fr_sponge.absorb(&digest);
+                    //~ 16. Setup the Fr-Sponge.
+                    Fq digest = fq_sponge.clone().digest();
+                    EFrSponge fr_sponge = EFrSponge(index.fr_sponge_params);
 
-        // prepare some often used values
-        let zeta1 = zeta.pow(&[n]);
-        let zetaw = zeta * index.domain.group_gen;
+                    //~ 17. Squeeze the Fq-sponge and absorb the result with the Fr-Sponge.
+                    fr_sponge.absorb(digest);
 
-        // retrieve ranges for the powers of alphas
-        let mut all_alphas = index.powers_of_alpha.clone();
-        all_alphas.instantiate(alpha);
+                    // prepare some often used values
+                    Fq zeta1 = zeta.pow(n);
+                    Fq zetaw = zeta * index.domain.group_gen;
 
-        // compute Lagrange base evaluation denominators
-        let w: Vec<_> = index.domain.elements().take(self.public.len()).collect();
+                    // retrieve ranges for the powers of alphas
+                    Alphas<Fr> all_alphas = index.powers_of_alpha;
+                    all_alphas.instantiate(alpha);
 
-        let mut zeta_minus_x: Vec<_> = w.iter().map(|w| zeta - w).collect();
+                    // compute Lagrange base evaluation denominators
+                    std::vector<Fq> w(index.domain.elements().begin(),
+                                      index.domain.elements().begin() + proof.public_p.size());
+                    std::vector<Fq> zeta_minus_x;
+                    for (auto i : &w) {
+                        zeta_minus_x.push_back(zeta - i);
+                    }
 
-        w.iter()
-            .take(self.public.len())
-            .for_each(|w| zeta_minus_x.push(zetaw - w));
+                    for (size_t i = 0; i < proof.public_p.size(); ++i) {
+                        zeta_minus_x.push_back(zetaw - w[i]);
+                    }
 
-        ark_ff::fields::batch_inversion::<Fr<G>>(&mut zeta_minus_x);
+                    ark_ff::fields::batch_inversion::<Fr<G>>(&mut zeta_minus_x);
 
-        //~ 18. Evaluate the negated public polynomial (if present) at $\zeta$ and $\zeta\omega$.
-        //~     NOTE: this works only in the case when the poly segment size is not smaller than that of the domain.
-        let p_eval = if !self.public.is_empty() {
-            vec![
-                vec![
-                    (self
-                        .public
-                        .iter()
-                        .zip(zeta_minus_x.iter())
-                        .zip(index.domain.elements())
-                        .map(|((p, l), w)| -*l * p * w)
-                        .fold(Fr::<G>::zero(), |x, y| x + y))
-                        * (zeta1 - Fr::<G>::one())
-                        * index.domain.size_inv,
-                ],
-                vec![
-                    (self
-                        .public
-                        .iter()
-                        .zip(zeta_minus_x[self.public.len()..].iter())
-                        .zip(index.domain.elements())
-                        .map(|((p, l), w)| -*l * p * w)
-                        .fold(Fr::<G>::zero(), |x, y| x + y))
-                        * index.domain.size_inv
-                        * (zetaw.pow(&[n as u64]) - Fr::<G>::one()),
-                ],
-            ]
-        } else {
-            vec![Vec::<Fr<G>>::new(), Vec::<Fr<G>>::new()]
-        };
+                    //~ 18. Evaluate the negated public polynomial (if present) at $\zeta$ and $\zeta\omega$.
+                    //~     NOTE: this works only in the case when the poly segment size is not smaller than that of the
+                    // domain.
+                    std::array<std::vector<Fr>, 2> p_eval;
+                    if (!proof.public_p.is_empty()) {
+                        Fr tmp = Fr::zero();
+                        for (auto i : &proof.public_p) {
+                            for (auto j : &zeta_minus_x) {
+                                for (auto k : &index.domain.elements()) {
+                                    tmp += -i * j * k;
+                                }
+                            }
+                        }
+                        p_eval[0].push_back(tmp * (zeta1 - Fr::one()) * index.domain.size_inv);
+                        p_eval[1].push_back(tmp * (zetaw.pow(n) - Fr::one()) * index.domain.size_inv);
+                    }
 
-        //~ 19. Absorb all the polynomial evaluations in $\zeta$ and $\zeta\omega$:
-        //~     - the public polynomial
-        //~     - z
-        //~     - generic selector
-        //~     - poseidon selector
-        //~     - the 15 register/witness
-        //~     - 6 sigmas evaluations (the last one is not evaluated)
-        for (p, e) in p_eval.iter().zip(&self.evals) {
-            fr_sponge.absorb_evaluations(p, e);
-        }
+                    //~ 19. Absorb all the polynomial evaluations in $\zeta$ and $\zeta\omega$:
+                    //~     - the public polynomial
+                    //~     - z
+                    //~     - generic selector
+                    //~     - poseidon selector
+                    //~     - the 15 register/witness
+                    //~     - 6 sigmas evaluations (the last one is not evaluated)
+                    for (size_t i = 0; i < p_eval.size(); ++i) {
+                        fr_sponge.absorb_evaluations(p_eval[i], proof.evals[i]);
+                    }
 
-        //~ 20. Absorb the unique evaluation of ft: $ft(\zeta\omega)$.
-        fr_sponge.absorb(&self.ft_eval1);
+                    //~ 20. Absorb the unique evaluation of ft: $ft(\zeta\omega)$.
+                    fr_sponge.absorb(proof.ft_eval1);
 
-        //~ 21. Sample $v'$ with the Fr-Sponge.
-        let v_chal = fr_sponge.challenge();
+                    //~ 21. Sample $v'$ with the Fr-Sponge.
+                    ScalarChallenge<Fq> v_chal = fr_sponge.challenge();
 
-        //~ 22. Derive $v$ from $v'$ using the endomorphism (TODO: specify).
-        let v = v_chal.to_field(&index.srs.endo_r);
+                    //~ 22. Derive $v$ from $v'$ using the endomorphism (TODO: specify).
+                    Fq v = v_chal.to_field(index.srs.endo_r);
 
-        //~ 23. Sample $u'$ with the Fr-Sponge.
-        let u_chal = fr_sponge.challenge();
+                    //~ 23. Sample $u'$ with the Fr-Sponge.
+                    ScalarChallenge<Fq> u_chal = fr_sponge.challenge();
 
-        //~ 24. Derive $u$ from $u'$ using the endomorphism (TODO: specify).
-        let u = u_chal.to_field(&index.srs.endo_r);
+                    //~ 24. Derive $u$ from $u'$ using the endomorphism (TODO: specify).
+                    Fq u = u_chal.to_field(index.srs.endo_r);
 
-        //~ 25. Create a list of all polynomials that have an evaluation proof.
-        let evaluation_points = [zeta, zetaw];
-        let powers_of_eval_points_for_chunks = [
-            zeta.pow(&[index.max_poly_size as u64]),
-            zetaw.pow(&[index.max_poly_size as u64]),
-        ];
+                    //~ 25. Create a list of all polynomials that have an evaluation proof.
+                    std::array<Fq, 2> evaluation_points = {zeta, zetaw};
+                    std::array<Fq, 2> powers_of_eval_points_for_chunks = {zeta.pow(index.max_poly_size),
+                                                                          zetaw.pow(index.max_poly_size)};
 
-        let polys: Vec<(PolyComm<G>, _)> = self
-            .prev_challenges
-            .iter()
-            .zip(self.prev_chal_evals(index, &evaluation_points, &powers_of_eval_points_for_chunks))
-            .map(|(c, e)| (c.1.clone(), e))
-            .collect();
+                    let polys : Vec<(PolyComm<G>, _)> =
+                                    self.prev_challenges.iter()
+                                        .zip(self.prev_chal_evals(index, &evaluation_points,
+                                                                  &powers_of_eval_points_for_chunks))
+                                        .map(| (c, e) | (c .1.clone(), e))
+                                        .collect();
 
-        let evals = vec![
-            self.evals[0].combine(powers_of_eval_points_for_chunks[0]),
-            self.evals[1].combine(powers_of_eval_points_for_chunks[1]),
-        ];
+                    let evals = vec ![
+                        self.evals[0].combine(powers_of_eval_points_for_chunks[0]),
+                        self.evals[1].combine(powers_of_eval_points_for_chunks[1]),
+                    ];
 
-        //~ 26. Compute the evaluation of $ft(\zeta)$.
-        let ft_eval0 = {
-            let zkp = index.zkpm.evaluate(&zeta);
-            let zeta1m1 = zeta1 - Fr::<G>::one();
+                    //~ 26. Compute the evaluation of $ft(\zeta)$.
+                    Fq ft_eval0;
+                    Fq zkp = index.zkpm.evaluate(zeta);
+                    Fq zeta1m1 = zeta1 - Fq::one();
 
-            let mut alpha_powers =
-                all_alphas.get_alphas(ArgumentType::Permutation, permutation::CONSTRAINTS);
-            let alpha0 = alpha_powers
-                .next()
-                .expect("missing power of alpha for permutation");
-            let alpha1 = alpha_powers
-                .next()
-                .expect("missing power of alpha for permutation");
-            let alpha2 = alpha_powers
-                .next()
-                .expect("missing power of alpha for permutation");
+                    std::vector<Fr> alpha_powers = all_alphas.get_alphas(permutation::CONSTRAINTS);
+                    Fr alpha0 = alpha_powers[0];
+                    Fr alpha1 = alpha_powers[1];
+                    Fr alpha2 = alpha_powers[2];
 
-            let init = (evals[0].w[PERMUTS - 1] + gamma) * evals[1].z * alpha0 * zkp;
-            let mut ft_eval0 = evals[0]
-                .w
-                .iter()
-                .zip(evals[0].s.iter())
-                .map(|(w, s)| (beta * s) + w + gamma)
-                .fold(init, |x, y| x * y);
+                    Fq init = (evals[0].w[PERMUTS - 1] + gamma) * evals[1].z * alpha0 * zkp;
+                    Fq ft_eval0;
+                    for (size_t i = 0; i < evals[0].size(); ++i) {
+                        ft_eval0 *= (beta * evals[0].s[i]) + evals[0][i] + gamma;
+                    }
 
-            ft_eval0 -= if !p_eval[0].is_empty() {
-                p_eval[0][0]
-            } else {
-                Fr::<G>::zero()
-            };
+                    if (!p_eval[0].is_empty()) {
+                        t_eval0 -= p_eval[0][0];
+                    } else {
+                        t_eval0 -= Fr::zero();
+                    }
 
-            ft_eval0 -= evals[0]
-                .w
-                .iter()
-                .zip(index.shift.iter())
-                .map(|(w, s)| gamma + (beta * zeta * s) + w)
-                .fold(alpha0 * zkp * evals[0].z, |x, y| x * y);
+                    Fq tmp = alpha0 * zkp * evals[0].z;
+                    for (size_t = 0; i < evals[0].w.size(); ++i) {
+                        tmp *= gamma + (beta * zeta * index.shift[i]) + evals[0].w[i]);
+                    }
 
-            let nominator = ((zeta1m1 * alpha1 * (zeta - index.w))
-                + (zeta1m1 * alpha2 * (zeta - Fr::<G>::one())))
-                * (Fr::<G>::one() - evals[0].z);
+                    ft_eval0 -= tmp;
 
-            let denominator = (zeta - index.w) * (zeta - Fr::<G>::one());
-            let denominator = denominator.inverse().expect("negligible probability");
+                    Fq nominator = ((zeta1m1 * alpha1 * (zeta - index.w)) + (zeta1m1 * alpha2 * (zeta - Fr::one()))) *
+                                   (Fr::one() - evals[0].z);
 
-            ft_eval0 += nominator * denominator;
+                    Fq denominator = (zeta - index.w) * (zeta - Fr::one());
+                    let denominator = denominator.inverse().expect("negligible probability");
 
-            let cs = Constants {
-                alpha,
-                beta,
-                gamma,
-                joint_combiner: joint_combiner.1,
-                endo_coefficient: index.endo,
-                mds: index.fr_sponge_params.mds.clone(),
-            };
-            ft_eval0 -= PolishToken::evaluate(
-                &index.linearization.constant_term,
-                index.domain,
-                zeta,
-                &evals,
-                &cs,
-            )
-            .unwrap();
+                    ft_eval0 += nominator * denominator;
 
-            ft_eval0
-        };
+                    Constants<Fr> cs = {alpha = alpha,
+                                        beta = beta,
+                                        gamma = gamma,
+                                        joint_combiner = joint_combiner .1,
+                                        endo_coefficient = index.endo,
+                                        mds = index.fr_sponge_params.mds.clone()};
+                    ft_eval0 -=
+                        PolishToken::evaluate(index.linearization.constant_term, index.domain, zeta, &evals, &cs);
 
-        let oracles = RandomOracles {
-            beta,
-            gamma,
-            alpha_chal,
-            alpha,
-            zeta,
-            v,
-            u,
-            zeta_chal,
-            v_chal,
-            u_chal,
-            joint_combiner,
-        };
+                    RandomOracles oracles = {
+                        beta, gamma, alpha_chal, alpha, zeta, v, u, zeta_chal, v_chal, u_chal, joint_combiner,
+                    };
 
-        Ok(OraclesResult {
-            fq_sponge,
-            digest,
-            oracles,
-            all_alphas,
-            p_eval,
-            powers_of_eval_points_for_chunks,
-            polys,
-            zeta1,
-            ft_eval0,
-        })
-    }
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
-};               // namespace nil
+                    return OraclesResult {fq_sponge,  digest, oracles,
+                                          all_alphas, p_eval, powers_of_eval_points_for_chunks,
+                                          polys,      zeta1,  ft_eval0};
+                }    // namespace snark
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
+};                   // namespace nil
 
 #endif    // CRYPTO3_ZK_PLONK_BATCHED_PICKLES_ORACLES_HPP
