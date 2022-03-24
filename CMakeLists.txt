@@ -35,11 +35,7 @@ macro(cm_find_package NAME)
     endif()
 endmacro()
 
-<<<<<<< Updated upstream
-if(NOT Boost_FOUND OR NOT Boost_CONTAINER_FOUND AND NOT CMAKE_CROSSCOMPILING)
-=======
 if((NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND) AND NOT CMAKE_CROSSCOMPILING)
->>>>>>> Stashed changes
     cm_find_package(Boost REQUIRED COMPONENTS container)
 endif()
 
@@ -510,11 +506,7 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
 
-<<<<<<< Updated upstream
-                           $<$<BOOL:${Boost_FOUND}>:${Boost_INCLUDE_DIRS}>)
-=======
                            ${Boost_INCLUDE_DIRS})
->>>>>>> Stashed changes
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
