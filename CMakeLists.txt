@@ -18,11 +18,7 @@ endif()
 cm_project(modes WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-<<<<<<< Updated upstream
-    cm_find_package(Boost)
-=======
     cm_find_package(Boost REQUIRED)
->>>>>>> Stashed changes
 endif()
 
 cm_find_package(CM)
