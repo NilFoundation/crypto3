@@ -18,7 +18,11 @@ endif()
 cm_project(modes WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
+<<<<<<< Updated upstream
     cm_find_package(Boost)
+=======
+    cm_find_package(Boost REQUIRED)
+>>>>>>> Stashed changes
 endif()
 
 cm_find_package(CM)
@@ -130,9 +134,16 @@ list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
 add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
-set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                      EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
+if(CMAKE_CROSSCOMPILING AND CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+    set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
+                          EXPORT_NAME ${CURRENT_PROJECT_NAME}
+                          COMPILE_FLAGS "-s USE_BOOST_HEADERS=1"
+                          LINK_FLAGS "-s USE_BOOST_HEADERS=1")
+else()
+    set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
+                          EXPORT_NAME ${CURRENT_PROJECT_NAME})
+endif()
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::block
