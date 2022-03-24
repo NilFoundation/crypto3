@@ -38,13 +38,6 @@ macro(cm_find_package NAME)
     endif()
 endmacro()
 
-<<<<<<< Updated upstream
-=======
-if((NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND) AND NOT CMAKE_CROSSCOMPILING)
-    cm_find_package(Boost REQUIRED COMPONENTS container)
-endif()
-
->>>>>>> Stashed changes
 include(TargetArchitecture)
 include(TargetConfiguration)
 include(PlatformConfiguration)
@@ -77,11 +70,7 @@ if(UNIX AND BUILD_WITH_CCACHE)
     endif(CCACHE_FOUND)
 endif()
 
-<<<<<<< Updated upstream
-if(NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-=======
 if((NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND) AND NOT CMAKE_CROSSCOMPILING)
->>>>>>> Stashed changes
     cm_find_package(Boost REQUIRED COMPONENTS container)
 endif()
 
@@ -135,13 +124,6 @@ list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
 add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
-<<<<<<< Updated upstream
-target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                      ${Boost_LIBRARIES})
-
-set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                      EXPORT_NAME ${CURRENT_PROJECT_NAME})
-=======
 
 if(CMAKE_CROSSCOMPILING AND CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
@@ -152,20 +134,15 @@ else()
     set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                           EXPORT_NAME ${CURRENT_PROJECT_NAME})
 endif()
->>>>>>> Stashed changes
 
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
-<<<<<<< Updated upstream
-                           $<$<BOOL:${Boost_FOUND}>:${Boost_INCLUDE_DIRS}>)
-=======
                            ${Boost_INCLUDE_DIRS})
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${Boost_LIBRARIES})
->>>>>>> Stashed changes
 
 if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR
    ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")
