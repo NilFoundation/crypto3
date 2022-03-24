@@ -35,11 +35,7 @@ macro(cm_find_package NAME)
     endif()
 endmacro()
 
-<<<<<<< Updated upstream
-if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-=======
 if((NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND) AND NOT CMAKE_CROSSCOMPILING)
->>>>>>> Stashed changes
     cm_find_package(Boost REQUIRED COMPONENTS container)
 endif()
 
