@@ -157,7 +157,7 @@ namespace nil {
                             bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 1, false}});
                             bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 1, false}});
                         }
-                        //bp.add_copy_constraint({{W6, j + 0, false}, {0, 0, false, var::column_type::public_input}});
+                        bp.add_copy_constraint({{W6, j + 0, false}, {0, 0, false, var::column_type::public_input}});
 
                         //TODO link to params.b
 

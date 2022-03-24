@@ -103,7 +103,7 @@ namespace nil {
 
             typename fri_type::params_type fri_params = create_fri_params<fri_type, BlueprintFieldType>(table_rows_log);
 
-            std::size_t permutation_size = 12;
+            std::size_t permutation_size = desc.witness_columns + desc.public_input_columns + desc.constant_columns;
 
             typename types::preprocessed_public_data_type public_preprocessed_data =
                  zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, 
