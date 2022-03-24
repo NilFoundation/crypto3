@@ -29,6 +29,7 @@
 
 #include <nil/crypto3/zk/commitments/polynomial/kimchi_pedersen.hpp>
 
+#include <nil/crypto3/zk/snark/systems/plonk/pickles/alphas.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/detail.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
@@ -40,7 +41,8 @@ namespace nil {
             namespace snark {
                 template<typename CurveType, std::size_t WiresAmount = 15, std::size_t Permuts = 7>
                 class verifier_index {
-                    typedef pedersen_commitment_scheme<CurveType> commitment_scheme;
+                    typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
+                    typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
                     using curve_t = CurveType;
                     using Fr = typename CurveType::scalar_field_type;
                     using Fq = typename CurveType::base_field_type;
@@ -49,22 +51,22 @@ namespace nil {
                     size_t max_poly_size;
                     size_t max_quot_size;
                     srs_t<CurveType> srs;
-                    std::array<commitment_scheme, Permuts> sigma_comm;
-                    std::array<commitment_scheme, WiresAmount> coefficients_comm;
-                    commitment_scheme generic_comm;
-                    commitment_scheme psm_comm;
-                    commitment_scheme complete_add_comm;
-                    commitment_scheme mul_comm;
-                    commitment_scheme emul_comm;
-                    commitment_scheme endomul_scalar_comm;
-                    std::array<commitment_scheme, 4> chacha_comm;
+                    std::array<commitment_type, Permuts> sigma_comm;
+                    std::array<commitment_type, WiresAmount> coefficients_comm;
+                    commitment_type generic_comm;
+                    commitment_type psm_comm;
+                    commitment_type complete_add_comm;
+                    commitment_type mul_comm;
+                    commitment_type emul_comm;
+                    commitment_type endomul_scalar_comm;
+                    std::array<commitment_type, 4> chacha_comm;
                     std::array<Fr, Permuts> shift;
 
                     // Polynomial in coefficients form
                     nil::crypto3::math::polynomial<Fr> zkpm;
                     Fr w;
                     Fr endo;
-                    lookup_verifier_index<CurveType, WiresAmount> lookup_index;
+                    lookup_verifier_index<CurveType> lookup_index;
                     linearization_t linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
                     Alphas<Fr> powers_of_alpha;
                     ArithmeticSpongeParams<Fr> fr_sponge_params;

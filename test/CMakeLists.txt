@@ -58,6 +58,7 @@ set(TESTS_NAMES
     "relations/numeric/sap"
     "relations/numeric/ssp"
 
+    "systems/plonk/pickles/pickles_struct_test"
     "systems/plonk/pickles/oracles"
     "systems/plonk/redshift/redshift"
 

@@ -173,15 +173,15 @@ namespace nil {
                     std::vector<PolishToken> index_term;
                 };
 
-                template<typename CurveType, std::size_t WiresAmount>
-                typedef pedersen_commitment_scheme<CurveType> commitment_scheme;
+                template<typename CurveType>
                 struct lookup_verifier_index {
+                    typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
                     enum lookups_used {
                         Single,
-                        Joint,
+                        Joint
                     } lookup_used;
-                    std::vector<commitment_scheme> lookup_table;
-                    std::vector<commitment_scheme> lookup_selectors;
+                    std::vector<commitment_type> lookup_table;
+                    std::vector<commitment_type> lookup_selectors;
                 };
             }    // namespace snark
         }        // namespace zk

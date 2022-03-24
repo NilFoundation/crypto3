@@ -43,8 +43,7 @@ namespace nil {
                 class kimchi_pedersen {
                 public:
                     typedef typename CurveType::scalar_field_type field_type;
-                    typedef typename CurveType::template g1_type<
-                        algebra::curves::coordinates::affine> group_type;
+                    typedef typename CurveType::template g1_type<> group_type;
 
                     struct params_type {
                         
@@ -62,8 +61,8 @@ namespace nil {
                         
                         typename group_type::value_type delta;
                         
-                        typename CurveType::scalar_field_type::value_type z1;
-                        typename CurveType::scalar_field_type::value_type z2;
+                        typename field_type::value_type z1;
+                        typename field_type::value_type z2;
 
                         typename group_type::value_type sg;
                     };

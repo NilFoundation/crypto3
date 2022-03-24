@@ -80,11 +80,11 @@ namespace nil {
                 };
 
                 /// This function runs the random oracle argument
-                template<typename CurveType, typename EFqSponge, size_t WiresAmount>
+                template<typename CurveType, typename EFqSponge>
                 OraclesResult<CurveType, EFqSponge> oracles(pickles_proof<CurveType, WiresAmount> proof,
                                                             verifier_index<CurveType> index,
                                                             pedersen_commitment_scheme<CurveType> p_comm) {
-                    typedef pedersen_commitment_scheme<CurveType> commitment_scheme;
+                    typedef kimchi_pedersen<CurveType> commitment_scheme;
                     using Fr = typename CurveType::scalar_field_type;
                     using Fq = typename CurveType::base_field_type;
                     //~

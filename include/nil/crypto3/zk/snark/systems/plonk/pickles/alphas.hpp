@@ -27,7 +27,7 @@
 #ifndef CRYPTO3_ZK_PLONK_BATCHED_PICKLES_ALPHAS_HPP
 #define CRYPTO3_ZK_PLONK_BATCHED_PICKLES_ALPHAS_HPP
 
-#include <nil/crypto3/zk/commitments/polynmomial/pedersen.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/kimchi_pedersen.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <map>
@@ -60,7 +60,7 @@ namespace nil {
 
                     // Return num alphas
                     std::vector<FieldType> get_alphas(uint32_t num) {
-                        BOOST_ASSERT(num <= alphas.size(), "Not enough alphas to return");
+                        BOOST_ASSERT_MSG(num <= alphas.size(), "Not enough alphas to return");
                         return std::vector(alphas.begin(), alphas.begin() + num);
                     }
                 };

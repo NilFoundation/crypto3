@@ -30,50 +30,52 @@
 #include <tuple>
 #include <vector>
 
-#include <nil/crypto3/zk/snark/commitments/polynmomial/pedersen.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/kimchi_pedersen.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                template<typename CommitmentType>
+                struct lookup_st {
+                    std::vector<CommitmentType> sorted;
+                    CommitmentType aggreg;
+                };
 
-                template<typename CurveType, std::size_t WiresAmount>
+                template<typename CurveType, std::size_t ColumnsAmount = 15, std::size_t PermutsAmount = 7>
                 class pickles_proof {
-                    typedef pedersen_commitment_scheme<CurveType> commitment_scheme;
+                    typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
+                    typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
 
                 public:
                     // Commitments:
-                    std::array<typename commitment_scheme::commitment_type, WiresAmount + 1> w_comm;
+                    struct commitments_t {
+                        std::array<commitment_type, ColumnsAmount> w_comm;
 
-                    typename commitment_scheme::commitment_type z_comm;
+                        commitment_type z_comm;
 
-                    typename commitment_scheme::commitment_type t_comm;
+                        commitment_type t_comm;
 
-                    // TODO: Lookup comm?
+                        lookup_st<commitment_type> lookup;
+                    } commitments;
 
-                    // Evaluations:
-                    std::array<typename commitment_scheme::evaluation_type, WiresAmount + 1> w_zeta;    // evals[0]
-                    std::array<typename commitment_scheme::evaluation_type, WiresAmount + 1>
-                        w_zeta_omega;    // evals[1]
+                    typename commitments::kimchi_pedersen<CurveType>::proof_type proof;
 
-                    typename commitment_scheme::evaluation_type z_zeta;          // evals[0]
-                    typename commitment_scheme::evaluation_type z_zeta_omega;    // evals[1]
+                    struct evals_t {
+                        std::array<typename commitment_scheme::evaluation_type, ColumnsAmount> w;
 
-                    // N_perm + 1
-                    std::vector<typename commitment_scheme::commitment_type> S_sigma_zeta;    // evals[0]
-                    // N_perm + 1
-                    std::vector<typename commitment_scheme::commitment_type> S_sigma_zeta_omega;    // evals[1]
+                        typename commitment_scheme::evaluation_type z;
 
-                    //typename commitment_scheme::evaluation_type L_zeta_omega; // TODO: what is it?
+                        std::array<typename commitment_scheme::commitment_type, PermutsAmount - 1> s;
 
-                    // Opening proof
-                    std::vector<typename CurveType::template g1_type<>::value_type> L;
-                    std::vector<typename CurveType::template g1_type<>::value_type> R;    // L + R using as lr in kimchi
+                        lookup_st<commitment_type> lookup;
 
-                    typename CurveType::template g1_type<>::value_type sigma;    // using as sg in kimchi
-                    typename CurveType::template g1_type<>::value_type delta;
+                        typename commitment_scheme::evaluation_type generic_selector;
 
-                    typename CurveType::scalar_field_type::value_type z1, z2;
+                        typename commitment_scheme::evaluation_type poseidon_selector;
+                    };
+
+                    std::array<evals_t, 2> evals;
 
                     // ft_eval1
                     typename CurveType::scalar_field_type::value_type ft_eval1;

@@ -109,7 +109,7 @@ namespace nil {
                     // permutation
                     Fr zkp = index.zkpm.evaluate(oracles_res.oracles.zeta);
 
-                    let alphas = all_alphas.get_alphas(ArgumentType::Permutation, permutation::CONSTRAINTS);
+                    let alphas = all_alphas.get_alphas(permutation::CONSTRAINTS);
 
                     let mut commitments = vec![&index.sigma_comm[PERMUTS - 1]];
                     let mut scalars = vec![ConstraintSystem::perm_scalars(
@@ -123,7 +123,7 @@ namespace nil {
                     // generic
                     {
                         let alphas =
-                            all_alphas.get_alphas(ArgumentType::Gate(GateType::Generic), generic::CONSTRAINTS);
+                            all_alphas.get_alphas(generic::CONSTRAINTS);
 
                         let generic_scalars =
                             &ConstraintSystem::gnrc_scalars(alphas, &evals[0].w, evals[0].generic_selector);
@@ -139,13 +139,13 @@ namespace nil {
                     // other gates are implemented using the expression framework
                     {
                         // TODO: Reuse constants from oracles function
-                        let constants = Constants {
-                            alpha: oracles.alpha,
-                            beta: oracles.beta,
-                            gamma: oracles.gamma,
-                            joint_combiner: oracles.joint_combiner.1,
-                            endo_coefficient: index.endo,
-                            mds: index.fr_sponge_params.mds.clone(),
+                        Constants constants = {
+                            alpha = oracles_res.oracles.alpha,
+                            beta = oracles_res.oracles.beta,
+                            gamma = oracles_res.oracles.gamma,
+                            joint_combiner = oracles_res.oracles.joint_combiner.1,
+                            endo_coefficient = index.endo,
+                            mds = index.fr_sponge_params.mds,
                         };
 
                         for (col, tokens) in &index.linearization.index_terms {
