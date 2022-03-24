@@ -35,7 +35,11 @@ macro(cm_find_package NAME)
     endif()
 endmacro()
 
+<<<<<<< Updated upstream
 if(NOT Boost_FOUND OR NOT Boost_CONTAINER_FOUND AND NOT CMAKE_CROSSCOMPILING)
+=======
+if((NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND) AND NOT CMAKE_CROSSCOMPILING)
+>>>>>>> Stashed changes
     cm_find_package(Boost REQUIRED COMPONENTS container)
 endif()
 
@@ -95,10 +99,6 @@ define_target_platform_features(${CMAKE_UPPER_WORKSPACE_NAME})
 
 check_sse()
 check_avx()
-
-if(NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND)
-    cm_find_package(Boost COMPONENTS container)
-endif()
 
 set(BUILD_WITH_CONFIGURATION_FILE_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake" CACHE STRING "Directory for build.hpp lookup")
 
@@ -475,7 +475,15 @@ cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_
 
 add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 
-set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES EXPORT_NAME ${CURRENT_PROJECT_NAME})
+if(CMAKE_CROSSCOMPILING AND CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+    set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
+                          EXPORT_NAME ${CURRENT_PROJECT_NAME}
+                          COMPILE_FLAGS "-s USE_BOOST_HEADERS=1"
+                          LINK_FLAGS "-s USE_BOOST_HEADERS=1")
+else()
+    set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
+                          EXPORT_NAME ${CURRENT_PROJECT_NAME})
+endif()
 
 if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")
     if(SSE2_FOUND)
@@ -502,7 +510,11 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
 
+<<<<<<< Updated upstream
                            $<$<BOOL:${Boost_FOUND}>:${Boost_INCLUDE_DIRS}>)
+=======
+                           ${Boost_INCLUDE_DIRS})
+>>>>>>> Stashed changes
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
