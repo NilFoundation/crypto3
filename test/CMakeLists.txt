@@ -58,8 +58,8 @@ set(TESTS_NAMES
     "relations/numeric/sap"
     "relations/numeric/ssp"
 
-    "systems/plonk/pickles"
-    "systems/plonk/redshift"
+    "systems/plonk/pickles/oracles"
+    "systems/plonk/redshift/redshift"
 
     "systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
     "systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"

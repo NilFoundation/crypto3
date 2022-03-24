@@ -29,7 +29,7 @@
 
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/detail.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/verifier_index.hpp>
-#include <nil/crypto3/zk/snark/commitments/polynmomial/pedersen.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/kimchi_pedersen.hpp>
 
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
@@ -56,7 +56,7 @@ namespace nil {
 
                 template<typename CurveType, typename EFqSponge>
                 struct OraclesResult {
-                    typedef pedersen_commitment_scheme<CurveType> commitment_scheme;
+                    typedef kimchi_pedersen<CurveType> commitment_scheme;
                     using Fr = typename CurveType::scalar_field_type;
                     using Fq = typename CurveType::base_field_type;
                     /// A sponge that acts on the base field of a curve

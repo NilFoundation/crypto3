@@ -27,7 +27,7 @@
 #ifndef CRYPTO3_ZK_PLONK_BATCHED_PICKLES_DETAIL_HPP
 #define CRYPTO3_ZK_PLONK_BATCHED_PICKLES_DETAIL_HPP
 
-#include <nil/crypto3/zk/snark/commitments/polynmomial/pedersen.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/kimchi_pedersen.hpp>
 
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
