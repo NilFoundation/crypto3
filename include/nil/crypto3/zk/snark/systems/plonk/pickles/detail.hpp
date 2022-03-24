@@ -38,6 +38,25 @@ namespace nil {
         namespace zk {
             namespace snark {
                 size_t const CHALLENGE_LENGTH_IN_LIMBS = 2;
+                size_t const PERMUTS = 7;
+
+                /// The collection of constants required to evaluate an `Expr`.
+                template<typename FieldType>
+                struct Constants {
+                    /// The challenge alpha from the PLONK IOP.
+                    FieldType alpha;
+                    /// The challenge beta from the PLONK IOP.
+                    FieldType beta;
+                    /// The challenge gamma from the PLONK IOP.
+                    FieldType gamma;
+                    /// The challenge joint_combiner which is used to combine
+                    /// joint lookup tables.
+                    FieldType joint_combiner;
+                    /// The endomorphism coefficient
+                    FieldType endo_coefficient;
+                    /// The MDS matrix
+                    std::vector<std::vector<FieldType>> mds;
+                };
 
                 template<typename FieldType>
                 struct ScalarChallenge {
@@ -55,14 +74,14 @@ namespace nil {
                             a.double_in_place();
                             b.double_in_place();
 
-                            bool r_2i = get_bit(rep, 2 * i);
+                            bool r_2i = multiprecision::bit_test(rep, 2 * i);
                             FieldType s;
                             if (r_2i) {
                                 s = one;
                             } else {
                                 s = neg_one;
                             }
-                            if get_bit(rep, 2 * i + 1) == 0 {
+                            if (multiprecision::bit_test(rep, 2 * i + 1) == 0) {
                                 b += s;
                             } else {
                                 a += s;
@@ -106,18 +125,6 @@ namespace nil {
                     Permutation,
                     /// The lookup argument
                     Lookup
-                };
-
-                template<typename FieldType>
-                struct Alphas {
-                    /// The next power of alpha to use
-                    /// the end result will be [1, alpha^{next_power - 1}]
-                    uint32_t next_power;
-                    /// The mapping between constraint types and powers of alpha
-                    std::map<ArgumentType, std::pair<uint32_t, uint32_t>> mapping;
-                    /// The powers of alpha: 1, alpha, alpha^2, etc.
-                    /// If set to [Some], you can't register new constraints.
-                    std::vector<FieldType> alphas;
                 };
 
                 template<typename CurveType>
