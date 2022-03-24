@@ -46,6 +46,8 @@ namespace nil {
                 class pickles_proof {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
                     typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
+                    typedef typename CurveType::scalar_field_type scalar_field_type;
+                    typedef typename CurveType::base_field_type base_field_type;
 
                 public:
                     // Commitments:
@@ -62,17 +64,17 @@ namespace nil {
                     typename commitments::kimchi_pedersen<CurveType>::proof_type proof;
 
                     struct evals_t {
-                        std::array<typename commitment_scheme::evaluation_type, ColumnsAmount> w;
+                        std::array<typename scalar_field_type::value_type, ColumnsAmount> w;
 
-                        typename commitment_scheme::evaluation_type z;
+                        typename scalar_field_type::value_type z;
 
-                        std::array<typename commitment_scheme::commitment_type, PermutsAmount - 1> s;
+                        std::array<typename scalar_field_type::value_type, PermutsAmount - 1> s;
 
                         lookup_st<commitment_type> lookup;
 
-                        typename commitment_scheme::evaluation_type generic_selector;
+                        typename scalar_field_type::value_type generic_selector;
 
-                        typename commitment_scheme::evaluation_type poseidon_selector;
+                        typename scalar_field_type::value_type poseidon_selector;
                     };
 
                     std::array<evals_t, 2> evals;

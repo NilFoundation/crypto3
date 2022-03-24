@@ -43,7 +43,7 @@ using namespace nil::crypto3;
 BOOST_AUTO_TEST_SUITE(pickles_proof_struct_test_suite)
 
 BOOST_AUTO_TEST_CASE(pickles_proof_struct_test_suite) {
-    nil::crypto3::zk::snark::pickles_proof<nil::crypto3::algebra::curves::vesta::g1_type<>> proof;
+    nil::crypto3::zk::snark::pickles_proof<nil::crypto3::algebra::curves::vesta> proof;
     // w_comm
     proof.commitments.w_comm[0].proof.commitments.w_comm[0].shifted = {
         0x29C11510848CF79EA9D58C2E7B2F9EABDE5470AB0C7D8051DB68B6A597844291_cppui256,
