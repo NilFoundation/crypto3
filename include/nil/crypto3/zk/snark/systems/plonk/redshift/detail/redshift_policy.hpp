@@ -117,6 +117,9 @@ namespace nil {
                                 math::polynomial<typename FieldType::value_type> lagrange_0;
 
                                 public_commitments commitments;
+
+                                std::array<std::vector<int>,
+                                    arithmetization_params::TotalColumns> columns_rotations;
                             };
 
                             plonk_public_polynomial_table<FieldType, arithmetization_params> public_polynomial_table;

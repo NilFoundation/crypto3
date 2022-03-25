@@ -248,7 +248,10 @@ namespace nil {
                         std::array<typename commitment_scheme_witness_type::proof_type, witness_columns>
                             witnesses_evaluation;
                         for (std::size_t i = 0; i < witness_precommitments.size(); i++) {
-                            std::vector<std::size_t> rotation_gates = {0};    // TODO: Rotation
+
+                            std::vector<int> rotation_gates =
+                                preprocessed_public_data.common_data.columns_rotations[i];
+                                
                             std::array<typename FieldType::value_type, 1>
                                 evaluation_points_gates;    // TODO: array size with rotation
                             for (std::size_t i = 0; i < evaluation_points_gates.size(); i++) {

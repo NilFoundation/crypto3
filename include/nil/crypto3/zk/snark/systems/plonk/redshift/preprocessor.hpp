@@ -221,6 +221,50 @@ namespace nil {
                         return S_id;
                     }
 
+                    static inline std::array<std::vector<int>,
+                        ParamsType::arithmetization_params::TotalColumns>
+                        columns_rotations(
+                            typename policy_type::constraint_system_type &constraint_system,
+                            const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
+                                &table_description) {
+
+                        std::array<std::vector<int>,
+                            ParamsType::arithmetization_params::TotalColumns> result;
+
+                        std::vector<plonk_gate<FieldType>> gates = constraint_system.gates();
+
+                        for (std::size_t g_index = 0; g_index < gates.size(); g_index++) {
+
+                            for (std::size_t c_index = 0;
+                                c_index < gates[g_index].constraints.size(); c_index++) {
+                                
+                                for (std::size_t t_index = 0;
+                                    t_index < gates[g_index].constraints[c_index].terms.size(); t_index++){
+                                    for (std::size_t v_index = 0;
+                                        v_index < gates[g_index].constraints[c_index].terms[t_index].vars.size();
+                                        v_index++){
+
+                                        if (gates[g_index].constraints[c_index].terms[t_index].vars[v_index].relative){
+                                            std::size_t column_index =
+                                                table_description.global_index(gates[g_index].constraints[c_index].terms[t_index].vars[v_index]);
+
+                                            int rotation =
+                                                gates[g_index].constraints[c_index].terms[t_index].vars[v_index].rotation;
+
+                                            if (std::find(result[column_index].begin(),
+                                                    result[column_index].end(), rotation) ==
+                                                result[column_index].end()){
+                                                result[column_index].push_back(rotation);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        return result;
+                    }
+
                     static inline std::vector<math::polynomial<typename FieldType::value_type>>
                         permutation_polynomials(std::size_t permutation_size, std::size_t table_size,
                                                 const typename FieldType::value_type &omega,
@@ -321,6 +365,8 @@ namespace nil {
                             commitment_scheme_public_type::precommit(q_last, commitment_params.D[0]);
                         special_selector_precommitments[1] =
                             commitment_scheme_public_type::precommit(q_blind, commitment_params.D[0]);
+
+
 
                         return public_precommitments_type {
                             id_permutation,          sigma_permutation,       public_input_precommitments,
@@ -433,9 +479,13 @@ namespace nil {
 
                         public_commitments_type public_commitments = commitments(public_precommitments);
 
+                        std::array<std::vector<int>,
+                        ParamsType::arithmetization_params::TotalColumns> c_rotations =
+                            columns_rotations(constraint_system, table_description);
+
                         typename policy_type::preprocessed_public_data_type::common_data_type common_data {
                             basic_domain, nil::crypto3::math::polynomial<typename FieldType::value_type> {Z},
-                            lagrange_0, public_commitments};
+                            lagrange_0, public_commitments, c_rotations};
 
                         return typename policy_type::preprocessed_public_data_type(
                             {public_polynomial_table, _permutation_polynomials, _identity_polynomials, q_last, q_blind,
