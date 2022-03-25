@@ -56,10 +56,11 @@ namespace nil {
                         std::vector<typename commitment_scheme_type_public::proof_type> special_selectors;
 
                         bool operator==(const evaluation_proof &rhs) const {
-                        return witness == rhs.witness && permutation == rhs.permutation &&
-                                   quotient == rhs.quotient && public_input == rhs.public_input &&
-                                   constant == rhs.constant && selector == rhs.selector &&
-                                   special_selectors == rhs.special_selectors;
+                            return challenge == rhs.challenge && witness == rhs.witness &&
+                                   permutation == rhs.permutation && quotient == rhs.quotient &&
+                                   id_permutation == rhs.id_permutation && sigma_permutation == rhs.sigma_permutation &&
+                                   public_input == rhs.public_input && constant == rhs.constant &&
+                                   selector == rhs.selector && special_selectors == rhs.special_selectors;
                         }
                         bool operator!=(const evaluation_proof &rhs) const {
                             return !(rhs == *this);
@@ -79,8 +80,7 @@ namespace nil {
 
                     bool operator==(const redshift_proof &rhs) const {
                         return witness_commitments == rhs.witness_commitments && T_commitments == rhs.T_commitments &&
-                                   v_perm_commitment == rhs.v_perm_commitment && 
-                                   eval_proof == rhs.eval_proof;
+                               v_perm_commitment == rhs.v_perm_commitment && eval_proof == rhs.eval_proof;
                     }
                     bool operator!=(const redshift_proof &rhs) const {
                         return !(rhs == *this);
