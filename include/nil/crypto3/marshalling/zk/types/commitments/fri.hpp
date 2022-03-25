@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2021-2022 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021-2022 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -99,38 +99,6 @@ namespace nil {
                                        TTypeBase, fri_round_proof<TTypeBase, FRIScheme>,
                                        nil::marshalling::option::sequence_size_field_prefix<
                                            nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
-
-                //                template<typename TTypeBase, typename FRIScheme,
-                //                         typename = typename std::enable_if<
-                //                             std::is_same<FRIScheme,
-                //                                          nil::crypto3::zk::snark::fri_commitment_scheme<
-                //                                              typename FRIScheme::field_type, typename
-                //                                              FRIScheme::merkle_tree_hash_type, typename
-                //                                              FRIScheme::transcript_hash_type, FRIScheme::m>>::value,
-                //                             bool>::type,
-                //                         typename... TOptions>
-                //                using fri_params = nil::marshalling::types::bundle<
-                //                    TTypeBase, std::tuple<
-                //                                   // std::size_t r;
-                //                                   nil::marshalling::types::integral<TTypeBase, std::size_t>,
-                //                                   // std::size_t max_degree;
-                //                                   nil::marshalling::types::integral<TTypeBase, std::size_t>,
-                //                                   // math::polynomial<typename FieldType::value_type> q;
-                //                                   nil::marshalling::types::array_list<
-                //                                       TTypeBase, field_element<TTypeBase, typename
-                //                                       FRIScheme::field_type::value_type>,
-                //                                       nil::marshalling::option::sequence_size_field_prefix<
-                //                                           nil::marshalling::types::integral<TTypeBase,
-                //                                           std::size_t>>>,
-                //                                   // std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>>
-                //                                   D;
-                //                                   // basic_radix2_domain by default, vectors of omegas will be
-                //                                   nil::marshalling::types::array_list<
-                //                                       TTypeBase, field_element<TTypeBase, typename
-                //                                       FRIScheme::field_type::value_type>,
-                //                                       nil::marshalling::option::sequence_size_field_prefix<
-                //                                           nil::marshalling::types::integral<TTypeBase,
-                //                                           std::size_t>>>>>;
 
                 template<typename FRIScheme, typename Endianness>
                 fri_round_proof<nil::marshalling::field_type<Endianness>, FRIScheme>
@@ -268,7 +236,9 @@ namespace nil {
                             std::get<1>(filled_proof.value()).value().at(i)));
                     }
 
-                    return typename FRIScheme::proof_type {round_proofs, final_polynomial};
+                    return typename FRIScheme::proof_type {
+                        round_proofs,
+                        nil::crypto3::math::polynomial<typename FRIScheme::field_type::value_type>(final_polynomial)};
                 }
             }    // namespace types
         }        // namespace marshalling

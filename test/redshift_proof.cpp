@@ -44,6 +44,8 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/alt_bn128.hpp>
+#include <nil/crypto3/algebra/curves/pallas.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 
 #include <nil/crypto3/hash/type_traits.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
@@ -52,7 +54,16 @@
 #include <nil/crypto3/random/algebraic_random_device.hpp>
 
 #include <nil/crypto3/marshalling/zk/types/redshift/proof.hpp>
+
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/redshift/verifier.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
+
+#include <nil/crypto3/zk/blueprint/plonk.hpp>
+#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
 
 template<typename TIter>
 void print_byteblob(TIter iter_begin, TIter iter_end) {
@@ -184,8 +195,9 @@ typename LPCScheme::proof_type generate_lpc_proof(std::size_t tree_depth, std::s
 }
 
 template<typename RedshiftProof>
-typename RedshiftProof::evaluation_proof generate_redshift_eval_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree,
-                                      std::size_t num) {
+typename RedshiftProof::evaluation_proof generate_redshift_eval_proof(std::size_t tree_depth,
+                                                                      std::size_t round_proofs_n, std::size_t degree,
+                                                                      std::size_t num) {
     typename RedshiftProof::evaluation_proof eval_proof;
 
     nil::crypto3::random::algebraic_random_device<typename RedshiftProof::field_type> d;
@@ -194,22 +206,26 @@ typename RedshiftProof::evaluation_proof generate_redshift_eval_proof(std::size_
     for (auto i = 0; i < num; ++i) {
         eval_proof.witness.emplace_back(generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_witness>(
             tree_depth, round_proofs_n, degree));
-        eval_proof.permutation.emplace_back(generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_permutation>(
-            tree_depth, round_proofs_n, degree));
+        eval_proof.permutation.emplace_back(
+            generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_permutation>(tree_depth, round_proofs_n,
+                                                                                           degree));
         eval_proof.quotient.emplace_back(generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_quotient>(
             tree_depth, round_proofs_n, degree));
-        eval_proof.id_permutation.emplace_back(generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(
-            tree_depth, round_proofs_n, degree));
-        eval_proof.sigma_permutation.emplace_back(generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(
-            tree_depth, round_proofs_n, degree));
+        eval_proof.id_permutation.emplace_back(
+            generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(tree_depth, round_proofs_n,
+                                                                                      degree));
+        eval_proof.sigma_permutation.emplace_back(
+            generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(tree_depth, round_proofs_n,
+                                                                                      degree));
         eval_proof.public_input.emplace_back(generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(
             tree_depth, round_proofs_n, degree));
         eval_proof.constant.emplace_back(generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(
             tree_depth, round_proofs_n, degree));
         eval_proof.selector.emplace_back(generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(
             tree_depth, round_proofs_n, degree));
-        eval_proof.special_selectors.emplace_back(generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(
-            tree_depth, round_proofs_n, degree));
+        eval_proof.special_selectors.emplace_back(
+            generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(tree_depth, round_proofs_n,
+                                                                                      degree));
     }
 
     return eval_proof;
@@ -217,7 +233,7 @@ typename RedshiftProof::evaluation_proof generate_redshift_eval_proof(std::size_
 
 template<typename RedshiftProof>
 RedshiftProof generate_redshift_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree,
-                                 std::size_t num) {
+                                      std::size_t num) {
     RedshiftProof proof;
     std::size_t k = 0;
     for (const auto c : generate_random_data<std::uint8_t, 32>(1)[0]) {
@@ -236,20 +252,18 @@ RedshiftProof generate_redshift_proof(std::size_t tree_depth, std::size_t round_
         }
     }
 
-    proof.eval_proof = generate_redshift_eval_proof<RedshiftProof>(tree_depth,  round_proofs_n,  degree,
-                                                       num);
+    proof.eval_proof = generate_redshift_eval_proof<RedshiftProof>(tree_depth, round_proofs_n, degree, num);
     return proof;
 }
 
 template<typename RedshiftProof, typename Endianness>
-void test_redshift_eval_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree,
-                         std::size_t num) {
+void test_redshift_eval_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree, std::size_t num) {
     using namespace nil::crypto3::marshalling;
 
-    using proof_marshalling_type = types::redshift_evaluation_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>;
+    using proof_marshalling_type =
+        types::redshift_evaluation_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>;
 
-    auto proof = generate_redshift_eval_proof<RedshiftProof>(tree_depth,  round_proofs_n,  degree,
-                                                                 num);
+    auto proof = generate_redshift_eval_proof<RedshiftProof>(tree_depth, round_proofs_n, degree, num);
     auto filled_redshift_proof = types::fill_redshift_evaluation_proof<RedshiftProof, Endianness>(proof);
     auto _proof = types::make_redshift_evaluation_proof<RedshiftProof, Endianness>(filled_redshift_proof);
     BOOST_CHECK(_proof == proof);
@@ -267,14 +281,35 @@ void test_redshift_eval_proof(std::size_t tree_depth, std::size_t round_proofs_n
 }
 
 template<typename RedshiftProof, typename Endianness>
-void test_redshift_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree,
-                         std::size_t num) {
+void test_random_redshift_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree,
+                                std::size_t num) {
     using namespace nil::crypto3::marshalling;
 
     using proof_marshalling_type = types::redshift_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>;
 
-    RedshiftProof proof = generate_redshift_proof<RedshiftProof>(tree_depth,  round_proofs_n,  degree,
-                                                                  num);
+    RedshiftProof proof = generate_redshift_proof<RedshiftProof>(tree_depth, round_proofs_n, degree, num);
+    auto filled_redshift_proof = types::fill_redshift_proof<RedshiftProof, Endianness>(proof);
+    RedshiftProof _proof = types::make_redshift_proof<RedshiftProof, Endianness>(filled_redshift_proof);
+    BOOST_CHECK(_proof == proof);
+
+    std::vector<std::uint8_t> cv;
+    cv.resize(filled_redshift_proof.length(), 0x00);
+    auto write_iter = cv.begin();
+    nil::marshalling::status_type status = filled_redshift_proof.write(write_iter, cv.size());
+
+    proof_marshalling_type test_val_read;
+    auto read_iter = cv.begin();
+    status = test_val_read.read(read_iter, cv.size());
+    auto constructed_val_read = types::make_redshift_proof<RedshiftProof, Endianness>(test_val_read);
+    BOOST_CHECK(proof == constructed_val_read);
+}
+
+template<typename Endianness, typename RedshiftProof>
+void test_redshift_proof_marshalling(const RedshiftProof &proof) {
+    using namespace nil::crypto3::marshalling;
+
+    using proof_marshalling_type = types::redshift_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>;
+
     auto filled_redshift_proof = types::fill_redshift_proof<RedshiftProof, Endianness>(proof);
     RedshiftProof _proof = types::make_redshift_proof<RedshiftProof, Endianness>(filled_redshift_proof);
     BOOST_CHECK(_proof == proof);
@@ -306,47 +341,117 @@ struct redshift_test_params {
     constexpr static const std::size_t m = 2;
 };
 
+template<typename fri_type, typename FieldType>
+typename fri_type::params_type create_fri_params(std::size_t degree_log) {
+    using namespace nil::crypto3;
+
+    typename fri_type::params_type params;
+    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+
+    constexpr std::size_t expand_factor = 0;
+    std::size_t r = degree_log - 1;
+
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
+        zk::commitments::detail::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
+
+    params.r = r;
+    params.D = domain_set;
+    params.q = q;
+    params.max_degree = (1 << degree_log) - 1;
+
+    return params;
+}
+
+template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename MerkleHashType,
+         typename TranscriptHashType, typename Endianness>
+void test_component_proof_marshalling(typename ComponentType::public_params_type init_params,
+                                      typename ComponentType::private_params_type assignment_params) {
+
+    using namespace nil::crypto3;
+
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using component_type = ComponentType;
+
+    zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
+
+    zk::blueprint<ArithmetizationType> bp(desc);
+    zk::blueprint_private_assignment_table<ArithmetizationType> private_assignment(desc);
+    zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
+
+    std::size_t start_row = component_type::allocate_rows(bp);
+    component_type::generate_gates(bp, public_assignment, init_params, start_row);
+    component_type::generate_copy_constraints(bp, public_assignment, init_params, start_row);
+    component_type::generate_assignments(private_assignment, public_assignment, init_params, assignment_params,
+                                         start_row);
+
+    // bp.fix_usable_rows();
+    private_assignment.padding();
+    public_assignment.padding();
+    std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
+    std::cout << "Padded rows: " << desc.rows_amount << std::endl;
+
+    zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(private_assignment,
+                                                                                             public_assignment);
+
+    using params =
+        zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, MerkleHashType, TranscriptHashType>;
+    using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
+
+    using fri_type = typename zk::commitments::fri<BlueprintFieldType, typename params::merkle_hash_type,
+                                                   typename params::transcript_hash_type, 2>;
+
+    std::size_t table_rows_log = std::ceil(std::log2(desc.rows_amount));
+
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, BlueprintFieldType>(table_rows_log);
+
+    std::size_t permutation_size = 12;
+
+    typename types::preprocessed_public_data_type public_preprocessed_data =
+        zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, desc,
+                                                                                     fri_params, permutation_size);
+    typename types::preprocessed_private_data_type private_preprocessed_data =
+        zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment, desc);
+
+    auto proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(
+        public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
+    using proof_marshalling_type =
+        marshalling::types::redshift_proof<nil::marshalling::field_type<Endianness>, decltype(proof)>;
+    test_redshift_proof_marshalling<Endianness>(proof);
+
+    bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data,
+                                                                                          proof, bp, fri_params);
+    BOOST_CHECK(verifier_res);
+}
+
 BOOST_AUTO_TEST_SUITE(redshift_marshalling_proof_test_suite)
 
 BOOST_AUTO_TEST_CASE(redshift_proof_bls12_381_be) {
-    using curve_type = nil::crypto3::algebra::curves::bls12<381>;
-    using field_type = typename curve_type::scalar_field_type;
+    using curve_type = nil::crypto3::algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
 
-    constexpr static const std::size_t opening_points_witness = 1;
-    constexpr static const std::size_t opening_points_v_p = 2;
-    constexpr static const std::size_t opening_points_t = 1;
-    constexpr static const std::size_t opening_points_public = 1;
+    constexpr std::size_t WitnessColumns = 11;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t SelectorColumns = 1;
+    using ArithmetizationParams =
+        nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns,
+                                                              SelectorColumns>;
+    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<FieldType, ArithmetizationParams>;
+    using component_type =
+        nil::crypto3::zk::components::curve_element_unified_addition<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5,
+                                                                     6, 7, 8, 9, 10>;
 
-    typedef nil::crypto3::zk::snark::redshift_params<field_type, redshift_test_params::witness_columns,
-                            redshift_test_params::public_input_columns, redshift_test_params::constant_columns,
-                            redshift_test_params::selector_columns> circuit_2_params;
+    using merkle_hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    using transcript_hash_type = nil::crypto3::hashes::keccak_1600<256>;
 
-    typedef nil::crypto3::zk::commitments::list_polynomial_commitment<field_type,
-                                                    typename circuit_2_params::commitment_params_type,
-                                                    opening_points_witness>
-        commitment_scheme_witness_type;
-    typedef nil::crypto3::zk::commitments::list_polynomial_commitment<field_type,
-                                                    typename circuit_2_params::commitment_params_type,
-                                                    opening_points_v_p>
-        commitment_scheme_permutation_type;
-    typedef nil::crypto3::zk::commitments::list_polynomial_commitment<field_type,
-                                                    typename circuit_2_params::commitment_params_type,
-                                                    opening_points_t>
-        commitment_scheme_quotient_type;
-    typedef nil::crypto3::zk::commitments::list_polynomial_commitment<field_type,
-                                                    typename circuit_2_params::commitment_params_type,
-                                                    opening_points_public>
-        commitment_scheme_public_input_type;
-    using proof_type = nil::crypto3::zk::snark::redshift_proof<
-        field_type,
-        commitment_scheme_witness_type,
-        commitment_scheme_permutation_type,
-        commitment_scheme_quotient_type,
-        commitment_scheme_public_input_type>;
+    typename component_type::public_params_type public_params = {};
+    typename component_type::private_params_type private_params = {
+        nil::crypto3::algebra::random_element<curve_type::template g1_type<>>(),
+        nil::crypto3::algebra::random_element<curve_type::template g1_type<>>()};
 
-    test_redshift_eval_proof<proof_type, nil::marshalling::option::big_endian>(3, 3, 3, 3);
-    test_redshift_proof<proof_type, nil::marshalling::option::big_endian>(3, 3, 3, 3);
-
+    test_component_proof_marshalling<component_type, FieldType, ArithmetizationParams, merkle_hash_type,
+                                     transcript_hash_type, nil::marshalling::option::big_endian>(public_params,
+                                                                                                 private_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
