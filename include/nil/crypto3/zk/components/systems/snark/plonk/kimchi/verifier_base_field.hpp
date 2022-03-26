@@ -75,33 +75,15 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
-                    struct batched_values {
-
-                    }
-
-                    batched_values generate_gates_to_batch(blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
-                        blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
-                            PublicInputColumns, ConstantColumns> &public_assignment,
-                        assignment_params &input) {
-
-                    }
-
-                    void generate_gates_final_check(blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> &private_assignment,
-                        blueprint_public_assignment_table<ArithmetizationType, SelectorColumns,
-                            PublicInputColumns, ConstantColumns> &public_assignment,
-                            std::vector<batched_values> batch) {
-
-                    }
-
                 public:
 
-                    struct init_params_type {
+                    constexpr static const std::size_t required_rows_amount = 1;
+
+                    struct public_params_type {
                         typename CurveType::template g1_type<>::value_type B;
                     };
 
-                    struct assignment_params_type {
-                        std::vector<typename snark::kimchi_proof_type> proofs;
-                        std::vector<verifier_index> indexes;
+                    struct private_params_type {
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
@@ -111,7 +93,7 @@ namespace nil {
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
+                        const public_params_type &init_params,
                         const std::size_t &component_start_row) {
 
                         const std::size_t &j = component_start_row;
@@ -120,7 +102,7 @@ namespace nil {
                     static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
+                        const public_params_type &init_params,
                         const std::size_t &component_start_row) {
 
                     }
@@ -129,17 +111,10 @@ namespace nil {
                         blueprint_private_assignment_table<ArithmetizationType>
                             &private_assignment,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
-                        const assignment_params_type &params,
+                        const public_params_type &init_params,
+                        const private_params_type &params,
                         const std::size_t &component_start_row) {
-                        
-                            std::vector<batched_values> batch(params.proofs.size());
-                            for (std::size_t i = 0; i < params.proofs.size(); i++) {
-                                batched_values[i] = generate_gates_to_batch(private_assigment,
-                                    public_assigment, params);
-                            }
-
-                            generate_gates_final_check()
+                    
                     }
                 };
             }    // namespace components

@@ -40,15 +40,15 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_base_field.hpp>
 
 #include "test_plonk_component.hpp"
 
 using namespace nil::crypto3;
 
-BOOST_AUTO_TEST_SUITE(blueprint_plonk_endo_scalar_test_suite)
+BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_base_field_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
 
-    using component_type = zk::components::endo_scalar<ArithmetizationType, curve_type,
+    using component_type = zk::components::pickles_verifier_base_field<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
 
