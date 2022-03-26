@@ -230,8 +230,9 @@ namespace nil {
                                 private_assignment.witness(W5)[row] = b;
                                 row++;
                             }
-
-                            private_assignment.witness(W6)[row - 1] = a * public_params.endo_factor + b;
+                            auto res = a * public_params.endo_factor + b;
+                            private_assignment.witness(W6)[row - 1] = res;
+                            std::cout<<"circuit result "<<res.data<<std::endl;
                     }
                 };
             }    // namespace components

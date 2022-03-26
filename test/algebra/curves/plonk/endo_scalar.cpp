@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
 
     typename component_type::private_params_type private_params = {challenge};
     typename component_type::public_params_type public_params = {endo_factor, num_bits};
-
+    std::cout<<"Expected result: "<<result.data<<std::endl;
     test_component<component_type, BlueprintFieldType, ArithmetizationParams> (public_params, private_params);
 }
 

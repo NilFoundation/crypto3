@@ -86,10 +86,10 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
                 public:
 
-                    //constexpr static const typename BlueprintFieldType::value_type endo = 0x2D33357CB532458ED3552A23A8554E5005270D29D19FC7D27B7FD22F0201B547_cppui255;
-                    constexpr static const typename BlueprintFieldType::value_type endo = typename BlueprintFieldType::value_type(algebra::fields::arithmetic_params<BlueprintFieldType>::multiplicative_generator).pow(typename BlueprintFieldType::integral_type( ( (BlueprintFieldType::value_type::zero() - BlueprintFieldType::value_type::one()) * ( typename BlueprintFieldType::value_type(3) ).inversed() ).data));
+                    constexpr static const typename BlueprintFieldType::value_type endo = 0x2D33357CB532458ED3552A23A8554E5005270D29D19FC7D27B7FD22F0201B547_cppui255;
+                    //constexpr static const typename BlueprintFieldType::value_type endo = typename BlueprintFieldType::value_type(algebra::fields::arithmetic_params<BlueprintFieldType>::multiplicative_generator).pow(typename BlueprintFieldType::integral_type( ( (BlueprintFieldType::value_type::zero() - BlueprintFieldType::value_type::one()) * ( typename BlueprintFieldType::value_type(3) ).inversed() ).data));
 
-                    constexpr static const std::size_t required_rows_amount = 65;
+                    constexpr static const std::size_t required_rows_amount = 33;
                     struct public_params_type { };
 
                     struct private_params_type {
@@ -180,12 +180,11 @@ namespace nil {
 
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type R;
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type Q;
-                            std::array<bool, CurveType::scalar_field_type::modulus_bits + 1> b = {false};
+                            std::array<bool, 128> b = {false};
                             typename CurveType::scalar_field_type::integral_type integral_b = typename CurveType::scalar_field_type::integral_type(params.b.data);
-                            for (std::size_t i = 0; i < CurveType::scalar_field_type::modulus_bits; i++) {
-                                b[CurveType::scalar_field_type::modulus_bits - i] = multiprecision::bit_test(integral_b, i);
+                            for (std::size_t i = 0; i < 128; i++) {
+                                b[128 - i - 1] = multiprecision::bit_test(integral_b, i);
                             }
-                            b[0] = 0;
                             typename ArithmetizationType::field_type::value_type n = 0;
                             typename ArithmetizationType::field_type::value_type n_next = 0;
                             typename ArithmetizationType::field_type::value_type s1 = 0;
@@ -235,17 +234,17 @@ namespace nil {
                                 private_assignment.witness(W8)[i] = R.Y;
                             }
 
-                            Q.X = (1 + (endo - 1) * b[254]) * T.X;
-                            Q.Y = (2* b[255] - 1) * T.Y;
+                            Q.X = (1 + (endo - 1) * b[126]) * T.X;
+                            Q.Y = (2* b[127] - 1) * T.Y;
                             /*s4 = 2 * R.Y * (2*R.X + Q.X - s3 * s3).inversed() - s3;
                             P.X = Q.X + s4*s4 - s3*s3;
                             P.Y = (R.X - P.X)*s4 -R.Y; */
                             P = R + Q + R;
-                            private_assignment.witness(W4)[j + 64] = P.X;
-                            private_assignment.witness(W5)[j + 64] = P.Y;
-                            n_next = n * 16 + b[252] * 8 
-                            + b[253] * 4 + b[254] * 2 + b[255];
-                            private_assignment.witness(W6)[j + 64] = n_next;
+                            private_assignment.witness(W4)[j + 32] = P.X;
+                            private_assignment.witness(W5)[j + 32] = P.Y;
+                            n_next = n * 16 + b[124] * 8 
+                            + b[125] * 4 + b[126] * 2 + b[127];
+                            private_assignment.witness(W6)[j + 32] = n_next;
                              std::cout<<"circuit result "<< P.X.data<< " "<< P.Y.data<<std::endl;
 
                     }

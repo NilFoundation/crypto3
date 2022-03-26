@@ -146,25 +146,38 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_base_endo_scalar_mul) {
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     typename component_type::public_params_type init_params = {};
-    curve_type::scalar_field_type::value_type b = algebra::random_element<BlueprintScalarType>();
+    //curve_type::scalar_field_type::value_type b = algebra::random_element<BlueprintScalarType>();
+    curve_type::scalar_field_type::value_type b = 2;
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
+    
     typename component_type::private_params_type assignment_params = {T,b};
     constexpr static const typename BlueprintFieldType::value_type endo  = component_type::endo;
+    typename BlueprintFieldType::value_type endo_scalar = 0x244630A7EE5033DA383B3677B4C5CA94A3EBE4156FC4FA4E08B35974929CA2C5_cppui255;
+
+    typename curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type testResult = endo_scalar * T;
+    std::cout<<"Expected result for endo_scalar * T: "<<testResult.X.data<<" "<< testResult.Y.data<<std::endl;
     std::array<bool, curve_type::scalar_field_type::modulus_bits + 1> bits = {false};
     typename curve_type::scalar_field_type::integral_type integral_b = typename curve_type::scalar_field_type::integral_type(b.data);
-    for (std::size_t i = 0; i < curve_type::scalar_field_type::modulus_bits; i++) {
-        bits[curve_type::scalar_field_type::modulus_bits - i] = multiprecision::bit_test(integral_b, i);
+    for (std::size_t i = 0; i < 128; i++) {
+        bits[128 - i - 1] = multiprecision::bit_test(integral_b, i);
     }
-    bits[0] = 0;
     typename curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type testQ;
     testQ.X = endo * T.X;
     testQ.Y = T.Y;
     typename curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type acc = T + (T + testQ) + testQ;
-    for (std::size_t i = 0; i < curve_type::scalar_field_type::modulus_bits; i = i + 2) {
-        auto b1 = bits[i];
-        auto b2 = bits[i + 1];
-        testQ.X = (1 + (endo - 1) * b1)*T.X;
-        testQ.Y = (b2 + b2 - 1) * T.Y;
+    for (std::size_t i = 0; i < 128; i = i + 2) {
+        typename BlueprintFieldType::value_type b1 = bits[i];
+        typename BlueprintFieldType::value_type b2 = bits[i + 1];
+        if (b1 == 0){
+        testQ.X = T.X;
+        } else {
+            testQ.X = endo * T.X;
+        }
+        if (b2 == 0) {
+            testQ.Y = -T.Y;
+        } else {
+            testQ.Y = T.Y;
+        }
         acc = acc + testQ + acc;
     }
     std::cout<<"Expected result: "<<acc.X.data<<" "<< acc.Y.data<<std::endl;
