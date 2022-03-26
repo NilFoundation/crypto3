@@ -158,6 +158,12 @@ namespace nil {
                 return non_linear_combination<VariableType>(A) - non_linear_combination<VariableType>(B);
             }
 
+            template<typename VariableType>
+            non_linear_combination<VariableType> operator-(const non_linear_term<VariableType> &A,
+                                                           const typename VariableType::assignment_type &field_coeff) {
+                return non_linear_combination<VariableType>(A) - non_linear_combination<VariableType>(field_coeff);
+            }
+
             /***************************** Linear combination ****************************/
 
             /**
