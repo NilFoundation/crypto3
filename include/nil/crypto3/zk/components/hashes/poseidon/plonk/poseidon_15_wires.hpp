@@ -397,11 +397,11 @@ namespace nil {
                         const public_params_type &init_params,
                         const std::size_t &component_start_row) {
 
-                        const std::size_t &j = component_start_row;
+                        std::size_t j = component_start_row;
 
                         for (std::size_t z = 0; z < rounds_amount; z += rounds_per_row){
-                            std::size_t selector_index =
-                                public_assignment.add_selector(j + z);
+                            //std::size_t selector_index =
+                            //    public_assignment.add_selector(j + z);
 
                             /*auto constraint_1 = bp.add_constraint(var(W6, 0) -
                                 (var(W0, 0).pow(5) * M[0][0] +
@@ -468,8 +468,9 @@ namespace nil {
                                  var(W4, 0).pow(5) * M[2][1] +
                                  var(W5, 0).pow(5) * M[2][2] + RC[z + 4][2]));*/
 
-                            bp.add_gate(selector_index,
-                                              {});
+                            //bp.add_gate(selector_index,
+                            //                  {});
+                            j++;
                         }
                     }
 

@@ -40,7 +40,6 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/hashes/poseidon/plonk/poseidon_15_wires.hpp>
-#include <nil/crypto3/zk/components/hashes/poseidon/plonk/poseidon_constants.hpp>
 
 #include "../../test_plonk_component.hpp"
 
