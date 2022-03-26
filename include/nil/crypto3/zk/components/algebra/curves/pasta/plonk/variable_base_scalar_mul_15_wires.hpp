@@ -79,11 +79,11 @@ namespace nil {
 
                     constexpr static const std::size_t required_rows_amount = 102;
                     
-                    struct init_params_type {
+                    struct public_params_type {
                     };
 
-                    struct assignment_params_type {
-                        typename CurveType::template g1_type<>::value_type P;
+                    struct private_params_type {
+                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type T;
                         typename CurveType::scalar_field_type::value_type b;
                     };
 
@@ -94,7 +94,7 @@ namespace nil {
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
+                        const public_params_type &init_params,
                         const std::size_t &component_start_row) {
 
                         const std::size_t &j = component_start_row;
@@ -112,54 +112,59 @@ namespace nil {
                                                                     (var(W3, 0) - (2 * var(W2, +1) - 1) * var(W1, 0)));
                         auto constraint_2 = bp.add_constraint((var(W7, 0) - var(W0, 0)) * var(W8, +1) -
                                                                     (var(W8, 0) - (2 * var(W3, +1) - 1) * var(W1, 0)));
-                        auto constraint_3 = bp.add_constraint((var(W10, 0) - var(W0, 0)) * var(W9, +1) -
-                                                                    (var(W11, 0) - (2 * var(W4, +1) - 1) * var(W1, 0)));
-                        auto constraint_4 = bp.add_constraint((var(W12, 0) - var(W0, 0)) * var(W10, +1) -
-                                                                    (var(W13, 0) - (2 * var(W5, +1) - 1) * var(W1, 0)));
-                        auto constraint_5 = bp.add_constraint((var(W0, +1) - var(W0, 0)) * var(W11, +1) -
-                                                                    (var(W1, +1) - (2 * var(W6, +1) - 1) * var(W1, 0)));
+                        auto constraint_3 = bp.add_constraint((var(W9, 0) - var(W0, 0)) * var(W9, +1) -
+                                                                    (var(W10, 0) - (2 * var(W4, +1) - 1) * var(W1, 0)));
+                        auto constraint_4 = bp.add_constraint((var(W11, 0) - var(W0, 0)) * var(W10, +1) -
+                                                                    (var(W12, 0) - (2 * var(W5, +1) - 1) * var(W1, 0)));
+                        auto constraint_5 = bp.add_constraint((var(W13, 0) - var(W0, 0)) * var(W11, +1) -
+                                                                    (var(W14, 0) - (2 * var(W6, +1) - 1) * var(W1, 0)));
 
                         auto constraint_6 = bp.add_constraint(
-                            (2 * var(W3, 0) - var(W7, 1) * (2 * var(W2, 0) - var(W7, 1) ^ 2 + var(W0, 0))) ^
-                            2 - ((2 * var(W2, 0) - var(W7, 1) ^ 2 + var(W0, 0)) ^
-                                 2 * (var(W7, 0) - var(W0, 0) + var(W7, 1) ^ 2)));
+                            (2 * var(W3, 0) - var(W7, 1) * (2 * var(W2, 0) - var(W7, 1).pow(2) + var(W0, 0)))
+                            *(2 * var(W3, 0) - var(W7, 1) * (2 * var(W2, 0) - var(W7, 1).pow(2) + var(W0, 0)))
+                            - ((2 * var(W2, 0) - var(W7, 1).pow(2) + var(W0, 0))*(2 * var(W2, 0) - var(W7, 1).pow(2) + var(W0, 0))
+                                 * (var(W7, 0) - var(W0, 0) + var(W7, 1).pow(2))));
                         auto constraint_7 = bp.add_constraint(
-                            (2 * var(W8, 0) - var(W8, 1) * (2 * var(W7, 0) - var(W8, 1) ^ 2 + var(W0, 0))) ^
-                            2 - ((2 * var(W7, 0) - var(W8, 1) ^ 2 + var(W0, 0)) ^
-                                 2 * (var(W9, 0) - var(W0, 0) + var(W8, 1) ^ 2)));
+                            (2 * var(W8, 0) - var(W8, 1) * (2 * var(W7, 0) - var(W8, 1).pow(2) + var(W0, 0)))
+                            * (2 * var(W8, 0) - var(W8, 1) * (2 * var(W7, 0) - var(W8, 1).pow(2) + var(W0, 0)))
+                            - ((2 * var(W7, 0) - var(W8, 1).pow(2) + var(W0, 0))* (2 * var(W7, 0) - var(W8, 1).pow(2) + var(W0, 0))
+                                 * (var(W9, 0) - var(W0, 0) + var(W8, 1).pow(2))));
                         auto constraint_8 = bp.add_constraint(
-                            (2 * var(W10, 0) - var(W9, 1) * (2 * var(W9, 0) - var(W9, 1) ^ 2 + var(W0, 0))) ^
-                            2 - ((2 * var(W9, 0) - var(W9, 1) ^ 2 + var(W0, 0)) ^
-                                 2 * (var(W11, 0) - var(W0, 0) + var(W9, 1) ^ 2)));
+                            (2 * var(W10, 0) - var(W9, 1) * (2 * var(W9, 0) - var(W9, 1).pow(2) + var(W0, 0)))
+                            *(2 * var(W10, 0) - var(W9, 1) * (2 * var(W9, 0) - var(W9, 1).pow(2) + var(W0, 0)))
+                            - ((2 * var(W9, 0) - var(W9, 1).pow(2) + var(W0, 0))*(2 * var(W9, 0) - var(W9, 1).pow(2) + var(W0, 0))
+                                 * (var(W11, 0) - var(W0, 0) + var(W9, 1).pow(2))));
                         auto constraint_9 = bp.add_constraint(
-                            (2 * var(W12, 0) - var(W10, +1) * (2 * var(W11, 0) - var(W10, +1) ^ 2 + var(W0, 0))) ^
-                            2 - ((2 * var(W11, 0) - var(W10, +1) ^ 2 + var(W0, 0)) ^
-                                 2 * (var(W13, 0) - var(W0, 0) + var(W10, +1) ^ 2)));
+                            (2 * var(W12, 0) - var(W10, +1) * (2 * var(W11, 0) - var(W10, +1).pow(2) + var(W0, 0)))
+                            *(2 * var(W12, 0) - var(W10, +1) * (2 * var(W11, 0) - var(W10, +1).pow(2) + var(W0, 0)))
+                            - ((2 * var(W11, 0) - var(W10, +1).pow(2) + var(W0, 0))*(2 * var(W11, 0) - var(W10, +1).pow(2) + var(W0, 0))
+                                 * (var(W13, 0) - var(W0, 0) + var(W10, +1).pow(2))));
                         auto constraint_10 = bp.add_constraint(
-                            (2 * var(W14, 0) - var(W11, +1) * (2 * var(W13, 0) - var(W11, +1) ^ 2 + var(W0, 0))) ^
-                            2 - (2 * var(W13, 0) - var(W11, +1) ^ 2 + var(W0, 0)) ^
-                            2 * (var(W0, 1) - var(W0, 0) + var(W11, +1) ^ 2));
+                            (2 * var(W14, 0) - var(W11, +1) * (2 * var(W13, 0) - var(W11, +1).pow(2) + var(W0, 0)))
+                            *(2 * var(W14, 0) - var(W11, +1) * (2 * var(W13, 0) - var(W11, +1).pow(2) + var(W0, 0)))
+                            - ((2 * var(W13, 0) - var(W11, +1).pow(2) + var(W0, 0))*(2 * var(W13, 0) - var(W11, +1).pow(2) + var(W0, 0))
+                            * (var(W0, 1) - var(W0, 0) + var(W11, +1).pow(2))));
 
                         auto constraint_11 = bp.add_constraint(
-                            (var(W8, 0) + var(W3, 0)) * (2 * var(W2, 0) - var(W7, +1) ^ 2 + var(W0, 0)) -
+                            (var(W8, 0) + var(W3, 0)) * (2 * var(W2, 0) - var(W7, +1).pow(2) + var(W0, 0)) -
                             ((var(W2, 0) - var(W7, 0)) *
-                             (2 * var(W3, 0) - var(W7, +1) * (2 * var(W2, 0) - var(W7, +1) ^ 2 + var(W0, 0)))));
+                             (2 * var(W3, 0) - var(W7, +1) * (2 * var(W2, 0) - var(W7, +1).pow(2) + var(W0, 0)))));
                         auto constraint_12 = bp.add_constraint(
-                            (var(W10, 0) + var(W8, 0)) * (2 * var(W7, 0) - var(W8, +1) ^ 2 + var(W0, 0)) -
+                            (var(W10, 0) + var(W8, 0)) * (2 * var(W7, 0) - var(W8, +1).pow(2) + var(W0, 0)) -
                             ((var(W7, 0) - var(W9, 0)) *
-                             (2 * var(W8, 0) - var(W8, +1) * (2 * var(W7, 0) - var(W8, +1) ^ 2 + var(W0, 0)))));
+                             (2 * var(W8, 0) - var(W8, +1) * (2 * var(W7, 0) - var(W8, +1).pow(2) + var(W0, 0)))));
                         auto constraint_13 = bp.add_constraint(
-                            (var(W12, 0) + var(W10, 0)) * (2 * var(W9, 0) - var(W9, +1) ^ 2 + var(W0, 0)) -
+                            (var(W12, 0) + var(W10, 0)) * (2 * var(W9, 0) - var(W9, +1).pow(2) + var(W0, 0)) -
                             ((var(W9, 0) - var(W11, 0)) *
-                             (2 * var(W10, 0) - var(W9, +1) * (2 * var(W9, 0) - var(W9, +1) ^ 2 + var(W0, 0)))));
+                             (2 * var(W10, 0) - var(W9, +1) * (2 * var(W9, 0) - var(W9, +1).pow(2) + var(W0, 0)))));
                         auto constraint_14 = bp.add_constraint(
-                            (var(W14, 0) + var(W10, 0)) * (2 * var(W11, 0) - var(W10, +1) ^ 2 + var(W0, 0)) -
+                            (var(W14, 0) + var(W12, 0)) * (2 * var(W11, 0) - var(W10, +1).pow(2) + var(W0, 0)) -
                             ((var(W11, 0) - var(W13, 0)) *
-                             (2 * var(W12, 0) - var(W10, +1) * (2 * var(W11, 0) - var(W10, +1) ^ 2 + var(W0, 0)))));
+                             (2 * var(W12, 0) - var(W10, +1) * (2 * var(W11, 0) - var(W10, +1).pow(2) + var(W0, 0)))));
                         auto constraint_15 = bp.add_constraint(
-                            (var(W1, +1) + var(W14, 0)) * (2 * var(W13, 0) - var(W11, +1) ^ 2 + var(W0, 0)) -
+                            (var(W1, +1) + var(W14, 0)) * (2 * var(W13, 0) - var(W11, +1).pow(2) + var(W0, 0)) -
                             ((var(W13, 0) - var(W0, +1)) *
-                             (2 * var(W14, 0) - var(W11, +1) * (2 * var(W13, 0) - var(W11, +1) ^ 2 + var(W0, 0)))));
+                             (2 * var(W14, 0) - var(W11, +1) * (2 * var(W13, 0) - var(W11, +1).pow(2) + var(W0, 0)))));
 
                         auto constraint_16 = bp.add_constraint(
                             var(W5, 0) - (32 * (var(W4, 0)) + 16 * var(W2, +1) + 8 * var(W3, +1) + 4 * var(W4, +1) +
@@ -175,13 +180,16 @@ namespace nil {
                     static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
+                        const public_params_type &init_params,
                         const std::size_t &component_start_row) {
+                        const std::size_t &j = component_start_row;
 
                         for (int z = 0; z < required_rows_amount - 2; z += 2) {
                             bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 2, false}});
                             bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 2, false}});
                         }
+
+                        //TODO link to params.b
 
                         // TODO: (x0, y0) in row i are copy constrained with values from the first doubling circuit
 
@@ -190,23 +198,88 @@ namespace nil {
                             bp.add_copy_constraint({{W3, j + z, false}, {W1, j + z - 1, false}});
                         }
 
+                         for (int z = 2; z < required_rows_amount; z += 2) {
+                            bp.add_copy_constraint({{W4, j + z, false}, {W5, j + z - 2, false}});
+                        }
+
                         std::size_t public_input_column_index = 0;
                         bp.add_copy_constraint(
                             {{W4, j, false}, {public_input_column_index, j, false, var::column_type::public_input}});
-                        public_assignment.public_input(public_input_column_index)[j] = 0;
-
-                        for (int z = 2; z < required_rows_amount; z += 2) {
-                            bp.add_copy_constraint({{W5, j + z, false}, {W4, j + z - 2, false}});
-                        }
                     }
 
                     static void generate_assignments(
                         blueprint_private_assignment_table<ArithmetizationType>
                             &private_assignment,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
-                        const assignment_params_type &params,
+                        const public_params_type &init_params,
+                        const private_params_type &params,
                         const std::size_t &component_start_row) {
+
+                            const std::size_t &j = component_start_row;
+                            public_assignment.public_input(0)[j] = ArithmetizationType::field_type::value_type::zero();
+
+                            const typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type &T = params.T;
+
+                            std::array<typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type, 6> P;
+                            typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type Q;
+
+                            std::array<bool, CurveType::scalar_field_type::modulus_bits + 1> b = {false};
+                            typename CurveType::scalar_field_type::integral_type integral_b = typename CurveType::scalar_field_type::integral_type(params.b.data);
+                            for (std::size_t i = 0; i < CurveType::scalar_field_type::modulus_bits; i++) {
+                                b[CurveType::scalar_field_type::modulus_bits - i - 1] = multiprecision::bit_test(integral_b, i);
+                            }
+                            typename ArithmetizationType::field_type::value_type n = 0;
+                            typename ArithmetizationType::field_type::value_type n_next = 0;
+                            for (std::size_t i = j; i < j + required_rows_amount; i= i + 2) {
+                                private_assignment.witness(W0)[i] = T.X;
+                                private_assignment.witness(W1)[i] = T.Y;
+                                if (i == j) {
+                                    P[0] = 2*T;
+                                }
+                                else {
+                                    P[0] = P[5];
+                                    n = n_next;
+                                }
+                                private_assignment.witness(W2)[i] = P[0].X;
+                                private_assignment.witness(W3)[i] = P[0].Y;
+                                private_assignment.witness(W4)[i] = n;
+                                n_next = 32*n + 16*b[((i - j) / 2)*5] + 8*b[((i - j) / 2)*5 + 1] + 4* b[((i - j) / 2)*5 + 2] +
+                                2*b[((i - j) / 2)*5 + 3] + b[((i - j) / 2)*5 + 4];
+                                private_assignment.witness(W5)[i] = n_next;
+                                Q.X = T.X;
+                                Q.Y = (2 * b[((i - j) / 2)*5] -1)*T.Y;
+                                P[1] = 2 * P[0] + Q;
+                                private_assignment.witness(W7)[i] =P[1].X;
+                                private_assignment.witness(W8)[i] =P[1].Y;
+                                private_assignment.witness(W7)[i + 1] = (P[0].Y - Q.Y) * (P[0].X - Q.X).inversed();
+                                Q.Y = (2 * b[((i - j) / 2)*5 + 1] -1)*T.Y;
+                                P[2] = 2 * P[1] + Q;
+                                private_assignment.witness(W9)[i] =P[2].X;
+                                private_assignment.witness(W10)[i] = P[2].Y;
+                                private_assignment.witness(W8)[i + 1] = (P[1].Y - Q.Y) * (P[1].X - Q.X).inversed();
+                                Q.Y = (2 * b[((i - j) / 2)*5 + 2] -1)*T.Y;
+                                P[3] = 2 * P[2] + Q;
+                                private_assignment.witness(W11)[i] =P[3].X;
+                                private_assignment.witness(W12)[i] = P[3].Y;
+                                private_assignment.witness(W9)[i + 1] = (P[2].Y - Q.Y) * (P[2].X - Q.X).inversed();
+                                Q.Y = (2 * b[((i - j) / 2)*5 + 3] -1)*T.Y;
+                                P[4] = 2 * P[3] + Q;
+                                private_assignment.witness(W13)[i] =P[4].X;
+                                private_assignment.witness(W14)[i] = P[4].Y;
+                                private_assignment.witness(W10)[i + 1] = (P[3].Y - Q.Y) * (P[3].X - Q.X).inversed();
+                                Q.Y = (2 * b[((i - j) / 2)*5 + 4] -1)*T.Y;
+                                P[5] = 2 * P[4] + Q;
+                                private_assignment.witness(W0)[i + 1] = P[5].X;
+                                private_assignment.witness(W1)[i + 1] = P[5].Y;  
+                                private_assignment.witness(W11)[i + 1] = (P[4].Y - Q.Y) * (P[4].X - Q.X).inversed();
+
+                                private_assignment.witness(W2)[i + 1] = b[((i - j) / 2)*5];
+                                private_assignment.witness(W3)[i + 1] = b[((i - j) / 2)*5 + 1];
+                                private_assignment.witness(W4)[i + 1] = b[((i - j) / 2)*5 + 2];
+                                private_assignment.witness(W5)[i + 1] = b[((i - j) / 2)*5 + 3];
+                                private_assignment.witness(W6)[i + 1] = b[((i - j) / 2)*5 + 4];
+                            }
+                                std::cout<<"circuit result "<< P[5].X.data<< " "<< P[5].Y.data<<std::endl;
 
                     }
                 };
