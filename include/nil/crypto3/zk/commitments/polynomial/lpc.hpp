@@ -68,7 +68,7 @@ namespace nil {
                  * Matter Labs,
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
-                template<typename FieldType, typename LPCParams, std::size_t K = 1>
+                template<typename FieldType, typename LPCParams>
                 struct list_polynomial_commitment : public detail::basic_fri<FieldType,
                                                                              typename LPCParams::merkle_hash_type,
                                                                              typename LPCParams::transcript_hash_type,
@@ -79,7 +79,6 @@ namespace nil {
                     constexpr static const std::size_t lambda = LPCParams::lambda;
                     constexpr static const std::size_t r = LPCParams::r;
                     constexpr static const std::size_t m = LPCParams::m;
-                    constexpr static const std::size_t k = K;
 
                     typedef LPCParams lpc_params;
 
@@ -105,7 +104,7 @@ namespace nil {
                             return !(rhs == *this);
                         }
 
-                        std::array<typename FieldType::value_type, k> z;
+                        std::vector<typename FieldType::value_type> z;
 
                         commitment_type T_root;
 
@@ -113,16 +112,17 @@ namespace nil {
                     };
 
                     static proof_type proof_eval(
-                        const std::array<typename FieldType::value_type, k> &evaluation_points,
+                        const std::vector<typename FieldType::value_type> &evaluation_points,
                         precommitment_type &T,
                         const math::polynomial<typename FieldType::value_type> &g,
                         const typename basic_fri::params_type &fri_params,
                         typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {
 
-                        std::array<typename FieldType::value_type, k> z;
-                        std::array<merkle_proof_type, k> p;
-                        std::array<std::pair<typename FieldType::value_type, typename FieldType::value_type>, k>
-                            U_interpolation_points;
+                        std::size_t k = evaluation_points.size();
+                        std::vector<typename FieldType::value_type> z(k);
+                        std::vector<merkle_proof_type> p(k);
+                        std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>>
+                            U_interpolation_points(k);
 
                         for (std::size_t j = 0; j < k; j++) {
                             z[j] = g.evaluate(evaluation_points[j]);    // transform to point-representation
@@ -153,13 +153,15 @@ namespace nil {
                     }
 
                     static bool verify_eval(
-                        const std::array<typename FieldType::value_type, k> &evaluation_points,
+                        const std::vector<typename FieldType::value_type> &evaluation_points,
                         proof_type &proof,
                         typename basic_fri::params_type fri_params,
                         typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {
 
-                        std::array<std::pair<typename FieldType::value_type, typename FieldType::value_type>, k>
-                            U_interpolation_points;
+                        std::size_t k = evaluation_points.size();
+
+                        std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>>
+                            U_interpolation_points(k);
 
                         for (std::size_t j = 0; j < k; j++) {
                             U_interpolation_points[j] = std::make_pair(evaluation_points[j], proof.z[j]);
@@ -184,8 +186,8 @@ namespace nil {
                     }
                 };
 
-                template<typename FieldType, typename LPCParams, std::size_t K>
-                using lpc = list_polynomial_commitment<FieldType, LPCParams, K>;
+                template<typename FieldType, typename LPCParams>
+                using lpc = list_polynomial_commitment<FieldType, LPCParams>;
             }    // namespace commitments
         }        // namespace zk
     }            // namespace crypto3

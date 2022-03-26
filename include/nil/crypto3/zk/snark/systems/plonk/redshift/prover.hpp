@@ -75,26 +75,17 @@ namespace nil {
                     constexpr static const std::size_t r = ParamsType::commitment_params_type::r;
                     constexpr static const std::size_t m = ParamsType::commitment_params_type::m;
 
-                    constexpr static const std::size_t opening_points_witness = 1;
-                    constexpr static const std::size_t opening_points_v_p = 2;
-                    constexpr static const std::size_t opening_points_t = 1;
-                    constexpr static const std::size_t opening_points_public = 1;
-
                     typedef commitments::list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type,
-                                                                    opening_points_witness>
+                                                                    typename ParamsType::commitment_params_type>
                         commitment_scheme_witness_type;
                     typedef commitments::list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type,
-                                                                    opening_points_v_p>
+                                                                    typename ParamsType::commitment_params_type>
                         commitment_scheme_permutation_type;
                     typedef commitments::list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type,
-                                                                    opening_points_t>
+                                                                    typename ParamsType::commitment_params_type>
                         commitment_scheme_quotient_type;
                     typedef commitments::list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type,
-                                                                    opening_points_public>
+                                                                    typename ParamsType::commitment_params_type>
                         commitment_scheme_public_input_type;
 
                     constexpr static const std::size_t gate_parts = 1;
@@ -252,10 +243,10 @@ namespace nil {
                             std::vector<int> rotation_gates =
                                 preprocessed_public_data.common_data.columns_rotations[i];
                                 
-                            std::array<typename FieldType::value_type, 1>
+                            std::vector<typename FieldType::value_type>
                                 evaluation_points_gates;    // TODO: array size with rotation
                             for (std::size_t i = 0; i < evaluation_points_gates.size(); i++) {
-                                evaluation_points_gates[i] = challenge * omega.pow(rotation_gates[i]);
+                                evaluation_points_gates.push_back(challenge * omega.pow(rotation_gates[i]));
                             }
 
                             witnesses_evaluation[i] =
@@ -268,7 +259,7 @@ namespace nil {
                         }
 
                         // permutation polynomial evaluation
-                        std::array<typename FieldType::value_type, 2> evaluation_points_v_p = {challenge,
+                        std::vector<typename FieldType::value_type> evaluation_points_v_p = {challenge,
                                                                                                challenge * omega};
                         typename commitment_scheme_permutation_type::proof_type v_p_evaluation =
                             commitment_scheme_permutation_type::proof_eval(
@@ -280,7 +271,7 @@ namespace nil {
                         proof.eval_proof.permutation.push_back(v_p_evaluation);
 
                         // quotient
-                        std::array<typename FieldType::value_type, 1> evaluation_points_quotient = {challenge};
+                        std::vector<typename FieldType::value_type> evaluation_points_quotient = {challenge};
                         std::vector<typename commitment_scheme_quotient_type::proof_type> quotient_evaluation(
                             T_splitted.size());
                         for (std::size_t i = 0; i < T_splitted.size(); i++) {
@@ -290,7 +281,7 @@ namespace nil {
                         }
 
                         // public
-                        std::array<typename FieldType::value_type, 1> evaluation_points_public = {challenge};
+                        std::vector<typename FieldType::value_type> evaluation_points_public = {challenge};
 
                         std::vector<typename commitment_scheme_public_input_type::proof_type> id_evals(preprocessed_public_data.identity_polynomials.size());
                         for (std::size_t i = 0; i < id_evals.size(); i++) {

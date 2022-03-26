@@ -90,7 +90,6 @@ using FieldType = typename curve_type::base_field_type;
 
 // lpc params
 constexpr static const std::size_t m = 2;
-constexpr static const std::size_t k = 1;
 
 constexpr static const std::size_t table_rows_log = 4;
 constexpr static const std::size_t table_rows = 1 << table_rows_log;
@@ -156,7 +155,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_polynomials_test) {
     using policy_type = zk::snark::detail::redshift_policy<FieldType, circuit_2_params>;
 
     constexpr static const std::size_t r = table_rows_log - 1;
-    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type, k> lpc_type;
+    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -233,7 +232,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     using policy_type = zk::snark::detail::redshift_policy<FieldType, circuit_2_params>;
 
     constexpr static const std::size_t r = table_rows_log - 1;
-    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type, k> lpc_type;
+    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -312,7 +311,7 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     using policy_type = zk::snark::detail::redshift_policy<FieldType, circuit_2_params>;
 
     constexpr static const std::size_t r = table_rows_log - 1;
-    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type, k> lpc_type;
+    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -377,7 +376,7 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
 
     using policy_type = zk::snark::detail::redshift_policy<FieldType, circuit_2_params>;
 
-    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type, k> lpc_type;
+    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 

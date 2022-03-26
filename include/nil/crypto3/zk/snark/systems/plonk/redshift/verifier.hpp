@@ -54,23 +54,18 @@ namespace nil {
                     constexpr static const std::size_t r = ParamsType::commitment_params_type::r;
                     constexpr static const std::size_t m = ParamsType::commitment_params_type::m;
 
-                    constexpr static const std::size_t opening_points_witness = 1;
-                    constexpr static const std::size_t opening_points_v_p = 2;
-                    constexpr static const std::size_t opening_points_t = 1;
-                    constexpr static const std::size_t opening_points_public = 1;
-
                     typedef commitments::list_polynomial_commitment<
-                        FieldType, typename ParamsType::commitment_params_type, opening_points_witness>
+                        FieldType, typename ParamsType::commitment_params_type>
                         commitment_scheme_witness_type;
                     typedef commitments::list_polynomial_commitment<
-                        FieldType, typename ParamsType::commitment_params_type, opening_points_v_p>
+                        FieldType, typename ParamsType::commitment_params_type>
                         commitment_scheme_permutation_type;
                     typedef commitments::list_polynomial_commitment<
-                        FieldType, typename ParamsType::commitment_params_type, opening_points_t>
+                        FieldType, typename ParamsType::commitment_params_type>
                         commitment_scheme_quotient_type;
 
                     typedef commitments::list_polynomial_commitment<
-                        FieldType, typename ParamsType::commitment_params_type, opening_points_public>
+                        FieldType, typename ParamsType::commitment_params_type>
                         commitment_scheme_public_input_type;
 
                     constexpr static const std::size_t gate_parts = 1;
@@ -161,11 +156,14 @@ namespace nil {
 
                         // witnesses
                         for (std::size_t i = 0; i < proof.eval_proof.witness.size(); i++) {
-                            std::vector<std::size_t> rotation_gates = {0};    // TODO: Rotation
-                            std::array<typename FieldType::value_type, 1>
-                                evaluation_points_gates;    // TODO: array size with rotation
+
+                            std::vector<int> rotation_gates =
+                                preprocessed_public_data.common_data.columns_rotations[i];
+
+                            std::vector<typename FieldType::value_type>
+                                evaluation_points_gates;
                             for (std::size_t i = 0; i < evaluation_points_gates.size(); i++) {
-                                evaluation_points_gates[i] = challenge * omega.pow(rotation_gates[i]);
+                                evaluation_points_gates.push_back(challenge * omega.pow(rotation_gates[i]));
                             }
                             if (!commitment_scheme_witness_type::verify_eval(
                                     evaluation_points_gates, proof.eval_proof.witness[i], fri_params, transcript)) {
@@ -174,7 +172,7 @@ namespace nil {
                         }
 
                         // permutation
-                        std::array<typename FieldType::value_type, 2> evaluation_points_permutation = {
+                        std::vector<typename FieldType::value_type> evaluation_points_permutation = {
                             challenge, challenge * omega};
                         for (std::size_t i = 0; i < proof.eval_proof.permutation.size(); i++) {
                             if (!commitment_scheme_permutation_type::verify_eval(evaluation_points_permutation,
@@ -186,7 +184,7 @@ namespace nil {
                         }
 
                         // quotient
-                        std::array<typename FieldType::value_type, 1> evaluation_points_quotient = {challenge};
+                        std::vector<typename FieldType::value_type> evaluation_points_quotient = {challenge};
                         for (std::size_t i = 0; i < proof.eval_proof.quotient.size(); i++) {
                             if (!commitment_scheme_quotient_type::verify_eval(evaluation_points_quotient,
                                     proof.eval_proof.quotient[i],
@@ -197,7 +195,7 @@ namespace nil {
                         }
 
                         // public data
-                        std::array<typename FieldType::value_type, 1> evaluation_points_public = {challenge};
+                        std::vector<typename FieldType::value_type> evaluation_points_public = {challenge};
                         for (std::size_t i = 0; i < proof.eval_proof.id_permutation.size(); i++) {
                             if (!commitment_scheme_public_input_type::verify_eval(evaluation_points_public,
                                     proof.eval_proof.id_permutation[i],
