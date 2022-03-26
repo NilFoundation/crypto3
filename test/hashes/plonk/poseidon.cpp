@@ -40,6 +40,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/hashes/poseidon/plonk/poseidon_15_wires.hpp>
+#include <nil/crypto3/zk/components/hashes/poseidon/plonk/poseidon_constants.hpp>
 
 #include "../../test_plonk_component.hpp"
 
@@ -53,8 +54,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     using BlueprintFieldType = typename curve_type::base_field_type;
     using FieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 15;
-    constexpr std::size_t PublicInputColumns = 5;
-    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 3;
     constexpr std::size_t SelectorColumns = 5;
 
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
@@ -65,10 +66,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     using component_type = zk::components::poseidon<ArithmetizationType, FieldType,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
-    typename component_type::init_params_type init_params = {};
-    typename component_type::assignment_params_type assignment_params = {};
+    typename component_type::public_params_type public_params = {};
+    typename component_type::private_params_type private_params = {};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams> (init_params, assignment_params);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams> (public_params, private_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

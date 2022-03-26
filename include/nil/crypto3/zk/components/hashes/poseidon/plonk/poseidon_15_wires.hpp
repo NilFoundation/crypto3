@@ -73,7 +73,12 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    constexpr static const std::array<std::array<typename FieldType::value_type, 3>, 3> M =
+                    constexpr static const std::size_t state_size = 3;
+                    constexpr static const std::size_t rounds_amount = 55;
+
+                    constexpr static const std::size_t rounds_per_row = 5;
+
+                    constexpr static const std::array<std::array<typename FieldType::value_type, state_size>, state_size> mds =
                         {{
                             {{
                             0x1a9bd250757e29ef4959b9bef59b4e60e20a56307d6491e7b7ea1fac679c7903_cppui253,
@@ -93,7 +98,7 @@ namespace nil {
                         }};
 
 
-                    constexpr static const std::array<std::array<typename FieldType::value_type, 3>, 55> RC =
+                    constexpr static const std::array<std::array<typename FieldType::value_type, state_size>, rounds_amount> round_constant =
                         {{
                             {{
                             0x2ec559cd1a1f2f6889fc8ae5f07757f202b364429677c8ff6603fd6d93659b47_cppui253,
@@ -377,9 +382,9 @@ namespace nil {
 
                     constexpr static const std::size_t required_rows_amount = 12;
 
-                    struct init_params_type { };
+                    struct public_params_type { };
 
-                    struct assignment_params_type {
+                    struct private_params_type {
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
@@ -389,16 +394,16 @@ namespace nil {
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
+                        const public_params_type &init_params,
                         const std::size_t &component_start_row) {
 
                         const std::size_t &j = component_start_row;
 
-                        for (std::size_t z = 0; z < 55; z+=5){
+                        for (std::size_t z = 0; z < rounds_amount; z += rounds_per_row){
                             std::size_t selector_index =
                                 public_assignment.add_selector(j + z);
 
-                            auto constraint_1 = bp.add_constraint(var(W6, 0) -
+                            /*auto constraint_1 = bp.add_constraint(var(W6, 0) -
                                 (var(W0, 0).pow(5) * M[0][0] +
                                  var(W1, 0).pow(5) * M[0][1] +
                                  var(W2, 0).pow(5) * M[0][2] + RC[z][0]));
@@ -461,21 +466,17 @@ namespace nil {
                             auto constraint_15 = bp.add_constraint(var(W2, +1) -
                                 (var(W3, 0).pow(5) * M[2][0] +
                                  var(W4, 0).pow(5) * M[2][1] +
-                                 var(W5, 0).pow(5) * M[2][2] + RC[z + 4][2]));
+                                 var(W5, 0).pow(5) * M[2][2] + RC[z + 4][2]));*/
 
                             bp.add_gate(selector_index,
-                                              {constraint_1, constraint_2, constraint_3,
-                                               constraint_4, constraint_5, constraint_6,
-                                               constraint_7, constraint_8, constraint_9,
-                                               constraint_10, constraint_11, constraint_12,
-                                               constraint_13, constraint_14, constraint_15});
+                                              {});
                         }
                     }
 
                     static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
+                        const public_params_type &init_params,
                         const std::size_t &component_start_row) {
 
                     }
@@ -484,10 +485,21 @@ namespace nil {
                         blueprint_private_assignment_table<ArithmetizationType>
                             &private_assignment,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
-                        const assignment_params_type &params,
+                        const public_params_type &init_params,
+                        const private_params_type &params,
                         const std::size_t &component_start_row) {
 
+                        /*auto full_round = [](const public_params_type &init_params,
+                            const private_params_type &params,
+                            std::size_t row, std::size_t )*/
+                        
+                        std::size_t row = component_start_row;
+                        for (std::size_t i = 0; i < rounds_amount; i++) {
+                            //public_assignment.constant(0)[row] = round_constant[i][0];
+                            //public_assignment.constant(1)[row] = round_constant[i][1];
+                            //public_assignment.constant(2)[row] = round_constant[i][2];
+                            row++;
+                        }
                     }
                 };
 
