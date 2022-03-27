@@ -78,6 +78,8 @@ namespace nil {
 
                     constexpr static const std::size_t rounds_per_row = 5;
 
+                    constexpr static const std::size_t sbox_alpha = 7;
+
                     constexpr static const std::array<std::array<typename FieldType::value_type, state_size>, state_size> mds =
                         {{
                             {{
@@ -385,6 +387,7 @@ namespace nil {
                     struct public_params_type { };
 
                     struct private_params_type {
+                        std::array<typename ArithmetizationType::field_type::value_type, state_size> input_state;
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
@@ -396,80 +399,78 @@ namespace nil {
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         const public_params_type &init_params,
                         const std::size_t &component_start_row) {
-
                         std::size_t j = component_start_row;
-
                         for (std::size_t z = 0; z < rounds_amount; z += rounds_per_row){
-                            //std::size_t selector_index =
-                            //    public_assignment.add_selector(j + z);
+                            std::size_t selector_index = public_assignment.add_selector(j);
+                            auto constraint_1 = bp.add_constraint(var(W3, 0) -
+                                (var(W0, 0).pow(sbox_alpha) * mds[0][0] +
+                                var(W1, 0).pow(sbox_alpha) * mds[0][1] +
+                                var(W2, 0).pow(sbox_alpha)* mds[0][2] + round_constant[z][0]));
+                            auto constraint_2 = bp.add_constraint(var(W4, 0) -
+                                (var(W0, 0).pow(sbox_alpha) * mds[1][0] +
+                                 var(W1, 0).pow(sbox_alpha) * mds[1][1] +
+                                 var(W2, 0).pow(sbox_alpha) * mds[1][2] + round_constant[z][1]));
+                            auto constraint_3 = bp.add_constraint(var(W5, 0) -
+                                (var(W0, 0).pow(sbox_alpha) * mds[2][0] +
+                                 var(W1, 0).pow(sbox_alpha) * mds[2][1] +
+                                 var(W2, 0).pow(sbox_alpha) * mds[2][2] + round_constant[z][2]));
 
-                            /*auto constraint_1 = bp.add_constraint(var(W6, 0) -
-                                (var(W0, 0).pow(5) * M[0][0] +
-                                 var(W1, 0).pow(5) * M[0][1] +
-                                 var(W2, 0).pow(5) * M[0][2] + RC[z][0]));
-                            auto constraint_2 = bp.add_constraint(var(W7, 0) -
-                                (var(W0, 0).pow(5) * M[1][0] +
-                                 var(W1, 0).pow(5) * M[1][1] +
-                                 var(W2, 0).pow(5) * M[1][2] + RC[z][1]));
-                            auto constraint_3 = bp.add_constraint(var(W8, 0) -
-                                (var(W0, 0).pow(5) * M[2][0] +
-                                 var(W1, 0).pow(5) * M[2][1] +
-                                 var(W2, 0).pow(5) * M[2][2] + RC[z][2]));
+                            auto constraint_4 = bp.add_constraint(var(W6, 0) -
+                                (var(W3, 0).pow(sbox_alpha) * mds[0][0] +
+                                 var(W4, 0).pow(sbox_alpha) * mds[0][1] +
+                                 var(W5, 0).pow(sbox_alpha) * mds[0][2] + round_constant[z + 1][0]));
+                            auto constraint_5 = bp.add_constraint(var(W7, 0) -
+                                (var(W3, 0).pow(sbox_alpha) * mds[1][0] +
+                                 var(W4, 0).pow(sbox_alpha) * mds[1][1] +
+                                 var(W5, 0).pow(sbox_alpha) * mds[1][2] + round_constant[z + 1][1]));
+                            auto constraint_6 = bp.add_constraint(var(W8, 0) -
+                                (var(W3, 0).pow(sbox_alpha) * mds[2][0] +
+                                 var(W4, 0).pow(sbox_alpha) * mds[2][1] +
+                                 var(W5, 0).pow(sbox_alpha) * mds[2][2] + round_constant[z + 1][2]));
 
-                            auto constraint_4 = bp.add_constraint(var(W9, 0) -
-                                (var(W6, 0).pow(5) * M[0][0] +
-                                 var(W7, 0).pow(5) * M[0][1] +
-                                 var(W8, 0).pow(5) * M[0][2] + RC[z + 1][0]));
-                            auto constraint_5 = bp.add_constraint(var(W10, 0) -
-                                (var(W6, 0).pow(5) * M[1][0] +
-                                 var(W7, 0).pow(5) * M[1][1] +
-                                 var(W8, 0).pow(5) * M[1][2] + RC[z + 1][1]));
-                            auto constraint_6 = bp.add_constraint(var(W11, 0) -
-                                (var(W6, 0).pow(5) * M[2][0] +
-                                 var(W7, 0).pow(5) * M[2][1] +
-                                 var(W8, 0).pow(5) * M[2][2] + RC[z + 1][2]));
+                            auto constraint_7 = bp.add_constraint(var(W9, 0) -
+                                (var(W6, 0).pow(sbox_alpha) * mds[0][0] +
+                                 var(W7, 0).pow(sbox_alpha) * mds[0][1] +
+                                 var(W8, 0).pow(sbox_alpha) * mds[0][2] + round_constant[z + 2][0]));
+                            auto constraint_8 = bp.add_constraint(var(W10, 0) -
+                                (var(W6, 0).pow(sbox_alpha) * mds[1][0] +
+                                 var(W7, 0).pow(sbox_alpha) * mds[1][1] +
+                                 var(W8, 0).pow(sbox_alpha) * mds[1][2] + round_constant[z + 2][1]));
+                            auto constraint_9 = bp.add_constraint(var(W11, 0) -
+                                (var(W6, 0).pow(sbox_alpha) * mds[2][0] +
+                                 var(W7, 0).pow(sbox_alpha) * mds[2][1] +
+                                 var(W8, 0).pow(sbox_alpha) * mds[2][2] + round_constant[z + 2][2]));
 
-                            auto constraint_7 = bp.add_constraint(var(W12, 0) -
-                                (var(W9, 0).pow(5) * M[0][0] +
-                                 var(W10, 0).pow(5) * M[0][1] +
-                                 var(W11, 0).pow(5) * M[0][2] + RC[z + 2][0]));
-                            auto constraint_8 = bp.add_constraint(var(W13, 0) -
-                                (var(W9, 0).pow(5) * M[1][0] +
-                                 var(W10, 0).pow(5) * M[1][1] +
-                                 var(W11, 0).pow(5) * M[1][2] + RC[z + 2][1]));
-                            auto constraint_9 = bp.add_constraint(var(W14, 0) -
-                                (var(W9, 0).pow(5) * M[2][0] +
-                                 var(W10, 0).pow(5) * M[2][1] +
-                                 var(W11, 0).pow(5) * M[2][2] + RC[z + 2][2]));
-
-                            auto constraint_10 = bp.add_constraint(var(W3, 0) -
-                                (var(W12, 0).pow(5) * M[0][0] +
-                                 var(W13, 0).pow(5) * M[0][1] +
-                                 var(W14, 0).pow(5) * M[0][2] + RC[z + 3][0]));
-                            auto constraint_11 = bp.add_constraint(var(W4, 0) -
-                                (var(W12, 0).pow(5) * M[1][0] +
-                                 var(W13, 0).pow(5) * M[1][1] +
-                                 var(W14, 0).pow(5) * M[1][2] + RC[z + 3][1]));
-                            auto constraint_12 = bp.add_constraint(var(W5, 0) -
-                                (var(W12, 0).pow(5) * M[2][0] +
-                                 var(W13, 0).pow(5) * M[2][1] +
-                                 var(W14, 0).pow(5) * M[2][2] + RC[z + 3][2]));
+                            auto constraint_10 = bp.add_constraint(var(W12, 0) -
+                                (var(W9, 0).pow(sbox_alpha) * mds[0][0] +
+                                 var(W10, 0).pow(sbox_alpha) * mds[0][1] +
+                                 var(W11, 0).pow(sbox_alpha) * mds[0][2] + round_constant[z + 3][0]));
+                            auto constraint_11 = bp.add_constraint(var(W13, 0) -
+                                (var(W9, 0).pow(sbox_alpha) * mds[1][0] +
+                                 var(W10, 0).pow(sbox_alpha) * mds[1][1] +
+                                 var(W11, 0).pow(sbox_alpha) * mds[1][2] + round_constant[z + 3][1]));
+                            auto constraint_12 = bp.add_constraint(var(W14, 0) -
+                                (var(W9, 0).pow(sbox_alpha) * mds[2][0] +
+                                 var(W10, 0).pow(sbox_alpha) * mds[2][1] +
+                                 var(W11, 0).pow(sbox_alpha) * mds[2][2] + round_constant[z + 3][2]));
 
                             auto constraint_13 = bp.add_constraint(var(W0, +1) -
-                                (var(W3, 0).pow(5) * M[0][0] +
-                                 var(W4, 0).pow(5) * M[0][1] +
-                                 var(W5, 0).pow(5) * M[0][2] + RC[z + 4][0]));
+                                (var(W12, 0).pow(sbox_alpha) * mds[0][0] +
+                                 var(W13, 0).pow(sbox_alpha) * mds[0][1] +
+                                 var(W14, 0).pow(sbox_alpha) * mds[0][2] + round_constant[z + 4][0]));
                             auto constraint_14 = bp.add_constraint(var(W1, +1) -
-                                (var(W3, 0).pow(5) * M[1][0] +
-                                 var(W4, 0).pow(5) * M[1][1] +
-                                 var(W5, 0).pow(5) * M[1][2] + RC[z + 4][1]));
+                                (var(W12, 0).pow(sbox_alpha) * mds[1][0] +
+                                 var(W13, 0).pow(sbox_alpha) * mds[1][1] +
+                                 var(W14, 0).pow(sbox_alpha) * mds[1][2] + round_constant[z + 4][1]));
                             auto constraint_15 = bp.add_constraint(var(W2, +1) -
-                                (var(W3, 0).pow(5) * M[2][0] +
-                                 var(W4, 0).pow(5) * M[2][1] +
-                                 var(W5, 0).pow(5) * M[2][2] + RC[z + 4][2]));*/
+                                (var(W12, 0).pow(sbox_alpha) * mds[2][0] +
+                                 var(W13, 0).pow(sbox_alpha) * mds[2][1] +
+                                 var(W14, 0).pow(sbox_alpha) * mds[2][2] + round_constant[z + 4][2]));
 
-                            //bp.add_gate(selector_index,
-                            //                  {});
+                            bp.add_gate(selector_index,
+                            {constraint_1, constraint_2, constraint_3,
+                                          constraint_4, constraint_5, constraint_6, constraint_7, constraint_8, constraint_9, constraint_10,
+                                          constraint_11, constraint_12, constraint_13, constraint_14, constraint_15});
                             j++;
                         }
                     }
@@ -490,17 +491,53 @@ namespace nil {
                         const private_params_type &params,
                         const std::size_t &component_start_row) {
 
-                        /*auto full_round = [](const public_params_type &init_params,
-                            const private_params_type &params,
-                            std::size_t row, std::size_t )*/
+                        std::array<typename ArithmetizationType::field_type::value_type, state_size> state = params.input_state;
+                        std::array<typename ArithmetizationType::field_type::value_type, state_size> next_state;
+
                         
                         std::size_t row = component_start_row;
-                        for (std::size_t i = 0; i < rounds_amount; i++) {
-                            //public_assignment.constant(0)[row] = round_constant[i][0];
-                            //public_assignment.constant(1)[row] = round_constant[i][1];
-                            //public_assignment.constant(2)[row] = round_constant[i][2];
-                            row++;
+                        private_assignment.witness(W0)[row] = state[0];
+                        private_assignment.witness(W1)[row] = state[1];
+                        private_assignment.witness(W2)[row] = state[2];
+
+                        for (std::size_t i = row; i < row + 11; i++) {
+                            for (int j = 0; j < state_size; j++) {
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[i*5][j];
+                            }
+                            private_assignment.witness(W3)[i] = next_state[0];
+                            private_assignment.witness(W4)[i] = next_state[1];
+                            private_assignment.witness(W5)[i] = next_state[2];
+                            state = next_state;
+                            for (int j = 0; j < state_size; j++) {
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[i*5 + 1][j];
+                            }
+                            private_assignment.witness(W6)[i] = next_state[0];
+                            private_assignment.witness(W7)[i] = next_state[1];
+                            private_assignment.witness(W8)[i] = next_state[2];
+                            state = next_state;
+                            for (int j = 0; j < state_size; j++) {
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[i*5 + 2][j];
+                            }
+                            private_assignment.witness(W9)[i] = next_state[0];
+                            private_assignment.witness(W10)[i] = next_state[1];
+                            private_assignment.witness(W11)[i] = next_state[2];
+                            state = next_state;
+                            for (int j = 0; j < state_size; j++) {
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[i*5 + 3][j];
+                            }
+                            private_assignment.witness(W12)[i] = next_state[0];
+                            private_assignment.witness(W13)[i] = next_state[1];
+                            private_assignment.witness(W14)[i] = next_state[2];
+                            state = next_state;
+                            for (int j = 0; j < state_size; j++) {
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[i*5 + 4][j];
+                            }
+                            private_assignment.witness(W0)[i + 1] = next_state[0];
+                            private_assignment.witness(W1)[i + 1] = next_state[1];
+                            private_assignment.witness(W2)[i + 1] = next_state[2];
+                            state = next_state;
                         }
+                        std::cout<<"Circuit result: "<<state[0].data<<" "<< state[1].data<<" " <<state[2].data<<std::endl;
                     }
                 };
 
