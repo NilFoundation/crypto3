@@ -245,8 +245,8 @@ namespace nil {
                                 
                             std::vector<typename FieldType::value_type>
                                 evaluation_points_gates;    // TODO: array size with rotation
-                            for (std::size_t i = 0; i < evaluation_points_gates.size(); i++) {
-                                evaluation_points_gates.push_back(challenge * omega.pow(rotation_gates[i]));
+                            for (std::size_t j = 0; j < rotation_gates.size(); j++) {
+                                evaluation_points_gates.push_back(challenge * omega.pow(rotation_gates[j]));
                             }
 
                             witnesses_evaluation[i] =

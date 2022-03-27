@@ -262,6 +262,14 @@ namespace nil {
                             }
                         }
 
+                        for (std::size_t i = 0; i < ParamsType::arithmetization_params::TotalColumns; i++) {
+                            if (std::find(result[i].begin(),
+                                                    result[i].end(), 0) ==
+                                                result[i].end()) {
+                                result[i].push_back(0);
+                            }
+                        }
+
                         return result;
                     }
 

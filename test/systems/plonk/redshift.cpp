@@ -350,12 +350,34 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
 
     // Challenge phase
     typename FieldType::value_type y = algebra::random_element<FieldType>();
+    typename FieldType::value_type omega = 
+                        preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
     typename policy_type::evaluation_map columns_at_y;
     for (std::size_t i = 0; i < redshift_test_params::witness_columns; i++) {
-        auto key = std::make_tuple(i, plonk_variable<FieldType>::rotation_type::current,
-                                   plonk_variable<FieldType>::column_type::witness);
-        columns_at_y[key] = polynomial_table.witness(i).evaluate(y);
+        for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
+            int rotation = preprocessed_public_data.common_data.columns_rotations[i][j];
+            auto key = std::make_tuple(i, rotation,
+                                    plonk_variable<FieldType>::column_type::witness);
+            columns_at_y[key] = polynomial_table.witness(i).evaluate(y * omega.pow(rotation));
+        }
+    }
+    for (std::size_t i = redshift_test_params::witness_columns; i < redshift_test_params::witness_columns + redshift_test_params::public_input_columns; i++) {
+        for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
+            int rotation = preprocessed_public_data.common_data.columns_rotations[i][j];
+            auto key = std::make_tuple(i, rotation,
+                                    plonk_variable<FieldType>::column_type::witness);
+            columns_at_y[key] = polynomial_table.public_input(i).evaluate(y * omega.pow(rotation));
+        }
+    }
+    for (std::size_t i = redshift_test_params::witness_columns + redshift_test_params::public_input_columns; 
+                i < redshift_test_params::witness_columns + redshift_test_params::public_input_columns + redshift_test_params::constant_columns; i++) {
+        for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
+            int rotation = preprocessed_public_data.common_data.columns_rotations[i][j];
+            auto key = std::make_tuple(i, rotation,
+                                    plonk_variable<FieldType>::column_type::witness);
+            columns_at_y[key] = polynomial_table.constant(i).evaluate(y * omega.pow(rotation));
+        }
     }
 
     std::array<typename FieldType::value_type, 1> verifier_res =

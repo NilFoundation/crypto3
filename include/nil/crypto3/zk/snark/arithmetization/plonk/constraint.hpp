@@ -153,6 +153,8 @@ namespace nil {
                                            int,
                                            typename VariableType::column_type>
                                     key = std::make_tuple(var.index, var.rotation, var.type);
+                                
+                                BOOST_ASSERT(assignments.count(key) > 0);
                                 term_value = term_value * assignments[key];
                             }
                             acc = acc + term_value;

@@ -44,7 +44,9 @@ namespace nil {
                 class redshift_verifier {
 
                     constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
-                    constexpr static const std::size_t public_columns = ParamsType::public_columns;
+                    constexpr static const std::size_t public_input_columns = ParamsType::public_input_columns;
+                    constexpr static const std::size_t constant_columns = ParamsType::constant_columns;
+
                     using merkle_hash_type = typename ParamsType::commitment_params_type::merkle_hash_type;
                     using transcript_hash_type = typename ParamsType::commitment_params_type::transcript_hash_type;
 
@@ -100,13 +102,19 @@ namespace nil {
                         std::size_t witness_columns_amount = proof.eval_proof.witness.size();
 
                         for (std::size_t i = 0; i < permutation_size; i++) {
+                            std::size_t zero_index = 0;
+                            for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
+                                if (preprocessed_public_data.common_data.columns_rotations[i][j] == 0) {
+                                    zero_index = j;
+                                }
+                            }
                             if (i < witness_columns_amount) {
-                                f[i] = proof.eval_proof.witness[i].z[0]; // TODO: organize permutation evaluations inside the proof
+                                f[i] = proof.eval_proof.witness[i].z[zero_index]; // TODO: organize permutation evaluations inside the proof
                             } else if (i < witness_columns_amount + proof.eval_proof.public_input.size()) {
-                                f[i] = proof.eval_proof.public_input[i - witness_columns_amount].z[0];
+                                f[i] = proof.eval_proof.public_input[i - witness_columns_amount].z[zero_index];
                             } else {
                                 std::size_t idx = i - witness_columns_amount - proof.eval_proof.public_input.size();
-                                f[i] = proof.eval_proof.constant[idx].z[0];
+                                f[i] = proof.eval_proof.constant[idx].z[zero_index];
                             }
                         }
 
@@ -122,10 +130,28 @@ namespace nil {
 
                         // 7. gate argument
                         typename policy_type::evaluation_map columns_at_y;
-                        for (std::size_t i = 0; i < proof.eval_proof.witness.size(); i++) {
-                            auto key = std::make_tuple(i, plonk_variable<FieldType>::rotation_type::current,
+                        for (std::size_t i = 0; i < witness_columns; i++) {
+                            for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
+                                auto key = std::make_tuple(i, preprocessed_public_data.common_data.columns_rotations[i][j],
                                                        plonk_variable<FieldType>::column_type::witness);
-                            columns_at_y[key] = proof.eval_proof.witness[i].z[0];
+                                columns_at_y[key] = proof.eval_proof.witness[i].z[j];
+                            }
+                        }
+                        for (std::size_t i = witness_columns; i < witness_columns + public_input_columns; i++) {
+                            for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
+                                auto key = std::make_tuple(i, preprocessed_public_data.common_data.columns_rotations[i][j],
+                                                       plonk_variable<FieldType>::column_type::public_input);
+                                std::size_t eval_idx = i - witness_columns;
+                                columns_at_y[key] = proof.eval_proof.public_input[eval_idx].z[j];
+                            }
+                        }
+                        for (std::size_t i = witness_columns + public_input_columns; i < witness_columns + public_input_columns + constant_columns; i++) {
+                            for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
+                                auto key = std::make_tuple(i, preprocessed_public_data.common_data.columns_rotations[i][j],
+                                                       plonk_variable<FieldType>::column_type::constant);
+                                std::size_t eval_idx = i - witness_columns - public_input_columns;
+                                columns_at_y[key] = proof.eval_proof.constant[eval_idx].z[j];
+                            }
                         }
 
                         std::array<typename FieldType::value_type, 1> gate_argument =
@@ -162,8 +188,8 @@ namespace nil {
 
                             std::vector<typename FieldType::value_type>
                                 evaluation_points_gates;
-                            for (std::size_t i = 0; i < evaluation_points_gates.size(); i++) {
-                                evaluation_points_gates.push_back(challenge * omega.pow(rotation_gates[i]));
+                            for (std::size_t j = 0; j < rotation_gates.size(); j++) {
+                                evaluation_points_gates.push_back(challenge * omega.pow(rotation_gates[j]));
                             }
                             if (!commitment_scheme_witness_type::verify_eval(
                                     evaluation_points_gates, proof.eval_proof.witness[i], fri_params, transcript)) {
