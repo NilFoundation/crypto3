@@ -134,7 +134,7 @@ namespace nil {
 
                 std::size_t add_selector(std::size_t row_index) {
                     static std::size_t selector_index = 0;
-                    snark::plonk_column<BlueprintFieldType> selector_column(row_index + 1,
+                    snark::plonk_column<BlueprintFieldType> selector_column(_table_description.rows_amount,
                                                                             BlueprintFieldType::value_type::zero());
 
                     selector_column[row_index] = BlueprintFieldType::value_type::one();
