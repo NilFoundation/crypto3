@@ -30,6 +30,7 @@
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/detail.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/verifier_index.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/kimchi_pedersen.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/pickles/proof.hpp>
 
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
@@ -56,7 +57,8 @@ namespace nil {
 
                 template<typename CurveType, typename EFqSponge>
                 struct OraclesResult {
-                    typedef kimchi_pedersen<CurveType> commitment_scheme;
+                    typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
+                    typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
                     using Fr = typename CurveType::scalar_field_type;
                     using Fq = typename CurveType::base_field_type;
                     /// A sponge that acts on the base field of a curve
@@ -72,7 +74,7 @@ namespace nil {
                     /// zeta^n and (zeta * omega)^n
                     std::array<Fr, 2> powers_of_eval_points_for_chunks;
                     /// ?
-                    std::vector < std::tuple < commitment_scheme, std::vector<std::vector<Fr>> polys;
+                    std::vector < std::tuple < commitment_type, std::vector<std::vector<Fr>> polys;
                     /// pre-computed zeta^n
                     Fr zeta1;
                     /// The evaluation f(zeta) - t(zeta) * Z_H(zeta)
@@ -81,10 +83,11 @@ namespace nil {
 
                 /// This function runs the random oracle argument
                 template<typename CurveType, typename EFqSponge>
-                OraclesResult<CurveType, EFqSponge> oracles(pickles_proof<CurveType, WiresAmount> proof,
+                OraclesResult<CurveType, EFqSponge> oracles(pickles_proof<CurveType> proof,
                                                             verifier_index<CurveType> index,
-                                                            pedersen_commitment_scheme<CurveType> p_comm) {
-                    typedef kimchi_pedersen<CurveType> commitment_scheme;
+                                                            commitments::kimchi_pedersen<CurveType> p_comm) {
+                    typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
+                    typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
                     using Fr = typename CurveType::scalar_field_type;
                     using Fq = typename CurveType::base_field_type;
                     //~
