@@ -120,6 +120,8 @@ namespace nil {
 
                                 std::array<std::vector<int>,
                                     arithmetization_params::TotalColumns> columns_rotations;
+
+                                std::size_t rows_amount;
                             };
 
                             plonk_public_polynomial_table<FieldType, arithmetization_params> public_polynomial_table;

@@ -493,7 +493,7 @@ namespace nil {
 
                         typename policy_type::preprocessed_public_data_type::common_data_type common_data {
                             basic_domain, nil::crypto3::math::polynomial<typename FieldType::value_type> {Z},
-                            lagrange_0, public_commitments, c_rotations};
+                            lagrange_0, public_commitments, c_rotations, N_rows};
 
                         return typename policy_type::preprocessed_public_data_type(
                             {public_polynomial_table, _permutation_polynomials, _identity_polynomials, q_last, q_blind,
