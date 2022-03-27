@@ -50,6 +50,7 @@ set(TESTS_NAMES
     "commitment/lpc"
     "commitment/fri"
     "commitment/lpc_performance"
+    "commitment/pedersen"
 
     "routing_algorithms/test_routing_algorithms"
 
@@ -57,8 +58,9 @@ set(TESTS_NAMES
     "relations/numeric/sap"
     "relations/numeric/ssp"
 
-    "systems/plonk/pickles"
-    "systems/plonk/redshift"
+    "systems/plonk/pickles/pickles_struct_test"
+    "systems/plonk/pickles/oracles"
+    "systems/plonk/redshift/redshift"
 
     "systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
     "systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"

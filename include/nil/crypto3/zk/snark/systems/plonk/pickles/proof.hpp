@@ -30,52 +30,64 @@
 #include <tuple>
 #include <vector>
 
-#include <nil/crypto3/zk/snark/commitments/pedersen.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/kimchi_pedersen.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                template<typename CommitmentType>
+                struct lookup_st {
+                    std::vector<CommitmentType> sorted;
+                    CommitmentType aggreg;
+                };
 
-                template<typename CurveType, std::size_t WiresAmount>
+                template<typename CurveType, std::size_t ColumnsAmount = 15, std::size_t PermutsAmount = 7>
                 class pickles_proof {
-                    typedef pedersen_commitment_scheme<CurveType> commitment_scheme;
+                    typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
+                    typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
+                    typedef typename CurveType::scalar_field_type scalar_field_type;
+                    typedef typename CurveType::base_field_type base_field_type;
 
                 public:
                     // Commitments:
-                    std::array<typename commitment_scheme::commitment_type, WiresAmount + 1> w_comm;
+                    struct commitments_t {
+                        std::array<commitment_type, ColumnsAmount> w_comm;
 
-                    typename commitment_scheme::commitment_type z_comm;
+                        commitment_type z_comm;
 
-                    // N_perm
-                    std::vector<typename commitment_scheme::commitment_type> t_comm;
+                        commitment_type t_comm;
 
-                    // Evaluations:
-                    std::array<typename commitment_scheme::evaluation_type, WiresAmount + 1> w_zeta;
-                    std::array<typename commitment_scheme::evaluation_type, WiresAmount + 1> w_zeta_omega;
+                        lookup_st<commitment_type> lookup;
+                    } commitments;
 
-                    typename commitment_scheme::evaluation_type z_zeta;
-                    typename commitment_scheme::evaluation_type z_zeta_omega;
+                    typename commitments::kimchi_pedersen<CurveType>::proof_type proof;
 
-                    // N_perm + 1
-                    std::vector<typename commitment_scheme::commitment_type> S_sigma_zeta;
-                    // N_perm + 1
-                    std::vector<typename commitment_scheme::commitment_type> S_sigma_zeta_omega;
+                    struct evals_t {
+                        std::array<typename scalar_field_type::value_type, ColumnsAmount> w;
 
-                    typename commitment_scheme::evaluation_type L_zeta_omega;
+                        typename scalar_field_type::value_type z;
 
-                    // Opening proof
-                    std::vector<typename CurveType::template g1_type<>::value_type> L;
-                    std::vector<typename CurveType::template g1_type<>::value_type> R;
+                        std::array<typename scalar_field_type::value_type, PermutsAmount - 1> s;
 
-                    typename CurveType::template g1_type<>::value_type sigma;
-                    typename CurveType::template g1_type<>::value_type G;
+                        lookup_st<commitment_type> lookup;
 
-                    typename CurveType::scalar_field_type::value_type z1, z2;
+                        typename scalar_field_type::value_type generic_selector;
+
+                        typename scalar_field_type::value_type poseidon_selector;
+                    };
+
+                    std::array<evals_t, 2> evals;
+
+                    // ft_eval1
+                    typename CurveType::scalar_field_type::value_type ft_eval1;
+
+                    // public
+                    std::vector<typename CurveType::scalar_field_type::value_type> public_p;
 
                     // Previous challenges
-                    std::vector<std::tuple<std::vector<typename CurveType::scalar_field_type::value_type>,
-                                           typename commitment_scheme::commitment_type>>
+                    std::vector<
+                        std::tuple<std::vector<typename CurveType::scalar_field_type::value_type>, commitment_scheme>>
                         prev_challenges;
                 };
             }    // namespace snark
