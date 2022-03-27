@@ -35,6 +35,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/variable_base_endo_scalar_mul_15_wires.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -75,12 +76,17 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
+                    using endo_mul = curve_element_variable_base_endo_scalar_mul<ArithmetizationType, CurveType,
+                                W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
                 public:
 
-                    constexpr static const std::size_t required_rows_amount = 1;
+                    constexpr static const std::size_t required_rows_amount = 1 + endo_mul::required_rows_amount;
 
                     struct public_params_type {
-                        typename CurveType::template g1_type<>::value_type B;
+                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type res;
+                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type base_point;
+                        typename CurveType::scalar_field_type::value_type challenge;
                     };
 
                     struct private_params_type {
@@ -93,28 +99,46 @@ namespace nil {
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const public_params_type &init_params,
+                        const public_params_type &public_params,
                         const std::size_t &component_start_row) {
 
-                        const std::size_t &j = component_start_row;
+                        std::size_t row = component_start_row;
+                        row++;
+
+                        typename endo_mul::public_params_type mul_public_params = {};
+                        endo_mul::generate_gates(bp, public_assignment,
+                            mul_public_params, row);
                     }
 
                     static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const public_params_type &init_params,
+                        const public_params_type &public_params,
                         const std::size_t &component_start_row) {
+                        
+                        std::size_t row = component_start_row;
+                        row++;
 
+                        typename endo_mul::public_params_type mul_public_params = {};
+                        endo_mul::generate_copy_constraints(bp, public_assignment,
+                            mul_public_params, row);
                     }
 
                     static void generate_assignments(
                         blueprint_private_assignment_table<ArithmetizationType>
                             &private_assignment,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const public_params_type &init_params,
-                        const private_params_type &params,
+                        const public_params_type &public_params,
+                        const private_params_type &private_params,
                         const std::size_t &component_start_row) {
-                    
+
+                        std::size_t row = component_start_row;
+                        row++;
+
+                        typename endo_mul::public_params_type mul_public_params = {};
+                        typename endo_mul::private_params_type mul_private_params = {public_params.base_point, public_params.challenge};
+                        endo_mul::generate_assignments(private_assignment, public_assignment, 
+                            mul_public_params, mul_private_params, row);
                     }
                 };
             }    // namespace components
