@@ -35,6 +35,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
+#include <nil/crypto3/zk/components/hashes/poseidon/poseidon_15_wires.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -75,9 +76,12 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
+                    using poseidon_component = poseidon<ArithmetizationType, CurveType,
+                                W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
                 public:
 
-                    constexpr static const std::size_t required_rows_amount = 1;
+                    constexpr static const std::size_t required_rows_amount = 1 + poseidon_component::required_rows_amount;
 
                     struct public_params_type {
                         typename CurveType::template g1_type<>::value_type B;
