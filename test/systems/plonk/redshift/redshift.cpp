@@ -367,7 +367,9 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
             int rotation = preprocessed_public_data.common_data.columns_rotations[i][j];
             auto key = std::make_tuple(i, rotation,
                                     plonk_variable<FieldType>::column_type::witness);
-            columns_at_y[key] = polynomial_table.public_input(i).evaluate(y * omega.pow(rotation));
+            
+            std::size_t idx = i - redshift_test_params::witness_columns;
+            columns_at_y[key] = polynomial_table.public_input(idx).evaluate(y * omega.pow(rotation));
         }
     }
     for (std::size_t i = redshift_test_params::witness_columns + redshift_test_params::public_input_columns; 
@@ -376,7 +378,9 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
             int rotation = preprocessed_public_data.common_data.columns_rotations[i][j];
             auto key = std::make_tuple(i, rotation,
                                     plonk_variable<FieldType>::column_type::witness);
-            columns_at_y[key] = polynomial_table.constant(i).evaluate(y * omega.pow(rotation));
+            
+            std::size_t idx = i - redshift_test_params::witness_columns - redshift_test_params::public_input_columns;
+            columns_at_y[key] = polynomial_table.constant(idx).evaluate(y * omega.pow(rotation));
         }
     }
 
