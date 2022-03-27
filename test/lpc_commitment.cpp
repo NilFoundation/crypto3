@@ -163,15 +163,15 @@ typename FRIScheme::proof_type generate_random_fri_proof(std::size_t tree_depth,
 
 template<typename LPCScheme>
 typename LPCScheme::proof_type generate_lpc_proof(std::size_t tree_depth, std::size_t round_proofs_n,
-                                                  std::size_t degree) {
+                                                  std::size_t degree, std::size_t k) {
     typename LPCScheme::proof_type proof;
 
     proof.T_root =
         nil::crypto3::hash<typename LPCScheme::transcript_hash_type>(generate_random_data<std::uint8_t, 32>(1).at(0));
 
     nil::crypto3::random::algebraic_random_device<typename LPCScheme::field_type> d;
-    for (std::size_t i = 0; i < proof.z.size(); ++i) {
-        proof.z.at(i) = d();
+    for (std::size_t i = 0; i < k; ++i) {
+        proof.z.push_back(d());
     }
 
     for (std::size_t i = 0; i < LPCScheme::lambda; ++i) {
@@ -182,17 +182,16 @@ typename LPCScheme::proof_type generate_lpc_proof(std::size_t tree_depth, std::s
     return proof;
 }
 
-template<typename Field, typename Hash, std::size_t Lambda, std::size_t R, std::size_t M, std::size_t K,
-         typename Endianness>
-void test_lpc(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree) {
+template<typename Field, typename Hash, std::size_t Lambda, std::size_t R, std::size_t M, typename Endianness>
+void test_lpc(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree, std::size_t k) {
     using namespace nil::crypto3::marshalling;
 
     using lpc_params_type = nil::crypto3::zk::commitments::list_polynomial_commitment_params<Hash, Hash, Lambda, R, M>;
-    using commitment_scheme_type = nil::crypto3::zk::commitments::list_polynomial_commitment<Field, lpc_params_type, K>;
+    using commitment_scheme_type = nil::crypto3::zk::commitments::list_polynomial_commitment<Field, lpc_params_type>;
     using proof_marshalling_type = types::lpc_proof<nil::marshalling::field_type<Endianness>, commitment_scheme_type>;
 
     typename commitment_scheme_type::proof_type proof =
-        generate_lpc_proof<commitment_scheme_type>(tree_depth, round_proofs_n, degree);
+        generate_lpc_proof<commitment_scheme_type>(tree_depth, round_proofs_n, degree, k);
 
     auto filled_proof = types::fill_lpc_proof<commitment_scheme_type, Endianness>(proof);
     typename commitment_scheme_type::proof_type _proof =
@@ -230,7 +229,7 @@ BOOST_AUTO_TEST_CASE(lpc_bls12_381_be) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    test_lpc<field_type, hash_type, lambda, r, m, k, nil::marshalling::option::big_endian>(5, 6, 7);
+    test_lpc<field_type, hash_type, lambda, r, m, nil::marshalling::option::big_endian>(5, 6, 7, 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

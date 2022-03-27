@@ -66,10 +66,12 @@
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
 
 template<typename TIter>
-void print_byteblob(TIter iter_begin, TIter iter_end) {
+void print_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end) {
+    os << std::hex;
     for (TIter it = iter_begin; it != iter_end; it++) {
-        std::cout << std::hex << int(*it) << std::endl;
+        os << std::setfill('0') << std::setw(2) << std::right << int(*it);
     }
+    os << std::endl << std::dec;
 }
 
 template<typename FpCurveGroupElement>
@@ -175,15 +177,15 @@ typename FRIScheme::proof_type generate_random_fri_proof(std::size_t tree_depth,
 
 template<typename LPCScheme>
 typename LPCScheme::proof_type generate_lpc_proof(std::size_t tree_depth, std::size_t round_proofs_n,
-                                                  std::size_t degree) {
+                                                  std::size_t degree, std::size_t k) {
     typename LPCScheme::proof_type proof;
 
     proof.T_root =
         nil::crypto3::hash<typename LPCScheme::transcript_hash_type>(generate_random_data<std::uint8_t, 32>(1).at(0));
 
     nil::crypto3::random::algebraic_random_device<typename LPCScheme::field_type> d;
-    for (std::size_t i = 0; i < proof.z.size(); ++i) {
-        proof.z.at(i) = d();
+    for (std::size_t i = 0; i < k; ++i) {
+        proof.z.push_back(d());
     }
 
     for (std::size_t i = 0; i < LPCScheme::lambda; ++i) {
@@ -197,7 +199,7 @@ typename LPCScheme::proof_type generate_lpc_proof(std::size_t tree_depth, std::s
 template<typename RedshiftProof>
 typename RedshiftProof::evaluation_proof generate_redshift_eval_proof(std::size_t tree_depth,
                                                                       std::size_t round_proofs_n, std::size_t degree,
-                                                                      std::size_t num) {
+                                                                      std::size_t num, std::size_t k) {
     typename RedshiftProof::evaluation_proof eval_proof;
 
     nil::crypto3::random::algebraic_random_device<typename RedshiftProof::field_type> d;
@@ -205,27 +207,27 @@ typename RedshiftProof::evaluation_proof generate_redshift_eval_proof(std::size_
 
     for (auto i = 0; i < num; ++i) {
         eval_proof.witness.emplace_back(generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_witness>(
-            tree_depth, round_proofs_n, degree));
+            tree_depth, round_proofs_n, degree, k));
         eval_proof.permutation.emplace_back(
             generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_permutation>(tree_depth, round_proofs_n,
-                                                                                           degree));
+                                                                                           degree, k));
         eval_proof.quotient.emplace_back(generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_quotient>(
-            tree_depth, round_proofs_n, degree));
+            tree_depth, round_proofs_n, degree, k));
         eval_proof.id_permutation.emplace_back(
             generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(tree_depth, round_proofs_n,
-                                                                                      degree));
+                                                                                      degree, k));
         eval_proof.sigma_permutation.emplace_back(
             generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(tree_depth, round_proofs_n,
-                                                                                      degree));
+                                                                                      degree, k));
         eval_proof.public_input.emplace_back(generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(
-            tree_depth, round_proofs_n, degree));
+            tree_depth, round_proofs_n, degree, k));
         eval_proof.constant.emplace_back(generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(
-            tree_depth, round_proofs_n, degree));
+            tree_depth, round_proofs_n, degree, k));
         eval_proof.selector.emplace_back(generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(
-            tree_depth, round_proofs_n, degree));
+            tree_depth, round_proofs_n, degree, k));
         eval_proof.special_selectors.emplace_back(
             generate_lpc_proof<typename RedshiftProof::commitment_scheme_type_public>(tree_depth, round_proofs_n,
-                                                                                      degree));
+                                                                                      degree, k));
     }
 
     return eval_proof;
@@ -233,37 +235,38 @@ typename RedshiftProof::evaluation_proof generate_redshift_eval_proof(std::size_
 
 template<typename RedshiftProof>
 RedshiftProof generate_redshift_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree,
-                                      std::size_t num) {
+                                      std::size_t num, std::size_t k) {
     RedshiftProof proof;
-    std::size_t k = 0;
+    std::size_t _i = 0;
     for (const auto c : generate_random_data<std::uint8_t, 32>(1)[0]) {
-        proof.v_perm_commitment[k++] = c;
+        proof.v_perm_commitment[_i++] = c;
     }
     proof.witness_commitments.resize(num);
     proof.T_commitments.resize(num);
     for (std::size_t i = 0; i < num; i++) {
-        k = 0;
+        _i = 0;
         for (const auto c : generate_random_data<std::uint8_t, 32>(1)[0]) {
-            proof.witness_commitments[i][k++] = c;
+            proof.witness_commitments[i][_i++] = c;
         }
-        k = 0;
+        _i = 0;
         for (const auto c : generate_random_data<std::uint8_t, 32>(1)[0]) {
-            proof.T_commitments[i][k++] = c;
+            proof.T_commitments[i][_i++] = c;
         }
     }
 
-    proof.eval_proof = generate_redshift_eval_proof<RedshiftProof>(tree_depth, round_proofs_n, degree, num);
+    proof.eval_proof = generate_redshift_eval_proof<RedshiftProof>(tree_depth, round_proofs_n, degree, num, k);
     return proof;
 }
 
 template<typename RedshiftProof, typename Endianness>
-void test_redshift_eval_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree, std::size_t num) {
+void test_redshift_eval_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree, std::size_t num,
+                              std::size_t k) {
     using namespace nil::crypto3::marshalling;
 
     using proof_marshalling_type =
         types::redshift_evaluation_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>;
 
-    auto proof = generate_redshift_eval_proof<RedshiftProof>(tree_depth, round_proofs_n, degree, num);
+    auto proof = generate_redshift_eval_proof<RedshiftProof>(tree_depth, round_proofs_n, degree, num, k);
     auto filled_redshift_proof = types::fill_redshift_evaluation_proof<RedshiftProof, Endianness>(proof);
     auto _proof = types::make_redshift_evaluation_proof<RedshiftProof, Endianness>(filled_redshift_proof);
     BOOST_CHECK(_proof == proof);
@@ -281,13 +284,13 @@ void test_redshift_eval_proof(std::size_t tree_depth, std::size_t round_proofs_n
 }
 
 template<typename RedshiftProof, typename Endianness>
-void test_random_redshift_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree,
-                                std::size_t num) {
+void test_random_redshift_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree, std::size_t num,
+                                std::size_t k) {
     using namespace nil::crypto3::marshalling;
 
     using proof_marshalling_type = types::redshift_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>;
 
-    RedshiftProof proof = generate_redshift_proof<RedshiftProof>(tree_depth, round_proofs_n, degree, num);
+    RedshiftProof proof = generate_redshift_proof<RedshiftProof>(tree_depth, round_proofs_n, degree, num, k);
     auto filled_redshift_proof = types::fill_redshift_proof<RedshiftProof, Endianness>(proof);
     RedshiftProof _proof = types::make_redshift_proof<RedshiftProof, Endianness>(filled_redshift_proof);
     BOOST_CHECK(_proof == proof);
@@ -318,6 +321,8 @@ void test_redshift_proof_marshalling(const RedshiftProof &proof) {
     cv.resize(filled_redshift_proof.length(), 0x00);
     auto write_iter = cv.begin();
     nil::marshalling::status_type status = filled_redshift_proof.write(write_iter, cv.size());
+    std::cout << "proof (" << cv.size() << " bytes) = ";
+    // print_byteblob(std::cout, cv.cbegin(), cv.cend());
 
     proof_marshalling_type test_val_read;
     auto read_iter = cv.begin();
@@ -363,7 +368,7 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log) {
 }
 
 template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename MerkleHashType,
-         typename TranscriptHashType, typename Endianness>
+         typename TranscriptHashType, std::size_t Lambda, typename Endianness>
 void test_component_proof_marshalling(typename ComponentType::public_params_type init_params,
                                       typename ComponentType::private_params_type assignment_params) {
 
@@ -393,8 +398,8 @@ void test_component_proof_marshalling(typename ComponentType::public_params_type
     zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(private_assignment,
                                                                                              public_assignment);
 
-    using params =
-        zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, MerkleHashType, TranscriptHashType>;
+    using params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, MerkleHashType,
+                                              TranscriptHashType, Lambda>;
     using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
 
     using fri_type = typename zk::commitments::fri<BlueprintFieldType, typename params::merkle_hash_type,
@@ -450,8 +455,8 @@ BOOST_AUTO_TEST_CASE(redshift_proof_bls12_381_be) {
         nil::crypto3::algebra::random_element<curve_type::template g1_type<>>()};
 
     test_component_proof_marshalling<component_type, FieldType, ArithmetizationParams, merkle_hash_type,
-                                     transcript_hash_type, nil::marshalling::option::big_endian>(public_params,
-                                                                                                 private_params);
+                                     transcript_hash_type, 10, nil::marshalling::option::big_endian>(public_params,
+                                                                                                     private_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

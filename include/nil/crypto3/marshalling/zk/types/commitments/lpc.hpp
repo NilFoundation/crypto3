@@ -49,9 +49,9 @@ namespace nil {
             namespace types {
                 template<typename TTypeBase, typename LPCScheme,
                          typename = typename std::enable_if<
-                             std::is_same<LPCScheme, nil::crypto3::zk::commitments::list_polynomial_commitment<
-                                                         typename LPCScheme::field_type, typename LPCScheme::lpc_params,
-                                                         LPCScheme::k>>::value,
+                             std::is_same<LPCScheme,
+                                          nil::crypto3::zk::commitments::list_polynomial_commitment<
+                                              typename LPCScheme::field_type, typename LPCScheme::lpc_params>>::value,
                              bool>::type,
                          typename... TOptions>
                 using lpc_proof = nil::marshalling::types::bundle<
@@ -64,7 +64,7 @@ namespace nil {
                                        nil::marshalling::option::sequence_size_field_prefix<
                                            nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
                                    // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
-                                   // std::array<typename FieldType::value_type, k> z;
+                                   // std::vector<typename FieldType::value_type> z;
                                    nil::marshalling::types::array_list<
                                        TTypeBase, field_element<TTypeBase, typename LPCScheme::field_type::value_type>,
                                        nil::marshalling::option::sequence_size_field_prefix<
@@ -101,7 +101,7 @@ namespace nil {
                         filled_T_root.value().push_back(octet_marshalling_type(c));
                     }
 
-                    // std::array<typename FieldType::value_type, k> z;
+                    // std::vector<typename FieldType::value_type> z;
                     field_vector_marshalling_type filled_z;
                     for (const auto &c : proof.z) {
                         filled_z.value().push_back(field_marhsalling_type(c));
@@ -129,10 +129,9 @@ namespace nil {
                         proof.T_root.at(i) = std::get<0>(filled_proof.value()).value().at(i).value();
                     }
 
-                    // std::array<typename FieldType::value_type, k> z;
-                    assert(proof.z.size() == std::get<1>(filled_proof.value()).value().size());
+                    // std::vector<typename FieldType::value_type> z;
                     for (std::size_t i = 0; i < std::get<1>(filled_proof.value()).value().size(); ++i) {
-                        proof.z.at(i) = std::get<1>(filled_proof.value()).value().at(i).value();
+                        proof.z.push_back(std::get<1>(filled_proof.value()).value().at(i).value());
                     }
 
                     // std::array<typename fri_type::proof_type, lambda> fri_proof;
