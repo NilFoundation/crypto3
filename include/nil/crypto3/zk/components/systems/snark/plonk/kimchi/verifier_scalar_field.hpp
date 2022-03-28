@@ -35,7 +35,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
-#include <nil/crypto3/zk/components/hashes/poseidon/poseidon_15_wires.hpp>
+#include <nil/crypto3/zk/components/hashes/poseidon/plonk/poseidon_15_wires.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -76,7 +76,7 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
-                    using poseidon_component = poseidon<ArithmetizationType, CurveType,
+                    using poseidon_component = poseidon<ArithmetizationType, BlueprintFieldType,
                                 W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                 public:
@@ -84,13 +84,10 @@ namespace nil {
                     constexpr static const std::size_t required_rows_amount = 1 + poseidon_component::required_rows_amount;
 
                     struct public_params_type {
-                        typename CurveType::template g1_type<>::value_type B;
+                        std::array<typename ArithmetizationType::field_type::value_type, 3> input_data;
                     };
 
                     struct private_params_type {
-                        typename CurveType::scalar_field_type::value_type a;
-                        typename CurveType::scalar_field_type::value_type s;
-                        typename CurveType::template g1_type<>::value_type P;
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
@@ -103,7 +100,11 @@ namespace nil {
                         const public_params_type &init_params,
                         const std::size_t &component_start_row) {
 
-                        const std::size_t &j = component_start_row;
+                        std::size_t row = component_start_row;
+                        row++;                       
+                        typename poseidon_component::public_params_type poseidon_public_params = {};
+                        poseidon_component::generate_gates(bp, public_assignment,
+                            poseidon_public_params, row);
                     }
 
                     static void generate_copy_constraints(
@@ -111,6 +112,12 @@ namespace nil {
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         const public_params_type &init_params,
                         const std::size_t &component_start_row) {
+                        std::size_t row = component_start_row;
+                        row++;
+
+                        typename poseidon_component::public_params_type poseidon_public_params = {};
+                        poseidon_component::generate_copy_constraints(bp, public_assignment,
+                            poseidon_public_params, row);
 
                     }
 
@@ -118,9 +125,20 @@ namespace nil {
                         blueprint_private_assignment_table<ArithmetizationType>
                             &private_assignment,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const public_params_type &init_params,
-                        const private_params_type &params,
+                        const public_params_type &public_params,
+                        const private_params_type &private_params,
                         const std::size_t &component_start_row) {
+
+                            
+                        std::size_t row = component_start_row;
+                        row++;
+
+                        typename poseidon_component::public_params_type poseidon_public_params = {};
+                        //std::array<typename ArithmetizationType::field_type::value_type, 3> input_state = public_params.input_data;
+                        std::array<typename ArithmetizationType::field_type::value_type, 3> input_state = {0, 1, 1};
+                        typename poseidon_component::private_params_type poseidon_private_params = {input_state};
+                        poseidon_component::generate_assignments(private_assignment, public_assignment, 
+                            poseidon_public_params, poseidon_private_params, row);
 
                     }
                 };

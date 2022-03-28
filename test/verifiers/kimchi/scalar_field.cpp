@@ -54,8 +54,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_scalar_field_test_suite) {
     using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 1;
+    constexpr std::size_t ConstantColumns = 3;
+    constexpr std::size_t SelectorColumns = 11;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -66,7 +66,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_scalar_field_test_suite) {
 
 
     typename component_type::private_params_type private_params = {};
-    typename component_type::public_params_type public_params = {};
+    std::array<typename ArithmetizationType::field_type::value_type, 3> input_data = {0, 1, 1};
+    typename component_type::public_params_type public_params = {input_data};
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams> (public_params, private_params);
 }
