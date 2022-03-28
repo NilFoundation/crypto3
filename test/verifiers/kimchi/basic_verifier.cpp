@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_basic_verifier_test_suite)
 template <typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams,
     typename ProofType>
 std::pair<proof_generator_result_type<BlueprintFieldType, ArithmetizationParams, ProofType>, 
-    zk::blueprint_private_assignment_table<zk::snark::plonk_constraint_system<BlueprintFieldType,
+    zk::blueprint_public_assignment_table<zk::snark::plonk_constraint_system<BlueprintFieldType,
         ArithmetizationParams>>> proof_generator(
     typename ComponentType::public_params_type init_params,
     typename ComponentType::private_params_type assignment_params){
@@ -116,7 +116,7 @@ std::pair<proof_generator_result_type<BlueprintFieldType, ArithmetizationParams,
 
     proof_generator_result_type<BlueprintFieldType, ArithmetizationParams, ProofType> generator_res =
          {proof, fri_params, bp, public_preprocessed_data};
-    return std::make_pair(generator_res, private_assignment);
+    return std::make_pair(generator_res, public_assignment);
 }
 
 template<typename CurveType, typename ProofType>
@@ -126,6 +126,8 @@ proof_generator_result_type_base base_field_prover(nil::crypto3::zk::snark::pick
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     typename component_type::private_params_type private_params = {};
+
+    std::cout<<"base field scalar "<< out_scalar<<std::endl;
 
     typename component_type::public_params_type public_params = {pickles_proof.commitments.z_comm.unshifted[0].to_affine(), out_scalar};
 
@@ -146,10 +148,8 @@ proof_generator_result_type_scalar scalar_field_prover(nil::crypto3::zk::snark::
     typename component_type::public_params_type public_params = {input_data};
     auto generator_res = proof_generator<component_type, FrType, ArithmetizationParamsScalar,
     ProofType>(public_params, private_params);
-    zk::blueprint_private_assignment_table<ArithmetizationTypeScalar> private_assignment = generator_res.second;
-    std::size_t W = 1;
-    std::size_t row = 12;
-    typename ArithmetizationTypeScalar::field_type::value_type out = private_assignment.witness(W)[row];
+    zk::blueprint_public_assignment_table<ArithmetizationTypeScalar> public_assignment = generator_res.second;
+    typename ArithmetizationTypeScalar::field_type::value_type out = public_assignment.public_input(0)[0];
     std::cout<<"expected scalar "<< out.data<<std::endl;
     typename CurveType::scalar_field_type::integral_type integral_out = typename CurveType::scalar_field_type::integral_type(out.data);
     generator_res.first.out = integral_out;

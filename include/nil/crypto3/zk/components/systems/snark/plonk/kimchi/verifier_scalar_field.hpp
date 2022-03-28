@@ -118,6 +118,7 @@ namespace nil {
                         typename poseidon_component::public_params_type poseidon_public_params = {};
                         poseidon_component::generate_copy_constraints(bp, public_assignment,
                             poseidon_public_params, row);
+                        bp.add_copy_constraint({{W1, row + required_rows_amount - 1, false}, {0, row - 1, false, snark::plonk_variable<BlueprintFieldType>::column_type::public_input}});
 
                     }
 
@@ -138,6 +139,7 @@ namespace nil {
                         typename poseidon_component::private_params_type poseidon_private_params = {input_state};
                         poseidon_component::generate_assignments(private_assignment, public_assignment, 
                             poseidon_public_params, poseidon_private_params, row);
+                        public_assignment.public_input(0)[component_start_row] = private_assignment.witness(1)[row + 11];
 
                     }
                 };
