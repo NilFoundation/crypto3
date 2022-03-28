@@ -500,7 +500,7 @@ namespace nil {
                         private_assignment.witness(W1)[row] = state[1];
                         private_assignment.witness(W2)[row] = state[2];
 
-                        for (std::size_t i = row; i < row + 11; i++) {
+                        for (std::size_t i = row; i < row + required_rows_amount - 1; i++) {
                             for (int j = 0; j < state_size; j++) {
                                 next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[i*5][j];
                             }
