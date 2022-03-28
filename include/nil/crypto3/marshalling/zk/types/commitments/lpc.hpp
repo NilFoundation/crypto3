@@ -56,25 +56,27 @@ namespace nil {
                          typename... TOptions>
                 using lpc_proof = nil::marshalling::types::bundle<
                     TTypeBase, std::tuple<
-                                   // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
-                                   // TODO: review std::uint8_t type usage (for example, pedersen outputs array of bits)
-                                   // typename merkle_tree_type::value_type T_root;
-                                   nil::marshalling::types::array_list<
-                                       TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
-                                       nil::marshalling::option::sequence_size_field_prefix<
-                                           nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                   // // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
+                                   // // TODO: review std::uint8_t type usage (for example, pedersen outputs array of bits)
+                                   // // typename merkle_tree_type::value_type T_root;
+                                   // nil::marshalling::types::array_list<
+                                   //     TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
+                                   //     nil::marshalling::option::sequence_size_field_prefix<
+                                   //         nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
                                    // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                                    // std::vector<typename FieldType::value_type> z;
                                    nil::marshalling::types::array_list<
                                        TTypeBase, field_element<TTypeBase, typename LPCScheme::field_type::value_type>,
                                        nil::marshalling::option::sequence_size_field_prefix<
-                                           nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                           nil::marshalling::types::integral<TTypeBase, std::size_t>>>
+                                           // ,
                                    // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                                    // std::array<typename fri_type::proof_type, lambda> fri_proof;
-                                   nil::marshalling::types::array_list<
-                                       TTypeBase, fri_proof<TTypeBase, typename LPCScheme::fri_type>,
-                                       nil::marshalling::option::sequence_size_field_prefix<
-                                           nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
+                                   // nil::marshalling::types::array_list<
+                                   //     TTypeBase, fri_proof<TTypeBase, typename LPCScheme::fri_type>,
+                                   //     nil::marshalling::option::sequence_size_field_prefix<
+                                   //         nil::marshalling::types::integral<TTypeBase, std::size_t>>>
+                                           >>;
 
                 template<typename LPCScheme, typename Endianness>
                 lpc_proof<nil::marshalling::field_type<Endianness>, LPCScheme>
@@ -96,10 +98,10 @@ namespace nil {
                         nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
 
                     // typename merkle_tree_type::value_type T_root;
-                    digest_marshalling_type filled_T_root;
-                    for (const auto c : proof.T_root) {
-                        filled_T_root.value().push_back(octet_marshalling_type(c));
-                    }
+                    // digest_marshalling_type filled_T_root;
+                    // for (const auto c : proof.T_root) {
+                    //     filled_T_root.value().push_back(octet_marshalling_type(c));
+                    // }
 
                     // std::vector<typename FieldType::value_type> z;
                     field_vector_marshalling_type filled_z;
@@ -108,13 +110,17 @@ namespace nil {
                     }
 
                     // std::array<typename fri_type::proof_type, lambda> fri_proof;
-                    fri_proof_vector_marshalling_type filled_fri_proof;
-                    for (const auto &p : proof.fri_proof) {
-                        filled_fri_proof.value().push_back(fill_fri_proof<typename LPCScheme::fri_type, Endianness>(p));
-                    }
+                    // fri_proof_vector_marshalling_type filled_fri_proof;
+                    // for (const auto &p : proof.fri_proof) {
+                    //     filled_fri_proof.value().push_back(fill_fri_proof<typename LPCScheme::fri_type, Endianness>(p));
+                    // }
 
                     return lpc_proof<nil::marshalling::field_type<Endianness>, LPCScheme>(
-                        std::make_tuple(filled_T_root, filled_z, filled_fri_proof));
+                        std::make_tuple(
+                            // filled_T_root, 
+                            filled_z
+                            // , filled_fri_proof
+                            ));
                 }
 
                 template<typename LPCScheme, typename Endianness>
@@ -124,22 +130,22 @@ namespace nil {
                     typename LPCScheme::proof_type proof;
 
                     // typename merkle_tree_type::value_type T_root;
-                    assert(proof.T_root.size() == std::get<0>(filled_proof.value()).value().size());
-                    for (std::size_t i = 0; i < std::get<0>(filled_proof.value()).value().size(); ++i) {
-                        proof.T_root.at(i) = std::get<0>(filled_proof.value()).value().at(i).value();
-                    }
+                    // assert(proof.T_root.size() == std::get<0>(filled_proof.value()).value().size());
+                    // for (std::size_t i = 0; i < std::get<0>(filled_proof.value()).value().size(); ++i) {
+                    //     proof.T_root.at(i) = std::get<0>(filled_proof.value()).value().at(i).value();
+                    // }
 
                     // std::vector<typename FieldType::value_type> z;
-                    for (std::size_t i = 0; i < std::get<1>(filled_proof.value()).value().size(); ++i) {
-                        proof.z.push_back(std::get<1>(filled_proof.value()).value().at(i).value());
+                    for (std::size_t i = 0; i < std::get<0>(filled_proof.value()).value().size(); ++i) {
+                        proof.z.push_back(std::get<0>(filled_proof.value()).value().at(i).value());
                     }
 
                     // std::array<typename fri_type::proof_type, lambda> fri_proof;
-                    assert(proof.fri_proof.size() == std::get<2>(filled_proof.value()).value().size());
-                    for (std::size_t i = 0; i < std::get<2>(filled_proof.value()).value().size(); ++i) {
-                        proof.fri_proof.at(i) = make_fri_proof<typename LPCScheme::fri_type, Endianness>(
-                            std::get<2>(filled_proof.value()).value().at(i));
-                    }
+                    // assert(proof.fri_proof.size() == std::get<2>(filled_proof.value()).value().size());
+                    // for (std::size_t i = 0; i < std::get<2>(filled_proof.value()).value().size(); ++i) {
+                    //     proof.fri_proof.at(i) = make_fri_proof<typename LPCScheme::fri_type, Endianness>(
+                    //         std::get<2>(filled_proof.value()).value().at(i));
+                    // }
 
                     return proof;
                 }
