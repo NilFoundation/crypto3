@@ -84,7 +84,6 @@ namespace nil {
                     constexpr static const std::size_t required_rows_amount = 1 + endo_mul::required_rows_amount;
 
                     struct public_params_type {
-                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type res;
                         typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type base_point;
                         typename CurveType::scalar_field_type::value_type challenge;
                     };

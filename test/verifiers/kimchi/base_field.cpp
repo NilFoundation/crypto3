@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     typename curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type res = endo_scalar * T;
 
     typename component_type::private_params_type private_params = {};
-    typename component_type::public_params_type public_params = {res, T, b};
+    typename component_type::public_params_type public_params = {T, b};
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams> (public_params, private_params);
 }

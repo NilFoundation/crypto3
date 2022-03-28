@@ -76,6 +76,7 @@ set(PLONK_TESTS_FILES
     "hashes/plonk/poseidon"
     "verifiers/kimchi/base_field"
     "verifiers/kimchi/scalar_field"
+    "verifiers/kimchi/basic_verifier"
     )
 
 set(FIELDS_TESTS_FILES

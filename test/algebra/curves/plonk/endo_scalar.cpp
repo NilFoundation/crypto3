@@ -28,8 +28,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <nil/crypto3/algebra/curves/pallas.hpp>
-#include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
+#include <nil/crypto3/algebra/curves/vesta.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
@@ -50,8 +50,8 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_endo_scalar_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
 
-    using curve_type = algebra::curves::pallas;
-    using BlueprintFieldType = typename curve_type::base_field_type;
+    using curve_type = algebra::curves::vesta;
+    using BlueprintFieldType = typename curve_type::scalar_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 0;
     constexpr std::size_t ConstantColumns = 0;
