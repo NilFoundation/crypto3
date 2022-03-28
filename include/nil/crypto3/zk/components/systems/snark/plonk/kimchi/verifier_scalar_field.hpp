@@ -134,8 +134,7 @@ namespace nil {
                         row++;
 
                         typename poseidon_component::public_params_type poseidon_public_params = {};
-                        //std::array<typename ArithmetizationType::field_type::value_type, 3> input_state = public_params.input_data;
-                        std::array<typename ArithmetizationType::field_type::value_type, 3> input_state = {0, 1, 1};
+                        std::array<typename ArithmetizationType::field_type::value_type, 3> input_state = public_params.input_data;
                         typename poseidon_component::private_params_type poseidon_private_params = {input_state};
                         poseidon_component::generate_assignments(private_assignment, public_assignment, 
                             poseidon_public_params, poseidon_private_params, row);
