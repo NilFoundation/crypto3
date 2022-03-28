@@ -59,7 +59,9 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_basic_verifier_test_suite)
 
 template <typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams,
     typename ProofType>
-proof_generator_result_type<BlueprintFieldType, ArithmetizationParams, ProofType> proof_generator(
+std::pair<proof_generator_result_type<BlueprintFieldType, ArithmetizationParams, ProofType>, 
+    zk::blueprint_private_assignment_table<zk::snark::plonk_constraint_system<BlueprintFieldType,
+        ArithmetizationParams>>> proof_generator(
     typename ComponentType::public_params_type init_params,
     typename ComponentType::private_params_type assignment_params){
 
@@ -112,22 +114,25 @@ proof_generator_result_type<BlueprintFieldType, ArithmetizationParams, ProofType
                                                                         bp,
                                                                         assignments, fri_params);
 
-    return proof_generator_result_type<BlueprintFieldType, ArithmetizationParams, ProofType>
+    proof_generator_result_type<BlueprintFieldType, ArithmetizationParams, ProofType> generator_res =
          {proof, fri_params, bp, public_preprocessed_data};
+    return std::make_pair(generator_res, private_assignment);
 }
 
 template<typename CurveType, typename ProofType>
-proof_generator_result_type_base base_field_prover(nil::crypto3::zk::snark::pickles_proof<CurveType> &pickles_proof) {
+proof_generator_result_type_base base_field_prover(nil::crypto3::zk::snark::pickles_proof<CurveType> &pickles_proof,
+ typename curve_type::scalar_field_type::integral_type out_scalar) {
     using component_type = zk::components::pickles_verifier_base_field<ArithmetizationTypeBase, CurveType,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     typename component_type::private_params_type private_params = {};
-    typename component_type::public_params_type public_params = {pickles_proof.commitments.z_comm.unshifted[0].to_affine(), pickles_proof.ft_eval1};
 
-    auto redshift_proof = proof_generator<component_type, FpType, ArithmetizationParamsBase,
+    typename component_type::public_params_type public_params = {pickles_proof.commitments.z_comm.unshifted[0].to_affine(), out_scalar};
+
+    auto generator_res = proof_generator<component_type, FpType, ArithmetizationParamsBase,
         ProofType>(public_params, private_params);
 
-    return redshift_proof;
+    return generator_res.first;
 }
 
 template<typename CurveType, typename ProofType>
@@ -137,11 +142,18 @@ proof_generator_result_type_scalar scalar_field_prover(nil::crypto3::zk::snark::
 
 
     typename component_type::private_params_type private_params = {};
-    std::array<typename ArithmetizationTypeScalar::field_type::value_type, 3> input_data = {0, 1, 1};
+    std::array<typename ArithmetizationTypeScalar::field_type::value_type, 3> input_data = {0, pickles_proof.ft_eval1, 1};
     typename component_type::public_params_type public_params = {input_data};
-
-    return proof_generator<component_type, FrType, ArithmetizationParamsScalar,
-        ProofType>(public_params, private_params);
+    auto generator_res = proof_generator<component_type, FrType, ArithmetizationParamsScalar,
+    ProofType>(public_params, private_params);
+    zk::blueprint_private_assignment_table<ArithmetizationTypeScalar> private_assignment = generator_res.second;
+    std::size_t W = 1;
+    std::size_t row = 12;
+    typename ArithmetizationTypeScalar::field_type::value_type out = private_assignment.witness(W)[row];
+    std::cout<<"expected scalar "<< out.data<<std::endl;
+    typename CurveType::scalar_field_type::integral_type integral_out = typename CurveType::scalar_field_type::integral_type(out.data);
+    generator_res.first.out = integral_out;
+    return generator_res.first;
 }
 
 
@@ -153,15 +165,15 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_basic_verifier_test_suite) {
     kimchi_proof.commitments.z_comm.unshifted.push_back(algebra::random_element<curve_type::template g1_type<>>());
 
     auto scalar_field_result = scalar_field_prover<curve_type, proof_type_scalar>(kimchi_proof);
-    auto base_field_result = base_field_prover<curve_type, proof_type_base>(kimchi_proof);
 
-    zk::snark::redshift_verifier<FpType, params_base>::process(base_field_result.public_preprocessed_data, base_field_result.redshift_proof, 
+    bool scalar_verifier_res = zk::snark::redshift_verifier<FrType, params_scalar>::process(scalar_field_result.public_preprocessed_data, scalar_field_result.redshift_proof, 
+                                                                                scalar_field_result.bp,scalar_field_result.fri_params);
+
+    auto base_field_result = base_field_prover<curve_type, proof_type_base>(kimchi_proof, scalar_field_result.out);
+
+    bool verifier_res = zk::snark::redshift_verifier<FpType, params_base>::process(base_field_result.public_preprocessed_data, base_field_result.redshift_proof, 
                                                                                 base_field_result.bp, base_field_result.fri_params);
-
-    //bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data, redshift_proof, 
-    //                                                                            bp, fri_params);
-
-    //std::cout<<base_field_result<<" "<<scalar_field_result<<std::endl;
+                        
 }
 
 BOOST_AUTO_TEST_SUITE_END()

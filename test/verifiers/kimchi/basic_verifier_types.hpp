@@ -65,6 +65,7 @@ struct proof_generator_result_type {
     typename fri_type::params_type fri_params;
     zk::blueprint<ArithmetizationType> bp;
     typename types::preprocessed_public_data_type public_preprocessed_data;
+    typename curve_type::scalar_field_type::integral_type out;
 };
 
 //////////// BASE /////////////////////////////
