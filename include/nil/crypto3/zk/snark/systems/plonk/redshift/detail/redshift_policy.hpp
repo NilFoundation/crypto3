@@ -64,6 +64,7 @@ namespace nil {
                         typedef plonk_constraint_system<FieldType, arithmetization_params>
                             constraint_system_type;
 
+                        typedef FieldType field_type;
                         typedef RedshiftParams redshift_params_type;
 
                         typedef plonk_assignment_table<FieldType, arithmetization_params>
