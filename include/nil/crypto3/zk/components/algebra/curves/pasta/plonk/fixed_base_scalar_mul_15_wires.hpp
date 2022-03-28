@@ -35,10 +35,83 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
+#include <nil/crypto3/zk/chips/plonk/bit_check.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
+            namespace chips {
+
+                template<typename ArithmetizationType,
+                         typename CurveType>
+                class fixed_base_scalar_mul_phi1;
+
+                template<typename BlueprintFieldType,
+                         typename ArithmetizationParams,
+                         typename CurveType>
+                class fixed_base_scalar_mul_phi1<
+                    snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams>,
+                    CurveType>{
+
+                    typedef snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams> ArithmetizationType;
+
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+                public:
+                    constexpr static const std::size_t required_rows_amount = 0;
+
+                    static snark::plonk_constraint<BlueprintFieldType> generate(
+                        blueprint<ArithmetizationType> &bp,
+                        const var& x_1, const var& x_2, const var& x_3, const var& x_4,
+                        std::array<typename CurveType::base_field_type::value_type, 8> u) {
+
+                        return bp.add_constraint(
+                            x_3 * (-u[0] * x_2 * x_1 + u[0] * x_1 + u[0] * x_2 - u[0] + u[2] * x_1 * x_2 - u[2] * x_2 +
+                                   u[4] * x_1 * x_2 - u[4] * x_2 - u[6] * x_1 * x_2 + u[1] * x_2 * x_1 - u[1] * x_1 -
+                                   u[1] * x_2 + u[1] - u[3] * x_1 * x_2 + u[3] * x_2 - u[5] * x_1 * x_2 + u[5] * x_2 +
+                                   u[7] * x_1 * x_2) -
+                            (x_4 - u[0] * x_2 * x_1 + u[0] * x_1 + u[0] * x_2 - u[0] + u[2] * x_1 * x_2 - u[2] * x_2 +
+                             u[4] * x_1 * x_2 - u[4] * x_2 - u[6] * x_1 * x_2));
+                    }
+                };
+
+                template<typename ArithmetizationType,
+                         typename CurveType>
+                class fixed_base_scalar_mul_phi2;
+
+                template<typename BlueprintFieldType,
+                         typename ArithmetizationParams,
+                         typename CurveType>
+                class fixed_base_scalar_mul_phi2<
+                    snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams>,
+                    CurveType>{
+
+                    typedef snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams> ArithmetizationType;
+
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+                public:
+                    constexpr static const std::size_t required_rows_amount = 0;
+
+                    static snark::plonk_constraint<BlueprintFieldType> generate(
+                        blueprint<ArithmetizationType> &bp,
+                        const var& x_1, const var& x_2, const var& x_3, const var& x_4,
+                        std::array<typename CurveType::base_field_type::value_type, 8> v) {
+
+                        return bp.add_constraint(
+                            x_3 * (-v[0] * x_2 * x_1 + v[0] * x_1 + v[0] * x_2 - v[0] + v[2] * x_1 * x_2 - v[2] * x_2 +
+                                   v[4] * x_1 * x_2 - v[4] * x_2 - v[6] * x_1 * x_2 + v[1] * x_2 * x_1 - v[1] * x_1 -
+                                   v[1] * x_2 + v[1] - v[3] * x_1 * x_2 + v[3] * x_2 - v[5] * x_1 * x_2 + v[5] * x_2 +
+                                   v[7] * x_1 * x_2) -
+                            (x_4 - v[0] * x_2 * x_1 + v[0] * x_1 + v[0] * x_2 - v[0] + v[2] * x_1 * x_2 - v[2] * x_2 +
+                             v[4] * x_1 * x_2 - v[4] * x_2 - v[6] * x_1 * x_2));
+                    }
+                };
+
+            }    // namespace chips
+
             namespace components {
 
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
@@ -73,18 +146,36 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
+                    using phi1_chip = chips::fixed_base_scalar_mul_phi1<
+                        ArithmetizationType, CurveType>;
+
+                    using phi2_chip = chips::fixed_base_scalar_mul_phi2<
+                        ArithmetizationType, CurveType>;
+
+                    using bit_check_chip = chips::bit_check<
+                        ArithmetizationType>;
+
                 public:
 
                     constexpr static const std::size_t required_rows_amount = 43;
 
-                    struct init_params_type {
+                    struct public_params_type {
                         typename CurveType::template g1_type<>::value_type B;
                     };
 
-                    struct assignment_params_type {
+                    struct input_type {
+                        var X;
+                        var Y;
+                    };
+
+                    struct private_params_type {
                         typename CurveType::scalar_field_type::value_type a;
                         typename CurveType::scalar_field_type::value_type s;
                         typename CurveType::template g1_type<>::value_type P;
+                    };
+
+                    struct output_type {
+                        var result;
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
@@ -102,37 +193,7 @@ namespace nil {
                         return coef * B;
                     }
 
-                    static snark::plonk_constraint<BlueprintFieldType>
-                        generate_phi1_constraint(blueprint<ArithmetizationType> &bp,
-                                           var x_1, var x_2, var x_3, var x_4,
-                                           std::array<typename CurveType::base_field_type::value_type, 8>
-                                               u) {
-
-                        return bp.add_constraint(
-                            x_3 * (-u[0] * x_2 * x_1 + u[0] * x_1 + u[0] * x_2 - u[0] + u[2] * x_1 * x_2 - u[2] * x_2 +
-                                   u[4] * x_1 * x_2 - u[4] * x_2 - u[6] * x_1 * x_2 + u[1] * x_2 * x_1 - u[1] * x_1 -
-                                   u[1] * x_2 + u[1] - u[3] * x_1 * x_2 + u[3] * x_2 - u[5] * x_1 * x_2 + u[5] * x_2 +
-                                   u[7] * x_1 * x_2) -
-                            (x_4 - u[0] * x_2 * x_1 + u[0] * x_1 + u[0] * x_2 - u[0] + u[2] * x_1 * x_2 - u[2] * x_2 +
-                             u[4] * x_1 * x_2 - u[4] * x_2 - u[6] * x_1 * x_2));
-                    }
-
-                    static snark::plonk_constraint<BlueprintFieldType>
-                        generate_phi2_constraint(blueprint<ArithmetizationType> &bp,
-                                           var x_1, var x_2, var x_3, var x_4,
-                                           std::array<typename CurveType::base_field_type::value_type, 8>
-                                               v) {
-                        return bp.add_constraint(
-                            x_3 * (-v[0] * x_2 * x_1 + v[0] * x_1 + v[0] * x_2 - v[0] + v[2] * x_1 * x_2 - v[2] * x_2 +
-                                   v[4] * x_1 * x_2 - v[4] * x_2 - v[6] * x_1 * x_2 + v[1] * x_2 * x_1 - v[1] * x_1 -
-                                   v[1] * x_2 + v[1] - v[3] * x_1 * x_2 + v[3] * x_2 - v[5] * x_1 * x_2 + v[5] * x_2 +
-                                   v[7] * x_1 * x_2) -
-                            (x_4 - v[0] * x_2 * x_1 + v[0] * x_1 + v[0] * x_2 - v[0] + v[2] * x_1 * x_2 - v[2] * x_2 +
-                             v[4] * x_1 * x_2 - v[4] * x_2 - v[6] * x_1 * x_2));
-                    }
-
-                public:
-                    static void generate_gates(
+                    static output_type generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         const init_params_type &init_params,
@@ -140,12 +201,12 @@ namespace nil {
 
                         const std::size_t &j = component_start_row;
 
-                        auto bit_check_0 = bp.add_bit_check(var(W0, 0));
-                        auto bit_check_1 = bp.add_bit_check(var(W1, 0));
-                        auto bit_check_2 = bp.add_bit_check(var(W2, 0));
-                        auto bit_check_3 = bp.add_bit_check(var(W3, 0));
-                        auto bit_check_4 = bp.add_bit_check(var(W4, 0));
-                        auto bit_check_5 = bp.add_bit_check(var(W5, 0));
+                        auto bit_check_0 = bit_check_chip::generate(bp, var(W0, 0));
+                        auto bit_check_1 = bit_check_chip::generate(bp, var(W1, 0));
+                        auto bit_check_2 = bit_check_chip::generate(bp, var(W2, 0));
+                        auto bit_check_3 = bit_check_chip::generate(bp, var(W3, 0));
+                        auto bit_check_4 = bit_check_chip::generate(bp, var(W4, 0));
+                        auto bit_check_5 = bit_check_chip::generate(bp, var(W5, 0));
 
                         std::array<typename CurveType::base_field_type::value_type, 8> u;
                         std::array<typename CurveType::base_field_type::value_type, 8> v;
@@ -161,8 +222,8 @@ namespace nil {
                                 v[i] = omega.Y;
                             }
 
-                            auto constraint_1 = generate_phi1_constraint(bp, var(W0, 0), var(W1, 0), var(W2, 0), var(W6, 0), u);
-                            auto constraint_2 = generate_phi2_constraint(bp, var(W0, 0), var(W1, 0), var(W2, 0), var(W8, 0), v);
+                            auto constraint_1 = phi1_chip::generate(bp, var(W0, 0), var(W1, 0), var(W2, 0), var(W6, 0), u);
+                            auto constraint_2 = phi2_chip::generate(bp, var(W0, 0), var(W1, 0), var(W2, 0), var(W8, 0), v);
 
                             for (std::size_t i = 0; i <= 7; i++) {
                                 typename CurveType::template g1_type<>::value_type omega =
@@ -170,8 +231,8 @@ namespace nil {
                                 u[i] = omega.X;
                                 v[i] = omega.Y;
                             }
-                            auto constraint_3 = generate_phi1_constraint(bp, var(W3, 0), var(W4, 0), var(W5, 0), var(W7, 0), u);
-                            auto constraint_4 = generate_phi2_constraint(bp, var(W3, 0), var(W4, 0), var(W5, 0), var(W9, 0), v);
+                            auto constraint_3 = phi1_chip::generate(bp, var(W3, 0), var(W4, 0), var(W5, 0), var(W7, 0), u);
+                            auto constraint_4 = phi2_chip::generate(bp, var(W3, 0), var(W4, 0), var(W5, 0), var(W9, 0), v);
 
                             auto acc_constraint = bp.add_constraint(
                                 var(W14, 0) - (var(W0, 0) + var(W1, 0) * 2 + var(W2, 0) * 4 + var(W3, 0) * 8 +
@@ -187,9 +248,7 @@ namespace nil {
                             bp.add_gate(selector_index_j_0,
                                               {bit_check_0, bit_check_1, bit_check_2, bit_check_3, bit_check_4,
                                                bit_check_5, constraint_1, constraint_2, constraint_3, constraint_4,
-                                               acc_constraint, constraint_6, constraint_7,
-                                               // incomplete_addition_constraint_1, incomplete_addition_constraint_2
-                                               });
+                                               acc_constraint, constraint_6, constraint_7});
                         }
 
                         // For j + z, z = 1..41:
@@ -204,8 +263,8 @@ namespace nil {
                                 v[i] = omega.Y;
                             }
 
-                            auto constraint_1 = generate_phi1_constraint(bp, var(W0, 0), var(W1, 0), var(W2, 0), var(W6, 0), u);
-                            auto constraint_2 = generate_phi2_constraint(bp, var(W0, 0), var(W1, 0), var(W2, 0), var(W8, 0), v);
+                            auto constraint_1 = phi1_chip::generate(bp, var(W0, 0), var(W1, 0), var(W2, 0), var(W6, 0), u);
+                            auto constraint_2 = phi2_chip::generate(bp, var(W0, 0), var(W1, 0), var(W2, 0), var(W8, 0), v);
 
                             for (std::size_t i = 0; i <= 7; i++) {
                                 typename CurveType::template g1_type<>::value_type omega =
@@ -213,8 +272,8 @@ namespace nil {
                                 u[i] = omega.X;
                                 v[i] = omega.Y;
                             }
-                            auto constraint_3 = generate_phi1_constraint(bp, var(W3, 0), var(W4, 0), var(W5, 0), var(W7, 0), u);
-                            auto constraint_4 = generate_phi2_constraint(bp, var(W3, 0), var(W4, 0), var(W5, 0), var(W9, 0), v);
+                            auto constraint_3 = phi1_chip::generate(bp, var(W3, 0), var(W4, 0), var(W5, 0), var(W7, 0), u);
+                            auto constraint_4 = phi2_chip::generate(bp, var(W3, 0), var(W4, 0), var(W5, 0), var(W9, 0), v);
 
                             auto acc_constraint = bp.add_constraint(
                                 var(W14, 0) - (var(W0, 0) + var(W1, 0) * 2 + var(W2, 0) * 4 + var(W3, 0) * 8 +
@@ -245,8 +304,8 @@ namespace nil {
                                 v[i] = omega.Y;
                             }
 
-                            auto constraint_1 = generate_phi1_constraint(bp, var(W0, 0), var(W1, 0), var(W2, 0), var(W6, 0), u);
-                            auto constraint_2 = generate_phi2_constraint(bp, var(W0, 0), var(W1, 0), var(W2, 0), var(W8, 0), v);
+                            auto constraint_1 = phi1_chip::generate(bp, var(W0, 0), var(W1, 0), var(W2, 0), var(W6, 0), u);
+                            auto constraint_2 = phi2_chip::generate(bp, var(W0, 0), var(W1, 0), var(W2, 0), var(W8, 0), v);
 
                             auto acc_constraint = bp.add_constraint(
                                 var(W14, 0) - (var(W0, 0) + var(W1, 0) * 2 + var(W2, 0) * 4 + var(W14, -1) * 8));
@@ -268,8 +327,32 @@ namespace nil {
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         const init_params_type &init_params,
+                        const input_type &input,
                         const std::size_t &component_start_row) {
 
+                        const std::size_t j = component_start_row;
+
+                        bp.add_copy_constraint({input.X,
+                            var(W10, j, false)});
+
+                        bp.add_copy_constraint({input.Y,
+                            var(W11, j, false)});
+                    }
+
+                public:
+
+                    static output_type generate_circuit(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        const init_params_type &init_params,
+                        const input_type &input,
+                        const std::size_t &component_start_row){
+
+                        generate_copy_constraints(bp,
+                            public_assignment, init_params, input, component_start_row);
+
+                        return generate_gates(bp,
+                            public_assignment, init_params, component_start_row);
                     }
 
                     static void generate_assignments(
