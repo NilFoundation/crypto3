@@ -30,7 +30,7 @@
 #include <nil/crypto3/algebra/fields/params.hpp>
 
 #include <nil/crypto3/algebra/fields/pallas/base_field.hpp>
-#include <nil/crypto3/algebra/fields/pallas/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 
 #include <nil/crypto3/detail/literals.hpp>
 
