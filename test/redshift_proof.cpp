@@ -32,6 +32,7 @@
 #include <boost/random/uniform_int.hpp>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
@@ -54,6 +55,7 @@
 #include <nil/crypto3/random/algebraic_random_device.hpp>
 
 #include <nil/crypto3/marshalling/zk/types/redshift/proof.hpp>
+#include <nil/crypto3/marshalling/zk/types/redshift/common_data.hpp>
 
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
@@ -321,14 +323,34 @@ void test_redshift_proof_marshalling(const RedshiftProof &proof) {
     cv.resize(filled_redshift_proof.length(), 0x00);
     auto write_iter = cv.begin();
     nil::marshalling::status_type status = filled_redshift_proof.write(write_iter, cv.size());
-    std::cout << "proof (" << cv.size() << " bytes) = ";
-    // print_byteblob(std::cout, cv.cbegin(), cv.cend());
+    std::cout << "proof (" << cv.size() << " bytes) = " << std::endl;
+    std::ofstream proof_file;
+    proof_file.open("redshift.txt");
+    print_byteblob(proof_file, cv.cbegin(), cv.cend());
 
     proof_marshalling_type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
     auto constructed_val_read = types::make_redshift_proof<RedshiftProof, Endianness>(test_val_read);
     BOOST_CHECK(proof == constructed_val_read);
+}
+
+template<typename Endianness, typename RedshiftPolicy>
+void test_redshift_proof_marshalling(const typename RedshiftPolicy::preprocessed_public_data_type::common_data_type &common_data) {
+    using namespace nil::crypto3::marshalling;
+
+    using marshalling_type = types::redshift_verifier_common_data<nil::marshalling::field_type<Endianness>, RedshiftPolicy>;
+
+    auto filled_val = types::fill_redshift_verifier_common_data<RedshiftPolicy, Endianness>(common_data);
+
+    std::vector<std::uint8_t> cv;
+    cv.resize(filled_val.length(), 0x00);
+    auto write_iter = cv.begin();
+    nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
+    std::cout << "common_data (" << cv.size() << " bytes) = " << std::endl;
+    std::ofstream proof_file;
+    proof_file.open("common_data.txt");
+    print_byteblob(proof_file, cv.cbegin(), cv.cend());
 }
 
 constexpr static const std::size_t table_rows_log = 4;
@@ -426,6 +448,8 @@ void test_component_proof_marshalling(typename ComponentType::public_params_type
     bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data,
                                                                                           proof, bp, fri_params);
     BOOST_CHECK(verifier_res);
+
+    test_redshift_proof_marshalling<Endianness, types>(public_preprocessed_data.common_data);
 }
 
 BOOST_AUTO_TEST_SUITE(redshift_marshalling_proof_test_suite)
@@ -455,7 +479,7 @@ BOOST_AUTO_TEST_CASE(redshift_proof_bls12_381_be) {
         nil::crypto3::algebra::random_element<curve_type::template g1_type<>>()};
 
     test_component_proof_marshalling<component_type, FieldType, ArithmetizationParams, merkle_hash_type,
-                                     transcript_hash_type, 10, nil::marshalling::option::big_endian>(public_params,
+                                     transcript_hash_type, 2, nil::marshalling::option::big_endian>(public_params,
                                                                                                      private_params);
 }
 
