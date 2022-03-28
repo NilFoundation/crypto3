@@ -137,7 +137,7 @@ namespace nil {
                         const std::size_t &j = component_start_row;
 
                         std::size_t public_input_column_index = 0;
-                        bp.add_copy_constraint({{W6, j, false}, 
+                        bp.add_copy_constraint({{W6, static_cast<int>(j), false},
                             {public_input_column_index, 0, false, var::column_type::public_input}});
                     }
 
