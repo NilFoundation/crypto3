@@ -502,35 +502,35 @@ namespace nil {
 
                         for (std::size_t i = row; i < row + required_rows_amount - 1; i++) {
                             for (int j = 0; j < state_size; j++) {
-                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[i*5][j];
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row)*5][j];
                             }
                             private_assignment.witness(W3)[i] = next_state[0];
                             private_assignment.witness(W4)[i] = next_state[1];
                             private_assignment.witness(W5)[i] = next_state[2];
                             state = next_state;
                             for (int j = 0; j < state_size; j++) {
-                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[i*5 + 1][j];
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row)*5 + 1][j];
                             }
                             private_assignment.witness(W6)[i] = next_state[0];
                             private_assignment.witness(W7)[i] = next_state[1];
                             private_assignment.witness(W8)[i] = next_state[2];
                             state = next_state;
                             for (int j = 0; j < state_size; j++) {
-                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[i*5 + 2][j];
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row)*5 + 2][j];
                             }
                             private_assignment.witness(W9)[i] = next_state[0];
                             private_assignment.witness(W10)[i] = next_state[1];
                             private_assignment.witness(W11)[i] = next_state[2];
                             state = next_state;
                             for (int j = 0; j < state_size; j++) {
-                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[i*5 + 3][j];
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i-row)*5 + 3][j];
                             }
                             private_assignment.witness(W12)[i] = next_state[0];
                             private_assignment.witness(W13)[i] = next_state[1];
                             private_assignment.witness(W14)[i] = next_state[2];
                             state = next_state;
                             for (int j = 0; j < state_size; j++) {
-                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[i*5 + 4][j];
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row)*5 + 4][j];
                             }
                             private_assignment.witness(W0)[i + 1] = next_state[0];
                             private_assignment.witness(W1)[i + 1] = next_state[1];
