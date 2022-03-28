@@ -26,6 +26,7 @@
 
 #define BOOST_TEST_MODULE blueprint_plonk_kimchi_basic_verifier_test
 
+#include <assert.h>
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
@@ -49,164 +50,116 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_scalar_field.hpp>
 
 #include "test_plonk_component.hpp"
+#include "basic_verifier_types.hpp"
 //#include "proof_data.hpp"
 
 using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_basic_verifier_test_suite)
 
-template<typename CurveType>
-bool base_field_prover(nil::crypto3::zk::snark::pickles_proof<CurveType> &pickles_proof) {
-    using BlueprintFieldType = typename CurveType::base_field_type;
+template <typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams,
+    typename ProofType>
+proof_generator_result_type<BlueprintFieldType, ArithmetizationParams, ProofType> proof_generator(
+    typename ComponentType::public_params_type init_params,
+    typename ComponentType::private_params_type assignment_params){
 
-    constexpr std::size_t WitnessColumns = 15;
-    constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 1;
-
-    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
-        PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
-                ArithmetizationParams>;
+        ArithmetizationParams>;
+    using component_type = ComponentType;
 
-    using component_type = zk::components::pickles_verifier_base_field<ArithmetizationType, CurveType,
+    zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
+
+    zk::blueprint<ArithmetizationType> bp(desc);
+    zk::blueprint_private_assignment_table<ArithmetizationType> private_assignment(desc);
+    zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
+
+    std::size_t start_row = component_type::allocate_rows(bp);
+    component_type::generate_gates(bp, public_assignment, init_params, start_row);
+    component_type::generate_copy_constraints(bp, public_assignment, init_params, start_row);
+    component_type::generate_assignments(private_assignment, public_assignment,
+        init_params, assignment_params, start_row);
+
+    private_assignment.padding();
+    public_assignment.padding();
+
+    zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(
+        private_assignment, public_assignment);
+
+    using params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams>;
+    using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
+
+    using fri_type = typename zk::commitments::fri<BlueprintFieldType,
+        typename params::merkle_hash_type,
+        typename params::transcript_hash_type,
+        2>;
+
+    std::size_t table_rows_log = std::ceil(std::log2(desc.rows_amount));
+
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, BlueprintFieldType>(table_rows_log);
+
+    std::size_t permutation_size = desc.witness_columns + desc.public_input_columns + desc.constant_columns;
+
+    typename types::preprocessed_public_data_type public_preprocessed_data =
+            zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, 
+            desc, fri_params, permutation_size);
+    typename types::preprocessed_private_data_type private_preprocessed_data =
+            zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment,
+            desc);
+
+    auto proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(public_preprocessed_data,
+                                                                        private_preprocessed_data,
+                                                                        desc,
+                                                                        bp,
+                                                                        assignments, fri_params);
+
+    return proof_generator_result_type<BlueprintFieldType, ArithmetizationParams, ProofType>
+         {proof, fri_params, bp, public_preprocessed_data};
+}
+
+template<typename CurveType, typename ProofType>
+proof_generator_result_type_base base_field_prover(nil::crypto3::zk::snark::pickles_proof<CurveType> &pickles_proof) {
+    using component_type = zk::components::pickles_verifier_base_field<ArithmetizationTypeBase, CurveType,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     typename component_type::private_params_type private_params = {};
     typename component_type::public_params_type public_params = {pickles_proof.commitments.z_comm.unshifted[0].to_affine(), pickles_proof.ft_eval1};
 
-    zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
+    auto redshift_proof = proof_generator<component_type, FpType, ArithmetizationParamsBase,
+        ProofType>(public_params, private_params);
 
-    zk::blueprint<ArithmetizationType> bp(desc);
-    zk::blueprint_private_assignment_table<ArithmetizationType> private_assignment(desc);
-    zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
-
-    std::size_t start_row = component_type::allocate_rows(bp);
-    component_type::generate_gates(bp, public_assignment, public_params, start_row);
-    component_type::generate_copy_constraints(bp, public_assignment, public_params, start_row);
-    component_type::generate_assignments(private_assignment, public_assignment,
-        public_params, private_params, start_row);
-
-    private_assignment.padding();
-    public_assignment.padding();
-
-    zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(
-        private_assignment, public_assignment);
-
-    using params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams>;
-    using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
-
-    using fri_type = typename zk::commitments::fri<BlueprintFieldType,
-        typename params::merkle_hash_type,
-        typename params::transcript_hash_type,
-        2>;
-
-    std::size_t table_rows_log = std::ceil(std::log2(desc.rows_amount));
-
-    typename fri_type::params_type fri_params = create_fri_params<fri_type, BlueprintFieldType>(table_rows_log);
-
-    std::size_t permutation_size = desc.witness_columns + desc.public_input_columns + desc.constant_columns;
-
-    typename types::preprocessed_public_data_type public_preprocessed_data =
-            zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, 
-            desc, fri_params, permutation_size);
-    typename types::preprocessed_private_data_type private_preprocessed_data =
-            zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment,
-            desc);
-
-    auto redshift_proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(public_preprocessed_data,
-                                                                        private_preprocessed_data,
-                                                                        desc,
-                                                                        bp,
-                                                                        assignments, fri_params);
-
-    bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data, redshift_proof, 
-                                                                                bp, fri_params);
-    return verifier_res;
+    return redshift_proof;
 }
 
-template<typename CurveType>
-bool scalar_field_prover(nil::crypto3::zk::snark::pickles_proof<CurveType> &pickles_proof) {
-    using BlueprintFieldType = typename CurveType::scalar_field_type;
-    constexpr std::size_t WitnessColumns = 15;
-    constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 3;
-    constexpr std::size_t SelectorColumns = 11;
-    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
-        PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
-                ArithmetizationParams>;
-
-    using component_type = zk::components::pickles_verifier_scalar_field<ArithmetizationType, CurveType,
+template<typename CurveType, typename ProofType>
+proof_generator_result_type_scalar scalar_field_prover(nil::crypto3::zk::snark::pickles_proof<CurveType> &pickles_proof) {
+    using component_type = zk::components::pickles_verifier_scalar_field<ArithmetizationTypeScalar, CurveType,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
 
     typename component_type::private_params_type private_params = {};
-    std::array<typename ArithmetizationType::field_type::value_type, 3> input_data = {0, 1, 1};
+    std::array<typename ArithmetizationTypeScalar::field_type::value_type, 3> input_data = {0, 1, 1};
     typename component_type::public_params_type public_params = {input_data};
 
-    zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
-
-    zk::blueprint<ArithmetizationType> bp(desc);
-    zk::blueprint_private_assignment_table<ArithmetizationType> private_assignment(desc);
-    zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
-
-    std::size_t start_row = component_type::allocate_rows(bp);
-    component_type::generate_gates(bp, public_assignment, public_params, start_row);
-    component_type::generate_copy_constraints(bp, public_assignment, public_params, start_row);
-    component_type::generate_assignments(private_assignment, public_assignment,
-        public_params, private_params, start_row);
-
-    private_assignment.padding();
-    public_assignment.padding();
-
-    zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(
-        private_assignment, public_assignment);
-
-    using params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams>;
-    using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
-
-    using fri_type = typename zk::commitments::fri<BlueprintFieldType,
-        typename params::merkle_hash_type,
-        typename params::transcript_hash_type,
-        2>;
-
-    std::size_t table_rows_log = std::ceil(std::log2(desc.rows_amount));
-
-    typename fri_type::params_type fri_params = create_fri_params<fri_type, BlueprintFieldType>(table_rows_log);
-
-    std::size_t permutation_size = desc.witness_columns + desc.public_input_columns + desc.constant_columns;
-
-    typename types::preprocessed_public_data_type public_preprocessed_data =
-            zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, 
-            desc, fri_params, permutation_size);
-    typename types::preprocessed_private_data_type private_preprocessed_data =
-            zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment,
-            desc);
-
-    auto redshift_proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(public_preprocessed_data,
-                                                                        private_preprocessed_data,
-                                                                        desc,
-                                                                        bp,
-                                                                        assignments, fri_params);
-
-    bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data, redshift_proof, 
-                                                                                bp, fri_params);
-    return verifier_res;
+    return proof_generator<component_type, FrType, ArithmetizationParamsScalar,
+        ProofType>(public_params, private_params);
 }
 
+
+
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_basic_verifier_test_suite) {
-    using curve_type = algebra::curves::pallas;
-    using FpType = typename curve_type::base_field_type;
-    using FrType = typename curve_type::scalar_field_type;
-
     //nil::crypto3::zk::snark::pickles_proof<curve_type> proof = test_proof();
-    nil::crypto3::zk::snark::pickles_proof<curve_type> proof;
-    proof.ft_eval1 = 2;
-    proof.commitments.z_comm.unshifted.push_back(algebra::random_element<curve_type::template g1_type<>>());
+    nil::crypto3::zk::snark::pickles_proof<curve_type> kimchi_proof;
+    kimchi_proof.ft_eval1 = 2;
+    kimchi_proof.commitments.z_comm.unshifted.push_back(algebra::random_element<curve_type::template g1_type<>>());
 
-    bool base_field_result = base_field_prover<curve_type>(proof);
-    //bool scalar_field_result = scalar_field_prover<curve_type>(proof);
+    auto scalar_field_result = scalar_field_prover<curve_type, proof_type_scalar>(kimchi_proof);
+    auto base_field_result = base_field_prover<curve_type, proof_type_base>(kimchi_proof);
+
+    zk::snark::redshift_verifier<FpType, params_base>::process(base_field_result.public_preprocessed_data, base_field_result.redshift_proof, 
+                                                                                base_field_result.bp, base_field_result.fri_params);
+
+    //bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data, redshift_proof, 
+    //                                                                            bp, fri_params);
 
     //std::cout<<base_field_result<<" "<<scalar_field_result<<std::endl;
 }
