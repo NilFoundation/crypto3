@@ -76,15 +76,51 @@ void print_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end) {
     os << std::endl << std::dec;
 }
 
-template<typename FpCurveGroupElement>
-void print_fp_curve_group_element(FpCurveGroupElement e) {
-    std::cout << e.X.data << " " << e.Y.data << " " << e.Z.data << std::endl;
+template<typename FieldParams>
+void print_field_element(std::ostream &os,
+                         const typename nil::crypto3::algebra::fields::detail::element_fp<FieldParams> &e,
+                         bool endline = true) {
+    os << e.data;
+    if (endline) {
+        os << std::endl;
+    }
 }
 
-template<typename Fp2CurveGroupElement>
-void print_fp2_curve_group_element(Fp2CurveGroupElement e) {
-    std::cout << "(" << e.X.data[0].data << " " << e.X.data[1].data << ") (" << e.Y.data[0].data << " "
-              << e.Y.data[1].data << ") (" << e.Z.data[0].data << " " << e.Z.data[1].data << ")" << std::endl;
+template<typename FieldParams>
+void print_field_element(std::ostream &os,
+                         const typename nil::crypto3::algebra::fields::detail::element_fp2<FieldParams> &e,
+                         bool endline = true) {
+    os << e.data[0].data << ", " << e.data[1].data;
+    if (endline) {
+        os << std::endl;
+    }
+}
+
+template<typename CurveParams, typename Form, typename Coordinates>
+typename std::enable_if<std::is_same<Coordinates, nil::crypto3::algebra::curves::coordinates::affine>::value>::type
+    print_curve_point(std::ostream &os,
+                      const nil::crypto3::algebra::curves::detail::curve_element<CurveParams, Form, Coordinates> &p) {
+    os << "( X: [";
+    print_field_element(os, p.X, false);
+    os << "], Y: [";
+    print_field_element(os, p.Y, false);
+    os << "] )" << std::endl;
+}
+
+template<typename CurveParams, typename Form, typename Coordinates>
+typename std::enable_if<std::is_same<Coordinates, nil::crypto3::algebra::curves::coordinates::projective>::value ||
+                        std::is_same<Coordinates, nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0>::value
+                        // || std::is_same<Coordinates, nil::crypto3::algebra::curves::coordinates::inverted>::value
+                        >::type
+    print_curve_point(std::ostream &os,
+                      const nil::crypto3::algebra::curves::detail::curve_element<CurveParams, Form, Coordinates> &p) {
+    os << "( X: [";
+    print_field_element(os, p.X, false);
+    os << "], Y: [";
+    print_field_element(os, p.Y, false);
+    os << "], Z:[";
+    print_field_element(os, p.Z, false);
+    os << "] )" << std::endl;
 }
 
 template<typename ValueType, std::size_t N>
@@ -314,6 +350,21 @@ void test_redshift_proof_marshalling(const RedshiftProof &proof) {
     using namespace nil::crypto3::marshalling;
 
     using proof_marshalling_type = types::redshift_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>;
+    // using lpc_marshalling_type = types::lpc_proof<nil::marshalling::field_type<Endianness>, typename
+    // RedshiftProof::commitment_scheme_type_witness>; using fri_marshalling_type =
+    // types::fri_proof<nil::marshalling::field_type<Endianness>, typename
+    // RedshiftProof::commitment_scheme_type_witness::fri_type>; auto filled_lpc = types::fill_lpc_proof<typename
+    // RedshiftProof::commitment_scheme_type_witness, Endianness>(proof.eval_proof.witness[0]); auto filled_fri =
+    // types::fill_fri_proof<typename RedshiftProof::commitment_scheme_type_witness::fri_type,
+    // Endianness>(proof.eval_proof.witness[0].fri_proof[0]); std::vector<std::uint8_t> ccv;
+    // ccv.resize(filled_lpc.length(), 0x00);
+    // auto write_iterc = ccv.begin();
+    // nil::marshalling::status_type cstatus = filled_lpc.write(write_iterc, ccv.size());
+    // std::cout << "lpc (" << ccv.size() << " bytes) = " << std::endl;
+    // ccv.resize(filled_fri.length(), 0x00);
+    // write_iterc = ccv.begin();
+    // cstatus = filled_lpc.write(write_iterc, ccv.size());
+    // std::cout << "fri (" << ccv.size() << " bytes) = " << std::endl;
 
     auto filled_redshift_proof = types::fill_redshift_proof<RedshiftProof, Endianness>(proof);
     RedshiftProof _proof = types::make_redshift_proof<RedshiftProof, Endianness>(filled_redshift_proof);
@@ -336,10 +387,12 @@ void test_redshift_proof_marshalling(const RedshiftProof &proof) {
 }
 
 template<typename Endianness, typename RedshiftPolicy>
-void test_redshift_proof_marshalling(const typename RedshiftPolicy::preprocessed_public_data_type::common_data_type &common_data) {
+void test_redshift_common_data_marshalling(
+    const typename RedshiftPolicy::preprocessed_public_data_type::common_data_type &common_data) {
     using namespace nil::crypto3::marshalling;
 
-    using marshalling_type = types::redshift_verifier_common_data<nil::marshalling::field_type<Endianness>, RedshiftPolicy>;
+    using marshalling_type =
+        types::redshift_verifier_common_data<nil::marshalling::field_type<Endianness>, RedshiftPolicy>;
 
     auto filled_val = types::fill_redshift_verifier_common_data<RedshiftPolicy, Endianness>(common_data);
 
@@ -439,6 +492,38 @@ void test_component_proof_marshalling(typename ComponentType::public_params_type
     typename types::preprocessed_private_data_type private_preprocessed_data =
         zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment, desc);
 
+    std::cout << "fri_params.r = " << fri_params.r << std::endl;
+    std::cout << "fri_params.max_degree = " << fri_params.max_degree << std::endl;
+    std::cout << "fri_params.q = ";
+    for (const auto &coeff : fri_params.q) {
+        std::cout << coeff.data << ", ";
+    }
+    std::cout << std::endl;
+    std::cout << "fri_params.D_omegas = ";
+    for (const auto &dom : fri_params.D) {
+        std::cout << static_cast<nil::crypto3::math::basic_radix2_domain<BlueprintFieldType> &>(*dom).omega.data
+                  << ", ";
+    }
+    std::cout << std::endl;
+    std::cout << "lpc_params.lambda = " << params::commitment_params_type::lambda << std::endl;
+    std::cout << "lpc_params.m = " << params::commitment_params_type::m << std::endl;
+    std::cout << "lpc_params.r = " << params::commitment_params_type::r << std::endl;
+    std::cout << "common_data.rows_amount = " << public_preprocessed_data.common_data.rows_amount << std::endl;
+    std::cout << "common_data.omega = "
+              << static_cast<nil::crypto3::math::basic_radix2_domain<BlueprintFieldType> &>(
+                     *public_preprocessed_data.common_data.basic_domain)
+                     .omega.data
+              << std::endl;
+    std::cout << "columns_rotations (" << public_preprocessed_data.common_data.columns_rotations.size()
+              << " number) = {" << std::endl;
+    for (const auto &column_rotations : public_preprocessed_data.common_data.columns_rotations) {
+        std::cout << "[";
+        for (auto rot : column_rotations) {
+            std::cout << int(rot) << ", ";
+        }
+        std::cout << "]," << std::endl;
+    }
+    std::cout << "}" << std::endl;
     auto proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(
         public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
     using proof_marshalling_type =
@@ -449,12 +534,12 @@ void test_component_proof_marshalling(typename ComponentType::public_params_type
                                                                                           proof, bp, fri_params);
     BOOST_CHECK(verifier_res);
 
-    test_redshift_proof_marshalling<Endianness, types>(public_preprocessed_data.common_data);
+    test_redshift_common_data_marshalling<Endianness, types>(public_preprocessed_data.common_data);
 }
 
 BOOST_AUTO_TEST_SUITE(redshift_marshalling_proof_test_suite)
 
-BOOST_AUTO_TEST_CASE(redshift_proof_bls12_381_be) {
+BOOST_AUTO_TEST_CASE(redshift_proof_pallas_unified_addition_be) {
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using FieldType = typename curve_type::base_field_type;
 
@@ -473,14 +558,31 @@ BOOST_AUTO_TEST_CASE(redshift_proof_bls12_381_be) {
     using merkle_hash_type = nil::crypto3::hashes::keccak_1600<256>;
     using transcript_hash_type = nil::crypto3::hashes::keccak_1600<256>;
 
+    // auto P = nil::crypto3::algebra::random_element<curve_type::template g1_type<>>();
+    // auto Q = nil::crypto3::algebra::random_element<curve_type::template g1_type<>>();
+    // print_curve_point(std::cout, P);
+    // print_curve_point(std::cout, Q);
+    auto P = typename curve_type::template g1_type<>::value_type(
+        typename FieldType::integral_type(
+            "27051394659719220028518019675882008165050688997034652269377427647537907151531"),
+        typename FieldType::integral_type(
+            "21822416251756708135025948123768256435855398384772800303773249136047377552748"),
+        typename FieldType::integral_type(
+            "4513575749500539555089017060302131147770340137568767831860577667019486447126"));
+    auto Q = typename curve_type::template g1_type<>::value_type(
+        typename FieldType::integral_type(
+            "27186088112168502962664987267099559313950899872804580248315246368032569661930"),
+        typename FieldType::integral_type(
+            "20390446623186344996164510355695306887861826808016772560867363266916574794339"),
+        typename FieldType::integral_type(
+            "13987831508602163988836506420714044551742920178521063041629360005595904804315"));
+
     typename component_type::public_params_type public_params = {};
-    typename component_type::private_params_type private_params = {
-        nil::crypto3::algebra::random_element<curve_type::template g1_type<>>(),
-        nil::crypto3::algebra::random_element<curve_type::template g1_type<>>()};
+    typename component_type::private_params_type private_params = {P, Q};
 
     test_component_proof_marshalling<component_type, FieldType, ArithmetizationParams, merkle_hash_type,
-                                     transcript_hash_type, 2, nil::marshalling::option::big_endian>(public_params,
-                                                                                                     private_params);
+                                     transcript_hash_type, 1, nil::marshalling::option::big_endian>(public_params,
+                                                                                                    private_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
