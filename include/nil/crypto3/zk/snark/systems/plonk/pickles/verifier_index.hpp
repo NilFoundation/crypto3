@@ -67,7 +67,8 @@ namespace nil {
                     Fr w;
                     Fr endo;
                     lookup_verifier_index<CurveType> lookup_index;
-                    linearization_t linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
+                    linearization_t<std::vector<PolishToken<Fr>>>
+                        linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
                     Alphas<Fr> powers_of_alpha;
                     ArithmeticSpongeParams<Fr> fr_sponge_params;
                     ArithmeticSpongeParams<Fq> fq_sponge_params;
