@@ -20,12 +20,12 @@ namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
-                template<typename FieldType, std::size_t Arity, std::size_t PartRounds>
+                template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t PartRounds>
                 struct poseidon_constants_operator {
                     typedef FieldType field_type;
-                    typedef poseidon_policy<field_type, Arity, PartRounds> policy_type;
-                    typedef poseidon_mds_matrix<field_type, Arity, PartRounds> matrix_policy_type;
-                    typedef poseidon_lfsr<field_type, Arity, PartRounds> constants_generator_policy_type;
+                    typedef poseidon_policy<field_type, Rate, Capacity, PartRounds> policy_type;
+                    typedef poseidon_mds_matrix<field_type, Rate, Capacity, PartRounds> matrix_policy_type;
+                    typedef poseidon_lfsr<field_type, Rate, Capacity, PartRounds> constants_generator_policy_type;
 
                     typedef typename field_type::value_type element_type;
                     typedef typename matrix_policy_type::state_vector_type state_vector_type;

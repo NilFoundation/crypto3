@@ -18,9 +18,9 @@ namespace nil {
             namespace detail {
                 using namespace nil::crypto3::multiprecision;
 
-                template<typename FieldType, std::size_t Arity, std::size_t PartRounds>
+                template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t PartRounds>
                 struct poseidon_lfsr {
-                    typedef poseidon_policy<FieldType, Arity, PartRounds> policy_type;
+                    typedef poseidon_policy<FieldType, Rate, Capacity, PartRounds> policy_type;
                     constexpr static const std::size_t state_words = policy_type::state_words;
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     constexpr static const std::size_t full_rounds = policy_type::full_rounds;

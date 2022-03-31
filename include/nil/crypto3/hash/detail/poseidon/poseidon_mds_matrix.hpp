@@ -25,9 +25,9 @@ namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
-                template<typename FieldType, std::size_t Arity, std::size_t PartRounds>
+                template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t PartRounds>
                 struct poseidon_mds_matrix {
-                    typedef poseidon_policy<FieldType, Arity, PartRounds> policy_type;
+                    typedef poseidon_policy<FieldType, Rate, Capacity, PartRounds> policy_type;
                     typedef typename FieldType::value_type element_type;
 
                     constexpr static const std::size_t state_words = policy_type::state_words;

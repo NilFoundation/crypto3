@@ -9,6 +9,8 @@
 
 #define BOOST_TEST_MODULE poseidon_test
 
+#include<boost/predef/architecture/x86/64.h>
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -61,11 +63,11 @@ namespace boost {
 const char *test_data = TEST_DATA;
 
 boost::property_tree::ptree string_data(const std::string &interface_type, const std::string &strength,
-                                        const std::string &arity) {
+                                        const std::string &Rate) {
     boost::property_tree::ptree string_data;
     boost::property_tree::read_json(test_data, string_data);
 
-    return string_data.get_child(interface_type).get_child(strength).get_child(arity);
+    return string_data.get_child(interface_type).get_child(strength).get_child(Rate);
 }
 
 template<typename poseidon_functions_t, typename TestSet>
@@ -94,100 +96,108 @@ void hash_test_data(const TestSet &test_set) {
 
 BOOST_AUTO_TEST_SUITE(poseidon_manual_tests)
 
+BOOST_AUTO_TEST_CASE(poseidon_mina_test) {
+    using poseidon_type = hashes::detail::poseidon_functions<poseidon_default_field_t, 1, 1, 55>;
+    using field_type = typename poseidon_type::element_type;
+
+    field_type input = 0xf2eee8d8f6e5fb182c610cae6c5393fce69dc4d900e7b4923b074e54ad00fb36_cppui256;
+    field_type expected_result = 0xfb5992f65c07f9335995f43fd791d39012ad466717729e61045c297507054f3d_cppui256;
+}
+
 BOOST_DATA_TEST_CASE(poseidon_strengthen_1, string_data("internal", "strengthen", "1"), data_set) {
-    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 1, 69>;
+    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 1, 1, 69>;
 
     hash_test_data<poseidon_functions_t>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(poseidon_strengthen_2, string_data("internal", "strengthen", "2"), data_set) {
-    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 2, 69>;
+    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 2, 1, 69>;
 
     hash_test_data<poseidon_functions_t>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(poseidon_strengthen_4, string_data("internal", "strengthen", "4"), data_set) {
-    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 4, 70>;
+    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 4, 1, 70>;
 
     hash_test_data<poseidon_functions_t>(data_set);
 }
 
-BOOST_DATA_TEST_CASE(poseidon_strengthen_8, string_data("internal", "strengthen", "8"), data_set) {
-    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 8, 72>;
+/*BOOST_DATA_TEST_CASE(poseidon_strengthen_8, string_data("internal", "strengthen", "8"), data_set) {
+    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 8, 1, 72>;
 
     hash_test_data<poseidon_functions_t>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(poseidon_strengthen_11, string_data("internal", "strengthen", "11"), data_set) {
-   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 11, 72>;
+   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 11, 1, 72>;
 
    hash_test_data<poseidon_functions_t>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(poseidon_strengthen_16, string_data("internal", "strengthen", "16"), data_set) {
-   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 16, 74>;
+   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 16, 1, 74>;
 
    hash_test_data<poseidon_functions_t>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(poseidon_strengthen_24, string_data("internal", "strengthen", "24"), data_set) {
-   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 24, 74>;
+   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 24, 1, 74>;
 
    hash_test_data<poseidon_functions_t>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(poseidon_strengthen_36, string_data("internal", "strengthen", "36"), data_set) {
-   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 36, 75>;
+   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 36, 1, 75>;
 
    hash_test_data<poseidon_functions_t>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(poseidon_standart_1, string_data("internal", "standart", "1"), data_set) {
-    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 1, 55>;
+    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 1, 1, 55>;
 
     hash_test_data<poseidon_functions_t>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(poseidon_standart_2, string_data("internal", "standart", "2"), data_set) {
-    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 2, 55>;
+    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 2, 1, 55>;
 
     hash_test_data<poseidon_functions_t>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(poseidon_standart_4, string_data("internal", "standart", "4"), data_set) {
-    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 4, 56>;
+    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 4, 1, 56>;
 
     hash_test_data<poseidon_functions_t>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(poseidon_standart_8, string_data("internal", "standart", "8"), data_set) {
-    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 8, 57>;
+    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 8, 1, 57>;
 
     hash_test_data<poseidon_functions_t>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(poseidon_standart_11, string_data("internal", "standart", "11"), data_set) {
-   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 11, 57>;
+   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 11, 1, 57>;
 
    hash_test_data<poseidon_functions_t>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(poseidon_standart_16, string_data("internal", "standart", "16"), data_set) {
-   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 16, 59>;
+   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 16, 1, 59>;
 
    hash_test_data<poseidon_functions_t>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(poseidon_standart_24, string_data("internal", "standart", "24"), data_set) {
-   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 24, 59>;
+   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 24, 1, 59>;
 
    hash_test_data<poseidon_functions_t>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(poseidon_standart_36, string_data("internal", "standart", "36"), data_set) {
-   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 36, 60>;
+   using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 36, 1, 60>;
 
    hash_test_data<poseidon_functions_t>(data_set);
-}
+}*/
 
 BOOST_AUTO_TEST_SUITE_END()

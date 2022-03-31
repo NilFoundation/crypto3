@@ -17,10 +17,10 @@
 namespace nil {
     namespace crypto3 {
         namespace hashes {
-            template<typename FieldType, std::size_t Arity, std::size_t PartRounds>
+            template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t PartRounds>
             class poseidon_compressor {
             protected:
-                typedef detail::poseidon_functions<FieldType, Arity, PartRounds> policy_type;
+                typedef detail::poseidon_functions<FieldType, Rate, Capacity, PartRounds> policy_type;
 
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -49,10 +49,10 @@ namespace nil {
                 }
             };
 
-            template<typename FieldType, std::size_t Arity, std::size_t PartRounds>
+            template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t PartRounds>
             struct poseidon {
             protected:
-                typedef detail::poseidon_policy<FieldType, Arity, PartRounds> policy_type;
+                typedef detail::poseidon_policy<FieldType, Rate, Capacity, PartRounds> policy_type;
 
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -74,7 +74,7 @@ namespace nil {
                     };
 
                     // typedef sponge_construction<params_type, typename policy_type::iv_generator,
-                    //                             poseidon_compressor<FieldType, Arity, strength>,
+                    //                             poseidon_compressor<FieldType, Rate, Capacity, strength>,
                     //                             // TODO: padding and finalizer
                     //                             detail::poseidon_padding<policy_type>,
                     //                             detail::poseidon_finalizer<policy_type>>

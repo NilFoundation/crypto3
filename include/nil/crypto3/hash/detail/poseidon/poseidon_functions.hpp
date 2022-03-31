@@ -19,12 +19,12 @@ namespace nil {
         namespace hashes {
             namespace detail {
                 // filecoin oriented implementation
-                template<typename FieldType, std::size_t Arity, std::size_t PartRounds>
+                template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t PartRounds>
                 struct poseidon_functions {
                     typedef FieldType field_type;
 
-                    typedef poseidon_policy<field_type, Arity, PartRounds> policy_type;
-                    typedef poseidon_constants_operator<FieldType, Arity, PartRounds> constants_operator_policy_type;
+                    typedef poseidon_policy<field_type, Rate, Capacity, PartRounds> policy_type;
+                    typedef poseidon_constants_operator<FieldType, Rate, Capacity, PartRounds> constants_operator_policy_type;
 
                     typedef typename field_type::value_type element_type;
                     typedef typename constants_operator_policy_type::state_vector_type state_vector_type;

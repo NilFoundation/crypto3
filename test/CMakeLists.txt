@@ -47,6 +47,8 @@ macro(define_hash_test name)
         target_compile_options(hash_${name}_test PRIVATE "-fconstexpr-ops-limit=4294967295")
     endif()
 
+    target_compile_options(hash_${name}_test PRIVATE "-ftemplate-backtrace-limit=0")
+
     string(CONCAT TEST_DATA ${CMAKE_CURRENT_SOURCE_DIR} "/data/" "${name}" ".json")
     target_compile_definitions(hash_${name}_test PRIVATE TEST_DATA="${TEST_DATA}")
 
