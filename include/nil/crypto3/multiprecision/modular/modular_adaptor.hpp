@@ -13,6 +13,7 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/functional/hash_fwd.hpp>
+#include <boost/predef.h>
 
 #include <nil/crypto3/multiprecision/detail/digits.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
