@@ -61,9 +61,23 @@ namespace nil {
                         typename base_field_type::value_type endo_q;
                     };
 
+                    struct commitment_type {
+                        std::vector<typename group_type::value_type> unshifted;
+                        typename group_type::value_type shifted = group_type::value_type::zero();
+                    };
+
                     struct private_key {
                         math::polynomial<scalar_field_type::value_type> F;
                         scalar_field_type::value_type w;
+                    };
+
+                    struct poly_type {
+                        // polynomial itself
+                        std::vector<typename scalar_field_type::value_type> coeffs;
+                        // optional degree bound - poly degree must not exceed it
+                        int bound = -1;
+                        // chunked commitment
+                        commitment_type commit;
                     };
 
                     struct proof_type {
@@ -79,14 +93,30 @@ namespace nil {
                         typename group_type::value_type sg;
                     };
 
+                    struct evaluation_type {
+                        // polycommitment
+                        commitment_type commit;
+                        // evals of polynomial at a set of points
+                        std::vector<std::vector<scalar_field_type>> evaluations;
+                        // optional degree bound
+                        int bound = -1;
+                    }
+
+                    struct batchproof_type {
+                        sponge_type sponge;
+                        std::vector<evaluation_type> evaluation;
+                        std::vector<scalar_field_type> evaluation_points;
+                        // scaling factor for eval points powers
+                        typename scalar_field_type::value_type xi;
+                        // scaling factor for polynomials
+                        typename scalar_field_type::value_type r;
+                        // batched proof
+                        proof_type opening;
+                    };
+
                     //fake structs
                     struct sponge_type {};
                     struct group_map_type {};
-
-                    struct commitment_type {
-                        std::vector<typename group_type::value_type> unshifted;
-                        typename group_type::value_type shifted = group_type::value_type::one();
-                    };
 
                     static params_type setup(const int d) {
                         // define parameters of protocol
@@ -142,20 +172,56 @@ namespace nil {
                         }
                         auto init_size = g.size();
                         for (int i = 0; i < power_of_two - init_size; ++i) {
-                            g.push_back(group_type::value_type::one());
+                            g.push_back(group_type::value_type::zero());
                         }
 
-                        // computing a
+                        // computing a and blinding factor
                         std::vector<typename scalar_field_type::value_type> a;
-                        for (int i = 0; i < power_of_two - a.size(); ++i) {
+                        auto blinding_factor = typename scalar_field_type::value_type::zero();
+                        auto scale = typename scalar_field_type::value_type::one();
+                        for (auto polynom : plms) {
+                            auto offset = polynom.coeffs.begin();
+                            int j = 0;
+                            if (polynom.bound >= 0) {
+                                while (j < polynom.commit.unshifted.size()) {
+                                    auto end_iter = (offset + params.g.size() > polynom.coeffs.end() 
+                                                ? polynom.coeffs.end() : offset + params.g.size());
+                                    auto segment = newVec(offset, end_iter);
+                                    // add unshifted to a
+                                    blinding_factor += polynom.commit.unshifted[j] * scale;
+                                    j += 1;
+                                    scale *= polyscale;
+                                    offset += params.g.size();
+                                    if (offset - polynom.coeffs.begin() > polynom.bound) {
+                                        // add shifted to a
+                                        blinding_factor += polynom.commit.shifted * scale;
+                                        scale *= polyscale;
+                                    }
+                                }
+                            } else {
+                                while (j < polynom.commit.unshifted.size()) {
+                                    auto end_iter = (offset + params.g.size() > polynom.coeffs.end() 
+                                                ? polynom.coeffs.end() : offset + params.g.size());
+                                    auto segment = newVec(offset, end_iter);
+                                    // add unshifted to a
+                                    blinding_factor += polynom.commit.unshifted[j] * scale;
+                                    j += 1;
+                                    scale *= polyscale;
+                                    offset += params.g.size();
+                                }
+                            }
+                        }
+                        init_size = a.size();
+                        for (int i = 0; i < power_of_two - init_size; ++i) {
                             a.push_back(0);
                         }
+
                         // computing b
-                        std::vector<typename scalar_field_type::value_type> b(g.size(), scalar_field_type::value_type::zero());
+                        std::vector<typename scalar_field_type::value_type> b(power_of_two, typename scalar_field_type::value_type::zero());
                         auto scale = typename scalar_field_type::value_type::one();
                         for (auto e : elm) {
                             auto spare = typename scalar_field_type::value_type::one();
-                            for (int i = 0; i < g.size(); ++i) {
+                            for (int i = 0; i < power_of_two; ++i) {
                                 b[i] += scale * spare;
                                 spare *= e;
                             }
@@ -165,6 +231,7 @@ namespace nil {
                         // challenge - all functions are blueprints
                         sponge.absorb(inner_product(a.begin(), a.end(), b.begin(), b.end(), 1));
                         typename group_type::value_type U = group_map(sponge.squeeze());
+
                         std::vector<typename scalar_field_type::value_type> chals;
                         std::vector<typename scalar_field_type::value_type> chal_invs;
 
@@ -191,11 +258,12 @@ namespace nil {
                             res.lr.push_back(std::make_tuple(l, r));
                             blinders.push_back(std::make_tuple(rand_l, rand_r));
 
-                            //fake funtions again
+                            //fake funtions
                             sponge.absorb(l);
                             sponge.absorb(r);
                             auto u_pre = sponge.squeeze_prechallenge();
                             auto u = u_pre //to field using endo_r
+
                             chals.push_back(u);
                             chal_invs.push_back(u.inverse());
 
@@ -209,12 +277,16 @@ namespace nil {
                         auto b0 = b[0];
                         auto g0 = g[0];
 
-                        auto r_prime = random_element<scalar_field_type>(); //smth about blinders, chals and chal_invs
+                        auto r_prime = blinding_factor;
+                        for (int i = 0; i < blinders.size(); ++i) {
+                            const auto[l, r] = blinders[i];
+                            r_prime += l * chal_invs[i] + r * chals[i];
+                        }
                         auto d = random_element<scalar_field_type>();
                         auto r_delta = random_element<scalar_field_type>();
 
                         //fake functions
-                        sponge.absorb(delta);
+                        sponge.absorb(r_delta);
                         auto c = sponge.squeeze(); //to field using endo_r
 
                         res.delta = (g0 + u * b0) * d + params.h * r_delta;
@@ -225,8 +297,112 @@ namespace nil {
                         return res;
                     }
 
-                    static bool verify_eval(const params_type& params, const proof_type& proof) {
-                        
+                    static bool verify_eval(const params_type& params, const group_map_type& group_map, const batchproof_type& batch) {
+                        size_t power_of_two = 1;
+                        while (power_of_two < params.g.size()) {
+                            power_of_two *= 2;
+                        }
+                        std::vector<typename group_type::value_type> points;
+                        points.push_back(params.h);
+                        for (auto i : params.g) {
+                            points.push_back(i);
+                        }
+                        for (int i = 0; i < power_of_two - params.g.size() - 1) {
+                            points.push_back(typename group_type::value_type::zero());
+                        }
+
+                        std::vector<typename scalar_field_type::value_type> scalars;
+                        for (int i = 0; i < power_of_two; ++i) {
+                            scalars.push_back(typename scalar_field_type::value_type::zero());
+                        }
+
+                        auto rand_base = random_element<scalar_field_type>();
+                        auto sg_rand_base = random_element<scalar_field_type>();
+                        auto rand_base_i = typename scalar_field_type::value_type::one();
+                        auto sg_rand_base_i = typename scalar_field_type::value_type::one();
+
+                        // fake functions - to be processed
+                        auto combined_inner_product0 = combined_inner_product(batch.evaluation_points,
+                                                        batch.xi, batch.r, batch.evaluations, params.g.size());
+                        sponge.absorb(combined_inner_product0);
+                        auto t = sponge.challenge();
+                        auto u = group_map(t);
+                        auto [chals, chal_invs] = batch.opening.challenges(params.endo_r, sponge);
+                        sponge.absorb_g(batch.opening.delta);
+                        auto c = sponge.challenge(); // to field using endo_r
+
+                        typename scalar_field_type::value_type b0;
+                        {
+                            auto scale = typename scalar_field_type::value_type::one();
+                            auto res = typename scalar_field_type::value_type::zero();
+                            for (auto e : batch.evaluation_points) {
+                                // fake func
+                                auto term = b_poly(chals, e);
+                                res += scale * term;
+                                scale *= batch.r;
+                            }
+                            b0 = res;
+                        }
+
+                        //fake func
+                        auto s = b_poly_coefficients(chals);
+
+                        auto neg_rand_base_i = - rand_base_i;
+
+                        points.push_back(batch.opening.sg);
+                        scalars.push_back(neg_rand_base_i * batch.opening.z1 - sg_rand_base_i);
+
+                        {
+                            // fake finc
+                            std::vector<typename scalar_field_type::value_type> terms = vec(sg_rand_base_i * s);
+                            for (int i = 0; i < terms.size(); ++i) {
+                                scalars[i + 1] += terms[i];
+                            }
+                        }
+                        scalars[0] -= rand_base_i * batch.opening.z2;
+                        scalars.push_back(neg_rand_base_i * batch.opening.z1 * b0);
+                        points.push_back(u);
+
+                        auto rand_base_i_c_i = c * rand_base_i;
+                        for (int i = 0; i < batch.opening.lr.size(); ++i) {
+                            const auto[l, r] = batch.opening.lr[i];
+                            points.push_back(l);
+                            scalars.push_back(rand_base_i_c_i * chal_invs[i]);
+
+                            points.push_back(r);
+                            scalars.push_back(rand_base_i_c_i * chals[i]);
+                        }
+
+                        {
+                            auto xi_i = typename scalar_field_type::value_type::one();
+                            for (auto eval : batch.evaluations) {
+                                for (auto comm : eval.commitment.unshifted) {
+                                    scalars.push_back(rand_base_i_c_i * xi_i);
+                                    points.push_back(comm);
+
+                                    xi_i *= xi;
+                                }
+
+                                if (eval.bound >= 0) {
+                                    if (eval.commitment.shifted != 0) {
+                                        scalars.push_back(rand_base_i_c_i * xi_i);
+                                        points.push_back(eval.commitment.shifted);
+
+                                        xi_i *= xi;
+                                    }
+                                }
+                            }
+                        }
+
+                        scalars.push_back(rand_base_i_c_i * combined_inner_product0);
+                        points.push_back(u);
+                        scalars.push_back(rand_base_i);
+                        points.push_back(batch.opening.delta);
+
+                        rand_base_i *= rand_base;
+                        sg_rand_base_i *= sg_rand_base;
+
+                        return (multiexp(points.begin(), points.end(), scalars.begin(), scalars.end(), 1) == typename group_type::value_type::zero());
                     }
                 };
 
