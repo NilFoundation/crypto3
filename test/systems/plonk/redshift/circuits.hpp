@@ -179,11 +179,11 @@ namespace nil {
 
                     test_circuit.init();
 
-                    plonk_variable<FieldType> w0(0, plonk_variable<FieldType>::rotation_type::current,
+                    plonk_variable<FieldType> w0(0, 0,
                                                  plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w1(0, plonk_variable<FieldType>::rotation_type::current,
+                    plonk_variable<FieldType> w1(0, 0,
                                                  plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w2(0, plonk_variable<FieldType>::rotation_type::current,
+                    plonk_variable<FieldType> w2(0, 0,
                                                  plonk_variable<FieldType>::column_type::witness);
 
                     plonk_constraint<FieldType> add_constraint;
@@ -314,11 +314,11 @@ namespace nil {
 
                     test_circuit.init();
 
-                    plonk_variable<FieldType> w0(0, plonk_variable<FieldType>::rotation_type::current, true,
+                    plonk_variable<FieldType> w0(0, 0, true,
                                                  plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w1(1, plonk_variable<FieldType>::rotation_type::current, true,
+                    plonk_variable<FieldType> w1(1, 0, true,
                                                  plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w2(2, plonk_variable<FieldType>::rotation_type::current, true,
+                    plonk_variable<FieldType> w2(2, 0, true,
                                                  plonk_variable<FieldType>::column_type::witness);
                     plonk_variable<FieldType> w0_prev(0, -1, true,
                                                  plonk_variable<FieldType>::column_type::witness);
