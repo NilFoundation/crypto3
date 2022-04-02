@@ -18,17 +18,19 @@ namespace nil {
             namespace detail {
                 using namespace nil::crypto3::multiprecision;
 
-                template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t PartRounds>
+                template<typename poseidon_policy_type>
                 struct poseidon_lfsr {
-                    typedef poseidon_policy<FieldType, Rate, Capacity, PartRounds> policy_type;
+                    typedef poseidon_policy_type policy_type;
+                    typedef typename policy_type::field_type field_type;
+
                     constexpr static const std::size_t state_words = policy_type::state_words;
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     constexpr static const std::size_t full_rounds = policy_type::full_rounds;
                     constexpr static const std::size_t part_rounds = policy_type::part_rounds;
 
-                    typedef typename FieldType::value_type element_type;
-                    typedef typename FieldType::integral_type integral_type;
-                    constexpr static const integral_type modulus = FieldType::modulus;
+                    typedef typename field_type::value_type element_type;
+                    typedef typename field_type::integral_type integral_type;
+                    constexpr static const integral_type modulus = field_type::modulus;
 
                     constexpr static const std::size_t lfsr_state_bits = 80;
                     typedef number<backends::cpp_int_backend<

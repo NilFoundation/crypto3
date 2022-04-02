@@ -19,12 +19,12 @@ namespace nil {
         namespace hashes {
             namespace detail {
                 // filecoin oriented implementation
-                template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t SBoxPower, std::size_t PartRounds>
+                template<typename poseidon_policy_type>
                 struct poseidon_functions {
-                    typedef FieldType field_type;
+                    typedef poseidon_policy_type policy_type;
+                    typedef typename policy_type::field_type field_type;
 
-                    typedef poseidon_policy<field_type, Rate, Capacity, PartRounds> policy_type;
-                    typedef poseidon_constants_operator<FieldType, Rate, Capacity, SBoxPower, PartRounds> constants_operator_policy_type;
+                    typedef poseidon_constants_operator<policy_type> constants_operator_policy_type;
 
                     typedef typename field_type::value_type element_type;
                     typedef typename constants_operator_policy_type::state_vector_type state_vector_type;
@@ -76,7 +76,7 @@ namespace nil {
                         }
 
                         // second half of full rounds
-                        for (std::size_t i = 0; i < half_full_rounds; i++) {
+                        for (std::size_t i = 0; i < full_rounds - half_full_rounds; i++) {
                             policy_constants_operator.arc_sbox_mds_full_round(A_vector, round_number++);
                         }
 
@@ -107,7 +107,7 @@ namespace nil {
                         policy_constants_operator.sbox_mds_part_round_optimized_last(A_vector, round_number++);
 
                         // second half of full rounds
-                        for (std::size_t i = 0; i < half_full_rounds; i++) {
+                        for (std::size_t i = 0; i < full_rounds - half_full_rounds; i++) {
                             policy_constants_operator.arc_sbox_mds_full_round_optimized_last(A_vector, round_number++);
                         }
 

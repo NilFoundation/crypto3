@@ -17,53 +17,11 @@ namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
-                template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t SBoxPower, std::size_t FullRounds, std::size_t PartRounds>
-                struct poseidon_extended_policy {
-                    typedef FieldType field_type;
-                    typedef typename field_type::value_type element_type;
-
-                    constexpr static const std::size_t word_bits = field_type::modulus_bits;
-                    typedef element_type word_type;
-
-                    constexpr static const std::size_t digest_bits = field_type::modulus_bits;
-                    typedef element_type digest_type;
-
-                    constexpr static const std::size_t state_bits = (Rate + Capacity) * field_type::modulus_bits;
-                    constexpr static const std::size_t state_words = (Rate + Capacity);
-                    typedef std::array<element_type, Rate + Capacity> state_type;
-
-                    constexpr static const std::size_t block_bits = Rate * field_type::modulus_bits;
-                    constexpr static const std::size_t block_words = Rate;
-                    typedef std::array<element_type, Rate> block_type;
-
-                    constexpr static const std::size_t full_rounds = FullRounds;
-                    constexpr static const std::size_t half_full_rounds = PartRounds;
-                    constexpr static const std::size_t part_rounds = PartRounds;
-
-                    constexpr static const std::size_t rate = Rate;
-                    constexpr static const std::size_t capacity = Capacity;
-                    constexpr static const std::size_t sbox_power = SBoxPower;
-
-                    struct iv_generator {
-                        // TODO: maybe it would be done in constexpr way
-                        const state_type &operator()() const {
-                            static const state_type H0 = []() {
-                                state_type H;
-                                H.fill(element_type(0));
-                                return H;
-                            }();
-                            return H0;
-                        }
-                    };
-                };
-
                 template<typename poseidon_policy>
                 struct poseidon_sponge_construction {
 
                     private:
-                        typedef detail::poseidon_functions<typename poseidon_policy::field_type,
-                            poseidon_policy::rate, poseidon_policy::capacity, 
-                            poseidon_policy::sbox_power, poseidon_policy::part_rounds> poseidon_functions;
+                        typedef detail::poseidon_functions<poseidon_policy> poseidon_functions;
 
                         std::size_t state_count = 0;
                         std::size_t state_absorbed = true;
