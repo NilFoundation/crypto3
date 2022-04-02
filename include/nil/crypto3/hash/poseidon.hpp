@@ -17,10 +17,10 @@
 namespace nil {
     namespace crypto3 {
         namespace hashes {
-            template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t PartRounds>
+            template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t SBoxPower, std::size_t PartRounds>
             class poseidon_compressor {
             protected:
-                typedef detail::poseidon_functions<FieldType, Rate, Capacity, PartRounds> policy_type;
+                typedef detail::poseidon_functions<FieldType, Rate, Capacity, SBoxPower, PartRounds> policy_type;
 
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;

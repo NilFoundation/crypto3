@@ -20,7 +20,7 @@ namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
-                template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t PartRounds>
+                template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t SBoxPower, std::size_t PartRounds>
                 struct poseidon_constants_operator {
                     typedef FieldType field_type;
                     typedef poseidon_policy<field_type, Rate, Capacity, PartRounds> policy_type;
@@ -56,7 +56,7 @@ namespace nil {
                         std::size_t constant_number_base = round_number * state_words;
                         for (std::size_t i = 0; i < state_words; i++) {
                             A[i] += get_equivalent_round_constant(constant_number_base + i);
-                            A[i] = A[i] * A[i] * A[i] * A[i] * A[i];
+                            A[i] = A[i].pow(SBoxPower);
                         }
                         policy_matrix.product_with_mds_matrix(A);
                     }
@@ -70,7 +70,7 @@ namespace nil {
                             (round_number - half_full_rounds - part_rounds) * state_words;
                         for (std::size_t i = 0; i < state_words; i++) {
                             A[i] += get_equivalent_round_constant(constant_number_base + i);
-                            A[i] = A[i] * A[i] * A[i] * A[i] * A[i];
+                            A[i] = A[i].pow(SBoxPower);
                         }
                         policy_matrix.product_with_mds_matrix(A);
                     }
@@ -93,7 +93,7 @@ namespace nil {
                                          "wrong using: sbox_arc_mds_part_round_optimized");
                         std::size_t constant_number_base =
                             (half_full_rounds + 1) * state_words + (round_number - half_full_rounds - 1) + 1;
-                        A[0] = A[0] * A[0] * A[0] * A[0] * A[0];
+                        A[0] = A[0].pow(SBoxPower);
                         A[0] += get_equivalent_round_constant(constant_number_base);
                         policy_matrix.product_with_equivalent_mds_matrix(A, round_number);
                     }
@@ -102,7 +102,7 @@ namespace nil {
                                                                    std::size_t round_number) const {
                         BOOST_ASSERT_MSG(round_number == half_full_rounds + part_rounds - 1,
                                          "wrong using: sbox_mds_part_round_optimized_last");
-                        A[0] = A[0] * A[0] * A[0] * A[0] * A[0];
+                        A[0] = A[0].pow(SBoxPower);
                         policy_matrix.product_with_equivalent_mds_matrix(A, round_number);
                     }
 
@@ -118,7 +118,7 @@ namespace nil {
                                          "wrong using: arc_sbox_mds_full_round");
                         for (std::size_t i = 0; i < state_words; i++) {
                             A[i] += get_round_constant(round_number * state_words + i);
-                            A[i] = A[i] * A[i] * A[i] * A[i] * A[i];
+                            A[i] = A[i].pow(SBoxPower);
                         }
                         policy_matrix.product_with_mds_matrix(A);
                     }
@@ -130,7 +130,7 @@ namespace nil {
                         for (std::size_t i = 0; i < state_words; i++) {
                             A[i] += get_round_constant(round_number * state_words + i);
                         }
-                        A[0] = A[0] * A[0] * A[0] * A[0] * A[0];
+                        A[0] = A[0].pow(SBoxPower);
                         policy_matrix.product_with_mds_matrix(A);
                     }
 
