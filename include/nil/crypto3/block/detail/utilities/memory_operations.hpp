@@ -45,7 +45,7 @@ namespace nil {
          * @param elem_size the size of each element
          * @return pointer to allocated and zeroed memory, or throw std::bad_alloc on failure
          */
-        BOOST_ATTRIBUTE_MALLOC_FUNCTION void *allocate_memory(size_t elems, size_t elem_size) {
+        __attribute__((malloc)) void *allocate_memory(size_t elems, size_t elem_size) {
 #if defined(CRYPTO3_HAS_LOCKING_ALLOCATOR)
             if (void *p = mlock_allocator::instance().allocate(elems, elem_size)) {
                 return p;
