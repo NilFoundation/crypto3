@@ -58,6 +58,21 @@ namespace nil {
                         get_policy_constant_operator();
 
                     static inline void permute(state_type &A) {
+                        auto full_round = [](state_vector_type &state, std::size_t round) {
+                            if (policy_type::alternative_permute) {
+                                return policy_constants_operator.sbox_mds_arc_full_round(state, round);
+                            } else {
+                                return policy_constants_operator.arc_sbox_mds_full_round(state, round);
+                            }
+                        };
+                        auto part_round = [](state_vector_type &state, std::size_t round) {
+                            if (policy_type::alternative_permute) {
+                                return policy_constants_operator.sbox_mds_arc_part_round(state, round);
+                            } else {
+                                return policy_constants_operator.arc_sbox_mds_part_round(state, round);
+                            }
+                        };
+
                         std::size_t round_number = 0;
 
                         state_vector_type A_vector;
@@ -67,17 +82,17 @@ namespace nil {
 
                         // first half of full rounds
                         for (std::size_t i = 0; i < half_full_rounds; i++) {
-                            policy_constants_operator.arc_sbox_mds_full_round(A_vector, round_number++);
+                            full_round(A_vector, round_number++);
                         }
 
                         // partial rounds
                         for (std::size_t i = 0; i < part_rounds; i++) {
-                            policy_constants_operator.arc_sbox_mds_part_round(A_vector, round_number++);
+                            part_round(A_vector, round_number++);
                         }
 
                         // second half of full rounds
                         for (std::size_t i = 0; i < full_rounds - half_full_rounds; i++) {
-                            policy_constants_operator.arc_sbox_mds_full_round(A_vector, round_number++);
+                            full_round(A_vector, round_number++);
                         }
 
                         for (std::size_t i = 0; i < state_words; i++) {

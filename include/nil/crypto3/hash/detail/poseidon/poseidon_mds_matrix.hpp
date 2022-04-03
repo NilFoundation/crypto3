@@ -18,6 +18,7 @@
 #include <nil/crypto3/algebra/vector/operators.hpp>
 
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
+#include <nil/crypto3/hash/detail/poseidon/kimchi_constants.hpp>
 
 #include <boost/assert.hpp>
 
@@ -81,6 +82,15 @@ namespace nil {
 #endif
                     inline mds_matrix_type generate_mds_matrix() {
                         mds_matrix_type new_mds_matrix;
+                        if (policy_type::full_rounds == 55) { // TODO: kimchi specialization
+                            for (std::size_t i = 0; i < state_words; i++) {
+                                for (std::size_t j = 0; j < state_words; j++) {
+                                    new_mds_matrix[i][j] = poseidon_constants_kimchi::mds[j][i];
+                                }
+                            }
+
+                            return new_mds_matrix;
+                        }
                         for (std::size_t i = 0; i < state_words; i++) {
                             for (std::size_t j = 0; j < state_words; j++) {
                                 new_mds_matrix[i][j] = element_type(i + j + state_words).inversed();

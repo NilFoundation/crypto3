@@ -26,7 +26,8 @@ namespace nil {
                  * @tparam Capacity Capacity or inner part of Poseidon permutation in field elements
                  * @tparam Strength mode of Poseidon permutation
                  */
-                template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t SBoxPower, std::size_t FullRounds, std::size_t PartRounds>
+                template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t SBoxPower, std::size_t FullRounds, std::size_t PartRounds,
+                    bool AlternativePermute = false>
                 struct base_poseidon_policy {
                     typedef FieldType field_type;
                     typedef typename field_type::value_type element_type;
@@ -52,6 +53,8 @@ namespace nil {
                     constexpr static const std::size_t rate = Rate;
                     constexpr static const std::size_t capacity = Capacity;
                     constexpr static const std::size_t sbox_power = SBoxPower;
+
+                    constexpr static const bool alternative_permute = AlternativePermute; 
 
                     struct iv_generator {
                         // TODO: maybe it would be done in constexpr way

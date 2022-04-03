@@ -136,6 +136,35 @@ namespace nil {
                         policy_matrix.product_with_mds_matrix(A);
                     }
 
+                    /*
+                     * =========================================================
+                     *  SBOX-MDS-ARC order
+                     * =========================================================
+                     */
+                    inline void sbox_mds_arc_full_round(state_vector_type &A, std::size_t round_number) const {
+                        BOOST_ASSERT_MSG(round_number < half_full_rounds ||
+                                             round_number >= half_full_rounds + part_rounds,
+                                         "wrong using: arc_sbox_mds_full_round");
+                        for (std::size_t i = 0; i < state_words; i++) {
+                            A[i] = A[i].pow(sbox_power);
+                        }
+                        policy_matrix.product_with_mds_matrix(A);
+                        for (std::size_t i = 0; i < state_words; i++) {
+                            A[i] += get_round_constant(round_number * state_words + i);
+                        }
+                    }
+
+                    inline void sbox_mds_arc_part_round(state_vector_type &A, std::size_t round_number) const {
+                        BOOST_ASSERT_MSG(round_number >= half_full_rounds &&
+                                             round_number < half_full_rounds + part_rounds,
+                                         "wrong using: arc_sbox_mds_part_round");
+                        A[0] = A[0].pow(sbox_power);
+                        policy_matrix.product_with_mds_matrix(A);
+                        for (std::size_t i = 0; i < state_words; i++) {
+                            A[i] += get_round_constant(round_number * state_words + i);
+                        }
+                    }
+
                     // private:
                     constexpr inline const element_type &get_round_constant(std::size_t constant_number) const {
                         return round_constants_generator.round_constants[constant_number];

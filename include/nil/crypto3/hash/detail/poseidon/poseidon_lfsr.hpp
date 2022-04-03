@@ -12,6 +12,8 @@
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/algebra/vector/vector.hpp>
 
+#include <nil/crypto3/hash/detail/poseidon/kimchi_constants.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace hashes {
@@ -42,6 +44,15 @@ namespace nil {
                     typedef algebra::vector<element_type, constants_number> round_constants_type;
 
                     constexpr void generate_round_constants() {
+                        if (policy_type::full_rounds == 55) { //TODO: kimchi constants
+                            for (std::size_t i = 0; i < (full_rounds + part_rounds) * state_words; i++) {
+                                std::size_t idx1 = i / state_words;
+                                std::size_t idx2 = i % state_words;
+                                round_constants[i] = poseidon_constants_kimchi::round_constant[idx1][idx2];
+                            }
+
+                            return;
+                        }
                         integral_type constant = 0;
                         lfsr_state_type lfsr_state = get_lfsr_init_state();
 
