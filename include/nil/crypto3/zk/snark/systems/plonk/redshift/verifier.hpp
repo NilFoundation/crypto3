@@ -46,6 +46,7 @@ namespace nil {
                     constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
                     constexpr static const std::size_t public_input_columns = ParamsType::public_input_columns;
                     constexpr static const std::size_t constant_columns = ParamsType::constant_columns;
+                    constexpr static const std::size_t selector_columns = ParamsType::selector_columns;
 
                     using merkle_hash_type = typename ParamsType::commitment_params_type::merkle_hash_type;
                     using transcript_hash_type = typename ParamsType::commitment_params_type::transcript_hash_type;
@@ -131,26 +132,59 @@ namespace nil {
 
                       typename policy_type::evaluation_map columns_at_y;
                         for (std::size_t i = 0; i < witness_columns; i++) {
-                            for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
-                                auto key = std::make_tuple(i, preprocessed_public_data.common_data.columns_rotations[i][j],
+
+                            std::size_t i_global_index = i;
+
+                            for (std::size_t j = 0; j <
+                                preprocessed_public_data.common_data.columns_rotations[i_global_index].size(); j++) {
+
+                                auto key = std::make_tuple(i,
+                                    preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                                        plonk_variable<FieldType>::column_type::witness);
                                 columns_at_y[key] = proof.eval_proof.witness[i].z[j];
                             }
                         }
-                        for (std::size_t i = witness_columns; i < witness_columns + public_input_columns; i++) {
-                            for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
-                                auto key = std::make_tuple(i, preprocessed_public_data.common_data.columns_rotations[i][j],
+                        for (std::size_t i = 0; i < 0 + public_input_columns; i++) {
+                            std::size_t i_global_index = witness_columns + i;
+
+                            for (std::size_t j = 0; j <
+                                preprocessed_public_data.common_data.columns_rotations[i_global_index].size(); j++) {
+
+                                auto key = std::make_tuple(i,
+                                    preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                                        plonk_variable<FieldType>::column_type::public_input);
                                 std::size_t eval_idx = i - witness_columns;
-                                columns_at_y[key] = proof.eval_proof.public_input[eval_idx].z[j];
+                                columns_at_y[key] = proof.eval_proof.public_input[i].z[j];
                             }
                         }
-                        for (std::size_t i = witness_columns + public_input_columns; i < witness_columns + public_input_columns + constant_columns; i++) {
-                            for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
-                                auto key = std::make_tuple(i, preprocessed_public_data.common_data.columns_rotations[i][j],
+                        for (std::size_t i = 0; i < 0 + constant_columns; i++) {
+                            std::size_t i_global_index = witness_columns +
+                                constant_columns + i;
+                            for (std::size_t j = 0; j <
+                                preprocessed_public_data.common_data.columns_rotations[i_global_index].size(); j++) {
+
+                                auto key = std::make_tuple(i,
+                                    preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                                        plonk_variable<FieldType>::column_type::constant);
                                 std::size_t eval_idx = i - witness_columns - public_input_columns;
-                                columns_at_y[key] = proof.eval_proof.constant[eval_idx].z[j];
+                                columns_at_y[key] = proof.eval_proof.constant[i].z[j];
+                            }
+                        }
+                        for (std::size_t i = 0;
+                            i < selector_columns; i++) {
+
+                            std::size_t i_global_index = witness_columns +
+                                constant_columns +
+                                public_input_columns + i;
+
+                            for (std::size_t j = 0; j <
+                                preprocessed_public_data.common_data.columns_rotations[i_global_index].size(); j++) {
+
+                                auto key = std::make_tuple(i,
+                                    preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
+                                                       plonk_variable<FieldType>::column_type::selector);
+                                std::size_t eval_idx = i;
+                                columns_at_y[key] = proof.eval_proof.selector[i].z[j];
                             }
                         }
                         //6. lookup argument
@@ -176,7 +210,6 @@ namespace nil {
                         std::array<typename FieldType::value_type, 1> gate_argument =
                             redshift_gates_argument<FieldType, ParamsType>::verify_eval(
                                 constraint_system.gates(),
-                                preprocessed_public_data.public_polynomial_table,
                                 columns_at_y,
                                 proof.eval_proof.challenge,
                                 transcript);

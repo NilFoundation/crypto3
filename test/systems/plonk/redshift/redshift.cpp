@@ -355,38 +355,68 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
 
     typename policy_type::evaluation_map columns_at_y;
     for (std::size_t i = 0; i < redshift_test_params::witness_columns; i++) {
-        for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
-            int rotation = preprocessed_public_data.common_data.columns_rotations[i][j];
+
+        std::size_t i_global_index = i;
+
+        for (std::size_t j = 0;
+            j < preprocessed_public_data.common_data.columns_rotations[i_global_index].size(); j++) {
+            int rotation = preprocessed_public_data.common_data.columns_rotations[i_global_index][j];
             auto key = std::make_tuple(i, rotation,
                                     plonk_variable<FieldType>::column_type::witness);
             columns_at_y[key] = polynomial_table.witness(i).evaluate(y * omega.pow(rotation));
         }
     }
-    for (std::size_t i = redshift_test_params::witness_columns; i < redshift_test_params::witness_columns + redshift_test_params::public_input_columns; i++) {
-        for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
-            int rotation = preprocessed_public_data.common_data.columns_rotations[i][j];
+    for (std::size_t i = 0; i < 0 + redshift_test_params::public_input_columns; i++) {
+
+        std::size_t i_global_index = redshift_test_params::witness_columns + i;
+
+        for (std::size_t j = 0; j <
+            preprocessed_public_data.common_data.columns_rotations[i_global_index].size(); j++) {
+
+            int rotation = preprocessed_public_data.common_data.columns_rotations[i_global_index][j];
             auto key = std::make_tuple(i, rotation,
-                                    plonk_variable<FieldType>::column_type::witness);
+                                    plonk_variable<FieldType>::column_type::public_input);
             
-            std::size_t idx = i - redshift_test_params::witness_columns;
-            columns_at_y[key] = polynomial_table.public_input(idx).evaluate(y * omega.pow(rotation));
+            columns_at_y[key] = polynomial_table.public_input(i).evaluate(y * omega.pow(rotation));
         }
     }
-    for (std::size_t i = redshift_test_params::witness_columns + redshift_test_params::public_input_columns; 
-                i < redshift_test_params::witness_columns + redshift_test_params::public_input_columns + redshift_test_params::constant_columns; i++) {
-        for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
-            int rotation = preprocessed_public_data.common_data.columns_rotations[i][j];
+    for (std::size_t i = 0; 
+                i < 0 + redshift_test_params::constant_columns; i++) {
+
+        std::size_t i_global_index = redshift_test_params::witness_columns +
+            redshift_test_params::public_input_columns + i;
+
+        for (std::size_t j = 0; j <
+            preprocessed_public_data.common_data.columns_rotations[i_global_index].size(); j++) {
+            int rotation = preprocessed_public_data.common_data.columns_rotations[i_global_index][j];
+
             auto key = std::make_tuple(i, rotation,
-                                    plonk_variable<FieldType>::column_type::witness);
+                                    plonk_variable<FieldType>::column_type::constant);
             
-            std::size_t idx = i - redshift_test_params::witness_columns - redshift_test_params::public_input_columns;
-            columns_at_y[key] = polynomial_table.constant(idx).evaluate(y * omega.pow(rotation));
+            columns_at_y[key] = polynomial_table.constant(i).evaluate(y * omega.pow(rotation));
+        }
+    }
+    for (std::size_t i = 0;
+        i < redshift_test_params::selector_columns; i++) {
+
+        std::size_t i_global_index = redshift_test_params::witness_columns +
+            redshift_test_params::constant_columns +
+            redshift_test_params::public_input_columns + i;
+
+        for (std::size_t j = 0; j <
+            preprocessed_public_data.common_data.columns_rotations[i_global_index].size(); j++) {
+            int rotation = preprocessed_public_data.common_data.columns_rotations[i_global_index][j];
+
+            auto key = std::make_tuple(i, rotation,
+                                   plonk_variable<FieldType>::column_type::selector);
+
+            columns_at_y[key] = polynomial_table.selector(i).evaluate(y * omega.pow(rotation));
         }
     }
 
     std::array<typename FieldType::value_type, 1> verifier_res =
-        redshift_gates_argument<FieldType, circuit_2_params>::verify_eval(constraint_system.gates(), preprocessed_public_data.public_polynomial_table, columns_at_y, y,
-                                                                          verifier_transcript);
+        redshift_gates_argument<FieldType, circuit_2_params>::verify_eval(constraint_system.gates(),
+            columns_at_y, y, verifier_transcript);
 
     typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();

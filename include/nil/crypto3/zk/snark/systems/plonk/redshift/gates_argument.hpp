@@ -94,8 +94,6 @@ namespace nil {
 
                     static inline std::array<typename FieldType::value_type, argument_size>
                         verify_eval(const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> &gates,
-                                    const plonk_public_polynomial_table<FieldType,
-                                        typename ParamsType::arithmetization_params> public_polynomials,
                                     typename policy_type::evaluation_map &evaluations,
                                     typename FieldType::value_type challenge,
                                     transcript_type &transcript = transcript_type()) {
@@ -113,8 +111,14 @@ namespace nil {
                                 theta_acc *= theta;
                             }
 
+                            std::tuple<std::size_t,
+                                           int,
+                                           typename plonk_variable<FieldType>::column_type>
+                                selector_key = std::make_tuple(gates[i].selector_index, 0,
+                                    plonk_variable<FieldType>::column_type::selector);
+
                             gate_result =
-                                gate_result * public_polynomials.selector(gates[i].selector_index).evaluate(challenge);
+                                gate_result * evaluations[selector_key];
 
                             F[0] = F[0] + gate_result;
                         }
