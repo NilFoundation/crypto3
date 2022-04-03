@@ -41,6 +41,7 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -72,7 +73,7 @@ namespace nil {
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
-                        const std::vector<plonk_gate<FieldType>> gates = constraint_system.gates();
+                        const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates = constraint_system.gates();
 
                         for (std::size_t i = 0; i < gates.size(); i++) {
                             math::polynomial<typename FieldType::value_type> gate_result = {0};
@@ -92,7 +93,7 @@ namespace nil {
                     }
 
                     static inline std::array<typename FieldType::value_type, argument_size>
-                        verify_eval(const std::vector<plonk_gate<FieldType>> &gates,
+                        verify_eval(const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> &gates,
                                     const plonk_public_polynomial_table<FieldType,
                                         typename ParamsType::arithmetization_params> public_polynomials,
                                     typename policy_type::evaluation_map &evaluations,

@@ -44,6 +44,7 @@
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -68,8 +69,9 @@ namespace nil {
 
                     typename policy_type::variable_assignment_type table;
 
-                    std::vector<plonk_gate<FieldType>> gates;
+                    std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates;
                     std::vector<plonk_copy_constraint<FieldType>> copy_constraints;
+                    std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates;
 
                     circuit_description() {
                         domain = math::make_evaluation_domain<FieldType>(table_rows);
@@ -192,7 +194,7 @@ namespace nil {
                     add_constraint.add_term(-w2);
 
                     std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
-                    plonk_gate<FieldType> add_gate(0, add_gate_costraints);
+                    plonk_gate<FieldType, plonk_constraint<FieldType>> add_gate(0, add_gate_costraints);
                     test_circuit.gates.push_back(add_gate);
 
                     plonk_constraint<FieldType> mul_constraint;
@@ -200,7 +202,7 @@ namespace nil {
                     add_constraint.add_term(-w2);
 
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
-                    plonk_gate<FieldType> mul_gate(1, mul_gate_costraints);
+                    plonk_gate<FieldType, plonk_constraint<FieldType>> mul_gate(1, mul_gate_costraints);
                     test_circuit.gates.push_back(mul_gate);
 
                     return test_circuit;
@@ -329,7 +331,7 @@ namespace nil {
                     add_constraint.add_term(w2, -one);
 
                     std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
-                    plonk_gate<FieldType> add_gate(0, add_gate_costraints);
+                    plonk_gate<FieldType, plonk_constraint<FieldType>> add_gate(0, add_gate_costraints);
                     test_circuit.gates.push_back(add_gate);
 
                     plonk_constraint<FieldType> mul_constraint;
@@ -340,7 +342,7 @@ namespace nil {
                     mul_constraint.add_term(w0_prev);
 
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
-                    plonk_gate<FieldType> mul_gate(1, mul_gate_costraints);
+                    plonk_gate<FieldType, plonk_constraint<FieldType>> mul_gate(1, mul_gate_costraints);
                     test_circuit.gates.push_back(mul_gate);
 
                     return test_circuit;

@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_polynomials_test) {
     desc.rows_amount = table_rows;
     desc.usable_rows_amount = usable_rows;
 
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints);
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE(redshift_permutation_argument_test) {
     desc.rows_amount = table_rows;
     desc.usable_rows_amount = usable_rows;
 
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints);
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
@@ -321,7 +321,7 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     desc.rows_amount = table_rows;
     desc.usable_rows_amount = usable_rows;
 
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints);
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,  circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
@@ -412,7 +412,7 @@ BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
     desc.rows_amount = table_rows;
     desc.usable_rows_amount = usable_rows;
 
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints);
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,  circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};

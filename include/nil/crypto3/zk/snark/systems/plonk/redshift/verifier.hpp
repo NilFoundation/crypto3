@@ -72,7 +72,8 @@ namespace nil {
 
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
-                    constexpr static const std::size_t f_parts = 4;
+                    constexpr static const std::size_t lookup_parts = 5;
+                    constexpr static const std::size_t f_parts = 9;
 
                 public:
                     static inline bool process(const typename policy_type::preprocessed_public_data_type preprocessed_public_data,
@@ -117,7 +118,7 @@ namespace nil {
                                 f[i] = proof.eval_proof.constant[idx].z[zero_index];
                             }
                         }
-
+  
                         // 5. permutation argument
                         std::array<typename FieldType::value_type, permutation_parts> permutation_argument =
                             redshift_permutation_argument<FieldType, commitment_scheme_public_input_type,
@@ -128,8 +129,7 @@ namespace nil {
                                                                                    proof.eval_proof.permutation[0].z[1],
                                                                                    proof.v_perm_commitment, transcript);
 
-                        // 7. gate argument
-                        typename policy_type::evaluation_map columns_at_y;
+                      typename policy_type::evaluation_map columns_at_y;
                         for (std::size_t i = 0; i < witness_columns; i++) {
                             for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
                                 auto key = std::make_tuple(i, preprocessed_public_data.common_data.columns_rotations[i][j],
@@ -153,6 +153,25 @@ namespace nil {
                                 columns_at_y[key] = proof.eval_proof.constant[eval_idx].z[j];
                             }
                         }
+                        //6. lookup argument
+                        std::array<typename FieldType::value_type, lookup_parts> lookup_argument =
+                        redshift_lookup_argument<FieldType, commitment_scheme_public_input_type,
+                                                        ParamsType>::verify_eval(preprocessed_public_data,
+                                                                                preprocessed_public_data.public_polynomial_table,
+                                                                                constraint_system.lookup_gates(),
+                                                                                proof.eval_proof.challenge,
+                                                                                columns_at_y,
+                                                                                proof.eval_proof.lookups[1].z[0],
+                                                                                proof.eval_proof.lookups[1].z[1],
+                                                                                proof.eval_proof.lookups[2].z[0],
+                                                                                proof.eval_proof.lookups[0].z[0],
+                                                                                proof.eval_proof.lookups[0].z[1],
+                                                                                proof.input_perm_commitment,
+                                                                                proof.value_perm_commitment,
+                                                                                proof.v_l_perm_commitment, transcript);
+
+                        // 7. gate argument
+                        
 
                         std::array<typename FieldType::value_type, 1> gate_argument =
                             redshift_gates_argument<FieldType, ParamsType>::verify_eval(
@@ -207,6 +226,34 @@ namespace nil {
                                                                                  transcript)) {
                                 return false;
                             }
+                        }
+
+                        // lookup
+                        std::vector<typename FieldType::value_type> evaluation_points_v_l= {
+                            challenge, challenge * omega};
+                            if (!commitment_scheme_permutation_type::verify_eval(evaluation_points_v_l,
+                                                                                 proof.eval_proof.lookups[0],
+                                                                                 fri_params,
+                                                                                 transcript)) {
+                                return false;
+                        }
+
+                        std::vector<typename FieldType::value_type> evaluation_points_input= {
+                            challenge, challenge * omega.inversed()};
+                            if (!commitment_scheme_permutation_type::verify_eval(evaluation_points_input,
+                                                                                 proof.eval_proof.lookups[1],
+                                                                                 fri_params,
+                                                                                 transcript)) {
+                                return false;
+                        }
+
+                        std::vector<typename FieldType::value_type> evaluation_points_value= {
+                            challenge};
+                            if (!commitment_scheme_permutation_type::verify_eval(evaluation_points_value,
+                                                                                 proof.eval_proof.lookups[2],
+                                                                                 fri_params,
+                                                                                 transcript)) {
+                                return false;
                         }
 
                         // quotient
@@ -276,7 +323,12 @@ namespace nil {
                         F[0] = permutation_argument[0];
                         F[1] = permutation_argument[1];
                         F[2] = permutation_argument[2];
-                        F[3] = gate_argument[0];
+                        F[3] = lookup_argument[0];
+                        F[4] = lookup_argument[1];
+                        F[5] = lookup_argument[2];
+                        F[6] = lookup_argument[3];
+                        F[7] = lookup_argument[4];
+                        F[8] = gate_argument[0];
 
                         typename FieldType::value_type F_consolidated = FieldType::value_type::zero();
                         for (std::size_t i = 0; i < f_parts; i++) {

@@ -36,6 +36,7 @@
 #include "nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp"
 #include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 
 using namespace nil::crypto3;
 
@@ -231,7 +232,7 @@ namespace nil {
                         std::array<std::vector<int>,
                             ParamsType::arithmetization_params::TotalColumns> result;
 
-                        std::vector<plonk_gate<FieldType>> gates = constraint_system.gates();
+                        std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates = constraint_system.gates();
 
                         for (std::size_t g_index = 0; g_index < gates.size(); g_index++) {
 
@@ -257,6 +258,33 @@ namespace nil {
                                                 result[column_index].push_back(rotation);
                                             }
                                         }
+                                    }
+                                }
+                            }
+                        }
+
+                        std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates = constraint_system.lookup_gates();
+
+                        for (std::size_t g_index = 0; g_index < lookup_gates.size(); g_index++) {
+
+                            for (std::size_t c_index = 0;
+                                c_index < lookup_gates[g_index].constraints.size(); c_index++) {
+                                
+                                for (std::size_t v_index = 0;
+                                    v_index < lookup_gates[g_index].constraints[c_index].lookup_input.size(); v_index++){
+
+                                        if (lookup_gates[g_index].constraints[c_index].lookup_input[v_index].relative){
+                                            std::size_t column_index =
+                                                table_description.global_index(lookup_gates[g_index].constraints[c_index].lookup_input[v_index]);
+
+                                            int rotation =
+                                                lookup_gates[g_index].constraints[c_index].lookup_input[v_index].rotation;
+
+                                            if (std::find(result[column_index].begin(),
+                                                    result[column_index].end(), rotation) ==
+                                                result[column_index].end()){
+                                                result[column_index].push_back(rotation);
+                                            }
                                     }
                                 }
                             }

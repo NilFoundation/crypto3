@@ -47,6 +47,7 @@ namespace nil {
                         std::vector<typename CommitmentSchemeTypeWitness::proof_type> witness;
                         std::vector<typename CommitmentSchemeTypePermutation::proof_type> permutation;
                         std::vector<typename CommitmentSchemeTypeQuotient::proof_type> quotient;
+                        std::vector<typename CommitmentSchemeTypeWitness::proof_type> lookups;
 
                         std::vector<typename commitment_scheme_type_public::proof_type> id_permutation;
                         std::vector<typename commitment_scheme_type_public::proof_type> sigma_permutation;
@@ -73,6 +74,12 @@ namespace nil {
                     std::vector<typename CommitmentSchemeTypeWitness::commitment_type> witness_commitments;
 
                     typename CommitmentSchemeTypePermutation::commitment_type v_perm_commitment;
+
+                    typename CommitmentSchemeTypePermutation::commitment_type input_perm_commitment;
+
+                    typename CommitmentSchemeTypePermutation::commitment_type value_perm_commitment;
+
+                    typename CommitmentSchemeTypePermutation::commitment_type v_l_perm_commitment;
 
                     std::vector<typename CommitmentSchemeTypeQuotient::commitment_type> T_commitments;
 
