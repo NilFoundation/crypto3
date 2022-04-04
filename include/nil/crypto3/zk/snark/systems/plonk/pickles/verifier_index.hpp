@@ -40,7 +40,7 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename CurveType, std::size_t WiresAmount = 15, std::size_t Permuts = 7>
-                class verifier_index {
+                struct verifier_index {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
                     typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
                     using curve_t = CurveType;
@@ -60,7 +60,7 @@ namespace nil {
                     commitment_type emul_comm;
                     commitment_type endomul_scalar_comm;
                     std::array<commitment_type, 4> chacha_comm;
-                    std::array<Fr, Permuts> shift;
+                    std::array<Fr, Permuts> shifts;
 
                     // Polynomial in coefficients form
                     nil::crypto3::math::polynomial<Fr> zkpm;
