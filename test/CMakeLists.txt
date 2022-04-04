@@ -61,6 +61,8 @@ set(TESTS_NAMES
     "systems/plonk/pickles/pickles_struct_test"
     "systems/plonk/pickles/kimchi"
     "systems/plonk/pickles/oracles"
+    "systems/plonk/pickles/to_field"
+    
     "systems/plonk/redshift/redshift"
 
     "systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
