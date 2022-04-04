@@ -61,127 +61,140 @@ boost::property_tree::ptree string_data(const char *child_name) {
 }
 
 template <typename Iterator>
-std::string get_cppui256(Iterator it) {
-    return it->second.template get_value<std::string>() + "_cppui256";
+nil::crypto3::multiprecision::cpp_int get_cppui256(Iterator it) {
+    BOOST_ASSERT(it->second.template get_value<std::string>() != "");
+    return nil::crypto3::multiprecision::cpp_int(it->second.template get_value<std::string>());
+}
+
+template <typename Iterator>
+std::string st_cppui256(Iterator it) {
+    return it->second.template get_value<std::string>();
 }
 
 zk::snark::pickles_proof<nil::crypto3::algebra::curves::vesta> fill_proof(boost::property_tree::ptree root) {
+    zk::snark::pickles_proof<nil::crypto3::algebra::curves::vesta> proof;
     size_t i = 0;
     std::string base_path = "protocolStateProof.json.proof.";
 
-    auto best_chain = root.get_child("data.bestChain")) {
-        i = 0;
-        for (auto &row :best_chain.second.get_child(base_path + "messages.w_comm")) {
-            auto it = row.second.get_child("").begin()->second.get_child("").begin();
-            proof.commitments.w_comm[i] = {get_cppui256(it++), get_cppui256(it), 0x1};
-            ++i;
-        }
-        it = best_chain.second.get_child(base_path + "messages.z_comm").begin()->second.get_child("").begin();
-        proof.commitments.z_comm = {get_cppui256(it++), get_cppui256(it), 0x1};
-        it = best_chain.second.get_child(base_path + "messages.t_comm").begin()->second.get_child("").begin();
-        proof.commitments.t_comm = {get_cppui256(it++), get_cppui256(it), 0x1};
-        proof.commitments.lookup;    // TODO: where it is?
-
-        i = 0;
-        for (pt::ptree::value_type &row :best_chain.second.get_child(base_path + "openings.proof.lr")) {
-            auto it = row.second.begin()->second.get_child("").begin();
-            proof.proof.lr.push_back({get_cppui256(it++), get_cppui256(it), 0x1});
-            ++i;
-        }
-        it = best_chain.second.get_child(base_path + "openings.proof.delta").begin();
-        proof.proof.delta = {get_cppui256(it++), get_cppui256(it), 0x1};
-        it = best_chain.second.get_child("openings.proof.sg").begin();
-        proof.proof.sg = {get_cppui256(it++), get_cppui256(it), 0x1};
-
-        proof.proof.z1 = get_cppui256(best_chain.second.get_child(base_path + "openings.proof.z1").begin());
-        proof.proof.z2 = get_cppui256(best_chain.second.get_child(base_path + "openings.proof.z2").begin());
-
-        std::size_t ev_i = 0;
-        for (auto &evals_it : best_chain.second.get_child(base_path + "openings.evals")) {
-
-            i = 0;
-            for (auto &row : evals_it.second.get_child("w")) {
-                proof.evals[ev_i].w[i] = get_cppui256(row.second.begin()));
-            }
-
-            proof.evals[ev_i].z = get_cppui256(evals_it.second.get_child("z").begin()));
-
-            i = 0;
-            for (auto &row : evals_it.second.get_child("s")) {
-                proof.evals[ev_i].s[i] = get_cppui256(row.second.begin()));
-            }
-            proof.evals[ev_i].generic_selector = get_cppui256(evals_it.second.get_child("generic_selector").begin()));
-            proof.evals[ev_i].poseidon_selector = get_cppui256(evals_it.second.get_child("poseidon_selector").begin()));
-
-            ev_i++;
-        }
-
-        ft_eval1 proof.ft_eval1 = new_root.second.get<std::string>(base_path + "openings.ft_eval1") + "_cppui256";
+    auto best_chain = *root.get_child("data.bestChain").begin();
+    i = 0;
+    for (auto &row : best_chain.second.get_child(base_path + "messages.w_comm")) {
+        auto it = row.second.get_child("").begin()->second.get_child("").begin();
+        proof.commitments.w_comm[i].unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+        ++i;
     }
-    //            // public
-    //            std::vector<typename CurveType::scalar_field_type::value_type> public_p; // TODO: implement it
-    //
-    //            // Previous challenges
-    //            std::vector<
-    //                std::tuple<std::vector<typename CurveType::scalar_field_type::value_type>, commitment_scheme>>
-    //                prev_challenges; // TODO: implement it
+    auto it = best_chain.second.get_child(base_path + "messages.z_comm").begin()->second.get_child("").begin();
+    proof.commitments.z_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+
+    it = best_chain.second.get_child(base_path + "messages.t_comm").begin()->second.get_child("").begin();
+    proof.commitments.t_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+//    proof.commitments.lookup;    // TODO: where it is?
+
+    i = 0;
+    for (auto &row :best_chain.second.get_child(base_path + "openings.proof.lr")) {
+        auto it0 = row.second.begin()->second.get_child("").begin();
+        auto it1 = row.second.begin();
+        it1++;
+        it1 = it1->second.begin();
+        proof.proof.lr.push_back({{get_cppui256(it0++), get_cppui256(it0)}, {get_cppui256(it1++), get_cppui256(it1)}});
+        ++i;
+    }
+    it = best_chain.second.get_child(base_path + "openings.proof.delta").begin();
+    proof.proof.delta = {get_cppui256(it++), get_cppui256(it)};
+    it = best_chain.second.get_child(base_path + "openings.proof.sg").begin();
+    proof.proof.sg = {get_cppui256(it++), get_cppui256(it)};
+
+    proof.proof.z1 = multiprecision::cpp_int(best_chain.second.get<std::string>(base_path + "openings.proof.z_1"));
+    proof.proof.z2 = multiprecision::cpp_int(best_chain.second.get<std::string>(base_path + "openings.proof.z_2"));
+
+    std::size_t ev_i = 0;
+    for (auto &evals_it : best_chain.second.get_child(base_path + "openings.evals")) {
+
+        i = 0;
+        for (auto &row : evals_it.second.get_child("w")) {
+            proof.evals[ev_i].w[i] = get_cppui256(row.second.begin());
+        }
+
+        proof.evals[ev_i].z = get_cppui256(evals_it.second.get_child("z").begin());
+
+        i = 0;
+        for (auto &row : evals_it.second.get_child("s")) {
+            proof.evals[ev_i].s[i] = get_cppui256(row.second.begin());
+        }
+        proof.evals[ev_i].generic_selector = get_cppui256(evals_it.second.get_child("generic_selector").begin());
+        proof.evals[ev_i].poseidon_selector = get_cppui256(evals_it.second.get_child("poseidon_selector").begin());
+
+        ev_i++;
+    }
+
+    proof.ft_eval1 = multiprecision::cpp_int(best_chain.second.get<std::string>(base_path + "openings.ft_eval1"));
+//            // public
+//            std::vector<typename CurveType::scalar_field_type::value_type> public_p; // TODO: implement it
+//
+//            // Previous challenges
+//            std::vector<
+//                std::tuple<std::vector<typename CurveType::scalar_field_type::value_type>, commitment_scheme>>
+//                prev_challenges; // TODO: implement it
+    return proof;
 }
 
 zk::snark::verifier_index<nil::crypto3::algebra::curves::vesta> fill_verify_index(boost::property_tree::ptree root) {
+    zk::snark::verifier_index<nil::crypto3::algebra::curves::vesta> ver_index;
     size_t i = 0;
     //    ver_index.domain;    // "log_size_of_group":15, "group_gen" : "0x130D1D6482B9C33536E280AE674431F85F4A103EF6AF12C7AC4CDF0AD3EDB265";
     ver_index.max_poly_size = root.get<std::size_t>("data.blockchainVerificationKey.index.max_poly_size");
     ver_index.max_quot_size = root.get<std::size_t>("data.blockchainVerificationKey.index.max_quot_size");
-    ver_index.srs = root.get<std::string>("data.blockchainVerificationKey.index.srs");    // TODO: null
+//    ver_index.srs = root.get<std::string>("data.blockchainVerificationKey.index.srs");    // TODO: null
     i = 0;
-    for (pt::ptree::value_type & row : root.get_child("data.blockchainVerificationKey.commitments.sigma_comm")) {
+    for (auto & row : root.get_child("data.blockchainVerificationKey.commitments.sigma_comm")) {
         auto it = row.second.begin();
-        ver_index.sigma_comm[i] = {get_cppui256(it++), get_cppui256(it), 0x1};
+        ver_index.sigma_comm[i].unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
         ++i;
     }
 
     i = 0;
-    for (pt::ptree::value_type &row : root.get_child("data.blockchainVerificationKey.commitments.coefficients_comm")) {
+    for (auto &row : root.get_child("data.blockchainVerificationKey.commitments.coefficients_comm")) {
         auto it = row.second.begin();
-        ver_index.coefficients_comm[i] = {get_cppui256(it++), get_cppui256(it), 0x1};
+        ver_index.coefficients_comm[i].unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
         ++i;
     }
     auto it = root.get_child("data.blockchainVerificationKey.commitments.generic_comm").begin();
-    generic_comm.coefficients_comm = {get_cppui256(it++), get_cppui256(it), 0x1};
+    ver_index.generic_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
 
     it = root.get_child("data.blockchainVerificationKey.commitments.psm_comm").begin();
-    ver_index.psm_comm.coefficients_comm = {get_cppui256(it++), get_cppui256(it), 0x1};
+    ver_index.psm_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
     it = root.get_child("data.blockchainVerificationKey.commitments.complete_add_comm").begin();
-    ver_index.complete_add_comm.coefficients_comm[i] = {get_cppui256(it++), get_cppui256(it), 0x1};
+    ver_index.complete_add_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
     it = root.get_child("data.blockchainVerificationKey.commitments.mul_comm").begin();
-    ver_index.mul_comm.coefficients_comm = {get_cppui256(it++), get_cppui256(it), 0x1};
+    ver_index.mul_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
     it = root.get_child("data.blockchainVerificationKey.commitments.emul_comm").begin();
-    ver_index.emul_comm.coefficients_comm = {get_cppui256(it++), get_cppui256(it), 0x1};
+    ver_index.emul_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
     it = root.get_child("data.blockchainVerificationKey.commitments.endomul_scalar_comm").begin();
-    ver_index.endomul_scalar_comm.coefficients_comm = {get_cppui256(it++), get_cppui256(it), 0x1};
+    ver_index.endomul_scalar_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
 
+    // TODO: null in example
+//    i = 0;
+//    for (auto &row : root.get_child("data.blockchainVerificationKey.commitments.chacha_comm")) {
+//        auto it = row.second.begin();
+//        ver_index.chacha_comm[i].unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+//        ++i;
+//    }
     i = 0;
-    for (pt::ptree::value_type &row : root.get_child("data.blockchainVerificationKey.commitments.chacha_comm")) {
-        auto it = row.second.begin();
-        ver_index.chacha_comm[i] = {get_cppui256(it++), get_cppui256(it), 0x1};
+    for (auto &row : root.get_child("data.blockchainVerificationKey.index.shifts")) {
+        ver_index.shifts[i] = multiprecision::cpp_int(row.second.get_value<std::string>());
         ++i;
     }
-    i = 0;
-    for (pt::ptree::value_type &row : root.get_child("data.blockchainVerificationKey.index.shifts")) {
-        auto it = row.second.begin();
-        ver_index.shifts[i] = {get_cppui256(it++), get_cppui256(it), 0x1};
-        ++i;
-    }
-
-    // Polynomial in coefficients form
-    //    ver_index.zkpm;    // TODO: where it is?
-    //    ver_index.w;       // TODO: where it is?
-    //    ver_index.endo;    // TODO: where it is?
-    //    ver_index.lookup_index = root.get_child("data.blockchainVerificationKey.index.lookup_index");    // TODO: null
-    //    ver_index.linearization;       // TODO: where it is?
-    //    ver_index.powers_of_alpha;     // TODO: where it is?
-    //    ver_index.fr_sponge_params;    // TODO: where it is?
-    //    ver_index.fq_sponge_params;    // TODO: where it is?
+//
+//    // Polynomial in coefficients form
+//    //    ver_index.zkpm;    // TODO: where it is?
+//    //    ver_index.w;       // TODO: where it is?
+//    //    ver_index.endo;    // TODO: where it is?
+//    //    ver_index.lookup_index = root.get_child("data.blockchainVerificationKey.index.lookup_index");    // TODO: null
+//    //    ver_index.linearization;       // TODO: where it is?
+//    //    ver_index.powers_of_alpha;     // TODO: where it is?
+//    //    ver_index.fr_sponge_params;    // TODO: where it is?
+//    //    ver_index.fq_sponge_params;    // TODO: where it is?
+    return ver_index;
 }
 
 BOOST_AUTO_TEST_CASE(pickles_proof_struct_test_suite) {
@@ -191,6 +204,5 @@ BOOST_AUTO_TEST_CASE(pickles_proof_struct_test_suite) {
 
     zk::snark::pickles_proof<nil::crypto3::algebra::curves::vesta> proof = fill_proof(root);
     zk::snark::verifier_index<nil::crypto3::algebra::curves::vesta> ver_index = fill_verify_index(root);
-
 }
 BOOST_AUTO_TEST_SUITE_END()
