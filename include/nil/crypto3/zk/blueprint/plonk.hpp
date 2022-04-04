@@ -86,7 +86,7 @@ namespace nil {
                     this->_gates.emplace_back(selector_index, constraints);
                 }
 
-                void add_gate(snark::plonk_gate<BlueprintFieldType> &gate) {
+                void add_gate(snark::plonk_gate<BlueprintFieldType, snark::plonk_constraint<BlueprintFieldType>> &gate) {
                     this->_gates.emplace_back(gate);
                 }
 
