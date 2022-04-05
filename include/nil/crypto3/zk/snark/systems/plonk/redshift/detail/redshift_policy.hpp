@@ -64,6 +64,7 @@ namespace nil {
                         typedef plonk_constraint_system<FieldType, arithmetization_params>
                             constraint_system_type;
 
+                        typedef FieldType field_type;
                         typedef RedshiftParams redshift_params_type;
 
                         typedef plonk_assignment_table<FieldType, arithmetization_params>
@@ -117,6 +118,11 @@ namespace nil {
                                 math::polynomial<typename FieldType::value_type> lagrange_0;
 
                                 public_commitments commitments;
+
+                                std::array<std::vector<int>,
+                                    arithmetization_params::TotalColumns> columns_rotations;
+
+                                std::size_t rows_amount;
                             };
 
                             plonk_public_polynomial_table<FieldType, arithmetization_params> public_polynomial_table;

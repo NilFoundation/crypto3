@@ -28,33 +28,34 @@
 #define CRYPTO3_ZK_PLONK_GATE_HPP
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType>
+                template<typename FieldType, typename ConstraintType>
                 struct plonk_gate {
                     typedef FieldType field_type;
-                    typedef plonk_constraint<FieldType> constraint_type;
+                    //typedef plonk_constraint<FieldType> constraint_type;
 
                     std::size_t selector_index;
-                    std::vector<constraint_type> constraints;
+                    std::vector<ConstraintType> constraints;
 
-                    plonk_gate(std::size_t selector_index, const constraint_type &constraint) :
-                        constraints(std::vector<constraint_type>({constraint})),
+                    plonk_gate(std::size_t selector_index, const ConstraintType &constraint) :
+                        constraints(std::vector<ConstraintType>({constraint})),
                         selector_index(selector_index) {
                     }
 
                     plonk_gate(std::size_t selector_index,
-                               const std::initializer_list<constraint_type> &&constraints) :
+                               const std::initializer_list<ConstraintType> &&constraints) :
                         constraints(constraints),
                         selector_index(selector_index) {
                     }
 
                     plonk_gate(std::size_t selector_index,
-                                  const std::vector<constraint_type> &constraints):
+                                  const std::vector<ConstraintType> &constraints):
                         constraints(constraints),
                         selector_index(selector_index){
                     }

@@ -38,6 +38,13 @@ namespace nil {
                     constexpr static const std::size_t PublicInputColumns = _PublicInputColumns;
                     constexpr static const std::size_t ConstantColumns = _ConstantColumns;
                     constexpr static const std::size_t SelectorColumns = _SelectorColumns;
+
+                    constexpr static const std::size_t PrivateColumns = WitnessColumns;
+                    constexpr static const std::size_t PublicColumns = PublicInputColumns +
+                        ConstantColumns + SelectorColumns;
+
+                    constexpr static const std::size_t TotalColumns = PrivateColumns +
+                        PublicColumns;
                 };
 
 #ifdef ZK_RUNTIME_CIRCUIT_DEFINITION

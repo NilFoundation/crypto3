@@ -41,6 +41,7 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -72,7 +73,7 @@ namespace nil {
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
-                        const std::vector<plonk_gate<FieldType>> gates = constraint_system.gates();
+                        const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates = constraint_system.gates();
 
                         for (std::size_t i = 0; i < gates.size(); i++) {
                             math::polynomial<typename FieldType::value_type> gate_result = {0};
@@ -92,9 +93,7 @@ namespace nil {
                     }
 
                     static inline std::array<typename FieldType::value_type, argument_size>
-                        verify_eval(const std::vector<plonk_gate<FieldType>> &gates,
-                                    const plonk_public_polynomial_table<FieldType,
-                                        typename ParamsType::arithmetization_params> public_polynomials,
+                        verify_eval(const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> &gates,
                                     typename policy_type::evaluation_map &evaluations,
                                     typename FieldType::value_type challenge,
                                     transcript_type &transcript = transcript_type()) {
@@ -112,8 +111,14 @@ namespace nil {
                                 theta_acc *= theta;
                             }
 
+                            std::tuple<std::size_t,
+                                           int,
+                                           typename plonk_variable<FieldType>::column_type>
+                                selector_key = std::make_tuple(gates[i].selector_index, 0,
+                                    plonk_variable<FieldType>::column_type::selector);
+
                             gate_result =
-                                gate_result * public_polynomials.selector(gates[i].selector_index).evaluate(challenge);
+                                gate_result * evaluations[selector_key];
 
                             F[0] = F[0] + gate_result;
                         }
