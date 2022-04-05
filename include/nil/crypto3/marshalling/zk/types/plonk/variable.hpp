@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2022 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2022 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MARSHALLING_ZK_MATH_VARIABLE_HPP
-#define CRYPTO3_MARSHALLING_ZK_MATH_VARIABLE_HPP
+#ifndef CRYPTO3_MARSHALLING_ZK_PLONK_VARIABLE_HPP
+#define CRYPTO3_MARSHALLING_ZK_PLONK_VARIABLE_HPP
 
 #include <type_traits>
 
@@ -34,61 +34,64 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 
+#include <nil/crypto3/marshalling/math/types/variable.hpp>
+
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
-#include <nil/crypto3/zk/snark/relations/plonk/variable.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                template<typename TTypeBase, typename Variable, typename = void>
-                struct variable;
-
                 template<typename TTypeBase, typename Field>
                 struct variable<TTypeBase, nil::crypto3::zk::snark::plonk_variable<Field>> {
                     using type = nil::marshalling::types::bundle<
-                        TTypeBase, std::tuple<
-                                       // int rotation
-                                       nil::marshalling::types::integral<TTypeBase, int>,
-                                       // enum column_type { witness, public_input, constant, selector } type
-                                       nil::marshalling::types::integral<TTypeBase, int>,
-                                       // std::size_t index
-                                       nil::marshalling::types::integral<TTypeBase, std::size_t>,
-                                       // bool relative
-                                       nil::marshalling::types::integral<TTypeBase, bool>>>;
+                        TTypeBase,
+                        std::tuple<
+                            // std::size_t index
+                            nil::marshalling::types::integral<TTypeBase, std::size_t>,
+                            // std::int32_t rotation
+                            nil::marshalling::types::integral<TTypeBase, std::int32_t>,
+                            // bool relative
+                            nil::marshalling::types::integral<TTypeBase, bool>,
+                            // enum column_type : std::uint8_t { witness, public_input, constant, selector } type
+                            nil::marshalling::types::integral<TTypeBase, std::uint8_t>>>;
                 };
 
-                template<typename Variable, typename Endianness, typename Field = typename Variable::field_type>
+                template<typename Variable, typename Endianness>
                 typename std::enable_if<
-                    std::is_same<Variable, nil::crypto3::zk::snark::plonk_variable<Field>>::value,
+                    std::is_same<Variable,
+                                 nil::crypto3::zk::snark::plonk_variable<typename Variable::field_type>>::value,
                     typename variable<nil::marshalling::field_type<Endianness>, Variable>::type>::type
                     fill_variable(const Variable &var) {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using result_type = typename variable<TTypeBase, Variable>::type;
                     using size_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
-                    using int_marshalling_type = nil::marshalling::types::integral<TTypeBase, int>;
+                    using int32_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::int32_t>;
+                    using octet_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint8_t>;
                     using bool_marshalling_type = nil::marshalling::types::integral<TTypeBase, bool>;
 
                     return result_type(
-                        std::make_tuple(int_marshalling_type(var.rotation), int_marshalling_type(var.type),
-                                        size_t_marshalling_type(var.index), bool_marshalling_type(var.relative)));
+                        std::make_tuple(size_t_marshalling_type(var.index), int32_marshalling_type(var.rotation),
+                                        bool_marshalling_type(var.relative), octet_marshalling_type(var.type)));
                 }
 
-                template<typename Variable, typename Endianness, typename Field = typename Variable::field_type>
-                typename std::enable_if<std::is_same<Variable, nil::crypto3::zk::snark::plonk_variable<Field>>::value,
+                template<typename Variable, typename Endianness>
+                typename std::enable_if<std::is_same<Variable, nil::crypto3::zk::snark::plonk_variable<
+                                                                   typename Variable::field_type>>::value,
                                         Variable>::type
                     make_variable(
                         const typename variable<nil::marshalling::field_type<Endianness>, Variable>::type &filled_var) {
 
-                    return Variable(std::get<2>(filled_var.value()).value(),
-                                    std::get<0>(filled_var.value()).value(),
-                                    std::get<3>(filled_var.value()).value(),
-                                    typename Variable::column_type(std::get<1>(filled_var.value()).value()));
+                    return Variable(std::get<0>(filled_var.value()).value(),
+                                    std::get<1>(filled_var.value()).value(),
+                                    std::get<2>(filled_var.value()).value(),
+                                    typename Variable::column_type(std::get<3>(filled_var.value()).value()));
                 }
             }    // namespace types
         }        // namespace marshalling
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_MARSHALLING_ZK_MATH_VARIABLE_HPP
+#endif    // CRYPTO3_MARSHALLING_ZK_PLONK_VARIABLE_HPP
