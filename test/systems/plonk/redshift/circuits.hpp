@@ -44,6 +44,7 @@
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -68,8 +69,9 @@ namespace nil {
 
                     typename policy_type::variable_assignment_type table;
 
-                    std::vector<plonk_gate<FieldType>> gates;
+                    std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates;
                     std::vector<plonk_copy_constraint<FieldType>> copy_constraints;
+                    std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates;
 
                     circuit_description() {
                         domain = math::make_evaluation_domain<FieldType>(table_rows);
@@ -179,11 +181,11 @@ namespace nil {
 
                     test_circuit.init();
 
-                    plonk_variable<FieldType> w0(0, plonk_variable<FieldType>::rotation_type::current,
+                    plonk_variable<FieldType> w0(0, 0,
                                                  plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w1(0, plonk_variable<FieldType>::rotation_type::current,
+                    plonk_variable<FieldType> w1(0, 0,
                                                  plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w2(0, plonk_variable<FieldType>::rotation_type::current,
+                    plonk_variable<FieldType> w2(0, 0,
                                                  plonk_variable<FieldType>::column_type::witness);
 
                     plonk_constraint<FieldType> add_constraint;
@@ -192,7 +194,7 @@ namespace nil {
                     add_constraint.add_term(-w2);
 
                     std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
-                    plonk_gate<FieldType> add_gate(0, add_gate_costraints);
+                    plonk_gate<FieldType, plonk_constraint<FieldType>> add_gate(0, add_gate_costraints);
                     test_circuit.gates.push_back(add_gate);
 
                     plonk_constraint<FieldType> mul_constraint;
@@ -200,7 +202,7 @@ namespace nil {
                     add_constraint.add_term(-w2);
 
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
-                    plonk_gate<FieldType> mul_gate(1, mul_gate_costraints);
+                    plonk_gate<FieldType, plonk_constraint<FieldType>> mul_gate(1, mul_gate_costraints);
                     test_circuit.gates.push_back(mul_gate);
 
                     return test_circuit;
@@ -216,7 +218,7 @@ namespace nil {
                 // k-1 | MUL  |  x  |  y  |  z  |   0    |   0   |   1   |
                 //
                 // ADD: x + y = z, copy(prev(z), y)
-                // MUL: x * y = z, copy(p1, y)
+                // MUL: x * y + prev(x) = z, copy(p1, y)
                 //---------------------------------------------------------------------------//
                 constexpr static const std::size_t witness_columns_2 = 3;
                 constexpr static const std::size_t public_columns_2 = 1;
@@ -280,7 +282,7 @@ namespace nil {
                     for (std::size_t i = test_circuit.table_rows - 2; i < test_circuit.table_rows; i++) {
                         table[0][i] = algebra::random_element<FieldType>();
                         table[1][i] = table[3][0];
-                        table[2][i] = table[0][i] * table[1][i];
+                        table[2][i] = table[0][i] * table[1][i] + table[0][i - 1];
                         table[3][i] = FieldType::value_type::zero();
                         q_add[i] = FieldType::value_type::zero();
                         q_mul[i] = one;
@@ -314,11 +316,13 @@ namespace nil {
 
                     test_circuit.init();
 
-                    plonk_variable<FieldType> w0(0, plonk_variable<FieldType>::rotation_type::current, true,
+                    plonk_variable<FieldType> w0(0, 0, true,
                                                  plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w1(1, plonk_variable<FieldType>::rotation_type::current, true,
+                    plonk_variable<FieldType> w1(1, 0, true,
                                                  plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w2(2, plonk_variable<FieldType>::rotation_type::current, true,
+                    plonk_variable<FieldType> w2(2, 0, true,
+                                                 plonk_variable<FieldType>::column_type::witness);
+                    plonk_variable<FieldType> w0_prev(0, -1, true,
                                                  plonk_variable<FieldType>::column_type::witness);
 
                     plonk_constraint<FieldType> add_constraint;
@@ -327,7 +331,7 @@ namespace nil {
                     add_constraint.add_term(w2, -one);
 
                     std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
-                    plonk_gate<FieldType> add_gate(0, add_gate_costraints);
+                    plonk_gate<FieldType, plonk_constraint<FieldType>> add_gate(0, add_gate_costraints);
                     test_circuit.gates.push_back(add_gate);
 
                     plonk_constraint<FieldType> mul_constraint;
@@ -335,9 +339,10 @@ namespace nil {
                     typename plonk_constraint<FieldType>::term_type w1_term(w1); 
                     mul_constraint.add_term(w0_term * w1_term);
                     mul_constraint.add_term(w2, -one);
+                    mul_constraint.add_term(w0_prev);
 
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
-                    plonk_gate<FieldType> mul_gate(1, mul_gate_costraints);
+                    plonk_gate<FieldType, plonk_constraint<FieldType>> mul_gate(1, mul_gate_costraints);
                     test_circuit.gates.push_back(mul_gate);
 
                     return test_circuit;

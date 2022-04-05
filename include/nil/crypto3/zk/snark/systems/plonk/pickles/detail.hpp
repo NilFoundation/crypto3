@@ -85,7 +85,7 @@ namespace nil {
                 template<typename CurveType>
                 struct BatchEvaluationProof {
                     typedef typename CurveType::scalar_field_type Fr;
-                    EFqSponge sponge;
+//                    EFqSponge sponge; TODO: return this
                     std::vector<Evaluation<CurveType>> evaluations;
                     /// vector of evaluation points
                     std::vector<Fr> evaluation_points;

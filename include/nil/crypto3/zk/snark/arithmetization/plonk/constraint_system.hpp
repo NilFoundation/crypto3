@@ -38,6 +38,7 @@
 #include <vector>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 
@@ -52,9 +53,9 @@ namespace nil {
                 struct plonk_constraint_system {
 
                 protected:
-                    std::vector<plonk_gate<FieldType>> _gates;
+                    std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> _gates;
                     std::vector<plonk_copy_constraint<FieldType>> _copy_constraints;
-                    std::vector<plonk_lookup_constraint<FieldType>> _lookup_constraints;
+                    std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> _lookup_gates;
 
                 public:
 
@@ -63,9 +64,10 @@ namespace nil {
                     plonk_constraint_system(){}
 
                     plonk_constraint_system(
-                        std::vector<plonk_gate<FieldType>> &gates,
-                        std::vector<plonk_copy_constraint<FieldType>> &copy_constraints):
-                        _gates(gates), _copy_constraints(copy_constraints){
+                        std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> &gates,
+                        std::vector<plonk_copy_constraint<FieldType>> &copy_constraints,
+                        std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>>  &lookup_gates):
+                        _gates(gates), _copy_constraints(copy_constraints), _lookup_gates(lookup_gates){
                     }
 
                     std::size_t num_gates() const {
@@ -85,7 +87,7 @@ namespace nil {
                     //     return true;
                     // }
 
-                    std::vector<plonk_gate<FieldType>> gates() const {
+                    std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates() const {
                         return _gates;
                     }
 
@@ -93,8 +95,8 @@ namespace nil {
                         return _copy_constraints;
                     }
 
-                    std::vector<math::polynomial<typename FieldType::value_type>> lookup_constraints() const {
-                        return _lookup_constraints;
+                    std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates() const {
+                        return _lookup_gates;
                     }
                 };
             }    // namespace snark

@@ -44,7 +44,10 @@ namespace nil {
                 class redshift_verifier {
 
                     constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
-                    constexpr static const std::size_t public_columns = ParamsType::public_columns;
+                    constexpr static const std::size_t public_input_columns = ParamsType::public_input_columns;
+                    constexpr static const std::size_t constant_columns = ParamsType::constant_columns;
+                    constexpr static const std::size_t selector_columns = ParamsType::selector_columns;
+
                     using merkle_hash_type = typename ParamsType::commitment_params_type::merkle_hash_type;
                     using transcript_hash_type = typename ParamsType::commitment_params_type::transcript_hash_type;
 
@@ -54,28 +57,24 @@ namespace nil {
                     constexpr static const std::size_t r = ParamsType::commitment_params_type::r;
                     constexpr static const std::size_t m = ParamsType::commitment_params_type::m;
 
-                    constexpr static const std::size_t opening_points_witness = 1;
-                    constexpr static const std::size_t opening_points_v_p = 2;
-                    constexpr static const std::size_t opening_points_t = 1;
-                    constexpr static const std::size_t opening_points_public = 1;
-
                     typedef commitments::list_polynomial_commitment<
-                        FieldType, typename ParamsType::commitment_params_type, opening_points_witness>
+                        FieldType, typename ParamsType::commitment_params_type>
                         commitment_scheme_witness_type;
                     typedef commitments::list_polynomial_commitment<
-                        FieldType, typename ParamsType::commitment_params_type, opening_points_v_p>
+                        FieldType, typename ParamsType::commitment_params_type>
                         commitment_scheme_permutation_type;
                     typedef commitments::list_polynomial_commitment<
-                        FieldType, typename ParamsType::commitment_params_type, opening_points_t>
+                        FieldType, typename ParamsType::commitment_params_type>
                         commitment_scheme_quotient_type;
 
                     typedef commitments::list_polynomial_commitment<
-                        FieldType, typename ParamsType::commitment_params_type, opening_points_public>
+                        FieldType, typename ParamsType::commitment_params_type>
                         commitment_scheme_public_input_type;
 
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
-                    constexpr static const std::size_t f_parts = 4;
+                    constexpr static const std::size_t lookup_parts = 5;
+                    constexpr static const std::size_t f_parts = 9;
 
                 public:
                     static inline bool process(const typename policy_type::preprocessed_public_data_type preprocessed_public_data,
@@ -105,16 +104,22 @@ namespace nil {
                         std::size_t witness_columns_amount = proof.eval_proof.witness.size();
 
                         for (std::size_t i = 0; i < permutation_size; i++) {
+                            std::size_t zero_index = 0;
+                            for (std::size_t j = 0; j < preprocessed_public_data.common_data.columns_rotations[i].size(); j++) {
+                                if (preprocessed_public_data.common_data.columns_rotations[i][j] == 0) {
+                                    zero_index = j;
+                                }
+                            }
                             if (i < witness_columns_amount) {
-                                f[i] = proof.eval_proof.witness[i].z[0]; // TODO: organize permutation evaluations inside the proof
+                                f[i] = proof.eval_proof.witness[i].z[zero_index]; // TODO: organize permutation evaluations inside the proof
                             } else if (i < witness_columns_amount + proof.eval_proof.public_input.size()) {
-                                f[i] = proof.eval_proof.public_input[i - witness_columns_amount].z[0];
+                                f[i] = proof.eval_proof.public_input[i - witness_columns_amount].z[zero_index];
                             } else {
                                 std::size_t idx = i - witness_columns_amount - proof.eval_proof.public_input.size();
-                                f[i] = proof.eval_proof.constant[idx].z[0];
+                                f[i] = proof.eval_proof.constant[idx].z[zero_index];
                             }
                         }
-
+  
                         // 5. permutation argument
                         std::array<typename FieldType::value_type, permutation_parts> permutation_argument =
                             redshift_permutation_argument<FieldType, commitment_scheme_public_input_type,
@@ -125,18 +130,86 @@ namespace nil {
                                                                                    proof.eval_proof.permutation[0].z[1],
                                                                                    proof.v_perm_commitment, transcript);
 
-                        // 7. gate argument
-                        typename policy_type::evaluation_map columns_at_y;
-                        for (std::size_t i = 0; i < proof.eval_proof.witness.size(); i++) {
-                            auto key = std::make_tuple(i, plonk_variable<FieldType>::rotation_type::current,
+                      typename policy_type::evaluation_map columns_at_y;
+                        for (std::size_t i = 0; i < witness_columns; i++) {
+
+                            std::size_t i_global_index = i;
+
+                            for (std::size_t j = 0; j <
+                                preprocessed_public_data.common_data.columns_rotations[i_global_index].size(); j++) {
+
+                                auto key = std::make_tuple(i,
+                                    preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                                        plonk_variable<FieldType>::column_type::witness);
-                            columns_at_y[key] = proof.eval_proof.witness[i].z[0];
+                                columns_at_y[key] = proof.eval_proof.witness[i].z[j];
+                            }
                         }
+                        for (std::size_t i = 0; i < 0 + public_input_columns; i++) {
+                            std::size_t i_global_index = witness_columns + i;
+
+                            for (std::size_t j = 0; j <
+                                preprocessed_public_data.common_data.columns_rotations[i_global_index].size(); j++) {
+
+                                auto key = std::make_tuple(i,
+                                    preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
+                                                       plonk_variable<FieldType>::column_type::public_input);
+                                std::size_t eval_idx = i - witness_columns;
+                                columns_at_y[key] = proof.eval_proof.public_input[i].z[j];
+                            }
+                        }
+                        for (std::size_t i = 0; i < 0 + constant_columns; i++) {
+                            std::size_t i_global_index = witness_columns +
+                                constant_columns + i;
+                            for (std::size_t j = 0; j <
+                                preprocessed_public_data.common_data.columns_rotations[i_global_index].size(); j++) {
+
+                                auto key = std::make_tuple(i,
+                                    preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
+                                                       plonk_variable<FieldType>::column_type::constant);
+                                std::size_t eval_idx = i - witness_columns - public_input_columns;
+                                columns_at_y[key] = proof.eval_proof.constant[i].z[j];
+                            }
+                        }
+                        for (std::size_t i = 0;
+                            i < selector_columns; i++) {
+
+                            std::size_t i_global_index = witness_columns +
+                                constant_columns +
+                                public_input_columns + i;
+
+                            for (std::size_t j = 0; j <
+                                preprocessed_public_data.common_data.columns_rotations[i_global_index].size(); j++) {
+
+                                auto key = std::make_tuple(i,
+                                    preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
+                                                       plonk_variable<FieldType>::column_type::selector);
+                                std::size_t eval_idx = i;
+                                columns_at_y[key] = proof.eval_proof.selector[i].z[j];
+                            }
+                        }
+                        //6. lookup argument
+                        std::array<typename FieldType::value_type, lookup_parts> lookup_argument =
+                        redshift_lookup_argument<FieldType, commitment_scheme_public_input_type,
+                                                        ParamsType>::verify_eval(preprocessed_public_data,
+                                                                                preprocessed_public_data.public_polynomial_table,
+                                                                                constraint_system.lookup_gates(),
+                                                                                proof.eval_proof.challenge,
+                                                                                columns_at_y,
+                                                                                proof.eval_proof.lookups[1].z[0],
+                                                                                proof.eval_proof.lookups[1].z[1],
+                                                                                proof.eval_proof.lookups[2].z[0],
+                                                                                proof.eval_proof.lookups[0].z[0],
+                                                                                proof.eval_proof.lookups[0].z[1],
+                                                                                proof.input_perm_commitment,
+                                                                                proof.value_perm_commitment,
+                                                                                proof.v_l_perm_commitment, transcript);
+
+                        // 7. gate argument
+                        
 
                         std::array<typename FieldType::value_type, 1> gate_argument =
                             redshift_gates_argument<FieldType, ParamsType>::verify_eval(
                                 constraint_system.gates(),
-                                preprocessed_public_data.public_polynomial_table,
                                 columns_at_y,
                                 proof.eval_proof.challenge,
                                 transcript);
@@ -161,11 +234,14 @@ namespace nil {
 
                         // witnesses
                         for (std::size_t i = 0; i < proof.eval_proof.witness.size(); i++) {
-                            std::vector<std::size_t> rotation_gates = {0};    // TODO: Rotation
-                            std::array<typename FieldType::value_type, 1>
-                                evaluation_points_gates;    // TODO: array size with rotation
-                            for (std::size_t i = 0; i < evaluation_points_gates.size(); i++) {
-                                evaluation_points_gates[i] = challenge * omega.pow(rotation_gates[i]);
+
+                            std::vector<int> rotation_gates =
+                                preprocessed_public_data.common_data.columns_rotations[i];
+
+                            std::vector<typename FieldType::value_type>
+                                evaluation_points_gates;
+                            for (std::size_t j = 0; j < rotation_gates.size(); j++) {
+                                evaluation_points_gates.push_back(challenge * omega.pow(rotation_gates[j]));
                             }
                             if (!commitment_scheme_witness_type::verify_eval(
                                     evaluation_points_gates, proof.eval_proof.witness[i], fri_params, transcript)) {
@@ -174,7 +250,7 @@ namespace nil {
                         }
 
                         // permutation
-                        std::array<typename FieldType::value_type, 2> evaluation_points_permutation = {
+                        std::vector<typename FieldType::value_type> evaluation_points_permutation = {
                             challenge, challenge * omega};
                         for (std::size_t i = 0; i < proof.eval_proof.permutation.size(); i++) {
                             if (!commitment_scheme_permutation_type::verify_eval(evaluation_points_permutation,
@@ -185,8 +261,36 @@ namespace nil {
                             }
                         }
 
+                        // lookup
+                        std::vector<typename FieldType::value_type> evaluation_points_v_l= {
+                            challenge, challenge * omega};
+                            if (!commitment_scheme_permutation_type::verify_eval(evaluation_points_v_l,
+                                                                                 proof.eval_proof.lookups[0],
+                                                                                 fri_params,
+                                                                                 transcript)) {
+                                return false;
+                        }
+
+                        std::vector<typename FieldType::value_type> evaluation_points_input= {
+                            challenge, challenge * omega.inversed()};
+                            if (!commitment_scheme_permutation_type::verify_eval(evaluation_points_input,
+                                                                                 proof.eval_proof.lookups[1],
+                                                                                 fri_params,
+                                                                                 transcript)) {
+                                return false;
+                        }
+
+                        std::vector<typename FieldType::value_type> evaluation_points_value= {
+                            challenge};
+                            if (!commitment_scheme_permutation_type::verify_eval(evaluation_points_value,
+                                                                                 proof.eval_proof.lookups[2],
+                                                                                 fri_params,
+                                                                                 transcript)) {
+                                return false;
+                        }
+
                         // quotient
-                        std::array<typename FieldType::value_type, 1> evaluation_points_quotient = {challenge};
+                        std::vector<typename FieldType::value_type> evaluation_points_quotient = {challenge};
                         for (std::size_t i = 0; i < proof.eval_proof.quotient.size(); i++) {
                             if (!commitment_scheme_quotient_type::verify_eval(evaluation_points_quotient,
                                     proof.eval_proof.quotient[i],
@@ -197,7 +301,7 @@ namespace nil {
                         }
 
                         // public data
-                        std::array<typename FieldType::value_type, 1> evaluation_points_public = {challenge};
+                        std::vector<typename FieldType::value_type> evaluation_points_public = {challenge};
                         for (std::size_t i = 0; i < proof.eval_proof.id_permutation.size(); i++) {
                             if (!commitment_scheme_public_input_type::verify_eval(evaluation_points_public,
                                     proof.eval_proof.id_permutation[i],
@@ -252,7 +356,12 @@ namespace nil {
                         F[0] = permutation_argument[0];
                         F[1] = permutation_argument[1];
                         F[2] = permutation_argument[2];
-                        F[3] = gate_argument[0];
+                        F[3] = lookup_argument[0];
+                        F[4] = lookup_argument[1];
+                        F[5] = lookup_argument[2];
+                        F[6] = lookup_argument[3];
+                        F[7] = lookup_argument[4];
+                        F[8] = gate_argument[0];
 
                         typename FieldType::value_type F_consolidated = FieldType::value_type::zero();
                         for (std::size_t i = 0; i < f_parts; i++) {

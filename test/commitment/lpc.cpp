@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
-    typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type, k> lpc_type;
+    typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(zk::is_commitment<lpc_type>::value);
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     merkle_tree_type tree = lpc_type::precommit(f, D[0]);
 
     // TODO: take a point outside of the basic domain
-    std::array<typename FieldType::value_type, 1> evaluation_points = {
+    std::vector<typename FieldType::value_type> evaluation_points = {
         algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
 
     std::array<std::uint8_t, 96> x_data {};
