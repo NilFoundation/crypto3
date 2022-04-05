@@ -273,12 +273,12 @@ namespace nil {
                                 for (std::size_t v_index = 0;
                                     v_index < lookup_gates[g_index].constraints[c_index].lookup_input.size(); v_index++){
 
-                                        if (lookup_gates[g_index].constraints[c_index].lookup_input[v_index].relative){
+                                        if (lookup_gates[g_index].constraints[c_index].lookup_input[v_index].vars[0].relative){
                                             std::size_t column_index =
-                                                table_description.global_index(lookup_gates[g_index].constraints[c_index].lookup_input[v_index]);
+                                                table_description.global_index(lookup_gates[g_index].constraints[c_index].lookup_input[v_index].vars[0]);
 
                                             int rotation =
-                                                lookup_gates[g_index].constraints[c_index].lookup_input[v_index].rotation;
+                                                lookup_gates[g_index].constraints[c_index].lookup_input[v_index].vars[0].rotation;
 
                                             if (std::find(result[column_index].begin(),
                                                     result[column_index].end(), rotation) ==

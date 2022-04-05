@@ -91,19 +91,19 @@ namespace nil {
                         //TODO: change to new form
                         for (std::size_t i = 0; i < lookup_gates.size(); i++) {
                             for (std::size_t j = 0; j < lookup_gates[i].constraints.size(); j++) {
-                                for (plonk_variable<FieldType> lookup :lookup_gates[i].constraints[j].lookup_input) {
+                                for (math::non_linear_term<VariableType> lookup :lookup_gates[i].constraints[j].lookup_input) {
                                     int k = 0;
                                     std::vector<typename FieldType::value_type> input_assignment;
                                     std::vector<typename FieldType::value_type> value_assignment;
-                                    switch (lookup.type) {
+                                    switch (lookup.vars[0].type) {
                                         case VariableType::column_type::witness:
-                                            input_assignment = plonk_columns.witness(lookup.index);
+                                            input_assignment = plonk_columns.witness(lookup.vars[0].index);
                                             break;
                                         case VariableType::column_type::public_input:
-                                            input_assignment = plonk_columns.public_input(lookup.index);
+                                            input_assignment = plonk_columns.public_input(lookup.vars[0].index);
                                             break;
                                         case VariableType::column_type::constant:
-                                            input_assignment = plonk_columns.constant(lookup.index);
+                                            input_assignment = plonk_columns.constant(lookup.vars[0].index);
                                             break;
                                     }
                                     switch (lookup_gates[i].constraints[j].lookup_value[k].type) {
@@ -118,7 +118,7 @@ namespace nil {
                                             break;
                                     }
                                     for (std::size_t t = 0; t < preprocessed_data.common_data.rows_amount; t++) {
-                                        F_compr_input[t] = F_compr_input[t] + theta_acc * input_assignment[(j + lookup.rotation) % input_assignment.size()]
+                                        F_compr_input[t] = F_compr_input[t] + theta_acc * input_assignment[(j + lookup.vars[0].rotation) % input_assignment.size()] * lookup.coeff
                                          * plonk_columns.selector(lookup_gates[i].selector_index)[t];
                                         F_compr_value[t] = F_compr_value[t] + theta_acc * value_assignment[j] * plonk_columns.selector(lookup_gates[i].selector_index)[t];
                                     }
@@ -222,8 +222,6 @@ namespace nil {
 
                     static inline std::array<typename FieldType::value_type, argument_size>
                         verify_eval(const typename policy_type::preprocessed_public_data_type preprocessed_data,
-                                    const plonk_public_polynomial_table<FieldType,
-                                        typename ParamsType::arithmetization_params> public_polynomials,
                                     const std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> &lookup_gates,
                                     // y
                                     const typename FieldType::value_type &challenge,
@@ -256,18 +254,22 @@ namespace nil {
 
                             for (std::size_t i = 0; i < lookup_gates.size(); i++) {
                                 for (std::size_t j = 0; j < lookup_gates[i].constraints.size(); j++) {
-                                    for (plonk_variable<FieldType> lookup :lookup_gates[i].constraints[j].lookup_input) {
+                                    for (math::non_linear_term<VariableType> lookup :lookup_gates[i].constraints[j].lookup_input) {
                                         int k = 0;
                                         std::tuple<std::size_t,
-                                        int, typename VariableType::column_type> input_key = std::make_tuple(lookup.index, lookup.rotation, lookup.type);
+                                        int, typename VariableType::column_type> input_key = std::make_tuple(lookup.vars[0].index, lookup.vars[0].rotation, lookup.vars[0].type);
                                         std::tuple<std::size_t,
                                         int, typename VariableType::column_type> value_key = std::make_tuple(lookup_gates[i].constraints[j].lookup_value[k].index,
                                         lookup_gates[i].constraints[j].lookup_value[k].rotation, lookup_gates[i].constraints[j].lookup_value[k].type);
-                                        F_input_compr = F_input_compr + theta_acc * evaluations[input_key]
-                                        * public_polynomials.selector(lookup_gates[i].selector_index).evaluate(challenge);
+
+                                         std::tuple<std::size_t, int, typename plonk_variable<FieldType>::column_type> selector_key = std::make_tuple(lookup_gates[i].selector_index, 0,
+                                        plonk_variable<FieldType>::column_type::selector);
+
+                                        F_input_compr = F_input_compr + theta_acc * evaluations[input_key] * lookup.coeff
+                                        * evaluations[selector_key];
 
                                         F_value_compr = F_value_compr + theta_acc * evaluations[value_key]
-                                        * public_polynomials.selector(lookup_gates[i].selector_index).evaluate(challenge);
+                                        * evaluations[selector_key];
                                         k++;
                                         theta_acc = theta * theta_acc;
                                     }

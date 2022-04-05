@@ -37,7 +37,7 @@ namespace nil {
                 template<typename FieldType, typename VariableType = plonk_variable<FieldType>>
                 class plonk_lookup_constraint {
                 public:
-                    std::vector<VariableType> lookup_input;
+                    std::vector<math::non_linear_term<VariableType>> lookup_input;
                     std::vector<VariableType> lookup_value;
 
                     /*template<std::size_t WitnessColumns, std::size_t SelectorColumns, 

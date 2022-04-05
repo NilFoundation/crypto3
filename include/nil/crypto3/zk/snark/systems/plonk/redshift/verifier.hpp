@@ -191,7 +191,6 @@ namespace nil {
                         std::array<typename FieldType::value_type, lookup_parts> lookup_argument =
                         redshift_lookup_argument<FieldType, commitment_scheme_public_input_type,
                                                         ParamsType>::verify_eval(preprocessed_public_data,
-                                                                                preprocessed_public_data.public_polynomial_table,
                                                                                 constraint_system.lookup_gates(),
                                                                                 proof.eval_proof.challenge,
                                                                                 columns_at_y,
