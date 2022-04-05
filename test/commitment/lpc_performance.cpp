@@ -112,8 +112,8 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     constexpr static const std::size_t m = 2;
 
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
-    typedef list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
-    typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type, k> lpc_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
+    typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
 
     constexpr static const std::size_t d_extended = d;
@@ -149,19 +149,19 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
         for (int j = 0; j < fri_params.max_degree + 1; j++) {
             poly.push_back(typename FieldType::value_type(polynomial_element_gen()));
         }
-        merkle_tree_type tree = lpc_type::commit(poly, D[0]); // phase_1: Commit
+        merkle_tree_type tree = lpc_type::precommit(poly, D[0]); // phase_1: Commit
 
         // TODO: take a point outside of the basic domain
-        std::array<typename FieldType::value_type, 1> evaluation_points = {
+        std::vector<typename FieldType::value_type> evaluation_points = {
             algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
 
         std::array<std::uint8_t, 96> x_data {};
-        zk::snark::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
+        zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
         auto proof = lpc_type::proof_eval(evaluation_points, tree, poly, fri_params, transcript); // phase_2: Prove
 
         // verify
-        zk::snark::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
+        zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
         BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, fri_params, transcript_verifier)); // phase_3: Verify
     }
