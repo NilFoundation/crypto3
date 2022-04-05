@@ -117,22 +117,22 @@ namespace nil {
 
                 template<typename FieldType>
                 struct ScalarChallenge {
-                    FieldType to_field(FieldType endo_coeff) {
+                    typename FieldType::value_type to_field(const typename FieldType::value_type &endo_coeff) {
                         uint64_t length_in_bits = (64 * CHALLENGE_LENGTH_IN_LIMBS);
-                        FieldType rep = _val;
+                        typename FieldType::integral_type rep = typename FieldType::integral_type(_val.data);
 
-                        FieldType a = 2;
-                        FieldType b = 2;
+                        typename FieldType::value_type a = 2;
+                        typename FieldType::value_type b = 2;
 
-                        FieldType one = FieldType::one();
-                        FieldType neg_one = -one;
+                        typename FieldType::value_type one = FieldType::value_type::one();
+                        typename FieldType::value_type neg_one = -one;
 
                         for (int32_t i = length_in_bits / 2 - 1; i >= 0; --i) {
-                            a.double_in_place();
-                            b.double_in_place();
+                            a = a.doubled();
+                            b = b.doubled();
 
                             bool r_2i = multiprecision::bit_test(rep, 2 * i);
-                            FieldType s;
+                            typename FieldType::value_type s;
                             if (r_2i) {
                                 s = one;
                             } else {
@@ -148,7 +148,7 @@ namespace nil {
                         return a * endo_coeff + b;
                     };
 
-                    FieldType _val;
+                    typename FieldType::value_type _val;
                 };
 
                 enum GateType {
