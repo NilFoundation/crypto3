@@ -184,16 +184,21 @@ zk::snark::verifier_index<nil::crypto3::algebra::curves::vesta> fill_verify_inde
         ver_index.shifts[i] = multiprecision::cpp_int(row.second.get_value<std::string>());
         ++i;
     }
-//
-//    // Polynomial in coefficients form
-//    //    ver_index.zkpm;    // TODO: where it is?
-//    //    ver_index.w;       // TODO: where it is?
-//    //    ver_index.endo;    // TODO: where it is?
+
+        // Polynomial in coefficients form
+        // Const
+        ver_index.zkpm = {0x2C46205451F6C3BBEA4BABACBEE609ECF1039A903C42BFF639EDC5BA33356332_cppui256,
+                      0x1764D9CB4C64EBA9A150920807637D458919CB6948821F4D15EB1994EADF9CE3_cppui256,
+                      0x0140117C8BBC4CE4644A58F7007148577782213065BB9699BF5C391FBE1B3E6D_cppui256,
+                      0x0000000000000000000000000000000000000000000000000000000000000001_cppui256};
+        ver_index.w = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
+        ver_index.endo = 0x2D33357CB532458ED3552A23A8554E5005270D29D19FC7D27B7FD22F0201B547_cppui256;
+        
 //    //    ver_index.lookup_index = root.get_child("data.blockchainVerificationKey.index.lookup_index");    // TODO: null
 //    //    ver_index.linearization;       // TODO: where it is?
 //    //    ver_index.powers_of_alpha;     // TODO: where it is?
-//    //    ver_index.fr_sponge_params;    // TODO: where it is?
-//    //    ver_index.fq_sponge_params;    // TODO: where it is?
+//    //    ver_index.fr_sponge_params;    // TODO: read from kimchi_const.json
+//    //    ver_index.fq_sponge_params;    // TODO: read from kimchi_const.json
     return ver_index;
 }
 
