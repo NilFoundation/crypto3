@@ -125,8 +125,8 @@ namespace nil {
                         for (int i = 0; i < d; ++i) {
                             g.push_back(algebra::random_element<group_type>());
                         }
-                        typename scalar_field_type::value_type r = random_element<scalar_field_type>();
-                        typename base_field_type::value_type q = random_element<scalar_field_type>();
+                        typename scalar_field_type::value_type r = algebra::random_element<scalar_field_type>();
+                        typename base_field_type::value_type q = algebra::random_element<scalar_field_type>();
                         return params_type(g, h, r, q);
                     }
 
@@ -247,8 +247,8 @@ namespace nil {
 //                            b_low = newVec(b.begin(), b.begin() + power_of_two);
 //                            b_high = newVec(b.begin() + power_of_two, b.end());
 //
-//                            auto rand_l = random_element<scalar_field_type>();
-//                            auto rand_r = random_element<scalar_field_type>();
+//                            auto rand_l = algebra::random_element<scalar_field_type>();
+//                            auto rand_r = algebra::random_element<scalar_field_type>();
 //
 //                            auto l = multiexp(g_low.begin(), g_low.end(), a_high.begin(), a_high.end(), 1)
 //                                            + rand_l * params.h + inner_product(a_high.begin(), a_high.end(), b_low.begin(), b_low.end(), 1) * U;
@@ -282,8 +282,8 @@ namespace nil {
 //                            const auto[l, r] = blinders[i];
 //                            r_prime += l * chal_invs[i] + r * chals[i];
 //                        }
-//                        auto d = random_element<scalar_field_type>();
-//                        auto r_delta = random_element<scalar_field_type>();
+//                        auto d = algebra::random_element<scalar_field_type>();
+//                        auto r_delta = algebra::random_element<scalar_field_type>();
 //
 //                        //fake functions
 //                        sponge.absorb(r_delta);
@@ -316,8 +316,8 @@ namespace nil {
 //                            scalars.push_back(typename scalar_field_type::value_type::zero());
 //                        }
 //
-//                        auto rand_base = random_element<scalar_field_type>();
-//                        auto sg_rand_base = random_element<scalar_field_type>();
+//                        auto rand_base = algebra::random_element<scalar_field_type>();
+//                        auto sg_rand_base = algebra::random_element<scalar_field_type>();
 //                        auto rand_base_i = typename scalar_field_type::value_type::one();
 //                        auto sg_rand_base_i = typename scalar_field_type::value_type::one();
 //
