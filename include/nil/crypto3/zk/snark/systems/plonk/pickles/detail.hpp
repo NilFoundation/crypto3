@@ -39,6 +39,63 @@ namespace nil {
             namespace snark {
                 size_t const CHALLENGE_LENGTH_IN_LIMBS = 2;
                 size_t const PERMUTS = 7;
+                size_t const CONSTRAINTS = 3;
+                size_t const COLUMNS = 15;
+
+                //                template<typename CurveType>
+                //                typename commitments::kimchi_pedersen<CurveType>::proof combine(typename
+                //                commitments::kimchi_pedersen<CurveType>::proof eval, typename
+                //                CurveType::scalar_field_type pt)  {
+                //                    s: array_init(|i| DensePolynomial::eval_polynomial(&self.s[i], pt)),
+                //                    w: array_init(|i| DensePolynomial::eval_polynomial(&self.w[i], pt)),
+                //                        z: DensePolynomial::eval_polynomial(&self.z, pt),
+                //                            lookup: self.lookup.as_ref().map(|l| LookupEvaluations {
+                //                                table: DensePolynomial::eval_polynomial(&l.table, pt),
+                //                                aggreg: DensePolynomial::eval_polynomial(&l.aggreg, pt),
+                //                                sorted: l
+                //                                    .sorted
+                //                                    .iter()
+                //                                    .map(|x| DensePolynomial::eval_polynomial(x, pt))
+                //                                    .collect(),
+                //                            }),
+                //                            generic_selector: DensePolynomial::eval_polynomial(&self.generic_selector,
+                //                            pt),
+                //                                               poseidon_selector:
+                //                                               DensePolynomial::eval_polynomial(&self.poseidon_selector,
+                //                                               pt),
+                //                    }
+                //                };
+
+                /// Contains the evaluation of a polynomial commitment at a set of points.
+                template<typename CurveType>
+                struct Evaluation {
+                    typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
+                    using Fr = typename CurveType::scalar_field_type;
+                    /// The commitment of the polynomial being evaluated
+                    commitment_type commitment;
+
+                    /// Contains an evaluation table
+                    std::vector<std::vector<Fr>> evaluations;
+
+                    /// optional degree bound
+                    size_t degree_bound;
+                };
+
+                // TODO: I think we should really change this name to something more correct
+                template<typename CurveType>
+                struct BatchEvaluationProof {
+                    typedef typename CurveType::scalar_field_type Fr;
+//                    EFqSponge sponge; TODO: return this
+                    std::vector<Evaluation<CurveType>> evaluations;
+                    /// vector of evaluation points
+                    std::vector<Fr> evaluation_points;
+                    /// scaling factor for evaluation point powers
+                    Fr xi;
+                    /// scaling factor for polynomials
+                    Fr r;
+                    /// batched opening proof
+                    typename commitments::kimchi_pedersen<CurveType>::proof_type opening;
+                };
 
                 /// The collection of constants required to evaluate an `Expr`.
                 template<typename FieldType>
@@ -60,22 +117,22 @@ namespace nil {
 
                 template<typename FieldType>
                 struct ScalarChallenge {
-                    FieldType to_field(FieldType endo_coeff) {
+                    typename FieldType::value_type to_field(const typename FieldType::value_type &endo_coeff) {
                         uint64_t length_in_bits = (64 * CHALLENGE_LENGTH_IN_LIMBS);
-                        FieldType rep = _val;
+                        typename FieldType::integral_type rep = typename FieldType::integral_type(_val.data);
 
-                        FieldType a = 2;
-                        FieldType b = 2;
+                        typename FieldType::value_type a = 2;
+                        typename FieldType::value_type b = 2;
 
-                        FieldType one = FieldType::one();
-                        FieldType neg_one = -one;
+                        typename FieldType::value_type one = FieldType::value_type::one();
+                        typename FieldType::value_type neg_one = -one;
 
                         for (int32_t i = length_in_bits / 2 - 1; i >= 0; --i) {
-                            a.double_in_place();
-                            b.double_in_place();
+                            a = a.doubled();
+                            b = b.doubled();
 
                             bool r_2i = multiprecision::bit_test(rep, 2 * i);
-                            FieldType s;
+                            typename FieldType::value_type s;
                             if (r_2i) {
                                 s = one;
                             } else {
@@ -91,7 +148,7 @@ namespace nil {
                         return a * endo_coeff + b;
                     };
 
-                    FieldType _val;
+                    typename FieldType::value_type _val;
                 };
 
                 enum GateType {
@@ -148,6 +205,17 @@ namespace nil {
                     std::vector<std::vector<FieldType>> mds;
                 };
 
+                enum Column {
+                    Witness,
+                    Z,
+                    LookupSorted,
+                    LookupAggreg,
+                    LookupTable,
+                    LookupKindIndex,
+                    Index,
+                    Coefficient
+                };
+
                 enum PolishToken {
                     Alpha,
                     Beta,
@@ -168,24 +236,22 @@ namespace nil {
                     Load
                 };
 
+                template<typename Container>
                 struct linearization_t {
-                    std::vector<PolishToken> constant_term;
-                    std::vector<PolishToken> index_term;
+                    Container constant_term;
+                    std::vector<std::tuple<Column, Container>> index_term;
                 };
 
                 template<typename CurveType>
                 struct lookup_verifier_index {
                     typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
-                    enum lookups_used {
-                        Single,
-                        Joint
-                    } lookup_used;
+                    enum lookups_used { Single, Joint } lookup_used;
                     std::vector<commitment_type> lookup_table;
                     std::vector<commitment_type> lookup_selectors;
                 };
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
-};               // namespace nil
+}    // namespace nil
 
 #endif    // CRYPTO3_ZK_PLONK_BATCHED_PICKLES_DETAIL_HPP

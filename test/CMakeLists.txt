@@ -59,7 +59,10 @@ set(TESTS_NAMES
     "relations/numeric/ssp"
 
     "systems/plonk/pickles/pickles_struct_test"
+    "systems/plonk/pickles/kimchi"
     "systems/plonk/pickles/oracles"
+    "systems/plonk/pickles/to_field"
+    
     "systems/plonk/redshift/redshift"
 
     "systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
@@ -83,3 +86,6 @@ set(TESTS_NAMES
 foreach(TEST_NAME ${TESTS_NAMES})
     define_zk_test(${TEST_NAME})
 endforeach()
+
+string(CONCAT TEST_DATA ${CMAKE_CURRENT_SOURCE_DIR} "/systems/plonk/pickles/data/kimchi.json")
+target_compile_definitions(zk_kimchi_test PRIVATE TEST_DATA="${TEST_DATA}")

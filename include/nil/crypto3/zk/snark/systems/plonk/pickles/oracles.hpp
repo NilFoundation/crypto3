@@ -84,8 +84,10 @@ namespace nil {
                 /// This function runs the random oracle argument
                 template<typename CurveType, typename EFqSponge>
                 OraclesResult<CurveType, EFqSponge> oracles(pickles_proof<CurveType> proof,
-                                                            verifier_index<CurveType> index,
-                                                            commitments::kimchi_pedersen<CurveType> p_comm) {
+                                                            verifier_index<CurveType>
+                                                                index,
+                                                            commitments::kimchi_pedersen<CurveType>
+                                                                p_comm) {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
                     typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
                     using Fr = typename CurveType::scalar_field_type;
@@ -186,7 +188,10 @@ namespace nil {
                         zeta_minus_x.push_back(zetaw - w[i]);
                     }
 
-                    ark_ff::fields::batch_inversion::<Fr<G>>(&mut zeta_minus_x);
+                    // Given a vector of field elements {v_i}, compute the vector {coeff * v_i^(-1)}, where coeff =
+                    // F::one()
+                    //                    ark_ff::fields::batch_inversion::<Fr<G>>(&mut zeta_minus_x);
+                    zeta_minus_x = zeta_minus_x.inverse() * Fr::one();
 
                     //~ 18. Evaluate the negated public polynomial (if present) at $\zeta$ and $\zeta\omega$.
                     //~     NOTE: this works only in the case when the poly segment size is not smaller than that of the
@@ -243,35 +248,33 @@ namespace nil {
                                         .map(| (c, e) | (c .1.clone(), e))
                                         .collect();
 
-                    let evals = vec ![
-                        self.evals[0].combine(powers_of_eval_points_for_chunks[0]),
-                        self.evals[1].combine(powers_of_eval_points_for_chunks[1]),
-                    ];
+                    std::array<typename commitment_scheme::evals_t, 2> evals = {
+                        proof.evals[0].combine(powers_of_eval_points_for_chunks[0]),
+                        proof.evals[1].combine(powers_of_eval_points_for_chunks[1])};
 
                     //~ 26. Compute the evaluation of $ft(\zeta)$.
                     Fq ft_eval0;
                     Fq zkp = index.zkpm.evaluate(zeta);
                     Fq zeta1m1 = zeta1 - Fq::one();
 
-                    std::vector<Fr> alpha_powers = all_alphas.get_alphas(permutation::CONSTRAINTS);
+                    std::vector<Fr> alpha_powers = all_alphas.get_alphas(CONSTRAINTS);
                     Fr alpha0 = alpha_powers[0];
                     Fr alpha1 = alpha_powers[1];
                     Fr alpha2 = alpha_powers[2];
 
                     Fq init = (evals[0].w[PERMUTS - 1] + gamma) * evals[1].z * alpha0 * zkp;
-                    Fq ft_eval0;
                     for (size_t i = 0; i < evals[0].size(); ++i) {
                         ft_eval0 *= (beta * evals[0].s[i]) + evals[0][i] + gamma;
                     }
 
                     if (!p_eval[0].is_empty()) {
-                        t_eval0 -= p_eval[0][0];
+                        ft_eval0 -= p_eval[0][0];
                     } else {
-                        t_eval0 -= Fr::zero();
+                        ft_eval0 -= Fr::zero();
                     }
 
                     Fq tmp = alpha0 * zkp * evals[0].z;
-                    for (size_t = 0; i < evals[0].w.size(); ++i) {
+                    for (size_t i = 0; i < evals[0].w.size(); ++i) {
                         tmp *= gamma + (beta * zeta * index.shift[i]) + evals[0].w[i]);
                     }
 
@@ -281,16 +284,11 @@ namespace nil {
                                    (Fr::one() - evals[0].z);
 
                     Fq denominator = (zeta - index.w) * (zeta - Fr::one());
-                    let denominator = denominator.inverse().expect("negligible probability");
+                    denominator = denominator.inverse();
 
                     ft_eval0 += nominator * denominator;
 
-                    Constants<Fr> cs = {alpha = alpha,
-                                        beta = beta,
-                                        gamma = gamma,
-                                        joint_combiner = joint_combiner .1,
-                                        endo_coefficient = index.endo,
-                                        mds = index.fr_sponge_params.mds.clone()};
+                    Constants<Fr> cs = {alpha, beta, gamma, joint_combiner, index.endo, index.fr_sponge_params.mds};
                     ft_eval0 -=
                         PolishToken::evaluate(index.linearization.constant_term, index.domain, zeta, &evals, &cs);
 

@@ -87,15 +87,15 @@ BOOST_AUTO_TEST_CASE(pickles_proof_struct_test_suite) {
     nil::crypto3::zk::snark::pickles_proof<nil::crypto3::algebra::curves::vesta> verifier_index;
 
     // w_comm
-    for (size_t i = 0; i < w_comm_unshifted.size(); ++i) {
-        proof.commitments.w_comm[i].unshifted.assign(w_comm_unshifted[i].begin(), w_comm_unshifted[i].end());
-        proof.commitments.w_comm[0].shifted = w_comm_shifted[i];
-    }
-    // z_comm
-    proof.commitments.z_comm.unshifted.emplace_back(
-        0x0208422D68D15EBB4DAE8A791B23D93DFB93AC143C7463C0ABB9926E29C5EE9C_cppui256,
-        0x1A3706AAC63B05B15DB008736ABABA3A4F91DE35E48CA744AEA5E91C1E2288AA_cppui256, 0x1);
-    proof.commitments.z_comm.shifted = {0x0, 0x0, 0x1};
+//    for (size_t i = 0; i < w_comm_unshifted.size(); ++i) {
+//        proof.commitments.w_comm[i].unshifted.assign(w_comm_unshifted[i].begin(), w_comm_unshifted[i].end());
+//        proof.commitments.w_comm[0].shifted = w_comm_shifted[i];
+//    }
+//    // z_comm
+//    proof.commitments.z_comm.unshifted.emplace_back(
+//        0x0208422D68D15EBB4DAE8A791B23D93DFB93AC143C7463C0ABB9926E29C5EE9C_cppui256,
+//        0x1A3706AAC63B05B15DB008736ABABA3A4F91DE35E48CA744AEA5E91C1E2288AA_cppui256, 0x1);
+//    proof.commitments.z_comm.shifted = {0x0, 0x0, 0x1};
 
     // t_comm
     proof.commitments.t_comm.unshifted.emplace_back(

@@ -40,14 +40,14 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename CurveType, std::size_t WiresAmount = 15, std::size_t Permuts = 7>
-                class verifier_index {
+                struct verifier_index {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
                     typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
                     using curve_t = CurveType;
-                    using Fr = typename CurveType::scalar_field_type;
-                    using Fq = typename CurveType::base_field_type;
+                    using Fr = typename CurveType::scalar_field_type::value_type;
+                    using Fq = typename CurveType::base_field_type::value_type;
 
-                    nil::crypto3::math::evaluation_domain<Fr> domain;
+//                    nil::crypto3::math::evaluation_domain<Fr> domain; TODO: return this
                     size_t max_poly_size;
                     size_t max_quot_size;
                     srs_t<CurveType> srs;
@@ -60,14 +60,14 @@ namespace nil {
                     commitment_type emul_comm;
                     commitment_type endomul_scalar_comm;
                     std::array<commitment_type, 4> chacha_comm;
-                    std::array<Fr, Permuts> shift;
+                    std::array<Fr, Permuts> shifts;
 
                     // Polynomial in coefficients form
                     nil::crypto3::math::polynomial<Fr> zkpm;
                     Fr w;
                     Fr endo;
                     lookup_verifier_index<CurveType> lookup_index;
-                    linearization_t linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
+//                    linearization_t<std::vector<PolishToken<Fr>>>  linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
                     Alphas<Fr> powers_of_alpha;
                     ArithmeticSpongeParams<Fr> fr_sponge_params;
                     ArithmeticSpongeParams<Fq> fq_sponge_params;
