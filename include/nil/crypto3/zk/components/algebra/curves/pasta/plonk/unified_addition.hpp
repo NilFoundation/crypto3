@@ -85,8 +85,10 @@ namespace nil {
                         typename CurveType::template g1_type<>::value_type Q;
                     };
 
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp,
+                        std::size_t components_amount = 1){
+                        return bp.allocate_rows(required_rows_amount *
+                            components_amount);
                     }
 
                     static void generate_gates(
