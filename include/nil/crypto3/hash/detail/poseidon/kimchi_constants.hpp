@@ -10,6 +10,7 @@
 #define CRYPTO3_HASH_POSEIDON_KIMCHI_CONSTANTS_HPP
 
 #include <nil/crypto3/algebra/fields/pallas/base_field.hpp>
+#include <nil/crypto3/algebra/fields/vesta/base_field.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -320,7 +321,6 @@ namespace nil {
                             }},
                         }};
                 };
-
 
                 struct poseidon_constants_kimchi_vesta {
                     using FieldType = nil::crypto3::algebra::fields::vesta_base_field;
