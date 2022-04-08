@@ -183,22 +183,34 @@ namespace nil {
                         F[2] = permutation_argument.F[2];
 
                         // 5. lookup_argument
-                        auto lookup_argument = redshift_lookup_argument<FieldType,
+                        bool use_lookup = constraint_system.lookup_gates().size() > 0;
+                        typename redshift_lookup_argument<FieldType,
+                                                          commitment_scheme_permutation_type,
+                                                          ParamsType>::prover_lookup_result lookup_argument;
+                        if (use_lookup) {
+                            lookup_argument = redshift_lookup_argument<FieldType,
                                                           commitment_scheme_permutation_type,
                                                           ParamsType>::prove_eval(constraint_system,
                                                                                   preprocessed_public_data,
                                                                                   assignments,
                                                                                   fri_params,
                                                                                   transcript);
+                        } else {
+                            for (std::size_t i = 0; i < lookup_argument.F.size(); i++) {
+                                lookup_argument.F[i] = {0};
+                            }
+                        }
                         
                         F[3] = lookup_argument.F[0];
                         F[4] = lookup_argument.F[1];
                         F[5] = lookup_argument.F[2];
                         F[6] = lookup_argument.F[3];
                         F[7] = lookup_argument.F[4];
-                        proof.input_perm_commitment = lookup_argument.input_precommitment.root();
-                        proof.value_perm_commitment = lookup_argument.value_precommitment.root();
-                        proof.v_l_perm_commitment = lookup_argument.V_L_precommitment.root();
+                        if (use_lookup) {
+                            proof.input_perm_commitment = lookup_argument.input_precommitment.root();
+                            proof.value_perm_commitment = lookup_argument.value_precommitment.root();
+                            proof.v_l_perm_commitment = lookup_argument.V_L_precommitment.root();
+                        }
                         // 6. circuit-satisfability
                         std::array<math::polynomial<typename FieldType::value_type>, gate_parts> prover_res =
                             redshift_gates_argument<FieldType, ParamsType>::prove_eval(
@@ -286,37 +298,39 @@ namespace nil {
                         proof.eval_proof.permutation.push_back(v_p_evaluation);
 
                         // lookup polynomials evaluation
-                        std::vector<typename FieldType::value_type> evaluation_points_v_l = {challenge,
-                                                                                               challenge * omega};
-                        typename commitment_scheme_permutation_type::proof_type v_l_evaluation =
-                            commitment_scheme_permutation_type::proof_eval(
-                                evaluation_points_v_l,
-                                lookup_argument.V_L_precommitment,
-                                lookup_argument.V_L_polynomial,
-                                fri_params,
-                                transcript);
-                        proof.eval_proof.lookups.push_back(v_l_evaluation);
+                        if (use_lookup) {
+                            std::vector<typename FieldType::value_type> evaluation_points_v_l = {challenge,
+                                                                                                challenge * omega};
+                            typename commitment_scheme_permutation_type::proof_type v_l_evaluation =
+                                commitment_scheme_permutation_type::proof_eval(
+                                    evaluation_points_v_l,
+                                    lookup_argument.V_L_precommitment,
+                                    lookup_argument.V_L_polynomial,
+                                    fri_params,
+                                    transcript);
+                            proof.eval_proof.lookups.push_back(v_l_evaluation);
 
-                        std::vector<typename FieldType::value_type> evaluation_points_input = {challenge,
-                                                                                               challenge * omega.inversed()};
-                        typename commitment_scheme_permutation_type::proof_type input_evaluation =
-                            commitment_scheme_permutation_type::proof_eval(
-                                evaluation_points_input,
-                                lookup_argument.input_precommitment,
-                                lookup_argument.input_polynomial,
-                                fri_params,
-                                transcript);
-                        proof.eval_proof.lookups.push_back(input_evaluation);
+                            std::vector<typename FieldType::value_type> evaluation_points_input = {challenge,
+                                                                                                challenge * omega.inversed()};
+                            typename commitment_scheme_permutation_type::proof_type input_evaluation =
+                                commitment_scheme_permutation_type::proof_eval(
+                                    evaluation_points_input,
+                                    lookup_argument.input_precommitment,
+                                    lookup_argument.input_polynomial,
+                                    fri_params,
+                                    transcript);
+                            proof.eval_proof.lookups.push_back(input_evaluation);
 
-                        std::vector<typename FieldType::value_type> evaluation_points_value = {challenge};
-                        typename commitment_scheme_permutation_type::proof_type value_evaluation =
-                            commitment_scheme_permutation_type::proof_eval(
-                                evaluation_points_value,
-                                lookup_argument.value_precommitment,
-                                lookup_argument.value_polynomial,
-                                fri_params,
-                                transcript);
-                        proof.eval_proof.lookups.push_back(value_evaluation);
+                            std::vector<typename FieldType::value_type> evaluation_points_value = {challenge};
+                            typename commitment_scheme_permutation_type::proof_type value_evaluation =
+                                commitment_scheme_permutation_type::proof_eval(
+                                    evaluation_points_value,
+                                    lookup_argument.value_precommitment,
+                                    lookup_argument.value_polynomial,
+                                    fri_params,
+                                    transcript);
+                            proof.eval_proof.lookups.push_back(value_evaluation);
+                        }
 
                         // quotient
                         std::vector<typename FieldType::value_type> evaluation_points_quotient = {challenge};
