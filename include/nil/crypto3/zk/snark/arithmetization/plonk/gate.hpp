@@ -38,26 +38,21 @@ namespace nil {
                 template<typename FieldType, typename ConstraintType>
                 struct plonk_gate {
                     typedef FieldType field_type;
-                    //typedef plonk_constraint<FieldType> constraint_type;
+                    typedef ConstraintType constraint_type;
 
                     std::size_t selector_index;
                     std::vector<ConstraintType> constraints;
 
                     plonk_gate(std::size_t selector_index, const ConstraintType &constraint) :
-                        constraints(std::vector<ConstraintType>({constraint})),
-                        selector_index(selector_index) {
+                        constraints(std::vector<ConstraintType>({constraint})), selector_index(selector_index) {
                     }
 
-                    plonk_gate(std::size_t selector_index,
-                               const std::initializer_list<ConstraintType> &&constraints) :
-                        constraints(constraints),
-                        selector_index(selector_index) {
+                    plonk_gate(std::size_t selector_index, const std::initializer_list<ConstraintType> &&constraints) :
+                        constraints(constraints), selector_index(selector_index) {
                     }
 
-                    plonk_gate(std::size_t selector_index,
-                                  const std::vector<ConstraintType> &constraints):
-                        constraints(constraints),
-                        selector_index(selector_index){
+                    plonk_gate(std::size_t selector_index, const std::vector<ConstraintType> &constraints) :
+                        constraints(constraints), selector_index(selector_index) {
                     }
                 };
 
