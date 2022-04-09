@@ -42,6 +42,7 @@
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
 
 #include "../../../test_plonk_component.hpp"
+// #include "../../../profiling_component.hpp"
 
 using namespace nil::crypto3;
 
@@ -64,8 +65,8 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
     using component_type = zk::components::curve_element_unified_addition<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10>;
-    typename component_type::assignment_params a_params = {2 * curve_type::template g1_type<>::value_type::one(), 2 * curve_type::template g1_type<>::value_type::one()};
-    component_type unified_addition_component(bp, {});
+    typename component_type::assignment_params a_params = {2 * curve_type::template g1_type<>::value_type::one(), 2 *
+curve_type::template g1_type<>::value_type::one()}; component_type unified_addition_component(bp, {});
 
     component_type::generate_gates(bp, public_assignment);
     component_type::generate_copy_constraints(bp, public_assignment);
@@ -76,7 +77,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
     bp.fix_usable_rows();
     bp.allocate_rows(3);
 
-    zk::snark::plonk_assignment_table<BlueprintFieldType, WitnessColumns, PublicInputColumns, 
+    zk::snark::plonk_assignment_table<BlueprintFieldType, WitnessColumns, PublicInputColumns,
         ConstantColumns, SelectorColumns> assignments(
         private_assignment, public_assignment);
 
@@ -93,7 +94,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
     std::size_t permutation_size = 12;
 
     typename types::preprocessed_public_data_type public_preprocessed_data =
-         zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, 
+         zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment,
             assignments.table_description(), fri_params, permutation_size);
     typename types::preprocessed_private_data_type private_preprocessed_data =
          zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment);
@@ -102,10 +103,8 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
                                                                        private_preprocessed_data, bp,
                                                                        assignments, fri_params);
 
-    bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data, proof, 
-                                                                        bp, fri_params);
-    profiling(assignments);
-    BOOST_CHECK(verifier_res);
+    bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data,
+proof, bp, fri_params); profiling(assignments); BOOST_CHECK(verifier_res);
 }*/
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
@@ -116,20 +115,22 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
-        PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
-                ArithmetizationParams>;
+    constexpr std::size_t Lambda = 1;
+    using ArithmetizationParams =
+        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
 
-    using component_type = zk::components::curve_element_unified_addition<ArithmetizationType, curve_type,
-                                                            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10>;
+    using component_type = zk::components::
+        curve_element_unified_addition<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10>;
 
     typename component_type::public_params_type public_params = {};
     typename component_type::private_params_type private_params = {
         algebra::random_element<curve_type::template g1_type<>>(),
         algebra::random_element<curve_type::template g1_type<>>()};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams> (public_params, private_params);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, 40>(public_params,
+                                                                                             private_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

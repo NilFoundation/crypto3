@@ -28,6 +28,8 @@
 #ifndef CRYPTO3_TEST_PLONK_COMPONENT_HPP
 #define CRYPTO3_TEST_PLONK_COMPONENT_HPP
 
+#include <fstream>
+
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
@@ -39,9 +41,13 @@
 
 #include "profiling.hpp"
 
+#include <nil/marshalling/status_type.hpp>
+#include <nil/marshalling/field_type.hpp>
+#include <nil/marshalling/endianness.hpp>
+#include <nil/crypto3/marshalling/zk/types/redshift/proof.hpp>
+
 namespace nil {
     namespace crypto3 {
-
         template<typename fri_type, typename FieldType>
         typename fri_type::params_type create_fri_params(std::size_t degree_log) {
             typename fri_type::params_type params;
@@ -60,14 +66,13 @@ namespace nil {
 
             return params;
         }
-        
-        template <typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams>
-        void test_component(
-            typename ComponentType::public_params_type init_params,
-            typename ComponentType::private_params_type assignment_params){
 
-            using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
-                ArithmetizationParams>;
+        template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
+                 std::size_t Lambda>
+        auto prepare_component(typename ComponentType::public_params_type init_params,
+                               typename ComponentType::private_params_type assignment_params) {
+
+            using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
             using component_type = ComponentType;
 
             zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
@@ -79,8 +84,8 @@ namespace nil {
             std::size_t start_row = component_type::allocate_rows(bp);
             component_type::generate_gates(bp, public_assignment, init_params, start_row);
             component_type::generate_copy_constraints(bp, public_assignment, init_params, start_row);
-            component_type::generate_assignments(private_assignment, public_assignment,
-                init_params, assignment_params, start_row);
+            component_type::generate_assignments(private_assignment, public_assignment, init_params, assignment_params,
+                                                 start_row);
 
             // bp.fix_usable_rows();
             private_assignment.padding();
@@ -88,16 +93,14 @@ namespace nil {
             std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
             std::cout << "Padded rows: " << desc.rows_amount << std::endl;
 
-            zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(
-                private_assignment, public_assignment);
+            zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(private_assignment,
+                                                                                                     public_assignment);
 
-            using params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams>;
+            using params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
             using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
 
-            using fri_type = typename zk::commitments::fri<BlueprintFieldType,
-                typename params::merkle_hash_type,
-                typename params::transcript_hash_type,
-                2>;
+            using fri_type = typename zk::commitments::fri<BlueprintFieldType, typename params::merkle_hash_type,
+                                                           typename params::transcript_hash_type, 2>;
 
             std::size_t table_rows_log = std::ceil(std::log2(desc.rows_amount));
 
@@ -106,25 +109,86 @@ namespace nil {
             std::size_t permutation_size = desc.witness_columns + desc.public_input_columns + desc.constant_columns;
 
             typename types::preprocessed_public_data_type public_preprocessed_data =
-                 zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, 
-                    desc, fri_params, permutation_size);
+                zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(
+                    bp, public_assignment, desc, fri_params, permutation_size);
             typename types::preprocessed_private_data_type private_preprocessed_data =
-                 zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment,
-                    desc);
+                zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment,
+                                                                                              desc);
 
-            auto proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(public_preprocessed_data,
-                                                                               private_preprocessed_data,
-                                                                               desc,
-                                                                               bp,
-                                                                               assignments, fri_params);
+            return std::make_tuple(desc, bp, fri_params, assignments, public_preprocessed_data,
+                                   private_preprocessed_data);
+        }
 
-            bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data, proof, 
-                                                                                bp, fri_params);
+        template<typename RedshiftParams, typename FieldType, typename Proof, typename FRIParams, typename CommonData>
+        void print_test_data(const Proof &proof, const FRIParams &fri_params, const CommonData &common_data) {
+            using Endianness = nil::marshalling::option::big_endian;
+            using TTypeBase = nil::marshalling::field_type<Endianness>;
+            using proof_marshalling_type = nil::crypto3::marshalling::types::redshift_proof<TTypeBase, Proof>;
+            auto filled_redshift_proof =
+                nil::crypto3::marshalling::types::fill_redshift_proof<Proof, Endianness>(proof);
+            std::vector<std::uint8_t> cv;
+            cv.resize(filled_redshift_proof.length(), 0x00);
+            auto write_iter = cv.begin();
+            nil::marshalling::status_type status = filled_redshift_proof.write(write_iter, cv.size());
+            std::cout << "proof (" << cv.size() << " bytes) = " << std::endl;
+            std::ofstream proof_file;
+            proof_file.open("redshift_proof.txt");
+            print_hex_byteblob(proof_file, cv.cbegin(), cv.cend(), false);
+
+            std::cout << "modulus = " << FieldType::modulus << std::endl;
+            std::cout << "fri_params.r = " << fri_params.r << std::endl;
+            std::cout << "fri_params.max_degree = " << fri_params.max_degree << std::endl;
+            std::cout << "fri_params.q = ";
+            for (const auto &coeff : fri_params.q) {
+                std::cout << coeff.data << ", ";
+            }
+            std::cout << std::endl;
+            std::cout << "fri_params.D_omegas = ";
+            for (const auto &dom : fri_params.D) {
+                std::cout << static_cast<nil::crypto3::math::basic_radix2_domain<FieldType> &>(*dom).omega.data << ", ";
+            }
+            std::cout << std::endl;
+            std::cout << "lpc_params.lambda = " << RedshiftParams::commitment_params_type::lambda << std::endl;
+            std::cout << "lpc_params.m = " << RedshiftParams::commitment_params_type::m << std::endl;
+            std::cout << "lpc_params.r = " << RedshiftParams::commitment_params_type::r << std::endl;
+            std::cout << "common_data.rows_amount = " << common_data.rows_amount << std::endl;
+            std::cout << "common_data.omega = "
+                      << static_cast<nil::crypto3::math::basic_radix2_domain<FieldType> &>(*common_data.basic_domain)
+                             .omega.data
+                      << std::endl;
+            std::cout << "columns_rotations (" << common_data.columns_rotations.size() << " number) = {" << std::endl;
+            for (const auto &column_rotations : common_data.columns_rotations) {
+                std::cout << "[";
+                for (auto rot : column_rotations) {
+                    std::cout << int(rot) << ", ";
+                }
+                std::cout << "]," << std::endl;
+            }
+            std::cout << "}" << std::endl;
+        }
+
+        template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
+                 std::size_t Lambda>
+        void test_component(typename ComponentType::public_params_type init_params,
+                            typename ComponentType::private_params_type assignment_params) {
+
+            using params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
+
+            auto [desc, bp, fri_params, assignments, public_preprocessed_data, private_preprocessed_data] =
+                prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda>(
+                    init_params, assignment_params);
+
+            auto proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(
+                public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
+
+            print_test_data<params, BlueprintFieldType>(proof, fri_params, public_preprocessed_data.common_data);
+
+            bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(
+                public_preprocessed_data, proof, bp, fri_params);
             profiling(assignments);
             BOOST_CHECK(verifier_res);
         }
-
-    }            // namespace crypto3
+    }    // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_TEST_PLONK_COMPONENT_HPP
