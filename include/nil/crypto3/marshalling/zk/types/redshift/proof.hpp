@@ -66,47 +66,47 @@ namespace nil {
                         nil::marshalling::types::array_list<
                             TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_witness>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename CommitmentSchemeTypePermutation::proof_type> permutation
                         nil::marshalling::types::array_list<
                             TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_permutation>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename CommitmentSchemeTypeQuotient::proof_type> quotient
                         nil::marshalling::types::array_list<
                             TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_quotient>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename commitment_scheme_type_public::proof_type> id_permutation
                         nil::marshalling::types::array_list<
                             TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_public>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename commitment_scheme_type_public::proof_type> sigma_permutation
                         nil::marshalling::types::array_list<
                             TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_public>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename commitment_scheme_type_public::proof_type> public_input
                         nil::marshalling::types::array_list<
                             TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_public>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename commitment_scheme_type_public::proof_type> constant
                         nil::marshalling::types::array_list<
                             TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_public>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename commitment_scheme_type_public::proof_type> selector
                         nil::marshalling::types::array_list<
                             TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_public>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename commitment_scheme_type_public::proof_type> special_selectors
                         nil::marshalling::types::array_list<
                             TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_public>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
+                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>>>;
 
                 template<
                     typename TTypeBase, typename RedshiftProof,
@@ -128,25 +128,25 @@ namespace nil {
                         nil::marshalling::types::array_list<
                             TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename CommitmentSchemeTypeWitness::commitment_type> witness_commitments
                         nil::marshalling::types::array_list<
                             TTypeBase,
                             nil::marshalling::types::array_list<
                                 TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
                                 nil::marshalling::option::sequence_size_field_prefix<
-                                    nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                    nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename CommitmentSchemeTypeQuotient::commitment_type> T_commitments
                         nil::marshalling::types::array_list<
                             TTypeBase,
                             nil::marshalling::types::array_list<
                                 TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
                                 nil::marshalling::option::sequence_size_field_prefix<
-                                    nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                    nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // evaluation_proof eval_proof
                         redshift_evaluation_proof<TTypeBase, RedshiftProof>>>;
 
@@ -155,29 +155,29 @@ namespace nil {
                     fill_redshift_evaluation_proof(const typename RedshiftProof::evaluation_proof &proof) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using size_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
+                    using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
                     using field_marhsalling_type =
                         field_element<TTypeBase, typename RedshiftProof::field_type::value_type>;
                     using lpc_witness_proof_marshalling_type =
                         lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_witness>;
                     using lpc_witness_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, lpc_witness_proof_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using lpc_permutation_proof_marshalling_type =
                         lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_permutation>;
                     using lpc_permutation_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, lpc_permutation_proof_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using lpc_quotient_proof_marshalling_type =
                         lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_quotient>;
                     using lpc_quotient_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, lpc_quotient_proof_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using lpc_public_proof_marshalling_type =
                         lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_public>;
                     using lpc_public_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, lpc_public_proof_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
 
                     // typename FieldType::value_type challenge
                     field_marhsalling_type filled_challenge = field_marhsalling_type(proof.challenge);
@@ -332,15 +332,15 @@ namespace nil {
                     fill_redshift_proof(const RedshiftProof &proof) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using size_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
+                    using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
                     using octet_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint8_t>;
                     using digest_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, octet_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using commitment_marshalling_type = digest_marshalling_type;
                     using commitment_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, commitment_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
 
                     // typename CommitmentSchemeTypePermutation::commitment_type v_perm_commitment
                     commitment_marshalling_type filled_v_perm_commitment;

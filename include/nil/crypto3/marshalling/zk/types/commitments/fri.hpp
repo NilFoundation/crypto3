@@ -63,13 +63,13 @@ namespace nil {
                                    nil::marshalling::types::array_list<
                                        TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
                                        nil::marshalling::option::sequence_size_field_prefix<
-                                           nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                           nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                                    // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                                    // std::array<typename FieldType::value_type, m> y;
                                    nil::marshalling::types::array_list<
                                        TTypeBase, field_element<TTypeBase, typename FRIScheme::field_type::value_type>,
                                        nil::marshalling::option::sequence_size_field_prefix<
-                                           nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                           nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                                    // merkle_proof_type colinear_path;
                                    merkle_proof<TTypeBase, typename FRIScheme::merkle_proof_type>,
                                    // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
@@ -77,7 +77,7 @@ namespace nil {
                                    nil::marshalling::types::array_list<
                                        TTypeBase, merkle_proof<TTypeBase, typename FRIScheme::merkle_proof_type>,
                                        nil::marshalling::option::sequence_size_field_prefix<
-                                           nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
+                                           nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>>>;
 
                 template<typename TTypeBase, typename FRIScheme,
                          typename = typename std::enable_if<
@@ -93,32 +93,32 @@ namespace nil {
                                    nil::marshalling::types::array_list<
                                        TTypeBase, field_element<TTypeBase, typename FRIScheme::field_type::value_type>,
                                        nil::marshalling::option::sequence_size_field_prefix<
-                                           nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                           nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                                    // std::vector<round_proof_type> round_proofs;    // 0..r-2
                                    nil::marshalling::types::array_list<
                                        TTypeBase, fri_round_proof<TTypeBase, FRIScheme>,
                                        nil::marshalling::option::sequence_size_field_prefix<
-                                           nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
+                                           nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>>>;
 
                 template<typename FRIScheme, typename Endianness>
                 fri_round_proof<nil::marshalling::field_type<Endianness>, FRIScheme>
                     fill_fri_round_proof(const typename FRIScheme::round_proof_type &proof) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using size_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
+                    using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
                     using octet_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint8_t>;
                     using digest_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, octet_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using merkle_proof_marshalling_type =
                         merkle_proof<TTypeBase, typename FRIScheme::merkle_proof_type>;
                     using merkle_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, merkle_proof_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using field_marhsalling_type = field_element<TTypeBase, typename FRIScheme::field_type::value_type>;
                     using field_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, field_marhsalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using field_poly_marshalling_type = field_vector_marshalling_type;
 
                     // typename FieldType::value_type colinear_value;
@@ -191,17 +191,17 @@ namespace nil {
                     fill_fri_proof(const typename FRIScheme::proof_type &proof) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using size_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
+                    using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
                     using field_marhsalling_type = field_element<TTypeBase, typename FRIScheme::field_type::value_type>;
                     using field_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, field_marhsalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using field_poly_marshalling_type = field_vector_marshalling_type;
                     using fri_round_proof_marshalling_type =
                         fri_round_proof<nil::marshalling::field_type<Endianness>, FRIScheme>;
                     using fri_round_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, fri_round_proof_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
 
                     // math::polynomial<typename FieldType::value_type> final_polynomial;
                     field_poly_marshalling_type filled_final_polynomial;
