@@ -85,21 +85,21 @@ namespace nil {
                         typename CurveType::template g1_type<>::value_type Q;
                     };
 
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp,
+                        std::size_t components_amount = 1){
+                        return bp.allocate_rows(required_rows_amount *
+                            components_amount);
                     }
 
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment, 
                         const public_params_type &init_params,
-                        const std::size_t &component_start_row) {
-
-                        const std::size_t &j = component_start_row;
+                        const std::initializer_list<std::size_t> &&row_start_indices) {
 
                         using var = snark::plonk_variable<BlueprintFieldType>;
 
-                        std::size_t selector_index = public_assignment.add_selector(j);
+                        std::size_t selector_index = public_assignment.add_selector(row_start_indices);
 
                         auto constraint_1 = bp.add_constraint(
                             var(W7, 0) * (var(W2, 0) - var(W0, 0)));
@@ -126,6 +126,19 @@ namespace nil {
                             constraint_4, constraint_5, constraint_6,
                             constraint_7
                         });
+                    }
+
+                    static void generate_gates(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment, 
+                        const public_params_type &init_params,
+                        const std::size_t row_start_index) {
+
+                        generate_gates(
+                            bp,
+                            public_assignment, 
+                            init_params,
+                            {row_start_index});
                     }
 
                     static void generate_copy_constraints(

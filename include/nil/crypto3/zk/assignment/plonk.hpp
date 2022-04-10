@@ -132,20 +132,9 @@ namespace nil {
                     return this->selector_columns[selector_index];
                 }
 
-                std::size_t add_selector(std::size_t row_index) {
+                std::size_t add_selector(const std::vector<std::size_t> &&row_indices) {
                     static std::size_t selector_index = 0;
-                    snark::plonk_column<BlueprintFieldType> selector_column(_table_description.rows_amount,
-                                                                            BlueprintFieldType::value_type::zero());
-
-                    selector_column[row_index] = BlueprintFieldType::value_type::one();
-                    this->selector_columns[selector_index] = selector_column;
-                    selector_index++;
-                    return selector_index - 1;
-                }
-
-                std::size_t add_selector(const std::initializer_list<std::size_t> &&row_indices) {
-                    static std::size_t selector_index = 0;
-                    std::size_t max_row_index = std::max(row_indices);
+                    std::size_t max_row_index = *std::max_element(row_indices.begin(), row_indices.end());
                     snark::plonk_column<BlueprintFieldType> selector_column(max_row_index + 1,
                                                                             BlueprintFieldType::value_type::zero());
                     for (std::size_t row_index : row_indices) {
@@ -154,6 +143,33 @@ namespace nil {
                     this->selector_columns[selector_index] = selector_column;
                     selector_index++;
                     return selector_index - 1;
+                }
+
+                std::size_t add_selector(std::size_t row_index) {
+                    return add_selector(std::vector<std::size_t>({row_index}));
+                }
+
+                std::size_t add_selector(const std::initializer_list<std::size_t> &&row_start_indices,
+                    const std::initializer_list<std::size_t> &&offsets) {
+
+                    std::vector<std::size_t> row_indices(row_start_indices.size() *
+                        offsets.size());
+                    std::vector<std::size_t>::iterator row_indices_iterator = row_indices.begin();
+
+                    for(std::size_t row_start_index: row_start_indices){
+                        for(std::size_t offset: offsets){
+                            *row_indices_iterator = row_start_index + offset;
+                            row_indices_iterator++;
+                        }
+                    }
+
+                    return add_selector(row_indices);
+                }
+
+                std::size_t add_selector(const std::initializer_list<std::size_t> &&row_start_indices,
+                    const std::size_t offset) {
+
+                    return add_selector(row_start_indices, {offset});
                 }
 
                 std::size_t
