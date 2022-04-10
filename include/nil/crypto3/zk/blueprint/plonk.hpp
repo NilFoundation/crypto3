@@ -32,6 +32,7 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -99,8 +100,19 @@ namespace nil {
                     this->_copy_constraints.emplace_back(copy_constraint);
                 }
 
-                void add_lookup_constraint(const snark::plonk_lookup_constraint<BlueprintFieldType> &copy_constraint) {
-                    this->_lookup_constraints.emplace_back({});
+                snark::plonk_lookup_constraint<BlueprintFieldType>
+                    add_lookup_constraint(std::vector<math::non_linear_term<snark::plonk_variable<BlueprintFieldType>>> lookup_input, 
+                    std::vector<snark::plonk_variable<BlueprintFieldType>> lookup_value) {
+                    snark::plonk_lookup_constraint<BlueprintFieldType> lookup_constraint;
+                    lookup_constraint.lookup_input = lookup_input;
+                    lookup_constraint.lookup_value = lookup_value;
+                    return lookup_constraint;
+                }
+
+
+                void add_lookup_gate(std::size_t selector_index,
+                              const std::initializer_list<snark::plonk_lookup_constraint<BlueprintFieldType>> &constraints) {
+                    this->_lookup_gates.emplace_back(selector_index, constraints);
                 }
             };
         }    // namespace zk
