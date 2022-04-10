@@ -24,7 +24,7 @@ namespace nil {
                         typedef detail::poseidon_functions<poseidon_policy> poseidon_functions;
 
                         std::size_t state_count = 0;
-                        std::size_t state_absorbed = true;
+                        bool state_absorbed = true;
 
                     public:
 
