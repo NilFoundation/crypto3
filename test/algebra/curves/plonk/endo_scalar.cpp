@@ -63,6 +63,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
 
     using component_type = zk::components::endo_scalar<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 40;
 
     
     typename BlueprintFieldType::value_type challenge = 0x00000000000000000000000000000000FC93536CAE0C612C18FBE5F6D8E8EEF2_cppui255;
@@ -73,7 +75,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     typename component_type::private_params_type private_params = {challenge};
     typename component_type::public_params_type public_params = {endo_factor, num_bits};
     std::cout<<"Expected result: "<<result.data<<std::endl;
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams> (public_params, private_params);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (public_params, private_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
