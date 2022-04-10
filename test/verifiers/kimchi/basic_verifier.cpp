@@ -51,7 +51,7 @@
 
 #include "test_plonk_component.hpp"
 #include "basic_verifier_types.hpp"
-//#include "proof_data.hpp"
+#include "proof_data.hpp"
 
 using namespace nil::crypto3;
 
@@ -159,16 +159,17 @@ proof_generator_result_type_scalar scalar_field_prover(nil::crypto3::zk::snark::
 
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_basic_verifier_test_suite) {
-    //nil::crypto3::zk::snark::pickles_proof<curve_type> proof = test_proof();
-    nil::crypto3::zk::snark::pickles_proof<curve_type> kimchi_proof;
-    kimchi_proof.ft_eval1 = 2;
-    kimchi_proof.commitments.z_comm.unshifted.push_back(algebra::random_element<curve_type::template g1_type<>>());
+    nil::crypto3::zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
+    //nil::crypto3::zk::snark::pickles_proof<curve_type> kimchi_proof;
+    //kimchi_proof.ft_eval1 = 2;
+    //kimchi_proof.commitments.z_comm.unshifted.push_back(algebra::random_element<curve_type::template g1_type<>>());
 
     auto scalar_field_result = scalar_field_prover<curve_type, proof_type_scalar>(kimchi_proof);
 
     bool scalar_verifier_res = zk::snark::redshift_verifier<FrType, params_scalar>::process(scalar_field_result.public_preprocessed_data, scalar_field_result.redshift_proof, 
                                                                                 scalar_field_result.bp,scalar_field_result.fri_params);
 
+    //typename BlueprintFieldType::value_type endo_scalar = 0x244630A7EE5033DA383B3677B4C5CA94A3EBE4156FC4FA4E08B35974929CA2C5_cppui255; // cooresponds "2"
     auto base_field_result = base_field_prover<curve_type, proof_type_base>(kimchi_proof, scalar_field_result.out);
 
     bool verifier_res = zk::snark::redshift_verifier<FpType, params_base>::process(base_field_result.public_preprocessed_data, base_field_result.redshift_proof, 
