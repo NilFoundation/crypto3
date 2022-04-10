@@ -79,6 +79,7 @@ set(PLONK_TESTS_FILES
     "verifiers/kimchi/scalar_field"
     "verifiers/kimchi/basic_verifier"
     "verifiers/kimchi/demo_verifier"
+    "verifiers/kimchi/oracles"
     )
 
 set(FIELDS_TESTS_FILES
