@@ -283,18 +283,8 @@ namespace nil {
                                 fri_params.D[i]->fft(poly_dfs);
 
                                 for (std::size_t j = 0; j < m; j++) {
-                                    typename FieldType::value_type leaf = y[j];
 
-                                    std::size_t leaf_index = 0;
-                                    for (; leaf_index < poly_dfs.size(); leaf_index++) {    // search 2**24
-                                        if (poly_dfs[leaf_index] == leaf)
-                                            break;
-                                    }
-
-                                    std::cout << i << ": " << leaf_index << " " << s_indices[j] << " " << domain_size << " " << poly_dfs.size() << std::endl;
-                                    assert(leaf_index == s_indices[j]);
-
-                                    p[j] = merkle_proof_type(*p_tree, leaf_index);
+                                    p[j] = merkle_proof_type(*p_tree, s_indices[j]);
                                 }
 
                                 typename FieldType::value_type colinear_value =
@@ -304,17 +294,7 @@ namespace nil {
                                     T_next = precommit(f_next, fri_params.D[i + 1]);    // new merkle tree
                                     transcript(commit(T_next));
 
-                                    std::vector<typename FieldType::value_type> poly_dfs(f_next.begin(),
-                                                                                    f_next.end());    // for FFT
-                                    fri_params.D[i + 1]->fft(poly_dfs);
-
-                                    std::size_t leaf_index = 0;
-                                    for (; leaf_index < poly_dfs.size(); leaf_index++) {
-                                        if (poly_dfs[leaf_index] == colinear_value)
-                                            break;
-                                    }
-
-                                    merkle_proof_type colinear_path = merkle_proof_type(T_next, leaf_index);
+                                    merkle_proof_type colinear_path = merkle_proof_type(T_next, x_next_index);
 
                                     round_proofs.push_back(
                                         round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
