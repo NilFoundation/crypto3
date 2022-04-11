@@ -166,11 +166,11 @@ namespace nil {
 
                             std::vector<std::array<std::uint8_t, field_element_type::length()>> y_data;
                             y_data.resize(D->m);
-                            std::vector<typename FieldType::value_type> tmp(f.begin(), f.end());    // for FFT
-                            D->fft(tmp);
+                            std::vector<typename FieldType::value_type> f_dfs(f.begin(), f.end());    // for FFT
+                            D->fft(f_dfs);
 
                             for (std::size_t i = 0; i < D->m; i++) {
-                                field_element_type y_val(tmp[i]);
+                                field_element_type y_val(f_dfs[i]);
                                 auto write_iter = y_data[i].begin();
                                 y_val.write(write_iter, field_element_type::length());
                             }
@@ -189,13 +189,34 @@ namespace nil {
                             return precommits;
                         }
 
-                        static commitment_type commit(precommitment_type P) {
-                            return P.root();
+                        template<std::size_t list_size>
+                        static precommitment_type
+                            batched_precommit(const std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
+                                      const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
+
+                            std::vector<std::array<std::uint8_t, field_element_type::length()*list_size>> y_data;
+                            y_data.resize(D->m);
+                            std::array<std::vector<typename FieldType::value_type>, list_size> poly_dfs;
+                            for (std::size_t i = 0; i < list_size; i++){
+                                poly_dfs[i].resize(poly[i].size());
+                                std::copy(poly[i].begin(), poly[i].end(), poly_dfs[i].begin());
+                                D->fft(poly_dfs[i]);
+                            }
+
+                            for (std::size_t i = 0; i < D->m; i++) {
+                                for (std::size_t j = 0; j < list_size; j++){
+
+                                    field_element_type y_val(poly_dfs[j][i]);
+                                    auto write_iter = y_data[i].begin() + field_element_type::length()*j;
+                                    y_val.write(write_iter, field_element_type::length());
+                                }
+                            }
+
+                            return precommitment_type(y_data.begin(), y_data.end());
                         }
 
-                        static commitment_type commit(math::polynomial<typename FieldType::value_type> &f,
-                                                      const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
-                            return commit(precommit(f, D));
+                        static commitment_type commit(precommitment_type P) {
+                            return P.root();
                         }
 
                         template<std::size_t list_size>
@@ -207,6 +228,16 @@ namespace nil {
                                 commits[i] = commit(P);
                             }
                             return commits;
+                        }
+
+                        static commitment_type commit(math::polynomial<typename FieldType::value_type> &f,
+                                                      const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
+                            return commit(precommit(f, D));
+                        }
+
+                        static commitment_type batched_commit(math::polynomial<typename FieldType::value_type> &f,
+                                                      const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
+                            return commit(batched_precommit(f, D));
                         }
 
                         static proof_type proof_eval(const math::polynomial<typename FieldType::value_type> &Q,
