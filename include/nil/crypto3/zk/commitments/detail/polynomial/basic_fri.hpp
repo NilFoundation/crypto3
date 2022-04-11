@@ -219,8 +219,6 @@ namespace nil {
 
                             math::polynomial<typename FieldType::value_type> f = Q;    // copy?
 
-
-
                             // TODO: how to sample x?
                             std::size_t domain_size = fri_params.D[0]->m;
                             std::size_t x_index = (transcript.template int_challenge<std::size_t>())%domain_size;
@@ -271,16 +269,6 @@ namespace nil {
                                 }
 
                                 std::array<merkle_proof_type, m> p;
-
-                                std::vector<typename FieldType::value_type> poly_dfs;    // we need it for FFT
-
-                                if (i == 0) {
-                                    std::copy(g.begin(), g.end(), std::back_inserter(poly_dfs));
-                                } else {
-                                    std::copy(f.begin(), f.end(), std::back_inserter(poly_dfs));
-                                }
-
-                                fri_params.D[i]->fft(poly_dfs);
 
                                 for (std::size_t j = 0; j < m; j++) {
 
