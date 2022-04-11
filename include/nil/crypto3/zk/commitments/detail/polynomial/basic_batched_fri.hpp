@@ -94,10 +94,12 @@ namespace nil {
                     template<typename FieldType,
                              typename MerkleTreeHashType,
                              typename TranscriptHashType,
-                             std::size_t M = 2>
+                             std::size_t M = 2,
+                             std::size_t BatchSize = 2>
                     struct basic_fri {
 
                         constexpr static const std::size_t m = M;
+                        constexpr static const std::size_t leaf_size = BatchSize;
 
                         typedef FieldType field_type;
                         typedef MerkleTreeHashType merkle_tree_hash_type;
@@ -160,48 +162,34 @@ namespace nil {
                             math::polynomial<typename FieldType::value_type> final_polynomial;
                         };
 
+                        template<std::size_t list_size>
                         static precommitment_type
-                            precommit(const math::polynomial<typename FieldType::value_type> &f,
+                            precommit(const std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
-                            std::vector<std::array<std::uint8_t, field_element_type::length()>> y_data;
+                            std::vector<std::array<std::uint8_t, field_element_type::length()*list_size>> y_data;
                             y_data.resize(D->m);
-                            std::vector<typename FieldType::value_type> f_dfs(f.begin(), f.end());    // for FFT
-                            D->fft(f_dfs);
+                            std::array<std::vector<typename FieldType::value_type>, list_size> poly_dfs;
+                            for (std::size_t i = 0; i < list_size; i++){
+                                poly_dfs[i].resize(poly[i].size());
+                                std::copy(poly[i].begin(), poly[i].end(), poly_dfs[i].begin());
+                                D->fft(poly_dfs[i]);
+                            }
 
                             for (std::size_t i = 0; i < D->m; i++) {
-                                field_element_type y_val(f_dfs[i]);
-                                auto write_iter = y_data[i].begin();
-                                y_val.write(write_iter, field_element_type::length());
+                                for (std::size_t j = 0; j < list_size; j++){
+
+                                    field_element_type y_val(poly_dfs[j][i]);
+                                    auto write_iter = y_data[i].begin() + field_element_type::length()*j;
+                                    y_val.write(write_iter, field_element_type::length());
+                                }
                             }
 
                             return precommitment_type(y_data.begin(), y_data.end());
                         }
 
-                        template<std::size_t list_size>
-                        static std::array<precommitment_type, list_size>
-                            precommit(const std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
-                                      const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
-                            std::array<precommitment_type, list_size> precommits;
-                            for (std::size_t i = 0; i < list_size; i++) {
-                                precommits[i] = precommit(poly[i], domain);
-                            }
-                            return precommits;
-                        }
-
                         static commitment_type commit(precommitment_type P) {
                             return P.root();
-                        }
-
-                        template<std::size_t list_size>
-                        static std::array<commitment_type, list_size>
-                            commit(std::array<precommitment_type, list_size> P) {
-
-                            std::array<commitment_type, list_size> commits;
-                            for (std::size_t i = 0; i < list_size; i++) {
-                                commits[i] = commit(P);
-                            }
-                            return commits;
                         }
 
                         static commitment_type commit(math::polynomial<typename FieldType::value_type> &f,
@@ -219,14 +207,12 @@ namespace nil {
 
                             math::polynomial<typename FieldType::value_type> f = Q;    // copy?
 
-
-
                             // TODO: how to sample x?
-                            std::size_t domain_size = fri_params.D[0]->m;
-                            std::size_t x_index = (transcript.template int_challenge<std::size_t>())%domain_size;
-                            std::size_t x_next_index;
-                            typename FieldType::value_type x =
-                                fri_params.D[0]->get_domain_element(1).pow(x_index);
+                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(
+                                transcript.template int_challenge<
+                                    std::size_t>());    // could be smth like
+                                                        // fri_params.D[0]->get_domain_element(RANDOM
+                                                        // % domain_size)
 
                             std::size_t r = fri_params.r;
 
@@ -237,29 +223,18 @@ namespace nil {
 
                             for (std::size_t i = 0; i < r; i++) {
 
-                                std::size_t domain_size = fri_params.D[i]->m;
-
                                 typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
                                 typename FieldType::value_type x_next = fri_params.q.evaluate(x);    // == x^2
-
-                                x_index %= domain_size;
-
-                                if (i < r-1){
-                                    x_next_index = x_index % (fri_params.D[i + 1]->m);
-                                }
 
                                 math::polynomial<typename FieldType::value_type> f_next = fold_polynomial<FieldType>(
                                     f, alpha);    // create polynomial of degree (degree(f) / 2)
 
                                 // m = 2, so:
                                 std::array<typename FieldType::value_type, m> s;
-                                std::array<std::size_t, m> s_indices;
                                 if constexpr (m == 2) {
                                     s[0] = x;
                                     s[1] = -x;
-                                    s_indices[0] = x_index;
-                                    s_indices[1] = (x_index + domain_size/2)%domain_size;
                                 } else {
                                     return {};
                                 }
@@ -290,10 +265,6 @@ namespace nil {
                                         if (poly_dfs[leaf_index] == leaf)
                                             break;
                                     }
-
-                                    std::cout << i << ": " << leaf_index << " " << s_indices[j] << " " << domain_size << " " << poly_dfs.size() << std::endl;
-                                    assert(leaf_index == s_indices[j]);
-
                                     p[j] = merkle_proof_type(*p_tree, leaf_index);
                                 }
 
@@ -328,7 +299,6 @@ namespace nil {
                                 }
 
                                 x = x_next;
-                                x_index = x_next_index;
                                 f = f_next;
                             }
                             return proof_type({round_proofs, f});
