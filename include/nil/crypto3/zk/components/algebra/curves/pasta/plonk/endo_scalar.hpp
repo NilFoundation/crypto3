@@ -90,6 +90,10 @@ namespace nil {
                         typename BlueprintFieldType::value_type scalar;
                     };
 
+                    struct result_type {
+                        var endo_scalar;
+                    };
+
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
                         return in_bp.allocate_rows(required_rows_amount);
                     }
@@ -174,7 +178,7 @@ namespace nil {
                         }
                     }
 
-                    static void generate_assignments(
+                    static result_type generate_assignments(
                             blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
                             blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                                         const public_params_type &public_params,
@@ -233,7 +237,9 @@ namespace nil {
                             }
                             auto res = a * public_params.endo_factor + b;
                             private_assignment.witness(W6)[row - 1] = res;
+
                             std::cout<<"circuit result "<<res.data<<std::endl;
+                            return result_type { var(W6, row - 1, false) };
                     }
                 };
             }    // namespace components

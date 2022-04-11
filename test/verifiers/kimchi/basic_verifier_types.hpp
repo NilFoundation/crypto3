@@ -28,7 +28,9 @@
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_PROOF_TYPES_HPP
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
+#include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
@@ -45,7 +47,7 @@
 
 using namespace nil::crypto3;
 
-using curve_type = algebra::curves::pallas;
+using curve_type = algebra::curves::vesta;
 using FpType = typename curve_type::base_field_type;
 using FrType = typename curve_type::scalar_field_type;
 
