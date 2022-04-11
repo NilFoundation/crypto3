@@ -82,7 +82,7 @@ namespace nil {
                     using commitment_type = typename basic_fri::commitment_type;
 
                     static typename basic_fri::proof_type proof_eval(
-                        const std::array<math::polynomial<typename FieldType::value_type>, leaf_size> &g,
+                        const std::array<math::polynomial<typename FieldType::value_type>, leaf_size> g,
                         precommitment_type &T,
                         const typename basic_fri::params_type &fri_params,
                         typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {

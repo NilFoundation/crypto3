@@ -229,7 +229,6 @@ namespace nil {
                             std::size_t r = fri_params.r;
 
                             std::vector<round_proof_type> round_proofs;
-                            math::polynomial<typename FieldType::value_type> final_polynomial;
                             std::unique_ptr<merkle_tree_type> p_tree = std::make_unique<merkle_tree_type>(T);
                             merkle_tree_type T_next;
 
