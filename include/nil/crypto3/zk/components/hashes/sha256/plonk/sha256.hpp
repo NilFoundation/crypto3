@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
 //
 // MIT License
 //
@@ -178,39 +179,174 @@ namespace nil {
                         generate_sigma0_gates(bp, public_assignment, j);
                     }
 
-                    /*void generate_Sigma0_gates() {
-
-                        this->bp.add_gate(j + 7, w[0][cur] - (w[2][cur] + w[3][cur] * 2**2 + w[4][cur] * 2**13 + w[5][cur] * 2**22));
-                        this->bp.add_gate(j + 5, w[0][cur] - (w[2][p1] + w[3][p1] * 4**2 + w[4][p1] * 4**13 + w[5][p1] * 4**22));
-                        this->bp.add_gate(j + 6, (w[2][cur] - 3) * (w[2][cur] - 2) * (w[2][cur] - 1) * w[2][cur]);
-                        this->bp.add_gate(j + 6, w[0][cur] + w[1][cur] * 4**14 + w[6][cur] * 4**28 + w[7][cur] * 2**30 -
-                            (w[3][cur] + w[4][cur] * 4**11 + w[5][cur] * 4**20 + w[1][cur] * 2**30 + w[4][cur] + 
-                            w[5][cur] * 4**[9] + w[2][cur] * 4**19 + w[3][cur] * 4**21 + w[5][cur] + w[2][cur] * 4**10 + 
-                            w[3][cur] * 4**12 + w[4][cur] * 4**23));
-                        this->bp.add_gate(j + 6, (w[6][cur] - 3) * (w[6][cur] - 2) * (w[6][cur] - 1) * w[6][cur]);
-                        this->bp.add_gate(j + 6, (w[7][cur] - 3) * (w[7][cur] - 2) * (w[7][cur] - 1) * w[7][cur]);
+                    static void generate_Sigma0_gates(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment, const std::size_t &start_row) {
+                        std::size_t j = start_row;
+                        std::size_t selector_index = public_assignment.add_selector(j, j + 505, 8);
+                        auto constraint_1 = bp.add_constraint(var(W0, +1) - (var(W2, +1) + var(W3, +1) * (1<<2) + var(W4, +1) 
+                        * (1<<13) +
+                         var(W5, +1) * (1<<22)));
+                         auto constraint_2 = bp.add_constraint(var(W0, -1) - (var(W2, 0) + var(W3, 0) * (1<<4) + var(W4, 0) 
+                        * (1<<26) +
+                         var(W5, 0) * (1<<44)));
+                        auto constraint_3 = bp.add_constraint((var(W2, 0) - 3) * (var(W2, 0)  - 2) * (var(W2, 0)  - 1)
+                         * var(W2, 0) );
+                        auto constraint_4 = bp.add_constraint(var(W0, 0) + var(W1, 0) * (1<<28) + var(W6, 0) * (1<<56) + 
+                        var(W7, 0) * (1<<60) - 
+                            (var(W2, 0) * ((1<<38) + (1<<20) + (1<<60)) + var(W3, 0) * ((1<<42) + 1 + (1<<24)) 
+                            + var(W4, 0)* ((1<<22) + (1<<46) + 1) + var(W5, 0)* ((1<<40) + (1<<18) + 1)));
+                        auto constraint_5 = bp.add_constraint((var(W6, 0)- 3) * (var(W6, 0) - 2) * 
+                        (var(W6, 0) - 1) * var(W6, 0));
+                        auto constraint_6 = bp.add_constraint((var(W7, 0) - 3) * (var(W7, 0) - 2) *
+                         (var(W7, 0) - 1) * var(W7, 0));
+                        bp.add_gate(selector_index,
+                            {constraint_1, constraint_2, constraint_3,
+                                          constraint_4, constraint_5, constraint_6});
+                        std::size_t selector_lookup_index = public_assignment.add_selector(j);
+                        auto lookup_constraint_1 = bp.add_lookup_constraint({var(W3, +1)* 8}, {{0, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_2 = bp.add_lookup_constraint({var(W2, +1), var(W2, 0)}, {{0, 0, false, var::column_type::constant}, {1, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_3 = bp.add_lookup_constraint({var(W4, +1)* 32}, {{0, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_4 = bp.add_lookup_constraint({var(W3, +1), var(W3, 0)}, {{0, 0, false, var::column_type::constant}, {1, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_5 = bp.add_lookup_constraint({var(W5, +1) * 16}, {{0, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_6 = bp.add_lookup_constraint({var(W4, +1), var(W4, 0)}, {{0, 0, false, var::column_type::constant}, {1, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_7 = bp.add_lookup_constraint({var(W5, +1), var(W5, 0)}, {{0, 0, false, var::column_type::constant}, {1, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_8 = bp.add_lookup_constraint({var(W5, - 1), var(W0, 0)}, {{0, 0, false, var::column_type::constant}, {1, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_9 = bp.add_lookup_constraint({var(W6, - 1), var(W1, 0)}, {{0, 0, false, var::column_type::constant}, {1, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_10 = bp.add_lookup_constraint({var(W7, - 1), var(W6, 0)}, {{0, 0, false, var::column_type::constant}, {1, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_11 = bp.add_lookup_constraint({var(W8, - 1), var(W7, 0)}, {{0, 0, false, var::column_type::constant}, {1, 0, false, var::column_type::constant}});
+                        bp.add_lookup_gate(selector_lookup_index,
+                            {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3,
+                                          lookup_constraint_4, lookup_constraint_5, lookup_constraint_6,
+                                          lookup_constraint_7, lookup_constraint_8,
+                                          lookup_constraint_9, lookup_constraint_10, lookup_constraint_11});
                     }
 
-                    void generate_Sigma1_gates() {
-                        this->bp.add_gate(j + 0, w[0][cur] - (w[2][cur] + w[3][cur] * 2**[6] + w[4][cur] * 2**[11] + w[5][cur] * 2**[25]));
-                        this->bp.add_gate(j + 1, w[0][cur] - (w[1][m1] + w[2][cur] * 7**[6] + w[3][cur] * 7**[11] + w[4][cur] * 7**[25]));
-                        this->bp.add_gate(j + 1, w[5][cur] + w[6][cur] * 4**[14] + w[7][cur] * 4**[28] + w[8][cur] * 2**[30] - 
-                            (w[2][cur] + w[3][cur] * 4**[5] + w[4][cur] * 4**[19] + w[1][m1] * 2**[26] + w[3][cur] + 
-                            w[4][cur] * 4**[14] + w[1][m1] * 4**[21] + w[2][cur] * 4**[27] + w[4][cur] + w[1][m1] * 4**[7] + 
-                            w[2][cur] * 4**[13] + w[3][cur] * 4**[27]));
-                        this->bp.add_gate(j + 1, (w[3][cur] - 3) * (w[3][cur] - 2) * (w[3][cur] - 1) * w[3][cur]);
-                        this->bp.add_gate(j + 1, (w[4][cur] - 3) * (w[4][cur] - 2) * (w[4][cur] - 1) * w[4][cur]);
+                    static void generate_Sigma1_gates(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment, const std::size_t &start_row){ 
+                        std::size_t j = start_row;
+                        std::size_t selector_index = public_assignment.add_selector(j, j + 510, 8);
+                        auto constraint_1 = bp.add_constraint(var(W0, -1) - (var(W2, -1) + var(W3, -1) * (1<<6) + var(W4, -1) 
+                        * (1<<11) +
+                         var(W5, -1) * (1<<25)));
+                         auto constraint_2 = bp.add_constraint(var(W0, 0) - (var(W2, 0) + var(W3, 0) * (1<<12) + var(W4, 0) 
+                        * (1<<22) +
+                         var(W5, 0) * (1<<50)));
+                        auto constraint_3 = bp.add_constraint(var(W5, 0) + var(W6, 0) * (1<<28) + var(W7, 0) * (1<<56) + 
+                        var(W8, 0) * (1<<60) - 
+                            (var(W2, 0) * ((1<<54) + (1<<26) + 1) + var(W3, 0) * ((1<<10) + 1 + (1<<54)) 
+                            + var(W4, 0)* ((1<<38) + (1<<28) + 1) + var(W1, -1)* ((1<<52) + (1<<42) + (1<<14))));
+                        auto constraint_4 = bp.add_constraint((var(W3, 0)- 3) * (var(W3, 0) - 2) * 
+                        (var(W3, 0) - 1) * var(W3, 0));
+                        auto constraint_5 = bp.add_constraint((var(W4, 0) - 3) * (var(W4, 0) - 2) *
+                         (var(W4, 0) - 1) * var(W4, 0));
+                        bp.add_gate(selector_index,
+                            {constraint_1, constraint_2, constraint_3,
+                                          constraint_4, constraint_5});
+                        std::size_t selector_lookup_index = public_assignment.add_selector(j);
+                        auto lookup_constraint_1 = bp.add_lookup_constraint({var(W3, -1)* 256}, {{2, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_2 = bp.add_lookup_constraint({var(W2, -1), var(W1, -1)}, {{2, 0, false, var::column_type::constant}, {3, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_3 = bp.add_lookup_constraint({var(W4, -1)* 512}, {{2, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_4 = bp.add_lookup_constraint({var(W3, -1), var(W2, 0)}, {{2, 0, false, var::column_type::constant}, {3, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_5 = bp.add_lookup_constraint({var(W5, -1) * 128}, {{2, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_6 = bp.add_lookup_constraint({var(W4, -1), var(W3, 0)}, {{2, 0, false, var::column_type::constant}, {3, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_7 = bp.add_lookup_constraint({var(W5, -1), var(W4, 0)}, {{2, 0, false, var::column_type::constant}, {3, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_8 = bp.add_lookup_constraint({var(W5, + 1), var(W5, 0)}, {{2, 0, false, var::column_type::constant}, {3, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_9 = bp.add_lookup_constraint({var(W6, + 1), var(W6, 0)}, {{2, 0, false, var::column_type::constant}, {3, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_10 = bp.add_lookup_constraint({var(W7, + 1), var(W7, 0)}, {{2, 0, false, var::column_type::constant}, {3, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_11 = bp.add_lookup_constraint({var(W8, + 1), var(W8, 0)}, {{2, 0, false, var::column_type::constant}, {3, 0, false, var::column_type::constant}});
+                        bp.add_lookup_gate(selector_lookup_index,
+                            {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3,
+                                          lookup_constraint_4, lookup_constraint_5, lookup_constraint_6,
+                                          lookup_constraint_7, lookup_constraint_8,
+                                          lookup_constraint_9, lookup_constraint_10, lookup_constraint_11});
                     }
 
-                    void generate_Maj_gates() {
-                        this->bp.add_gate(j + 4, w[0][cur] + w[1][cur] * 4**8 + w[2][cur] * 4*(8 * 2) + w[3][cur] * 4*(8 * 3) - 
-                            (w[0][p1] + w[1][p1] + w[4][p1]));
+                    static void generate_Maj_gates(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment, const std::size_t &start_row) {
+                        std::size_t j = start_row;
+                        std::size_t selector_index = public_assignment.add_selector(j, j + 507, 8);
+                        auto constraint_1 = bp.add_constraint(var(W0, 0)+ var(W1, 0) * (1<<16) + var(W2, 0)* (1<<32) 
+                        + var(W3, 0) * (1<<64) - (var(W0, +1) + var(W1, + 1) + var(W4, + 1)));
+                        bp.add_gate(selector_index,
+                            {constraint_1});
+                        std::size_t selector_lookup_index = public_assignment.add_selector(j);
+                        auto lookup_constraint_1 = bp.add_lookup_constraint({var(W5, 0), var(W0, 0)}, {{4, 0, false, var::column_type::constant}, {5, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_2 = bp.add_lookup_constraint({var(W6, 0), var(W1, 0)}, {{4, 0, false, var::column_type::constant}, {5, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_3 = bp.add_lookup_constraint({var(W7, 0), var(W2, 0)}, {{4, 0, false, var::column_type::constant}, {5, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_4 = bp.add_lookup_constraint({var(W8, 0), var(W3, 0)}, {{4, 0, false, var::column_type::constant}, {5, 0, false, var::column_type::constant}});
+                        bp.add_lookup_gate(selector_lookup_index,
+                            {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3,
+                                          lookup_constraint_4});
+
                     }
 
-                    void generate_Ch_gates(){
-                        this->bp.add_gate(j + 2, w[0][cur] + w[1][cur] * 7**8 + w[2][cur] * 7**(8 * 2) + w[3][cur] * 7**(8 * 3) - 
-                            (w[0][m1] + 2 * w[1][m1] + 3 * w[0][p1]));
-                    }*/
+                    static void generate_Ch_gates(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment, const std::size_t &start_row) {
+                        std::size_t j = start_row;
+                        std::size_t selector_index = public_assignment.add_selector(j, j + 509, 8);
+                        auto constraint_1 = bp.add_constraint(var(W0, 0)+ var(W1, 0) * (pow(7, 8)) 
+                        + var(W2, 0)* (pow(7, 16)) 
+                        + var(W3, 0) * (pow(7, 24)) - (var(W0, -1) + 2 * var(W1, - 1) + 3 * var(W1, + 1)));
+                        bp.add_gate(selector_index,
+                            {constraint_1});
+                        std::size_t selector_lookup_index = public_assignment.add_selector(j);
+                        auto lookup_constraint_1 = bp.add_lookup_constraint({var(W5, +1), var(W0, 0)}, {{6, 0, false, var::column_type::constant}, {7, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_2 = bp.add_lookup_constraint({var(W6, +1), var(W1, 0)}, {{6, 0, false, var::column_type::constant}, {7, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_3 = bp.add_lookup_constraint({var(W7, +1), var(W2, 0)}, {{6, 0, false, var::column_type::constant}, {7, 0, false, var::column_type::constant}});
+                        auto lookup_constraint_4 = bp.add_lookup_constraint({var(W8, +1), var(W3, 0)}, {{6, 0, false, var::column_type::constant}, {7, 0, false, var::column_type::constant}});
+                        bp.add_lookup_gate(selector_lookup_index,
+                            {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3,
+                                          lookup_constraint_4});
+
+                    }
+
+                    static void generate_compression_gates(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment, const std::size_t &start_row) {
+                        std::size_t j = start_row;
+                        j++;
+                        generate_Sigma1_gates(bp, public_assignment, j);
+                        j++;
+                        generate_Ch_gates(bp, public_assignment, j);
+                        j++;
+                        for (std::size_t i = j; i < 508; i = i + 8) {
+                            std::size_t selector_index = public_assignment.add_selector(i);
+                            auto constraint_1 = bp.add_constraint(var(W4, 0) - (var(W1, 0) + var(W2, 0) +  var(W5, -1) +
+                            var(W6, -1) * (1<<14) - var(W7, -1)*(1<<28) + var(W8, -1)*(1<<30)+ var(W5, 0) + var(W6, 0)*(1<<8) + 
+                            var(W7, 0)*(1<<16) + var(W8, 0)*(1<<24) + round_constant[(i-j)/8] + var(W3, 0)));
+                            bp.add_gate(selector_index,
+                            {constraint_1});
+                        }
+                        j++;
+                        std::size_t selector_index = public_assignment.add_selector(j, j + 507, 8);
+                        auto constraint_1 = bp.add_constraint(var(W4, 0) - (var(W4, -1) + var(W1, -1) +  var(W5, +1) +
+                            var(W6, +1) *(1<<14)  - var(W7, +1)*(1<<28) + var(W8, +1)*(1<<30)+ var(W5, 0) + var(W6, 0)*(1<<8) + 
+                            var(W7, 0)*(1<<16) + var(W8, 0)*(1<<24)));
+                        bp.add_gate(selector_index,
+                            {constraint_1});
+                        generate_Maj_gates(bp, public_assignment, j);
+                        j++;
+                        j++;
+                        generate_Sigma0_gates(bp, public_assignment, j);
+                        j = j + 8*63 + 2;
+                        std::size_t selector_out_index_1 = public_assignment.add_selector(j);
+                        auto constraint_out_1 = bp.add_constraint(var(W0, 0) - (var(W0, -1) + var(W0, +1)));
+                        auto constraint_out_2 = bp.add_constraint(var(W1, 0) - (var(W1, -1) + var(W1, +1)));
+                        auto constraint_out_3 = bp.add_constraint(var(W2, 0) - (var(W2, -1) + var(W2, +1)));
+                        auto constraint_out_4 = bp.add_constraint(var(W3, 0) - (var(W3, -1) + var(W3, +1)));
+                        auto constraint_out_5 = bp.add_constraint(var(W4, 0) - (var(W4, -1) + var(W4, +1)));
+                        auto constraint_out_6 = bp.add_constraint(var(W5, 0) - (var(W5, -1) + var(W5, +1)));
+                        bp.add_gate(selector_out_index_1,
+                            {constraint_out_1, constraint_out_2, constraint_out_3, constraint_out_4, constraint_out_5,
+                             constraint_out_6});
+                        j++;
+                        std::size_t selector_out_index_2 = public_assignment.add_selector(j);
+                        auto constraint_out_7 = bp.add_constraint(var(W0, +1) - (var(W2, +1) + var(W4, +1)));
+                        auto constraint_out_8 = bp.add_constraint(var(W1, + 1) - (var(W3, +1) + var(W5, +1)));
+                        bp.add_gate(selector_out_index_2,
+                            {constraint_out_7, constraint_out_8});
+
+                    }
+
 
                     static std::array<std::vector<std::size_t>, 2> split_and_sparse(std::vector<bool> bits, std::vector<std::size_t> sizes) {
                         std::size_t size = sizes.size();
@@ -253,7 +389,10 @@ namespace nil {
                         const public_params_type &init_params,
                         const std::size_t &component_start_row) {
                         std::size_t j = component_start_row;
+                        j = j + 3;
                         generate_message_scheduling_gates(bp, public_assignment, j);
+                        j = j + 5*48;
+                        //generate_compression_gates(bp, public_assignment, j);
                     }
 
                     static void generate_copy_constraints(

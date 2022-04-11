@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021-2022 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021-2022 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
 //
 // MIT License
 //
@@ -55,6 +56,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256) {
     constexpr std::size_t PublicInputColumns = 0;
     constexpr std::size_t ConstantColumns = 2;
     constexpr std::size_t SelectorColumns = 5;
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 1;
 
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -68,7 +71,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256) {
     std::array<typename ArithmetizationType::field_type::value_type, 8> input_state = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
     std::array<typename ArithmetizationType::field_type::value_type, 16> input_words = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
     typename component_type::private_params_type private_params = {input_state, input_words};
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams> (public_params, private_params);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (public_params, private_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
