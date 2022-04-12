@@ -160,7 +160,6 @@ namespace nil {
                                     i,
                                     preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                     plonk_variable<FieldType>::column_type::public_input);
-                                std::size_t eval_idx = i - witness_columns;
                                 columns_at_y[key] = proof.eval_proof.public_input[i].z[j];
                             }
                         }
@@ -174,7 +173,6 @@ namespace nil {
                                     i,
                                     preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                     plonk_variable<FieldType>::column_type::constant);
-                                std::size_t eval_idx = i - witness_columns - public_input_columns;
                                 columns_at_y[key] = proof.eval_proof.constant[i].z[j];
                             }
                         }
@@ -190,7 +188,6 @@ namespace nil {
                                     i,
                                     preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                     plonk_variable<FieldType>::column_type::selector);
-                                std::size_t eval_idx = i;
                                 columns_at_y[key] = proof.eval_proof.selector[i].z[j];
                             }
                         }
