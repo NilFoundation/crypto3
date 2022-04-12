@@ -63,9 +63,9 @@ namespace nil {
                          typename TranscriptHashType,
                          std::size_t M = 2,
                          std::size_t BatchSize = 1>
-                class batched_fri : public detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M> {
+                class batched_fri : public detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize> {
 
-                    using basic_fri = detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M>;
+                    using basic_fri = detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize>;
 
                 public:
                     constexpr static const std::size_t m = basic_fri::m;

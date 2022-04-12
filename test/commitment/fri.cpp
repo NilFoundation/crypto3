@@ -232,8 +232,9 @@ BOOST_AUTO_TEST_CASE(batched_fri_basic_test) {
 
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
+    constexpr static const std::size_t leaf_size = 2;
 
-    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
@@ -244,7 +245,6 @@ BOOST_AUTO_TEST_CASE(batched_fri_basic_test) {
     params_type params;
 
     constexpr static const std::size_t d_extended = d;
-    constexpr static const std::size_t leaf_size = 1;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
@@ -260,7 +260,9 @@ BOOST_AUTO_TEST_CASE(batched_fri_basic_test) {
     BOOST_CHECK(params.q.evaluate(D[0]->get_domain_element(1)) == D[0]->get_domain_element(1).squared());
 
     // commit
-    std::array<math::polynomial<typename FieldType::value_type>, leaf_size> f = {{{1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}}};
+    std::array<math::polynomial<typename FieldType::value_type>, leaf_size> f = {{
+        {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1},
+        {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}}};
 
     merkle_tree_type commit_merkle = fri_type::precommit(f, D[0]);
     std::array<typename FieldType::value_type, 1> evaluation_points = {D[0]->get_domain_element(1).pow(5)};
