@@ -67,14 +67,16 @@ namespace nil {
                     W0, W1, W2, W3, W4,
                     W5, W6, W7, W8, W9,
                     W10, W11, W12, W13, W14> {
+                    public:
+                        constexpr static const std::size_t state_size = 3;
+                        constexpr static const std::size_t rounds_amount = 55;
+                    
+                    private: 
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
-
-                    constexpr static const std::size_t state_size = 3;
-                    constexpr static const std::size_t rounds_amount = 55;
 
                     constexpr static const std::size_t rounds_per_row = 5;
 
@@ -381,6 +383,7 @@ namespace nil {
 
 
                  public:
+                    constexpr static const std::size_t rate = 2;
 
                     constexpr static const std::size_t required_rows_amount = 12;
 
