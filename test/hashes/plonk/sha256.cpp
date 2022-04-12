@@ -24,7 +24,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE plonk_poseidon_test
+#define BOOST_TEST_MODULE plonk_sha256_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -40,44 +40,38 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/hashes/poseidon/plonk/poseidon_15_wires.hpp>
+#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha256.hpp>
 
 #include "../../test_plonk_component.hpp"
 
 using namespace nil::crypto3;
 
-BOOST_AUTO_TEST_SUITE(blueprint_plonk_poseidon_test_suite)
+BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case1) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256) {
 
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
-    using FieldType = typename curve_type::base_field_type;
-    constexpr std::size_t WitnessColumns = 15;
+    constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 0;
-    constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 11;
-
-    using ArithmetizationParams =
-        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-
-    using component_type =
-        zk::components::poseidon<ArithmetizationType, FieldType, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+    constexpr std::size_t ConstantColumns = 2;
+    constexpr std::size_t SelectorColumns = 5;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
-    constexpr std::size_t Lambda = 5;
+    constexpr std::size_t Lambda = 1;
+
+    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
+        PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
+                ArithmetizationParams>;
+
+    using component_type = zk::components::sha256<ArithmetizationType, curve_type,
+                                                            0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
     typename component_type::public_params_type public_params = {};
-    std::array<typename ArithmetizationType::field_type::value_type, 3> input_state = {0, 1, 1};
-    typename component_type::private_params_type private_params = {input_state};
-    std::array<typename ArithmetizationType::field_type::value_type, 3> output_state = {
-        0x294B71F8CF2C775369A3B0B8912E508790B0C64BDBE6A5C26F2C6B53767A47CB_cppui255,
-        0x244E5FA0EE801AB3FCCAB47ED7F6EAB38126318F7BD2C414ADDBF62FCC30316A_cppui255,
-        0x273C6EE50F9A2970162F5D4503596175C6D3FB4C0BF6C269BCD1DFEFB4F50D47_cppui255};
-    std::cout << "Expected result: " << output_state[0].data << " " << output_state[1].data << " "
-              << output_state[2].data << std::endl;
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(public_params,
-                                                                                                 private_params);
+    std::array<typename ArithmetizationType::field_type::value_type, 8> input_state = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
+    std::array<typename ArithmetizationType::field_type::value_type, 16> input_words = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    typename component_type::private_params_type private_params = {input_state, input_words};
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (public_params, private_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
