@@ -10,6 +10,8 @@
 #ifndef BOOST_MULTIPRECISION_ASM_FUNCTIONS_HPP
 #define BOOST_MULTIPRECISION_ASM_FUNCTIONS_HPP
 
+#include <boost/predef.h>
+
 namespace nil {
     namespace crypto3 {
         namespace multiprecision {
