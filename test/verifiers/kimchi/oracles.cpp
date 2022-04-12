@@ -47,9 +47,9 @@
 
 using namespace nil::crypto3;
 
-BOOST_AUTO_TEST_SUITE(blueprint_plonk_endo_scalar_test_suite)
+BOOST_AUTO_TEST_SUITE(blueprint_plonk_oracles_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
 
     using curve_type = algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::scalar_field_type;

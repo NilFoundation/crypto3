@@ -34,7 +34,10 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/entities/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/sponge.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
 
 namespace nil {
@@ -80,6 +83,7 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using endo_scalar_component = zk::components::endo_scalar<ArithmetizationType, CurveType,
                                                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using from_limbs = zk::components::from_limbs<ArithmetizationType, CurveType, W0, W1, W2>;
 
                     static typename BlueprintFieldType::value_type var_value(blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
                             blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
@@ -102,22 +106,11 @@ namespace nil {
                             std::array<var, 2> scalar_limbs_var,
                             std::size_t &component_start_row) {
 
-                        constexpr const std::size_t from_limbs_rows = 1;
+                        typename from_limbs::result_type res = from_limbs::generate_assignments(private_assignment, 
+                            public_assignment, typename from_limbs::params_type {scalar_limbs_var}, component_start_row);
 
-                        std::size_t row = component_start_row;
-                        typename BlueprintFieldType::value_type first_limb = var_value(private_assignment, public_assignment, scalar_limbs_var[0]);
-                        typename BlueprintFieldType::value_type second_limb = var_value(private_assignment, public_assignment, scalar_limbs_var[1]);
-                        private_assignment.witness(W0)[row] = first_limb;
-                        private_assignment.witness(W1)[row] = second_limb;
-                        std::cout<<"first limb: "<<first_limb.data<<std::endl;
-                        typename BlueprintFieldType::value_type scalar = 2;
-                        scalar = scalar.pow(64) * second_limb + first_limb;
-                        std::cout<<scalar.data<<std::endl;
-                        private_assignment.witness(W2)[row] = scalar;
-                        var res(W2, row, false);
-
-                        component_start_row += from_limbs_rows;
-                        return res;
+                        component_start_row += from_limbs::required_rows_amount;
+                        return res.result;
                     }
 
                     static void copy_constraints_from_limbs(blueprint<ArithmetizationType> &bp,
@@ -217,19 +210,22 @@ namespace nil {
                                         const std::size_t &component_start_row) {
                             
                         std::size_t row = component_start_row;
+                        const std::size_t public_input_size = 5; 
 
                         // copy public input
                         public_assignment.public_input(0)[row] = public_params.alpha[0];
                         public_assignment.public_input(0)[row + 1] = public_params.alpha[1];
                         public_assignment.public_input(0)[row + 2] = public_params.zeta[0];
                         public_assignment.public_input(0)[row + 3] = public_params.zeta[1];
+                        public_assignment.public_input(0)[row + 4] = public_params.fq_digest;
 
                         std::array<var, 2> alpha_pub_limbs = {var(0, row, false, var::column_type::public_input), 
                                 var(0, row + 1, false, var::column_type::public_input)};
                         std::array<var, 2> zeta_pub_limbs = {var(0, row + 2, false, var::column_type::public_input), 
                                 var(0, row + 3, false, var::column_type::public_input)};
+                        var fq_digest(0, row + 4, false, var::column_type::public_input);
 
-                        row += 4;
+                        row += public_input_size;
 
                         var alpha = assignments_from_limbs(private_assignment, public_assignment,
                             alpha_pub_limbs, row);
@@ -240,6 +236,12 @@ namespace nil {
                             zeta_pub_limbs, row);
                         var zeta_endo = assignments_endo_scalar(private_assignment, public_assignment,
                             zeta, row);
+
+                        kimchi_transcript<ArithmetizationType, CurveType,
+                            W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> transcript;
+                        transcript.init_assignment(private_assignment, public_assignment, row);
+                        transcript.absorb_assignment(private_assignment, public_assignment,
+                            fq_digest, row);
                     }
                 };
             }    // namespace components
