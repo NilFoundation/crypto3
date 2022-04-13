@@ -128,17 +128,16 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul) {
     using component_type = zk::components::curve_element_variable_base_scalar_mul<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
-    typename component_type::public_params_type init_params = {};
     curve_type::scalar_field_type::value_type b = algebra::random_element<BlueprintScalarType>();
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
-	typename component_type::private_params_type assignment_params = {T,b};
+	typename component_type::params_type assignment_params = {T,b};
 	typename curve_type::scalar_field_type::value_type tmp = 2;
 	tmp = tmp.pow(255);
 	tmp = (1 + tmp + 2*b);
 	curve_type::scalar_field_type::value_type c = tmp;
 	curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type acc = c*T;
     std::cout<<"Expected result: "<<acc.X.data<<" "<< acc.Y.data<<std::endl;
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (init_params, assignment_params);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (assignment_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

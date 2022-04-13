@@ -72,10 +72,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     typename BlueprintFieldType::value_type result = 0x004638173549A4C55A118327904B54E5F6F6314225C8C862F5AFA2506C77AC65_cppui255;
     std::size_t num_bits = 128;
 
-    typename component_type::private_params_type private_params = {challenge};
-    typename component_type::public_params_type public_params = {endo_factor, num_bits};
+    typename component_type::params_type params = {challenge, endo_factor, num_bits};
     std::cout<<"Expected result: "<<result.data<<std::endl;
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (public_params, private_params);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

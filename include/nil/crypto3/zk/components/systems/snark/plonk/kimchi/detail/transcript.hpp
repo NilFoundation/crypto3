@@ -84,10 +84,7 @@ namespace nil {
                 public:
                     constexpr static const std::size_t required_rows_amount = 1;
 
-                    struct public_params_type {
-                    };
-
-                    struct private_params_type {
+                    struct params_type {
                         
                     };
 

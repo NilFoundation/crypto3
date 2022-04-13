@@ -388,9 +388,7 @@ namespace nil {
 
                     constexpr static const std::size_t required_rows_amount = 12;
 
-                    struct public_params_type { };
-
-                    struct private_params_type {
+                    struct params_type {
                         std::array<typename ArithmetizationType::field_type::value_type, state_size> input_state;
                     };
 
@@ -401,7 +399,7 @@ namespace nil {
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const public_params_type &init_params,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
                         std::size_t j = component_start_row;
                         for (std::size_t z = 0; z < rounds_amount; z += rounds_per_row){
@@ -482,7 +480,7 @@ namespace nil {
                     static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const public_params_type &init_params,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
 
                     }
@@ -490,8 +488,7 @@ namespace nil {
                     static void generate_assignments(
                         blueprint_assignment_table<ArithmetizationType>
                             &assignment,
-                        const public_params_type &init_params,
-                        const private_params_type &params,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
 
                         std::array<typename ArithmetizationType::field_type::value_type, state_size> state = params.input_state;

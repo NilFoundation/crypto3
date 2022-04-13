@@ -107,17 +107,15 @@ namespace nil {
                     var permute_assignment(
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             std::size_t &component_start_row) {
-                        
-                        typename poseidon_component::public_params_type public_params = {};
 
                         std::array<typename ArithmetizationType::field_type::value_type, poseidon_component::state_size> input_state;
                         for (std::size_t i = 0; i < poseidon_component::state_size; i++) { // TODO poseidon component should recieve var as params
                             input_state[i] = var_value(state[i]);
                         }
-                        typename public_params_type::private_params_type private_params = {input_state};
+                        typename params_type::params_type params = {input_state};
 
                         poseidon_component::generate_assignments(assignment,
-                            public_params, private_params, component_start_row);
+                            params, component_start_row);
                         
                         component_start_row += poseidon_component::required_rows_amount;
 
@@ -161,10 +159,7 @@ namespace nil {
                 public:
                     constexpr static const std::size_t required_rows_amount = 1;
 
-                    struct public_params_type {
-                    };
-
-                    struct private_params_type {
+                    struct params_type {
                     };
 
                     void init_assignment(blueprint_assignment_table<ArithmetizationType>

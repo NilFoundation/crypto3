@@ -90,9 +90,8 @@ namespace nil {
                     constexpr static const typename BlueprintFieldType::value_type endo = typename BlueprintFieldType::value_type(algebra::fields::arithmetic_params<BlueprintFieldType>::multiplicative_generator).pow(typename BlueprintFieldType::integral_type( ( (BlueprintFieldType::value_type::zero() - BlueprintFieldType::value_type::one()) * ( typename BlueprintFieldType::value_type(3) ).inversed() ).data));
 
                     constexpr static const std::size_t required_rows_amount = 33;
-                    struct public_params_type { };
 
-                    struct private_params_type {
+                    struct params_type {
                         typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type T;
                         typename CurveType::scalar_field_type::value_type b;
                     };
@@ -104,7 +103,7 @@ namespace nil {
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const public_params_type &init_params,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
 
                         const std::size_t &j = component_start_row;
@@ -149,7 +148,7 @@ namespace nil {
                     static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const public_params_type &init_params,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
                         const std::size_t &j = component_start_row;
 
@@ -167,8 +166,7 @@ namespace nil {
                     static void generate_assignments(
                         blueprint_assignment_table<ArithmetizationType>
                             &assignment,
-                        const public_params_type &init_params,
-                        const private_params_type &params,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
                             const std::size_t &j = component_start_row;
                             assignment.public_input(0)[0] = ArithmetizationType::field_type::value_type::zero();

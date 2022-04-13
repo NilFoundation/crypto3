@@ -137,12 +137,12 @@ namespace nil {
 
                     static result_type generate_assignments(
                             blueprint_assignment_table<ArithmetizationType> &assignment,
-                                        const params_type &private_params,
+                                        const params_type &params,
                                         const std::size_t &component_start_row) {
 
                         std::size_t row = component_start_row;
-                        typename BlueprintFieldType::value_type first_limb = var_value(assignment, private_params.scalar_limbs_var[0]);
-                        typename BlueprintFieldType::value_type second_limb = var_value(assignment, private_params.scalar_limbs_var[1]);
+                        typename BlueprintFieldType::value_type first_limb = var_value(assignment, params.scalar_limbs_var[0]);
+                        typename BlueprintFieldType::value_type second_limb = var_value(assignment, params.scalar_limbs_var[1]);
                         assignment.witness(W0)[row] = first_limb;
                         assignment.witness(W1)[row] = second_limb;
                         typename BlueprintFieldType::value_type scalar = 2;

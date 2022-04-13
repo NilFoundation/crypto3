@@ -72,10 +72,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     typename BlueprintFieldType::value_type endo_scalar = 0x244630A7EE5033DA383B3677B4C5CA94A3EBE4156FC4FA4E08B35974929CA2C5_cppui255;
     typename curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type res = endo_scalar * T;
 
-    typename component_type::private_params_type private_params = {};
-    typename component_type::public_params_type public_params = {T, b};
+    typename component_type::params_type params = {T, b};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (public_params, private_params);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

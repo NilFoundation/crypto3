@@ -83,12 +83,9 @@ namespace nil {
 
                     constexpr static const std::size_t required_rows_amount = 1 + endo_mul::required_rows_amount;
 
-                    struct public_params_type {
+                    struct params_type {
                         typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type base_point;
                         typename CurveType::scalar_field_type::value_type challenge;
-                    };
-
-                    struct private_params_type {
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
@@ -98,45 +95,43 @@ namespace nil {
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const public_params_type &public_params,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
 
                         std::size_t row = component_start_row;
                         row++;
 
-                        typename endo_mul::public_params_type mul_public_params = {};
+                        typename endo_mul::params_type mul_params = {};
                         endo_mul::generate_gates(bp, assignment,
-                            mul_public_params, row);
+                            mul_params, row);
                     }
 
                     static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const public_params_type &public_params,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
                         
                         std::size_t row = component_start_row;
                         row++;
 
-                        typename endo_mul::public_params_type mul_public_params = {};
+                        typename endo_mul::params_type mul_params = {};
                         endo_mul::generate_copy_constraints(bp, assignment,
-                            mul_public_params, row);
+                            mul_params, row);
                     }
 
                     static void generate_assignments(
                         blueprint_assignment_table<ArithmetizationType>
                             &assignment,
-                        const public_params_type &public_params,
-                        const private_params_type &private_params,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
 
                         std::size_t row = component_start_row;
                         row++;
 
-                        typename endo_mul::public_params_type mul_public_params = {};
-                        typename endo_mul::private_params_type mul_private_params = {public_params.base_point, public_params.challenge};
+                        typename endo_mul::params_type mul_params = {params.base_point, params.challenge};
                         endo_mul::generate_assignments(assignment, 
-                            mul_public_params, mul_private_params, row);
+                            mul_params, row);
                     }
                 };
             }    // namespace components

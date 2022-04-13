@@ -69,8 +69,7 @@ namespace nil {
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
                  std::size_t Lambda>
-        auto prepare_component(typename ComponentType::public_params_type init_params,
-                               typename ComponentType::private_params_type assignment_params) {
+        auto prepare_component(typename ComponentType::params_type params) {
 
             using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
             using component_type = ComponentType;
@@ -84,9 +83,9 @@ namespace nil {
                     private_assignment, public_assignment);
 
             std::size_t start_row = component_type::allocate_rows(bp);
-            component_type::generate_gates(bp, assignment_bp, init_params, start_row);
-            component_type::generate_copy_constraints(bp, assignment_bp, init_params, start_row);
-            component_type::generate_assignments(assignment_bp, init_params, assignment_params,
+            component_type::generate_gates(bp, assignment_bp, params, start_row);
+            component_type::generate_copy_constraints(bp, assignment_bp, params, start_row);
+            component_type::generate_assignments(assignment_bp, params,
                                                  start_row);
 
             // bp.fix_usable_rows();
@@ -97,11 +96,11 @@ namespace nil {
             zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(private_assignment,
                                                                                                      public_assignment);
 
-            using params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
-            using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
+            using redshift_params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
+            using types = zk::snark::detail::redshift_policy<BlueprintFieldType, redshift_params>;
 
-            using fri_type = typename zk::commitments::fri<BlueprintFieldType, typename params::merkle_hash_type,
-                                                           typename params::transcript_hash_type, 2>;
+            using fri_type = typename zk::commitments::fri<BlueprintFieldType, typename redshift_params::merkle_hash_type,
+                                                           typename redshift_params::transcript_hash_type, 2>;
 
             std::size_t table_rows_log = std::ceil(std::log2(desc.rows_amount));
 
@@ -110,10 +109,10 @@ namespace nil {
             std::size_t permutation_size = desc.witness_columns + desc.public_input_columns + desc.constant_columns;
 
             typename types::preprocessed_public_data_type public_preprocessed_data =
-                zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(
+                zk::snark::redshift_public_preprocessor<BlueprintFieldType, redshift_params>::process(
                     bp, public_assignment, desc, fri_params, permutation_size);
             typename types::preprocessed_private_data_type private_preprocessed_data =
-                zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment,
+                zk::snark::redshift_private_preprocessor<BlueprintFieldType, redshift_params>::process(bp, private_assignment,
                                                                                               desc);
 
             return std::make_tuple(desc, bp, fri_params, assignments, public_preprocessed_data,
@@ -170,21 +169,20 @@ namespace nil {
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
                  std::size_t Lambda>
-        void test_component(typename ComponentType::public_params_type init_params,
-                            typename ComponentType::private_params_type assignment_params) {
+        void test_component(typename ComponentType::params_type params) {
 
-            using params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
+            using redshift_params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
 
             auto [desc, bp, fri_params, assignments, public_preprocessed_data, private_preprocessed_data] =
                 prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda>(
-                    init_params, assignment_params);
+                    params);
 
-            auto proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(
+            auto proof = zk::snark::redshift_prover<BlueprintFieldType, redshift_params>::process(
                 public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
 
-            print_test_data<params, BlueprintFieldType>(proof, fri_params, public_preprocessed_data.common_data);
+            print_test_data<redshift_params, BlueprintFieldType>(proof, fri_params, public_preprocessed_data.common_data);
 
-            bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(
+            bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, redshift_params>::process(
                 public_preprocessed_data, proof, bp, fri_params);
             profiling(assignments);
             BOOST_CHECK(verifier_res);

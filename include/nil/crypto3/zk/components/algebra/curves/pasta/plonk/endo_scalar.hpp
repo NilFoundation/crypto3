@@ -81,13 +81,10 @@ namespace nil {
                 public:
                     constexpr static const std::size_t required_rows_amount = 8;
 
-                    struct public_params_type {
+                    struct params_type {
+                        typename BlueprintFieldType::value_type scalar;
                         typename BlueprintFieldType::value_type endo_factor;
                         std::size_t num_bits;
-                    };
-
-                    struct private_params_type {
-                        typename BlueprintFieldType::value_type scalar;
                     };
 
                     struct result_type {
@@ -100,7 +97,7 @@ namespace nil {
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
                             blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const public_params_type &public_params,
+                            const params_type &params,
                         const std::size_t &component_start_row = 0) {
 
                         const std::size_t &j = component_start_row;
@@ -159,14 +156,14 @@ namespace nil {
                             constraint_9, constraint_10, constraint_11});
 
                         auto constraint_12 = bp.add_constraint(var(W6, 0) - 
-                            (public_params.endo_factor * var(W4, 0) + var(W5, 0)));
+                            (params.endo_factor * var(W4, 0) + var(W5, 0)));
 
                         bp.add_gate(selector_index_2, {constraint_12});
                     }
 
                     static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
                             blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const public_params_type &public_params,
+                            const params_type &params,
                             const std::size_t &component_start_row = 0){
 
                         const std::size_t &j = component_start_row;
@@ -180,20 +177,19 @@ namespace nil {
 
                     static result_type generate_assignments(
                             blueprint_assignment_table<ArithmetizationType> &assignment,
-                                        const public_params_type &public_params,
-                                        const private_params_type &private_params,
+                                        const params_type &params,
                                         const std::size_t &component_start_row) {
                             
                             std::size_t row = component_start_row;
                             
                             std::size_t crumbs_per_row = 8;
                             std::size_t bits_per_crumb = 2;
-                            std::size_t bits_per_row = bits_per_crumb * crumbs_per_row; // we suppose that public_params.num_bits % bits_per_row = 0
+                            std::size_t bits_per_row = bits_per_crumb * crumbs_per_row; // we suppose that params.num_bits % bits_per_row = 0
 
-                            std::vector<typename BlueprintFieldType::value_type> bits_msb(public_params.num_bits);
-                            typename BlueprintFieldType::integral_type integral_scalar = typename  BlueprintFieldType::integral_type(private_params.scalar.data);
-                            for (std::size_t i = 0; i < public_params.num_bits; i++) {
-                                bits_msb[public_params.num_bits - 1 - i] = multiprecision::bit_test(integral_scalar, i);
+                            std::vector<typename BlueprintFieldType::value_type> bits_msb(params.num_bits);
+                            typename BlueprintFieldType::integral_type integral_scalar = typename  BlueprintFieldType::integral_type(params.scalar.data);
+                            for (std::size_t i = 0; i < params.num_bits; i++) {
+                                bits_msb[params.num_bits - 1 - i] = multiprecision::bit_test(integral_scalar, i);
                             }
 
                             typename BlueprintFieldType::value_type a = 2;
@@ -234,7 +230,7 @@ namespace nil {
                                 assignment.witness(W5)[row] = b;
                                 row++;
                             }
-                            auto res = a * public_params.endo_factor + b;
+                            auto res = a * params.endo_factor + b;
                             assignment.witness(W6)[row - 1] = res;
 
                             std::cout<<"circuit result "<<res.data<<std::endl;

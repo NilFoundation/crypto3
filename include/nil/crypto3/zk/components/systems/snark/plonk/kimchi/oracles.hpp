@@ -131,10 +131,9 @@ namespace nil {
                         //TODO endo_scalar component has to get variable as scalar param
                         typename BlueprintFieldType::value_type scalar_value = var_value(assignment, scalar);
                         
-                        typename endo_scalar_component::private_params_type private_params = {scalar_value};
-                        typename endo_scalar_component::public_params_type public_params = {endo_factor, num_bits};
+                        typename endo_scalar_component::params_type params = {scalar_value, endo_factor, num_bits};
                         typename endo_scalar_component::result_type endo_scalar_res = endo_scalar_component::generate_assignments(assignment,
-                            public_params, private_params, component_start_row);
+                            params, component_start_row);
                         component_start_row += endo_scalar_component::required_rows_amount;
                         return endo_scalar_res.endo_scalar;
                     }
@@ -142,7 +141,8 @@ namespace nil {
                 public:
                     constexpr static const std::size_t required_rows_amount = 32;
 
-                    struct public_params_type {
+                    struct params_type {
+                        //kimchi_verifier_index_scalar<CurveType> verifier_index;
                         //kimchi_scalar_limbs joint_combiner;
                         //kimchi_scalar_limbs beta;
                         //kimchi_scalar_limbs gamma;
@@ -151,17 +151,13 @@ namespace nil {
                         typename BlueprintFieldType::value_type fq_digest; // TODO overflow check
                     };
 
-                    struct private_params_type {
-                        kimchi_verifier_index_scalar<CurveType> verifier_index;
-                    };
-
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
                         return in_bp.allocate_rows(required_rows_amount);
                     }
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
                             blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const public_params_type &public_params,
+                            const params_type &params,
                         const std::size_t &component_start_row = 0) {
 
                         const std::size_t &j = component_start_row;
@@ -175,7 +171,7 @@ namespace nil {
 
                     static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
                             blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const public_params_type &public_params,
+                            const params_type &params,
                             const std::size_t &component_start_row = 0){
 
                         std::size_t row = component_start_row;
@@ -201,19 +197,18 @@ namespace nil {
 
                     static void generate_assignments(
                             blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const public_params_type &public_params,
-                            const private_params_type &private_params,
+                            const params_type &params,
                             const std::size_t &component_start_row) {
                             
                         std::size_t row = component_start_row;
                         const std::size_t public_input_size = 5; 
 
                         // copy public input
-                        assignment.public_input(0)[row] = public_params.alpha[0];
-                        assignment.public_input(0)[row + 1] = public_params.alpha[1];
-                        assignment.public_input(0)[row + 2] = public_params.zeta[0];
-                        assignment.public_input(0)[row + 3] = public_params.zeta[1];
-                        assignment.public_input(0)[row + 4] = public_params.fq_digest;
+                        assignment.public_input(0)[row] = params.alpha[0];
+                        assignment.public_input(0)[row + 1] = params.alpha[1];
+                        assignment.public_input(0)[row + 2] = params.zeta[0];
+                        assignment.public_input(0)[row + 3] = params.zeta[1];
+                        assignment.public_input(0)[row + 4] = params.fq_digest;
 
                         std::array<var, 2> alpha_pub_limbs = {var(0, row, false, var::column_type::public_input), 
                                 var(0, row + 1, false, var::column_type::public_input)};

@@ -24,7 +24,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE blueprint_plonk_endo_scalar_test
+#define BOOST_TEST_MODULE blueprint_plonk_kimchi_oracles_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -76,10 +76,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     typename BlueprintFieldType::value_type expected_result = 0x0000000000000000000000000000000010F8B9EDA2A55474E693585D56FCD8BE_cppui256;
     std::cout<<"Expected: "<<expected_result.data<<std::endl;
 
-    typename component_type::private_params_type private_params = {};
-    typename component_type::public_params_type public_params = {alpha_limbs, zeta_limbs, fq_digest};
+    typename component_type::params_type params = {alpha_limbs, zeta_limbs, fq_digest};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (public_params, private_params);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
