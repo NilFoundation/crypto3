@@ -73,7 +73,7 @@ namespace nil {
              *  Computes the absolute value.
              */
             template<typename T>
-            constexpr nil::crypto3::detail::remove_complex_t<T> abs(T x) {
+            constexpr nil::crypto3::algebra::remove_complex_t<T> abs(T x) {
                 // CRYPTO3_DETAIL_ASSERT_ARITHMETIC(T);
                 if constexpr (algebra::is_complex_v<T>)
                     return sqrt(x.real() * x.real() + x.imag() * x.imag());
