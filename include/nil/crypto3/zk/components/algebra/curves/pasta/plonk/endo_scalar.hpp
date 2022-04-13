@@ -99,15 +99,15 @@ namespace nil {
                     }
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                             const public_params_type &public_params,
                         const std::size_t &component_start_row = 0) {
 
                         const std::size_t &j = component_start_row;
                         using F = typename BlueprintFieldType::value_type;
 
-                        std::size_t selector_index_1 = public_assignment.add_selector(j, j + required_rows_amount - 1);
-                        std::size_t selector_index_2 = public_assignment.add_selector(j + required_rows_amount - 1);
+                        std::size_t selector_index_1 = assignment.add_selector(j, j + required_rows_amount - 1);
+                        std::size_t selector_index_2 = assignment.add_selector(j + required_rows_amount - 1);
 
                         auto c_f = [](var x) {
                             return (F(11) * F(6).inversed()) * x 
@@ -165,7 +165,7 @@ namespace nil {
                     }
 
                     static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                             const public_params_type &public_params,
                             const std::size_t &component_start_row = 0){
 
@@ -179,8 +179,7 @@ namespace nil {
                     }
 
                     static result_type generate_assignments(
-                            blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                                         const public_params_type &public_params,
                                         const private_params_type &private_params,
                                         const std::size_t &component_start_row) {
@@ -202,9 +201,9 @@ namespace nil {
                             typename BlueprintFieldType::value_type n = 0;
 
                             for (std::size_t chunk_start = 0; chunk_start < bits_msb.size(); chunk_start += bits_per_row) {
-                                private_assignment.witness(W0)[row] = n;
-                                private_assignment.witness(W2)[row] = a;
-                                private_assignment.witness(W3)[row] = b;
+                                assignment.witness(W0)[row] = n;
+                                assignment.witness(W2)[row] = a;
+                                assignment.witness(W3)[row] = b;
 
                                 for (std::size_t j = 0; j < crumbs_per_row; j++) {
                                     std::size_t crumb = chunk_start + j * bits_per_crumb;
@@ -212,7 +211,7 @@ namespace nil {
                                     typename BlueprintFieldType::value_type b1 = bits_msb[crumb + 0];
 
                                     typename BlueprintFieldType::value_type crumb_value = b0 + b1.doubled();
-                                    private_assignment.witness(W7 + j)[row] = crumb_value;
+                                    assignment.witness(W7 + j)[row] = crumb_value;
 
                                     a = a.doubled();
                                     b = b.doubled();
@@ -230,13 +229,13 @@ namespace nil {
                                     n += crumb_value;
                                 }
 
-                                private_assignment.witness(W1)[row] = n;
-                                private_assignment.witness(W4)[row] = a;
-                                private_assignment.witness(W5)[row] = b;
+                                assignment.witness(W1)[row] = n;
+                                assignment.witness(W4)[row] = a;
+                                assignment.witness(W5)[row] = b;
                                 row++;
                             }
                             auto res = a * public_params.endo_factor + b;
-                            private_assignment.witness(W6)[row - 1] = res;
+                            assignment.witness(W6)[row - 1] = res;
 
                             std::cout<<"circuit result "<<res.data<<std::endl;
                             return result_type { var(W6, row - 1, false) };

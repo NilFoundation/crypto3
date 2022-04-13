@@ -93,13 +93,13 @@ namespace nil {
 
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment, 
+                        blueprint_assignment_table<ArithmetizationType> &assignment, 
                         const public_params_type &init_params,
                         const std::initializer_list<std::size_t> &&row_start_indices) {
 
                         using var = snark::plonk_variable<BlueprintFieldType>;
 
-                        std::size_t selector_index = public_assignment.add_selector(row_start_indices);
+                        std::size_t selector_index = assignment.add_selector(row_start_indices);
 
                         auto constraint_1 = bp.add_constraint(
                             var(W7, 0) * (var(W2, 0) - var(W0, 0)));
@@ -130,20 +130,20 @@ namespace nil {
 
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment, 
+                        blueprint_assignment_table<ArithmetizationType> &assignment, 
                         const public_params_type &init_params,
                         const std::size_t row_start_index) {
 
                         generate_gates(
                             bp,
-                            public_assignment, 
+                            assignment, 
                             init_params,
                             {row_start_index});
                     }
 
                     static void generate_copy_constraints(
                             blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                             const public_params_type &init_params,
                             const std::size_t &component_start_row){
 
@@ -155,16 +155,15 @@ namespace nil {
                     }
 
                     static void generate_assignments(
-                            blueprint_private_assignment_table<ArithmetizationType>
-                                &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                            blueprint_assignment_table<ArithmetizationType>
+                                &assignment,
                             const public_params_type &init_params,
                             const private_params_type &params,
                             const std::size_t &component_start_row) {
 
                         const std::size_t &j = component_start_row;
 
-                        public_assignment.public_input(0)[0] = ArithmetizationType::field_type::value_type::zero();
+                        assignment.public_input(0)[0] = ArithmetizationType::field_type::value_type::zero();
 
                         const typename CurveType::template g1_type<>::value_type R = params.P + params.Q;
                         const typename CurveType::template g1_type<>::value_type &P = params.P;
@@ -174,39 +173,39 @@ namespace nil {
                         auto Q_affine = Q.to_affine();
                         auto R_affine = R.to_affine();
 
-                        private_assignment.witness(W0)[j] = P_affine.X;
-                        private_assignment.witness(W1)[j] = P_affine.Y;
-                        private_assignment.witness(W2)[j] = Q_affine.X;
-                        private_assignment.witness(W3)[j] = Q_affine.Y;
-                        private_assignment.witness(W4)[j] = R_affine.X;
-                        private_assignment.witness(W5)[j] = R_affine.Y;
+                        assignment.witness(W0)[j] = P_affine.X;
+                        assignment.witness(W1)[j] = P_affine.Y;
+                        assignment.witness(W2)[j] = Q_affine.X;
+                        assignment.witness(W3)[j] = Q_affine.Y;
+                        assignment.witness(W4)[j] = R_affine.X;
+                        assignment.witness(W5)[j] = R_affine.Y;
 
                         // TODO: check, if this one correct:
-                        private_assignment.witness(W6)[j] = R.is_zero();
+                        assignment.witness(W6)[j] = R.is_zero();
 
                         if (P.X != Q.X){
-                            private_assignment.witness(W7)[j] = 0;
-                            private_assignment.witness(W8)[j] = (P_affine.Y - Q_affine.Y)/(P_affine.X - Q_affine.X);
+                            assignment.witness(W7)[j] = 0;
+                            assignment.witness(W8)[j] = (P_affine.Y - Q_affine.Y)/(P_affine.X - Q_affine.X);
 
-                            private_assignment.witness(W9)[j] = 0;
+                            assignment.witness(W9)[j] = 0;
 
-                            private_assignment.witness(W10)[j] = (Q_affine.X - P_affine.X).inversed();
+                            assignment.witness(W10)[j] = (Q_affine.X - P_affine.X).inversed();
                         } else {
-                            private_assignment.witness(W7)[j] = 1;
+                            assignment.witness(W7)[j] = 1;
 
                             if (P.Y != Q.Y) { 
-                                private_assignment.witness(W9)[j] = (Q_affine.Y - P_affine.Y).inversed();
+                                assignment.witness(W9)[j] = (Q_affine.Y - P_affine.Y).inversed();
                             } else { // doubling
                                 if (P.Y != 0) {
-                                    private_assignment.witness(W8)[j] = (3 * (P_affine.X * P_affine.X))/(2 * P_affine.Y);
+                                    assignment.witness(W8)[j] = (3 * (P_affine.X * P_affine.X))/(2 * P_affine.Y);
                                 } else {
-                                    private_assignment.witness(W8)[j] = 0;
+                                    assignment.witness(W8)[j] = 0;
                                 }
                                 
-                                private_assignment.witness(W9)[j] = 0;
+                                assignment.witness(W9)[j] = 0;
                             }
 
-                            private_assignment.witness(W10)[j] = 0;
+                            assignment.witness(W10)[j] = 0;
                         }
                     }
                 };

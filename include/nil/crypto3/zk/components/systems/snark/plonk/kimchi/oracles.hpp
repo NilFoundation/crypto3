@@ -85,36 +85,34 @@ namespace nil {
                                                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
                     using from_limbs = zk::components::from_limbs<ArithmetizationType, CurveType, W0, W1, W2>;
 
-                    static typename BlueprintFieldType::value_type var_value(blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    static typename BlueprintFieldType::value_type var_value(blueprint_assignment_table<ArithmetizationType> &assignment,
                             const var &a) {
 
                         typename BlueprintFieldType::value_type result;
                         if (a.type == var::column_type::witness) {
-                            result = private_assignment.witness(a.index)[a.rotation];
+                            result = assignment.witness(a.index)[a.rotation];
                         } else if (a.type == var::column_type::public_input) {
-                            result = public_assignment.public_input(a.index)[a.rotation];
+                            result = assignment.public_input(a.index)[a.rotation];
                         } else {
-                            result = public_assignment.constant(a.index)[a.rotation];
+                            result = assignment.constant(a.index)[a.rotation];
                         }
 
                         return result;
                     }
 
-                    static var assignments_from_limbs(blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    static var assignments_from_limbs(blueprint_assignment_table<ArithmetizationType> &assignment,
                             std::array<var, 2> scalar_limbs_var,
                             std::size_t &component_start_row) {
 
-                        typename from_limbs::result_type res = from_limbs::generate_assignments(private_assignment, 
-                            public_assignment, typename from_limbs::params_type {scalar_limbs_var}, component_start_row);
+                        typename from_limbs::result_type res = from_limbs::generate_assignments(assignment, 
+                            typename from_limbs::params_type {scalar_limbs_var}, component_start_row);
 
                         component_start_row += from_limbs::required_rows_amount;
                         return res.result;
                     }
 
                     static void copy_constraints_from_limbs(blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                             std::array<var, 2> scalar_limbs_var,
                             const std::size_t &component_start_row = 0) {
 
@@ -124,20 +122,19 @@ namespace nil {
                             {scalar_limbs_var[1].index, scalar_limbs_var[1].rotation, false, scalar_limbs_var[1].type}});
                     }
 
-                    static var assignments_endo_scalar(blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    static var assignments_endo_scalar(blueprint_assignment_table<ArithmetizationType> &assignment,
                             var scalar,
                             std::size_t &component_start_row) {
                         
                         typename BlueprintFieldType::value_type endo_factor = 0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
                         std::size_t num_bits = 128;
                         //TODO endo_scalar component has to get variable as scalar param
-                        typename BlueprintFieldType::value_type scalar_value = var_value(private_assignment, public_assignment, scalar);
+                        typename BlueprintFieldType::value_type scalar_value = var_value(assignment, scalar);
                         
                         typename endo_scalar_component::private_params_type private_params = {scalar_value};
                         typename endo_scalar_component::public_params_type public_params = {endo_factor, num_bits};
-                        typename endo_scalar_component::result_type endo_scalar_res = endo_scalar_component::generate_assignments(private_assignment,
-                            public_assignment, public_params, private_params, component_start_row);
+                        typename endo_scalar_component::result_type endo_scalar_res = endo_scalar_component::generate_assignments(assignment,
+                            public_params, private_params, component_start_row);
                         component_start_row += endo_scalar_component::required_rows_amount;
                         return endo_scalar_res.endo_scalar;
                     }
@@ -163,21 +160,21 @@ namespace nil {
                     }
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                             const public_params_type &public_params,
                         const std::size_t &component_start_row = 0) {
 
                         const std::size_t &j = component_start_row;
                         using F = typename BlueprintFieldType::value_type;
 
-                        std::size_t selector_index_1 = public_assignment.add_selector(j, j + required_rows_amount - 1);
+                        std::size_t selector_index_1 = assignment.add_selector(j, j + required_rows_amount - 1);
 
                         bp.add_gate(selector_index_1, 
                             {});
                     }
 
                     static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                             const public_params_type &public_params,
                             const std::size_t &component_start_row = 0){
 
@@ -190,12 +187,12 @@ namespace nil {
 
                         row += 4;
                         
-                        copy_constraints_from_limbs(bp, public_assignment, alpha_pub_limbs, row);
+                        copy_constraints_from_limbs(bp, assignment, alpha_pub_limbs, row);
                         row++;
                         // copy endo-scalar
                         row += endo_scalar_component::required_rows_amount;
                         
-                        copy_constraints_from_limbs(bp, public_assignment, zeta_pub_limbs, row);
+                        copy_constraints_from_limbs(bp, assignment, zeta_pub_limbs, row);
                         row++;
                         // copy endo-scalar
                         row += endo_scalar_component::required_rows_amount;
@@ -203,21 +200,20 @@ namespace nil {
                     }
 
                     static void generate_assignments(
-                            blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                                        const public_params_type &public_params,
-                                        const private_params_type &private_params,
-                                        const std::size_t &component_start_row) {
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                            const public_params_type &public_params,
+                            const private_params_type &private_params,
+                            const std::size_t &component_start_row) {
                             
                         std::size_t row = component_start_row;
                         const std::size_t public_input_size = 5; 
 
                         // copy public input
-                        public_assignment.public_input(0)[row] = public_params.alpha[0];
-                        public_assignment.public_input(0)[row + 1] = public_params.alpha[1];
-                        public_assignment.public_input(0)[row + 2] = public_params.zeta[0];
-                        public_assignment.public_input(0)[row + 3] = public_params.zeta[1];
-                        public_assignment.public_input(0)[row + 4] = public_params.fq_digest;
+                        assignment.public_input(0)[row] = public_params.alpha[0];
+                        assignment.public_input(0)[row + 1] = public_params.alpha[1];
+                        assignment.public_input(0)[row + 2] = public_params.zeta[0];
+                        assignment.public_input(0)[row + 3] = public_params.zeta[1];
+                        assignment.public_input(0)[row + 4] = public_params.fq_digest;
 
                         std::array<var, 2> alpha_pub_limbs = {var(0, row, false, var::column_type::public_input), 
                                 var(0, row + 1, false, var::column_type::public_input)};
@@ -227,20 +223,20 @@ namespace nil {
 
                         row += public_input_size;
 
-                        var alpha = assignments_from_limbs(private_assignment, public_assignment,
+                        var alpha = assignments_from_limbs(assignment,
                             alpha_pub_limbs, row);
-                        var alpha_endo = assignments_endo_scalar(private_assignment, public_assignment,
+                        var alpha_endo = assignments_endo_scalar(assignment,
                             alpha, row);
                         
-                        var zeta = assignments_from_limbs(private_assignment, public_assignment,
+                        var zeta = assignments_from_limbs(assignment,
                             zeta_pub_limbs, row);
-                        var zeta_endo = assignments_endo_scalar(private_assignment, public_assignment,
+                        var zeta_endo = assignments_endo_scalar(assignment,
                             zeta, row);
 
                         kimchi_transcript<ArithmetizationType, CurveType,
                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> transcript;
-                        transcript.init_assignment(private_assignment, public_assignment, row);
-                        transcript.absorb_assignment(private_assignment, public_assignment,
+                        transcript.init_assignment(assignment, row);
+                        transcript.absorb_assignment(assignment,
                             fq_digest, row);
                     }
                 };

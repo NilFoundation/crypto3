@@ -89,25 +89,23 @@ namespace nil {
                     static std::array<var, poseidon_component::state_size> state;
 
                     /////////// TODO replace with new assignment table interface
-                    static typename BlueprintFieldType::value_type var_value(blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    static typename BlueprintFieldType::value_type var_value(blueprint_assignment_table<ArithmetizationType> &assignment,
                             const var &a) {
 
                         typename BlueprintFieldType::value_type result;
                         if (a.type == var::column_type::witness) {
-                            result = private_assignment.witness(a.index)[a.rotation];
+                            result = assignment.witness(a.index)[a.rotation];
                         } else if (a.type == var::column_type::public_input) {
-                            result = public_assignment.public_input(a.index)[a.rotation];
+                            result = assignment.public_input(a.index)[a.rotation];
                         } else {
-                            result = public_assignment.constant(a.index)[a.rotation];
+                            result = assignment.constant(a.index)[a.rotation];
                         }
 
                         return result;
                     }
 
-                    var permute_assignment(blueprint_private_assignment_table<ArithmetizationType>
-                            &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    var permute_assignment(
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                             std::size_t &component_start_row) {
                         
                         typename poseidon_component::public_params_type public_params = {};
@@ -118,7 +116,7 @@ namespace nil {
                         }
                         typename public_params_type::private_params_type private_params = {input_state};
 
-                        poseidon_component::generate_assignments(private_assignment, public_assignment,
+                        poseidon_component::generate_assignments(assignment,
                             public_params, private_params, component_start_row);
                         
                         component_start_row += poseidon_component::required_rows_amount;
@@ -128,19 +126,18 @@ namespace nil {
                         }
                     }
 
-                    void add_input_assignment(blueprint_private_assignment_table<ArithmetizationType>
-                            &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    void add_input_assignment(blueprint_assignment_table<ArithmetizationType>
+                            &assignment,
                             var &input,
                             std::size_t state_index,
                             std::size_t &component_start_row) {
                             
-                        private_assignment.witness(W0 + poseidon_component::state_size)[component_start_row] = var_value(input);
+                        assignment.witness(W0 + poseidon_component::state_size)[component_start_row] = var_value(input);
                         for (std::size_t i = 0; i < poseidon_component::state_size; i++) {
                             if (i == state_index) {
-                                private_assignment.witness(W0 + i)[component_start_row] = var_value(state[i]) + var_value(input);
+                                assignment.witness(W0 + i)[component_start_row] = var_value(state[i]) + var_value(input);
                             } else {
-                                private_assignment.witness(W0 + i)[component_start_row] = var_value(state[i]);
+                                assignment.witness(W0 + i)[component_start_row] = var_value(state[i]);
                             }
                             state[i] = var(W0 + i, component_start_row, false);
                         }
@@ -148,14 +145,14 @@ namespace nil {
                     }
 
                     void permute_constraints(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const var &zero,
                         const std::size_t &component_start_row) {
 
                     }
 
                     void add_input_constraints(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const var &zero,
                         const std::size_t &component_start_row) {
 
@@ -170,13 +167,12 @@ namespace nil {
                     struct private_params_type {
                     };
 
-                    void init_assignment(blueprint_private_assignment_table<ArithmetizationType>
-                            &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    void init_assignment(blueprint_assignment_table<ArithmetizationType>
+                            &assignment,
                             std::size_t &component_start_row) {
                         
                         for (std::size_t i = 0; i < poseidon_component::state_size; i++) {
-                            private_assignment.witness(W0 + i)[component_start_row] = 0;
+                            assignment.witness(W0 + i)[component_start_row] = 0;
                             state[i] = var(W0 + i, component_start_row, false);
                         }
 
@@ -184,35 +180,34 @@ namespace nil {
                     }
 
                     void init_generate_constraints(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const var &zero,
                         const std::size_t &component_start_row) {
                             
                     }
 
-                    void absorb_assignment(blueprint_private_assignment_table<ArithmetizationType>
-                            &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    void absorb_assignment(
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                             var absorbing_value,
                             std::size_t &component_start_row) {
                         
                         if (this->state_absorbed) {
                             if (this->state_count == poseidon_component::rate) {
-                                permute_assignment(private_assignment, public_assignment,
+                                permute_assignment(assignment,
                                     component_start_row);
 
-                                add_input_assignment(private_assignment, public_assignment,
+                                add_input_assignment(assignment,
                                     absorbing_value, 0, component_start_row);
 
                                 this->state_count = 1;
                             } else {
-                                add_input_assignment(private_assignment, public_assignment,
+                                add_input_assignment(assignment,
                                     absorbing_value, this->state_count, component_start_row);
 
                                 this->state_count++;
                             }
                         } else {
-                            add_input_assignment(private_assignment, public_assignment,
+                            add_input_assignment(assignment,
                                     absorbing_value, 0, component_start_row);
 
                             this->state_absorbed = true;
@@ -221,20 +216,19 @@ namespace nil {
                     }
 
                     void absorb_generate_constraints(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const var &zero,
                         const std::size_t &component_start_row) {
                             
                     }
 
-                    var squeeze_assignment(blueprint_private_assignment_table<ArithmetizationType>
-                            &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    var squeeze_assignment(
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                             var absorbing_value,
                             std::size_t &component_start_row) {
                         if (!this->state_absorbed) { // state = squeezed
                             if (this->state_count == poseidon_component::rate) {
-                                permute_assignment(private_assignment, public_assignment,
+                                permute_assignment(assignment,
                                     component_start_row);
                                 this->state_count = 1;
                                 // TODO: poseidon should return var
@@ -245,7 +239,7 @@ namespace nil {
                                 return var(W0 + this->state_count, component_start_row - 1, false);
                             }
                         } else {
-                            permute_assignment(private_assignment, public_assignment,
+                            permute_assignment(assignment,
                                     component_start_row);
 
                             this->state_absorbed = false;
@@ -256,7 +250,7 @@ namespace nil {
                     }
 
                     void squeeze_generate_constraints(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const var &zero,
                         const std::size_t &component_start_row) {
                             

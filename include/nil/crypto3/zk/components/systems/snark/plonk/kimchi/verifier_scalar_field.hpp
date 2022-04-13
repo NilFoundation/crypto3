@@ -97,36 +97,35 @@ namespace nil {
 
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const public_params_type &init_params,
                         const std::size_t &component_start_row) {
 
                         std::size_t row = component_start_row;
                         row++;                       
                         typename poseidon_component::public_params_type poseidon_public_params = {};
-                        poseidon_component::generate_gates(bp, public_assignment,
+                        poseidon_component::generate_gates(bp, assignment,
                             poseidon_public_params, row);
                     }
 
                     static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const public_params_type &init_params,
                         const std::size_t &component_start_row) {
                         std::size_t row = component_start_row;
                         row++;
 
                         typename poseidon_component::public_params_type poseidon_public_params = {};
-                        poseidon_component::generate_copy_constraints(bp, public_assignment,
+                        poseidon_component::generate_copy_constraints(bp, assignment,
                             poseidon_public_params, row);
                         bp.add_copy_constraint({{W1, row + required_rows_amount - 1, false}, {0, row - 1, false, snark::plonk_variable<BlueprintFieldType>::column_type::public_input}});
 
                     }
 
                     static void generate_assignments(
-                        blueprint_private_assignment_table<ArithmetizationType>
-                            &private_assignment,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        blueprint_assignment_table<ArithmetizationType>
+                            &assignment,
                         const public_params_type &public_params,
                         const private_params_type &private_params,
                         const std::size_t &component_start_row) {
@@ -138,9 +137,9 @@ namespace nil {
                         typename poseidon_component::public_params_type poseidon_public_params = {};
                         std::array<typename ArithmetizationType::field_type::value_type, 3> input_state = public_params.input_data;
                         typename poseidon_component::private_params_type poseidon_private_params = {input_state};
-                        poseidon_component::generate_assignments(private_assignment, public_assignment, 
+                        poseidon_component::generate_assignments(assignment, 
                             poseidon_public_params, poseidon_private_params, row);
-                        public_assignment.public_input(0)[component_start_row] = private_assignment.witness(1)[row + 11];
+                        assignment.public_input(0)[component_start_row] = assignment.witness(1)[row + 11];
 
                     }
                 };

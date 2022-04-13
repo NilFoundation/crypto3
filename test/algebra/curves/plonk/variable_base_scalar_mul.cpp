@@ -123,6 +123,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
+	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 40;
     using component_type = zk::components::curve_element_variable_base_scalar_mul<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
@@ -136,7 +138,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul) {
 	curve_type::scalar_field_type::value_type c = tmp;
 	curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type acc = c*T;
     std::cout<<"Expected result: "<<acc.X.data<<" "<< acc.Y.data<<std::endl;
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams> (init_params, assignment_params);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (init_params, assignment_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

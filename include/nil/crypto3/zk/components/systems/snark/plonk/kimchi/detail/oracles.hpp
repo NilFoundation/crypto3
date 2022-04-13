@@ -64,17 +64,16 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    static typename BlueprintFieldType::value_type var_value(blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    static typename BlueprintFieldType::value_type var_value(blueprint_assignment_table<ArithmetizationType> &assignment,
                             const var &a) {
 
                         typename BlueprintFieldType::value_type result;
                         if (a.type == var::column_type::witness) {
-                            result = private_assignment.witness(a.index)[a.rotation];
+                            result = assignment.witness(a.index)[a.rotation];
                         } else if (a.type == var::column_type::public_input) {
-                            result = public_assignment.public_input(a.index)[a.rotation];
+                            result = assignment.public_input(a.index)[a.rotation];
                         } else {
-                            result = public_assignment.constant(a.index)[a.rotation];
+                            result = assignment.constant(a.index)[a.rotation];
                         }
 
                         return result;
@@ -102,7 +101,7 @@ namespace nil {
                     }
 
                     static void allocate(blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                             const params_type &scalar_limbs_var,
                             allocated_data_type &allocated_data,
                             const std::size_t &component_start_row = 0) {
@@ -115,7 +114,7 @@ namespace nil {
                     }
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                             allocated_data_type &allocated_data,
                         const std::size_t &component_start_row = 0) {
 
@@ -128,7 +127,7 @@ namespace nil {
                             }
                         }
 
-                        std::size_t selector_index_1 = public_assignment.add_selector(selector_rows);
+                        std::size_t selector_index_1 = assignment.add_selector(selector_rows);
 
                         // TODO constraints
 
@@ -137,20 +136,19 @@ namespace nil {
                     }
 
                     static result_type generate_assignments(
-                            blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                                         const params_type &private_params,
                                         const std::size_t &component_start_row) {
 
                         std::size_t row = component_start_row;
-                        typename BlueprintFieldType::value_type first_limb = var_value(private_assignment, public_assignment, private_params.scalar_limbs_var[0]);
-                        typename BlueprintFieldType::value_type second_limb = var_value(private_assignment, public_assignment, private_params.scalar_limbs_var[1]);
-                        private_assignment.witness(W0)[row] = first_limb;
-                        private_assignment.witness(W1)[row] = second_limb;
+                        typename BlueprintFieldType::value_type first_limb = var_value(assignment, private_params.scalar_limbs_var[0]);
+                        typename BlueprintFieldType::value_type second_limb = var_value(assignment, private_params.scalar_limbs_var[1]);
+                        assignment.witness(W0)[row] = first_limb;
+                        assignment.witness(W1)[row] = second_limb;
                         typename BlueprintFieldType::value_type scalar = 2;
                         scalar = scalar.pow(64) * second_limb + first_limb;
                         std::cout<<scalar.data<<std::endl;
-                        private_assignment.witness(W2)[row] = scalar;
+                        assignment.witness(W2)[row] = scalar;
                         var res(W2, row, false);
 
                         return result_type {res};

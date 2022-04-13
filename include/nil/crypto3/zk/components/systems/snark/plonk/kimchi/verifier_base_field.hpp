@@ -97,7 +97,7 @@ namespace nil {
 
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const public_params_type &public_params,
                         const std::size_t &component_start_row) {
 
@@ -105,13 +105,13 @@ namespace nil {
                         row++;
 
                         typename endo_mul::public_params_type mul_public_params = {};
-                        endo_mul::generate_gates(bp, public_assignment,
+                        endo_mul::generate_gates(bp, assignment,
                             mul_public_params, row);
                     }
 
                     static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const public_params_type &public_params,
                         const std::size_t &component_start_row) {
                         
@@ -119,14 +119,13 @@ namespace nil {
                         row++;
 
                         typename endo_mul::public_params_type mul_public_params = {};
-                        endo_mul::generate_copy_constraints(bp, public_assignment,
+                        endo_mul::generate_copy_constraints(bp, assignment,
                             mul_public_params, row);
                     }
 
                     static void generate_assignments(
-                        blueprint_private_assignment_table<ArithmetizationType>
-                            &private_assignment,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        blueprint_assignment_table<ArithmetizationType>
+                            &assignment,
                         const public_params_type &public_params,
                         const private_params_type &private_params,
                         const std::size_t &component_start_row) {
@@ -136,7 +135,7 @@ namespace nil {
 
                         typename endo_mul::public_params_type mul_public_params = {};
                         typename endo_mul::private_params_type mul_private_params = {public_params.base_point, public_params.challenge};
-                        endo_mul::generate_assignments(private_assignment, public_assignment, 
+                        endo_mul::generate_assignments(assignment, 
                             mul_public_params, mul_private_params, row);
                     }
                 };

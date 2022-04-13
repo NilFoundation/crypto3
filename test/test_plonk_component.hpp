@@ -80,16 +80,17 @@ namespace nil {
             zk::blueprint<ArithmetizationType> bp(desc);
             zk::blueprint_private_assignment_table<ArithmetizationType> private_assignment(desc);
             zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
+            zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(
+                    private_assignment, public_assignment);
 
             std::size_t start_row = component_type::allocate_rows(bp);
-            component_type::generate_gates(bp, public_assignment, init_params, start_row);
-            component_type::generate_copy_constraints(bp, public_assignment, init_params, start_row);
-            component_type::generate_assignments(private_assignment, public_assignment, init_params, assignment_params,
+            component_type::generate_gates(bp, assignment_bp, init_params, start_row);
+            component_type::generate_copy_constraints(bp, assignment_bp, init_params, start_row);
+            component_type::generate_assignments(assignment_bp, init_params, assignment_params,
                                                  start_row);
 
             // bp.fix_usable_rows();
-            private_assignment.padding();
-            public_assignment.padding();
+            assignment_bp.padding();
             std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
             std::cout << "Padded rows: " << desc.rows_amount << std::endl;
 

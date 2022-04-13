@@ -48,7 +48,7 @@ using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_double) {
+/*BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_double) {
 
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_double) {
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(public_params,
                                                                                                  private_params);
-}
+}*/
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
 

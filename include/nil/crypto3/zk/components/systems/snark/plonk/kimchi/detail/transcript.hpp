@@ -97,45 +97,42 @@ namespace nil {
                             components_amount);
                     }
 
-                    void init_assignment(blueprint_private_assignment_table<ArithmetizationType>
-                            &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    void init_assignment(
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                             std::size_t &component_start_row) {
                         
                     }
 
                     void init_generate_constraints(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const var &zero,
                         const std::size_t &component_start_row) {
                             
                     }
 
-                    void absorb_assignment(blueprint_private_assignment_table<ArithmetizationType>
-                            &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    void absorb_assignment(
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                             var absorbing_value,
                             std::size_t &component_start_row) {
                         
                     }
 
                     void absorb_generate_constraints(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const var &zero,
                         const std::size_t &component_start_row) {
                             
                     }
 
-                    var squeeze_assignment(blueprint_private_assignment_table<ArithmetizationType>
-                            &private_assignment,
-                            blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                    var squeeze_assignment(
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
                             var absorbing_value,
                             std::size_t &component_start_row) {
 
                     }
 
                     void squeeze_generate_constraints(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const var &zero,
                         const std::size_t &component_start_row) {
                             

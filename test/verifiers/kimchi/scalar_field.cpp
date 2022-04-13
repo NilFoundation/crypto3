@@ -61,6 +61,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_scalar_field_test_suite) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 40;
 
     using component_type = zk::components::pickles_verifier_scalar_field<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
@@ -70,7 +72,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_scalar_field_test_suite) {
     std::array<typename ArithmetizationType::field_type::value_type, 3> input_data = {0, 1, 1};
     typename component_type::public_params_type public_params = {input_data};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams> (public_params, private_params);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (public_params, private_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
