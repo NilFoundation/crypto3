@@ -100,67 +100,14 @@ namespace nil {
                         return bp.allocate_rows(required_rows_amount);
                     }
 
-                    static void generate_gates(
+                    static void generate_circuit(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
                         const std::size_t &component_start_row) {
 
-                        const std::size_t &j = component_start_row;
-
-                        std::size_t selector_index = assignment.add_selector(j, j + required_rows_amount - 2);
-
-                        auto bit_check_1 = bp.add_bit_check(var(W11, 0));
-                        auto bit_check_2 = bp.add_bit_check(var(W12, 0));
-                        auto bit_check_3 = bp.add_bit_check(var(W13, 0));
-                        auto bit_check_4 = bp.add_bit_check(var(W14, 0));
-
-                        auto constraint_1 = bp.add_constraint(
-                            ((1 + (endo - 1) * var(W11, 0)) * var(W0, 0) - var(W4, 0)) * var(W9, 0) -
-                            2 * var(W12, 0)* var(W1, 0) + var(W1, 0) + var(W5, 0));
-                        auto constraint_2 = bp.add_constraint(
-                            (2 * var(W4, 0) - var(W9, 0) * var(W9, 0) + (1 + (endo - 1) * var(W11, 0)) * var(W0, 0)) *
-                                ((var(W4, 0) - var(W7, 0)) * var(W9, 0) + var(W8, 0) + var(W5, 0)) -
-                            ((var(W4, 0) - var(W7, 0)) * 2 * var(W5, 0)));
-                        auto constraint_3 = bp.add_constraint(
-                            (var(W8, 0) + var(W5, 0)) * (var(W8, 0) + var(W5, 0))
-                            - ((var(W4, 0) - var(W7, 0)) * (var(W4, 0) - var(W7, 0)) * (var(W9, 0) * var(W9, 0) - (1 + (endo - 1) * var(W11, 0)) * var(W0, 0) + var(W7, 0))));
-                        auto constraint_4 = bp.add_constraint(
-                            ((1 + (endo - 1) * var(W13, 0)) * var(W0, 0) - var(W7, 0)) * var(W10, 0) -
-                            2 * var(W14, 0)* var(W1, 0) + var(W1, 0) + var(W8, 0));
-                        auto constraint_5 = bp.add_constraint(
-                            (2 * var(W7, 0) - var(W10, 0) * var(W10, 0) + (1 + (endo - 1) * var(W13, 0)) * var(W0, 0)) *
-                                ((var(W7, 0) - var(W4, +1)) * var(W10, 0) + var(W5, +1) + var(W8, 0)) -
-                            ((var(W7, 0) - var(W4, +1)) * 2 * var(W8, 0)));
-                        auto constraint_6 = bp.add_constraint(
-                            (var(W5, +1) + var(W8, 0)) * (var(W5, +1) + var(W8, 0))
-                            - ((var(W7, 0) - var(W4, +1)) * (var(W7, 0) - var(W4, +1))
-                                * (var(W10, 0) * var(W10, 0)  - (1 + (endo - 1) * var(W13, 0)) * var(W0, 0) + var(W4, +1))));
-                        auto constraint_7 =
-                            bp.add_constraint(var(W6, +1) - (16 * var(W6, 0) + 8 * var(W11, 0) + 4 * var(W12, 0) +
-                                                                   2 * var(W13, 0) + var(W14, 0)));
-                        bp.add_gate(selector_index,
-                                          {bit_check_1, bit_check_2, bit_check_3, bit_check_4, constraint_1, constraint_2, constraint_3,
-                                          constraint_4, constraint_5, constraint_6, constraint_7});
-                    }
-
-
-                    static void generate_copy_constraints(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
-                        const std::size_t &j = component_start_row;
-
-                        for (int z = 0; z < required_rows_amount - 2; z++) {
-                            bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 1, false}});
-                            bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 1, false}});
-                        }
-                        bp.add_copy_constraint({{W6, j + 0, false}, {0, 0, false, var::column_type::public_input}});
-
-                        //TODO link to params.b
-
-                        // TODO: (xP , yP ) in row i are copy constrained with values from the first doubling circuit
+                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_copy_constraints(bp, assignment, params, component_start_row);
                     }
 
                     static void generate_assignments(
@@ -244,6 +191,70 @@ namespace nil {
                             assignment.witness(W6)[j + 32] = n_next;
                              std::cout<<"circuit result "<< P.X.data<< " "<< P.Y.data<<std::endl;
 
+                    }
+
+                    private:
+                    static void generate_gates(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t &component_start_row) {
+
+                        const std::size_t &j = component_start_row;
+
+                        std::size_t selector_index = assignment.add_selector(j, j + required_rows_amount - 2);
+
+                        auto bit_check_1 = bp.add_bit_check(var(W11, 0));
+                        auto bit_check_2 = bp.add_bit_check(var(W12, 0));
+                        auto bit_check_3 = bp.add_bit_check(var(W13, 0));
+                        auto bit_check_4 = bp.add_bit_check(var(W14, 0));
+
+                        auto constraint_1 = bp.add_constraint(
+                            ((1 + (endo - 1) * var(W11, 0)) * var(W0, 0) - var(W4, 0)) * var(W9, 0) -
+                            2 * var(W12, 0)* var(W1, 0) + var(W1, 0) + var(W5, 0));
+                        auto constraint_2 = bp.add_constraint(
+                            (2 * var(W4, 0) - var(W9, 0) * var(W9, 0) + (1 + (endo - 1) * var(W11, 0)) * var(W0, 0)) *
+                                ((var(W4, 0) - var(W7, 0)) * var(W9, 0) + var(W8, 0) + var(W5, 0)) -
+                            ((var(W4, 0) - var(W7, 0)) * 2 * var(W5, 0)));
+                        auto constraint_3 = bp.add_constraint(
+                            (var(W8, 0) + var(W5, 0)) * (var(W8, 0) + var(W5, 0))
+                            - ((var(W4, 0) - var(W7, 0)) * (var(W4, 0) - var(W7, 0)) * (var(W9, 0) * var(W9, 0) - (1 + (endo - 1) * var(W11, 0)) * var(W0, 0) + var(W7, 0))));
+                        auto constraint_4 = bp.add_constraint(
+                            ((1 + (endo - 1) * var(W13, 0)) * var(W0, 0) - var(W7, 0)) * var(W10, 0) -
+                            2 * var(W14, 0)* var(W1, 0) + var(W1, 0) + var(W8, 0));
+                        auto constraint_5 = bp.add_constraint(
+                            (2 * var(W7, 0) - var(W10, 0) * var(W10, 0) + (1 + (endo - 1) * var(W13, 0)) * var(W0, 0)) *
+                                ((var(W7, 0) - var(W4, +1)) * var(W10, 0) + var(W5, +1) + var(W8, 0)) -
+                            ((var(W7, 0) - var(W4, +1)) * 2 * var(W8, 0)));
+                        auto constraint_6 = bp.add_constraint(
+                            (var(W5, +1) + var(W8, 0)) * (var(W5, +1) + var(W8, 0))
+                            - ((var(W7, 0) - var(W4, +1)) * (var(W7, 0) - var(W4, +1))
+                                * (var(W10, 0) * var(W10, 0)  - (1 + (endo - 1) * var(W13, 0)) * var(W0, 0) + var(W4, +1))));
+                        auto constraint_7 =
+                            bp.add_constraint(var(W6, +1) - (16 * var(W6, 0) + 8 * var(W11, 0) + 4 * var(W12, 0) +
+                                                                   2 * var(W13, 0) + var(W14, 0)));
+                        bp.add_gate(selector_index,
+                                          {bit_check_1, bit_check_2, bit_check_3, bit_check_4, constraint_1, constraint_2, constraint_3,
+                                          constraint_4, constraint_5, constraint_6, constraint_7});
+                    }
+
+
+                    static void generate_copy_constraints(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t &component_start_row) {
+                        const std::size_t &j = component_start_row;
+
+                        for (int z = 0; z < required_rows_amount - 2; z++) {
+                            bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 1, false}});
+                            bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 1, false}});
+                        }
+                        bp.add_copy_constraint({{W6, j + 0, false}, {0, 0, false, var::column_type::public_input}});
+
+                        //TODO link to params.b
+
+                        // TODO: (xP , yP ) in row i are copy constrained with values from the first doubling circuit
                     }
                 };
             }    // namespace components

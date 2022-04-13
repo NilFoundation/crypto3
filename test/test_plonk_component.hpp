@@ -83,8 +83,7 @@ namespace nil {
                     private_assignment, public_assignment);
 
             std::size_t start_row = component_type::allocate_rows(bp);
-            component_type::generate_gates(bp, assignment_bp, params, start_row);
-            component_type::generate_copy_constraints(bp, assignment_bp, params, start_row);
+            component_type::generate_circuit(bp, assignment_bp, params, start_row);
             component_type::generate_assignments(assignment_bp, params,
                                                  start_row);
 

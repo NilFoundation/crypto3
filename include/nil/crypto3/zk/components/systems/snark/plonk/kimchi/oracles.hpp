@@ -155,44 +155,14 @@ namespace nil {
                         return in_bp.allocate_rows(required_rows_amount);
                     }
 
-                    static void generate_gates(blueprint<ArithmetizationType> &bp,
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const params_type &params,
-                        const std::size_t &component_start_row = 0) {
+                    static void generate_circuit(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t &component_start_row) {
 
-                        const std::size_t &j = component_start_row;
-                        using F = typename BlueprintFieldType::value_type;
-
-                        std::size_t selector_index_1 = assignment.add_selector(j, j + required_rows_amount - 1);
-
-                        bp.add_gate(selector_index_1, 
-                            {});
-                    }
-
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const params_type &params,
-                            const std::size_t &component_start_row = 0){
-
-                        std::size_t row = component_start_row;
-
-                        std::array<var, 2> alpha_pub_limbs = {var(0, row, false, var::column_type::public_input), 
-                                var(0, row + 1, false, var::column_type::public_input)};
-                        std::array<var, 2> zeta_pub_limbs = {var(0, row + 2, false, var::column_type::public_input), 
-                                var(0, row + 3, false, var::column_type::public_input)};
-
-                        row += 4;
-                        
-                        copy_constraints_from_limbs(bp, assignment, alpha_pub_limbs, row);
-                        row++;
-                        // copy endo-scalar
-                        row += endo_scalar_component::required_rows_amount;
-                        
-                        copy_constraints_from_limbs(bp, assignment, zeta_pub_limbs, row);
-                        row++;
-                        // copy endo-scalar
-                        row += endo_scalar_component::required_rows_amount;
-                            
+                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_copy_constraints(bp, assignment, params, component_start_row);
                     }
 
                     static void generate_assignments(
@@ -233,6 +203,47 @@ namespace nil {
                         transcript.init_assignment(assignment, row);
                         transcript.absorb_assignment(assignment,
                             fq_digest, row);
+                    }
+
+                    private:
+                    static void generate_gates(blueprint<ArithmetizationType> &bp,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                            const params_type &params,
+                        const std::size_t &component_start_row = 0) {
+
+                        const std::size_t &j = component_start_row;
+                        using F = typename BlueprintFieldType::value_type;
+
+                        std::size_t selector_index_1 = assignment.add_selector(j, j + required_rows_amount - 1);
+
+                        bp.add_gate(selector_index_1, 
+                            {});
+                    }
+
+                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                            const params_type &params,
+                            const std::size_t &component_start_row = 0){
+
+                        std::size_t row = component_start_row;
+
+                        std::array<var, 2> alpha_pub_limbs = {var(0, row, false, var::column_type::public_input), 
+                                var(0, row + 1, false, var::column_type::public_input)};
+                        std::array<var, 2> zeta_pub_limbs = {var(0, row + 2, false, var::column_type::public_input), 
+                                var(0, row + 3, false, var::column_type::public_input)};
+
+                        row += 4;
+                        
+                        copy_constraints_from_limbs(bp, assignment, alpha_pub_limbs, row);
+                        row++;
+                        // copy endo-scalar
+                        row += endo_scalar_component::required_rows_amount;
+                        
+                        copy_constraints_from_limbs(bp, assignment, zeta_pub_limbs, row);
+                        row++;
+                        // copy endo-scalar
+                        row += endo_scalar_component::required_rows_amount;
+                            
                     }
                 };
             }    // namespace components

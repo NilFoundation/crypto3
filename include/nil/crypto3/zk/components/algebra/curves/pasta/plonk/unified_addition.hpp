@@ -74,6 +74,7 @@ namespace nil {
                         ArithmetizationParams> ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
+
                 public:
                     constexpr static const std::size_t required_rows_amount = 1;
 
@@ -88,67 +89,14 @@ namespace nil {
                             components_amount);
                     }
 
-                    static void generate_gates(
+                    static void generate_circuit(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment, 
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
-                        const std::initializer_list<std::size_t> &&row_start_indices) {
+                        const std::size_t &component_start_row) {
 
-                        using var = snark::plonk_variable<BlueprintFieldType>;
-
-                        std::size_t selector_index = assignment.add_selector(row_start_indices);
-
-                        auto constraint_1 = bp.add_constraint(
-                            var(W7, 0) * (var(W2, 0) - var(W0, 0)));
-                        auto constraint_2 = bp.add_constraint(
-                            (var(W2, 0) - var(W0, 0)) * var(W10, 0) - 
-                            (1 - var(W7, 0)));
-                        auto constraint_3 = bp.add_constraint(
-                            var(W7, 0) * (2*var(W8, 0) * var(W1, 0) - 
-                            3*(var(W0, 0) * var(W0, 0))) + (1 - var(W7, 0)) * 
-                            ((var(W2, 0) - var(W0, 0)) * var(W8, 0) - 
-                            (var(W3, 0) - var(W1, 0))));
-                        auto constraint_4 = bp.add_constraint(
-                            (var(W8, 0) * var(W8, 0)) - (var(W0, 0) + var(W2, 0) + var(W4, 0)));
-                        auto constraint_5 = bp.add_constraint(
-                            var(W5, 0) - (var(W8, 0) * (var(W0, 0) - 
-                            var(W4, 0)) - var(W1, 0)));
-                        auto constraint_6 = bp.add_constraint(
-                            (var(W3, 0) - var(W1, 0)) * (var(W7, 0) - var(W6, 0)));
-                        auto constraint_7 = bp.add_constraint(
-                            (var(W3, 0) - var(W1, 0)) * var(W9, 0) - var(W6, 0));
-
-                        bp.add_gate(selector_index, 
-                            { constraint_1, constraint_2, constraint_3,
-                            constraint_4, constraint_5, constraint_6,
-                            constraint_7
-                        });
-                    }
-
-                    static void generate_gates(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment, 
-                        const params_type &params,
-                        const std::size_t row_start_index) {
-
-                        generate_gates(
-                            bp,
-                            assignment, 
-                            params,
-                            {row_start_index});
-                    }
-
-                    static void generate_copy_constraints(
-                            blueprint<ArithmetizationType> &bp,
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const params_type &params,
-                            const std::size_t &component_start_row){
-
-                        const std::size_t &j = component_start_row;
-
-                        std::size_t public_input_column_index = 0;
-                        bp.add_copy_constraint({{W6, static_cast<int>(j), false},
-                            {public_input_column_index, 0, false, var::column_type::public_input}});
+                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_copy_constraints(bp, assignment, params, component_start_row);
                     }
 
                     static void generate_assignments(
@@ -203,6 +151,57 @@ namespace nil {
 
                             assignment.witness(W10)[j] = 0;
                         }
+                    }
+
+                    private:
+                    static void generate_gates(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment, 
+                        const params_type &params,
+                        const std::size_t row_start_index) {
+
+                        using var = snark::plonk_variable<BlueprintFieldType>;
+
+                        std::size_t selector_index = assignment.add_selector(row_start_index, row_start_index + required_rows_amount - 1);
+
+                        auto constraint_1 = bp.add_constraint(
+                            var(W7, 0) * (var(W2, 0) - var(W0, 0)));
+                        auto constraint_2 = bp.add_constraint(
+                            (var(W2, 0) - var(W0, 0)) * var(W10, 0) - 
+                            (1 - var(W7, 0)));
+                        auto constraint_3 = bp.add_constraint(
+                            var(W7, 0) * (2*var(W8, 0) * var(W1, 0) - 
+                            3*(var(W0, 0) * var(W0, 0))) + (1 - var(W7, 0)) * 
+                            ((var(W2, 0) - var(W0, 0)) * var(W8, 0) - 
+                            (var(W3, 0) - var(W1, 0))));
+                        auto constraint_4 = bp.add_constraint(
+                            (var(W8, 0) * var(W8, 0)) - (var(W0, 0) + var(W2, 0) + var(W4, 0)));
+                        auto constraint_5 = bp.add_constraint(
+                            var(W5, 0) - (var(W8, 0) * (var(W0, 0) - 
+                            var(W4, 0)) - var(W1, 0)));
+                        auto constraint_6 = bp.add_constraint(
+                            (var(W3, 0) - var(W1, 0)) * (var(W7, 0) - var(W6, 0)));
+                        auto constraint_7 = bp.add_constraint(
+                            (var(W3, 0) - var(W1, 0)) * var(W9, 0) - var(W6, 0));
+
+                        bp.add_gate(selector_index, 
+                            { constraint_1, constraint_2, constraint_3,
+                            constraint_4, constraint_5, constraint_6,
+                            constraint_7
+                        });
+                    }
+
+                    static void generate_copy_constraints(
+                            blueprint<ArithmetizationType> &bp,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                            const params_type &params,
+                            const std::size_t &component_start_row){
+
+                        const std::size_t &j = component_start_row;
+
+                        std::size_t public_input_column_index = 0;
+                        bp.add_copy_constraint({{W6, static_cast<int>(j), false},
+                            {public_input_column_index, 0, false, var::column_type::public_input}});
                     }
                 };
             }    // namespace components

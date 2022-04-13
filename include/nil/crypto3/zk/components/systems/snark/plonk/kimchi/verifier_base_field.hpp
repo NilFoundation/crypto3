@@ -92,6 +92,31 @@ namespace nil {
                         return bp.allocate_rows(required_rows_amount);
                     }
 
+                    static void generate_circuit(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t &component_start_row) {
+
+                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_copy_constraints(bp, assignment, params, component_start_row);
+                    }
+
+                    static void generate_assignments(
+                        blueprint_assignment_table<ArithmetizationType>
+                            &assignment,
+                        const params_type &params,
+                        const std::size_t &component_start_row) {
+
+                        std::size_t row = component_start_row;
+                        row++;
+
+                        typename endo_mul::params_type mul_params = {params.base_point, params.challenge};
+                        endo_mul::generate_assignments(assignment, 
+                            mul_params, row);
+                    }
+
+                    private:
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
@@ -117,20 +142,6 @@ namespace nil {
 
                         typename endo_mul::params_type mul_params = {};
                         endo_mul::generate_copy_constraints(bp, assignment,
-                            mul_params, row);
-                    }
-
-                    static void generate_assignments(
-                        blueprint_assignment_table<ArithmetizationType>
-                            &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
-
-                        std::size_t row = component_start_row;
-                        row++;
-
-                        typename endo_mul::params_type mul_params = {params.base_point, params.challenge};
-                        endo_mul::generate_assignments(assignment, 
                             mul_params, row);
                     }
                 };

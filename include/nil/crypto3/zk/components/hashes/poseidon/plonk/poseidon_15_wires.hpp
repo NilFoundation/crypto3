@@ -396,6 +396,72 @@ namespace nil {
                         return bp.allocate_rows(required_rows_amount);
                     }
 
+                    static void generate_circuit(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t &component_start_row) {
+
+                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_copy_constraints(bp, assignment, params, component_start_row);
+                    }
+
+                    static void generate_assignments(
+                        blueprint_assignment_table<ArithmetizationType>
+                            &assignment,
+                        const params_type &params,
+                        const std::size_t &component_start_row) {
+
+                        std::array<typename ArithmetizationType::field_type::value_type, state_size> state = params.input_state;
+                        std::array<typename ArithmetizationType::field_type::value_type, state_size> next_state;
+
+                        
+                        std::size_t row = component_start_row;
+                        assignment.witness(W0)[row] = state[0];
+                        assignment.witness(W1)[row] = state[1];
+                        assignment.witness(W2)[row] = state[2];
+
+                        for (std::size_t i = row; i < row + required_rows_amount - 1; i++) {
+                            for (int j = 0; j < state_size; j++) {
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row)*5][j];
+                            }
+                            assignment.witness(W3)[i] = next_state[0];
+                            assignment.witness(W4)[i] = next_state[1];
+                            assignment.witness(W5)[i] = next_state[2];
+                            state = next_state;
+                            for (int j = 0; j < state_size; j++) {
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row)*5 + 1][j];
+                            }
+                            assignment.witness(W6)[i] = next_state[0];
+                            assignment.witness(W7)[i] = next_state[1];
+                            assignment.witness(W8)[i] = next_state[2];
+                            state = next_state;
+                            for (int j = 0; j < state_size; j++) {
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row)*5 + 2][j];
+                            }
+                            assignment.witness(W9)[i] = next_state[0];
+                            assignment.witness(W10)[i] = next_state[1];
+                            assignment.witness(W11)[i] = next_state[2];
+                            state = next_state;
+                            for (int j = 0; j < state_size; j++) {
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i-row)*5 + 3][j];
+                            }
+                            assignment.witness(W12)[i] = next_state[0];
+                            assignment.witness(W13)[i] = next_state[1];
+                            assignment.witness(W14)[i] = next_state[2];
+                            state = next_state;
+                            for (int j = 0; j < state_size; j++) {
+                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row)*5 + 4][j];
+                            }
+                            assignment.witness(W0)[i + 1] = next_state[0];
+                            assignment.witness(W1)[i + 1] = next_state[1];
+                            assignment.witness(W2)[i + 1] = next_state[2];
+                            state = next_state;
+                        }
+                        std::cout<<"Circuit result: "<<state[0].data<<" "<< state[1].data<<" " <<state[2].data<<std::endl;
+                    }
+
+                    private:
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
@@ -483,61 +549,6 @@ namespace nil {
                         const params_type &params,
                         const std::size_t &component_start_row) {
 
-                    }
-
-                    static void generate_assignments(
-                        blueprint_assignment_table<ArithmetizationType>
-                            &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
-
-                        std::array<typename ArithmetizationType::field_type::value_type, state_size> state = params.input_state;
-                        std::array<typename ArithmetizationType::field_type::value_type, state_size> next_state;
-
-                        
-                        std::size_t row = component_start_row;
-                        assignment.witness(W0)[row] = state[0];
-                        assignment.witness(W1)[row] = state[1];
-                        assignment.witness(W2)[row] = state[2];
-
-                        for (std::size_t i = row; i < row + required_rows_amount - 1; i++) {
-                            for (int j = 0; j < state_size; j++) {
-                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row)*5][j];
-                            }
-                            assignment.witness(W3)[i] = next_state[0];
-                            assignment.witness(W4)[i] = next_state[1];
-                            assignment.witness(W5)[i] = next_state[2];
-                            state = next_state;
-                            for (int j = 0; j < state_size; j++) {
-                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row)*5 + 1][j];
-                            }
-                            assignment.witness(W6)[i] = next_state[0];
-                            assignment.witness(W7)[i] = next_state[1];
-                            assignment.witness(W8)[i] = next_state[2];
-                            state = next_state;
-                            for (int j = 0; j < state_size; j++) {
-                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row)*5 + 2][j];
-                            }
-                            assignment.witness(W9)[i] = next_state[0];
-                            assignment.witness(W10)[i] = next_state[1];
-                            assignment.witness(W11)[i] = next_state[2];
-                            state = next_state;
-                            for (int j = 0; j < state_size; j++) {
-                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i-row)*5 + 3][j];
-                            }
-                            assignment.witness(W12)[i] = next_state[0];
-                            assignment.witness(W13)[i] = next_state[1];
-                            assignment.witness(W14)[i] = next_state[2];
-                            state = next_state;
-                            for (int j = 0; j < state_size; j++) {
-                                next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row)*5 + 4][j];
-                            }
-                            assignment.witness(W0)[i + 1] = next_state[0];
-                            assignment.witness(W1)[i + 1] = next_state[1];
-                            assignment.witness(W2)[i + 1] = next_state[2];
-                            state = next_state;
-                        }
-                        std::cout<<"Circuit result: "<<state[0].data<<" "<< state[1].data<<" " <<state[2].data<<std::endl;
                     }
                 };
 

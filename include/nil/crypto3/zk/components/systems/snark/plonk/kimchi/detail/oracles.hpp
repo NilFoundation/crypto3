@@ -113,6 +113,35 @@ namespace nil {
                             {scalar_limbs_var[1].index, scalar_limbs_var[1].rotation, false, scalar_limbs_var[1].type}});
                     }
 
+                    static void generate_circuit(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t &component_start_row) {
+
+                        generate_gates(bp, assignment, params, component_start_row);
+                    }
+
+                    static result_type generate_assignments(
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                                        const params_type &params,
+                                        const std::size_t &component_start_row) {
+
+                        std::size_t row = component_start_row;
+                        typename BlueprintFieldType::value_type first_limb = var_value(assignment, params.scalar_limbs_var[0]);
+                        typename BlueprintFieldType::value_type second_limb = var_value(assignment, params.scalar_limbs_var[1]);
+                        assignment.witness(W0)[row] = first_limb;
+                        assignment.witness(W1)[row] = second_limb;
+                        typename BlueprintFieldType::value_type scalar = 2;
+                        scalar = scalar.pow(64) * second_limb + first_limb;
+                        std::cout<<scalar.data<<std::endl;
+                        assignment.witness(W2)[row] = scalar;
+                        var res(W2, row, false);
+
+                        return result_type {res};
+                    }
+
+                    private:
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             allocated_data_type &allocated_data,
@@ -133,25 +162,6 @@ namespace nil {
 
                         bp.add_gate(selector_index_1, 
                             {});
-                    }
-
-                    static result_type generate_assignments(
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                                        const params_type &params,
-                                        const std::size_t &component_start_row) {
-
-                        std::size_t row = component_start_row;
-                        typename BlueprintFieldType::value_type first_limb = var_value(assignment, params.scalar_limbs_var[0]);
-                        typename BlueprintFieldType::value_type second_limb = var_value(assignment, params.scalar_limbs_var[1]);
-                        assignment.witness(W0)[row] = first_limb;
-                        assignment.witness(W1)[row] = second_limb;
-                        typename BlueprintFieldType::value_type scalar = 2;
-                        scalar = scalar.pow(64) * second_limb + first_limb;
-                        std::cout<<scalar.data<<std::endl;
-                        assignment.witness(W2)[row] = scalar;
-                        var res(W2, row, false);
-
-                        return result_type {res};
                     }
                 };
                 

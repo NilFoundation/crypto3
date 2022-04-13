@@ -95,6 +95,79 @@ namespace nil {
                         return in_bp.allocate_rows(required_rows_amount);
                     }
 
+                    static void generate_circuit(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t &component_start_row) {
+
+                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_copy_constraints(bp, assignment, params, component_start_row);
+                    }
+
+                    static result_type generate_assignments(
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                                        const params_type &params,
+                                        const std::size_t &component_start_row) {
+                            
+                            std::size_t row = component_start_row;
+                            
+                            std::size_t crumbs_per_row = 8;
+                            std::size_t bits_per_crumb = 2;
+                            std::size_t bits_per_row = bits_per_crumb * crumbs_per_row; // we suppose that params.num_bits % bits_per_row = 0
+
+                            std::vector<typename BlueprintFieldType::value_type> bits_msb(params.num_bits);
+                            typename BlueprintFieldType::integral_type integral_scalar = typename  BlueprintFieldType::integral_type(params.scalar.data);
+                            for (std::size_t i = 0; i < params.num_bits; i++) {
+                                bits_msb[params.num_bits - 1 - i] = multiprecision::bit_test(integral_scalar, i);
+                            }
+
+                            typename BlueprintFieldType::value_type a = 2;
+                            typename BlueprintFieldType::value_type b = 2;
+                            typename BlueprintFieldType::value_type n = 0;
+
+                            for (std::size_t chunk_start = 0; chunk_start < bits_msb.size(); chunk_start += bits_per_row) {
+                                assignment.witness(W0)[row] = n;
+                                assignment.witness(W2)[row] = a;
+                                assignment.witness(W3)[row] = b;
+
+                                for (std::size_t j = 0; j < crumbs_per_row; j++) {
+                                    std::size_t crumb = chunk_start + j * bits_per_crumb;
+                                    typename BlueprintFieldType::value_type b0 = bits_msb[crumb + 1];
+                                    typename BlueprintFieldType::value_type b1 = bits_msb[crumb + 0];
+
+                                    typename BlueprintFieldType::value_type crumb_value = b0 + b1.doubled();
+                                    assignment.witness(W7 + j)[row] = crumb_value;
+
+                                    a = a.doubled();
+                                    b = b.doubled();
+
+                                    typename BlueprintFieldType::value_type s = 
+                                        (b0 == BlueprintFieldType::value_type::one()) ? 1 : -1;
+
+                                    if (b1 == BlueprintFieldType::value_type::zero()) {
+                                        b += s;
+                                    } else {
+                                        a += s;
+                                    }
+
+                                    n = (n.doubled()).doubled();
+                                    n += crumb_value;
+                                }
+
+                                assignment.witness(W1)[row] = n;
+                                assignment.witness(W4)[row] = a;
+                                assignment.witness(W5)[row] = b;
+                                row++;
+                            }
+                            auto res = a * params.endo_factor + b;
+                            assignment.witness(W6)[row - 1] = res;
+
+                            std::cout<<"circuit result "<<res.data<<std::endl;
+                            return result_type { var(W6, row - 1, false) };
+                    }
+
+                    private:
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             const params_type &params,
@@ -173,68 +246,6 @@ namespace nil {
                             bp.add_copy_constraint({{W2, j + z, false}, {W4, j + z - 1, false}});
                             bp.add_copy_constraint({{W3, j + z, false}, {W5, j + z - 1, false}});
                         }
-                    }
-
-                    static result_type generate_assignments(
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                                        const params_type &params,
-                                        const std::size_t &component_start_row) {
-                            
-                            std::size_t row = component_start_row;
-                            
-                            std::size_t crumbs_per_row = 8;
-                            std::size_t bits_per_crumb = 2;
-                            std::size_t bits_per_row = bits_per_crumb * crumbs_per_row; // we suppose that params.num_bits % bits_per_row = 0
-
-                            std::vector<typename BlueprintFieldType::value_type> bits_msb(params.num_bits);
-                            typename BlueprintFieldType::integral_type integral_scalar = typename  BlueprintFieldType::integral_type(params.scalar.data);
-                            for (std::size_t i = 0; i < params.num_bits; i++) {
-                                bits_msb[params.num_bits - 1 - i] = multiprecision::bit_test(integral_scalar, i);
-                            }
-
-                            typename BlueprintFieldType::value_type a = 2;
-                            typename BlueprintFieldType::value_type b = 2;
-                            typename BlueprintFieldType::value_type n = 0;
-
-                            for (std::size_t chunk_start = 0; chunk_start < bits_msb.size(); chunk_start += bits_per_row) {
-                                assignment.witness(W0)[row] = n;
-                                assignment.witness(W2)[row] = a;
-                                assignment.witness(W3)[row] = b;
-
-                                for (std::size_t j = 0; j < crumbs_per_row; j++) {
-                                    std::size_t crumb = chunk_start + j * bits_per_crumb;
-                                    typename BlueprintFieldType::value_type b0 = bits_msb[crumb + 1];
-                                    typename BlueprintFieldType::value_type b1 = bits_msb[crumb + 0];
-
-                                    typename BlueprintFieldType::value_type crumb_value = b0 + b1.doubled();
-                                    assignment.witness(W7 + j)[row] = crumb_value;
-
-                                    a = a.doubled();
-                                    b = b.doubled();
-
-                                    typename BlueprintFieldType::value_type s = 
-                                        (b0 == BlueprintFieldType::value_type::one()) ? 1 : -1;
-
-                                    if (b1 == BlueprintFieldType::value_type::zero()) {
-                                        b += s;
-                                    } else {
-                                        a += s;
-                                    }
-
-                                    n = (n.doubled()).doubled();
-                                    n += crumb_value;
-                                }
-
-                                assignment.witness(W1)[row] = n;
-                                assignment.witness(W4)[row] = a;
-                                assignment.witness(W5)[row] = b;
-                                row++;
-                            }
-                            auto res = a * params.endo_factor + b;
-                            assignment.witness(W6)[row - 1] = res;
-
-                            std::cout<<"circuit result "<<res.data<<std::endl;
-                            return result_type { var(W6, row - 1, false) };
                     }
                 };
             }    // namespace components
