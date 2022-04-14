@@ -116,8 +116,12 @@ namespace nil {
                 typedef snark::plonk_constraint_system<BlueprintFieldType,
                     ArithmetizationParams> ArithmetizationType;
 
+                using var = snark::plonk_variable<BlueprintFieldType>;
+
                 snark::plonk_table_description<BlueprintFieldType,
                         ArithmetizationParams> &_table_description;
+
+                std::size_t allocated_public_input_rows = 0;
             public:
                 blueprint_public_assignment_table(
                     snark::plonk_table_description<BlueprintFieldType,
@@ -258,6 +262,12 @@ namespace nil {
 
                     return _table_description.rows_amount;
                 }
+
+                var allocate_public_input(typename BlueprintFieldType::value_type data) {
+                    public_input(0)[allocated_public_input_rows] = data;
+                    allocated_public_input_rows++;
+                    return var(0, allocated_public_input_rows - 1, false, var::column_type::public_input);
+                }
             };
 
             template<typename BlueprintFieldType,
@@ -266,7 +276,9 @@ namespace nil {
                                                         ArithmetizationParams>> {
                 
                 using ArithmetizationType = snark::plonk_constraint_system<BlueprintFieldType,
-                    ArithmetizationParams> ;
+                    ArithmetizationParams>;
+
+                using var = snark::plonk_variable<BlueprintFieldType>;
 
                 blueprint_private_assignment_table<ArithmetizationType> &_private_assignment;
                 blueprint_public_assignment_table<ArithmetizationType> &_public_assignment;
@@ -320,6 +332,10 @@ namespace nil {
                     return _public_assignment.constant(constant_index);
                 }
 
+                var allocate_public_input(typename BlueprintFieldType::value_type data) {
+                    return _public_assignment.allocate_public_input(data);
+                }
+
                 // shared interface
                 snark::plonk_column<BlueprintFieldType> &operator[](std::size_t index) {
                     if (index < ArithmetizationParams::WitnessColumns) {
@@ -339,6 +355,19 @@ namespace nil {
                     std::size_t rows = _private_assignment.padding();
                     rows = _public_assignment.padding();
                     return rows;
+                }
+
+                typename BlueprintFieldType::value_type var_value(const var &a) {
+                    typename BlueprintFieldType::value_type result;
+                    if (a.type == var::column_type::witness) {
+                        result = witness(a.index)[a.rotation];
+                    } else if (a.type == var::column_type::public_input) {
+                        result = public_input(a.index)[a.rotation];
+                    } else {
+                        result = constant(a.index)[a.rotation];
+                    }
+
+                    return result;
                 }
             };
 

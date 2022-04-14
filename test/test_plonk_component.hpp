@@ -69,7 +69,8 @@ namespace nil {
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
                  std::size_t Lambda>
-        auto prepare_component(typename ComponentType::params_type params) {
+        auto prepare_component(typename ComponentType::params_type params,
+            std::vector<typename BlueprintFieldType::value_type> &public_input) {
 
             using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
             using component_type = ComponentType;
@@ -83,11 +84,16 @@ namespace nil {
                     private_assignment, public_assignment);
 
             std::size_t start_row = component_type::allocate_rows(bp);
+            bp.allocate_rows(public_input.size());
+
+            for (std::size_t i = 0; i < public_input.size(); i++) {
+                auto allocated_pi = assignment_bp.allocate_public_input(public_input[i]);
+            }
+
             component_type::generate_circuit(bp, assignment_bp, params, start_row);
             component_type::generate_assignments(assignment_bp, params,
                                                  start_row);
 
-            // bp.fix_usable_rows();
             assignment_bp.padding();
             std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
             std::cout << "Padded rows: " << desc.rows_amount << std::endl;
@@ -168,13 +174,14 @@ namespace nil {
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
                  std::size_t Lambda>
-        void test_component(typename ComponentType::params_type params) {
+        void test_component(typename ComponentType::params_type params,
+            std::vector<typename BlueprintFieldType::value_type> public_input) {
 
             using redshift_params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
 
             auto [desc, bp, fri_params, assignments, public_preprocessed_data, private_preprocessed_data] =
                 prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda>(
-                    params);
+                    params, public_input);
 
             auto proof = zk::snark::redshift_prover<BlueprintFieldType, redshift_params>::process(
                 public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);

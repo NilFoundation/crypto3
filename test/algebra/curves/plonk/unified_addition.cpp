@@ -86,14 +86,22 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
+    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+
     using component_type = zk::components::
         curve_element_unified_addition<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10>;
 
-    typename component_type::params_type params = {
-        algebra::random_element<curve_type::template g1_type<>>(),
-        algebra::random_element<curve_type::template g1_type<>>()};
+    auto P = algebra::random_element<curve_type::template g1_type<>>().to_affine();
+    auto Q = algebra::random_element<curve_type::template g1_type<>>().to_affine();
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params);
+    typename component_type::params_type params = {
+        {var(0, 1, false, var::column_type::public_input), var(0, 2, false, var::column_type::public_input)},
+        {var(0, 3, false, var::column_type::public_input), var(0, 4, false, var::column_type::public_input)}
+    };
+
+    std::vector<typename BlueprintFieldType::value_type> public_input = {0, P.X, P.Y, Q.X, Q.Y};
+    
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

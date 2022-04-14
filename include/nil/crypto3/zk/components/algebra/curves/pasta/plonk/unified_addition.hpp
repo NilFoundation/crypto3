@@ -79,8 +79,13 @@ namespace nil {
                     constexpr static const std::size_t required_rows_amount = 1;
 
                     struct params_type {
-                        typename CurveType::template g1_type<>::value_type P;
-                        typename CurveType::template g1_type<>::value_type Q;
+                        struct var_ec_point {
+                            var x;
+                            var y;
+                        };
+                        
+                        var_ec_point P;
+                        var_ec_point Q;
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp,
@@ -109,39 +114,44 @@ namespace nil {
 
                         assignment.public_input(0)[0] = ArithmetizationType::field_type::value_type::zero();
 
-                        const typename CurveType::template g1_type<>::value_type R = params.P + params.Q;
-                        const typename CurveType::template g1_type<>::value_type &P = params.P;
-                        const typename CurveType::template g1_type<>::value_type &Q = params.Q;
+                        typename BlueprintFieldType::value_type p_x = assignment.var_value(params.P.x);
+                        typename BlueprintFieldType::value_type p_y = assignment.var_value(params.P.y);
+                        typename CurveType::template 
+                            g1_type<algebra::curves::coordinates::affine>::value_type P(p_x, p_y);
 
-                        auto P_affine = P.to_affine();
-                        auto Q_affine = Q.to_affine();
-                        auto R_affine = R.to_affine();
+                        typename BlueprintFieldType::value_type q_x = assignment.var_value(params.Q.x);
+                        typename BlueprintFieldType::value_type q_y = assignment.var_value(params.Q.y);  
+                        typename CurveType::template 
+                            g1_type<algebra::curves::coordinates::affine>::value_type Q(q_x, q_y);
 
-                        assignment.witness(W0)[j] = P_affine.X;
-                        assignment.witness(W1)[j] = P_affine.Y;
-                        assignment.witness(W2)[j] = Q_affine.X;
-                        assignment.witness(W3)[j] = Q_affine.Y;
-                        assignment.witness(W4)[j] = R_affine.X;
-                        assignment.witness(W5)[j] = R_affine.Y;
+                        const typename CurveType::template
+                            g1_type<algebra::curves::coordinates::affine>::value_type R = P + Q;
+                        
+                        assignment.witness(W0)[j] = P.X;
+                        assignment.witness(W1)[j] = P.Y;
+                        assignment.witness(W2)[j] = Q.X;
+                        assignment.witness(W3)[j] = Q.Y;
+                        assignment.witness(W4)[j] = R.X;
+                        assignment.witness(W5)[j] = R.Y;
 
                         // TODO: check, if this one correct:
                         assignment.witness(W6)[j] = R.is_zero();
 
                         if (P.X != Q.X){
                             assignment.witness(W7)[j] = 0;
-                            assignment.witness(W8)[j] = (P_affine.Y - Q_affine.Y)/(P_affine.X - Q_affine.X);
+                            assignment.witness(W8)[j] = (P.Y - Q.Y)/(P.X - Q.X);
 
                             assignment.witness(W9)[j] = 0;
 
-                            assignment.witness(W10)[j] = (Q_affine.X - P_affine.X).inversed();
+                            assignment.witness(W10)[j] = (Q.X - P.X).inversed();
                         } else {
                             assignment.witness(W7)[j] = 1;
 
                             if (P.Y != Q.Y) { 
-                                assignment.witness(W9)[j] = (Q_affine.Y - P_affine.Y).inversed();
+                                assignment.witness(W9)[j] = (Q.Y - P.Y).inversed();
                             } else { // doubling
                                 if (P.Y != 0) {
-                                    assignment.witness(W8)[j] = (3 * (P_affine.X * P_affine.X))/(2 * P_affine.Y);
+                                    assignment.witness(W8)[j] = (3 * (P.X * P.X))/(2 * P.Y);
                                 } else {
                                     assignment.witness(W8)[j] = 0;
                                 }
@@ -160,9 +170,7 @@ namespace nil {
                         const params_type &params,
                         const std::size_t row_start_index) {
 
-                        using var = snark::plonk_variable<BlueprintFieldType>;
-
-                        std::size_t selector_index = assignment.add_selector(row_start_index, row_start_index + required_rows_amount - 1);
+                        std::size_t selector_index = assignment.add_selector(row_start_index);
 
                         auto constraint_1 = bp.add_constraint(
                             var(W7, 0) * (var(W2, 0) - var(W0, 0)));

@@ -82,7 +82,7 @@ namespace nil {
                     constexpr static const std::size_t required_rows_amount = 8;
 
                     struct params_type {
-                        typename BlueprintFieldType::value_type scalar;
+                        var scalar;
                         typename BlueprintFieldType::value_type endo_factor;
                         std::size_t num_bits;
                     };
@@ -117,7 +117,8 @@ namespace nil {
                             std::size_t bits_per_row = bits_per_crumb * crumbs_per_row; // we suppose that params.num_bits % bits_per_row = 0
 
                             std::vector<typename BlueprintFieldType::value_type> bits_msb(params.num_bits);
-                            typename BlueprintFieldType::integral_type integral_scalar = typename  BlueprintFieldType::integral_type(params.scalar.data);
+                            typename BlueprintFieldType::value_type scalar = assignment.var_value(params.scalar);
+                            typename BlueprintFieldType::integral_type integral_scalar = typename  BlueprintFieldType::integral_type(scalar.data);
                             for (std::size_t i = 0; i < params.num_bits; i++) {
                                 bits_msb[params.num_bits - 1 - i] = multiprecision::bit_test(integral_scalar, i);
                             }
@@ -242,10 +243,13 @@ namespace nil {
                         const std::size_t &j = component_start_row;
 
                         for (std::size_t z = 1; z < required_rows_amount; z++){
-                            bp.add_copy_constraint({{W0, j + z, false}, {W1, j + z - 1, false}});
-                            bp.add_copy_constraint({{W2, j + z, false}, {W4, j + z - 1, false}});
-                            bp.add_copy_constraint({{W3, j + z, false}, {W5, j + z - 1, false}});
+                            bp.add_copy_constraint({{W0, static_cast<int>(j + z), false}, {W1, static_cast<int>(j + z - 1), false}});
+                            bp.add_copy_constraint({{W2, static_cast<int>(j + z), false}, {W4, static_cast<int>(j + z - 1), false}});
+                            bp.add_copy_constraint({{W3, static_cast<int>(j + z), false}, {W5, static_cast<int>(j + z - 1), false}});
                         }
+
+                        // check that the recalculated n is equal to the input challenge
+                        bp.add_copy_constraint({{W1, static_cast<int>(j + required_rows_amount - 1), false}, params.scalar});
                     }
                 };
             }    // namespace components
