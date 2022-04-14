@@ -90,7 +90,8 @@ namespace nil {
                 auto allocated_pi = assignment_bp.allocate_public_input(public_input[i]);
             }
 
-            component_type::generate_circuit(bp, assignment_bp, params, start_row);
+            typename component_type::allocated_data_type allocated_data;
+            component_type::generate_circuit(bp, assignment_bp, params, allocated_data, start_row);
             component_type::generate_assignments(assignment_bp, params,
                                                  start_row);
 

@@ -88,6 +88,16 @@ namespace nil {
                         var_ec_point Q;
                     };
 
+                    struct allocated_data_type {
+                        allocated_data_type() {
+                            previously_allocated = false;
+                        }
+
+                        // TODO access modifiers
+                        bool previously_allocated;
+                        std::size_t add_selector;
+                    };
+
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp,
                         std::size_t components_amount = 1){
                         return bp.allocate_rows(required_rows_amount *
@@ -98,9 +108,10 @@ namespace nil {
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
+                        allocated_data_type &allocated_data,
                         const std::size_t &component_start_row) {
 
-                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_gates(bp, assignment, params, allocated_data, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
                     }
 
@@ -168,9 +179,18 @@ namespace nil {
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment, 
                         const params_type &params,
+                        allocated_data_type &allocated_data,
                         const std::size_t row_start_index) {
 
-                        std::size_t selector_index = assignment.add_selector(row_start_index);
+                        std::size_t selector_index;
+                        if (!allocated_data.previously_allocated) {
+                            selector_index = assignment.add_selector(row_start_index);
+                            allocated_data.previously_allocated = true;
+                            allocated_data.add_selector = selector_index;
+                        } else {
+                            selector_index = allocated_data.add_selector;
+                            assignment.enable_selector(selector_index, row_start_index); 
+                        }
 
                         auto constraint_1 = bp.add_constraint(
                             var(W7, 0) * (var(W2, 0) - var(W0, 0)));

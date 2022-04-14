@@ -91,6 +91,17 @@ namespace nil {
                         var endo_scalar;
                     };
 
+                    struct allocated_data_type {
+                        allocated_data_type() {
+                            previously_allocated = false;
+                        }
+
+                        // TODO access modifiers
+                        bool previously_allocated;
+                        std::size_t selector_1;
+                        std::size_t selector_2;
+                    };
+
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
                         return in_bp.allocate_rows(required_rows_amount);
                     }
@@ -99,9 +110,10 @@ namespace nil {
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
+                        allocated_data_type &allocated_data,
                         const std::size_t &component_start_row) {
 
-                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_gates(bp, assignment, params, allocated_data, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
                     }
 
@@ -172,13 +184,26 @@ namespace nil {
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             const params_type &params,
+                            allocated_data_type &allocated_data,
                         const std::size_t &component_start_row = 0) {
 
                         const std::size_t &j = component_start_row;
                         using F = typename BlueprintFieldType::value_type;
 
-                        std::size_t selector_index_1 = assignment.add_selector(j, j + required_rows_amount - 1);
-                        std::size_t selector_index_2 = assignment.add_selector(j + required_rows_amount - 1);
+                        std::size_t selector_index_1;
+                        std::size_t selector_index_2;
+                        if (!allocated_data.previously_allocated) {
+                            selector_index_1 = assignment.add_selector(j, j + required_rows_amount - 1);
+                            selector_index_2 = assignment.add_selector(j + required_rows_amount - 1);
+                            allocated_data.previously_allocated = true;
+                            allocated_data.selector_1 = selector_index_1;
+                            allocated_data.selector_2 = selector_index_2;
+                        } else {
+                            selector_index_1 = allocated_data.selector_1;
+                            selector_index_2 = allocated_data.selector_2;
+                            assignment.enable_selector(selector_index_1, j, j + required_rows_amount - 1); 
+                            assignment.enable_selector(selector_index_2, j + required_rows_amount - 1); 
+                        }
 
                         auto c_f = [](var x) {
                             return (F(11) * F(6).inversed()) * x 

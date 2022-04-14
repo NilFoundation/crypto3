@@ -193,6 +193,30 @@ namespace nil {
                     return selector_index - 1;
                 }
 
+                void enable_selector(std::size_t selector_index, const std::vector<std::size_t> &&row_indices) {
+                    assert(selector_index < this->selector_columns.size());
+
+                    for (std::size_t row_index : row_indices) {
+                        this->selector_columns[selector_index][row_index] = BlueprintFieldType::value_type::one();
+                    }
+                }
+
+                void enable_selector(std::size_t selector_index, std::size_t row_index) {
+                    assert(selector_index < this->selector_columns.size());
+
+                    enable_selector(selector_index, std::vector<std::size_t>({row_index}));
+                }
+
+                void
+                    enable_selector(std::size_t selector_index, std::size_t begin_row_index, std::size_t end_row_index, std::size_t index_step = 1) {
+                    
+                    assert(selector_index < this->selector_columns.size());
+
+                    for (std::size_t row_index = begin_row_index; row_index <= end_row_index; row_index += index_step) {
+                        this->selector_columns[selector_index][row_index] = BlueprintFieldType::value_type::one();
+                    }
+                }
+
                 snark::plonk_column<BlueprintFieldType> &public_input(std::size_t public_input_index) {
                     assert(public_input_index < this->public_input_columns.size());
                     this->public_input_columns[public_input_index].resize(_table_description.rows_amount);
@@ -322,6 +346,20 @@ namespace nil {
                 std::size_t
                     add_selector(std::size_t begin_row_index, std::size_t end_row_index, std::size_t index_step = 1) {
                     return _public_assignment.add_selector(begin_row_index, end_row_index, index_step);
+                }
+
+                void enable_selector(std::size_t selector_index, const std::vector<std::size_t> &&row_indices) {
+                    _public_assignment.enable_selector(selector_index, std::move(row_indices));
+                }
+
+                void enable_selector(std::size_t selector_index, std::size_t row_index) {
+                    _public_assignment.enable_selector(selector_index, row_index);
+                }
+
+                void
+                    enable_selector(std::size_t selector_index, std::size_t begin_row_index, std::size_t end_row_index, std::size_t index_step = 1) {
+                    
+                    _public_assignment.enable_selector(selector_index, begin_row_index, end_row_index, index_step);
                 }
 
                 snark::plonk_column<BlueprintFieldType> &public_input(std::size_t public_input_index) {
