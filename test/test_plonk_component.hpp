@@ -200,7 +200,7 @@ namespace nil {
             bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, redshift_params>::process(
                 public_preprocessed_data, proof, bp, fri_params);
             profiling(assignments);
-            profiling_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda>::process(
+            profiling_component<BlueprintFieldType, ArithmetizationParams, Hash, Lambda>::process(
                 std::cout, bp, public_preprocessed_data);
             BOOST_CHECK(verifier_res);
         }

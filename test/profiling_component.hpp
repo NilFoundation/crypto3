@@ -38,8 +38,7 @@
 
 namespace nil {
     namespace crypto3 {
-        template<typename ComponentType, typename FieldType, typename ArithmetizationParams, typename Hash,
-                 std::size_t Lambda>
+        template<typename FieldType, typename ArithmetizationParams, typename Hash, std::size_t Lambda>
         struct profiling_component {
             using redshift_params = zk::snark::redshift_params<FieldType, ArithmetizationParams, Hash, Hash, Lambda>;
             using types = zk::snark::detail::redshift_policy<FieldType, redshift_params>;
