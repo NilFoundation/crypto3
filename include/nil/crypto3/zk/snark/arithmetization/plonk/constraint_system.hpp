@@ -51,23 +51,26 @@ namespace nil {
 
                 template<typename FieldType, typename ArithmetizationParams>
                 struct plonk_constraint_system {
+                    typedef std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates_type;
+                    typedef std::vector<plonk_copy_constraint<FieldType>> copy_constraints_type;
+                    typedef std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates_type;
 
                 protected:
-                    std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> _gates;
-                    std::vector<plonk_copy_constraint<FieldType>> _copy_constraints;
-                    std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> _lookup_gates;
+                    gates_type _gates;
+                    copy_constraints_type _copy_constraints;
+                    lookup_gates_type _lookup_gates;
 
                 public:
-
                     typedef FieldType field_type;
 
-                    plonk_constraint_system(){}
+                    plonk_constraint_system() {
+                    }
 
-                    plonk_constraint_system(
-                        std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> &gates,
-                        std::vector<plonk_copy_constraint<FieldType>> &copy_constraints,
-                        std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>>  &lookup_gates):
-                        _gates(gates), _copy_constraints(copy_constraints), _lookup_gates(lookup_gates){
+                    plonk_constraint_system(const gates_type &gates,
+                                            const copy_constraints_type &copy_constraints,
+                                            const lookup_gates_type &lookup_gates) :
+                        _gates(gates),
+                        _copy_constraints(copy_constraints), _lookup_gates(lookup_gates) {
                     }
 
                     std::size_t num_gates() const {
@@ -87,15 +90,15 @@ namespace nil {
                     //     return true;
                     // }
 
-                    std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates() const {
+                    const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> &gates() const {
                         return _gates;
                     }
 
-                    std::vector<plonk_copy_constraint<FieldType>> copy_constraints() const {
+                    const std::vector<plonk_copy_constraint<FieldType>> &copy_constraints() const {
                         return _copy_constraints;
                     }
 
-                    std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates() const {
+                    const std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> &lookup_gates() const {
                         return _lookup_gates;
                     }
                 };
