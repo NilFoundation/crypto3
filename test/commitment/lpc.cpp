@@ -43,7 +43,9 @@
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/batched_lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/batched_fri.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
 
@@ -106,6 +108,144 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     // TODO: take a point outside of the basic domain
     std::vector<typename FieldType::value_type> evaluation_points = {
         algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
+
+    std::array<std::uint8_t, 96> x_data {};
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
+
+    auto proof = lpc_type::proof_eval(evaluation_points, tree, f, fri_params, transcript);
+
+    // verify
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
+
+    BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, fri_params, transcript_verifier));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(batched_lpc_test_suite)
+
+BOOST_AUTO_TEST_CASE(batched_lpc_basic_test) {
+
+    // setup
+    typedef algebra::curves::bls12<381> curve_type;
+    typedef typename curve_type::scalar_field_type FieldType;
+
+    typedef hashes::sha2<256> merkle_hash_type;
+    typedef hashes::sha2<256> transcript_hash_type;
+
+    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
+
+    constexpr static const std::size_t leaf_size = 1;
+    constexpr static const std::size_t lambda = 40;
+    constexpr static const std::size_t k = 1;
+
+    constexpr static const std::size_t d = 16;
+
+    constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
+    constexpr static const std::size_t m = 2;
+
+    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
+
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
+    typedef zk::commitments::batched_list_polynomial_commitment<FieldType, lpc_params_type, leaf_size> lpc_type;
+
+    typedef typename lpc_type::proof_type proof_type;
+
+    constexpr static const std::size_t d_extended = d;
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
+
+    typename fri_type::params_type fri_params;
+
+    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+    fri_params.r = r;
+    fri_params.D = D;
+    fri_params.q = q;
+    fri_params.max_degree = d - 1;
+
+    // commit
+
+    std::array<math::polynomial<typename FieldType::value_type>, leaf_size> f =
+        {{
+            {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}
+        }};
+
+    merkle_tree_type tree = lpc_type::precommit(f, D[0]);
+
+    // TODO: take a point outside of the basic domain
+    std::array<std::vector<typename FieldType::value_type>, leaf_size> evaluation_points = 
+        {{
+            {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}
+        }};
+
+    std::array<std::uint8_t, 96> x_data {};
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
+
+    auto proof = lpc_type::proof_eval(evaluation_points, tree, f, fri_params, transcript);
+
+    // verify
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
+
+    BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, fri_params, transcript_verifier));
+}
+
+BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_2) {
+
+    // setup
+    typedef algebra::curves::bls12<381> curve_type;
+    typedef typename curve_type::scalar_field_type FieldType;
+
+    typedef hashes::sha2<256> merkle_hash_type;
+    typedef hashes::sha2<256> transcript_hash_type;
+
+    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
+
+    constexpr static const std::size_t leaf_size = 2;
+    constexpr static const std::size_t lambda = 40;
+    constexpr static const std::size_t k = 1;
+
+    constexpr static const std::size_t d = 16;
+
+    constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
+    constexpr static const std::size_t m = 2;
+
+    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
+
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
+    typedef zk::commitments::batched_list_polynomial_commitment<FieldType, lpc_params_type, leaf_size> lpc_type;
+
+    typedef typename lpc_type::proof_type proof_type;
+
+    constexpr static const std::size_t d_extended = d;
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
+
+    typename fri_type::params_type fri_params;
+
+    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+    fri_params.r = r;
+    fri_params.D = D;
+    fri_params.q = q;
+    fri_params.max_degree = d - 1;
+
+    // commit
+
+    std::array<math::polynomial<typename FieldType::value_type>, leaf_size> f =
+        {{
+            {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1},
+            {1, 2, 5, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}
+        }};
+
+    merkle_tree_type tree = lpc_type::precommit(f, D[0]);
+
+    // TODO: take a point outside of the basic domain
+    std::array<std::vector<typename FieldType::value_type>, leaf_size> evaluation_points = 
+        {{
+            {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator},
+            {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}
+        }};
 
     std::array<std::uint8_t, 96> x_data {};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
