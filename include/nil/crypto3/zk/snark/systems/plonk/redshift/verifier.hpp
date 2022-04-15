@@ -95,7 +95,6 @@ namespace nil {
                         transcript(proof.witness_commitment);
 
                         // 4. prepare evaluaitons of the polynomials that are copy-constrained
-                        std::vector<std::size_t> rotation_gates = {0};
                         std::size_t permutation_size =
                             preprocessed_public_data.common_data.commitments.id_permutation.size();
                         std::vector<typename FieldType::value_type> f(permutation_size);
@@ -234,22 +233,21 @@ namespace nil {
                             preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
                         std::array<std::vector<typename FieldType::value_type>,
-				witness_columns> witness_evaluation_points;
+                            witness_columns> witness_evaluation_points;
                         // witnesses
                         for (std::size_t witness_index = 0; witness_index < witness_columns; witness_index++) {
 
                             std::vector<int> witness_rotation = preprocessed_public_data.common_data.columns_rotations[witness_index];
 
-                            for (std::size_t rotation_index = 0; rotation_index < rotation_gates.size(); rotation_index++) {
-                                witness_evaluation_points[witness_index].push_back(challenge * omega.pow(rotation_gates[rotation_index]));
+                            for (std::size_t rotation_index = 0; rotation_index < witness_rotation.size(); rotation_index++) {
+                                witness_evaluation_points[witness_index].push_back(challenge * omega.pow(witness_rotation[rotation_index]));
                             }
                         }
-    
-			if (!commitment_scheme_witness_type::verify_eval(
+                        if (!commitment_scheme_witness_type::verify_eval(
                                 witness_evaluation_points, proof.eval_proof.witness, fri_params, transcript)) {
                             return false;
                         }
-
+                        
                         // permutation
                         std::vector<typename FieldType::value_type> evaluation_points_permutation = {challenge,
                                                                                                      challenge * omega};

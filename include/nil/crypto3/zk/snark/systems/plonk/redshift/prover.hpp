@@ -270,7 +270,7 @@ namespace nil {
                             for (std::size_t rotation_index = 0; rotation_index < witness_rotation.size(); rotation_index++) {
                                 witness_evaluation_points[witness_index].push_back(challenge * omega.pow(witness_rotation[rotation_index]));
                             }
-			}
+                        }
 
                         proof.eval_proof.witness = commitment_scheme_witness_type::proof_eval(witness_evaluation_points,
                                                                        witness_precommitment,
