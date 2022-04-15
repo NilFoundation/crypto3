@@ -29,7 +29,8 @@
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
-#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/batched_lpc.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
@@ -57,8 +58,8 @@ namespace nil {
                     constexpr static const std::size_t r = ParamsType::commitment_params_type::r;
                     constexpr static const std::size_t m = ParamsType::commitment_params_type::m;
 
-                    typedef commitments::list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type>
+                    typedef commitments::batched_list_polynomial_commitment<FieldType,
+                                                                    typename ParamsType::commitment_params_type, witness_columns>
                         commitment_scheme_witness_type;
                     typedef commitments::list_polynomial_commitment<FieldType,
                                                                     typename ParamsType::commitment_params_type>
@@ -91,17 +92,13 @@ namespace nil {
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(transcript_init);
 
                         // 3. append witness commitments to transcript
-                        for (std::size_t i = 0; i < witness_columns; i++) {
-                            transcript(proof.witness_commitments[i]);
-                        }
+                        transcript(proof.witness_commitment);
 
                         // 4. prepare evaluaitons of the polynomials that are copy-constrained
                         std::vector<std::size_t> rotation_gates = {0};
                         std::size_t permutation_size =
                             preprocessed_public_data.common_data.commitments.id_permutation.size();
                         std::vector<typename FieldType::value_type> f(permutation_size);
-
-                        std::size_t witness_columns_amount = proof.eval_proof.witness.size();
 
                         for (std::size_t i = 0; i < permutation_size; i++) {
                             std::size_t zero_index = 0;
@@ -112,13 +109,13 @@ namespace nil {
                                     zero_index = j;
                                 }
                             }
-                            if (i < witness_columns_amount) {
-                                f[i] = proof.eval_proof.witness[i]
-                                           .z[zero_index];    // TODO: organize permutation evaluations inside the proof
-                            } else if (i < witness_columns_amount + proof.eval_proof.public_input.size()) {
-                                f[i] = proof.eval_proof.public_input[i - witness_columns_amount].z[zero_index];
+                            if (i < witness_columns) {
+                                f[i] = proof.eval_proof.witness
+                                           .z[i][zero_index];    // TODO: organize permutation evaluations inside the proof
+                            } else if (i < witness_columns + proof.eval_proof.public_input.size()) {
+                                f[i] = proof.eval_proof.public_input[i - witness_columns].z[zero_index];
                             } else {
-                                std::size_t idx = i - witness_columns_amount - proof.eval_proof.public_input.size();
+                                std::size_t idx = i - witness_columns - proof.eval_proof.public_input.size();
                                 f[i] = proof.eval_proof.constant[idx].z[zero_index];
                             }
                         }
@@ -146,7 +143,7 @@ namespace nil {
                                     i,
                                     preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                     plonk_variable<FieldType>::column_type::witness);
-                                columns_at_y[key] = proof.eval_proof.witness[i].z[j];
+                                columns_at_y[key] = proof.eval_proof.witness.z[i][j];
                             }
                         }
                         for (std::size_t i = 0; i < 0 + public_input_columns; i++) {
@@ -236,19 +233,21 @@ namespace nil {
                         typename FieldType::value_type omega =
                             preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
+                        std::array<std::vector<typename FieldType::value_type>,
+				witness_columns> witness_evaluation_points;
                         // witnesses
-                        for (std::size_t i = 0; i < proof.eval_proof.witness.size(); i++) {
+                        for (std::size_t witness_index = 0; witness_index < witness_columns; witness_index++) {
 
-                            std::vector<int> rotation_gates = preprocessed_public_data.common_data.columns_rotations[i];
+                            std::vector<int> witness_rotation = preprocessed_public_data.common_data.columns_rotations[witness_index];
 
-                            std::vector<typename FieldType::value_type> evaluation_points_gates;
-                            for (std::size_t j = 0; j < rotation_gates.size(); j++) {
-                                evaluation_points_gates.push_back(challenge * omega.pow(rotation_gates[j]));
+                            for (std::size_t rotation_index = 0; rotation_index < rotation_gates.size(); rotation_index++) {
+                                witness_evaluation_points[witness_index].push_back(challenge * omega.pow(rotation_gates[rotation_index]));
                             }
-                            if (!commitment_scheme_witness_type::verify_eval(
-                                    evaluation_points_gates, proof.eval_proof.witness[i], fri_params, transcript)) {
-                                return false;
-                            }
+                        }
+    
+			if (!commitment_scheme_witness_type::verify_eval(
+                                witness_evaluation_points, proof.eval_proof.witness, fri_params, transcript)) {
+                            return false;
                         }
 
                         // permutation

@@ -84,21 +84,8 @@ namespace nil {
                         using precommitment_type = merkle_tree_type;
                         using commitment_type = typename precommitment_type::value_type;
                         using transcript_type = transcript::fiat_shamir_heuristic_sequential<TranscriptHashType>;
-
-                        struct params_type {
-                            bool operator==(const params_type &rhs) const {
-                                return r == rhs.r && max_degree == rhs.max_degree && D == rhs.D && q == rhs.q;
-                            }
-                            bool operator!=(const params_type &rhs) const {
-                                return !(rhs == *this);
-                            }
-
-                            std::size_t r;
-                            std::size_t max_degree;
-                            std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
-
-                            math::polynomial<typename FieldType::value_type> q;
-                        };
+			using params_type = typename basic_fri<FieldType, MerkleTreeHashType,
+				TranscriptHashType, M>::params_type;
 
                         struct round_proof_type {
                             bool operator==(const round_proof_type &rhs) const {

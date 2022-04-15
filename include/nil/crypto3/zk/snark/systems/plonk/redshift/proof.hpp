@@ -44,10 +44,10 @@ namespace nil {
 
                     struct evaluation_proof {
                         typename FieldType::value_type challenge;
-                        std::vector<typename CommitmentSchemeTypeWitness::proof_type> witness;
+                        typename CommitmentSchemeTypeWitness::proof_type witness;
                         std::vector<typename CommitmentSchemeTypePermutation::proof_type> permutation;
                         std::vector<typename CommitmentSchemeTypeQuotient::proof_type> quotient;
-                        std::vector<typename CommitmentSchemeTypeWitness::proof_type> lookups;
+                        std::vector<typename CommitmentSchemeTypeQuotient::proof_type> lookups;
 
                         std::vector<typename commitment_scheme_type_public::proof_type> id_permutation;
                         std::vector<typename commitment_scheme_type_public::proof_type> sigma_permutation;
@@ -71,7 +71,7 @@ namespace nil {
                     redshift_proof() {
                     }
 
-                    std::vector<typename CommitmentSchemeTypeWitness::commitment_type> witness_commitments;
+                    typename CommitmentSchemeTypeWitness::commitment_type witness_commitment;
 
                     typename CommitmentSchemeTypePermutation::commitment_type v_perm_commitment;
 
@@ -86,7 +86,7 @@ namespace nil {
                     evaluation_proof eval_proof;
 
                     bool operator==(const redshift_proof &rhs) const {
-                        return witness_commitments == rhs.witness_commitments && T_commitments == rhs.T_commitments &&
+                        return witness_commitment == rhs.witness_commitment && T_commitments == rhs.T_commitments &&
                                v_perm_commitment == rhs.v_perm_commitment && eval_proof == rhs.eval_proof;
                     }
                     bool operator!=(const redshift_proof &rhs) const {

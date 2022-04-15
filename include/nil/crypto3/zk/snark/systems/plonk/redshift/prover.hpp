@@ -32,6 +32,7 @@
 #include <nil/crypto3/container/merkle/tree.hpp>
 
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/batched_lpc.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
@@ -77,8 +78,8 @@ namespace nil {
                     constexpr static const std::size_t r = ParamsType::commitment_params_type::r;
                     constexpr static const std::size_t m = ParamsType::commitment_params_type::m;
 
-                    typedef commitments::list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type>
+                    typedef commitments::batched_list_polynomial_commitment<FieldType,
+                                                                    typename ParamsType::commitment_params_type, witness_columns>
                         commitment_scheme_witness_type;
                     typedef commitments::list_polynomial_commitment<FieldType,
                                                                     typename ParamsType::commitment_params_type>
@@ -150,17 +151,13 @@ namespace nil {
                         std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_poly =
                             preprocessed_private_data.private_polynomial_table.witnesses();
 
-                        std::array<typename commitment_scheme_witness_type::precommitment_type, witness_columns>
-                            witness_precommitments =
+                        typename commitment_scheme_witness_type::precommitment_type witness_precommitment =
                                 commitment_scheme_witness_type::template precommit<witness_columns>(witness_poly,
                                                                                                     fri_params.D[0]);
 
-                        proof.witness_commitments.resize(witness_columns);
-                        for (std::size_t i = 0; i < witness_columns; i++) {
-                            proof.witness_commitments[i] =
-                                commitment_scheme_witness_type::commit(witness_precommitments[i]);
-                            transcript(proof.witness_commitments[i]);
-                        }
+                        proof.witness_commitment =
+                                commitment_scheme_witness_type::commit(witness_precommitment);
+                            transcript(proof.witness_commitment);
 
                         // 4. permutation_argument
                         auto permutation_argument =
@@ -262,28 +259,24 @@ namespace nil {
                         typename FieldType::value_type omega =
                             preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
+                        std::array<std::vector<typename FieldType::value_type>, witness_columns> witness_evaluation_points;
+
                         // witness polynomials (table columns)
-                        std::array<typename commitment_scheme_witness_type::proof_type, witness_columns>
-                            witnesses_evaluation;
-                        for (std::size_t i = 0; i < witness_precommitments.size(); i++) {
+                        for (std::size_t witness_index = 0; witness_index < witness_columns; witness_index++) {
 
-                            std::vector<int> rotation_gates =
-                                preprocessed_public_data.common_data.columns_rotations[i];
+                            std::vector<int> witness_rotation =
+                                preprocessed_public_data.common_data.columns_rotations[witness_index];
                                 
-                            std::vector<typename FieldType::value_type>
-                                evaluation_points_gates;    // TODO: array size with rotation
-                            for (std::size_t j = 0; j < rotation_gates.size(); j++) {
-                                evaluation_points_gates.push_back(challenge * omega.pow(rotation_gates[j]));
+                            for (std::size_t rotation_index = 0; rotation_index < witness_rotation.size(); rotation_index++) {
+                                witness_evaluation_points[witness_index].push_back(challenge * omega.pow(witness_rotation[rotation_index]));
                             }
+			}
 
-                            witnesses_evaluation[i] =
-                                commitment_scheme_witness_type::proof_eval(evaluation_points_gates,
-                                                                           witness_precommitments[i],
-                                                                           witness_poly[i],
-                                                                           fri_params,
-                                                                           transcript);
-                            proof.eval_proof.witness.push_back(witnesses_evaluation[i]);
-                        }
+                        proof.eval_proof.witness = commitment_scheme_witness_type::proof_eval(witness_evaluation_points,
+                                                                       witness_precommitment,
+                                                                       witness_poly,
+                                                                       fri_params,
+                                                                       transcript);
 
                         // permutation polynomial evaluation
                         std::vector<typename FieldType::value_type> evaluation_points_v_p = {challenge,
