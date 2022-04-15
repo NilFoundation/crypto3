@@ -97,9 +97,11 @@ namespace nil {
                             TermsIt it,
                             const typename types::preprocessed_public_data_type &public_preprocessed_data) {
                 if (it != std::cend(terms)) {
-                    if (!is_last_element(terms, it)) {
-                        os << "addmod(" << std::endl;
-                    }
+                    os << "mstore("
+                          "add(gate_params, CONSTRAINT_EVAL_OFFSET),"
+                          "addmod("
+                          "mload(add(gate_params, CONSTRAINT_EVAL_OFFSET)),"
+                       << std::endl;
                     if (it->coeff != FieldType::value_type::one()) {
                         if (it->vars.size()) {
                             os << "mulmod(0x" << std::hex << it->coeff.data << std::dec << "," << std::endl;
@@ -116,14 +118,11 @@ namespace nil {
                                << std::endl;
                         }
                     }
-                    if (!is_last_element(terms, it)) {
-                        os << "," << std::endl;
-                        print_terms(os, terms, it + 1, public_preprocessed_data);
-                        os << ","
-                              "modulus"
-                              ")"
-                           << std::endl;
-                    }
+                    os << ","
+                          "modulus"
+                          "))"
+                       << std::endl;
+                    print_terms(os, terms, it + 1, public_preprocessed_data);
                 }
             }
 
@@ -131,11 +130,8 @@ namespace nil {
                 print_constraint(std::ostream &os,
                                  const typename nil::crypto3::zk::snark::plonk_constraint<FieldType> &constraint,
                                  const typename types::preprocessed_public_data_type &public_preprocessed_data) {
-                os << "mstore("
-                      "add(gate_params, CONSTRAINT_EVAL_OFFSET),"
-                   << std::endl;
+                os << "mstore(add(gate_params, CONSTRAINT_EVAL_OFFSET), 0)" << std::endl;
                 print_terms(os, constraint.terms, std::cbegin(constraint.terms), public_preprocessed_data);
-                os << ")" << std::endl;
             }
 
             static void print_gate_evaluation(std::ostream &os) {
