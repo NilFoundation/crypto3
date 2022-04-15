@@ -40,6 +40,7 @@
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 
 #include "profiling.hpp"
+#include "profiling_component.hpp"
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
@@ -68,9 +69,12 @@ namespace nil {
         }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
-                 std::size_t Lambda>
-        auto prepare_component(typename ComponentType::params_type params,
-            std::vector<typename BlueprintFieldType::value_type> &public_input) {
+                 std::size_t Lambda, typename PublicInput,
+                 typename std::enable_if<
+                     std::is_same<typename BlueprintFieldType::value_type,
+                                  typename std::iterator_traits<typename PublicInput::iterator>::value_type>::value,
+                     bool>::type = true>
+        auto prepare_component(typename ComponentType::params_type params, const PublicInput &public_input) {
 
             using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
             using component_type = ComponentType;
@@ -80,8 +84,7 @@ namespace nil {
             zk::blueprint<ArithmetizationType> bp(desc);
             zk::blueprint_private_assignment_table<ArithmetizationType> private_assignment(desc);
             zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
-            zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(
-                    private_assignment, public_assignment);
+            zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
 
             std::size_t start_row = component_type::allocate_rows(bp);
             bp.allocate_rows(public_input.size());
@@ -92,8 +95,7 @@ namespace nil {
 
             typename component_type::allocated_data_type allocated_data;
             component_type::generate_circuit(bp, assignment_bp, params, allocated_data, start_row);
-            component_type::generate_assignments(assignment_bp, params,
-                                                 start_row);
+            component_type::generate_assignments(assignment_bp, params, start_row);
 
             assignment_bp.padding();
             std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
@@ -102,11 +104,13 @@ namespace nil {
             zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(private_assignment,
                                                                                                      public_assignment);
 
-            using redshift_params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
+            using redshift_params =
+                zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
             using types = zk::snark::detail::redshift_policy<BlueprintFieldType, redshift_params>;
 
-            using fri_type = typename zk::commitments::fri<BlueprintFieldType, typename redshift_params::merkle_hash_type,
-                                                           typename redshift_params::transcript_hash_type, 2>;
+            using fri_type =
+                typename zk::commitments::fri<BlueprintFieldType, typename redshift_params::merkle_hash_type,
+                                              typename redshift_params::transcript_hash_type, 2>;
 
             std::size_t table_rows_log = std::ceil(std::log2(desc.rows_amount));
 
@@ -118,8 +122,8 @@ namespace nil {
                 zk::snark::redshift_public_preprocessor<BlueprintFieldType, redshift_params>::process(
                     bp, public_assignment, desc, fri_params, permutation_size);
             typename types::preprocessed_private_data_type private_preprocessed_data =
-                zk::snark::redshift_private_preprocessor<BlueprintFieldType, redshift_params>::process(bp, private_assignment,
-                                                                                              desc);
+                zk::snark::redshift_private_preprocessor<BlueprintFieldType, redshift_params>::process(
+                    bp, private_assignment, desc);
 
             return std::make_tuple(desc, bp, fri_params, assignments, public_preprocessed_data,
                                    private_preprocessed_data);
@@ -174,24 +178,30 @@ namespace nil {
         }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
-                 std::size_t Lambda>
-        void test_component(typename ComponentType::params_type params,
-            std::vector<typename BlueprintFieldType::value_type> public_input) {
+                 std::size_t Lambda, typename PublicInput>
+        typename std::enable_if<
+            std::is_same<typename BlueprintFieldType::value_type,
+                         typename std::iterator_traits<typename PublicInput::iterator>::value_type>::value>::type
+            test_component(typename ComponentType::params_type params, const PublicInput &public_input) {
 
-            using redshift_params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
+            using redshift_params =
+                zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
 
             auto [desc, bp, fri_params, assignments, public_preprocessed_data, private_preprocessed_data] =
-                prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda>(
-                    params, public_input);
+                prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda>(params,
+                                                                                                          public_input);
 
             auto proof = zk::snark::redshift_prover<BlueprintFieldType, redshift_params>::process(
                 public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
 
-            print_test_data<redshift_params, BlueprintFieldType>(proof, fri_params, public_preprocessed_data.common_data);
+            print_test_data<redshift_params, BlueprintFieldType>(proof, fri_params,
+                                                                 public_preprocessed_data.common_data);
 
             bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, redshift_params>::process(
                 public_preprocessed_data, proof, bp, fri_params);
             profiling(assignments);
+            profiling_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda>::process(
+                std::cout, bp, public_preprocessed_data);
             BOOST_CHECK(verifier_res);
         }
     }    // namespace crypto3
