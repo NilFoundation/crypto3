@@ -90,15 +90,15 @@ namespace nil {
                     //     return true;
                     // }
 
-                    const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> &gates() const {
+                    const gates_type &gates() const {
                         return _gates;
                     }
 
-                    const std::vector<plonk_copy_constraint<FieldType>> &copy_constraints() const {
+                    const copy_constraints_type &copy_constraints() const {
                         return _copy_constraints;
                     }
 
-                    const std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> &lookup_gates() const {
+                    const lookup_gates_type &lookup_gates() const {
                         return _lookup_gates;
                     }
                 };
