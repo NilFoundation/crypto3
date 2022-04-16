@@ -37,10 +37,10 @@
 #include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
+#include <nil/crypto3/zk/blueprint/profiling_plonk_circuit.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 
 #include "profiling.hpp"
-#include "profiling_component.hpp"
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
@@ -200,8 +200,12 @@ namespace nil {
             bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, redshift_params>::process(
                 public_preprocessed_data, proof, bp, fri_params);
             profiling(assignments);
-            profiling_component<BlueprintFieldType, ArithmetizationParams, Hash, Lambda>::process(
-                std::cout, bp, public_preprocessed_data);
+            std::ofstream gate_argument_mono;
+            gate_argument_mono.open("gate_argument_mono.txt");
+            profiling_plonk_circuit<BlueprintFieldType, ArithmetizationParams, Hash, Lambda>::process(
+                gate_argument_mono, bp, public_preprocessed_data);
+            profiling_plonk_circuit<BlueprintFieldType, ArithmetizationParams, Hash, Lambda>::process_split(
+                bp, public_preprocessed_data);
             BOOST_CHECK(verifier_res);
         }
     }    // namespace crypto3

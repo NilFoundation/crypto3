@@ -28,6 +28,9 @@
 #ifndef CRYPTO3_PROFILING_COMPONENT_HPP
 #define CRYPTO3_PROFILING_COMPONENT_HPP
 
+#include <fstream>
+#include <sstream>
+
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
@@ -39,7 +42,7 @@
 namespace nil {
     namespace crypto3 {
         template<typename FieldType, typename ArithmetizationParams, typename Hash, std::size_t Lambda>
-        struct profiling_component {
+        struct profiling_plonk_circuit {
             using redshift_params = zk::snark::redshift_params<FieldType, ArithmetizationParams, Hash, Hash, Lambda>;
             using types = zk::snark::detail::redshift_policy<FieldType, redshift_params>;
             using ArithmetizationType = zk::snark::plonk_constraint_system<FieldType, ArithmetizationParams>;
@@ -59,8 +62,7 @@ namespace nil {
                 os << "get_W_i_by_rotation_idx(" << var.index << "," << rotation_idx
                    << ","
                       "mload(add(gate_params, WITNESS_EVALUATIONS_OFFSET))"
-                      ")"
-                   << std::endl;
+                      ")";
             }
 
             template<typename Vars, typename VarsIt>
@@ -73,16 +75,15 @@ namespace nil {
                            const typename types::preprocessed_public_data_type &public_preprocessed_data) {
                 if (it != std::cend(vars)) {
                     if (!is_last_element(vars, it)) {
-                        os << "mulmod(" << std::endl;
+                        os << "mulmod(";
                     }
                     print_variable(os, *it, public_preprocessed_data);
                     if (!is_last_element(vars, it)) {
-                        os << "," << std::endl;
+                        os << ",";
                         print_term(os, vars, it + 1, public_preprocessed_data);
                         os << ","
                               "modulus"
-                              ")"
-                           << std::endl;
+                              ")";
                     }
                 }
             }
@@ -99,13 +100,12 @@ namespace nil {
                     os << "mstore("
                           "add(gate_params, CONSTRAINT_EVAL_OFFSET),"
                           "addmod("
-                          "mload(add(gate_params, CONSTRAINT_EVAL_OFFSET)),"
-                       << std::endl;
+                          "mload(add(gate_params, CONSTRAINT_EVAL_OFFSET)),";
                     if (it->coeff != FieldType::value_type::one()) {
                         if (it->vars.size()) {
-                            os << "mulmod(0x" << std::hex << it->coeff.data << std::dec << "," << std::endl;
+                            os << "mulmod(0x" << std::hex << it->coeff.data << std::dec << ",";
                         } else {
-                            os << "0x" << std::hex << it->coeff.data << std::dec << std::endl;
+                            os << "0x" << std::hex << it->coeff.data << std::dec;
                         }
                     }
                     print_term(os, it->vars, std::cbegin(it->vars), public_preprocessed_data);
@@ -113,8 +113,7 @@ namespace nil {
                         if (it->vars.size()) {
                             os << ","
                                   "modulus"
-                                  ")"
-                               << std::endl;
+                                  ")";
                         }
                     }
                     os << ","
@@ -182,7 +181,6 @@ namespace nil {
                       "mload(add(gate_params, GATE_EVAL_OFFSET)),"
                       "modulus"
                       ")"
-                      "mstore(add(gate_params, GATE_EVAL_OFFSET), 0)"
                    << std::endl;
             }
 
@@ -204,6 +202,15 @@ namespace nil {
                                 const typename types::preprocessed_public_data_type &public_preprocessed_data) {
                 for (const auto &gate : bp.gates()) {
                     print_gate(os, gate, public_preprocessed_data);
+                }
+            }
+
+            static void process_split(const zk::blueprint<ArithmetizationType> &bp,
+                                      const typename types::preprocessed_public_data_type &public_preprocessed_data) {
+                for (const auto &gate : bp.gates()) {
+                    std::ofstream gate_out;
+                    gate_out.open("gate" + std::to_string(gate.selector_index) + ".txt");
+                    print_gate(gate_out, gate, public_preprocessed_data);
                 }
             }
         };
