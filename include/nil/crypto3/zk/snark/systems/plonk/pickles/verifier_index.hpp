@@ -47,7 +47,7 @@ namespace nil {
                     using Fr = typename CurveType::scalar_field_type::value_type;
                     using Fq = typename CurveType::base_field_type::value_type;
 
-//                    nil::crypto3::math::evaluation_domain<Fr> domain; TODO: return this
+                    EvaluationDomain<Fr> domain;
                     size_t max_poly_size;
                     size_t max_quot_size;
                     srs_t<CurveType> srs;

@@ -200,6 +200,12 @@ namespace nil {
                 };
 
                 template<typename FieldType>
+                struct EvaluationDomain {
+                    std::size_t log_size_of_group;
+                    FieldType group_gen;
+                };
+
+                template<typename FieldType>
                 struct arithmetic_sponge_params {
                     std::vector<std::vector<FieldType>> round_constants;
                     std::vector<std::vector<FieldType>> mds;

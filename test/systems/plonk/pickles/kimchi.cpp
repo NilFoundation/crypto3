@@ -49,25 +49,10 @@ using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(kimchi_proof_struct_test_suite)
 
-const char *test_data = TEST_DATA;
-
-boost::property_tree::ptree string_data(const char *child_name) {
-    boost::property_tree::ptree root_data;
-    boost::property_tree::read_json(test_data, root_data);
-    boost::property_tree::ptree string_data = root_data.get_child(child_name);
-
-    return string_data;
-}
-
-template <typename Iterator>
+template<typename Iterator>
 nil::crypto3::multiprecision::cpp_int get_cppui256(Iterator it) {
     BOOST_ASSERT(it->second.template get_value<std::string>() != "");
     return nil::crypto3::multiprecision::cpp_int(it->second.template get_value<std::string>());
-}
-
-template <typename Iterator>
-std::string st_cppui256(Iterator it) {
-    return it->second.template get_value<std::string>();
 }
 
 zk::snark::pickles_proof<nil::crypto3::algebra::curves::vesta> fill_proof(boost::property_tree::ptree root) {
@@ -87,10 +72,10 @@ zk::snark::pickles_proof<nil::crypto3::algebra::curves::vesta> fill_proof(boost:
 
     it = best_chain.second.get_child(base_path + "messages.t_comm").begin()->second.get_child("").begin();
     proof.commitments.t_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
-//    proof.commitments.lookup;    // TODO: where it is?
+    //    proof.commitments.lookup;    // TODO: where it is?
 
     i = 0;
-    for (auto &row :best_chain.second.get_child(base_path + "openings.proof.lr")) {
+    for (auto &row : best_chain.second.get_child(base_path + "openings.proof.lr")) {
         auto it0 = row.second.begin()->second.get_child("").begin();
         auto it1 = row.second.begin();
         it1++;
@@ -127,25 +112,28 @@ zk::snark::pickles_proof<nil::crypto3::algebra::curves::vesta> fill_proof(boost:
     }
 
     proof.ft_eval1 = multiprecision::cpp_int(best_chain.second.get<std::string>(base_path + "openings.ft_eval1"));
-//            // public
-//            std::vector<typename CurveType::scalar_field_type::value_type> public_p; // TODO: implement it
-//
-//            // Previous challenges
-//            std::vector<
-//                std::tuple<std::vector<typename CurveType::scalar_field_type::value_type>, commitment_scheme>>
-//                prev_challenges; // TODO: implement it
+    //            // public
+    //            std::vector<typename CurveType::scalar_field_type::value_type> public_p; // TODO: where it is?
+    //
+    //            // Previous challenges
+    //            std::vector<
+    //                std::tuple<std::vector<typename CurveType::scalar_field_type::value_type>, commitment_scheme>>
+    //                prev_challenges; // TODO: where it is?
     return proof;
 }
 
-zk::snark::verifier_index<nil::crypto3::algebra::curves::vesta> fill_verify_index(boost::property_tree::ptree root) {
+zk::snark::verifier_index<nil::crypto3::algebra::curves::vesta>
+    fill_verify_index(boost::property_tree::ptree root, boost::property_tree::ptree const_root) {
     zk::snark::verifier_index<nil::crypto3::algebra::curves::vesta> ver_index;
     size_t i = 0;
-    //    ver_index.domain;    // "log_size_of_group":15, "group_gen" : "0x130D1D6482B9C33536E280AE674431F85F4A103EF6AF12C7AC4CDF0AD3EDB265";
+    ver_index.domain = {const_root.get<std::size_t>("verify_index.domain.log_size_of_group"),
+                        multiprecision::cpp_int(const_root.get<std::string>("verify_index.domain.group_gen"))};
+
     ver_index.max_poly_size = root.get<std::size_t>("data.blockchainVerificationKey.index.max_poly_size");
     ver_index.max_quot_size = root.get<std::size_t>("data.blockchainVerificationKey.index.max_quot_size");
-//    ver_index.srs = root.get<std::string>("data.blockchainVerificationKey.index.srs");    // TODO: null
+    //    ver_index.srs = root.get<std::string>("data.blockchainVerificationKey.index.srs");    // TODO: null
     i = 0;
-    for (auto & row : root.get_child("data.blockchainVerificationKey.commitments.sigma_comm")) {
+    for (auto &row : root.get_child("data.blockchainVerificationKey.commitments.sigma_comm")) {
         auto it = row.second.begin();
         ver_index.sigma_comm[i].unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
         ++i;
@@ -172,41 +160,62 @@ zk::snark::verifier_index<nil::crypto3::algebra::curves::vesta> fill_verify_inde
     ver_index.endomul_scalar_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
 
     // TODO: null in example
-//    i = 0;
-//    for (auto &row : root.get_child("data.blockchainVerificationKey.commitments.chacha_comm")) {
-//        auto it = row.second.begin();
-//        ver_index.chacha_comm[i].unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
-//        ++i;
-//    }
+    //    i = 0;
+    //    for (auto &row : root.get_child("data.blockchainVerificationKey.commitments.chacha_comm")) {
+    //        auto it = row.second.begin();
+    //        ver_index.chacha_comm[i].unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+    //        ++i;
+    //    }
     i = 0;
     for (auto &row : root.get_child("data.blockchainVerificationKey.index.shifts")) {
         ver_index.shifts[i] = multiprecision::cpp_int(row.second.get_value<std::string>());
         ++i;
     }
 
-        // Polynomial in coefficients form
-        // Const
-        ver_index.zkpm = {0x2C46205451F6C3BBEA4BABACBEE609ECF1039A903C42BFF639EDC5BA33356332_cppui256,
+    // Polynomial in coefficients form
+    // Const
+    ver_index.zkpm = {0x2C46205451F6C3BBEA4BABACBEE609ECF1039A903C42BFF639EDC5BA33356332_cppui256,
                       0x1764D9CB4C64EBA9A150920807637D458919CB6948821F4D15EB1994EADF9CE3_cppui256,
                       0x0140117C8BBC4CE4644A58F7007148577782213065BB9699BF5C391FBE1B3E6D_cppui256,
                       0x0000000000000000000000000000000000000000000000000000000000000001_cppui256};
-        ver_index.w = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
-        ver_index.endo = 0x2D33357CB532458ED3552A23A8554E5005270D29D19FC7D27B7FD22F0201B547_cppui256;
-        
-//    //    ver_index.lookup_index = root.get_child("data.blockchainVerificationKey.index.lookup_index");    // TODO: null
-//    //    ver_index.linearization;       // TODO: where it is?
-//    //    ver_index.powers_of_alpha;     // TODO: where it is?
-//    //    ver_index.fr_sponge_params;    // TODO: read from kimchi_const.json
-//    //    ver_index.fq_sponge_params;    // TODO: read from kimchi_const.json
+    ver_index.w = multiprecision::cpp_int(const_root.get<std::string>("verify_index.w"));
+    ver_index.endo = multiprecision::cpp_int(const_root.get<std::string>("verify_index.endo"));
+
+    //ver_index.lookup_index = root.get_child("data.blockchainVerificationKey.index.lookup_index"); // TODO: null
+    //ver_index.linearization;       // TODO: where it is?
+    ver_index.powers_of_alpha.next_power = 24;
+
+    for (auto &row : const_root.get_child("verify_index.fr_sponge_params.round_constants")) {
+        auto it = row.second.begin();
+        ver_index.fr_sponge_params.round_constants.push_back(
+            {get_cppui256(it++), get_cppui256(it++), get_cppui256(it)});
+    }
+    for (auto &row : const_root.get_child("verify_index.fr_sponge_params.mds")) {
+        auto it = row.second.begin();
+        ver_index.fr_sponge_params.mds.push_back({get_cppui256(it++), get_cppui256(it++), get_cppui256(it)});
+    }
+
+    for (auto &row : const_root.get_child("verify_index.fq_sponge_params.round_constants")) {
+        auto it = row.second.begin();
+        ver_index.fq_sponge_params.round_constants.push_back(
+            {get_cppui256(it++), get_cppui256(it++), get_cppui256(it)});
+    }
+    for (auto &row : const_root.get_child("verify_index.fq_sponge_params.mds")) {
+        auto it = row.second.begin();
+        ver_index.fq_sponge_params.mds.push_back({get_cppui256(it++), get_cppui256(it++), get_cppui256(it)});
+    }
     return ver_index;
 }
 
 BOOST_AUTO_TEST_CASE(pickles_proof_struct_test_suite) {
     boost::property_tree::ptree root;
+    boost::property_tree::ptree const_root;
     // Load the json file in this ptree
-    boost::property_tree::read_json(TEST_DATA, root);
+    std::string test_data = TEST_DATA;
+    boost::property_tree::read_json(test_data + ".json", root);
+    boost::property_tree::read_json(test_data + "_const.json", const_root);
 
     zk::snark::pickles_proof<nil::crypto3::algebra::curves::vesta> proof = fill_proof(root);
-    zk::snark::verifier_index<nil::crypto3::algebra::curves::vesta> ver_index = fill_verify_index(root);
+    zk::snark::verifier_index<nil::crypto3::algebra::curves::vesta> ver_index = fill_verify_index(root, const_root);
 }
 BOOST_AUTO_TEST_SUITE_END()
