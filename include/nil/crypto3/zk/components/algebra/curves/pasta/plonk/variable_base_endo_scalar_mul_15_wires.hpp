@@ -90,9 +90,8 @@ namespace nil {
                     constexpr static const typename BlueprintFieldType::value_type endo = typename BlueprintFieldType::value_type(algebra::fields::arithmetic_params<BlueprintFieldType>::multiplicative_generator).pow(typename BlueprintFieldType::integral_type( ( (BlueprintFieldType::value_type::zero() - BlueprintFieldType::value_type::one()) * ( typename BlueprintFieldType::value_type(3) ).inversed() ).data));
 
                     constexpr static const std::size_t required_rows_amount = 33;
-                    struct public_params_type { };
 
-                    struct private_params_type {
+                    struct params_type {
                         typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type T;
                         typename CurveType::scalar_field_type::value_type b;
                     };
@@ -101,15 +100,109 @@ namespace nil {
                         return bp.allocate_rows(required_rows_amount);
                     }
 
+                    static void generate_circuit(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t &component_start_row) {
+
+                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_copy_constraints(bp, assignment, params, component_start_row);
+                    }
+
+                    static void generate_assignments(
+                        blueprint_assignment_table<ArithmetizationType>
+                            &assignment,
+                        const params_type &params,
+                        const std::size_t &component_start_row) {
+                            const std::size_t &j = component_start_row;
+                            assignment.public_input(0)[0] = ArithmetizationType::field_type::value_type::zero();
+
+                            const typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type &T = params.T;
+
+                            typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type P;
+
+                            typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type R;
+                            typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type Q;
+                            std::array<bool, 128> b = {false};
+                            typename CurveType::scalar_field_type::integral_type integral_b = typename CurveType::scalar_field_type::integral_type(params.b.data);
+                            for (std::size_t i = 0; i < 128; i++) {
+                                b[128 - i - 1] = multiprecision::bit_test(integral_b, i);
+                            }
+                            typename ArithmetizationType::field_type::value_type n = 0;
+                            typename ArithmetizationType::field_type::value_type n_next = 0;
+                            typename ArithmetizationType::field_type::value_type s1 = 0;
+                            typename ArithmetizationType::field_type::value_type s3 = 0;
+                            for (std::size_t i = j; i < j + required_rows_amount - 1; i++) {
+                                assignment.witness(W0)[i] = T.X;
+                                assignment.witness(W1)[i] = T.Y;
+                                if (i == j) {
+                                    Q.X = endo * T.X;
+                                    Q.Y = T.Y;
+                                    P = T + (T + Q) + Q;
+                                    assignment.witness(W4)[i] = P.X;
+                                    assignment.witness(W5)[i] = P.Y;
+                                    assignment.witness(W6)[i] = n;
+                                }
+                                else {
+                                    Q.X = (1 + (endo - 1) * b[(i - j)*4 - 2]) * T.X;
+                                    Q.Y = (2* b[(i - j)*4 - 1] - 1) * T.Y;
+                                    /*s4 = 2 * R.Y * (2*R.X + Q.X - s3 * s3).inversed() - s3;
+                                    P.X = Q.X + s4*s4 - s3*s3;
+                                    P.Y = (R.X - P.X)*s4 -R.Y;*/
+                                    P = 2*R + Q;                   
+                                    assignment.witness(W4)[i] = P.X;
+                                    assignment.witness(W5)[i] = P.Y;
+                                    n_next = n * 16 + b[(i - j) * 4 - 4] * 8 
+                                    + b[(i - j) * 4 - 3]  * 4 + b[(i - j) * 4 - 2]  * 2 + b[(i - j) * 4 - 1] ;
+                                    assignment.witness(W6)[i] = n_next;
+                                    n = n_next;
+                                }
+                                assignment.witness(W11)[i] = b[(i - j)*4];
+                                assignment.witness(W12)[i] = b[(i - j)*4 + 1];
+                                assignment.witness(W13)[i] = b[(i - j)*4 + 2];
+                                assignment.witness(W14)[i] = b[(i - j)*4 + 3];
+                                Q.X = (1 + (endo - 1) * b[(i - j)*4]) * T.X;
+                                Q.Y = (2* b[(i - j)*4 + 1] - 1) * T.Y;
+                                s1 = (Q.Y- P.Y) * (Q.X - P.X).inversed();
+                                //s2 = 2 * P.Y * (2*P.X + Q.X - s1 * s1).inversed() - s1;
+
+                                assignment.witness(W9)[i] = s1;
+                                /*R.X = Q.X + s2*s2 - s1*s1;
+                                R.Y = (P.X - R.X)*s2 -P.Y;*/
+                                R = 2*P + Q;
+                                s3 = ((2 * b[(i - j)*4 + 3] - 1) * T.Y - R.Y) * ((1 + (endo - 1)*
+                                b[(i - j)*4 + 2]) * T.X - R.X).inversed();
+                                assignment.witness(W10)[i] = s3;
+                                assignment.witness(W7)[i] = R.X;
+                                assignment.witness(W8)[i] = R.Y;
+                            }
+
+                            Q.X = (1 + (endo - 1) * b[126]) * T.X;
+                            Q.Y = (2* b[127] - 1) * T.Y;
+                            /*s4 = 2 * R.Y * (2*R.X + Q.X - s3 * s3).inversed() - s3;
+                            P.X = Q.X + s4*s4 - s3*s3;
+                            P.Y = (R.X - P.X)*s4 -R.Y; */
+                            P = R + Q + R;
+                            assignment.witness(W4)[j + 32] = P.X;
+                            assignment.witness(W5)[j + 32] = P.Y;
+                            n_next = n * 16 + b[124] * 8 
+                                + b[125] * 4 + b[126] * 2 + b[127];
+                            assignment.witness(W6)[j + 32] = n_next;
+                             std::cout<<"circuit result "<< P.X.data<< " "<< P.Y.data<<std::endl;
+
+                    }
+
+                    private:
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const public_params_type &init_params,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
 
                         const std::size_t &j = component_start_row;
 
-                        std::size_t selector_index = public_assignment.add_selector(j, j + required_rows_amount - 2);
+                        std::size_t selector_index = assignment.add_selector(j, j + required_rows_amount - 2);
 
                         auto bit_check_1 = bp.add_bit_check(var(W11, 0));
                         auto bit_check_2 = bp.add_bit_check(var(W12, 0));
@@ -148,8 +241,8 @@ namespace nil {
 
                     static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const public_params_type &init_params,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
                         const std::size_t &j = component_start_row;
 
@@ -162,91 +255,6 @@ namespace nil {
                         //TODO link to params.b
 
                         // TODO: (xP , yP ) in row i are copy constrained with values from the first doubling circuit
-                    }
-
-                    static void generate_assignments(
-                        blueprint_private_assignment_table<ArithmetizationType>
-                            &private_assignment,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const public_params_type &init_params,
-                        const private_params_type &params,
-                        const std::size_t &component_start_row) {
-                            const std::size_t &j = component_start_row;
-                            public_assignment.public_input(0)[0] = ArithmetizationType::field_type::value_type::zero();
-
-                            const typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type &T = params.T;
-
-                            typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type P;
-
-                            typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type R;
-                            typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type Q;
-                            std::array<bool, 128> b = {false};
-                            typename CurveType::scalar_field_type::integral_type integral_b = typename CurveType::scalar_field_type::integral_type(params.b.data);
-                            for (std::size_t i = 0; i < 128; i++) {
-                                b[128 - i - 1] = multiprecision::bit_test(integral_b, i);
-                            }
-                            typename ArithmetizationType::field_type::value_type n = 0;
-                            typename ArithmetizationType::field_type::value_type n_next = 0;
-                            typename ArithmetizationType::field_type::value_type s1 = 0;
-                            typename ArithmetizationType::field_type::value_type s3 = 0;
-                            for (std::size_t i = j; i < j + required_rows_amount - 1; i++) {
-                                private_assignment.witness(W0)[i] = T.X;
-                                private_assignment.witness(W1)[i] = T.Y;
-                                if (i == j) {
-                                    Q.X = endo * T.X;
-                                    Q.Y = T.Y;
-                                    P = T + (T + Q) + Q;
-                                    private_assignment.witness(W4)[i] = P.X;
-                                    private_assignment.witness(W5)[i] = P.Y;
-                                    private_assignment.witness(W6)[i] = n;
-                                }
-                                else {
-                                    Q.X = (1 + (endo - 1) * b[(i - j)*4 - 2]) * T.X;
-                                    Q.Y = (2* b[(i - j)*4 - 1] - 1) * T.Y;
-                                    /*s4 = 2 * R.Y * (2*R.X + Q.X - s3 * s3).inversed() - s3;
-                                    P.X = Q.X + s4*s4 - s3*s3;
-                                    P.Y = (R.X - P.X)*s4 -R.Y;*/
-                                    P = 2*R + Q;                   
-                                    private_assignment.witness(W4)[i] = P.X;
-                                    private_assignment.witness(W5)[i] = P.Y;
-                                    n_next = n * 16 + b[(i - j) * 4 - 4] * 8 
-                                    + b[(i - j) * 4 - 3]  * 4 + b[(i - j) * 4 - 2]  * 2 + b[(i - j) * 4 - 1] ;
-                                    private_assignment.witness(W6)[i] = n_next;
-                                    n = n_next;
-                                }
-                                private_assignment.witness(W11)[i] = b[(i - j)*4];
-                                private_assignment.witness(W12)[i] = b[(i - j)*4 + 1];
-                                private_assignment.witness(W13)[i] = b[(i - j)*4 + 2];
-                                private_assignment.witness(W14)[i] = b[(i - j)*4 + 3];
-                                Q.X = (1 + (endo - 1) * b[(i - j)*4]) * T.X;
-                                Q.Y = (2* b[(i - j)*4 + 1] - 1) * T.Y;
-                                s1 = (Q.Y- P.Y) * (Q.X - P.X).inversed();
-                                //s2 = 2 * P.Y * (2*P.X + Q.X - s1 * s1).inversed() - s1;
-
-                                private_assignment.witness(W9)[i] = s1;
-                                /*R.X = Q.X + s2*s2 - s1*s1;
-                                R.Y = (P.X - R.X)*s2 -P.Y;*/
-                                R = 2*P + Q;
-                                s3 = ((2 * b[(i - j)*4 + 3] - 1) * T.Y - R.Y) * ((1 + (endo - 1)*
-                                b[(i - j)*4 + 2]) * T.X - R.X).inversed();
-                                private_assignment.witness(W10)[i] = s3;
-                                private_assignment.witness(W7)[i] = R.X;
-                                private_assignment.witness(W8)[i] = R.Y;
-                            }
-
-                            Q.X = (1 + (endo - 1) * b[126]) * T.X;
-                            Q.Y = (2* b[127] - 1) * T.Y;
-                            /*s4 = 2 * R.Y * (2*R.X + Q.X - s3 * s3).inversed() - s3;
-                            P.X = Q.X + s4*s4 - s3*s3;
-                            P.Y = (R.X - P.X)*s4 -R.Y; */
-                            P = R + Q + R;
-                            private_assignment.witness(W4)[j + 32] = P.X;
-                            private_assignment.witness(W5)[j + 32] = P.Y;
-                            n_next = n * 16 + b[124] * 8 
-                            + b[125] * 4 + b[126] * 2 + b[127];
-                            private_assignment.witness(W6)[j + 32] = n_next;
-                             std::cout<<"circuit result "<< P.X.data<< " "<< P.Y.data<<std::endl;
-
                     }
                 };
             }    // namespace components

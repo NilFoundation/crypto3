@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 //
 // MIT License
 //
@@ -22,11 +23,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for auxiliary components for the SHA256 component.
-//---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_BASE_FIELD_COMPONENT_15_WIRES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_BASE_FIELD_COMPONENT_15_WIRES_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_TRANSCRIPT_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_TRANSCRIPT_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -35,17 +34,18 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/variable_base_endo_scalar_mul_15_wires.hpp>
+
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/sponge.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-
+                
                 template<typename ArithmetizationType,
                          typename CurveType,
                          std::size_t... WireIndexes>
-                class pickles_verifier_base_field;
+                class kimchi_transcript;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
@@ -65,84 +65,74 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class pickles_verifier_base_field<
+                class kimchi_transcript<
                     snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams>,
                     CurveType,
                     W0, W1, W2, W3, W4,
                     W5, W6, W7, W8, W9,
-                    W10, W11, W12, W13, W14> {
+                    W10, W11, W12, W13, W14>{
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
-                    using endo_mul = curve_element_variable_base_endo_scalar_mul<ArithmetizationType, CurveType,
-                                W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+
+                    kimchi_sponge<ArithmetizationType, CurveType,
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> sponge;
 
                 public:
-
-                    constexpr static const std::size_t required_rows_amount = 1 + endo_mul::required_rows_amount;
+                    constexpr static const std::size_t required_rows_amount = 1;
 
                     struct params_type {
-                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type base_point;
-                        typename CurveType::scalar_field_type::value_type challenge;
+                        
                     };
 
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp,
+                        std::size_t components_amount = 1){
+                        return bp.allocate_rows(required_rows_amount *
+                            components_amount);
                     }
 
-                    static void generate_circuit(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
-
-                        generate_gates(bp, assignment, params, component_start_row);
-                        generate_copy_constraints(bp, assignment, params, component_start_row);
-                    }
-
-                    static void generate_assignments(
-                        blueprint_assignment_table<ArithmetizationType>
-                            &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
-
-                        std::size_t row = component_start_row;
-                        row++;
-
-                        typename endo_mul::params_type mul_params = {params.base_point, params.challenge};
-                        endo_mul::generate_assignments(assignment, 
-                            mul_params, row);
-                    }
-
-                    private:
-                    static void generate_gates(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
-
-                        std::size_t row = component_start_row;
-                        row++;
-
-                        typename endo_mul::params_type mul_params = {};
-                        endo_mul::generate_gates(bp, assignment,
-                            mul_params, row);
-                    }
-
-                    static void generate_copy_constraints(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
+                    void init_assignment(
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                            std::size_t &component_start_row) {
                         
-                        std::size_t row = component_start_row;
-                        row++;
+                    }
 
-                        typename endo_mul::params_type mul_params = {};
-                        endo_mul::generate_copy_constraints(bp, assignment,
-                            mul_params, row);
+                    void init_generate_constraints(blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const var &zero,
+                        const std::size_t &component_start_row) {
+                            
+                    }
+
+                    void absorb_assignment(
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                            var absorbing_value,
+                            std::size_t &component_start_row) {
+                        
+                    }
+
+                    void absorb_generate_constraints(blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const var &zero,
+                        const std::size_t &component_start_row) {
+                            
+                    }
+
+                    var squeeze_assignment(
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                            var absorbing_value,
+                            std::size_t &component_start_row) {
+
+                    }
+
+                    void squeeze_generate_constraints(blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const var &zero,
+                        const std::size_t &component_start_row) {
+                            
                     }
                 };
             }    // namespace components
@@ -150,4 +140,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_BASE_FIELD_COMPONENT_15_WIRES_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_TRANSCRIPT_HPP

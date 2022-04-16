@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     using curve_type = algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::scalar_field_type;
     constexpr std::size_t WitnessColumns = 15;
-    constexpr std::size_t PublicInputColumns = 0;
+    constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
@@ -66,16 +66,18 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
+    using var = zk::snark::plonk_variable<BlueprintFieldType>;
     
     typename BlueprintFieldType::value_type challenge = 0x00000000000000000000000000000000FC93536CAE0C612C18FBE5F6D8E8EEF2_cppui255;
     typename BlueprintFieldType::value_type endo_factor = 0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
     typename BlueprintFieldType::value_type result = 0x004638173549A4C55A118327904B54E5F6F6314225C8C862F5AFA2506C77AC65_cppui255;
     std::size_t num_bits = 128;
 
-    typename component_type::private_params_type private_params = {challenge};
-    typename component_type::public_params_type public_params = {endo_factor, num_bits};
+    var challenge_var = {0, 0, false, var::column_type::public_input};
+    typename component_type::params_type params = {challenge_var, endo_factor, num_bits};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {challenge};
     std::cout<<"Expected result: "<<result.data<<std::endl;
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (public_params, private_params);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

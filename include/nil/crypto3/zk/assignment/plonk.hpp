@@ -40,6 +40,9 @@ namespace nil {
             template<typename ArithmetizationType, std::size_t... BlueprintParams>
             class blueprint_public_assignment_table;
 
+            template<typename ArithmetizationType, std::size_t... BlueprintParams>
+            class blueprint_assignment_table;
+
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>
             class blueprint_private_assignment_table<snark::plonk_constraint_system<BlueprintFieldType,
@@ -113,8 +116,12 @@ namespace nil {
                 typedef snark::plonk_constraint_system<BlueprintFieldType,
                     ArithmetizationParams> ArithmetizationType;
 
+                using var = snark::plonk_variable<BlueprintFieldType>;
+
                 snark::plonk_table_description<BlueprintFieldType,
                         ArithmetizationParams> &_table_description;
+
+                std::size_t allocated_public_input_rows = 0;
             public:
                 blueprint_public_assignment_table(
                     snark::plonk_table_description<BlueprintFieldType,
@@ -186,6 +193,30 @@ namespace nil {
                     return selector_index - 1;
                 }
 
+                void enable_selector(std::size_t selector_index, const std::vector<std::size_t> &&row_indices) {
+                    assert(selector_index < this->selector_columns.size());
+
+                    for (std::size_t row_index : row_indices) {
+                        this->selector_columns[selector_index][row_index] = BlueprintFieldType::value_type::one();
+                    }
+                }
+
+                void enable_selector(std::size_t selector_index, std::size_t row_index) {
+                    assert(selector_index < this->selector_columns.size());
+
+                    enable_selector(selector_index, std::vector<std::size_t>({row_index}));
+                }
+
+                void
+                    enable_selector(std::size_t selector_index, std::size_t begin_row_index, std::size_t end_row_index, std::size_t index_step = 1) {
+                    
+                    assert(selector_index < this->selector_columns.size());
+
+                    for (std::size_t row_index = begin_row_index; row_index <= end_row_index; row_index += index_step) {
+                        this->selector_columns[selector_index][row_index] = BlueprintFieldType::value_type::one();
+                    }
+                }
+
                 snark::plonk_column<BlueprintFieldType> &public_input(std::size_t public_input_index) {
                     assert(public_input_index < this->public_input_columns.size());
                     this->public_input_columns[public_input_index].resize(_table_description.rows_amount);
@@ -254,6 +285,127 @@ namespace nil {
                     }
 
                     return _table_description.rows_amount;
+                }
+
+                var allocate_public_input(typename BlueprintFieldType::value_type data) {
+                    public_input(0)[allocated_public_input_rows] = data;
+                    allocated_public_input_rows++;
+                    return var(0, allocated_public_input_rows - 1, false, var::column_type::public_input);
+                }
+            };
+
+            template<typename BlueprintFieldType,
+                     typename ArithmetizationParams>
+            class blueprint_assignment_table<snark::plonk_constraint_system<BlueprintFieldType,
+                                                        ArithmetizationParams>> {
+                
+                using ArithmetizationType = snark::plonk_constraint_system<BlueprintFieldType,
+                    ArithmetizationParams>;
+
+                using var = snark::plonk_variable<BlueprintFieldType>;
+
+                blueprint_private_assignment_table<ArithmetizationType> &_private_assignment;
+                blueprint_public_assignment_table<ArithmetizationType> &_public_assignment;
+
+                public:
+                blueprint_assignment_table(
+                        blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignmen): 
+                            _private_assignment(private_assignment), _public_assignment(public_assignmen) {
+
+                }
+
+                // private_assignment interface
+                snark::plonk_column<BlueprintFieldType> &witness(std::size_t witness_index) {
+                    return _private_assignment.witness(witness_index);
+                }    
+
+                // public_assignment interface
+                snark::plonk_column<BlueprintFieldType> &selector(std::size_t selector_index) {
+                    return _public_assignment.selector(selector_index);
+                }
+
+                std::size_t add_selector(const std::vector<std::size_t> &&row_indices) {
+                    return _public_assignment.add_selector(std::move(row_indices));
+                }
+
+                std::size_t add_selector(std::size_t row_index) {
+                    return _public_assignment.add_selector(row_index);
+                }
+
+                std::size_t add_selector(const std::initializer_list<std::size_t> &&row_start_indices,
+                        const std::initializer_list<std::size_t> &&offsets) {
+                    return _public_assignment.add_selector(row_start_indices, offsets);
+                }
+
+                std::size_t add_selector(const std::initializer_list<std::size_t> &&row_start_indices,
+                        const std::size_t offset) {
+                    return _public_assignment.add_selector(row_start_indices, offset);
+                }
+
+                std::size_t
+                    add_selector(std::size_t begin_row_index, std::size_t end_row_index, std::size_t index_step = 1) {
+                    return _public_assignment.add_selector(begin_row_index, end_row_index, index_step);
+                }
+
+                void enable_selector(std::size_t selector_index, const std::vector<std::size_t> &&row_indices) {
+                    _public_assignment.enable_selector(selector_index, std::move(row_indices));
+                }
+
+                void enable_selector(std::size_t selector_index, std::size_t row_index) {
+                    _public_assignment.enable_selector(selector_index, row_index);
+                }
+
+                void
+                    enable_selector(std::size_t selector_index, std::size_t begin_row_index, std::size_t end_row_index, std::size_t index_step = 1) {
+                    
+                    _public_assignment.enable_selector(selector_index, begin_row_index, end_row_index, index_step);
+                }
+
+                snark::plonk_column<BlueprintFieldType> &public_input(std::size_t public_input_index) {
+                    return _public_assignment.public_input(public_input_index);
+                }
+
+                snark::plonk_column<BlueprintFieldType> &constant(std::size_t constant_index) {
+                    return _public_assignment.constant(constant_index);
+                }
+
+                var allocate_public_input(typename BlueprintFieldType::value_type data) {
+                    return _public_assignment.allocate_public_input(data);
+                }
+
+                // shared interface
+                snark::plonk_column<BlueprintFieldType> &operator[](std::size_t index) {
+                    if (index < ArithmetizationParams::WitnessColumns) {
+                        return _private_assignment[index];
+                    }
+
+                    index -= ArithmetizationParams::WitnessColumns;
+                    return _public_assignment[index];
+                }
+
+                snark::plonk_table_description<BlueprintFieldType,
+                        ArithmetizationParams> table_description() const {
+                    return _public_assignment.table_description();
+                }
+
+                std::size_t padding() {
+                    std::size_t rows = _private_assignment.padding();
+                    rows = _public_assignment.padding();
+                    return rows;
+                }
+
+                typename BlueprintFieldType::value_type var_value(const var &a) {
+                    typename BlueprintFieldType::value_type result;
+                    if (a.type == var::column_type::witness) {
+                        result = witness(a.index)[a.rotation];
+                    } else if (a.type == var::column_type::public_input) {
+                        result = public_input(a.index)[a.rotation];
+                    } else {
+                        result = constant(a.index)[a.rotation];
+                    }
+
+                    return result;
                 }
             };
 

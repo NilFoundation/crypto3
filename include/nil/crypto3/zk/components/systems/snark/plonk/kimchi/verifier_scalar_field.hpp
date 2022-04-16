@@ -84,63 +84,68 @@ namespace nil {
 
                     constexpr static const std::size_t required_rows_amount = 1 + poseidon_component::required_rows_amount;
 
-                    struct public_params_type {
+                    struct params_type {
                         std::array<typename ArithmetizationType::field_type::value_type, 3> input_data;
-                    };
-
-                    struct private_params_type {
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
                         return bp.allocate_rows(required_rows_amount);
                     }
 
-                    static void generate_gates(
+                    static void generate_circuit(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const public_params_type &init_params,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
 
-                        std::size_t row = component_start_row;
-                        row++;                       
-                        typename poseidon_component::public_params_type poseidon_public_params = {};
-                        poseidon_component::generate_gates(bp, public_assignment,
-                            poseidon_public_params, row);
-                    }
-
-                    static void generate_copy_constraints(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const public_params_type &init_params,
-                        const std::size_t &component_start_row) {
-                        std::size_t row = component_start_row;
-                        row++;
-
-                        typename poseidon_component::public_params_type poseidon_public_params = {};
-                        poseidon_component::generate_copy_constraints(bp, public_assignment,
-                            poseidon_public_params, row);
-                        bp.add_copy_constraint({{W1, row + required_rows_amount - 1, false}, {0, row - 1, false, snark::plonk_variable<BlueprintFieldType>::column_type::public_input}});
-
+                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_copy_constraints(bp, assignment, params, component_start_row);
                     }
 
                     static void generate_assignments(
-                        blueprint_private_assignment_table<ArithmetizationType>
-                            &private_assignment,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const public_params_type &public_params,
-                        const private_params_type &private_params,
+                        blueprint_assignment_table<ArithmetizationType>
+                            &assignment,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
 
                             
                         std::size_t row = component_start_row;
                         row++;
 
-                        typename poseidon_component::public_params_type poseidon_public_params = {};
-                        std::array<typename ArithmetizationType::field_type::value_type, 3> input_state = public_params.input_data;
-                        typename poseidon_component::private_params_type poseidon_private_params = {input_state};
-                        poseidon_component::generate_assignments(private_assignment, public_assignment, 
-                            poseidon_public_params, poseidon_private_params, row);
-                        public_assignment.public_input(0)[component_start_row] = private_assignment.witness(1)[row + 11];
+                        std::array<typename ArithmetizationType::field_type::value_type, 3> input_state = params.input_data;
+                        typename poseidon_component::params_type poseidon_params = {input_state};
+                        poseidon_component::generate_assignments(assignment, 
+                            poseidon_params, row);
+                        assignment.public_input(0)[component_start_row] = assignment.witness(1)[row + 11];
+
+                    }
+
+                    private:
+                    static void generate_gates(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t &component_start_row) {
+
+                        std::size_t row = component_start_row;
+                        row++;                       
+                        typename poseidon_component::params_type poseidon_params = {};
+                        poseidon_component::generate_gates(bp, assignment,
+                            poseidon_params, row);
+                    }
+
+                    static void generate_copy_constraints(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t &component_start_row) {
+                        std::size_t row = component_start_row;
+                        row++;
+
+                        typename poseidon_component::params_type poseidon_params = {};
+                        poseidon_component::generate_copy_constraints(bp, assignment,
+                            poseidon_params, row);
+                        bp.add_copy_constraint({{W1, row + required_rows_amount - 1, false}, {0, row - 1, false, snark::plonk_variable<BlueprintFieldType>::column_type::public_input}});
 
                     }
                 };
