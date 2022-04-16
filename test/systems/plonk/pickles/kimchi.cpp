@@ -48,7 +48,7 @@
 
 using namespace nil::crypto3;
 
-BOOST_AUTO_TEST_SUITE(pickles_proof_struct_test_suite)
+BOOST_AUTO_TEST_SUITE(kimchi_proof_struct_test_suite)
 
 const char *test_data = TEST_DATA;
 
