@@ -69,8 +69,8 @@ namespace nil {
                     lookup_verifier_index<CurveType> lookup_index;
 //                    linearization_t<std::vector<PolishToken<Fr>>>  linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
                     Alphas<Fr> powers_of_alpha;
-                    ArithmeticSpongeParams<Fr> fr_sponge_params;
-                    ArithmeticSpongeParams<Fq> fq_sponge_params;
+                    arithmetic_sponge_params<Fr> fr_sponge_params;
+                    arithmetic_sponge_params<Fq> fq_sponge_params;
                 };
             }    // namespace snark
         }        // namespace zk

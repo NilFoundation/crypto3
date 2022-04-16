@@ -83,7 +83,7 @@ namespace nil {
 
                 // TODO: I think we should really change this name to something more correct
                 template<typename CurveType>
-                struct BatchEvaluationProof {
+                struct batch_evaluation_proof {
                     typedef typename CurveType::scalar_field_type Fr;
 //                    EFqSponge sponge; TODO: return this
                     std::vector<Evaluation<CurveType>> evaluations;
@@ -200,7 +200,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                struct ArithmeticSpongeParams {
+                struct arithmetic_sponge_params {
                     std::vector<std::vector<FieldType>> round_constants;
                     std::vector<std::vector<FieldType>> mds;
                 };

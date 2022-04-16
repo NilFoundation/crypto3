@@ -43,7 +43,6 @@
 #include <boost/foreach.hpp>
 
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/proof.hpp>
-
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/verifier_index.hpp>
 
 using namespace nil::crypto3;

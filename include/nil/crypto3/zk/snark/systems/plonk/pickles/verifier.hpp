@@ -30,7 +30,6 @@
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/detail.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/alphas.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/verifier_index.hpp>
-#include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/kimchi_pedersen.hpp>
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
@@ -40,7 +39,7 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename CurveType, std::size_t WiresAmount>
-                BatchEvaluationProof<CurveType>
+                batch_evaluation_proof<CurveType>
                     to_batch(verifier_index<CurveType> index, commitments::kimchi_pedersen<CurveType> proof) {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
                     typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
@@ -251,7 +250,7 @@ namespace nil {
                 // prepare for the opening proof verification
                 std::vector<Fr> evaluation_points = {oracles_res.oracles.zeta,
                                                      oracles_res.oracles.zeta * index.domain.group_gen};
-                return BatchEvaluationProof {oracles_res.fq_sponge, evaluations,           evaluation_points,
+                return batch_evaluation_proof {oracles_res.fq_sponge, evaluations,           evaluation_points,
                                              oracles_res.oracles.v, oracles_res.oracles.u, proof.proof};
                 }
             }    // namespace snark
