@@ -85,7 +85,7 @@ namespace nil {
                 template<typename CurveType>
                 struct batch_evaluation_proof {
                     typedef typename CurveType::scalar_field_type Fr;
-//                    EFqSponge sponge; TODO: return this
+                    //                    EFqSponge sponge; TODO: return this
                     std::vector<Evaluation<CurveType>> evaluations;
                     /// vector of evaluation points
                     std::vector<Fr> evaluation_points;
@@ -151,7 +151,7 @@ namespace nil {
                     typename FieldType::value_type _val;
                 };
 
-                enum GateType {
+                enum gate_type {
                     /// Zero gate
                     Zero = 0,
                     /// Generic arithmetic gate
@@ -173,7 +173,7 @@ namespace nil {
                     ChaChaFinal = 10,
                 };
 
-                enum ArgumentType {
+                enum argument_type {
                     /// Gates in the PLONK constraint system.
                     /// As gates are mutually exclusive (a single gate is set per row),
                     /// we can reuse the same powers of alpha across gates.
@@ -185,7 +185,7 @@ namespace nil {
                 };
 
                 template<typename CurveType>
-                struct srs_t {
+                struct common_reference_string {
                     /// The vector of group elements for committing to polynomials in coefficient form
                     std::vector<CurveType> g;
                     /// A group element used for blinding commitments
@@ -200,7 +200,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                struct EvaluationDomain {
+                struct evaluation_domain {
                     std::size_t log_size_of_group;
                     FieldType group_gen;
                 };
@@ -243,7 +243,7 @@ namespace nil {
                 };
 
                 template<typename Container>
-                struct linearization_t {
+                struct linearization {
                     Container constant_term;
                     std::vector<std::tuple<Column, Container>> index_term;
                 };
