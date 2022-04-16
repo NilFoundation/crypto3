@@ -58,7 +58,7 @@ set(TESTS_NAMES
     "relations/numeric/sap"
     "relations/numeric/ssp"
 
-    "systems/plonk/pickles/pickles_struct_test"
+    "systems/plonk/pickles/pickles"
     "systems/plonk/pickles/kimchi"
     "systems/plonk/pickles/oracles"
     "systems/plonk/pickles/to_field"
