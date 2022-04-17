@@ -56,46 +56,44 @@ namespace nil {
                          typename... TOptions>
                 using lpc_proof = nil::marshalling::types::bundle<
                     TTypeBase, std::tuple<
-                                   // // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
-                                   // // TODO: review std::uint8_t type usage (for example, pedersen outputs array of bits)
-                                   // // typename merkle_tree_type::value_type T_root;
-                                   // nil::marshalling::types::array_list<
-                                   //     TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
-                                   //     nil::marshalling::option::sequence_size_field_prefix<
-                                   //         nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                   // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
+                                   // TODO: review std::uint8_t type usage (for example, pedersen outputs array of bits)
+                                   // typename merkle_tree_type::value_type T_root;
+                                   nil::marshalling::types::array_list<
+                                       TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
+                                       nil::marshalling::option::sequence_size_field_prefix<
+                                           nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                                    // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                                    // std::vector<typename FieldType::value_type> z;
                                    nil::marshalling::types::array_list<
                                        TTypeBase, field_element<TTypeBase, typename LPCScheme::field_type::value_type>,
                                        nil::marshalling::option::sequence_size_field_prefix<
-                                           nil::marshalling::types::integral<TTypeBase, std::size_t>>>
-                                           // ,
+                                           nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                                    // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                                    // std::array<typename fri_type::proof_type, lambda> fri_proof;
-                                   // nil::marshalling::types::array_list<
-                                   //     TTypeBase, fri_proof<TTypeBase, typename LPCScheme::fri_type>,
-                                   //     nil::marshalling::option::sequence_size_field_prefix<
-                                   //         nil::marshalling::types::integral<TTypeBase, std::size_t>>>
-                                           >>;
+                                   nil::marshalling::types::array_list<
+                                       TTypeBase, fri_proof<TTypeBase, typename LPCScheme::fri_type>,
+                                       nil::marshalling::option::sequence_size_field_prefix<
+                                           nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>>>;
 
                 template<typename LPCScheme, typename Endianness>
                 lpc_proof<nil::marshalling::field_type<Endianness>, LPCScheme>
                     fill_lpc_proof(const typename LPCScheme::proof_type &proof) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using size_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
+                    using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
                     using octet_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint8_t>;
                     using digest_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, octet_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using field_marhsalling_type = field_element<TTypeBase, typename LPCScheme::field_type::value_type>;
                     using field_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, field_marhsalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using fri_proof_marshalling_type = fri_proof<TTypeBase, typename LPCScheme::fri_type>;
                     using fri_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, fri_proof<TTypeBase, typename LPCScheme::fri_type>,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
 
                     // typename merkle_tree_type::value_type T_root;
                     // digest_marshalling_type filled_T_root;

@@ -56,17 +56,17 @@ namespace nil {
                 using merkle_proof = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
-                        // leaf_index
-                        nil::marshalling::types::integral<TTypeBase, std::size_t>,
+                        // std::size_t _li
+                        nil::marshalling::types::integral<TTypeBase, std::uint64_t>,
                         // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                         // TODO: review std::uint8_t type usage (for example, pedersen outputs array of bits)
-                        // root
+                        // value_type _root
                         nil::marshalling::types::array_list<
                             TTypeBase,
                             nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
-                        // path
+                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
+                        // path_type _path
                         nil::marshalling::types::array_list<
                             TTypeBase,
                             // layer path
@@ -76,22 +76,22 @@ namespace nil {
                                 nil::marshalling::types::bundle<
                                     TTypeBase,
                                     std::tuple<
-                                        // position
-                                        nil::marshalling::types::integral<TTypeBase, std::size_t>,
+                                        // std::size_t _position
+                                        nil::marshalling::types::integral<TTypeBase, std::uint64_t>,
                                         // TODO: use nil::marshalling::option::fixed_size_storage with
                                         //  hash_type::digest_size
                                         // TODO: review std::uint8_t type usage
-                                        // hash
+                                        // value_type _hash
                                         nil::marshalling::types::array_list<
                                             TTypeBase,
                                             nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
                                             nil::marshalling::option::sequence_size_field_prefix<
-                                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>,
+                                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>>>,
                                 // TODO: use nil::marshalling::option::fixed_size_storage<MerkleProof::arity - 1>
                                 nil::marshalling::option::sequence_size_field_prefix<
-                                    nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                                    nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                             nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
+                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>>>;
 
                 template<typename MerkleProof,
                          typename = typename std::enable_if<
@@ -99,7 +99,7 @@ namespace nil {
                                           nil::crypto3::containers::merkle_proof<typename MerkleProof::hash_type,
                                                                                  MerkleProof::arity>>::value>::type>
                 struct merkle_proof_marshalling {
-                    static void set_leaf_index(MerkleProof &mp, const std::size_t li) {
+                    static void set_leaf_index(MerkleProof &mp, const std::uint64_t li) {
                         mp._li = li;
                     }
 
@@ -113,7 +113,7 @@ namespace nil {
                     }
 
                     static void set_layer_element_position(typename MerkleProof::path_element_type &element,
-                                                           std::size_t position) {
+                                                           std::uint64_t position) {
                         element._position = position;
                     }
 
@@ -128,27 +128,27 @@ namespace nil {
                     fill_merkle_proof(const MerkleProof &mp) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using size_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
+                    using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
                     using octet_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint8_t>;
                     using digest_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase,
                         octet_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using layer_element_marshalling_type =
                         nil::marshalling::types::bundle<TTypeBase,
                                                         std::tuple<
                                                             // position
-                                                            size_t_marshalling_type,
+                                                            uint64_t_marshalling_type,
                                                             // hash
                                                             digest_marshalling_type>>;
                     using layer_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase,
                         layer_element_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using path_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase,
                         layer_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
+                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
 
                     digest_marshalling_type filled_root;
                     auto &filled_root_val = filled_root.value();
@@ -165,13 +165,13 @@ namespace nil {
                                 filled_layer_element_hash.value().push_back(octet_marshalling_type(c));
                             }
                             filled_layer.value().push_back(layer_element_marshalling_type(
-                                std::make_tuple(size_t_marshalling_type(el.position()), filled_layer_element_hash)));
+                                std::make_tuple(uint64_t_marshalling_type(el.position()), filled_layer_element_hash)));
                         }
                         filled_path.value().push_back(filled_layer);
                     }
 
                     return merkle_proof<nil::marshalling::field_type<Endianness>, MerkleProof>(
-                        std::make_tuple(size_t_marshalling_type(mp.leaf_index()), filled_root, filled_path));
+                        std::make_tuple(uint64_t_marshalling_type(mp.leaf_index()), filled_root, filled_path));
                 }
 
                 template<typename MerkleProof, typename Endianness>
