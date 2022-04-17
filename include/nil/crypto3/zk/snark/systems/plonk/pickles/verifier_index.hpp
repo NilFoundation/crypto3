@@ -43,14 +43,14 @@ namespace nil {
                 struct verifier_index {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
                     typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
-                    using curve_t = CurveType;
-                    using Fr = typename CurveType::scalar_field_type::value_type;
-                    using Fq = typename CurveType::base_field_type::value_type;
+                    using curve_type = CurveType;
+                    using scalar_field_value_type = typename CurveType::scalar_field_type::value_type;
+                    using base_field_value_type = typename CurveType::base_field_type::value_type;
 
-//                    nil::crypto3::math::evaluation_domain<Fr> domain; TODO: return this
+                    evaluation_domain<scalar_field_value_type> domain;
                     size_t max_poly_size;
                     size_t max_quot_size;
-                    srs_t<CurveType> srs;
+                    common_reference_string<CurveType> srs;
                     std::array<commitment_type, Permuts> sigma_comm;
                     std::array<commitment_type, WiresAmount> coefficients_comm;
                     commitment_type generic_comm;
@@ -60,17 +60,19 @@ namespace nil {
                     commitment_type emul_comm;
                     commitment_type endomul_scalar_comm;
                     std::array<commitment_type, 4> chacha_comm;
-                    std::array<Fr, Permuts> shifts;
+                    std::array<scalar_field_value_type, Permuts> shifts;
 
                     // Polynomial in coefficients form
-                    nil::crypto3::math::polynomial<Fr> zkpm;
-                    Fr w;
-                    Fr endo;
+                    nil::crypto3::math::polynomial<scalar_field_value_type> zkpm;
+                    scalar_field_value_type w;
+                    scalar_field_value_type endo;
                     lookup_verifier_index<CurveType> lookup_index;
-//                    linearization_t<std::vector<PolishToken<Fr>>>  linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
-                    Alphas<Fr> powers_of_alpha;
-                    ArithmeticSpongeParams<Fr> fr_sponge_params;
-                    ArithmeticSpongeParams<Fq> fq_sponge_params;
+                    //                    linearization<std::vector<PolishToken<scalar_field_value_type>>>
+                    //                    linearization;    // TODO:
+                    //                    Linearization<Vec<PolishToken<scalar_field_value_type<G>>>>
+                    Alphas<scalar_field_value_type> powers_of_alpha;
+                    arithmetic_sponge_params<scalar_field_value_type> fr_sponge_params;
+                    arithmetic_sponge_params<base_field_value_type> fq_sponge_params;
                 };
             }    // namespace snark
         }        // namespace zk
