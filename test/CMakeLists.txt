@@ -51,6 +51,8 @@ set(TESTS_NAMES
     "commitment/fri"
     "commitment/lpc_performance"
     "commitment/pedersen"
+    "commitment/type_traits"
+
 
     "routing_algorithms/test_routing_algorithms"
 

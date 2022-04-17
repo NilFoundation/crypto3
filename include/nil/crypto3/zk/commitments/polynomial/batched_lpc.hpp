@@ -57,7 +57,7 @@ namespace nil {
                  * Matter Labs,
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
-                template<typename FieldType, typename LPCParams, std::size_t BatchSize>
+                template<typename FieldType, typename LPCParams, std::size_t BatchSize=1>
                 struct batched_list_polynomial_commitment : public detail::basic_batched_fri<FieldType,
                                                                              typename LPCParams::merkle_hash_type,
                                                                              typename LPCParams::transcript_hash_type,
@@ -218,7 +218,7 @@ namespace nil {
                     }
                 };
 
-                template<typename FieldType, typename LPCParams, std::size_t BatchSize>
+                template<typename FieldType, typename LPCParams, std::size_t BatchSize=1>
                 using batched_lpc = batched_list_polynomial_commitment<FieldType, LPCParams, BatchSize>;
             }    // namespace commitments
         }        // namespace zk

@@ -25,8 +25,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_COMMITMENTS_KZG_COMMITMENT_HPP
-#define CRYPTO3_ZK_COMMITMENTS_KZG_COMMITMENT_HPP
+#ifndef CRYPTO3_ZK_COMMITMENTS_KZG_HPP
+#define CRYPTO3_ZK_COMMITMENTS_KZG_HPP
 
 #include <tuple>
 #include <vector>
@@ -48,9 +48,9 @@ using namespace nil::crypto3::math;
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace commitments {
                 template<typename CurveType>
-                struct kzg_commitment {
+                struct kzg {
 
                     typedef CurveType curve_type;
                     typedef algebra::pairing::pairing_policy<curve_type> pairing;
@@ -124,9 +124,9 @@ namespace nil {
                         return gt1 == gt2;
                     }
                 };
-            };    // namespace snark
+            };    // namespace commitments 
         }         // namespace zk
     }             // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_COMMITMENTS_KZG_COMMITMENT_HPP
+#endif    // CRYPTO3_ZK_COMMITMENTS_KZG_HPP
