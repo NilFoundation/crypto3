@@ -54,13 +54,13 @@
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
 
-#include <nil/crypto3/marshalling/zk/types/redshift/proof.hpp>
-#include <nil/crypto3/marshalling/zk/types/redshift/common_data.hpp>
+#include <nil/crypto3/marshalling/zk/types/placeholder/proof.hpp>
+#include <nil/crypto3/marshalling/zk/types/placeholder/common_data.hpp>
 
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/prover.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/verifier.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/prover.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/verifier.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
@@ -302,11 +302,11 @@ void test_redshift_eval_proof(std::size_t tree_depth, std::size_t round_proofs_n
     using namespace nil::crypto3::marshalling;
 
     using proof_marshalling_type =
-        types::redshift_evaluation_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>;
+        types::placeholder_evaluation_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>;
 
     auto proof = generate_redshift_eval_proof<RedshiftProof>(tree_depth, round_proofs_n, degree, num, k);
-    auto filled_redshift_proof = types::fill_redshift_evaluation_proof<RedshiftProof, Endianness>(proof);
-    auto _proof = types::make_redshift_evaluation_proof<RedshiftProof, Endianness>(filled_redshift_proof);
+    auto filled_redshift_proof = types::fill_placeholder_evaluation_proof<RedshiftProof, Endianness>(proof);
+    auto _proof = types::make_placeholder_evaluation_proof<RedshiftProof, Endianness>(filled_redshift_proof);
     BOOST_CHECK(_proof == proof);
 
     std::vector<std::uint8_t> cv;
@@ -317,7 +317,7 @@ void test_redshift_eval_proof(std::size_t tree_depth, std::size_t round_proofs_n
     proof_marshalling_type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
-    auto constructed_val_read = types::make_redshift_evaluation_proof<RedshiftProof, Endianness>(test_val_read);
+    auto constructed_val_read = types::make_placeholder_evaluation_proof<RedshiftProof, Endianness>(test_val_read);
     BOOST_CHECK(proof == constructed_val_read);
 }
 
@@ -326,11 +326,11 @@ void test_random_redshift_proof(std::size_t tree_depth, std::size_t round_proofs
                                 std::size_t k) {
     using namespace nil::crypto3::marshalling;
 
-    using proof_marshalling_type = types::redshift_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>;
+    using proof_marshalling_type = types::placeholder_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>;
 
     RedshiftProof proof = generate_redshift_proof<RedshiftProof>(tree_depth, round_proofs_n, degree, num, k);
     auto filled_redshift_proof = types::fill_redshift_proof<RedshiftProof, Endianness>(proof);
-    RedshiftProof _proof = types::make_redshift_proof<RedshiftProof, Endianness>(filled_redshift_proof);
+    RedshiftProof _proof = types::make_placeholder_proof<RedshiftProof, Endianness>(filled_redshift_proof);
     BOOST_CHECK(_proof == proof);
 
     std::vector<std::uint8_t> cv;
@@ -341,7 +341,7 @@ void test_random_redshift_proof(std::size_t tree_depth, std::size_t round_proofs
     proof_marshalling_type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
-    auto constructed_val_read = types::make_redshift_proof<RedshiftProof, Endianness>(test_val_read);
+    auto constructed_val_read = types::make_placeholder_proof<RedshiftProof, Endianness>(test_val_read);
     BOOST_CHECK(proof == constructed_val_read);
 }
 
@@ -349,13 +349,13 @@ template<typename Endianness, typename RedshiftProof>
 void test_redshift_proof_marshalling(const RedshiftProof &proof) {
     using namespace nil::crypto3::marshalling;
 
-    using proof_marshalling_type = types::redshift_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>;
+    using proof_marshalling_type = types::placeholder_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>;
     // using lpc_marshalling_type = types::lpc_proof<nil::marshalling::field_type<Endianness>, typename
-    // RedshiftProof::commitment_scheme_type_witness>; using fri_marshalling_type =
+    // PlaceholderProof::commitment_scheme_type_witness>; using fri_marshalling_type =
     // types::fri_proof<nil::marshalling::field_type<Endianness>, typename
-    // RedshiftProof::commitment_scheme_type_witness::fri_type>; auto filled_lpc = types::fill_lpc_proof<typename
-    // RedshiftProof::commitment_scheme_type_witness, Endianness>(proof.eval_proof.witness[0]); auto filled_fri =
-    // types::fill_fri_proof<typename RedshiftProof::commitment_scheme_type_witness::fri_type,
+    // PlaceholderProof::commitment_scheme_type_witness::fri_type>; auto filled_lpc = types::fill_lpc_proof<typename
+    // PlaceholderProof::commitment_scheme_type_witness, Endianness>(proof.eval_proof.witness[0]); auto filled_fri =
+    // types::fill_fri_proof<typename PlaceholderProof::commitment_scheme_type_witness::fri_type,
     // Endianness>(proof.eval_proof.witness[0].fri_proof[0]); std::vector<std::uint8_t> ccv;
     // ccv.resize(filled_lpc.length(), 0x00);
     // auto write_iterc = ccv.begin();
@@ -367,7 +367,7 @@ void test_redshift_proof_marshalling(const RedshiftProof &proof) {
     // std::cout << "fri (" << ccv.size() << " bytes) = " << std::endl;
 
     auto filled_redshift_proof = types::fill_redshift_proof<RedshiftProof, Endianness>(proof);
-    RedshiftProof _proof = types::make_redshift_proof<RedshiftProof, Endianness>(filled_redshift_proof);
+    RedshiftProof _proof = types::make_placeholder_proof<RedshiftProof, Endianness>(filled_redshift_proof);
     BOOST_CHECK(_proof == proof);
 
     std::vector<std::uint8_t> cv;
@@ -376,13 +376,13 @@ void test_redshift_proof_marshalling(const RedshiftProof &proof) {
     nil::marshalling::status_type status = filled_redshift_proof.write(write_iter, cv.size());
     std::cout << "proof (" << cv.size() << " bytes) = " << std::endl;
     std::ofstream proof_file;
-    proof_file.open("redshift.txt");
+    proof_file.open("placeholder.txt");
     print_byteblob(proof_file, cv.cbegin(), cv.cend());
 
     proof_marshalling_type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
-    auto constructed_val_read = types::make_redshift_proof<RedshiftProof, Endianness>(test_val_read);
+    auto constructed_val_read = types::make_placeholder_proof<RedshiftProof, Endianness>(test_val_read);
     BOOST_CHECK(proof == constructed_val_read);
 }
 
@@ -473,9 +473,9 @@ void test_component_proof_marshalling(typename ComponentType::public_params_type
     zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(private_assignment,
                                                                                              public_assignment);
 
-    using params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, MerkleHashType,
+    using params = zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, MerkleHashType,
                                               TranscriptHashType, Lambda>;
-    using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
+    using types = zk::snark::detail::placeholder_policy<BlueprintFieldType, params>;
 
     using fri_type = typename zk::commitments::fri<BlueprintFieldType, typename params::merkle_hash_type,
                                                    typename params::transcript_hash_type, 2>;
@@ -490,7 +490,7 @@ void test_component_proof_marshalling(typename ComponentType::public_params_type
         zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, desc,
                                                                                      fri_params, permutation_size);
     typename types::preprocessed_private_data_type private_preprocessed_data =
-        zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment, desc);
+        zk::snark::placeholder_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment, desc);
 
     std::cout << "fri_params.r = " << fri_params.r << std::endl;
     std::cout << "fri_params.max_degree = " << fri_params.max_degree << std::endl;
@@ -524,13 +524,13 @@ void test_component_proof_marshalling(typename ComponentType::public_params_type
         std::cout << "]," << std::endl;
     }
     std::cout << "}" << std::endl;
-    auto proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(
+    auto proof = zk::snark::placeholder_prover<BlueprintFieldType, params>::process(
         public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
     using proof_marshalling_type =
-        marshalling::types::redshift_proof<nil::marshalling::field_type<Endianness>, decltype(proof)>;
+        marshalling::types::placeholder_proof<nil::marshalling::field_type<Endianness>, decltype(proof)>;
     test_redshift_proof_marshalling<Endianness>(proof);
 
-    bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(public_preprocessed_data,
+    bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, params>::process(public_preprocessed_data,
                                                                                           proof, bp, fri_params);
     BOOST_CHECK(verifier_res);
 

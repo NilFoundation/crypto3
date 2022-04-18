@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MARSHALLING_REDSHIFT_PROOF_HPP
-#define CRYPTO3_MARSHALLING_REDSHIFT_PROOF_HPP
+#ifndef CRYPTO3_MARSHALLING_PLACEHOLDER_PROOF_HPP
+#define CRYPTO3_MARSHALLING_PLACEHOLDER_PROOF_HPP
 
 #include <ratio>
 #include <limits>
@@ -40,86 +40,87 @@
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/lpc.hpp>
 
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/proof.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                template<
-                    typename TTypeBase, typename RedshiftProof,
-                    typename = typename std::enable_if<
-                        std::is_same<RedshiftProof, nil::crypto3::zk::snark::redshift_proof<
-                                                        typename RedshiftProof::field_type,
-                                                        typename RedshiftProof::commitment_scheme_type_witness,
-                                                        typename RedshiftProof::commitment_scheme_type_permutation,
-                                                        typename RedshiftProof::commitment_scheme_type_quotient,
-                                                        typename RedshiftProof::commitment_scheme_type_public>>::value,
-                        bool>::type,
-                    typename... TOptions>
-                using redshift_evaluation_proof = nil::marshalling::types::bundle<
+                template<typename TTypeBase, typename PlaceholderProof,
+                         typename = typename std::enable_if<
+                             std::is_same<PlaceholderProof,
+                                          nil::crypto3::zk::snark::placeholder_proof<
+                                              typename PlaceholderProof::field_type,
+                                              typename PlaceholderProof::commitment_scheme_type_witness,
+                                              typename PlaceholderProof::commitment_scheme_type_permutation,
+                                              typename PlaceholderProof::commitment_scheme_type_quotient,
+                                              typename PlaceholderProof::commitment_scheme_type_public>>::value,
+                             bool>::type,
+                         typename... TOptions>
+                using placeholder_evaluation_proof = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
                         // typename FieldType::value_type challenge
-                        field_element<TTypeBase, typename RedshiftProof::field_type::value_type>,
+                        field_element<TTypeBase, typename PlaceholderProof::field_type::value_type>,
                         // std::vector<typename CommitmentSchemeTypeWitness::proof_type> witness
                         nil::marshalling::types::array_list<
-                            TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_witness>,
+                            TTypeBase, lpc_proof<TTypeBase, typename PlaceholderProof::commitment_scheme_type_witness>,
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename CommitmentSchemeTypePermutation::proof_type> permutation
                         nil::marshalling::types::array_list<
-                            TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_permutation>,
+                            TTypeBase,
+                            lpc_proof<TTypeBase, typename PlaceholderProof::commitment_scheme_type_permutation>,
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename CommitmentSchemeTypeQuotient::proof_type> quotient
                         nil::marshalling::types::array_list<
-                            TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_quotient>,
+                            TTypeBase, lpc_proof<TTypeBase, typename PlaceholderProof::commitment_scheme_type_quotient>,
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename commitment_scheme_type_public::proof_type> id_permutation
                         nil::marshalling::types::array_list<
-                            TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_public>,
+                            TTypeBase, lpc_proof<TTypeBase, typename PlaceholderProof::commitment_scheme_type_public>,
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename commitment_scheme_type_public::proof_type> sigma_permutation
                         nil::marshalling::types::array_list<
-                            TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_public>,
+                            TTypeBase, lpc_proof<TTypeBase, typename PlaceholderProof::commitment_scheme_type_public>,
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename commitment_scheme_type_public::proof_type> public_input
                         nil::marshalling::types::array_list<
-                            TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_public>,
+                            TTypeBase, lpc_proof<TTypeBase, typename PlaceholderProof::commitment_scheme_type_public>,
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename commitment_scheme_type_public::proof_type> constant
                         nil::marshalling::types::array_list<
-                            TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_public>,
+                            TTypeBase, lpc_proof<TTypeBase, typename PlaceholderProof::commitment_scheme_type_public>,
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename commitment_scheme_type_public::proof_type> selector
                         nil::marshalling::types::array_list<
-                            TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_public>,
+                            TTypeBase, lpc_proof<TTypeBase, typename PlaceholderProof::commitment_scheme_type_public>,
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // std::vector<typename commitment_scheme_type_public::proof_type> special_selectors
                         nil::marshalling::types::array_list<
-                            TTypeBase, lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_public>,
+                            TTypeBase, lpc_proof<TTypeBase, typename PlaceholderProof::commitment_scheme_type_public>,
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>>>;
 
-                template<
-                    typename TTypeBase, typename RedshiftProof,
-                    typename = typename std::enable_if<
-                        std::is_same<RedshiftProof, nil::crypto3::zk::snark::redshift_proof<
-                                                        typename RedshiftProof::field_type,
-                                                        typename RedshiftProof::commitment_scheme_type_witness,
-                                                        typename RedshiftProof::commitment_scheme_type_permutation,
-                                                        typename RedshiftProof::commitment_scheme_type_quotient,
-                                                        typename RedshiftProof::commitment_scheme_type_public>>::value,
-                        bool>::type,
-                    typename... TOptions>
-                using redshift_proof = nil::marshalling::types::bundle<
+                template<typename TTypeBase, typename PlaceholderProof,
+                         typename = typename std::enable_if<
+                             std::is_same<PlaceholderProof,
+                                          nil::crypto3::zk::snark::placeholder_proof<
+                                              typename PlaceholderProof::field_type,
+                                              typename PlaceholderProof::commitment_scheme_type_witness,
+                                              typename PlaceholderProof::commitment_scheme_type_permutation,
+                                              typename PlaceholderProof::commitment_scheme_type_quotient,
+                                              typename PlaceholderProof::commitment_scheme_type_public>>::value,
+                             bool>::type,
+                         typename... TOptions>
+                using placeholder_proof = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
                         // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
@@ -148,33 +149,33 @@ namespace nil {
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                         // evaluation_proof eval_proof
-                        redshift_evaluation_proof<TTypeBase, RedshiftProof>>>;
+                        placeholder_evaluation_proof<TTypeBase, PlaceholderProof>>>;
 
-                template<typename RedshiftProof, typename Endianness>
-                redshift_evaluation_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>
-                    fill_redshift_evaluation_proof(const typename RedshiftProof::evaluation_proof &proof) {
+                template<typename PlaceholderProof, typename Endianness>
+                placeholder_evaluation_proof<nil::marshalling::field_type<Endianness>, PlaceholderProof>
+                    fill_placeholder_evaluation_proof(const typename PlaceholderProof::evaluation_proof &proof) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
                     using field_marhsalling_type =
-                        field_element<TTypeBase, typename RedshiftProof::field_type::value_type>;
+                        field_element<TTypeBase, typename PlaceholderProof::field_type::value_type>;
                     using lpc_witness_proof_marshalling_type =
-                        lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_witness>;
+                        lpc_proof<TTypeBase, typename PlaceholderProof::commitment_scheme_type_witness>;
                     using lpc_witness_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, lpc_witness_proof_marshalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using lpc_permutation_proof_marshalling_type =
-                        lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_permutation>;
+                        lpc_proof<TTypeBase, typename PlaceholderProof::commitment_scheme_type_permutation>;
                     using lpc_permutation_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, lpc_permutation_proof_marshalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using lpc_quotient_proof_marshalling_type =
-                        lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_quotient>;
+                        lpc_proof<TTypeBase, typename PlaceholderProof::commitment_scheme_type_quotient>;
                     using lpc_quotient_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, lpc_quotient_proof_marshalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using lpc_public_proof_marshalling_type =
-                        lpc_proof<TTypeBase, typename RedshiftProof::commitment_scheme_type_public>;
+                        lpc_proof<TTypeBase, typename PlaceholderProof::commitment_scheme_type_public>;
                     using lpc_public_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, lpc_public_proof_marshalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
@@ -186,77 +187,78 @@ namespace nil {
                     lpc_witness_proof_vector_marshalling_type filled_witness;
                     for (const auto &p : proof.witness) {
                         filled_witness.value().push_back(
-                            fill_lpc_proof<typename RedshiftProof::commitment_scheme_type_witness, Endianness>(p));
+                            fill_lpc_proof<typename PlaceholderProof::commitment_scheme_type_witness, Endianness>(p));
                     }
 
                     // std::vector<typename CommitmentSchemeTypePermutation::proof_type> permutation
                     lpc_permutation_proof_vector_marshalling_type filled_permutation;
                     for (const auto &p : proof.permutation) {
                         filled_permutation.value().push_back(
-                            fill_lpc_proof<typename RedshiftProof::commitment_scheme_type_permutation, Endianness>(p));
+                            fill_lpc_proof<typename PlaceholderProof::commitment_scheme_type_permutation, Endianness>(
+                                p));
                     }
 
                     // std::vector<typename CommitmentSchemeTypeQuotient::proof_type> quotient
                     lpc_quotient_proof_vector_marshalling_type filled_quotient;
                     for (const auto &p : proof.quotient) {
                         filled_quotient.value().push_back(
-                            fill_lpc_proof<typename RedshiftProof::commitment_scheme_type_quotient, Endianness>(p));
+                            fill_lpc_proof<typename PlaceholderProof::commitment_scheme_type_quotient, Endianness>(p));
                     }
 
                     // std::vector<typename commitment_scheme_type_public::proof_type> id_permutation
                     lpc_public_proof_vector_marshalling_type filled_id_permutation;
                     for (const auto &p : proof.id_permutation) {
                         filled_id_permutation.value().push_back(
-                            fill_lpc_proof<typename RedshiftProof::commitment_scheme_type_public, Endianness>(p));
+                            fill_lpc_proof<typename PlaceholderProof::commitment_scheme_type_public, Endianness>(p));
                     }
 
                     // std::vector<typename commitment_scheme_type_public::proof_type> sigma_permutation
                     lpc_public_proof_vector_marshalling_type filled_sigma_permutation;
                     for (const auto &p : proof.sigma_permutation) {
                         filled_sigma_permutation.value().push_back(
-                            fill_lpc_proof<typename RedshiftProof::commitment_scheme_type_public, Endianness>(p));
+                            fill_lpc_proof<typename PlaceholderProof::commitment_scheme_type_public, Endianness>(p));
                     }
 
                     // std::vector<typename commitment_scheme_type_public::proof_type> public_input
                     lpc_public_proof_vector_marshalling_type filled_public_input;
                     for (const auto &p : proof.public_input) {
                         filled_public_input.value().push_back(
-                            fill_lpc_proof<typename RedshiftProof::commitment_scheme_type_public, Endianness>(p));
+                            fill_lpc_proof<typename PlaceholderProof::commitment_scheme_type_public, Endianness>(p));
                     }
 
                     // std::vector<typename commitment_scheme_type_public::proof_type> constant
                     lpc_public_proof_vector_marshalling_type filled_constant;
                     for (const auto &p : proof.constant) {
                         filled_constant.value().push_back(
-                            fill_lpc_proof<typename RedshiftProof::commitment_scheme_type_public, Endianness>(p));
+                            fill_lpc_proof<typename PlaceholderProof::commitment_scheme_type_public, Endianness>(p));
                     }
 
                     // std::vector<typename commitment_scheme_type_public::proof_type> selector
                     lpc_public_proof_vector_marshalling_type filled_selector;
                     for (const auto &p : proof.selector) {
                         filled_selector.value().push_back(
-                            fill_lpc_proof<typename RedshiftProof::commitment_scheme_type_public, Endianness>(p));
+                            fill_lpc_proof<typename PlaceholderProof::commitment_scheme_type_public, Endianness>(p));
                     }
 
                     // std::vector<typename commitment_scheme_type_public::proof_type> special_selectors
                     lpc_public_proof_vector_marshalling_type filled_special_selectors;
                     for (const auto &p : proof.special_selectors) {
                         filled_special_selectors.value().push_back(
-                            fill_lpc_proof<typename RedshiftProof::commitment_scheme_type_public, Endianness>(p));
+                            fill_lpc_proof<typename PlaceholderProof::commitment_scheme_type_public, Endianness>(p));
                     }
 
-                    return redshift_evaluation_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>(
+                    return placeholder_evaluation_proof<nil::marshalling::field_type<Endianness>, PlaceholderProof>(
                         std::make_tuple(filled_challenge, filled_witness, filled_permutation, filled_quotient,
                                         filled_id_permutation, filled_sigma_permutation, filled_public_input,
                                         filled_constant, filled_selector, filled_special_selectors));
                 }
 
-                template<typename RedshiftProof, typename Endianness>
-                typename RedshiftProof::evaluation_proof make_redshift_evaluation_proof(
-                    const redshift_evaluation_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>
+                template<typename PlaceholderProof, typename Endianness>
+                typename PlaceholderProof::evaluation_proof make_placeholder_evaluation_proof(
+                    const placeholder_evaluation_proof<nil::marshalling::field_type<Endianness>, PlaceholderProof>
                         &filled_proof) {
 
-                    typename RedshiftProof::evaluation_proof proof;
+                    typename PlaceholderProof::evaluation_proof proof;
 
                     // typename FieldType::value_type challenge
                     proof.challenge = std::get<0>(filled_proof.value()).value();
@@ -264,72 +266,72 @@ namespace nil {
                     // std::vector<typename CommitmentSchemeTypeWitness::proof_type> witness
                     for (std::size_t i = 0; i < std::get<1>(filled_proof.value()).value().size(); ++i) {
                         proof.witness.emplace_back(
-                            make_lpc_proof<typename RedshiftProof::commitment_scheme_type_witness, Endianness>(
+                            make_lpc_proof<typename PlaceholderProof::commitment_scheme_type_witness, Endianness>(
                                 std::get<1>(filled_proof.value()).value().at(i)));
                     }
 
                     // std::vector<typename CommitmentSchemeTypePermutation::proof_type> permutation
                     for (std::size_t i = 0; i < std::get<2>(filled_proof.value()).value().size(); ++i) {
                         proof.permutation.emplace_back(
-                            make_lpc_proof<typename RedshiftProof::commitment_scheme_type_permutation, Endianness>(
+                            make_lpc_proof<typename PlaceholderProof::commitment_scheme_type_permutation, Endianness>(
                                 std::get<2>(filled_proof.value()).value().at(i)));
                     }
 
                     // std::vector<typename CommitmentSchemeTypeQuotient::proof_type> quotient
                     for (std::size_t i = 0; i < std::get<3>(filled_proof.value()).value().size(); ++i) {
                         proof.quotient.emplace_back(
-                            make_lpc_proof<typename RedshiftProof::commitment_scheme_type_quotient, Endianness>(
+                            make_lpc_proof<typename PlaceholderProof::commitment_scheme_type_quotient, Endianness>(
                                 std::get<3>(filled_proof.value()).value().at(i)));
                     }
 
                     // std::vector<typename commitment_scheme_type_public::proof_type> id_permutation
                     for (std::size_t i = 0; i < std::get<4>(filled_proof.value()).value().size(); ++i) {
                         proof.id_permutation.emplace_back(
-                            make_lpc_proof<typename RedshiftProof::commitment_scheme_type_public, Endianness>(
+                            make_lpc_proof<typename PlaceholderProof::commitment_scheme_type_public, Endianness>(
                                 std::get<4>(filled_proof.value()).value().at(i)));
                     }
 
                     // std::vector<typename commitment_scheme_type_public::proof_type> sigma_permutation
                     for (std::size_t i = 0; i < std::get<5>(filled_proof.value()).value().size(); ++i) {
                         proof.sigma_permutation.emplace_back(
-                            make_lpc_proof<typename RedshiftProof::commitment_scheme_type_public, Endianness>(
+                            make_lpc_proof<typename PlaceholderProof::commitment_scheme_type_public, Endianness>(
                                 std::get<5>(filled_proof.value()).value().at(i)));
                     }
 
                     // std::vector<typename commitment_scheme_type_public::proof_type> public_input
                     for (std::size_t i = 0; i < std::get<6>(filled_proof.value()).value().size(); ++i) {
                         proof.public_input.emplace_back(
-                            make_lpc_proof<typename RedshiftProof::commitment_scheme_type_public, Endianness>(
+                            make_lpc_proof<typename PlaceholderProof::commitment_scheme_type_public, Endianness>(
                                 std::get<6>(filled_proof.value()).value().at(i)));
                     }
 
                     // std::vector<typename commitment_scheme_type_public::proof_type> constant
                     for (std::size_t i = 0; i < std::get<7>(filled_proof.value()).value().size(); ++i) {
                         proof.constant.emplace_back(
-                            make_lpc_proof<typename RedshiftProof::commitment_scheme_type_public, Endianness>(
+                            make_lpc_proof<typename PlaceholderProof::commitment_scheme_type_public, Endianness>(
                                 std::get<7>(filled_proof.value()).value().at(i)));
                     }
 
                     // std::vector<typename commitment_scheme_type_public::proof_type> selector
                     for (std::size_t i = 0; i < std::get<8>(filled_proof.value()).value().size(); ++i) {
                         proof.selector.emplace_back(
-                            make_lpc_proof<typename RedshiftProof::commitment_scheme_type_public, Endianness>(
+                            make_lpc_proof<typename PlaceholderProof::commitment_scheme_type_public, Endianness>(
                                 std::get<8>(filled_proof.value()).value().at(i)));
                     }
 
                     // std::vector<typename commitment_scheme_type_public::proof_type> special_selectors
                     for (std::size_t i = 0; i < std::get<9>(filled_proof.value()).value().size(); ++i) {
                         proof.special_selectors.emplace_back(
-                            make_lpc_proof<typename RedshiftProof::commitment_scheme_type_public, Endianness>(
+                            make_lpc_proof<typename PlaceholderProof::commitment_scheme_type_public, Endianness>(
                                 std::get<9>(filled_proof.value()).value().at(i)));
                     }
 
                     return proof;
                 }
 
-                template<typename RedshiftProof, typename Endianness>
-                redshift_proof<nil::marshalling::field_type<Endianness>, RedshiftProof>
-                    fill_redshift_proof(const RedshiftProof &proof) {
+                template<typename PlaceholderProof, typename Endianness>
+                placeholder_proof<nil::marshalling::field_type<Endianness>, PlaceholderProof>
+                    fill_redshift_proof(const PlaceholderProof &proof) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
@@ -368,16 +370,16 @@ namespace nil {
                         filled_T_commitments.value().push_back(filled_c);
                     }
 
-                    return redshift_proof<TTypeBase, RedshiftProof>(
-                        std::make_tuple(filled_v_perm_commitment, filled_witness_commitments, filled_T_commitments,
-                                        fill_redshift_evaluation_proof<RedshiftProof, Endianness>(proof.eval_proof)));
+                    return placeholder_proof<TTypeBase, PlaceholderProof>(std::make_tuple(
+                        filled_v_perm_commitment, filled_witness_commitments, filled_T_commitments,
+                        fill_placeholder_evaluation_proof<PlaceholderProof, Endianness>(proof.eval_proof)));
                 }
 
-                template<typename RedshiftProof, typename Endianness>
-                RedshiftProof make_redshift_proof(
-                    const redshift_proof<nil::marshalling::field_type<Endianness>, RedshiftProof> &filled_proof) {
+                template<typename PlaceholderProof, typename Endianness>
+                PlaceholderProof make_placeholder_proof(
+                    const placeholder_proof<nil::marshalling::field_type<Endianness>, PlaceholderProof> &filled_proof) {
 
-                    RedshiftProof proof;
+                    PlaceholderProof proof;
 
                     // typename CommitmentSchemeTypePermutation::commitment_type v_perm_commitment
                     assert(proof.v_perm_commitment.size() == std::get<0>(filled_proof.value()).value().size());
@@ -387,7 +389,7 @@ namespace nil {
 
                     // std::vector<typename CommitmentSchemeTypeWitness::commitment_type> witness_commitments
                     for (std::size_t i = 0; i < std::get<1>(filled_proof.value()).value().size(); ++i) {
-                        typename RedshiftProof::commitment_scheme_type_witness::commitment_type comm;
+                        typename PlaceholderProof::commitment_scheme_type_witness::commitment_type comm;
                         assert(comm.size() == std::get<1>(filled_proof.value()).value().at(i).value().size());
                         for (std::size_t j = 0; j < std::get<1>(filled_proof.value()).value().at(i).value().size();
                              ++j) {
@@ -398,7 +400,7 @@ namespace nil {
 
                     // std::vector<typename CommitmentSchemeTypeQuotient::commitment_type> T_commitments
                     for (std::size_t i = 0; i < std::get<2>(filled_proof.value()).value().size(); ++i) {
-                        typename RedshiftProof::commitment_scheme_type_quotient::commitment_type comm;
+                        typename PlaceholderProof::commitment_scheme_type_quotient::commitment_type comm;
                         assert(comm.size() == std::get<2>(filled_proof.value()).value().at(i).value().size());
                         for (std::size_t j = 0; j < std::get<2>(filled_proof.value()).value().at(i).value().size();
                              ++j) {
@@ -408,8 +410,8 @@ namespace nil {
                     }
 
                     // evaluation_proof eval_proof
-                    proof.eval_proof =
-                        make_redshift_evaluation_proof<RedshiftProof, Endianness>(std::get<3>(filled_proof.value()));
+                    proof.eval_proof = make_placeholder_evaluation_proof<PlaceholderProof, Endianness>(
+                        std::get<3>(filled_proof.value()));
 
                     return proof;
                 }
@@ -417,4 +419,4 @@ namespace nil {
         }        // namespace marshalling
     }            // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_MARSHALLING_REDSHIFT_PROOF_HPP
+#endif    // CRYPTO3_MARSHALLING_PLACEHOLDER_PROOF_HPP
