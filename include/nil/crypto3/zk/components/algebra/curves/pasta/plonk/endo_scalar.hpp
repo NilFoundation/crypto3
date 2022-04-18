@@ -88,7 +88,10 @@ namespace nil {
                     };
 
                     struct result_type {
-                        var endo_scalar;
+                        var endo_scalar = var(0, 0, false);
+                        result_type(const std::size_t &component_start_row) {
+                            endo_scalar = var(W6, component_start_row + required_rows_amount - 1, false, var::column_type::witness);
+                        }
                     };
 
                     struct allocated_data_type {
@@ -106,7 +109,7 @@ namespace nil {
                         return in_bp.allocate_rows(required_rows_amount);
                     }
 
-                    static void generate_circuit(
+                    static result_type generate_circuit(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
@@ -115,6 +118,7 @@ namespace nil {
 
                         generate_gates(bp, assignment, params, allocated_data, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
+                        return result_type(component_start_row);
                     }
 
                     static result_type generate_assignments(
@@ -177,7 +181,7 @@ namespace nil {
                             assignment.witness(W6)[row - 1] = res;
 
                             std::cout<<"circuit result "<<res.data<<std::endl;
-                            return result_type { var(W6, row - 1, false) };
+                            return result_type(component_start_row);
                     }
 
                     private:
@@ -195,7 +199,6 @@ namespace nil {
                         if (!allocated_data.previously_allocated) {
                             selector_index_1 = assignment.add_selector(j, j + required_rows_amount - 1);
                             selector_index_2 = assignment.add_selector(j + required_rows_amount - 1);
-                            allocated_data.previously_allocated = true;
                             allocated_data.selector_1 = selector_index_1;
                             allocated_data.selector_2 = selector_index_2;
                         } else {
@@ -249,15 +252,16 @@ namespace nil {
                             (1 << 6) * var(W11, 0) + (1 << 4) * var(W12, 0) + (1 << 2) * var(W13, 0) +
                             var(W14, 0)));
 
-                        bp.add_gate(selector_index_1, 
+                        auto constraint_12 = bp.add_constraint(var(W6, 0) - 
+                            (params.endo_factor * var(W4, 0) + var(W5, 0)));
+                        if (!allocated_data.previously_allocated) {
+                            bp.add_gate(selector_index_2, {constraint_12});
+                            bp.add_gate(selector_index_1, 
                             {constraint_1, constraint_2, constraint_3, constraint_4,
                             constraint_5, constraint_6, constraint_7, constraint_8,
                             constraint_9, constraint_10, constraint_11});
-
-                        auto constraint_12 = bp.add_constraint(var(W6, 0) - 
-                            (params.endo_factor * var(W4, 0) + var(W5, 0)));
-
-                        bp.add_gate(selector_index_2, {constraint_12});
+                        }
+                        allocated_data.previously_allocated = true;
                     }
 
                     static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,

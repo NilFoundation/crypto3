@@ -88,6 +88,15 @@ namespace nil {
                         var_ec_point Q;
                     };
 
+                    struct result_type {
+                        var X = var(0, 0, false);
+                        var Y = var(0, 0, false);
+                        result_type(const std::size_t &component_start_row) {
+                            X = var(W4, component_start_row, false, var::column_type::witness);
+                            Y = var(W5, component_start_row, false, var::column_type::witness);
+                        }
+                    };
+
                     struct allocated_data_type {
                         allocated_data_type() {
                             previously_allocated = false;
@@ -104,7 +113,7 @@ namespace nil {
                             components_amount);
                     }
 
-                    static void generate_circuit(
+                    static result_type generate_circuit(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
@@ -113,9 +122,10 @@ namespace nil {
 
                         generate_gates(bp, assignment, params, allocated_data, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
+                        return result_type(component_start_row);
                     }
 
-                    static void generate_assignments(
+                    static result_type generate_assignments(
                             blueprint_assignment_table<ArithmetizationType>
                                 &assignment,
                             const params_type &params,
@@ -172,6 +182,7 @@ namespace nil {
 
                             assignment.witness(W10)[j] = 0;
                         }
+                        return result_type(component_start_row);
                     }
 
                     private:
@@ -185,7 +196,6 @@ namespace nil {
                         std::size_t selector_index;
                         if (!allocated_data.previously_allocated) {
                             selector_index = assignment.add_selector(row_start_index);
-                            allocated_data.previously_allocated = true;
                             allocated_data.add_selector = selector_index;
                         } else {
                             selector_index = allocated_data.add_selector;
@@ -211,12 +221,14 @@ namespace nil {
                             (var(W3, 0) - var(W1, 0)) * (var(W7, 0) - var(W6, 0)));
                         auto constraint_7 = bp.add_constraint(
                             (var(W3, 0) - var(W1, 0)) * var(W9, 0) - var(W6, 0));
-
-                        bp.add_gate(selector_index, 
-                            { constraint_1, constraint_2, constraint_3,
-                            constraint_4, constraint_5, constraint_6,
-                            constraint_7
-                        });
+                        if (!allocated_data.previously_allocated) {
+                            bp.add_gate(selector_index, 
+                                { constraint_1, constraint_2, constraint_3,
+                                constraint_4, constraint_5, constraint_6,
+                                constraint_7
+                            });
+                        }
+                        allocated_data.previously_allocated = true;
                     }
 
                     static void generate_copy_constraints(

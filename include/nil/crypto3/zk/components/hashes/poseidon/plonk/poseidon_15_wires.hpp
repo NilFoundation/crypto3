@@ -389,30 +389,52 @@ namespace nil {
                     constexpr static const std::size_t required_rows_amount = 12;
 
                     struct params_type {
-                        std::array<typename ArithmetizationType::field_type::value_type, state_size> input_state;
+                        std::array<var, state_size> input_state;
+                    };
+
+                    struct allocated_data_type {
+                        allocated_data_type() {
+                            previously_allocated = false;
+                        }
+
+                        // TODO access modifiers
+                        bool previously_allocated;
+                        std::array<std::size_t, 11> selectors;
+                    };
+
+                    struct result_type {
+                        std::array<var, state_size> output_state = {var(0, 0, false), var(0, 0, false), var(0, 0, false)};
+
+                        result_type(const std::size_t &component_start_row) {
+                            std::array<var, state_size> output_state = {var(W0, component_start_row + required_rows_amount - 1, false),
+                            var(W1, component_start_row + required_rows_amount - 1, false), var(W2, component_start_row + required_rows_amount - 1, false)};
+                        }
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
                         return bp.allocate_rows(required_rows_amount);
                     }
 
-                    static void generate_circuit(
+                    static result_type generate_circuit(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
+                        allocated_data_type &allocated_data,
                         const std::size_t &component_start_row) {
 
-                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_gates(bp, assignment, params, allocated_data, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
+                        return result_type(component_start_row);
                     }
 
-                    static void generate_assignments(
+                    static result_type generate_assignments(
                         blueprint_assignment_table<ArithmetizationType>
                             &assignment,
                         const params_type &params,
                         const std::size_t &component_start_row) {
 
-                        std::array<typename ArithmetizationType::field_type::value_type, state_size> state = params.input_state;
+                        std::array<typename ArithmetizationType::field_type::value_type, state_size> state = {assignment.var_value(params.input_state[0]),
+                        assignment.var_value(params.input_state[1]), assignment.var_value(params.input_state[2])};
                         std::array<typename ArithmetizationType::field_type::value_type, state_size> next_state;
 
                         
@@ -459,6 +481,7 @@ namespace nil {
                             state = next_state;
                         }
                         std::cout<<"Circuit result: "<<state[0].data<<" "<< state[1].data<<" " <<state[2].data<<std::endl;
+                        return result_type(component_start_row);
                     }
 
                     private:
@@ -466,10 +489,18 @@ namespace nil {
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
+                        allocated_data_type &allocated_data,
                         const std::size_t &component_start_row) {
                         std::size_t j = component_start_row;
                         for (std::size_t z = 0; z < rounds_amount; z += rounds_per_row){
-                            std::size_t selector_index = assignment.add_selector(j);
+                            std::size_t selector_index;
+                        if (!allocated_data.previously_allocated) {
+                            selector_index = assignment.add_selector(j);
+                            allocated_data.selectors[j - component_start_row] = selector_index;
+                        } else {
+                            selector_index = allocated_data.selectors[j - component_start_row];
+                            assignment.enable_selector(selector_index, j); 
+                        }
                             auto constraint_1 = bp.add_constraint(var(W3, 0) -
                                 (var(W0, 0).pow(sbox_alpha) * mds[0][0] +
                                 var(W1, 0).pow(sbox_alpha) * mds[0][1] +
@@ -534,13 +565,15 @@ namespace nil {
                                 (var(W12, 0).pow(sbox_alpha) * mds[2][0] +
                                  var(W13, 0).pow(sbox_alpha) * mds[2][1] +
                                  var(W14, 0).pow(sbox_alpha) * mds[2][2] + round_constant[z + 4][2]));
-
-                            bp.add_gate(selector_index,
-                            {constraint_1, constraint_2, constraint_3,
-                                          constraint_4, constraint_5, constraint_6, constraint_7, constraint_8, constraint_9, constraint_10,
-                                          constraint_11, constraint_12, constraint_13, constraint_14, constraint_15});
+                            if (!allocated_data.previously_allocated) {
+                                bp.add_gate(selector_index,
+                                {constraint_1, constraint_2, constraint_3,
+                                            constraint_4, constraint_5, constraint_6, constraint_7, constraint_8, constraint_9, constraint_10,
+                                            constraint_11, constraint_12, constraint_13, constraint_14, constraint_15});
+                            }
                             j++;
                         }
+                        allocated_data.previously_allocated = true;
                     }
 
                     static void generate_copy_constraints(

@@ -81,25 +81,51 @@ namespace nil {
                     constexpr static const std::size_t required_rows_amount = 102;
 
                     struct params_type {
-                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type T;
-                        typename CurveType::scalar_field_type::value_type b;
+                        struct var_ec_point {
+                            var x;
+                            var y;
+                        };
+                        
+                        var_ec_point T;
+                        var b;
+                    };
+
+                    struct result_type {
+                        var X = var(0, 0, false);
+                        var Y = var(0, 0, false);
+                        result_type(const std::size_t &component_start_row) {
+                            X = var(W0, component_start_row + required_rows_amount, false, var::column_type::witness);
+                            Y = var(W1, component_start_row + required_rows_amount, false, var::column_type::witness);
+                        }
+                    };
+
+                    struct allocated_data_type {
+                        allocated_data_type() {
+                            previously_allocated = false;
+                        }
+
+                        // TODO access modifiers
+                        bool previously_allocated;
+                        std::size_t vbsm_selector_index;
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
                         return bp.allocate_rows(required_rows_amount);
                     }
 
-                    static void generate_circuit(
+                    static result_type generate_circuit(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
+                        allocated_data_type &allocated_data,
                         const std::size_t &component_start_row) {
 
-                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_gates(bp, assignment, params, allocated_data, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
+                        return result_type(component_start_row);
                     }
 
-                    static void generate_assignments(
+                    static result_type generate_assignments(
                         blueprint_assignment_table<ArithmetizationType>
                             &assignment,
                         const params_type &params,
@@ -107,16 +133,19 @@ namespace nil {
 
                             const std::size_t &j = component_start_row;
                             assignment.public_input(0)[j] = ArithmetizationType::field_type::value_type::zero();
-
-                            const typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type &T = params.T;
+                            typename BlueprintFieldType::value_type b = assignment.var_value(params.b);
+                            typename BlueprintFieldType::value_type T_x = assignment.var_value(params.T.x);
+                            typename BlueprintFieldType::value_type T_y = assignment.var_value(params.T.y);
+                            typename CurveType::template 
+                            g1_type<algebra::curves::coordinates::affine>::value_type T(T_x, T_y);
 
                             std::array<typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type, 6> P;
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type Q;
 
-                            std::array<bool, CurveType::scalar_field_type::modulus_bits + 1> b = {false};
-                            typename CurveType::scalar_field_type::integral_type integral_b = typename CurveType::scalar_field_type::integral_type(params.b.data);
+                            std::array<bool, CurveType::scalar_field_type::modulus_bits + 1> bits = {false};
+                            typename CurveType::scalar_field_type::integral_type integral_b = typename CurveType::scalar_field_type::integral_type(b.data);
                             for (std::size_t i = 0; i < CurveType::scalar_field_type::modulus_bits; i++) {
-                                b[CurveType::scalar_field_type::modulus_bits - i - 1] = multiprecision::bit_test(integral_b, i);
+                                bits[CurveType::scalar_field_type::modulus_bits - i - 1] = multiprecision::bit_test(integral_b, i);
                             }
                             typename ArithmetizationType::field_type::value_type n = 0;
                             typename ArithmetizationType::field_type::value_type n_next = 0;
@@ -133,43 +162,44 @@ namespace nil {
                                 assignment.witness(W2)[i] = P[0].X;
                                 assignment.witness(W3)[i] = P[0].Y;
                                 assignment.witness(W4)[i] = n;
-                                n_next = 32*n + 16*b[((i - j) / 2)*5] + 8*b[((i - j) / 2)*5 + 1] + 4* b[((i - j) / 2)*5 + 2] +
-                                    2*b[((i - j) / 2)*5 + 3] + b[((i - j) / 2)*5 + 4];
+                                n_next = 32*n + 16*bits[((i - j) / 2)*5] + 8*bits[((i - j) / 2)*5 + 1] + 4* bits[((i - j) / 2)*5 + 2] +
+                                    2*bits[((i - j) / 2)*5 + 3] + bits[((i - j) / 2)*5 + 4];
                                 assignment.witness(W5)[i] = n_next;
                                 Q.X = T.X;
-                                Q.Y = (2 * b[((i - j) / 2)*5] -1)*T.Y;
+                                Q.Y = (2 * bits[((i - j) / 2)*5] -1)*T.Y;
                                 P[1] = 2 * P[0] + Q;
                                 assignment.witness(W7)[i] =P[1].X;
                                 assignment.witness(W8)[i] =P[1].Y;
                                 assignment.witness(W7)[i + 1] = (P[0].Y - Q.Y) * (P[0].X - Q.X).inversed();
-                                Q.Y = (2 * b[((i - j) / 2)*5 + 1] -1)*T.Y;
+                                Q.Y = (2 * bits[((i - j) / 2)*5 + 1] -1)*T.Y;
                                 P[2] = 2 * P[1] + Q;
                                 assignment.witness(W9)[i] =P[2].X;
                                 assignment.witness(W10)[i] = P[2].Y;
                                 assignment.witness(W8)[i + 1] = (P[1].Y - Q.Y) * (P[1].X - Q.X).inversed();
-                                Q.Y = (2 * b[((i - j) / 2)*5 + 2] -1)*T.Y;
+                                Q.Y = (2 * bits[((i - j) / 2)*5 + 2] -1)*T.Y;
                                 P[3] = 2 * P[2] + Q;
                                 assignment.witness(W11)[i] =P[3].X;
                                 assignment.witness(W12)[i] = P[3].Y;
                                 assignment.witness(W9)[i + 1] = (P[2].Y - Q.Y) * (P[2].X - Q.X).inversed();
-                                Q.Y = (2 * b[((i - j) / 2)*5 + 3] -1)*T.Y;
+                                Q.Y = (2 * bits[((i - j) / 2)*5 + 3] -1)*T.Y;
                                 P[4] = 2 * P[3] + Q;
                                 assignment.witness(W13)[i] =P[4].X;
                                 assignment.witness(W14)[i] = P[4].Y;
                                 assignment.witness(W10)[i + 1] = (P[3].Y - Q.Y) * (P[3].X - Q.X).inversed();
-                                Q.Y = (2 * b[((i - j) / 2)*5 + 4] -1)*T.Y;
+                                Q.Y = (2 * bits[((i - j) / 2)*5 + 4] -1)*T.Y;
                                 P[5] = 2 * P[4] + Q;
                                 assignment.witness(W0)[i + 1] = P[5].X;
                                 assignment.witness(W1)[i + 1] = P[5].Y;  
                                 assignment.witness(W11)[i + 1] = (P[4].Y - Q.Y) * (P[4].X - Q.X).inversed();
 
-                                assignment.witness(W2)[i + 1] = b[((i - j) / 2)*5];
-                                assignment.witness(W3)[i + 1] = b[((i - j) / 2)*5 + 1];
-                                assignment.witness(W4)[i + 1] = b[((i - j) / 2)*5 + 2];
-                                assignment.witness(W5)[i + 1] = b[((i - j) / 2)*5 + 3];
-                                assignment.witness(W6)[i + 1] = b[((i - j) / 2)*5 + 4];
+                                assignment.witness(W2)[i + 1] = bits[((i - j) / 2)*5];
+                                assignment.witness(W3)[i + 1] = bits[((i - j) / 2)*5 + 1];
+                                assignment.witness(W4)[i + 1] = bits[((i - j) / 2)*5 + 2];
+                                assignment.witness(W5)[i + 1] = bits[((i - j) / 2)*5 + 3];
+                                assignment.witness(W6)[i + 1] = bits[((i - j) / 2)*5 + 4];
                             }
-                                std::cout<<"circuit result "<< P[5].X.data<< " "<< P[5].Y.data<<std::endl;
+                            std::cout<<"circuit result "<< P[5].X.data<< " "<< P[5].Y.data<<std::endl;
+                            return result_type(component_start_row);
 
                     }
 
@@ -178,12 +208,19 @@ namespace nil {
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
+                        allocated_data_type &allocated_data,
                         const std::size_t &component_start_row) {
 
                         const std::size_t &j = component_start_row;
 
-                        std::size_t vbsm_selector_index =
-                            assignment.add_selector(j, j + required_rows_amount - 1, 2);
+                        std::size_t vbsm_selector_index;
+                        if (!allocated_data.previously_allocated) {
+                            vbsm_selector_index = assignment.add_selector(j, j + required_rows_amount - 1, 2);
+                            allocated_data.vbsm_selector_index = vbsm_selector_index;
+                        } else {
+                            vbsm_selector_index = allocated_data.vbsm_selector_index;
+                            assignment.enable_selector(vbsm_selector_index, j, j + required_rows_amount - 1, 2); 
+                        }
 
                         auto bit_check_1 = bp.add_bit_check(var(W2, +1));
                         auto bit_check_2 = bp.add_bit_check(var(W3, +1));
@@ -252,12 +289,15 @@ namespace nil {
                         auto constraint_16 = bp.add_constraint(
                             var(W5, 0) - (32 * (var(W4, 0)) + 16 * var(W2, +1) + 8 * var(W3, +1) + 4 * var(W4, +1) +
                                           2 * var(W5, +1) + var(W6, +1)));
-                        bp.add_gate(vbsm_selector_index,
-                                          {bit_check_1,   bit_check_2,   bit_check_3,   bit_check_4,   bit_check_5,
-                                           constraint_1,  constraint_2,  constraint_3,  constraint_4,  constraint_5,
-                                           constraint_6,  constraint_7,  constraint_8,  constraint_9,  constraint_10,
-                                           constraint_11, constraint_12, constraint_13, constraint_14, constraint_15,
-                                           constraint_16});
+                        if (!allocated_data.previously_allocated) {
+                            bp.add_gate(vbsm_selector_index,
+                                            {bit_check_1,   bit_check_2,   bit_check_3,   bit_check_4,   bit_check_5,
+                                            constraint_1,  constraint_2,  constraint_3,  constraint_4,  constraint_5,
+                                            constraint_6,  constraint_7,  constraint_8,  constraint_9,  constraint_10,
+                                            constraint_11, constraint_12, constraint_13, constraint_14, constraint_15,
+                                            constraint_16});
+                        }
+                        allocated_data.previously_allocated = true; 
                     }
 
                     static void generate_copy_constraints(
