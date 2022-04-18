@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PROOF_HPP
-#define CRYPTO3_ZK_PLONK_REDSHIFT_PROOF_HPP
+#ifndef CRYPTO3_ZK_PLONK_PLACEHOLDER_PROOF_HPP
+#define CRYPTO3_ZK_PLONK_PLACEHOLDER_PROOF_HPP
 
 namespace nil {
     namespace crypto3 {
@@ -35,7 +35,7 @@ namespace nil {
                 template<typename FieldType, typename CommitmentSchemeTypeWitness,
                          typename CommitmentSchemeTypePermutation, typename CommitmentSchemeTypeQuotient,
                          typename CommitmentSchemeTypePublic>
-                struct redshift_proof {
+                struct placeholder_proof {
                     typedef FieldType field_type;
                     typedef CommitmentSchemeTypeWitness commitment_scheme_type_witness;
                     typedef CommitmentSchemeTypePermutation commitment_scheme_type_permutation;
@@ -68,7 +68,7 @@ namespace nil {
                         }
                     };
 
-                    redshift_proof() {
+                    placeholder_proof() {
                     }
 
                     typename CommitmentSchemeTypeWitness::commitment_type witness_commitment;
@@ -85,11 +85,11 @@ namespace nil {
 
                     evaluation_proof eval_proof;
 
-                    bool operator==(const redshift_proof &rhs) const {
+                    bool operator==(const placeholder_proof &rhs) const {
                         return witness_commitment == rhs.witness_commitment && T_commitments == rhs.T_commitments &&
                                v_perm_commitment == rhs.v_perm_commitment && eval_proof == rhs.eval_proof;
                     }
-                    bool operator!=(const redshift_proof &rhs) const {
+                    bool operator!=(const placeholder_proof &rhs) const {
                         return !(rhs == *this);
                     }
                 };
@@ -98,4 +98,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_PROOF_HPP
+#endif    // CRYPTO3_ZK_PLONK_PLACEHOLDER_PROOF_HPP

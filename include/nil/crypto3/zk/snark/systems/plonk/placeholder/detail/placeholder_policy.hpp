@@ -27,8 +27,8 @@
 //
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PLONK_REDSHIFT_TYPES_POLICY_HPP
-#define CRYPTO3_PLONK_REDSHIFT_TYPES_POLICY_HPP
+#ifndef CRYPTO3_PLONK_PLACEHOLDER_TYPES_POLICY_HPP
+#define CRYPTO3_PLONK_PLACEHOLDER_TYPES_POLICY_HPP
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
@@ -37,8 +37,8 @@
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/proof.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -46,7 +46,7 @@ namespace nil {
             namespace snark {
                 namespace detail {
                     template<typename FieldType, typename RedshiftParams>
-                    struct redshift_policy {
+                    struct placeholder_policy {
 
                         constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
                         constexpr static const std::size_t public_input_columns = 
@@ -84,7 +84,7 @@ namespace nil {
                         template<typename CommitmentSchemeTypeWitness, typename CommitmentSchemeTypePermutation,
                                  typename CommitmentSchemeTypeQuotient, typename CommitmentSchemeTypePublic>
                         using proof_type =
-                            redshift_proof<FieldType, CommitmentSchemeTypeWitness, CommitmentSchemeTypePermutation,
+                            placeholder_proof<FieldType, CommitmentSchemeTypeWitness, CommitmentSchemeTypePermutation,
                                            CommitmentSchemeTypeQuotient, CommitmentSchemeTypePublic>;
 
                         struct preprocessed_public_data_type {
@@ -153,4 +153,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PLONK_REDSHIFT_TYPES_POLICY_HPP
+#endif    // CRYPTO3_PLONK_PLACEHOLDER_TYPES_POLICY_HPP

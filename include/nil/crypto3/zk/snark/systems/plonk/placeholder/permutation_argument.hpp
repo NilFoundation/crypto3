@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PERMUTATION_ARGUMENT_HPP
-#define CRYPTO3_ZK_PLONK_REDSHIFT_PERMUTATION_ARGUMENT_HPP
+#ifndef CRYPTO3_ZK_PLONK_PLACEHOLDER_PERMUTATION_ARGUMENT_HPP
+#define CRYPTO3_ZK_PLONK_PLACEHOLDER_PERMUTATION_ARGUMENT_HPP
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/shift.hpp>
@@ -38,8 +38,8 @@
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -49,12 +49,12 @@ namespace nil {
                          typename CommitmentSchemeTypePublic,
                          typename CommitmentSchemeTypePermutation,
                          typename ParamsType>
-                class redshift_permutation_argument {
+                class placeholder_permutation_argument {
 
                     using transcript_hash_type = typename ParamsType::transcript_hash_type;
                     using transcript_type = transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
 
-                    typedef detail::redshift_policy<FieldType, ParamsType> policy_type;
+                    typedef detail::placeholder_policy<FieldType, ParamsType> policy_type;
 
                     static constexpr std::size_t argument_size = 3;
 
@@ -204,4 +204,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // #ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PERMUTATION_ARGUMENT_HPP
+#endif    // #ifndef CRYPTO3_ZK_PLONK_PLACEHOLDER_PERMUTATION_ARGUMENT_HPP
