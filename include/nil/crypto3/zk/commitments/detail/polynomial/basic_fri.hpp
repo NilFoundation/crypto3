@@ -81,11 +81,11 @@ namespace nil {
                     /**
                      * @brief Based on the FRI Commitment description from \[ResShift].
                      * @tparam d ...
-                     * @tparam Rounds Denoted by r in \[RedShift].
+                     * @tparam Rounds Denoted by r in \[Placeholder].
                      *
                      * References:
-                     * \[RedShift]:
-                     * "REDSHIFT: Transparent SNARKs from List
+                     * \[Placeholder]:
+                     * "PLACEHOLDER: Transparent SNARKs from List
                      * Polynomial Commitment IOPs",
                      * Assimakis Kattis, Konstantin Panarin, Alexander Vlasov,
                      * Matter Labs,

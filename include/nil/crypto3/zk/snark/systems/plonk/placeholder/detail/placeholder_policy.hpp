@@ -23,7 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of types for Redshift PLONK scheme.
+// @file Declaration of types for Placeholder PLONK scheme.
 //
 //---------------------------------------------------------------------------//
 
@@ -45,16 +45,16 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace detail {
-                    template<typename FieldType, typename RedshiftParams>
+                    template<typename FieldType, typename PlaceholderParams>
                     struct placeholder_policy {
 
-                        constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
+                        constexpr static const std::size_t witness_columns = PlaceholderParams::witness_columns;
                         constexpr static const std::size_t public_input_columns = 
-                            RedshiftParams::public_input_columns;
-                        constexpr static const std::size_t constant_columns = RedshiftParams::constant_columns;
-                        constexpr static const std::size_t selector_columns = RedshiftParams::selector_columns;                       
+                            PlaceholderParams::public_input_columns;
+                        constexpr static const std::size_t constant_columns = PlaceholderParams::constant_columns;
+                        constexpr static const std::size_t selector_columns = PlaceholderParams::selector_columns;                       
 
-                        using arithmetization_params = typename RedshiftParams::arithmetization_params;
+                        using arithmetization_params = typename PlaceholderParams::arithmetization_params;
                         /******************************** Params ********************************/
 
                         /**
@@ -65,7 +65,7 @@ namespace nil {
                             constraint_system_type;
 
                         typedef FieldType field_type;
-                        typedef RedshiftParams redshift_params_type;
+                        typedef PlaceholderParams placeholder_params_type;
 
                         typedef plonk_assignment_table<FieldType, arithmetization_params>
                             variable_assignment_type;
@@ -75,7 +75,7 @@ namespace nil {
                         /*********************************** Proof ***********************************/
 
                         /**
-                         * A proof for the Redshift cheme.
+                         * A proof for the Placeholder cheme.
                          *
                          * While the proof has a structure, externally one merely opaquely produces,
                          * serializes/deserializes, and verifies proofs. We only expose some information
@@ -88,7 +88,7 @@ namespace nil {
                                            CommitmentSchemeTypeQuotient, CommitmentSchemeTypePublic>;
 
                         struct preprocessed_public_data_type {
-                            typedef typename RedshiftParams::commitment_scheme_public_type
+                            typedef typename PlaceholderParams::commitment_scheme_public_type
                                 commitment_scheme_public_type;
 
                             struct public_precommitments {

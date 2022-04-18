@@ -479,12 +479,12 @@ namespace nil {
                         std::vector<math::polynomial<typename FieldType::value_type>> _permutation_polynomials =
                             permutation_polynomials(
                                 columns_with_copy_constraints, N_rows, basic_domain->get_domain_element(1),
-                                policy_type::redshift_params_type::delta, permutation, basic_domain);
+                                policy_type::placeholder_params_type::delta, permutation, basic_domain);
 
                         std::vector<math::polynomial<typename FieldType::value_type>> _identity_polynomials =
                             identity_polynomials(columns_with_copy_constraints, N_rows,
                                                  basic_domain->get_domain_element(1),
-                                                 policy_type::redshift_params_type::delta, basic_domain);
+                                                 policy_type::placeholder_params_type::delta, basic_domain);
 
                         math::polynomial<typename FieldType::value_type> lagrange_0 =
                             lagrange_polynomial(basic_domain, 0);

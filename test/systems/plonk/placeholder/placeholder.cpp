@@ -24,7 +24,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE redshift_test
+#define BOOST_TEST_MODULE placeholder_test
 
 #include <string>
 
@@ -82,7 +82,7 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log) {
     return params;
 }
 
-BOOST_AUTO_TEST_SUITE(redshift_prover_test_suite)
+BOOST_AUTO_TEST_SUITE(placeholder_prover_test_suite)
 
 // using curve_type = algebra::curves::bls12<381>;
 using curve_type = algebra::curves::pallas;
@@ -412,7 +412,7 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
     }
 }
 
-BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
+BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
 
     circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
         circuit_test_2<FieldType>();
@@ -516,7 +516,7 @@ BOOST_AUTO_TEST_CASE(redshift_gate_argument_test) {
     BOOST_CHECK(prover_res[0].evaluate(y) == verifier_res[0]);
 }
 
-BOOST_AUTO_TEST_CASE(redshift_prover_basic_test) {
+BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
 
     circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
         circuit_test_2<FieldType>();
