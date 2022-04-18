@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 	typedef zk::snark::redshift_preprocessor <typename curve_type::base_field_type, 5, 1> preprocess_type;
 
     auto preprocessed_data = preprocess_type::process(cs, assignments);
-	typedef zk::snark::redshift_prover <typename curve_type::base_field_type, 5, 5, 1, 5> prove_type;
+	typedef zk::snark::placeholder_prover <typename curve_type::base_field_type, 5, 5, 1, 5> prove_type;
 	auto proof = prove_type::process(preprocessed_data, cs, assignments);
 }
 
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(variable_base_scalar_mul_9_wires_test_case) {
 	typedef zk::snark::redshift_preprocessor <typename curve_type::base_field_type, 9, 1> preprocess_type;
 
     auto preprocessed_data = preprocess_type::process(cs, assignments);
-	typedef zk::snark::redshift_prover <typename curve_type::base_field_type, 9, 5, 1, 5> prove_type;
+	typedef zk::snark::placeholder_prover <typename curve_type::base_field_type, 9, 5, 1, 5> prove_type;
 	auto proof = prove_type::process(preprocessed_data, cs, assignments);
 }*/
 

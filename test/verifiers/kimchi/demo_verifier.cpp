@@ -42,7 +42,7 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/proof.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/proof.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
@@ -52,7 +52,7 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
-#include <nil/crypto3/marshalling/zk/types/redshift/proof.hpp>
+#include <nil/crypto3/marshalling/zk/types/placeholder/proof.hpp>
 
 #include "test_plonk_component.hpp"
 #include "proof_data.hpp"
@@ -118,8 +118,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(private_assignment,
                                                                                              public_assignment);
 
-    using params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams, hash_type, hash_type, Lambda>;
-    using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
+    using params = zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, hash_type, hash_type, Lambda>;
+    using types = zk::snark::detail::placeholder_policy<BlueprintFieldType, params>;
 
     using fri_type = typename zk::commitments::fri<BlueprintFieldType, typename params::merkle_hash_type,
                                                    typename params::transcript_hash_type, 2>;
@@ -134,15 +134,15 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
         zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, desc,
                                                                                      fri_params, permutation_size);
     typename types::preprocessed_private_data_type private_preprocessed_data =
-        zk::snark::redshift_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment, desc);
+        zk::snark::placeholder_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment, desc);
 
-    auto redshift_proof = zk::snark::redshift_prover<BlueprintFieldType, params>::process(
+    auto redshift_proof = zk::snark::placeholder_prover<BlueprintFieldType, params>::process(
         public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
     using proof_marshalling_type =
-        nil::crypto3::marshalling::types::redshift_proof<TTypeBase, decltype(redshift_proof)>;
+        nil::crypto3::marshalling::types::placeholder_proof<TTypeBase, decltype(redshift_proof)>;
     auto filled_redshift_proof =
         nil::crypto3::marshalling::types::fill_redshift_proof<decltype(redshift_proof), Endianness>(redshift_proof);
     std::vector<std::uint8_t> cv;
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     nil::marshalling::status_type status = filled_redshift_proof.write(write_iter, cv.size());
     std::cout << "proof (" << cv.size() << " bytes) = " << std::endl;
     std::ofstream proof_file;
-    proof_file.open("redshift.txt");
+    proof_file.open("placeholder.txt");
     print_byteblob(proof_file, cv.cbegin(), cv.cend());
 
     std::cout << "modulus = " << BlueprintFieldType::modulus << std::endl;
@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     }
     std::cout << "}" << std::endl;
 
-    bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, params>::process(
+    bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, params>::process(
         public_preprocessed_data, redshift_proof, bp, fri_params);
     std::cout << "Proof check: " << verifier_res << std::endl;
 }
