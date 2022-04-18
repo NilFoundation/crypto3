@@ -40,7 +40,7 @@
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/lpc.hpp>
 
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,7 +48,7 @@ namespace nil {
             namespace types {
                 template<typename TTypeBase, typename RedshiftPolicy,
                          typename = typename std::enable_if<
-                             std::is_same<RedshiftPolicy, nil::crypto3::zk::snark::detail::redshift_policy<
+                             std::is_same<RedshiftPolicy, nil::crypto3::zk::snark::detail::placeholder_policy<
                                                               typename RedshiftPolicy::field_type,
                                                               typename RedshiftPolicy::redshift_params_type>>::value,
                              bool>::type,
