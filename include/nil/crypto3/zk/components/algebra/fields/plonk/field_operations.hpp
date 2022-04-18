@@ -2,6 +2,7 @@
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
+// Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
 //
 // MIT License
 //
@@ -76,7 +77,7 @@ namespace nil {
 
                         result_type(const params_type &params,
                             const std::size_t &component_start_row) {
-
+                            result =  var(W2, component_start_row, false);
                         }
                     };
 
@@ -87,6 +88,7 @@ namespace nil {
 
                         // TODO access modifiers
                         bool previously_allocated;
+                        std::size_t selector_index;
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp,
@@ -113,6 +115,12 @@ namespace nil {
                                 &assignment,
                             const params_type &params,
                             const std::size_t &component_start_row) {
+                            typename BlueprintFieldType::value_type x = assignment.var_value(params.x);
+                            typename BlueprintFieldType::value_type y = assignment.var_value(params.y);
+                            typename BlueprintFieldType::value_type res = x * y;
+                            assignment.witness(W0)[component_start_row] = x;
+                            assignment.witness(W1)[component_start_row] = y;
+                            assignment.witness(W2)[component_start_row] = res;
 
                         return result_type(params, component_start_row);
                     }
@@ -126,8 +134,20 @@ namespace nil {
                         const std::size_t row_start_index) {
 
                         if (!allocated_data.previously_allocated) {
-                        } else { 
+                            selector_index = assignment.add_selector(row_start_index);
+                            allocated_data.selector_index = selector_index;
+                        } else {
+                            selector_index = allocated_data.selector_index;
+                            assignment.enable_selector(selector_index, row_start_index); 
                         }
+                        auto constraint_1 = bp.add_constraint(
+                            (var(W0, 0) * var(W1, 0) - var(W2, 0));
+
+                        if (!allocated_data.previously_allocated) {
+                            bp.add_gate(selector_index,
+                                          {constraint_1});
+                        }
+                        allocated_data.previously_allocated = true;
 
                     }
 
@@ -136,7 +156,8 @@ namespace nil {
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             const params_type &params,
                             const std::size_t &component_start_row){
-
+                        bp.add_copy_constraint({{W0, component_start_row, false}, params.x});
+                        bp.add_copy_constraint({{W1, component_start_row, false}, params.y});
                     }
                 };
             }    // namespace components
