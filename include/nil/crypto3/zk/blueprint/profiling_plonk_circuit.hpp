@@ -36,15 +36,15 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
 
 namespace nil {
     namespace crypto3 {
         template<typename FieldType, typename ArithmetizationParams, typename Hash, std::size_t Lambda>
         struct profiling_plonk_circuit {
-            using redshift_params = zk::snark::redshift_params<FieldType, ArithmetizationParams, Hash, Hash, Lambda>;
-            using types = zk::snark::detail::redshift_policy<FieldType, redshift_params>;
+            using redshift_params = zk::snark::placeholder_params<FieldType, ArithmetizationParams, Hash, Hash, Lambda>;
+            using types = zk::snark::detail::placeholder_policy<FieldType, redshift_params>;
             using ArithmetizationType = zk::snark::plonk_constraint_system<FieldType, ArithmetizationParams>;
 
             template<typename Container, typename ContainerIt>

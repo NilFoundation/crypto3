@@ -55,8 +55,8 @@ template <typename BlueprintFieldType, typename ArithmetizationParams, typename 
 struct proof_generator_result_type {
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
         ArithmetizationParams>;
-    using params = zk::snark::redshift_params<BlueprintFieldType, ArithmetizationParams>;
-    using types = zk::snark::detail::redshift_policy<BlueprintFieldType, params>;
+    using params = zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams>;
+    using types = zk::snark::detail::placeholder_policy<BlueprintFieldType, params>;
 
     using fri_type = typename zk::commitments::fri<BlueprintFieldType,
         typename params::merkle_hash_type,
@@ -81,8 +81,8 @@ using ArithmetizationParamsBase = zk::snark::plonk_arithmetization_params<Witnes
 using ArithmetizationTypeBase = zk::snark::plonk_constraint_system<FpType,
             ArithmetizationParamsBase>;
 
-using params_base = zk::snark::redshift_params<FpType, ArithmetizationParamsBase>;
-using types_base = zk::snark::detail::redshift_policy<FpType, params_base>;
+using params_base = zk::snark::placeholder_params<FpType, ArithmetizationParamsBase>;
+using types_base = zk::snark::detail::placeholder_policy<FpType, params_base>;
 
 typedef zk::commitments::list_polynomial_commitment<FpType,
                                                 typename params_base::commitment_params_type>
@@ -97,7 +97,7 @@ typedef zk::commitments::list_polynomial_commitment<FpType,
                                                 typename params_base::commitment_params_type>
     commitment_scheme_public_input_type_base;
 
-using proof_type_base = zk::snark::redshift_proof<FpType, commitment_scheme_witness_type_base,
+using proof_type_base = zk::snark::placeholder_proof<FpType, commitment_scheme_witness_type_base,
         commitment_scheme_permutation_type_base, commitment_scheme_quotient_type_base,
         commitment_scheme_public_input_type_base>;
 
@@ -115,8 +115,8 @@ using ArithmetizationParamsScalar = zk::snark::plonk_arithmetization_params<Witn
 using ArithmetizationTypeScalar = zk::snark::plonk_constraint_system<FrType,
             ArithmetizationParamsScalar>;
 
-using params_scalar = zk::snark::redshift_params<FrType, ArithmetizationParamsScalar>;
-using types_scalar = zk::snark::detail::redshift_policy<FrType, params_scalar>;
+using params_scalar = zk::snark::placeholder_params<FrType, ArithmetizationParamsScalar>;
+using types_scalar = zk::snark::detail::placeholder_policy<FrType, params_scalar>;
 
 typedef zk::commitments::list_polynomial_commitment<FrType,
                                                 typename params_scalar::commitment_params_type>
@@ -131,7 +131,7 @@ typedef zk::commitments::list_polynomial_commitment<FrType,
                                                 typename params_scalar::commitment_params_type>
     commitment_scheme_public_input_type_scalar;
 
-using proof_type_scalar = zk::snark::redshift_proof<FrType, commitment_scheme_witness_type_scalar,
+using proof_type_scalar = zk::snark::placeholder_proof<FrType, commitment_scheme_witness_type_scalar,
         commitment_scheme_permutation_type_scalar, commitment_scheme_quotient_type_scalar,
         commitment_scheme_public_input_type_scalar>;
 
