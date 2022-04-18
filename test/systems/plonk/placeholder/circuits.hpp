@@ -42,8 +42,8 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/assignment.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/preprocessor.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 
 namespace nil {
@@ -52,7 +52,7 @@ namespace nil {
             namespace snark {
                 template<typename FieldType, typename ParamsType, std::size_t rows_log, std::size_t permutation_size>
                 class circuit_description {
-                    typedef zk::snark::detail::redshift_policy<FieldType, ParamsType> policy_type;
+                    typedef zk::snark::detail::placeholder_policy<FieldType, ParamsType> policy_type;
 
                     constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
                     constexpr static const std::size_t public_columns = ParamsType::public_input_columns;
@@ -105,7 +105,7 @@ namespace nil {
                     public_columns_1, constant_columns_1, selector_columns_1>;
 
                 template<typename FieldType>
-                circuit_description<FieldType, redshift_params<FieldType, arithmetization_params_1>, 4, 3> circuit_test_1() {
+                circuit_description<FieldType, placeholder_params<FieldType, arithmetization_params_1>, 4, 3> circuit_test_1() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t permutation = 3;
 
@@ -116,7 +116,7 @@ namespace nil {
                     constexpr static const std::size_t table_columns = 
                         witness_columns + public_columns + constant_columns;
 
-                    typedef redshift_params<FieldType, arithmetization_params_1> circuit_params;
+                    typedef placeholder_params<FieldType, arithmetization_params_1> circuit_params;
 
                     circuit_description<FieldType, circuit_params, rows_log, permutation> test_circuit;
 
@@ -229,7 +229,7 @@ namespace nil {
                     public_columns_2, constant_columns_2, selector_columns_2>;
 
                 template<typename FieldType>
-                circuit_description<FieldType, redshift_params<FieldType,
+                circuit_description<FieldType, placeholder_params<FieldType,
                     arithmetization_params_2>, 4, 4> circuit_test_2() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t permutation = 4;
@@ -241,7 +241,7 @@ namespace nil {
                     constexpr static const std::size_t table_columns = 
                             witness_columns + public_columns + constant_columns;
 
-                    typedef redshift_params<FieldType, arithmetization_params_2> circuit_params;
+                    typedef placeholder_params<FieldType, arithmetization_params_2> circuit_params;
 
                     circuit_description<FieldType, circuit_params, rows_log, permutation> test_circuit;
 
@@ -357,7 +357,7 @@ namespace nil {
                     public_columns_3, constant_columns_3, selector_columns_3>;
 
                 template<typename FieldType>
-                circuit_description<FieldType, redshift_params<FieldType,
+                circuit_description<FieldType, placeholder_params<FieldType,
                     arithmetization_params_3>, 4, 0> circuit_test_3() {
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t permutation = 0;
@@ -369,7 +369,7 @@ namespace nil {
                     constexpr static const std::size_t table_columns = 
                             witness_columns + public_columns + constant_columns;
 
-                    typedef redshift_params<FieldType, arithmetization_params_3> circuit_params;
+                    typedef placeholder_params<FieldType, arithmetization_params_3> circuit_params;
 
                     circuit_description<FieldType, circuit_params, rows_log, permutation> test_circuit;
 

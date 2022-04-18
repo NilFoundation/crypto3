@@ -65,7 +65,7 @@ set(TESTS_NAMES
     "systems/plonk/pickles/oracles"
     "systems/plonk/pickles/to_field"
     
-    "systems/plonk/redshift/redshift"
+    "systems/plonk/placeholder/placeholder"
 
     "systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
     "systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"
