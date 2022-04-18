@@ -92,25 +92,51 @@ namespace nil {
                     constexpr static const std::size_t required_rows_amount = 33;
 
                     struct params_type {
-                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type T;
-                        typename CurveType::scalar_field_type::value_type b;
+                        struct var_ec_point {
+                            var x;
+                            var y;
+                        };
+                        
+                        var_ec_point T;
+                        var b;
                     };
 
-                        static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
+                    struct result_type {
+                            var X = var(0, 0, false);
+                            var Y = var(0, 0, false);
+                            result_type(const std::size_t &component_start_row) {
+                                X =  var(W4, component_start_row + 32, false);
+                                Y =  var(W5, component_start_row + 32, false);
+                            }
+                    };
+
+                    struct allocated_data_type {
+                        allocated_data_type() {
+                            previously_allocated = false;
+                        }
+
+                        // TODO access modifiers
+                        bool previously_allocated;
+                        std::size_t selector_index;
+                    };
+
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
                         return bp.allocate_rows(required_rows_amount);
                     }
 
-                    static void generate_circuit(
+                    static result_type generate_circuit(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
+                        allocated_data_type &allocated_data,
                         const std::size_t &component_start_row) {
 
-                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_gates(bp, assignment, params, allocated_data, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
+                        return result_type(component_start_row);
                     }
 
-                    static void generate_assignments(
+                    static result_type generate_assignments(
                         blueprint_assignment_table<ArithmetizationType>
                             &assignment,
                         const params_type &params,
@@ -118,16 +144,20 @@ namespace nil {
                             const std::size_t &j = component_start_row;
                             assignment.public_input(0)[0] = ArithmetizationType::field_type::value_type::zero();
 
-                            const typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type &T = params.T;
+                            typename BlueprintFieldType::value_type b = assignment.var_value(params.b);
+                            typename BlueprintFieldType::value_type T_x = assignment.var_value(params.T.x);
+                            typename BlueprintFieldType::value_type T_y = assignment.var_value(params.T.y);
+                            typename CurveType::template 
+                            g1_type<algebra::curves::coordinates::affine>::value_type T(T_x, T_y);
 
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type P;
 
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type R;
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type Q;
-                            std::array<bool, 128> b = {false};
-                            typename CurveType::scalar_field_type::integral_type integral_b = typename CurveType::scalar_field_type::integral_type(params.b.data);
+                            std::array<bool, 128> bits = {false};
+                            typename CurveType::scalar_field_type::integral_type integral_b = typename CurveType::scalar_field_type::integral_type(b.data);
                             for (std::size_t i = 0; i < 128; i++) {
-                                b[128 - i - 1] = multiprecision::bit_test(integral_b, i);
+                                bits[128 - i - 1] = multiprecision::bit_test(integral_b, i);
                             }
                             typename ArithmetizationType::field_type::value_type n = 0;
                             typename ArithmetizationType::field_type::value_type n_next = 0;
@@ -145,25 +175,25 @@ namespace nil {
                                     assignment.witness(W6)[i] = n;
                                 }
                                 else {
-                                    Q.X = (1 + (endo - 1) * b[(i - j)*4 - 2]) * T.X;
-                                    Q.Y = (2* b[(i - j)*4 - 1] - 1) * T.Y;
+                                    Q.X = (1 + (endo - 1) * bits[(i - j)*4 - 2]) * T.X;
+                                    Q.Y = (2* bits[(i - j)*4 - 1] - 1) * T.Y;
                                     /*s4 = 2 * R.Y * (2*R.X + Q.X - s3 * s3).inversed() - s3;
                                     P.X = Q.X + s4*s4 - s3*s3;
                                     P.Y = (R.X - P.X)*s4 -R.Y;*/
                                     P = 2*R + Q;                   
                                     assignment.witness(W4)[i] = P.X;
                                     assignment.witness(W5)[i] = P.Y;
-                                    n_next = n * 16 + b[(i - j) * 4 - 4] * 8 
-                                    + b[(i - j) * 4 - 3]  * 4 + b[(i - j) * 4 - 2]  * 2 + b[(i - j) * 4 - 1] ;
+                                    n_next = n * 16 + bits[(i - j) * 4 - 4] * 8 
+                                    + bits[(i - j) * 4 - 3]  * 4 + bits[(i - j) * 4 - 2]  * 2 + bits[(i - j) * 4 - 1] ;
                                     assignment.witness(W6)[i] = n_next;
                                     n = n_next;
                                 }
-                                assignment.witness(W11)[i] = b[(i - j)*4];
-                                assignment.witness(W12)[i] = b[(i - j)*4 + 1];
-                                assignment.witness(W13)[i] = b[(i - j)*4 + 2];
-                                assignment.witness(W14)[i] = b[(i - j)*4 + 3];
-                                Q.X = (1 + (endo - 1) * b[(i - j)*4]) * T.X;
-                                Q.Y = (2* b[(i - j)*4 + 1] - 1) * T.Y;
+                                assignment.witness(W11)[i] = bits[(i - j)*4];
+                                assignment.witness(W12)[i] = bits[(i - j)*4 + 1];
+                                assignment.witness(W13)[i] = bits[(i - j)*4 + 2];
+                                assignment.witness(W14)[i] = bits[(i - j)*4 + 3];
+                                Q.X = (1 + (endo - 1) * bits[(i - j)*4]) * T.X;
+                                Q.Y = (2* bits[(i - j)*4 + 1] - 1) * T.Y;
                                 s1 = (Q.Y- P.Y) * (Q.X - P.X).inversed();
                                 //s2 = 2 * P.Y * (2*P.X + Q.X - s1 * s1).inversed() - s1;
 
@@ -171,25 +201,26 @@ namespace nil {
                                 /*R.X = Q.X + s2*s2 - s1*s1;
                                 R.Y = (P.X - R.X)*s2 -P.Y;*/
                                 R = 2*P + Q;
-                                s3 = ((2 * b[(i - j)*4 + 3] - 1) * T.Y - R.Y) * ((1 + (endo - 1)*
-                                b[(i - j)*4 + 2]) * T.X - R.X).inversed();
+                                s3 = ((2 * bits[(i - j)*4 + 3] - 1) * T.Y - R.Y) * ((1 + (endo - 1)*
+                                bits[(i - j)*4 + 2]) * T.X - R.X).inversed();
                                 assignment.witness(W10)[i] = s3;
                                 assignment.witness(W7)[i] = R.X;
                                 assignment.witness(W8)[i] = R.Y;
                             }
 
-                            Q.X = (1 + (endo - 1) * b[126]) * T.X;
-                            Q.Y = (2* b[127] - 1) * T.Y;
+                            Q.X = (1 + (endo - 1) * bits[126]) * T.X;
+                            Q.Y = (2* bits[127] - 1) * T.Y;
                             /*s4 = 2 * R.Y * (2*R.X + Q.X - s3 * s3).inversed() - s3;
                             P.X = Q.X + s4*s4 - s3*s3;
                             P.Y = (R.X - P.X)*s4 -R.Y; */
                             P = R + Q + R;
                             assignment.witness(W4)[j + 32] = P.X;
                             assignment.witness(W5)[j + 32] = P.Y;
-                            n_next = n * 16 + b[124] * 8 
-                                + b[125] * 4 + b[126] * 2 + b[127];
+                            n_next = n * 16 + bits[124] * 8 
+                                + bits[125] * 4 + bits[126] * 2 + bits[127];
                             assignment.witness(W6)[j + 32] = n_next;
-                             std::cout<<"circuit result "<< P.X.data<< " "<< P.Y.data<<std::endl;
+                            std::cout<<"circuit result "<< P.X.data<< " "<< P.Y.data<<std::endl;
+                            return result_type(component_start_row);
 
                     }
 
@@ -198,11 +229,19 @@ namespace nil {
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
+                        allocated_data_type &allocated_data,
                         const std::size_t &component_start_row) {
 
                         const std::size_t &j = component_start_row;
 
-                        std::size_t selector_index = assignment.add_selector(j, j + required_rows_amount - 2);
+                        std::size_t selector_index;
+                        if (!allocated_data.previously_allocated) {
+                            selector_index = assignment.add_selector(j, j + required_rows_amount - 2);
+                            allocated_data.selector_index = selector_index;
+                        } else {
+                            selector_index = allocated_data.selector_index;
+                            assignment.enable_selector(selector_index, j, j + required_rows_amount - 2); 
+                        }
 
                         auto bit_check_1 = bp.add_bit_check(var(W11, 0));
                         auto bit_check_2 = bp.add_bit_check(var(W12, 0));
@@ -233,9 +272,12 @@ namespace nil {
                         auto constraint_7 =
                             bp.add_constraint(var(W6, +1) - (16 * var(W6, 0) + 8 * var(W11, 0) + 4 * var(W12, 0) +
                                                                    2 * var(W13, 0) + var(W14, 0)));
-                        bp.add_gate(selector_index,
+                        if (!allocated_data.previously_allocated) {
+                            bp.add_gate(selector_index,
                                           {bit_check_1, bit_check_2, bit_check_3, bit_check_4, constraint_1, constraint_2, constraint_3,
                                           constraint_4, constraint_5, constraint_6, constraint_7});
+                        }
+                        allocated_data.previously_allocated = true;
                     }
 
 
