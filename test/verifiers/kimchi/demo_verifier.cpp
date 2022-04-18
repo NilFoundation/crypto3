@@ -131,24 +131,24 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     std::size_t permutation_size = desc.witness_columns + desc.public_input_columns + desc.constant_columns;
 
     typename types::preprocessed_public_data_type public_preprocessed_data =
-        zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, desc,
+        zk::snark::placeholder_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, desc,
                                                                                      fri_params, permutation_size);
     typename types::preprocessed_private_data_type private_preprocessed_data =
         zk::snark::placeholder_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment, desc);
 
-    auto redshift_proof = zk::snark::placeholder_prover<BlueprintFieldType, params>::process(
+    auto placeholder_proof = zk::snark::placeholder_prover<BlueprintFieldType, params>::process(
         public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
     using proof_marshalling_type =
-        nil::crypto3::marshalling::types::placeholder_proof<TTypeBase, decltype(redshift_proof)>;
-    auto filled_redshift_proof =
-        nil::crypto3::marshalling::types::fill_redshift_proof<decltype(redshift_proof), Endianness>(redshift_proof);
+        nil::crypto3::marshalling::types::placeholder_proof<TTypeBase, decltype(placeholder_proof)>;
+    auto filled_placeholder_proof =
+        nil::crypto3::marshalling::types::fill_placeholder_proof<decltype(placeholder_proof), Endianness>(placeholder_proof);
     std::vector<std::uint8_t> cv;
-    cv.resize(filled_redshift_proof.length(), 0x00);
+    cv.resize(filled_placeholder_proof.length(), 0x00);
     auto write_iter = cv.begin();
-    nil::marshalling::status_type status = filled_redshift_proof.write(write_iter, cv.size());
+    nil::marshalling::status_type status = filled_placeholder_proof.write(write_iter, cv.size());
     std::cout << "proof (" << cv.size() << " bytes) = " << std::endl;
     std::ofstream proof_file;
     proof_file.open("placeholder.txt");
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     std::cout << "}" << std::endl;
 
     bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, params>::process(
-        public_preprocessed_data, redshift_proof, bp, fri_params);
+        public_preprocessed_data, placeholder_proof, bp, fri_params);
     std::cout << "Proof check: " << verifier_res << std::endl;
 }
 

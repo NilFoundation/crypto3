@@ -103,7 +103,7 @@ std::pair<proof_generator_result_type<BlueprintFieldType, ArithmetizationParams,
     std::size_t permutation_size = desc.witness_columns + desc.public_input_columns + desc.constant_columns;
 
     typename types::preprocessed_public_data_type public_preprocessed_data =
-            zk::snark::redshift_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, 
+            zk::snark::placeholder_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, 
             desc, fri_params, permutation_size);
     typename types::preprocessed_private_data_type private_preprocessed_data =
             zk::snark::placeholder_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment,
@@ -167,13 +167,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_basic_verifier_test_suite) {
 
     auto scalar_field_result = scalar_field_prover<curve_type, proof_type_scalar>(kimchi_proof);
 
-    bool scalar_verifier_res = zk::snark::placeholder_verifier<FrType, params_scalar>::process(scalar_field_result.public_preprocessed_data, scalar_field_result.redshift_proof,
+    bool scalar_verifier_res = zk::snark::placeholder_verifier<FrType, params_scalar>::process(scalar_field_result.public_preprocessed_data, scalar_field_result.placeholder_proof,
                                                                                 scalar_field_result.bp,scalar_field_result.fri_params);
 
     //typename BlueprintFieldType::value_type endo_scalar = 0x244630A7EE5033DA383B3677B4C5CA94A3EBE4156FC4FA4E08B35974929CA2C5_cppui255; // cooresponds "2"
     auto base_field_result = base_field_prover<curve_type, proof_type_base>(kimchi_proof, scalar_field_result.out);
 
-    bool verifier_res = zk::snark::placeholder_verifier<FpType, params_base>::process(base_field_result.public_preprocessed_data, base_field_result.redshift_proof,
+    bool verifier_res = zk::snark::placeholder_verifier<FpType, params_base>::process(base_field_result.public_preprocessed_data, base_field_result.placeholder_proof,
                                                                                 base_field_result.bp, base_field_result.fri_params);
                         
 }

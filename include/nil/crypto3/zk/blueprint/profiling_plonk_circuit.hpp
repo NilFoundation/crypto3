@@ -43,8 +43,8 @@ namespace nil {
     namespace crypto3 {
         template<typename FieldType, typename ArithmetizationParams, typename Hash, std::size_t Lambda>
         struct profiling_plonk_circuit {
-            using redshift_params = zk::snark::placeholder_params<FieldType, ArithmetizationParams, Hash, Hash, Lambda>;
-            using types = zk::snark::detail::placeholder_policy<FieldType, redshift_params>;
+            using placeholder_params = zk::snark::placeholder_params<FieldType, ArithmetizationParams, Hash, Hash, Lambda>;
+            using types = zk::snark::detail::placeholder_policy<FieldType, placeholder_params>;
             using ArithmetizationType = zk::snark::plonk_constraint_system<FieldType, ArithmetizationParams>;
 
             template<typename Container, typename ContainerIt>

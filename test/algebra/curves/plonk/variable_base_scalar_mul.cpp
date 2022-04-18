@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 	auto assignments = bp.full_variable_assignment();
 
-	typedef zk::snark::redshift_preprocessor <typename curve_type::base_field_type, 5, 1> preprocess_type;
+	typedef zk::snark::placeholder_preprocessor <typename curve_type::base_field_type, 5, 1> preprocess_type;
 
     auto preprocessed_data = preprocess_type::process(cs, assignments);
 	typedef zk::snark::placeholder_prover <typename curve_type::base_field_type, 5, 5, 1, 5> prove_type;
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(variable_base_scalar_mul_9_wires_test_case) {
 
 	auto assignments = bp.full_variable_assignment();
 
-	typedef zk::snark::redshift_preprocessor <typename curve_type::base_field_type, 9, 1> preprocess_type;
+	typedef zk::snark::placeholder_preprocessor <typename curve_type::base_field_type, 9, 1> preprocess_type;
 
     auto preprocessed_data = preprocess_type::process(cs, assignments);
 	typedef zk::snark::placeholder_prover <typename curve_type::base_field_type, 9, 5, 1, 5> prove_type;
