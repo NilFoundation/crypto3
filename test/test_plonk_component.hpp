@@ -194,8 +194,8 @@ namespace nil {
             auto proof = zk::snark::redshift_prover<BlueprintFieldType, redshift_params>::process(
                 public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
 
-            print_test_data<redshift_params, BlueprintFieldType>(proof, fri_params,
-                                                                 public_preprocessed_data.common_data);
+            //print_test_data<redshift_params, BlueprintFieldType>(proof, fri_params,
+            //                                                     public_preprocessed_data.common_data);
 
             bool verifier_res = zk::snark::redshift_verifier<BlueprintFieldType, redshift_params>::process(
                 public_preprocessed_data, proof, bp, fri_params);

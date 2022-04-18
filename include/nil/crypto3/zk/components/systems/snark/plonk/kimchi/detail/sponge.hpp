@@ -86,23 +86,7 @@ namespace nil {
                     std::size_t add_input_gate_index;
                     std::size_t permute_gate_index;
 
-                    static std::array<var, poseidon_component::state_size> state;
-
-                    /////////// TODO replace with new assignment table interface
-                    static typename BlueprintFieldType::value_type var_value(blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const var &a) {
-
-                        typename BlueprintFieldType::value_type result;
-                        if (a.type == var::column_type::witness) {
-                            result = assignment.witness(a.index)[a.rotation];
-                        } else if (a.type == var::column_type::public_input) {
-                            result = assignment.public_input(a.index)[a.rotation];
-                        } else {
-                            result = assignment.constant(a.index)[a.rotation];
-                        }
-
-                        return result;
-                    }
+                    std::array<var, poseidon_component::state_size> state = {var(W0, 0), var(W1, 0), var(W2, 0)};
 
                     var permute_assignment(
                             blueprint_assignment_table<ArithmetizationType> &assignment,
@@ -110,7 +94,7 @@ namespace nil {
 
                         std::array<typename ArithmetizationType::field_type::value_type, poseidon_component::state_size> input_state;
                         for (std::size_t i = 0; i < poseidon_component::state_size; i++) { // TODO poseidon component should recieve var as params
-                            input_state[i] = var_value(state[i]);
+                            input_state[i] = assignment.var_value(state[i]);
                         }
                         typename params_type::params_type params = {input_state};
 
@@ -130,12 +114,12 @@ namespace nil {
                             std::size_t state_index,
                             std::size_t &component_start_row) {
                             
-                        assignment.witness(W0 + poseidon_component::state_size)[component_start_row] = var_value(input);
+                        assignment.witness(W0 + poseidon_component::state_size)[component_start_row] = assignment.var_value(input);
                         for (std::size_t i = 0; i < poseidon_component::state_size; i++) {
                             if (i == state_index) {
-                                assignment.witness(W0 + i)[component_start_row] = var_value(state[i]) + var_value(input);
+                                assignment.witness(W0 + i)[component_start_row] = assignment.var_value(state[i]) + assignment.var_value(input);
                             } else {
-                                assignment.witness(W0 + i)[component_start_row] = var_value(state[i]);
+                                assignment.witness(W0 + i)[component_start_row] = assignment.var_value(state[i]);
                             }
                             state[i] = var(W0 + i, component_start_row, false);
                         }
@@ -146,7 +130,7 @@ namespace nil {
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const var &zero,
                         const std::size_t &component_start_row) {
-
+                        
                     }
 
                     void add_input_constraints(blueprint<ArithmetizationType> &bp,

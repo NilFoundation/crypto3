@@ -41,6 +41,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/oracles.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>>
 
 #include "test_plonk_component.hpp"
 #include "proof_data.hpp"
@@ -67,7 +68,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     using component_type = zk::components::oracles_scalar<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
-    nil::crypto3::zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
+    zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 
     zk::components::kimchi_scalar_limbs alpha_limbs = {7388568927873460733U, 2067855711556196027U}; // 000000000000000000000000000000001CB27FD04E11D6BB6689784B2862E9FD
     zk::components::kimchi_scalar_limbs zeta_limbs = {13556945131955241727U, 14838652236930703881U}; // 00000000000000000000000000000000CDED7B9747CF6209BC23F1C50DA742FF
@@ -76,9 +77,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     typename BlueprintFieldType::value_type expected_result = 0x0000000000000000000000000000000010F8B9EDA2A55474E693585D56FCD8BE_cppui256;
     std::cout<<"Expected: "<<expected_result.data<<std::endl;
 
-    typename component_type::params_type params = {alpha_limbs, zeta_limbs, fq_digest};
+    zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
+    verifier_index.n = 1;
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params);
+    typename component_type::params_type params = {verifier_index, alpha_limbs, zeta_limbs, fq_digest};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {};
+
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -26,8 +26,8 @@
 // @file Declaration of interfaces for PLONK unified addition component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_COMPONENT_TEMPLATE_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_COMPONENT_TEMPLATE_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_FIELD_EXPONENTIATION_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_FIELD_EXPONENTIATION_HPP
 
 #include <cmath>
 
@@ -45,13 +45,11 @@ namespace nil {
             namespace components {
 
                 template<typename ArithmetizationType,
-                         typename CurveType,
                          std::size_t... WireIndexes>
-                class component_template;
+                class exponentiation;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
-                         typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -62,14 +60,17 @@ namespace nil {
                          std::size_t W7,
                          std::size_t W8,
                          std::size_t W9,
-                         std::size_t W10>
-                class component_template<
+                         std::size_t W10,
+                         std::size_t W11,
+                         std::size_t W12,
+                         std::size_t W13,
+                         std::size_t W14>
+                class exponentiation<
                     snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams>,
-                    CurveType,
                     W0, W1, W2, W3, W4,
                     W5, W6, W7, W8, W9,
-                    W10>{
+                    W10, W11, W12, W13, W14>{
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
@@ -80,10 +81,14 @@ namespace nil {
                     constexpr static const std::size_t required_rows_amount = 1;
 
                     struct params_type {
+                        var base;
+                        var power;
                     };
 
                     struct result_type {
-                        result_type(params_type &params,
+                        var result = var(0, 0);
+
+                        result_type(const params_type &params,
                             const std::size_t &component_start_row) {
 
                         }
@@ -145,7 +150,7 @@ namespace nil {
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             const params_type &params,
                             const std::size_t &component_start_row){
-                                5
+
                     }
                 };
             }    // namespace components
@@ -153,4 +158,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_COMPONENT_TEMPLATE_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_FIELD_EXPONENTIATION_HPP

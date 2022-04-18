@@ -64,20 +64,128 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    static typename BlueprintFieldType::value_type var_value(blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const var &a) {
+                public:
+                    constexpr static const std::size_t required_rows_amount = 1;
 
-                        typename BlueprintFieldType::value_type result;
-                        if (a.type == var::column_type::witness) {
-                            result = assignment.witness(a.index)[a.rotation];
-                        } else if (a.type == var::column_type::public_input) {
-                            result = assignment.public_input(a.index)[a.rotation];
-                        } else {
-                            result = assignment.constant(a.index)[a.rotation];
+                    struct params_type {
+                        std::array<var, 2> scalar_limbs_var;
+                    };
+
+                    struct result_type
+                    {
+                        var result = var(0, 0);
+
+                        result_type(const std::size_t &component_start_row) {
+                            result = var(W2, static_cast<int>(component_start_row), false, var::column_type::witness);
+                        }
+                    };
+
+                    struct allocated_data_type {
+                        allocated_data_type() {
+                            previously_allocated = false;
                         }
 
-                        return result;
+                        // TODO access modifiers
+                        bool previously_allocated;
+                        std::size_t selector_1;
+                    };
+                    
+
+                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
+                        return in_bp.allocate_rows(required_rows_amount);
                     }
+
+                    static result_type generate_circuit(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        allocated_data_type &allocated_data,
+                        const std::size_t &component_start_row) {
+
+                        generate_gates(bp, assignment, params, allocated_data, component_start_row);
+                        generate_copy_constraints(bp, assignment, params, component_start_row);
+
+                        return result_type(component_start_row);
+                    }
+
+                    static result_type generate_assignments(
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                                        const params_type &params,
+                                        const std::size_t &component_start_row) {
+
+                        std::size_t row = component_start_row;
+                        typename BlueprintFieldType::value_type first_limb = assignment.var_value(params.scalar_limbs_var[0]);
+                        typename BlueprintFieldType::value_type second_limb = assignment.var_value(params.scalar_limbs_var[1]);
+                        assignment.witness(W0)[row] = first_limb;
+                        assignment.witness(W1)[row] = second_limb;
+                        typename BlueprintFieldType::value_type scalar = 2;
+                        scalar = scalar.pow(64) * second_limb + first_limb;
+                        std::cout<<scalar.data<<std::endl;
+                        assignment.witness(W2)[row] = scalar;
+
+                        return result_type(component_start_row);
+                    }
+
+                    private:
+                    static void generate_gates(blueprint<ArithmetizationType> &bp,
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        allocated_data_type &allocated_data,
+                        const std::size_t &component_start_row) {
+
+                        const std::size_t &row = component_start_row;
+
+                        std::size_t selector_index_1;
+                        if (!allocated_data.previously_allocated) {
+                            selector_index_1 = assignment.add_selector(row, row + required_rows_amount - 1);
+                            allocated_data.previously_allocated = true;
+                            allocated_data.selector_1 = selector_index_1;
+                        } else {
+                            selector_index_1 = allocated_data.selector_1;
+                            assignment.enable_selector(selector_index_1, row, row + required_rows_amount - 1);
+                        }
+
+                        // TODO constraints
+
+                        bp.add_gate(selector_index_1, 
+                            {});
+                    }
+                    
+                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                            const params_type &params,
+                            const std::size_t &component_start_row = 0){
+
+                        bp.add_copy_constraint({{W0, static_cast<int>(component_start_row), false}, 
+                        {params.scalar_limbs_var[0].index, params.scalar_limbs_var[0].rotation, false, params.scalar_limbs_var[0].type}});
+                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false}, 
+                            {params.scalar_limbs_var[1].index, params.scalar_limbs_var[1].rotation, false, params.scalar_limbs_var[1].type}});
+                    }
+                };
+
+
+                ///////////////// Generic Gate ////////////////////////////////
+                template<typename ArithmetizationType,
+                         typename CurveType,
+                         std::size_t... WireIndexes>
+                class from_limbs;
+
+                template<typename ArithmetizationParams,
+                         typename CurveType,
+                         std::size_t W0,
+                         std::size_t W1,
+                         std::size_t W2>
+                class from_limbs<
+                    snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
+                    CurveType,
+                    W0, W1, W2> {
+
+                    using BlueprintFieldType = typename CurveType::scalar_field_type;
+
+                    typedef snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams> ArithmetizationType;
+
+                    using var = snark::plonk_variable<BlueprintFieldType>;
 
                 public:
                     constexpr static const std::size_t required_rows_amount = 1;
@@ -88,11 +196,21 @@ namespace nil {
 
                     struct result_type
                     {
-                        var result;
+                        var result = var(0, 0);
+
+                        result_type(const std::size_t &component_start_row) {
+                            result = var(W2, static_cast<int>(component_start_row), false, var::column_type::witness);
+                        }
                     };
 
                     struct allocated_data_type {
-                        std::vector<std::size_t> start_rows;
+                        allocated_data_type() {
+                            previously_allocated = false;
+                        }
+
+                        // TODO access modifiers
+                        bool previously_allocated;
+                        std::size_t selector_1;
                     };
                     
 
@@ -100,26 +218,17 @@ namespace nil {
                         return in_bp.allocate_rows(required_rows_amount);
                     }
 
-                    static void allocate(blueprint<ArithmetizationType> &bp,
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const params_type &scalar_limbs_var,
-                            allocated_data_type &allocated_data,
-                            const std::size_t &component_start_row = 0) {
-                                allocated_data.start_rows.push_back(component_start_row);
-
-                        bp.add_copy_constraint({{W0, static_cast<int>(component_start_row), false}, 
-                        {scalar_limbs_var[0].index, scalar_limbs_var[0].rotation, false, scalar_limbs_var[0].type}});
-                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false}, 
-                            {scalar_limbs_var[1].index, scalar_limbs_var[1].rotation, false, scalar_limbs_var[1].type}});
-                    }
-
-                    static void generate_circuit(
+                    static result_type generate_circuit(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
+                        allocated_data_type &allocated_data,
                         const std::size_t &component_start_row) {
 
-                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_gates(bp, assignment, params, allocated_data, component_start_row);
+                        generate_copy_constraints(bp, assignment, params, component_start_row);
+
+                        return result_type(component_start_row);
                     }
 
                     static result_type generate_assignments(
@@ -128,40 +237,52 @@ namespace nil {
                                         const std::size_t &component_start_row) {
 
                         std::size_t row = component_start_row;
-                        typename BlueprintFieldType::value_type first_limb = var_value(assignment, params.scalar_limbs_var[0]);
-                        typename BlueprintFieldType::value_type second_limb = var_value(assignment, params.scalar_limbs_var[1]);
+                        typename BlueprintFieldType::value_type first_limb = assignment.var_value(params.scalar_limbs_var[0]);
+                        typename BlueprintFieldType::value_type second_limb = assignment.var_value(params.scalar_limbs_var[1]);
                         assignment.witness(W0)[row] = first_limb;
                         assignment.witness(W1)[row] = second_limb;
                         typename BlueprintFieldType::value_type scalar = 2;
                         scalar = scalar.pow(64) * second_limb + first_limb;
                         std::cout<<scalar.data<<std::endl;
                         assignment.witness(W2)[row] = scalar;
-                        var res(W2, row, false);
 
-                        return result_type {res};
+                        return result_type(component_start_row);
                     }
 
                     private:
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            allocated_data_type &allocated_data,
-                        const std::size_t &component_start_row = 0) {
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        allocated_data_type &allocated_data,
+                        const std::size_t &component_start_row) {
 
                         const std::size_t &row = component_start_row;
 
-                        std::vector<std::size_t> selector_rows(allocated_data.start_rows * required_rows_amount);
-                        for (std::size_t i = 0; i < allocated_data.start_rows; i++) {
-                            for (std::size_t j = 0; j < required_rows_amount; j++) {
-                                selector_rows[i * required_rows_amount + j] = allocated_data.start_rows[i] + j;
-                            }
+                        std::size_t selector_index_1;
+                        if (!allocated_data.previously_allocated) {
+                            selector_index_1 = assignment.add_selector(row, row + required_rows_amount - 1);
+                            allocated_data.previously_allocated = true;
+                            allocated_data.selector_1 = selector_index_1;
+                        } else {
+                            selector_index_1 = allocated_data.selector_1;
+                            assignment.enable_selector(selector_index_1, row, row + required_rows_amount - 1);
                         }
-
-                        std::size_t selector_index_1 = assignment.add_selector(selector_rows);
 
                         // TODO constraints
 
                         bp.add_gate(selector_index_1, 
                             {});
+                    }
+                    
+                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                            const params_type &params,
+                            const std::size_t &component_start_row = 0){
+
+                        bp.add_copy_constraint({{W0, static_cast<int>(component_start_row), false}, 
+                        {params.scalar_limbs_var[0].index, params.scalar_limbs_var[0].rotation, false, params.scalar_limbs_var[0].type}});
+                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false}, 
+                            {params.scalar_limbs_var[1].index, params.scalar_limbs_var[1].rotation, false, params.scalar_limbs_var[1].type}});
                     }
                 };
                 

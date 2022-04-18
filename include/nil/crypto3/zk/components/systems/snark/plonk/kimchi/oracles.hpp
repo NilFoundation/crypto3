@@ -39,6 +39,8 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/plonk/exponentiation.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -84,21 +86,12 @@ namespace nil {
                     using endo_scalar_component = zk::components::endo_scalar<ArithmetizationType, CurveType,
                                                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
                     using from_limbs = zk::components::from_limbs<ArithmetizationType, CurveType, W0, W1, W2>;
+                    using exponentiation_component = zk::components::exponentiation<ArithmetizationType,
+                                                            W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using multiplication_component = zk::components::multiplication<ArithmetizationType,
+                                                            W0, W1, W2>;
 
-                    static typename BlueprintFieldType::value_type var_value(blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const var &a) {
-
-                        typename BlueprintFieldType::value_type result;
-                        if (a.type == var::column_type::witness) {
-                            result = assignment.witness(a.index)[a.rotation];
-                        } else if (a.type == var::column_type::public_input) {
-                            result = assignment.public_input(a.index)[a.rotation];
-                        } else {
-                            result = assignment.constant(a.index)[a.rotation];
-                        }
-
-                        return result;
-                    }
+                    constexpr static const permute_size = 7;
 
                     static var assignments_from_limbs(blueprint_assignment_table<ArithmetizationType> &assignment,
                             std::array<var, 2> scalar_limbs_var,
@@ -129,20 +122,51 @@ namespace nil {
                         typename BlueprintFieldType::value_type endo_factor = 0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
                         std::size_t num_bits = 128;
                         //TODO endo_scalar component has to get variable as scalar param
-                        typename BlueprintFieldType::value_type scalar_value = var_value(assignment, scalar);
                         
-                        typename endo_scalar_component::params_type params = {scalar_value, endo_factor, num_bits};
+                        typename endo_scalar_component::params_type params = {scalar, endo_factor, num_bits};
                         typename endo_scalar_component::result_type endo_scalar_res = endo_scalar_component::generate_assignments(assignment,
                             params, component_start_row);
                         component_start_row += endo_scalar_component::required_rows_amount;
                         return endo_scalar_res.endo_scalar;
                     }
 
+                    static var assignment_exponentiation(blueprint_assignment_table<ArithmetizationType> &assignment,
+                            var base,
+                            var power,
+                            std::size_t &component_start_row) {
+                        typename exponentiation_component::params_type params = {base, power};
+                        typename exponentiation_component::result_type res = 
+                            exponentiation_component::generate_assignments(assignment, params, component_start_row);
+                        component_start_row += exponentiation_component::required_rows_amount;
+                        return res.result;
+                    }
+
+                    static var assigment_multiplication(blueprint_assignment_table<ArithmetizationType> &assignment,
+                            var x,
+                            var y,
+                            std::size_t &component_start_row) {
+                        typename multiplication_component::params_type params = {x, y};
+                        typename multiplication_component::result_type res = 
+                            multiplication_component::generate_assignments(assignment, params, component_start_row);
+                        component_start_row += multiplication_component::required_rows_amount;
+                        return res.result;
+                    }
+
+                    static std::vector<var> assigment_element_powers(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                var x,
+                                std::size_t n,
+                                std::size_t &component_start_row) {
+                            std::size_t column_index = W0;
+                            for (std::size_t i = 0; i < n; i++) {
+                                
+                            }
+                        }
+
                 public:
                     constexpr static const std::size_t required_rows_amount = 32;
 
                     struct params_type {
-                        //kimchi_verifier_index_scalar<CurveType> verifier_index;
+                        kimchi_verifier_index_scalar<CurveType> verifier_index;
                         //kimchi_scalar_limbs joint_combiner;
                         //kimchi_scalar_limbs beta;
                         //kimchi_scalar_limbs gamma;
@@ -151,21 +175,40 @@ namespace nil {
                         typename BlueprintFieldType::value_type fq_digest; // TODO overflow check
                     };
 
+                    struct result_type {
+                        result_type(const params_type &params,
+                            const std::size_t &component_start_row) {
+
+                        }
+                    };
+
+                    struct allocated_data_type {
+                        allocated_data_type() {
+                            previously_allocated = false;
+                        }
+
+                        // TODO access modifiers
+                        bool previously_allocated;
+                    };
+
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
                         return in_bp.allocate_rows(required_rows_amount);
                     }
 
-                    static void generate_circuit(
+                    static result_type generate_circuit(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
+                        allocated_data_type &allocated_data,
                         const std::size_t &component_start_row) {
 
-                        generate_gates(bp, assignment, params, component_start_row);
+                        generate_gates(bp, assignment, params, allocated_data, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
+
+                        return result_type(params, component_start_row);
                     }
 
-                    static void generate_assignments(
+                    static result_type generate_assignments(
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             const params_type &params,
                             const std::size_t &component_start_row) {
@@ -174,19 +217,17 @@ namespace nil {
                         const std::size_t public_input_size = 5; 
 
                         // copy public input
-                        assignment.public_input(0)[row] = params.alpha[0];
-                        assignment.public_input(0)[row + 1] = params.alpha[1];
-                        assignment.public_input(0)[row + 2] = params.zeta[0];
-                        assignment.public_input(0)[row + 3] = params.zeta[1];
-                        assignment.public_input(0)[row + 4] = params.fq_digest;
+                        var alpha_limb_1 = assignment.allocate_public_input(params.alpha[0]);
+                        var alpha_limb_2 = assignment.allocate_public_input(params.alpha[1]);
+                        var zeta_limb_1 = assignment.allocate_public_input(params.zeta[0]);
+                        var zeta_limb_2 = assignment.allocate_public_input(params.zeta[1]);
+                        var fq_digest = assignment.allocate_public_input(params.fq_digest);
+                        var omega = assignment.allocate_public_input(params.omega);
 
-                        std::array<var, 2> alpha_pub_limbs = {var(0, row, false, var::column_type::public_input), 
-                                var(0, row + 1, false, var::column_type::public_input)};
-                        std::array<var, 2> zeta_pub_limbs = {var(0, row + 2, false, var::column_type::public_input), 
-                                var(0, row + 3, false, var::column_type::public_input)};
-                        var fq_digest(0, row + 4, false, var::column_type::public_input);
+                        std::array<var, 2> alpha_pub_limbs = {alpha_limb_1, alpha_limb_2};
+                        std::array<var, 2> zeta_pub_limbs = {zeta_limb_1, zeta_limb_2};
 
-                        row += public_input_size;
+                        //row += public_input_size;
 
                         var alpha = assignments_from_limbs(assignment,
                             alpha_pub_limbs, row);
@@ -203,12 +244,20 @@ namespace nil {
                         transcript.init_assignment(assignment, row);
                         transcript.absorb_assignment(assignment,
                             fq_digest, row);
+
+                        var n = assignment.allocate_public_input(params.verifier_index.n);
+                        var zeta_pow_n = assignment_exponentiation(assignment, zeta, n, row);
+
+                        var zeta_omega = assigment_multiplication(assignment, zeta, omega, row);
+                        
+                        return result_type(params, component_start_row);
                     }
 
                     private:
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             const params_type &params,
+                            allocated_data_type &allocated_data,
                         const std::size_t &component_start_row = 0) {
 
                         const std::size_t &j = component_start_row;
