@@ -129,7 +129,8 @@ namespace nil {
                                    private_preprocessed_data);
         }
 
-        template<typename PlaceholderParams, typename FieldType, typename Proof, typename FRIParams, typename CommonData>
+        template<typename PlaceholderParams, typename FieldType, typename Proof, typename FRIParams,
+                 typename CommonData>
         void print_test_data(const Proof &proof, const FRIParams &fri_params, const CommonData &common_data) {
             using Endianness = nil::marshalling::option::big_endian;
             using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -194,8 +195,8 @@ namespace nil {
             auto proof = zk::snark::placeholder_prover<BlueprintFieldType, placeholder_params>::process(
                 public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
 
-            //print_test_data<placeholder_params, BlueprintFieldType>(proof, fri_params,
-            //                                                     public_preprocessed_data.common_data);
+            // print_test_data<placeholder_params, BlueprintFieldType>(proof, fri_params,
+            //                                                      public_preprocessed_data.common_data);
 
             bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, placeholder_params>::process(
                 public_preprocessed_data, proof, bp, fri_params);
@@ -207,6 +208,30 @@ namespace nil {
             profiling_plonk_circuit<BlueprintFieldType, ArithmetizationParams, Hash, Lambda>::process_split(
                 bp, public_preprocessed_data);
             BOOST_CHECK(verifier_res);
+        }
+
+        template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
+                 std::size_t Lambda, typename PublicInput,
+                 typename std::enable_if<
+                     std::is_same<typename BlueprintFieldType::value_type,
+                                  typename std::iterator_traits<typename PublicInput::iterator>::value_type>::value,
+                     bool>::type = true>
+        auto create_component_proof(typename ComponentType::params_type params, const PublicInput &public_input) {
+
+            using placeholder_params =
+                zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
+
+            auto [desc, bp, fri_params, assignments, public_preprocessed_data, private_preprocessed_data] =
+                prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda>(params,
+                                                                                                          public_input);
+
+            auto proof = zk::snark::placeholder_prover<BlueprintFieldType, placeholder_params>::process(
+                public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
+
+            bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, placeholder_params>::process(
+                public_preprocessed_data, proof, bp, fri_params);
+            BOOST_CHECK(verifier_res);
+            return proof;
         }
     }    // namespace crypto3
 }    // namespace nil
