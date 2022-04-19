@@ -170,7 +170,7 @@ void test_fri_round_proof(std::size_t tree_depth) {
 
     using commitment_scheme_type = nil::crypto3::zk::commitments::fri<Field, Hash, Hash>;
     using proof_marshalling_type =
-        types::fri_round_proof<nil::marshalling::field_type<Endianness>, commitment_scheme_type>;
+        typename types::fri_round_proof<nil::marshalling::field_type<Endianness>, commitment_scheme_type>::type;
 
     typename commitment_scheme_type::round_proof_type proof =
         generate_random_fri_round_proof<commitment_scheme_type>(tree_depth);
@@ -203,7 +203,8 @@ void test_fri_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::siz
     using namespace nil::crypto3::marshalling;
 
     using commitment_scheme_type = nil::crypto3::zk::commitments::fri<Field, Hash, Hash>;
-    using proof_marshalling_type = types::fri_proof<nil::marshalling::field_type<Endianness>, commitment_scheme_type>;
+    using proof_marshalling_type =
+        typename types::fri_proof<nil::marshalling::field_type<Endianness>, commitment_scheme_type>::type;
 
     typename commitment_scheme_type::proof_type proof =
         generate_random_fri_proof<commitment_scheme_type>(tree_depth, round_proofs_n, degree);

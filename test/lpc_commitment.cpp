@@ -188,7 +188,8 @@ void test_lpc(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t de
 
     using lpc_params_type = nil::crypto3::zk::commitments::list_polynomial_commitment_params<Hash, Hash, Lambda, R, M>;
     using commitment_scheme_type = nil::crypto3::zk::commitments::list_polynomial_commitment<Field, lpc_params_type>;
-    using proof_marshalling_type = types::lpc_proof<nil::marshalling::field_type<Endianness>, commitment_scheme_type>;
+    using proof_marshalling_type =
+        typename types::lpc_proof<nil::marshalling::field_type<Endianness>, commitment_scheme_type>::type;
 
     typename commitment_scheme_type::proof_type proof =
         generate_lpc_proof<commitment_scheme_type>(tree_depth, round_proofs_n, degree, k);

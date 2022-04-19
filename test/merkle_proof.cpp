@@ -32,6 +32,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include <fstream>
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
@@ -91,11 +92,11 @@ void test_merkle_proof(std::size_t tree_depth) {
     auto data = generate_random_data<std::uint8_t, 32>(leafs_number);
     merkle_tree_type tree(data.begin(), data.end());
     std::size_t proof_idx = std::rand() % leafs_number;
-//    std::cout << "Verified data: ";
-//        for (auto c : data[proof_idx]) {
-//        std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
-//    }
-//    std::cout << std::endl << std::endl;
+   std::cout << "Verified data: ";
+       for (auto c : data[proof_idx]) {
+       std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
+   }
+   std::cout << std::endl << std::endl;
     merkle_proof_type proof(tree, proof_idx);
 
     auto filled_merkle_proof = types::fill_merkle_proof<merkle_proof_type, Endianness>(proof);
@@ -111,6 +112,9 @@ void test_merkle_proof(std::size_t tree_depth) {
 //        std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
 //    }
 //    std::cout << std::endl << std::endl;
+    std::ofstream merkle_out;
+    merkle_out.open("merkle_proof.txt");
+    print_byteblob(merkle_out, cv.cbegin(), cv.cend());
 
     merkle_proof_marshalling_type test_val_read;
     auto read_iter = cv.begin();
@@ -151,8 +155,8 @@ BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_2_js_test) {
 
 BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_2_test) {
     std::srand(std::time(0));
-    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 2>(5);
-    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 2>(10);
+    // test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 2>(5);
+    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 2>(18);
 }
 
 // TODO: fix test case for arity 3

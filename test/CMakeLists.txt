@@ -65,7 +65,7 @@ set(TESTS_NAMES
     "r1cs_gg_ppzksnark"
     "fri_commitment"
     "lpc_commitment"
-    "redshift_proof"
+    "placeholder_proof"
     "plonk_gates"
     "eddsa")
 
