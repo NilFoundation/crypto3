@@ -18,6 +18,7 @@ macro(define_blueprint_example name)
                           ${CMAKE_WORKSPACE_NAME}::hash
                           ${CMAKE_WORKSPACE_NAME}::multiprecision
                           ${CMAKE_WORKSPACE_NAME}::zk
+                          marshalling::crypto3_zk
 
                           ${Boost_LIBRARIES})
     set_target_properties(blueprint_${name}_example PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED TRUE)
