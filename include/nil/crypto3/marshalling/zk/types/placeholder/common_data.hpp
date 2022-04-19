@@ -46,20 +46,20 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                template<typename TTypeBase, typename PlaceholderPolicy,
+                template<typename TTypeBase, typename RedshiftPolicy,
                          typename = typename std::enable_if<
-                             std::is_same<PlaceholderPolicy, nil::crypto3::zk::snark::detail::placeholder_policy<
-                                                              typename PlaceholderPolicy::field_type,
-                                                              typename PlaceholderPolicy::placeholder_params_type>>::value,
+                             std::is_same<RedshiftPolicy, nil::crypto3::zk::snark::detail::placeholder_policy<
+                                                              typename RedshiftPolicy::field_type,
+                                                              typename RedshiftPolicy::redshift_params_type>>::value,
                              bool>::type,
                          typename... TOptions>
-                using placeholder_verifier_common_data = nil::marshalling::types::bundle<
+                using redshift_verifier_common_data = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
                         // std::size_t rows_amount;
                         nil::marshalling::types::integral<TTypeBase, std::size_t>,
                         // omega
-                        field_element<TTypeBase, typename PlaceholderPolicy::field_type::value_type>,
+                        field_element<TTypeBase, typename RedshiftPolicy::field_type::value_type>,
                         // std::array<std::vector<int>, arithmetization_params::TotalColumns> columns_rotations;
                         nil::marshalling::types::array_list<
                             TTypeBase,
@@ -70,10 +70,10 @@ namespace nil {
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
 
-                template<typename PlaceholderPolicy, typename Endianness>
-                placeholder_verifier_common_data<nil::marshalling::field_type<Endianness>, PlaceholderPolicy>
-                    fill_placeholder_verifier_common_data(
-                        const typename PlaceholderPolicy::preprocessed_public_data_type::common_data_type &common_data) {
+                template<typename RedshiftPolicy, typename Endianness>
+                redshift_verifier_common_data<nil::marshalling::field_type<Endianness>, RedshiftPolicy>
+                    fill_redshift_verifier_common_data(
+                        const typename RedshiftPolicy::preprocessed_public_data_type::common_data_type &common_data) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using int_marshalling_type = nil::marshalling::types::integral<TTypeBase, int>;
@@ -85,7 +85,7 @@ namespace nil {
                         TTypeBase, int_vector_marshalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
                     using field_element_marshalling_type =
-                        field_element<TTypeBase, typename PlaceholderPolicy::field_type::value_type>;
+                        field_element<TTypeBase, typename RedshiftPolicy::field_type::value_type>;
 
                     // std::size_t rows_amount;
                     size_t_marshalling_type filled_rows_amount(common_data.rows_amount);
@@ -103,7 +103,7 @@ namespace nil {
                         filled_columns_rotations.value().push_back(filled_column_rotations);
                     }
 
-                    return placeholder_verifier_common_data<TTypeBase, PlaceholderPolicy>(
+                    return redshift_verifier_common_data<TTypeBase, RedshiftPolicy>(
                         std::make_tuple(filled_rows_amount, filled_omega, filled_columns_rotations));
                 }
             }    // namespace types

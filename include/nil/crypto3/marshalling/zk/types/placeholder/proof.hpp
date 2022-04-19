@@ -331,7 +331,7 @@ namespace nil {
 
                 template<typename PlaceholderProof, typename Endianness>
                 placeholder_proof<nil::marshalling::field_type<Endianness>, PlaceholderProof>
-                    fill_placeholder_proof(const PlaceholderProof &proof) {
+                    fill_redshift_proof(const PlaceholderProof &proof) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
