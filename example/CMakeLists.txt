@@ -27,7 +27,8 @@ endmacro()
 
 set(EXAMPLES_NAMES
     "curves"
-    "test_component")
+    "test_component"
+    "plonk/addition_component")
 
 foreach(EXAMPLE_NAME ${EXAMPLES_NAMES})
     define_blueprint_example(${EXAMPLE_NAME})
