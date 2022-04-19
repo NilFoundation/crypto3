@@ -59,9 +59,10 @@ namespace nil {
                         bool operator==(const evaluation_proof &rhs) const {
                             return challenge == rhs.challenge && witness == rhs.witness &&
                                    permutation == rhs.permutation && quotient == rhs.quotient &&
-                                   id_permutation == rhs.id_permutation && sigma_permutation == rhs.sigma_permutation &&
-                                   public_input == rhs.public_input && constant == rhs.constant &&
-                                   selector == rhs.selector && special_selectors == rhs.special_selectors;
+                                   lookups == rhs.lookups && id_permutation == rhs.id_permutation &&
+                                   sigma_permutation == rhs.sigma_permutation && public_input == rhs.public_input &&
+                                   constant == rhs.constant && selector == rhs.selector &&
+                                   special_selectors == rhs.special_selectors;
                         }
                         bool operator!=(const evaluation_proof &rhs) const {
                             return !(rhs == *this);
@@ -86,8 +87,12 @@ namespace nil {
                     evaluation_proof eval_proof;
 
                     bool operator==(const placeholder_proof &rhs) const {
-                        return witness_commitment == rhs.witness_commitment && T_commitments == rhs.T_commitments &&
-                               v_perm_commitment == rhs.v_perm_commitment && eval_proof == rhs.eval_proof;
+                        return witness_commitment == rhs.witness_commitment &&
+                               v_perm_commitment == rhs.v_perm_commitment &&
+                               input_perm_commitment == rhs.input_perm_commitment &&
+                               value_perm_commitment == rhs.value_perm_commitment &&
+                               v_l_perm_commitment == rhs.v_l_perm_commitment && T_commitments == rhs.T_commitments &&
+                               eval_proof == rhs.eval_proof;
                     }
                     bool operator!=(const placeholder_proof &rhs) const {
                         return !(rhs == *this);

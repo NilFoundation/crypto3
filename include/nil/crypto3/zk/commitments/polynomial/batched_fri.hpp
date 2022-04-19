@@ -63,9 +63,12 @@ namespace nil {
                          typename TranscriptHashType,
                          std::size_t M = 2,
                          std::size_t BatchSize = 1>
-                class batched_fri : public detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize> {
+                class batched_fri
+                    : public detail::
+                          basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize> {
 
-                    using basic_fri = detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize>;
+                    using basic_fri =
+                        detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize>;
 
                 public:
                     constexpr static const std::size_t m = basic_fri::m;
@@ -74,6 +77,7 @@ namespace nil {
                     using field_type = typename basic_fri::field_type;
                     using merkle_tree_hash_type = typename basic_fri::merkle_tree_hash_type;
                     using transcript_hash_type = typename basic_fri::transcript_hash_type;
+                    using round_proof_type = typename basic_fri::round_proof_type;
                     using proof_type = typename basic_fri::proof_type;
                     using params_type = typename basic_fri::params_type;
                     using transcript_type = typename basic_fri::transcript_type;
@@ -81,11 +85,12 @@ namespace nil {
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
 
-                    static typename basic_fri::proof_type proof_eval(
-                        const std::array<math::polynomial<typename FieldType::value_type>, leaf_size> g,
-                        precommitment_type &T,
-                        const typename basic_fri::params_type &fri_params,
-                        typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {
+                    static typename basic_fri::proof_type
+                        proof_eval(const std::array<math::polynomial<typename FieldType::value_type>, leaf_size> g,
+                                   precommitment_type &T,
+                                   const typename basic_fri::params_type &fri_params,
+                                   typename basic_fri::transcript_type &transcript =
+                                       typename basic_fri::transcript_type()) {
 
                         return basic_fri::proof_eval(g, g, T, fri_params, transcript);
                     }
@@ -96,14 +101,12 @@ namespace nil {
                         typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {
 
                         std::array<math::polynomial<typename FieldType::value_type>, leaf_size> U;
-                        for (std::size_t polynom_index = 0; polynom_index < leaf_size;
-                                            polynom_index++){
+                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                             U[polynom_index] = {0};
                         }
 
                         std::array<math::polynomial<typename FieldType::value_type>, leaf_size> V;
-                        for (std::size_t polynom_index = 0; polynom_index < leaf_size;
-                                            polynom_index++){
+                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                             V[polynom_index] = {1};
                         }
 
