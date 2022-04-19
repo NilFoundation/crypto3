@@ -62,11 +62,9 @@ namespace nil {
                          typename MerkleTreeHashType,
                          typename TranscriptHashType,
                          std::size_t M = 2>
-                class fri : public detail::basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M> {
+                struct fri : public detail::basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M> {
 
                     using basic_fri = detail::basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M>;
-
-                public:
                     constexpr static const std::size_t m = basic_fri::m;
 
                     using field_type = typename basic_fri::field_type;

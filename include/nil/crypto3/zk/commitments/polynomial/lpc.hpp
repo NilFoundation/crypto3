@@ -84,10 +84,11 @@ namespace nil {
 
                     typedef typename containers::merkle_proof<merkle_hash_type, 2> merkle_proof_type;
 
-                    using basic_fri = detail::basic_fri<FieldType,
-                                                        typename LPCParams::merkle_hash_type,
-                                                        typename LPCParams::transcript_hash_type,
-                                                        m>;
+                    using fri_type = fri<FieldType,
+                                         typename LPCParams::merkle_hash_type,
+                                         typename LPCParams::transcript_hash_type,
+                                         m>;
+                    using basic_fri = typename fri_type::basic_fri;
 
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
