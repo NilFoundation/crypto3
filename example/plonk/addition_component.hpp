@@ -45,7 +45,6 @@ namespace nil {
             namespace components {
 
                 template<typename ArithmetizationType,
-                         typename CurveType,
                          std::size_t... WireIndexes>
                 class addition;
 
@@ -64,7 +63,7 @@ namespace nil {
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2>
-                class component_template<
+                class addition<
                     snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams>,
                     W0, W1, W2>{
@@ -90,7 +89,7 @@ namespace nil {
 
                     // Addition Component doesn't calculate anything, so result_type contains nothing
                     struct result_type {
-                        result_type(params_type &params,
+                        result_type(const params_type &params,
                             const std::size_t &component_start_row) {
 
                         }
