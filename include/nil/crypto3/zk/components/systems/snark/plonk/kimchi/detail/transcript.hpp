@@ -90,7 +90,7 @@ namespace nil {
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp,
-                        std::size_t components_amount = 1){
+                        std::size_t components_amount = 1) {
                         return bp.allocate_rows(required_rows_amount *
                             components_amount);
                     }

@@ -71,6 +71,8 @@ void print_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end) {
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_demo_verifier_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
+    constexpr std::size_t complexity = 1;
+
     using curve_type = algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::base_field_type;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
@@ -89,12 +91,20 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
 
     using component_type = zk::components::curve_element_unified_addition<ArithmetizationType, curve_type, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8, 9, 10>;
+    using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    typename component_type::private_params_type private_params = {kimchi_proof.commitments.w_comm[0].unshifted[0],
-                                                                   kimchi_proof.commitments.w_comm[1].unshifted[0]};
-    typename component_type::public_params_type public_params = {};
+    auto P = kimchi_proof.commitments.w_comm[0].unshifted[0];
+    auto Q = kimchi_proof.commitments.w_comm[1].unshifted[0];
+    std::vector<BlueprintFieldType::value_type> public_input = {0, P.X, P.Y, Q.X, Q.Y};
+    
+    typename component_type::params_type component_params = {
+        var(0, 1, false, var::column_type::public_input),
+        var(0, 2, false, var::column_type::public_input), 
+        var(0, 3, false, var::column_type::public_input), 
+        var(0, 4, false, var::column_type::public_input)
+    };
 
-    auto expected_result = (private_params.P + private_params.Q).to_affine();
+    auto expected_result = P + Q;
     std::cout << "exprected result: (" << expected_result.X.data << ", " << expected_result.Y.data << ")" << std::endl;
 
     zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
@@ -102,18 +112,25 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     zk::blueprint<ArithmetizationType> bp(desc);
     zk::blueprint_private_assignment_table<ArithmetizationType> private_assignment(desc);
     zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
+    zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
 
-    std::size_t start_row = component_type::allocate_rows(bp);
-    component_type::generate_gates(bp, public_assignment, public_params, start_row);
-    component_type::generate_copy_constraints(bp, public_assignment, public_params, start_row);
-    component_type::generate_assignments(private_assignment, public_assignment, public_params, private_params,
-                                         start_row);
+    bp.allocate_rows(public_input.size());
+    for (std::size_t i = 0; i < public_input.size(); i++) {
+        auto allocated_pi = assignment_bp.allocate_public_input(public_input[i]);
+    }
 
-    std::cout << "actual result: (" << private_assignment.witness(4)[0].data << ", "
-              << private_assignment.witness(5)[0].data << ")" << std::endl;
+    typename component_type::allocated_data_type allocated_data;
+    std::size_t start_row = component_type::allocate_rows(bp, complexity);
+    for (std::size_t i = 0; i < complexity; i++) {
+        std::size_t row = start_row + i * component_type::required_rows_amount;
+        component_type::generate_circuit(bp, assignment_bp, component_params, allocated_data, row);
+        component_type::generate_assignments(assignment_bp, component_params, row);
+    }
 
-    private_assignment.padding();
-    public_assignment.padding();
+    std::cout << "actual result: (" << assignment_bp.witness(4)[start_row].data << ", "
+              << assignment_bp.witness(5)[start_row].data << ")" << std::endl;
+
+    assignment_bp.padding();
 
     zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(private_assignment,
                                                                                              public_assignment);
@@ -138,55 +155,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
 
     auto placeholder_proof = zk::snark::placeholder_prover<BlueprintFieldType, params>::process(
         public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
-
-    using Endianness = nil::marshalling::option::big_endian;
-    using TTypeBase = nil::marshalling::field_type<Endianness>;
-    using proof_marshalling_type =
-        nil::crypto3::marshalling::types::placeholder_proof<TTypeBase, decltype(placeholder_proof)>;
-    auto filled_placeholder_proof =
-        nil::crypto3::marshalling::types::fill_placeholder_proof<decltype(placeholder_proof), Endianness>(placeholder_proof);
-    std::vector<std::uint8_t> cv;
-    cv.resize(filled_placeholder_proof.length(), 0x00);
-    auto write_iter = cv.begin();
-    nil::marshalling::status_type status = filled_placeholder_proof.write(write_iter, cv.size());
-    std::cout << "proof (" << cv.size() << " bytes) = " << std::endl;
-    std::ofstream proof_file;
-    proof_file.open("placeholder.txt");
-    print_byteblob(proof_file, cv.cbegin(), cv.cend());
-
-    std::cout << "modulus = " << BlueprintFieldType::modulus << std::endl;
-    std::cout << "fri_params.r = " << fri_params.r << std::endl;
-    std::cout << "fri_params.max_degree = " << fri_params.max_degree << std::endl;
-    std::cout << "fri_params.q = ";
-    for (const auto &coeff : fri_params.q) {
-        std::cout << coeff.data << ", ";
-    }
-    std::cout << std::endl;
-    std::cout << "fri_params.D_omegas = ";
-    for (const auto &dom : fri_params.D) {
-        std::cout << static_cast<nil::crypto3::math::basic_radix2_domain<BlueprintFieldType> &>(*dom).omega.data
-                  << ", ";
-    }
-    std::cout << std::endl;
-    std::cout << "lpc_params.lambda = " << params::commitment_params_type::lambda << std::endl;
-    std::cout << "lpc_params.m = " << params::commitment_params_type::m << std::endl;
-    std::cout << "lpc_params.r = " << params::commitment_params_type::r << std::endl;
-    std::cout << "common_data.rows_amount = " << public_preprocessed_data.common_data.rows_amount << std::endl;
-    std::cout << "common_data.omega = "
-              << static_cast<nil::crypto3::math::basic_radix2_domain<BlueprintFieldType> &>(
-                     *public_preprocessed_data.common_data.basic_domain)
-                     .omega.data
-              << std::endl;
-    std::cout << "columns_rotations (" << public_preprocessed_data.common_data.columns_rotations.size()
-              << " number) = {" << std::endl;
-    for (const auto &column_rotations : public_preprocessed_data.common_data.columns_rotations) {
-        std::cout << "[";
-        for (auto rot : column_rotations) {
-            std::cout << int(rot) << ", ";
-        }
-        std::cout << "]," << std::endl;
-    }
-    std::cout << "}" << std::endl;
 
     bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, params>::process(
         public_preprocessed_data, placeholder_proof, bp, fri_params);
