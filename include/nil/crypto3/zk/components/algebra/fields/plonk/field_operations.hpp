@@ -133,6 +133,7 @@ namespace nil {
                         allocated_data_type &allocated_data,
                         const std::size_t row_start_index) {
 
+                        std::size_t selector_index;
                         if (!allocated_data.previously_allocated) {
                             selector_index = assignment.add_selector(row_start_index);
                             allocated_data.selector_index = selector_index;
@@ -141,7 +142,7 @@ namespace nil {
                             assignment.enable_selector(selector_index, row_start_index); 
                         }
                         auto constraint_1 = bp.add_constraint(
-                            (var(W0, 0) * var(W1, 0) - var(W2, 0));
+                            var(W0, 0) * var(W1, 0) - var(W2, 0));
 
                         if (!allocated_data.previously_allocated) {
                             bp.add_gate(selector_index,

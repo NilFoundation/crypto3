@@ -91,7 +91,7 @@ namespace nil {
                     using multiplication_component = zk::components::multiplication<ArithmetizationType,
                                                             W0, W1, W2>;
 
-                    constexpr static const permute_size = 7;
+                    constexpr static const std::size_t permute_size = 7;
 
                     static var assignments_from_limbs(blueprint_assignment_table<ArithmetizationType> &assignment,
                             std::array<var, 2> scalar_limbs_var,
@@ -156,17 +156,32 @@ namespace nil {
                                 var x,
                                 std::size_t n,
                                 std::size_t &component_start_row) {
-                            std::size_t column_index = W0;
-                            for (std::size_t i = 0; i < n; i++) {
-                                
-                            }
-                        }
+                        return std::vector<var>(1);
+                    }
+
+                    static std::vector<var> assignment_lagrange(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                var zeta,
+                                var zeta_omega,
+                                std::vector<var> omega_powers,
+                                std::size_t &component_start_row) {
+                        return std::vector<var>(1);
+                    }
+
+                    static std::array<var, 2> assignment_puiblic_eval(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                var zeta,
+                                var zeta_omega,
+                                std::vector<var> &lagrange_base,
+                                std::size_t &component_start_row) {
+                        std::array<var, 2> res = {var(0, 0), var(0, 0)};
+                        return res;
+                    }
 
                 public:
                     constexpr static const std::size_t required_rows_amount = 32;
 
                     struct params_type {
                         kimchi_verifier_index_scalar<CurveType> verifier_index;
+                        kimchi_proof_scalar<CurveType> proof;
                         //kimchi_scalar_limbs joint_combiner;
                         //kimchi_scalar_limbs beta;
                         //kimchi_scalar_limbs gamma;
@@ -214,7 +229,6 @@ namespace nil {
                             const std::size_t &component_start_row) {
                             
                         std::size_t row = component_start_row;
-                        const std::size_t public_input_size = 5; 
 
                         // copy public input
                         var alpha_limb_1 = assignment.allocate_public_input(params.alpha[0]);
@@ -222,12 +236,10 @@ namespace nil {
                         var zeta_limb_1 = assignment.allocate_public_input(params.zeta[0]);
                         var zeta_limb_2 = assignment.allocate_public_input(params.zeta[1]);
                         var fq_digest = assignment.allocate_public_input(params.fq_digest);
-                        var omega = assignment.allocate_public_input(params.omega);
+                        var omega = assignment.allocate_public_input(params.verifier_index.omega);
 
                         std::array<var, 2> alpha_pub_limbs = {alpha_limb_1, alpha_limb_2};
                         std::array<var, 2> zeta_pub_limbs = {zeta_limb_1, zeta_limb_2};
-
-                        //row += public_input_size;
 
                         var alpha = assignments_from_limbs(assignment,
                             alpha_pub_limbs, row);
@@ -249,6 +261,38 @@ namespace nil {
                         var zeta_pow_n = assignment_exponentiation(assignment, zeta, n, row);
 
                         var zeta_omega = assigment_multiplication(assignment, zeta, omega, row);
+                        var zeta_omega_pow_n = assignment_exponentiation(assignment, zeta_omega, n, row);
+
+                        std::vector<var> alpha_powers = assigment_element_powers(assignment, alpha, params.verifier_index.alpha_powers, row);
+                        std::vector<var> omega_powers = assigment_element_powers(assignment, alpha, params.verifier_index.public_input_size, row);
+                        std::vector<var> lagrange_base = assignment_lagrange(assignment, zeta, zeta_omega, omega_powers, row);
+
+                        std::array<var, 2> public_eval = assignment_puiblic_eval(assignment, zeta, zeta_omega, lagrange_base, row);
+                        transcript.absorb_evaluations_assignment(
+                            assignment,
+                            public_eval[0],
+                            params.proof.proof_evals[0],
+                            row
+                        );
+                        transcript.absorb_evaluations_assignment(
+                            assignment,
+                            public_eval[1],
+                            params.proof.proof_evals[1],
+                            row
+                        );
+
+                        transcript.absorb_assignment(assignment, params.proof.ft_eval, row);
+
+                        var v_challenge = transcript.challenge_assignment(
+                            assignment, row);
+                        var v = assignments_endo_scalar(assignment,
+                            v_challenge, row);
+
+                        var u_challenge = transcript.challenge_assignment(
+                            assignment, row);
+                        var u = assignments_endo_scalar(assignment,
+                            u_challenge, row);
+                        
                         
                         return result_type(params, component_start_row);
                     }

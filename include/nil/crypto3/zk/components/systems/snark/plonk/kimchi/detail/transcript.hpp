@@ -36,6 +36,7 @@
 #include <nil/crypto3/zk/component.hpp>
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/sponge.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -114,6 +115,14 @@ namespace nil {
                         
                     }
 
+                    void absorb_evaluations_assignment(
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        var public_eval,
+                        kimchi_proof_evaluations<CurveType> private_eval,
+                        std::size_t &component_start_row) {
+
+                    }
+
                     void absorb_generate_constraints(blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const var &zero,
@@ -121,16 +130,14 @@ namespace nil {
                             
                     }
 
-                    var squeeze_assignment(
+                    var challenge_assignment(
                             blueprint_assignment_table<ArithmetizationType> &assignment,
-                            var absorbing_value,
                             std::size_t &component_start_row) {
 
                     }
 
-                    void squeeze_generate_constraints(blueprint<ArithmetizationType> &bp,
+                    void challenge_generate_constraints(blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const var &zero,
                         const std::size_t &component_start_row) {
                             
                     }

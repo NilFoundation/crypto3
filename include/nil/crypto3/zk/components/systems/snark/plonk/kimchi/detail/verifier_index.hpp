@@ -47,6 +47,8 @@ namespace nil {
                     //nil::crypto3::math::evaluation_domain<Fr> domain;
                     size_t max_poly_size;
                     size_t max_quot_size;
+                    std::size_t alpha_powers;
+                    std::size_t public_input_size;
                     std::array<Fr, Permuts> shift;
 
                     // Polynomial in coefficients form

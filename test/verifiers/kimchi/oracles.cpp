@@ -41,7 +41,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/oracles.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
 
 #include "test_plonk_component.hpp"
 #include "proof_data.hpp"
@@ -80,7 +80,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
     verifier_index.n = 1;
 
-    typename component_type::params_type params = {verifier_index, alpha_limbs, zeta_limbs, fq_digest};
+    zk::components::kimchi_proof_scalar<curve_type> proof;
+
+    typename component_type::params_type params = {verifier_index, proof, alpha_limbs, zeta_limbs, fq_digest};
     std::vector<typename BlueprintFieldType::value_type> public_input = {};
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input);
