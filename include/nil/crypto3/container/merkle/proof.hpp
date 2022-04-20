@@ -142,9 +142,6 @@ namespace nil {
 
                         value_type _hash;
                         std::size_t _position;
-
-                        template<typename, typename>
-                        friend class nil::crypto3::marshalling::types::merkle_proof_marshalling;
                     };
 
                     typedef std::array<path_element_type, Arity - 1> layer_type;
@@ -158,16 +155,9 @@ namespace nil {
                         return _path;
                     }
 
-                private:
                     std::size_t _li;
                     value_type _root;
                     path_type _path;
-
-                    template<typename, typename, std::size_t>
-                    friend class nil::crypto3::zk::components::merkle_proof;
-
-                    template<typename, typename>
-                    friend class nil::crypto3::marshalling::types::merkle_proof_marshalling;
                 };
             }    // namespace detail
 
