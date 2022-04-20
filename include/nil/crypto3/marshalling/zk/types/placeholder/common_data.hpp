@@ -40,7 +40,7 @@
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/lpc.hpp>
 
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,12 +48,12 @@ namespace nil {
             namespace types {
                 template<typename TTypeBase, typename RedshiftPolicy,
                          typename = typename std::enable_if<
-                             std::is_same<RedshiftPolicy, nil::crypto3::zk::snark::detail::redshift_policy<
+                             std::is_same<RedshiftPolicy, nil::crypto3::zk::snark::detail::placeholder_policy<
                                                               typename RedshiftPolicy::field_type,
-                                                              typename RedshiftPolicy::redshift_params_type>>::value,
+                                                              typename RedshiftPolicy::placeholder_params_type>>::value,
                              bool>::type,
                          typename... TOptions>
-                using redshift_verifier_common_data = nil::marshalling::types::bundle<
+                using placeholder_verifier_common_data = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
                         // std::size_t rows_amount;
@@ -71,8 +71,8 @@ namespace nil {
                                 nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
 
                 template<typename RedshiftPolicy, typename Endianness>
-                redshift_verifier_common_data<nil::marshalling::field_type<Endianness>, RedshiftPolicy>
-                    fill_redshift_verifier_common_data(
+                placeholder_verifier_common_data<nil::marshalling::field_type<Endianness>, RedshiftPolicy>
+                    fill_placeholder_verifier_common_data(
                         const typename RedshiftPolicy::preprocessed_public_data_type::common_data_type &common_data) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -103,7 +103,7 @@ namespace nil {
                         filled_columns_rotations.value().push_back(filled_column_rotations);
                     }
 
-                    return redshift_verifier_common_data<TTypeBase, RedshiftPolicy>(
+                    return placeholder_verifier_common_data<TTypeBase, RedshiftPolicy>(
                         std::make_tuple(filled_rows_amount, filled_omega, filled_columns_rotations));
                 }
             }    // namespace types
