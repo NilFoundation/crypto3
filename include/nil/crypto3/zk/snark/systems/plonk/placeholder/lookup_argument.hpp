@@ -111,6 +111,8 @@ namespace nil {
                                         case VariableType::column_type::constant:
                                             input_assignment = plonk_columns.constant(lookup.vars[0].index);
                                             break;
+                                        case VariableType::column_type::selector:
+                                            break;
                                     }
                                     switch (lookup_gates[i].constraints[j].lookup_value[k].type) {
                                         case VariableType::column_type::witness:
@@ -124,6 +126,8 @@ namespace nil {
                                         case VariableType::column_type::constant:
                                             value_assignment = plonk_columns.constant(
                                                 lookup_gates[i].constraints[j].lookup_value[k].index);
+                                            break;
+                                        case VariableType::column_type::selector:
                                             break;
                                     }
                                     for (std::size_t t = 0; t < preprocessed_data.common_data.rows_amount; t++) {
