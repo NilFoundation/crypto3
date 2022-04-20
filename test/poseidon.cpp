@@ -202,6 +202,42 @@ BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_5) {
     BOOST_CHECK(res == expected_result);
 }
 
+BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_6) {
+    using field_type = fields::pallas_base_field;
+    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 2, 1, 7, 55, 0, true>;
+    using sponge_construction_type = hashes::detail::poseidon_sponge_construction<poseidon_policy>;
+
+    std::vector<field_type::value_type> input = {0x1A3FBD7D8C00BD0C3D4BC1DD41BF7FAA5903518DA636955D98712F9AC6D6DDFA_cppui256,
+                                                0x1AA195509819DF535E832D7D8AF809B385EF96A85A5A2DCE0DB7F9D72954F829_cppui256};
+    std::array<typename poseidon_policy::element_type, poseidon_policy::state_words> expected_state = {0x1A3FBD7D8C00BD0C3D4BC1DD41BF7FAA5903518DA636955D98712F9AC6D6DDFA_cppui256,
+                                                                                                    0x1AA195509819DF535E832D7D8AF809B385EF96A85A5A2DCE0DB7F9D72954F829_cppui256,
+                                                                                                    0};
+    sponge_construction_type pallas_sponge;
+    
+    pallas_sponge.absorb(input);
+
+    BOOST_CHECK(pallas_sponge.state == expected_state);
+}
+
+BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_7) {
+    using field_type = fields::pallas_base_field;
+    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 2, 1, 7, 55, 0, true>;
+    using sponge_construction_type = hashes::detail::poseidon_sponge_construction<poseidon_policy>;
+
+    std::vector<field_type::value_type> input = {0x1A3FBD7D8C00BD0C3D4BC1DD41BF7FAA5903518DA636955D98712F9AC6D6DDFA_cppui256,
+                                                0x1AA195509819DF535E832D7D8AF809B385EF96A85A5A2DCE0DB7F9D72954F829_cppui256,
+                                                0x3726E7B88E19F5485CFCEE49CDD9E1C54061AF5519AE3439B4B213A9611F13D7_cppui256,
+                                                0x17119ED889942903B42F983E9A2A76B1C68BD7196EC92E5EA1037E4DB97F7FBA_cppui256};
+    std::array<typename poseidon_policy::element_type, poseidon_policy::state_words> expected_state = {0x211553266A0ACB4CE162546A006BEC47997C4125FF22051A3B2E47BFC73A991C_cppui256,
+                                                                                                    0x03652CA9EB006660E05448DABFAAAF579A522E745691862E6CDB5EACBFE7D5E4_cppui256,
+                                                                                                    0x2EAC0AE1C9FC6CEF8CC200D82303F6105DEE979FD1F80FA1561ED32F2C474B42_cppui256};
+    sponge_construction_type pallas_sponge;
+    
+    pallas_sponge.absorb(input);
+
+    BOOST_CHECK(pallas_sponge.state == expected_state);
+}
+
 /*BOOST_DATA_TEST_CASE(poseidon_strengthen_1, string_data("internal", "strengthen", "1"), data_set) {
     using policy_type = hashes::detail::base_poseidon_policy<poseidon_default_field_t, 1, 1, default_sbox_power, default_full_rounds, 69>;
     using poseidon_functions_t = hashes::detail::poseidon_functions<policy_type>;
