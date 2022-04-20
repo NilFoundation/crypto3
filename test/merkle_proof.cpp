@@ -155,8 +155,8 @@ BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_2_js_test) {
 
 BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_2_test) {
     std::srand(std::time(0));
-    // test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 2>(5);
-    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 2>(18);
+    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 2>(5);
+    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 2>(6);
 }
 
 // TODO: fix test case for arity 3

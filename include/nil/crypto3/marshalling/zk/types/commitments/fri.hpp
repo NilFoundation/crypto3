@@ -66,13 +66,8 @@ namespace nil {
                         std::tuple<
                             // typename FieldType::value_type colinear_value;
                             field_element<TTypeBase, typename FRIScheme::field_type::value_type>,
-                            // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
-                            // TODO: review std::uint8_t type usage (for example, pedersen outputs array of bits)
                             // typename merkle_tree_type::value_type T_root;
-                            nil::marshalling::types::array_list<
-                                TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
-                                nil::marshalling::option::sequence_size_field_prefix<
-                                    nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
+                            typename merkle_node_value<TTypeBase, typename FRIScheme::merkle_proof_type>::type,
                             // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                             // std::array<typename FieldType::value_type, m> y;
                             nil::marshalling::types::array_list<
@@ -129,10 +124,7 @@ namespace nil {
                                 nil::marshalling::option::sequence_size_field_prefix<
                                     nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                             // typename merkle_tree_type::value_type T_root
-                            nil::marshalling::types::array_list<
-                                TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
-                                nil::marshalling::option::sequence_size_field_prefix<
-                                    nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
+                            typename merkle_node_value<TTypeBase, typename FRIScheme::merkle_proof_type>::type,
                             // std::array<std::array<typename FieldType::value_type, m>, leaf_size> y
                             // TODO: use nil::marshalling::option::fixed_size_storage with std::array
                             nil::marshalling::types::array_list<
@@ -193,9 +185,6 @@ namespace nil {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
                     using octet_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint8_t>;
-                    using digest_marshalling_type = nil::marshalling::types::array_list<
-                        TTypeBase, octet_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using merkle_proof_marshalling_type =
                         merkle_proof<TTypeBase, typename FRIScheme::merkle_proof_type>;
                     using merkle_proof_vector_marshalling_type = nil::marshalling::types::array_list<
@@ -211,10 +200,8 @@ namespace nil {
                     field_marhsalling_type filled_colinear_value(proof.colinear_value);
 
                     // typename merkle_tree_type::value_type T_root;
-                    digest_marshalling_type filled_T_root;
-                    for (const auto c : proof.T_root) {
-                        filled_T_root.value().push_back(octet_marshalling_type(c));
-                    }
+                    typename merkle_node_value<TTypeBase, typename FRIScheme::merkle_proof_type>::type filled_T_root =
+                        fill_merkle_node_value<typename FRIScheme::merkle_proof_type, Endianness>(proof.T_root);
 
                     // std::array<typename FieldType::value_type, m> y;
                     field_vector_marshalling_type filled_y;
@@ -255,10 +242,8 @@ namespace nil {
                     proof.colinear_value = std::get<0>(filled_proof.value()).value();
 
                     // typename merkle_tree_type::value_type T_root;
-                    BOOST_ASSERT(proof.T_root.size() == std::get<1>(filled_proof.value()).value().size());
-                    for (std::size_t i = 0; i < std::get<1>(filled_proof.value()).value().size(); ++i) {
-                        proof.T_root.at(i) = std::get<1>(filled_proof.value()).value().at(i).value();
-                    }
+                    proof.T_root = make_merkle_node_value<typename FRIScheme::merkle_proof_type, Endianness>(
+                        std::get<1>(filled_proof.value()));
 
                     // std::array<typename FieldType::value_type, m> y;
                     BOOST_ASSERT(proof.y.size() == std::get<2>(filled_proof.value()).value().size());
@@ -361,9 +346,6 @@ namespace nil {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
                     using octet_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint8_t>;
-                    using digest_marshalling_type = nil::marshalling::types::array_list<
-                        TTypeBase, octet_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using merkle_proof_marshalling_type =
                         merkle_proof<TTypeBase, typename FRIScheme::merkle_proof_type>;
                     using merkle_proof_vector_marshalling_type = nil::marshalling::types::array_list<
@@ -385,10 +367,8 @@ namespace nil {
                     }
 
                     // typename merkle_tree_type::value_type T_root;
-                    digest_marshalling_type filled_T_root;
-                    for (const auto c : proof.T_root) {
-                        filled_T_root.value().push_back(octet_marshalling_type(c));
-                    }
+                    typename merkle_node_value<TTypeBase, typename FRIScheme::merkle_proof_type>::type filled_T_root =
+                        fill_merkle_node_value<typename FRIScheme::merkle_proof_type, Endianness>(proof.T_root);
 
                     // std::array<std::array<typename FieldType::value_type, m>, leaf_size> y;
                     field_vector_vector_marshalling_type filled_y;
@@ -437,10 +417,8 @@ namespace nil {
                     }
 
                     // typename merkle_tree_type::value_type T_root;
-                    BOOST_ASSERT(proof.T_root.size() == std::get<1>(filled_proof.value()).value().size());
-                    for (std::size_t i = 0; i < std::get<1>(filled_proof.value()).value().size(); ++i) {
-                        proof.T_root.at(i) = std::get<1>(filled_proof.value()).value().at(i).value();
-                    }
+                    proof.T_root = make_merkle_node_value<typename FRIScheme::merkle_proof_type, Endianness>(
+                        std::get<1>(filled_proof.value()));
 
                     // std::array<std::array<typename FieldType::value_type, m>, leaf_size> y;
                     BOOST_ASSERT(proof.y.size() == std::get<2>(filled_proof.value()).value().size());

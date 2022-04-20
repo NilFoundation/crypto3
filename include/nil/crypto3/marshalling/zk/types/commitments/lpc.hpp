@@ -55,56 +55,58 @@ namespace nil {
 
                 template<typename TTypeBase, typename LPCScheme>
                 struct lpc_proof<
-                    TTypeBase, LPCScheme,
-                    typename std::enable_if<std::is_same<
-                        LPCScheme, nil::crypto3::zk::commitments::list_polynomial_commitment<
-                                       typename LPCScheme::field_type, typename LPCScheme::lpc_params>>::value>::type> {
+                    TTypeBase,
+                    LPCScheme,
+                    typename std::enable_if<std::is_same<LPCScheme,
+                                                         nil::crypto3::zk::commitments::list_polynomial_commitment<
+                                                             typename LPCScheme::field_type,
+                                                             typename LPCScheme::lpc_params>>::value>::type> {
                     using type = nil::marshalling::types::bundle<
                         TTypeBase,
                         std::tuple<
                             // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                             // TODO: review std::uint8_t type usage (for example, pedersen outputs array of bits)
                             // typename merkle_tree_type::value_type T_root;
-                            nil::marshalling::types::array_list<
-                                TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
-                                nil::marshalling::option::sequence_size_field_prefix<
-                                    nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
+                            typename merkle_node_value<TTypeBase, typename LPCScheme::merkle_proof_type>::type,
                             // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                             // std::vector<typename FieldType::value_type> z;
                             nil::marshalling::types::array_list<
-                                TTypeBase, field_element<TTypeBase, typename LPCScheme::field_type::value_type>,
+                                TTypeBase,
+                                field_element<TTypeBase, typename LPCScheme::field_type::value_type>,
                                 nil::marshalling::option::sequence_size_field_prefix<
                                     nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                             // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                             // std::array<typename fri_type::proof_type, lambda> fri_proof;
                             nil::marshalling::types::array_list<
-                                TTypeBase, typename fri_proof<TTypeBase, typename LPCScheme::fri_type>::type,
+                                TTypeBase,
+                                typename fri_proof<TTypeBase, typename LPCScheme::fri_type>::type,
                                 nil::marshalling::option::sequence_size_field_prefix<
                                     nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>>>;
                 };
 
                 template<typename TTypeBase, typename LPCScheme>
-                struct lpc_proof<TTypeBase, LPCScheme,
-                                 typename std::enable_if<std::is_same<
-                                     LPCScheme, nil::crypto3::zk::commitments::batched_list_polynomial_commitment<
-                                                    typename LPCScheme::field_type, typename LPCScheme::lpc_params,
-                                                    LPCScheme::leaf_size>>::value>::type> {
+                struct lpc_proof<TTypeBase,
+                                 LPCScheme,
+                                 typename std::enable_if<
+                                     std::is_same<LPCScheme,
+                                                  nil::crypto3::zk::commitments::batched_list_polynomial_commitment<
+                                                      typename LPCScheme::field_type,
+                                                      typename LPCScheme::lpc_params,
+                                                      LPCScheme::leaf_size>>::value>::type> {
                     using type = nil::marshalling::types::bundle<
                         TTypeBase,
                         std::tuple<
                             // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                             // TODO: review std::uint8_t type usage (for example, pedersen outputs array of bits)
                             // typename merkle_tree_type::value_type T_root;
-                            nil::marshalling::types::array_list<
-                                TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
-                                nil::marshalling::option::sequence_size_field_prefix<
-                                    nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
+                            typename merkle_node_value<TTypeBase, typename LPCScheme::merkle_proof_type>::type,
                             // std::array<std::vector<typename FieldType::value_type>, leaf_size> z
                             // TODO: use nil::marshalling::option::fixed_size_storage with std::array
                             nil::marshalling::types::array_list<
                                 TTypeBase,
                                 nil::marshalling::types::array_list<
-                                    TTypeBase, field_element<TTypeBase, typename LPCScheme::field_type::value_type>,
+                                    TTypeBase,
+                                    field_element<TTypeBase, typename LPCScheme::field_type::value_type>,
                                     nil::marshalling::option::sequence_size_field_prefix<
                                         nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                                 nil::marshalling::option::sequence_size_field_prefix<
@@ -112,41 +114,39 @@ namespace nil {
                             // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
                             // std::array<typename fri_type::proof_type, lambda> fri_proof;
                             nil::marshalling::types::array_list<
-                                TTypeBase, typename fri_proof<TTypeBase, typename LPCScheme::fri_type>::type,
+                                TTypeBase,
+                                typename fri_proof<TTypeBase, typename LPCScheme::fri_type>::type,
                                 nil::marshalling::option::sequence_size_field_prefix<
                                     nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>>>;
                 };
 
-                template<typename LPCScheme, typename Endianness,
-                         typename std::enable_if<
-                             std::is_same<LPCScheme,
-                                          nil::crypto3::zk::commitments::list_polynomial_commitment<
-                                              typename LPCScheme::field_type, typename LPCScheme::lpc_params>>::value,
-                             bool>::type = true>
+                template<typename LPCScheme,
+                         typename Endianness,
+                         typename std::enable_if<std::is_same<LPCScheme,
+                                                              nil::crypto3::zk::commitments::list_polynomial_commitment<
+                                                                  typename LPCScheme::field_type,
+                                                                  typename LPCScheme::lpc_params>>::value,
+                                                 bool>::type = true>
                 typename lpc_proof<nil::marshalling::field_type<Endianness>, LPCScheme>::type
                     fill_lpc_proof(const typename LPCScheme::proof_type &proof) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
-                    using octet_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint8_t>;
-                    using digest_marshalling_type = nil::marshalling::types::array_list<
-                        TTypeBase, octet_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using field_marhsalling_type = field_element<TTypeBase, typename LPCScheme::field_type::value_type>;
                     using field_vector_marshalling_type = nil::marshalling::types::array_list<
-                        TTypeBase, field_marhsalling_type,
+                        TTypeBase,
+                        field_marhsalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using fri_proof_marshalling_type =
                         typename fri_proof<TTypeBase, typename LPCScheme::fri_type>::type;
                     using fri_proof_vector_marshalling_type = nil::marshalling::types::array_list<
-                        TTypeBase, fri_proof_marshalling_type,
+                        TTypeBase,
+                        fri_proof_marshalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
 
                     // typename merkle_tree_type::value_type T_root;
-                    digest_marshalling_type filled_T_root;
-                    for (const auto c : proof.T_root) {
-                        filled_T_root.value().push_back(octet_marshalling_type(c));
-                    }
+                    typename merkle_node_value<TTypeBase, typename LPCScheme::merkle_proof_type>::type filled_T_root =
+                        fill_merkle_node_value<typename LPCScheme::merkle_proof_type, Endianness>(proof.T_root);
 
                     // std::vector<typename FieldType::value_type> z;
                     field_vector_marshalling_type filled_z;
@@ -164,22 +164,21 @@ namespace nil {
                         std::make_tuple(filled_T_root, filled_z, filled_fri_proof));
                 }
 
-                template<typename LPCScheme, typename Endianness,
-                         typename std::enable_if<
-                             std::is_same<LPCScheme,
-                                          nil::crypto3::zk::commitments::list_polynomial_commitment<
-                                              typename LPCScheme::field_type, typename LPCScheme::lpc_params>>::value,
-                             bool>::type = true>
+                template<typename LPCScheme,
+                         typename Endianness,
+                         typename std::enable_if<std::is_same<LPCScheme,
+                                                              nil::crypto3::zk::commitments::list_polynomial_commitment<
+                                                                  typename LPCScheme::field_type,
+                                                                  typename LPCScheme::lpc_params>>::value,
+                                                 bool>::type = true>
                 typename LPCScheme::proof_type make_lpc_proof(
                     const typename lpc_proof<nil::marshalling::field_type<Endianness>, LPCScheme>::type &filled_proof) {
 
                     typename LPCScheme::proof_type proof;
 
                     // typename merkle_tree_type::value_type T_root;
-                    BOOST_ASSERT(proof.T_root.size() == std::get<0>(filled_proof.value()).value().size());
-                    for (std::size_t i = 0; i < std::get<0>(filled_proof.value()).value().size(); ++i) {
-                        proof.T_root.at(i) = std::get<0>(filled_proof.value()).value().at(i).value();
-                    }
+                    proof.T_root = make_merkle_node_value<typename LPCScheme::merkle_proof_type, Endianness>(
+                        std::get<0>(filled_proof.value()));
 
                     // std::vector<typename FieldType::value_type> z;
                     for (std::size_t i = 0; i < std::get<1>(filled_proof.value()).value().size(); ++i) {
@@ -196,39 +195,39 @@ namespace nil {
                     return proof;
                 }
 
-                template<typename LPCScheme, typename Endianness,
+                template<typename LPCScheme,
+                         typename Endianness,
                          typename std::enable_if<
-                             std::is_same<LPCScheme, nil::crypto3::zk::commitments::batched_list_polynomial_commitment<
-                                                         typename LPCScheme::field_type, typename LPCScheme::lpc_params,
-                                                         LPCScheme::leaf_size>>::value,
+                             std::is_same<LPCScheme,
+                                          nil::crypto3::zk::commitments::batched_list_polynomial_commitment<
+                                              typename LPCScheme::field_type,
+                                              typename LPCScheme::lpc_params,
+                                              LPCScheme::leaf_size>>::value,
                              bool>::type = true>
                 typename lpc_proof<nil::marshalling::field_type<Endianness>, LPCScheme>::type
                     fill_lpc_proof(const typename LPCScheme::proof_type &proof) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
-                    using octet_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint8_t>;
-                    using digest_marshalling_type = nil::marshalling::types::array_list<
-                        TTypeBase, octet_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using field_marhsalling_type = field_element<TTypeBase, typename LPCScheme::field_type::value_type>;
                     using field_vector_marshalling_type = nil::marshalling::types::array_list<
-                        TTypeBase, field_marhsalling_type,
+                        TTypeBase,
+                        field_marhsalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using field_vector_vector_marshalling_type = nil::marshalling::types::array_list<
-                        TTypeBase, field_vector_marshalling_type,
+                        TTypeBase,
+                        field_vector_marshalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using fri_proof_marshalling_type =
                         typename fri_proof<TTypeBase, typename LPCScheme::fri_type>::type;
                     using fri_proof_vector_marshalling_type = nil::marshalling::types::array_list<
-                        TTypeBase, fri_proof_marshalling_type,
+                        TTypeBase,
+                        fri_proof_marshalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
 
                     // typename merkle_tree_type::value_type T_root;
-                    digest_marshalling_type filled_T_root;
-                    for (const auto c : proof.T_root) {
-                        filled_T_root.value().push_back(octet_marshalling_type(c));
-                    }
+                    typename merkle_node_value<TTypeBase, typename LPCScheme::merkle_proof_type>::type filled_T_root =
+                        fill_merkle_node_value<typename LPCScheme::merkle_proof_type, Endianness>(proof.T_root);
 
                     // std::array<std::vector<typename FieldType::value_type>, leaf_size> z
                     field_vector_vector_marshalling_type filled_z;
@@ -250,11 +249,14 @@ namespace nil {
                         std::make_tuple(filled_T_root, filled_z, filled_fri_proof));
                 }
 
-                template<typename LPCScheme, typename Endianness,
+                template<typename LPCScheme,
+                         typename Endianness,
                          typename std::enable_if<
-                             std::is_same<LPCScheme, nil::crypto3::zk::commitments::batched_list_polynomial_commitment<
-                                                         typename LPCScheme::field_type, typename LPCScheme::lpc_params,
-                                                         LPCScheme::leaf_size>>::value,
+                             std::is_same<LPCScheme,
+                                          nil::crypto3::zk::commitments::batched_list_polynomial_commitment<
+                                              typename LPCScheme::field_type,
+                                              typename LPCScheme::lpc_params,
+                                              LPCScheme::leaf_size>>::value,
                              bool>::type = true>
                 typename LPCScheme::proof_type make_lpc_proof(
                     const typename lpc_proof<nil::marshalling::field_type<Endianness>, LPCScheme>::type &filled_proof) {
@@ -262,10 +264,8 @@ namespace nil {
                     typename LPCScheme::proof_type proof;
 
                     // typename merkle_tree_type::value_type T_root;
-                    BOOST_ASSERT(proof.T_root.size() == std::get<0>(filled_proof.value()).value().size());
-                    for (std::size_t i = 0; i < std::get<0>(filled_proof.value()).value().size(); ++i) {
-                        proof.T_root.at(i) = std::get<0>(filled_proof.value()).value().at(i).value();
-                    }
+                    proof.T_root = make_merkle_node_value<typename LPCScheme::merkle_proof_type, Endianness>(
+                        std::get<0>(filled_proof.value()));
 
                     // std::vector<typename FieldType::value_type> z;
                     for (std::size_t i = 0; i < std::get<1>(filled_proof.value()).value().size(); ++i) {
