@@ -47,12 +47,26 @@
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
 
 template<typename TIter>
-void print_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end) {
+void print_hex_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end, bool endl) {
     os << std::hex;
     for (TIter it = iter_begin; it != iter_end; it++) {
         os << std::setfill('0') << std::setw(2) << std::right << int(*it);
     }
-    os << std::endl << std::dec;
+    os << std::dec;
+    if (endl) {
+        os << std::endl;
+    }
+}
+
+template<typename MerkleProofIterator, typename VerifiedDataIterator>
+void print_merkle_proof(MerkleProofIterator merkle_proof_begin, MerkleProofIterator merkle_proof_end,
+                        VerifiedDataIterator verified_data_begin, VerifiedDataIterator verified_data_end, bool endl) {
+    std::ofstream merkle_out;
+    merkle_out.open("merkle_proof.txt");
+    print_hex_byteblob(merkle_out, merkle_proof_begin, merkle_proof_end, endl);
+    std::ofstream merkle_verified_data_out;
+    merkle_verified_data_out.open("merkle_proof_verified_data.txt");
+    print_hex_byteblob(merkle_verified_data_out, verified_data_begin, verified_data_end, endl);
 }
 
 template<typename FpCurveGroupElement>
@@ -79,7 +93,7 @@ typename std::enable_if<std::is_unsigned<ValueType>::value, std::vector<std::arr
     return v;
 }
 
-template<typename Endianness, typename Hash, std::size_t Arity>
+template<typename Endianness, typename Hash, std::size_t Arity, std::size_t LeafSize = 32>
 void test_merkle_proof(std::size_t tree_depth) {
 
     using namespace nil::crypto3::marshalling;
@@ -89,14 +103,9 @@ void test_merkle_proof(std::size_t tree_depth) {
         types::merkle_proof<nil::marshalling::field_type<Endianness>, merkle_proof_type>;
 
     std::size_t leafs_number = std::pow(Arity, tree_depth);
-    auto data = generate_random_data<std::uint8_t, 32>(leafs_number);
+    auto data = generate_random_data<std::uint8_t, LeafSize>(leafs_number);
     merkle_tree_type tree(data.begin(), data.end());
     std::size_t proof_idx = std::rand() % leafs_number;
-   std::cout << "Verified data: ";
-       for (auto c : data[proof_idx]) {
-       std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
-   }
-   std::cout << std::endl << std::endl;
     merkle_proof_type proof(tree, proof_idx);
 
     auto filled_merkle_proof = types::fill_merkle_proof<merkle_proof_type, Endianness>(proof);
@@ -107,14 +116,9 @@ void test_merkle_proof(std::size_t tree_depth) {
     cv.resize(filled_merkle_proof.length(), 0x00);
     auto write_iter = cv.begin();
     nil::marshalling::status_type status = filled_merkle_proof.write(write_iter, cv.size());
-//    std::cout << "Merkle proof: ";
-//    for (auto c : cv) {
-//        std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << int(c);
-//    }
-//    std::cout << std::endl << std::endl;
-    std::ofstream merkle_out;
-    merkle_out.open("merkle_proof.txt");
-    print_byteblob(merkle_out, cv.cbegin(), cv.cend());
+
+    std::cout << "Proof size: " << cv.size() << std::endl;
+    print_merkle_proof(cv.cbegin(), cv.cend(), data[proof_idx].cbegin(), data[proof_idx].cend(), true);
 
     merkle_proof_marshalling_type test_val_read;
     auto read_iter = cv.begin();
@@ -125,38 +129,11 @@ void test_merkle_proof(std::size_t tree_depth) {
 
 BOOST_AUTO_TEST_SUITE(marshalling_merkle_proof_test_suite)
 
-BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_2_js_test) {
-    using namespace nil::crypto3::marshalling;
-    using Hash = nil::crypto3::hashes::keccak_1600<256>;
-    using Endianness = nil::marshalling::option::big_endian;
-    constexpr std::size_t Arity = 2;
-    std::size_t tree_depth = 5;
-    using merkle_tree_type = nil::crypto3::containers::merkle_tree<Hash, Arity>;
-    using merkle_proof_type = nil::crypto3::containers::merkle_proof<Hash, Arity>;
-    using merkle_proof_marshalling_type =
-        types::merkle_proof<nil::marshalling::field_type<Endianness>, merkle_proof_type>;
-
-    std::size_t leafs_number = std::pow(Arity, tree_depth);
-    auto data = generate_random_data<std::uint8_t, 32>(leafs_number);
-    merkle_tree_type tree(data.begin(), data.end());
-    std::size_t proof_idx = std::rand() % leafs_number;
-    std::cout << "Verified data: ";
-    print_byteblob(std::cout, data[proof_idx].cbegin(), data[proof_idx].cend());
-    merkle_proof_type proof(tree, proof_idx);
-
-    auto filled_merkle_proof = types::fill_merkle_proof<merkle_proof_type, Endianness>(proof);
-    std::vector<std::uint8_t> cv;
-    cv.resize(filled_merkle_proof.length(), 0x00);
-    auto write_iter = cv.begin();
-    nil::marshalling::status_type status = filled_merkle_proof.write(write_iter, cv.size());
-    std::cout << "Merkle proof: ";
-    print_byteblob(std::cout, cv.cbegin(), cv.cend());
-}
-
 BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_2_test) {
     std::srand(std::time(0));
     test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 2>(5);
-    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 2>(6);
+    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 2>(10);
+    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 2, 300>(15);
 }
 
 // TODO: fix test case for arity 3
