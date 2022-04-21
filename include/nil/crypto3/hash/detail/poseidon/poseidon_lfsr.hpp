@@ -48,7 +48,7 @@ namespace nil {
                             for (std::size_t i = 0; i < (full_rounds + part_rounds) * state_words; i++) {
                                 std::size_t idx1 = i / state_words;
                                 std::size_t idx2 = i % state_words;
-                                round_constants[i] = poseidon_constants_kimchi::round_constant[idx1][idx2];
+                                round_constants[i] = poseidon_constants_kimchi_vesta::round_constant[idx1][idx2];
                             }
 
                             return;
