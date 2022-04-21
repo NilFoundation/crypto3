@@ -91,9 +91,9 @@ namespace nil {
                     struct result_type {
                         var X = var(0, 0, false);
                         var Y = var(0, 0, false);
-                        result_type(const std::size_t &component_start_row) {
-                            X = var(W4, component_start_row, false, var::column_type::witness);
-                            Y = var(W5, component_start_row, false, var::column_type::witness);
+                        result_type(const std::size_t row_start_index) {
+                            X = var(W4, row_start_index, false, var::column_type::witness);
+                            Y = var(W5, row_start_index, false, var::column_type::witness);
                         }
                     };
 
@@ -118,20 +118,20 @@ namespace nil {
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
                         allocated_data_type &allocated_data,
-                        const std::size_t &component_start_row) {
+                        const std::size_t row_start_index){
 
-                        generate_gates(bp, assignment, params, allocated_data, component_start_row);
-                        generate_copy_constraints(bp, assignment, params, component_start_row);
-                        return result_type(component_start_row);
+                        generate_gates(bp, assignment, params, allocated_data, row_start_index);
+                        generate_copy_constraints(bp, assignment, params, row_start_index);
+                        return result_type(row_start_index);
                     }
 
                     static result_type generate_assignments(
                             blueprint_assignment_table<ArithmetizationType>
                                 &assignment,
                             const params_type &params,
-                            const std::size_t &component_start_row) {
+                            const std::size_t row_start_index){
 
-                        const std::size_t &j = component_start_row;
+                        const std::size_t j = row_start_index;
 
                         assignment.public_input(0)[0] = ArithmetizationType::field_type::value_type::zero();
 
@@ -182,7 +182,7 @@ namespace nil {
 
                             assignment.witness(W10)[j] = 0;
                         }
-                        return result_type(component_start_row);
+                        return result_type(row_start_index);
                     }
 
                     private:
@@ -235,9 +235,9 @@ namespace nil {
                             blueprint<ArithmetizationType> &bp,
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             const params_type &params,
-                            const std::size_t &component_start_row){
+                            const std::size_t row_start_index){
 
-                        const std::size_t &j = component_start_row;
+                        const std::size_t j = row_start_index;
 
                         std::size_t public_input_column_index = 0;
                         bp.add_copy_constraint({{W6, static_cast<int>(j), false},

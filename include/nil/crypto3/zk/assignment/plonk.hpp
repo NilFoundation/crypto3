@@ -94,13 +94,15 @@ namespace nil {
 
                         if (_table_description.rows_amount < 4)
                             _table_description.rows_amount = 4;
-
-                        for (std::size_t w_index = 0; w_index <
-                            ArithmetizationParams::WitnessColumns; w_index++){
-
-                            this->witness_columns[w_index].resize(_table_description.rows_amount);
-                        }
                     }
+                    
+                    for (std::size_t w_index = 0; w_index <
+                        ArithmetizationParams::WitnessColumns; w_index++){
+
+                        this->witness_columns[w_index].resize(_table_description.rows_amount,
+                            decltype(this->witness_columns)::value_type::value_type::zero());
+                    }
+                    
 
                     return _table_description.rows_amount;
                 }
@@ -263,25 +265,28 @@ namespace nil {
 
                         if (_table_description.rows_amount < 4)
                             _table_description.rows_amount = 4;
+                    }
 
-                        for (std::size_t pi_index = 0; pi_index <
-                            this->public_input_columns.size(); pi_index++) {
+                    for (std::size_t pi_index = 0; pi_index <
+                        this->public_input_columns.size(); pi_index++) {
 
-                            this->public_input_columns[pi_index].resize(_table_description.rows_amount);
-                        }
+                        std::cout << "Resize: " << _table_description.rows_amount << std::endl;
+                        this->public_input_columns[pi_index].resize(_table_description.rows_amount,
+                            decltype(this->public_input_columns)::value_type::value_type::zero());
+                    }
 
-                        for (std::size_t c_index = 0; c_index <
-                            this->constant_columns.size(); c_index++) {
+                    for (std::size_t c_index = 0; c_index <
+                        this->constant_columns.size(); c_index++) {
 
-                            this->constant_columns[c_index].resize(_table_description.rows_amount);
-                        }
+                        this->constant_columns[c_index].resize(_table_description.rows_amount,
+                            decltype(this->constant_columns)::value_type::value_type::zero());
+                    }
 
-                        for (std::size_t s_index = 0; s_index <
-                            this->selector_columns.size(); s_index++) {
+                    for (std::size_t s_index = 0; s_index <
+                        this->selector_columns.size(); s_index++) {
 
-                            this->selector_columns[s_index].resize(_table_description.rows_amount);
-                        }
-
+                        this->selector_columns[s_index].resize(_table_description.rows_amount,
+                            decltype(this->selector_columns)::value_type::value_type::zero());
                     }
 
                     return _table_description.rows_amount;
