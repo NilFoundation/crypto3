@@ -224,18 +224,25 @@ BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_7) {
     using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 2, 1, 7, 55, 0, true>;
     using sponge_construction_type = hashes::detail::poseidon_sponge_construction<poseidon_policy>;
 
-    std::vector<field_type::value_type> input = {0x1A3FBD7D8C00BD0C3D4BC1DD41BF7FAA5903518DA636955D98712F9AC6D6DDFA_cppui256,
-                                                0x1AA195509819DF535E832D7D8AF809B385EF96A85A5A2DCE0DB7F9D72954F829_cppui256,
-                                                0x3726E7B88E19F5485CFCEE49CDD9E1C54061AF5519AE3439B4B213A9611F13D7_cppui256,
-                                                0x17119ED889942903B42F983E9A2A76B1C68BD7196EC92E5EA1037E4DB97F7FBA_cppui256};
-    std::array<typename poseidon_policy::element_type, poseidon_policy::state_words> expected_state = {0x211553266A0ACB4CE162546A006BEC47997C4125FF22051A3B2E47BFC73A991C_cppui256,
-                                                                                                    0x03652CA9EB006660E05448DABFAAAF579A522E745691862E6CDB5EACBFE7D5E4_cppui256,
-                                                                                                    0x2EAC0AE1C9FC6CEF8CC200D82303F6105DEE979FD1F80FA1561ED32F2C474B42_cppui256};
+    std::vector<field_type::value_type> input = {0x3CF70C3A89749A45DB5236B8DE167A37762526C45270138A9FCDF2352B1899DA_cppui256,
+                                                0x1BDF55BC84C1A0E0F7F6834949FCF90279B9D21C17DBC9928202C49039570598_cppui256,
+                                                0x09441E95A82199EFC390152C5039C0D0566A90B7F6D1AA5813B2DAB90110FF90_cppui256,
+                                                0x375B4A9785503C24531723DB1F31B50B79C3D1EC9F95DB7645A3EDA03862B588_cppui256,
+                                                0x12688FE351ED01F3BB2EB6B0FA2A70FB232654F32B08990DC3A411E527776A89_cppui256};
+    std::array<typename poseidon_policy::element_type, poseidon_policy::state_words> 
+        expected_state_absorb = {0x2437F72484D8C5483D75F898376BC3EE29EDF2F7EF5305A3C61B937654954000_cppui256,
+                                0x16F954CD8F2B73D797170C5124F31A65160A3FCA92B77709E564075C2405BF80_cppui256,
+                                0x3696E4E8F08273FFEFDAD72C5002D103E9B8976F6579A010D6CC2A75B276851F_cppui256};
     sponge_construction_type pallas_sponge;
     
     pallas_sponge.absorb(input);
 
-    BOOST_CHECK(pallas_sponge.state == expected_state);
+    BOOST_CHECK(pallas_sponge.state == expected_state_absorb);
+
+    typename poseidon_policy::element_type expected_challenge = 0x0CA2C3342C2959D7CD94B5C9D4DC55900F5F60B345F714827C8B907752D5A209_cppui256;
+    typename poseidon_policy::element_type challenge = pallas_sponge.squeeze();
+
+    BOOST_CHECK(challenge == expected_challenge);
 }
 
 /*BOOST_DATA_TEST_CASE(poseidon_strengthen_1, string_data("internal", "strengthen", "1"), data_set) {
