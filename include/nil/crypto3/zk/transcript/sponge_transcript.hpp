@@ -48,7 +48,7 @@ namespace nil {
                 template<typename curve_type>
                 class sponge{
                 public:
-                    using group_type = typename curve_type::template g1_type<>;
+                    using group_type = typename curve_type::g1_type<algebra::curves::coordinates::affine>;
                     using scalar_field_type = typename curve_type::scalar_field_type;
                     using base_field_type = typename curve_type::base_field_type;
                     using policy_type = hashes::detail::base_poseidon_policy<base_field_type, 2, 1, 7, 55, 0, true>;
