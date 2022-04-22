@@ -40,7 +40,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha256.hpp>
+#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha256_process.hpp>
 
 #include "../../test_plonk_component.hpp"
 
@@ -48,13 +48,13 @@ using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
 
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 2;
+    constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 73;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
@@ -65,14 +65,22 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256) {
                 ArithmetizationParams>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::sha256<ArithmetizationType, curve_type,
+    using component_type = zk::components::sha256_process<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
-    std::array<typename ArithmetizationType::field_type::value_type, 4> public_input = {0, 0, 0, 0};
-    std::array<var, 4> input_state_var = {var(1, 0, false, var::column_type::public_input),
-     var(1, 1, false, var::column_type::public_input), var(1, 2, false, var::column_type::public_input), var(1, 3, false, var::column_type::public_input)};
+    std::array<typename ArithmetizationType::field_type::value_type, 24> public_input = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c,
+     0x1f83d9ab, 0x5be0cd19, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    std::array<var, 8> input_state_var = {var(0, 0, false, var::column_type::public_input),
+     var(0, 1, false, var::column_type::public_input), var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input),
+     var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input), var(0, 6, false, var::column_type::public_input),
+     var(0, 7, false, var::column_type::public_input)};
 
-    typename component_type::params_type params = {input_state_var};
+    std::vector<var> input_words_var(16, var(0,0));
+    for (int i = 0; i<16; i++) {
+        input_words_var[i]= var(0, 8 + i, false, var::column_type::public_input);
+    }
+
+    typename component_type::params_type params = {input_state_var, input_words_var};
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input);
 }
 
