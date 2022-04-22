@@ -100,7 +100,7 @@ namespace nil {
                                 std::array<typename commitment_scheme_public_type::precommitment_type, 2> special_selectors;
                             };
 
-                            struct public_commitments {
+                            struct public_commitments { // TODO: verifier needs this data
                                 std::vector<typename commitment_scheme_public_type::commitment_type> id_permutation;
                                 std::vector<typename commitment_scheme_public_type::commitment_type> sigma_permutation;
                                 std::array<typename commitment_scheme_public_type::commitment_type, public_input_columns> public_input;
