@@ -123,7 +123,6 @@ namespace nil {
                 snark::plonk_table_description<BlueprintFieldType,
                         ArithmetizationParams> &_table_description;
 
-                std::size_t allocated_public_input_rows = 0;
             public:
                 blueprint_public_assignment_table(
                     snark::plonk_table_description<BlueprintFieldType,
@@ -269,6 +268,8 @@ namespace nil {
                 }
 
                 var allocate_public_input(typename BlueprintFieldType::value_type data) {
+                    static std::size_t allocated_public_input_rows = 0;
+
                     public_input(0)[allocated_public_input_rows] = data;
                     allocated_public_input_rows++;
                     return var(0, allocated_public_input_rows - 1, false, var::column_type::public_input);

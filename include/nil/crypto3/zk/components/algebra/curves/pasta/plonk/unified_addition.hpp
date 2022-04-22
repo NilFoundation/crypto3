@@ -166,8 +166,7 @@ namespace nil {
                             assignment.witness(W4)[j] = R.X;
                             assignment.witness(W5)[j] = R.Y;
 
-                            // TODO: check, if this one correct:
-                            assignment.witness(W6)[j] = R.is_zero();
+                            assignment.witness(W6)[j] = 0;
 
                             if (P.X != Q.X){
                                 assignment.witness(W7)[j] = 0;
@@ -249,6 +248,8 @@ namespace nil {
 
                             bp.add_copy_constraint({{W6, static_cast<int>(j), false},
                                 {public_input_column_index, 0, false, var::column_type::public_input}});
+
+                            assignment.public_input(public_input_column_index)[0] = 0;
                         }
                     }
                 };

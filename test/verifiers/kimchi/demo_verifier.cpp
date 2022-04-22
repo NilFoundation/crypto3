@@ -71,7 +71,7 @@ void print_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end) {
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_demo_verifier_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
-    constexpr std::size_t complexity = 100;
+    constexpr std::size_t complexity = 10;
 
     using curve_type = algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::base_field_type;
@@ -107,24 +107,26 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
     zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
 
-    bp.allocate_rows(public_input.size());
-    for (std::size_t i = 0; i < public_input.size(); i++) {
-        auto allocated_pi = assignment_bp.allocate_public_input(public_input[i]);
-    }
-
     std::vector<std::size_t> rows = component_type::allocate_rows(bp, complexity);
 
     std::vector<component_type::result_type> result(complexity);
     std::vector<component_type::params_type> component_params(complexity);
 
+    bp.allocate_rows(public_input.size());
+    component_type::params_type tmp_params = {
+        {
+            assignment_bp.allocate_public_input(public_input[0]),
+            assignment_bp.allocate_public_input(public_input[1])
+        },
+        {
+            assignment_bp.allocate_public_input(public_input[2]),
+            assignment_bp.allocate_public_input(public_input[3])
+        }
+    };
+
     for (std::size_t i = 0; i < complexity; i++) {
         result[i] = component_type::result_type(rows[i]);
-        component_params[i] = {
-            var(0, 1, false, var::column_type::public_input),
-            var(0, 2, false, var::column_type::public_input), 
-            var(0, 3, false, var::column_type::public_input), 
-            var(0, 4, false, var::column_type::public_input)
-        };
+        component_params[i] = tmp_params;
     }
 
     component_type::generate_circuit(bp, assignment_bp, component_params, rows);
