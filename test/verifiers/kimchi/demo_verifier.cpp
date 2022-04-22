@@ -71,7 +71,7 @@ void print_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end) {
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_demo_verifier_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
-    constexpr std::size_t complexity = 1;
+    constexpr std::size_t complexity = 100;
 
     using curve_type = algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::base_field_type;
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     constexpr std::size_t WitnessColumns = 11;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 1;
+    constexpr std::size_t SelectorColumns = 2;
 
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -96,13 +96,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     auto P = kimchi_proof.commitments.w_comm[0].unshifted[0];
     auto Q = kimchi_proof.commitments.w_comm[1].unshifted[0];
     std::vector<BlueprintFieldType::value_type> public_input = {0, P.X, P.Y, Q.X, Q.Y};
-    
-    typename component_type::params_type component_params = {
-        var(0, 1, false, var::column_type::public_input),
-        var(0, 2, false, var::column_type::public_input), 
-        var(0, 3, false, var::column_type::public_input), 
-        var(0, 4, false, var::column_type::public_input)
-    };
 
     auto expected_result = P + Q;
     std::cout << "exprected result: (" << expected_result.X.data << ", " << expected_result.Y.data << ")" << std::endl;
@@ -119,16 +112,29 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
         auto allocated_pi = assignment_bp.allocate_public_input(public_input[i]);
     }
 
-    typename component_type::allocated_data_type allocated_data;
-    std::size_t start_row = component_type::allocate_rows(bp, complexity);
+    std::vector<std::size_t> rows = component_type::allocate_rows(bp, complexity);
+
+    std::vector<component_type::result_type> result(complexity);
+    std::vector<component_type::params_type> component_params(complexity);
+
     for (std::size_t i = 0; i < complexity; i++) {
-        std::size_t row = start_row + i * component_type::required_rows_amount;
-        component_type::generate_circuit(bp, assignment_bp, component_params, allocated_data, row);
-        component_type::generate_assignments(assignment_bp, component_params, row);
+        result[i] = component_type::result_type(rows[i]);
+        component_params[i] = {
+            var(0, 1, false, var::column_type::public_input),
+            var(0, 2, false, var::column_type::public_input), 
+            var(0, 3, false, var::column_type::public_input), 
+            var(0, 4, false, var::column_type::public_input)
+        };
     }
 
-    std::cout << "actual result: (" << assignment_bp.witness(4)[start_row].data << ", "
-              << assignment_bp.witness(5)[start_row].data << ")" << std::endl;
+    component_type::generate_circuit(bp, assignment_bp, component_params, rows);
+    component_type::generate_assignments(assignment_bp, component_params, rows);
+
+    std::cout << "actual result: " << std::endl;
+    for (std::size_t i = 0; i < complexity; i++) {
+        std::cout << "(" << assignment_bp.var_value(result[i].X).data << ", "
+                  << assignment_bp.var_value(result[i].Y).data << ")" << std::endl;
+    }
 
     assignment_bp.padding();
 
