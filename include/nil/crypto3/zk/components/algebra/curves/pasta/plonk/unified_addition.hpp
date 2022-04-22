@@ -119,7 +119,7 @@ namespace nil {
 
                     static void generate_circuit(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const std::vector<params_type> params,
                         const std::vector<std::size_t> row_start_indices){
 
@@ -198,7 +198,7 @@ namespace nil {
                 private:
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment, 
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment, 
                         const std::vector<params_type> params,
                         const std::vector<std::size_t> row_start_indices) {
 
@@ -235,7 +235,7 @@ namespace nil {
 
                     static void generate_copy_constraints(
                             blueprint<ArithmetizationType> &bp,
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
                             const std::vector<params_type> params,
                             const std::vector<std::size_t> row_start_indices){
 

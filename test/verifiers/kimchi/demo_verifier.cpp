@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
         component_params[i] = tmp_params;
     }
 
-    component_type::generate_circuit(bp, assignment_bp, component_params, rows);
+    component_type::generate_circuit(bp, public_assignment, component_params, rows);
     component_type::generate_assignments(assignment_bp, component_params, rows);
 
     std::cout << "actual result: " << std::endl;
