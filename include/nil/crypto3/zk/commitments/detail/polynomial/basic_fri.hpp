@@ -221,8 +221,8 @@ namespace nil {
 
                             // TODO: how to sample x?
                             std::size_t domain_size = fri_params.D[0]->m;
-                            std::size_t x_index = (transcript.template int_challenge<std::uint64_t>())%domain_size;
-                            std::size_t x_next_index;
+                            std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>())%domain_size;
+                            std::uint64_t x_next_index;
                             typename FieldType::value_type x =
                                 fri_params.D[0]->get_domain_element(1).pow(x_index);
 
@@ -307,7 +307,7 @@ namespace nil {
                                                 const math::polynomial<typename FieldType::value_type> &V,
                                                 transcript_type &transcript = transcript_type()) {
 
-                            std::size_t idx = transcript.template int_challenge<std::size_t>();
+                            std::uint64_t idx = transcript.template int_challenge<std::uint64_t>();
                             typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(idx);
 
                             std::size_t r = fri_params.r;
