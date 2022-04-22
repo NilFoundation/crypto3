@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_FRI_COMMITMENT_SCHEME_HPP
-#define CRYPTO3_ZK_FRI_COMMITMENT_SCHEME_HPP
+#ifndef CRYPTO3_ZK_BATCHED_FRI_COMMITMENT_SCHEME_HPP
+#define CRYPTO3_ZK_BATCHED_FRI_COMMITMENT_SCHEME_HPP
 
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
@@ -38,7 +38,7 @@
 #include <nil/crypto3/container/merkle/proof.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -61,11 +61,16 @@ namespace nil {
                 template<typename FieldType,
                          typename MerkleTreeHashType,
                          typename TranscriptHashType,
-                         std::size_t M = 2>
-                struct fri : public detail::basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M> {
+                         std::size_t M = 2,
+                         std::size_t BatchSize = 1>
+                struct batched_fri
+                    : public detail::
+                          basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize> {
 
-                    using basic_fri = detail::basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M>;
+                    using basic_fri =
+                        detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize>;
                     constexpr static const std::size_t m = basic_fri::m;
+                    constexpr static const std::size_t leaf_size = BatchSize;
 
                     using field_type = typename basic_fri::field_type;
                     using merkle_tree_hash_type = typename basic_fri::merkle_tree_hash_type;
@@ -80,11 +85,12 @@ namespace nil {
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
 
-                    static typename basic_fri::proof_type proof_eval(
-                        const math::polynomial<typename FieldType::value_type> &g,
-                        precommitment_type &T,
-                        const typename basic_fri::params_type &fri_params,
-                        typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {
+                    static typename basic_fri::proof_type
+                        proof_eval(const std::array<math::polynomial<typename FieldType::value_type>, leaf_size> g,
+                                   precommitment_type &T,
+                                   const typename basic_fri::params_type &fri_params,
+                                   typename basic_fri::transcript_type &transcript =
+                                       typename basic_fri::transcript_type()) {
 
                         return basic_fri::proof_eval(g, g, T, fri_params, transcript);
                     }
@@ -94,8 +100,16 @@ namespace nil {
                         typename basic_fri::params_type &fri_params,
                         typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {
 
-                        math::polynomial<typename FieldType::value_type> U = {0};
-                        math::polynomial<typename FieldType::value_type> V = {1};
+                        std::array<math::polynomial<typename FieldType::value_type>, leaf_size> U;
+                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                            U[polynom_index] = {0};
+                        }
+
+                        std::array<math::polynomial<typename FieldType::value_type>, leaf_size> V;
+                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                            V[polynom_index] = {1};
+                        }
+
                         return basic_fri::verify_eval(proof, fri_params, U, V, transcript);
                     }
                 };
@@ -104,4 +118,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_FRI_COMMITMENT_SCHEME_HPP
+#endif    // CRYPTO3_ZK_BATCHED_FRI_COMMITMENT_SCHEME_HPP

@@ -25,8 +25,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_REDSHIFT_GATES_ARGUMENT_HPP
-#define CRYPTO3_ZK_PLONK_REDSHIFT_GATES_ARGUMENT_HPP
+#ifndef CRYPTO3_ZK_PLONK_PLACEHOLDER_GATES_ARGUMENT_HPP
+#define CRYPTO3_ZK_PLONK_PLACEHOLDER_GATES_ARGUMENT_HPP
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/shift.hpp>
@@ -40,8 +40,8 @@
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 
 namespace nil {
@@ -49,15 +49,15 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename FieldType, typename ParamsType, std::size_t ArgumentSize = 1>
-                struct redshift_gates_argument;
+                struct placeholder_gates_argument;
 
                 template<typename FieldType, typename ParamsType>
-                struct redshift_gates_argument<FieldType, ParamsType, 1> {
+                struct placeholder_gates_argument<FieldType, ParamsType, 1> {
 
                     typedef typename ParamsType::transcript_hash_type transcript_hash_type;
                     using transcript_type = transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
 
-                    typedef detail::redshift_policy<FieldType, ParamsType> policy_type;
+                    typedef detail::placeholder_policy<FieldType, ParamsType> policy_type;
 
                     constexpr static const std::size_t argument_size = 1;
 
@@ -132,4 +132,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_GATES_ARGUMENT_HPP
+#endif    // CRYPTO3_ZK_PLONK_PLACEHOLDER_GATES_ARGUMENT_HPP

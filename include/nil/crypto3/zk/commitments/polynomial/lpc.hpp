@@ -58,11 +58,11 @@ namespace nil {
                 /**
                  * @brief Based on the FRI Commitment description from \[ResShift].
                  * @tparam d ...
-                 * @tparam Rounds Denoted by r in \[RedShift].
+                 * @tparam Rounds Denoted by r in \[Placeholder].
                  *
                  * References:
-                 * \[RedShift]:
-                 * "REDSHIFT: Transparent SNARKs from List
+                 * \[Placeholder]:
+                 * "PLACEHOLDER: Transparent SNARKs from List
                  * Polynomial Commitment IOPs",
                  * Assimakis Kattis, Konstantin Panarin, Alexander Vlasov,
                  * Matter Labs,
@@ -84,14 +84,11 @@ namespace nil {
 
                     typedef typename containers::merkle_proof<merkle_hash_type, 2> merkle_proof_type;
 
-                    using basic_fri = detail::basic_fri<FieldType,
-                                                        typename LPCParams::merkle_hash_type,
-                                                        typename LPCParams::transcript_hash_type,
-                                                        m>;
                     using fri_type = fri<FieldType,
                                          typename LPCParams::merkle_hash_type,
                                          typename LPCParams::transcript_hash_type,
                                          m>;
+                    using basic_fri = typename fri_type::basic_fri;
 
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
@@ -120,7 +117,6 @@ namespace nil {
 
                         std::size_t k = evaluation_points.size();
                         std::vector<typename FieldType::value_type> z(k);
-                        std::vector<merkle_proof_type> p(k);
                         std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>>
                             U_interpolation_points(k);
 
@@ -137,11 +133,8 @@ namespace nil {
                         for (std::size_t j = 0; j < k; j++) {
                             math::polynomial<typename FieldType::value_type> denominator_polynom = {
                                 -evaluation_points[j], 1};
-                            Q = Q / denominator_polynom;    // polynomial divison
+                            Q = Q / denominator_polynom;
                         }
-
-                        // temporary definition, until polynomial is constexpr
-                        const math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
                         std::array<typename basic_fri::proof_type, lambda> fri_proof;
 

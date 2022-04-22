@@ -25,8 +25,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PROOF_HPP
-#define CRYPTO3_ZK_PLONK_REDSHIFT_PROOF_HPP
+#ifndef CRYPTO3_ZK_PLONK_PLACEHOLDER_PROOF_HPP
+#define CRYPTO3_ZK_PLONK_PLACEHOLDER_PROOF_HPP
 
 namespace nil {
     namespace crypto3 {
@@ -36,7 +36,7 @@ namespace nil {
                 template<typename FieldType, typename CommitmentSchemeTypeWitness,
                          typename CommitmentSchemeTypePermutation, typename CommitmentSchemeTypeQuotient,
                          typename CommitmentSchemeTypePublic>
-                struct redshift_proof {
+                struct placeholder_proof {
                     typedef FieldType field_type;
                     typedef CommitmentSchemeTypeWitness commitment_scheme_type_witness;
                     typedef CommitmentSchemeTypePermutation commitment_scheme_type_permutation;
@@ -45,10 +45,10 @@ namespace nil {
 
                     struct evaluation_proof {
                         typename FieldType::value_type challenge;
-                        std::vector<typename CommitmentSchemeTypeWitness::proof_type> witness;
+                        typename CommitmentSchemeTypeWitness::proof_type witness;
                         std::vector<typename CommitmentSchemeTypePermutation::proof_type> permutation;
                         std::vector<typename CommitmentSchemeTypeQuotient::proof_type> quotient;
-                        std::vector<typename CommitmentSchemeTypeWitness::proof_type> lookups;
+                        std::vector<typename CommitmentSchemeTypeQuotient::proof_type> lookups;
 
                         std::vector<typename commitment_scheme_type_public::proof_type> id_permutation;
                         std::vector<typename commitment_scheme_type_public::proof_type> sigma_permutation;
@@ -60,19 +60,20 @@ namespace nil {
                         bool operator==(const evaluation_proof &rhs) const {
                             return challenge == rhs.challenge && witness == rhs.witness &&
                                    permutation == rhs.permutation && quotient == rhs.quotient &&
-                                   id_permutation == rhs.id_permutation && sigma_permutation == rhs.sigma_permutation &&
-                                   public_input == rhs.public_input && constant == rhs.constant &&
-                                   selector == rhs.selector && special_selectors == rhs.special_selectors;
+                                   lookups == rhs.lookups && id_permutation == rhs.id_permutation &&
+                                   sigma_permutation == rhs.sigma_permutation && public_input == rhs.public_input &&
+                                   constant == rhs.constant && selector == rhs.selector &&
+                                   special_selectors == rhs.special_selectors;
                         }
                         bool operator!=(const evaluation_proof &rhs) const {
                             return !(rhs == *this);
                         }
                     };
 
-                    redshift_proof() {
+                    placeholder_proof() {
                     }
 
-                    std::vector<typename CommitmentSchemeTypeWitness::commitment_type> witness_commitments;
+                    typename CommitmentSchemeTypeWitness::commitment_type witness_commitment;
 
                     typename CommitmentSchemeTypePermutation::commitment_type v_perm_commitment;
 
@@ -86,11 +87,15 @@ namespace nil {
 
                     evaluation_proof eval_proof;
 
-                    bool operator==(const redshift_proof &rhs) const {
-                        return witness_commitments == rhs.witness_commitments && T_commitments == rhs.T_commitments &&
-                               v_perm_commitment == rhs.v_perm_commitment && eval_proof == rhs.eval_proof;
+                    bool operator==(const placeholder_proof &rhs) const {
+                        return witness_commitment == rhs.witness_commitment &&
+                               v_perm_commitment == rhs.v_perm_commitment &&
+                               input_perm_commitment == rhs.input_perm_commitment &&
+                               value_perm_commitment == rhs.value_perm_commitment &&
+                               v_l_perm_commitment == rhs.v_l_perm_commitment && T_commitments == rhs.T_commitments &&
+                               eval_proof == rhs.eval_proof;
                     }
-                    bool operator!=(const redshift_proof &rhs) const {
+                    bool operator!=(const placeholder_proof &rhs) const {
                         return !(rhs == *this);
                     }
                 };
@@ -99,4 +104,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_PROOF_HPP
+#endif    // CRYPTO3_ZK_PLONK_PLACEHOLDER_PROOF_HPP

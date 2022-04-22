@@ -25,27 +25,27 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PROVER_HPP
-#define CRYPTO3_ZK_PLONK_REDSHIFT_PROVER_HPP
+#ifndef CRYPTO3_ZK_PLONK_PLACEHOLDER_PROVER_HPP
+#define CRYPTO3_ZK_PLONK_PLACEHOLDER_PROVER_HPP
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 #include <nil/crypto3/container/merkle/tree.hpp>
 
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/batched_lpc.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/lookup_argument.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/gates_argument.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/permutation_argument.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/lookup_argument.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/gates_argument.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
                 namespace detail {
                     template<typename FieldType>
                     static inline std::vector<math::polynomial<typename FieldType::value_type>>
@@ -63,14 +63,14 @@ namespace nil {
                 }    // namespace detail
 
                 template<typename FieldType, typename ParamsType>
-                class redshift_prover {
+                class placeholder_prover {
 
                     constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
                     constexpr static const std::size_t public_columns = ParamsType::public_columns;
                     using merkle_hash_type = typename ParamsType::commitment_params_type::merkle_hash_type;
                     using transcript_hash_type = typename ParamsType::commitment_params_type::transcript_hash_type;
 
-                    using policy_type = detail::redshift_policy<FieldType, ParamsType>;
+                    using policy_type = detail::placeholder_policy<FieldType, ParamsType>;
 
                     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
@@ -78,8 +78,8 @@ namespace nil {
                     constexpr static const std::size_t r = ParamsType::commitment_params_type::r;
                     constexpr static const std::size_t m = ParamsType::commitment_params_type::m;
 
-                    typedef commitments::list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type>
+                    typedef commitments::batched_list_polynomial_commitment<FieldType,
+                                                                    typename ParamsType::commitment_params_type, witness_columns>
                         commitment_scheme_witness_type;
                     typedef commitments::list_polynomial_commitment<FieldType,
                                                                     typename ParamsType::commitment_params_type>
@@ -151,21 +151,17 @@ namespace nil {
                         std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_poly =
                             preprocessed_private_data.private_polynomial_table.witnesses();
 
-                        std::array<typename commitment_scheme_witness_type::precommitment_type, witness_columns>
-                            witness_precommitments =
+                        typename commitment_scheme_witness_type::precommitment_type witness_precommitment =
                                 commitment_scheme_witness_type::template precommit<witness_columns>(witness_poly,
                                                                                                     fri_params.D[0]);
 
-                        proof.witness_commitments.resize(witness_columns);
-                        for (std::size_t i = 0; i < witness_columns; i++) {
-                            proof.witness_commitments[i] =
-                                commitment_scheme_witness_type::commit(witness_precommitments[i]);
-                            transcript(proof.witness_commitments[i]);
-                        }
+                        proof.witness_commitment =
+                                commitment_scheme_witness_type::commit(witness_precommitment);
+                            transcript(proof.witness_commitment);
 
                         // 4. permutation_argument
                         auto permutation_argument =
-                            redshift_permutation_argument<FieldType,
+                                placeholder_permutation_argument<FieldType,
                                                           commitment_scheme_public_input_type,
                                                           commitment_scheme_permutation_type,
                                                           ParamsType>::prove_eval(constraint_system,
@@ -185,11 +181,12 @@ namespace nil {
 
                         // 5. lookup_argument
                         bool use_lookup = constraint_system.lookup_gates().size() > 0;
-                        typename redshift_lookup_argument<FieldType,
+                        typename placeholder_lookup_argument<FieldType,
                                                           commitment_scheme_permutation_type,
                                                           ParamsType>::prover_lookup_result lookup_argument;
                         if (use_lookup) {
-                            lookup_argument = redshift_lookup_argument<FieldType,
+                            lookup_argument =
+                                placeholder_lookup_argument<FieldType,
                                                           commitment_scheme_permutation_type,
                                                           ParamsType>::prove_eval(constraint_system,
                                                                                   preprocessed_public_data,
@@ -214,7 +211,7 @@ namespace nil {
                         }
                         // 6. circuit-satisfability
                         std::array<math::polynomial<typename FieldType::value_type>, gate_parts> prover_res =
-                            redshift_gates_argument<FieldType, ParamsType>::prove_eval(
+                            placeholder_gates_argument<FieldType, ParamsType>::prove_eval(
                                 constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain, transcript);
 
                         F[8] = prover_res[0];
@@ -263,28 +260,24 @@ namespace nil {
                         typename FieldType::value_type omega =
                             preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
+                        std::array<std::vector<typename FieldType::value_type>, witness_columns> witness_evaluation_points;
+
                         // witness polynomials (table columns)
-                        std::array<typename commitment_scheme_witness_type::proof_type, witness_columns>
-                            witnesses_evaluation;
-                        for (std::size_t i = 0; i < witness_precommitments.size(); i++) {
+                        for (std::size_t witness_index = 0; witness_index < witness_columns; witness_index++) {
 
-                            std::vector<int> rotation_gates =
-                                preprocessed_public_data.common_data.columns_rotations[i];
+                            std::vector<int> witness_rotation =
+                                preprocessed_public_data.common_data.columns_rotations[witness_index];
                                 
-                            std::vector<typename FieldType::value_type>
-                                evaluation_points_gates;    // TODO: array size with rotation
-                            for (std::size_t j = 0; j < rotation_gates.size(); j++) {
-                                evaluation_points_gates.push_back(challenge * omega.pow(rotation_gates[j]));
+                            for (std::size_t rotation_index = 0; rotation_index < witness_rotation.size(); rotation_index++) {
+                                witness_evaluation_points[witness_index].push_back(challenge * omega.pow(witness_rotation[rotation_index]));
                             }
-
-                            witnesses_evaluation[i] =
-                                commitment_scheme_witness_type::proof_eval(evaluation_points_gates,
-                                                                           witness_precommitments[i],
-                                                                           witness_poly[i],
-                                                                           fri_params,
-                                                                           transcript);
-                            proof.eval_proof.witness.push_back(witnesses_evaluation[i]);
                         }
+
+                        proof.eval_proof.witness = commitment_scheme_witness_type::proof_eval(witness_evaluation_points,
+                                                                       witness_precommitment,
+                                                                       witness_poly,
+                                                                       fri_params,
+                                                                       transcript);
 
                         // permutation polynomial evaluation
                         std::vector<typename FieldType::value_type> evaluation_points_v_p = {challenge,
@@ -403,4 +396,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_PROVER_HPP
+#endif    // CRYPTO3_ZK_PLONK_PLACEHOLDER_PROVER_HPP
