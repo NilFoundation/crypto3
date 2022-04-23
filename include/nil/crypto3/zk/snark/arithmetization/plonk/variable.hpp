@@ -72,6 +72,10 @@ namespace nil {
                     std::size_t index;
                     bool relative;
 
+                    constexpr plonk_variable() :
+                        index(0),
+                        rotation(0), relative(false), type(column_type::witness) {};
+
                     constexpr plonk_variable(const std::size_t index,
                                              std::int32_t rotation,
                                              bool relative = true,
