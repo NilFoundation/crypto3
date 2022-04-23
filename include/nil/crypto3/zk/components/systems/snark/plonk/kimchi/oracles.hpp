@@ -42,6 +42,8 @@
 #include <nil/crypto3/zk/components/algebra/fields/plonk/exponentiation.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 
+#include <nil/crypto3/zk/snark/systems/plonk/pickles/constants.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -88,8 +90,15 @@ namespace nil {
                     using from_limbs = zk::components::from_limbs<ArithmetizationType, CurveType, W0, W1, W2>;
                     using exponentiation_component = zk::components::exponentiation<ArithmetizationType,
                                                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                    using multiplication_component = zk::components::multiplication<ArithmetizationType,
+                    
+                    struct field_op_component {
+                        using mul = zk::components::multiplication<ArithmetizationType,
                                                             W0, W1, W2>;
+                        using add = zk::components::multiplication<ArithmetizationType,
+                                                            W0, W1, W2>;
+                        using sub = zk::components::multiplication<ArithmetizationType,
+                                                            W0, W1, W2>;
+                    };
 
                     constexpr static const std::size_t permute_size = 7;
 
@@ -176,6 +185,17 @@ namespace nil {
                         return res;
                     }
 
+                    // let init = (evals[0].w[PERMUTS - 1] + gamma) * evals[1].z * alpha0 * zkp;
+                    static var ft_eval_1(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                var eval_w,
+                                var gamma,
+                                var eval_z,
+                                var alpha_0,
+                                var zkp,
+                                std::size_t &component_start_row) {
+
+                    }
+
                 public:
                     constexpr static const std::size_t required_rows_amount = 32;
 
@@ -183,17 +203,40 @@ namespace nil {
                         kimchi_verifier_index_scalar<CurveType> verifier_index;
                         kimchi_proof_scalar<CurveType> proof;
                         //kimchi_scalar_limbs joint_combiner;
-                        //kimchi_scalar_limbs beta;
-                        //kimchi_scalar_limbs gamma;
+                        typename BlueprintFieldType::value_type beta; // beta and gamma can be combined from limbs in the base circuit
+                        typename BlueprintFieldType::value_type gamma;
                         kimchi_scalar_limbs alpha;
                         kimchi_scalar_limbs zeta;
                         typename BlueprintFieldType::value_type fq_digest; // TODO overflow check
                     };
 
                     struct result_type {
+                        struct random_orcales {
+                            var joint_combiner;
+                            var beta;
+                            var gamma;
+                            var alpha_chal;
+                            var alpha;
+                            var zeta;
+                            var v;
+                            var u;
+                            var zeta_chal;
+                            var v_chal;
+                            var u_chal;
+                        }
+
+                        var digest;
+                        random_oracles oracles;
+                        std::vector<var> alpha_powers;
+                        std::vector<std::vector<var>> p_eval;
+                        std::array<var, 2> zeta_powers;
+                        ??? polys;
+                        var zeta1;
+                        vat ft_eval0;
+
+
                         result_type(const params_type &params,
                             const std::size_t &component_start_row) {
-
                         }
                     };
 
@@ -237,6 +280,14 @@ namespace nil {
                         var zeta_limb_2 = assignment.allocate_public_input(params.zeta[1]);
                         var fq_digest = assignment.allocate_public_input(params.fq_digest);
                         var omega = assignment.allocate_public_input(params.verifier_index.omega);
+                        var beta = assignment.allocate_public_input(params.beta);
+                        var gamma = assignment.allocate_public_input(params.gamma);
+
+                        std::vector<var> zkpm(params.verifier_index.zkpm.size());
+                        for (std::size_t i = 0; i < zkpm.size(); i++) {
+                            zkpm[i] = assignment.allocate_public_input(
+                                params.verifier_index.zkpm[i]);
+                        }
 
                         std::array<var, 2> alpha_pub_limbs = {alpha_limb_1, alpha_limb_2};
                         std::array<var, 2> zeta_pub_limbs = {zeta_limb_1, zeta_limb_2};
@@ -292,7 +343,49 @@ namespace nil {
                             assignment, row);
                         var u = assignments_endo_scalar(assignment,
                             u_challenge, row);
-                        
+
+                        std::array<var, 2> powers_of_eval_points_for_chunks = {
+                            assignment_exponentiation(assignment, zeta, verifier_index.max_poly_size, row),
+                            assignment_exponentiation(assignment, zeta_omega, verifier_index.max_poly_size, row),
+                        };
+
+                        std::vector<var> polys = ?;
+
+                        std::array<kimchi_proof_evaluations, 2> evals = {
+                            assignment_combine_evaluations(assignment, params.proof.proof_evals[0],
+                                powers_of_eval_points_for_chunks[0], row),
+                            assignment_combine_evaluations(assignment, params.proof.proof_evals[1],
+                                powers_of_eval_points_for_chunks[1], row),
+                        };
+
+                        // ft(zeta)
+                        var zkpm_at_zeta = assignment_evaluate_polynomial(
+                            assignment, zkpm, zeta, row);
+                        var zeta1m1 = assignment_add(assignment, zeta_pow_n, -1, row);
+
+                        // (evals[0].w[PERMUTS - 1] + gamma) * evals[1].z * alphas[0] * zkpm_at_zeta;
+                        var init = ft_eval_1(evals[0].w[kimchi_constant::PERMUTE - 1],
+                            gamma,
+                            evals[1].z,
+                            alpha_powers[0],
+                            zkpm_at_zeta);
+                        var ft_eval0 = permutation_fold(
+
+                        );
+                        var nominator;
+                        var denominator;
+                        ft_eval0 = assignment_add(assignment,
+                            ft_eval0,
+                            assignment_mul(assignment, nominator, denominator, row),
+                            row);
+                        var tmp = ft_eval_2(
+
+                        );
+                        ft_eval0 = assignment_sub(
+                            assignment,
+                            ft_eval0,
+                            tmp,
+                            row);
                         
                         return result_type(params, component_start_row);
                     }
@@ -336,7 +429,7 @@ namespace nil {
                         row++;
                         // copy endo-scalar
                         row += endo_scalar_component::required_rows_amount;
-                            
+                        
                     }
                 };
             }    // namespace components
