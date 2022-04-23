@@ -76,6 +76,7 @@ set(PLONK_TESTS_FILES
     "algebra/curves/plonk/endo_scalar"
     "hashes/plonk/poseidon"
     "hashes/plonk/sha256"
+    "merkle_tree/plonk/merkle_tree"
     "verifiers/kimchi/base_field"
     "verifiers/kimchi/scalar_field"
     "verifiers/kimchi/basic_verifier"
