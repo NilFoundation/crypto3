@@ -162,18 +162,101 @@ namespace nil {
                     }
 
                     static std::vector<var> assigment_element_powers(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                var x,
-                                std::size_t n,
-                                std::size_t &component_start_row) {
-                        return std::vector<var>(1);
+                            var x,
+                            std::size_t n,
+                            std::size_t &row) {
+
+                        std::vector<var> res(n); 
+                        assignment.witness(W0)[row] = 1;
+                        res[0] = var(0, row, false);
+                        typename BlueprintFieldType::value_type base_value =
+                            assignment.var_value(x);
+                        assignment.witness(W0 + 1)[row] = base_value;
+                        res[1] = var(W0 + 1, row, false);
+                        typename BlueprintFieldType::value_type prev_value =
+                            base_value;
+                        std::size_t column_idx = 2;
+
+                        for (std::size_t i = 2; i < n; i++) {
+                            // we need to copy any power of the element
+                            // so we place them only on copy-constrainted columns
+                            if (column_idx >= kimchi_constant::PERMUTE) {
+                                column_idx = 0;
+                                row++;
+                            }
+                            typename BlueprintFieldType::value_type new_value =
+                                prev_value * base_value
+                            assignment.witness(W0 + column_idx)[row] = new_value;
+                            res[i] = var(W0 + i, row, false);
+                            prev_value = new_value;
+                        }
+
+                        return res;
                     }
 
                     static std::vector<var> assignment_lagrange(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                var zeta,
-                                var zeta_omega,
-                                std::vector<var> omega_powers,
-                                std::size_t &component_start_row) {
-                        return std::vector<var>(1);
+                            var zeta_var,
+                            var zeta_omega_var,
+                            std::vector<var> omega_powers,
+                            std::size_t &row) {
+
+                        /*
+                        let mut lagrange = w.iter().map(|w| zeta - w).collect::<Vec<_>>();
+                        (0..self.public.len())
+                            .zip(w.iter())
+                            .for_each(|(_, w)| lagrange.push(zetaw - w));
+                        ark_ff::fields::batch_inversion::<Fr<G>>(&mut lagrange);
+                        */
+                        // TODO: the naive method for batch inversion is not the optimal one, we can use
+                        // Montgomery’s Trick and Fast Implementation of Masked AES
+                        // Genelle, Prouff and Quisquater, Section 3.2
+                        // result = [(zeta - omega^(i))^(-1)] concat. [(zeta_omega - omega^(i))^(-1)] for i in (0..public_input_size)
+                        // * omega = w in the table
+                        // W0     | W1                | W2  | W3  | W4  | W5  | W6  | W7           | W8         | W9  | W10 | W11 | W12 | W13          | W14 | W15 |
+                        // zeta   | w^0               | w^1 | w^2 | w^3 | w^4 | w^5 | zeta - w^0   | zeta - w^1 | ... | ... | ... | ... | zeta - w^5   |     |     |
+                        // zeta_w | (zeta - w^0)^(-1) | ... | ... | ... | ... | ... | zeta_w = w^0 | ...        | ... | ... | ... | ... | zeta_w - w^5 |     |     |
+                        //        | (zeta_w - w^0)^(-1) | ..| ... | ... | ... | ... | ...
+                        // ....
+                        std::vector<var> res(omega_powers.size() * 2);
+                        std::size_t omega_idx = 0;
+                        std::size_t component_instances = omega_powers.size() / 6;
+                        if (omega_powers.size() % 6 > 0) {
+                            component_instances += 1;
+                        }
+
+                        typename BlueprintFieldType::value_type zeta = assignment.var_value(zeta_var);
+                        typename BlueprintFieldType::value_type zeta_omega = assignment.var_value(zeta_omega_var);
+                        std::vector<BlueprintFieldType::value_type> omegas(omega_powers.size());
+                        for (std::size_t i = 0; i < omega_powers.size(); i++) {
+                            omegas[i] = assignment.var_value(omega_powers[i]);
+                        }
+
+                        for (std::size_t i = 0; i < component_instances; i++) {
+                            assignment.witness(W0)[row] = zeta;
+                            std::size_t row_limit = omega_idx + 6 >= omega_powers.size() ? 
+                                omega_powers.size() - omega_idx :
+                                6;
+
+                            for (std::size_t j = 0; j < row_limit; j++) {
+                                assignment.witness(W1 + j)[row] = omegas[omega_idx];
+                                assignment.witness(W7 + j)[row] = zeta - omegas[omega_idx];
+                                assignment.witness(W7 + j)[row + 1] = zeta_omega - omegas[omega_idx];
+                                omega_idx++;
+                            }
+                            row++;
+
+                            assignment.witness(W0)[row] = zeta_omega;
+                            for (std::size_t j = 0; j < row_limit; j++) {
+                                assignment.witness(W1 + j)[row] = (assignment.witness(W7 + j)[row - 1]).inversed();
+                                res[i + j] = var(W1 + j, row, false);
+                                assignment.witness(W1 + j)[row + 1] = (assignment.witness(W7 + j)[row]).inversed();
+                                res[omega_powers.size() + i + j] = var(W1 + j, row, false);
+                            }
+                            row++;
+                        }
+
+
+                        return res;
                     }
 
                     static std::array<var, 2> assignment_puiblic_eval(blueprint_assignment_table<ArithmetizationType> &assignment,
@@ -202,11 +285,11 @@ namespace nil {
                     struct params_type {
                         kimchi_verifier_index_scalar<CurveType> verifier_index;
                         kimchi_proof_scalar<CurveType> proof;
-                        //kimchi_scalar_limbs joint_combiner;
+                        typename BlueprintFieldType::value_type joint_combiner;
                         typename BlueprintFieldType::value_type beta; // beta and gamma can be combined from limbs in the base circuit
                         typename BlueprintFieldType::value_type gamma;
-                        kimchi_scalar_limbs alpha;
-                        kimchi_scalar_limbs zeta;
+                        typename BlueprintFieldType::value_type alpha;
+                        typename BlueprintFieldType::value_type zeta;
                         typename BlueprintFieldType::value_type fq_digest; // TODO overflow check
                     };
 
@@ -274,14 +357,13 @@ namespace nil {
                         std::size_t row = component_start_row;
 
                         // copy public input
-                        var alpha_limb_1 = assignment.allocate_public_input(params.alpha[0]);
-                        var alpha_limb_2 = assignment.allocate_public_input(params.alpha[1]);
-                        var zeta_limb_1 = assignment.allocate_public_input(params.zeta[0]);
-                        var zeta_limb_2 = assignment.allocate_public_input(params.zeta[1]);
+                        var alpha = assignment.allocate_public_input(params.alpha);
+                        var zeta = assignment.allocate_public_input(params.zetas);
                         var fq_digest = assignment.allocate_public_input(params.fq_digest);
                         var omega = assignment.allocate_public_input(params.verifier_index.omega);
                         var beta = assignment.allocate_public_input(params.beta);
                         var gamma = assignment.allocate_public_input(params.gamma);
+                        var joint_combiner = assignment.allocate_public_input(params.joint_combiner);
 
                         std::vector<var> zkpm(params.verifier_index.zkpm.size());
                         for (std::size_t i = 0; i < zkpm.size(); i++) {
@@ -289,16 +371,9 @@ namespace nil {
                                 params.verifier_index.zkpm[i]);
                         }
 
-                        std::array<var, 2> alpha_pub_limbs = {alpha_limb_1, alpha_limb_2};
-                        std::array<var, 2> zeta_pub_limbs = {zeta_limb_1, zeta_limb_2};
-
-                        var alpha = assignments_from_limbs(assignment,
-                            alpha_pub_limbs, row);
                         var alpha_endo = assignments_endo_scalar(assignment,
                             alpha, row);
                         
-                        var zeta = assignments_from_limbs(assignment,
-                            zeta_pub_limbs, row);
                         var zeta_endo = assignments_endo_scalar(assignment,
                             zeta, row);
 
