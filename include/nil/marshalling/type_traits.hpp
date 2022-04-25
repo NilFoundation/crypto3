@@ -36,9 +36,6 @@
 
 namespace nil {
     namespace marshalling {
-
-        using namespace boost::mpl::placeholders;
-
         BOOST_TTI_HAS_TYPE(tag)
 
         /// @brief Compile time check function of whether a provided type is any
@@ -50,13 +47,13 @@ namespace nil {
         struct is_array_list {
 
             static const bool value = has_type_tag<T, 
-                boost::is_same<_1, types::tag::array_list>>::value;
+                boost::is_same<boost::mpl::placeholders::_1, types::tag::array_list>>::value;
         };
 
         template<typename T>
         struct is_raw_array_list {
             static const bool value = has_type_tag<T, 
-                boost::is_same<_1, types::tag::raw_array_list>>::value;
+                boost::is_same<boost::mpl::placeholders::_1, types::tag::raw_array_list>>::value;
         };
 
         /// @brief Compile time check function of whether a provided type is any
@@ -67,7 +64,7 @@ namespace nil {
         template<typename T>
         struct is_bitfield {
             static const bool value = has_type_tag<T, 
-                boost::is_same<_1, types::tag::bitfield>>::value;
+                boost::is_same<boost::mpl::placeholders::_1, types::tag::bitfield>>::value;
         };
 
         /// @brief Compile time check function of whether a provided type is any
@@ -78,7 +75,7 @@ namespace nil {
         template<typename T>
         struct is_bitmask_value {
             static const bool value = has_type_tag<T, 
-                boost::is_same<_1, types::tag::bitmask>>::value;
+                boost::is_same<boost::mpl::placeholders::_1, types::tag::bitmask>>::value;
         };
 
         /// @brief Compile time check function of whether a provided type is any
@@ -89,7 +86,7 @@ namespace nil {
         template<typename T>
         struct is_bundle {
             static const bool value = has_type_tag<T, 
-                boost::is_same<_1, types::tag::bundle>>::value;
+                boost::is_same<boost::mpl::placeholders::_1, types::tag::bundle>>::value;
         };
 
         /// @brief Compile time check function of whether a provided type is any
@@ -100,7 +97,7 @@ namespace nil {
         template<typename T>
         struct is_enumeration {
             static const bool value = has_type_tag<T, 
-                boost::is_same<_1, types::tag::enumeration>>::value;
+                boost::is_same<boost::mpl::placeholders::_1, types::tag::enumeration>>::value;
         };
 
         /// @brief Compile time check function of whether a provided type is any
@@ -111,7 +108,7 @@ namespace nil {
         template<typename T>
         struct is_float_value {
             static const bool value = has_type_tag<T, 
-                boost::is_same<_1, types::tag::floating_point>>::value;
+                boost::is_same<boost::mpl::placeholders::_1, types::tag::floating_point>>::value;
         };
 
         /// @brief Compile time check function of whether a provided type is any
@@ -122,7 +119,7 @@ namespace nil {
         template<typename T>
         struct is_integral {
             static const bool value = has_type_tag<T, 
-                boost::is_same<_1, types::tag::integral>>::value;
+                boost::is_same<boost::mpl::placeholders::_1, types::tag::integral>>::value;
         };
 
         /// @brief Compile time check function of whether a provided type is any
@@ -133,7 +130,7 @@ namespace nil {
         template<typename T>
         struct is_no_value {
             static const bool value = has_type_tag<T, 
-                boost::is_same<_1, types::tag::no_value>>::value;
+                boost::is_same<boost::mpl::placeholders::_1, types::tag::no_value>>::value;
         };
 
         /// @brief Compile time check function of whether a provided type is any
@@ -144,7 +141,7 @@ namespace nil {
         template<typename T>
         struct is_optional {
             static const bool value = has_type_tag<T, 
-                boost::is_same<_1, types::tag::optional>>::value;
+                boost::is_same<boost::mpl::placeholders::_1, types::tag::optional>>::value;
         };
 
         /// @brief Compile time check function of whether a provided type is any
@@ -155,7 +152,7 @@ namespace nil {
         template<typename T>
         struct is_string {
             static const bool value = has_type_tag<T, 
-                boost::is_same<_1, types::tag::string>>::value;
+                boost::is_same<boost::mpl::placeholders::_1, types::tag::string>>::value;
         };
 
         /// @brief Compile time check function of whether a provided type is any
@@ -166,7 +163,7 @@ namespace nil {
         template<typename T>
         struct is_variant {
             static const bool value = has_type_tag<T, 
-                boost::is_same<_1, types::tag::variant>>::value;
+                boost::is_same<boost::mpl::placeholders::_1, types::tag::variant>>::value;
         };
 
         template<typename T>
