@@ -395,8 +395,8 @@ namespace nil {
                             a = a_new;
                         }
 
-                        /*std::vector<std::size_t> value_sizes = {14};
-                        // lookup table for sparse values with base = 4
+                        std::vector<std::size_t> value_sizes = {14};
+                         //lookup table for sparse values with base = 4
                         for(typename CurveType::scalar_field_type::integral_type i = 0; i < typename CurveType::scalar_field_type::integral_type(16384); i++){
                             std::vector<bool> value(14);
                             for (std::size_t j = 0; j < 14; j++) {
@@ -429,7 +429,7 @@ namespace nil {
                             static std::array<std::vector<typename CurveType::scalar_field_type::integral_type>, 2> value = reversed_sparse_and_split(i, value_sizes, base7);
                             public_assignment.constant(4)[component_start_row + std::size_t(i)] = value[0][0];
                             public_assignment.constant(5)[component_start_row + std::size_t(i)] = i;
-                        }*/
+                        }
 
                         return result_type(component_start_row);
                     }
@@ -466,7 +466,7 @@ namespace nil {
                             {constraint_1, constraint_2, constraint_3,
                                           constraint_4, constraint_5});
                          }
-                        /*std::size_t selector_lookup_index = public_assignment.add_selector(j, j + 237, 5);
+                        std::size_t selector_lookup_index = public_assignment.add_selector(j, j + 237, 5);
                         auto lookup_constraint_1 = bp.add_lookup_constraint({var(W1, - 1), var(W7, - 1)}, {{0, 0, false, var::column_type::constant}, {1, 0, false, var::column_type::constant}});
                         auto lookup_constraint_2 = bp.add_lookup_constraint({var(W2, - 1)* 1024}, {{0, 0, false, var::column_type::constant}});
                         auto lookup_constraint_3 = bp.add_lookup_constraint({var(W2, - 1), var(W2, 0)}, {{0, 0, false, var::column_type::constant}, {1, 0, false, var::column_type::constant}});
@@ -481,7 +481,7 @@ namespace nil {
                             {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3,
                                           lookup_constraint_4, lookup_constraint_5, lookup_constraint_6,
                                           lookup_constraint_7, lookup_constraint_8,
-                                          lookup_constraint_9, lookup_constraint_10});*/
+                                          lookup_constraint_9, lookup_constraint_10});
                     }
                     static void generate_sigma1_gates(blueprint<ArithmetizationType> &bp,
                         blueprint_assignment_table<ArithmetizationType> &assignment,
@@ -514,7 +514,7 @@ namespace nil {
                                 {constraint_1, constraint_2, constraint_3,
                                             constraint_4, constraint_5});
                          }
-                        /*std::size_t selector_lookup_index = public_assignment.add_selector(j);
+                        std::size_t selector_lookup_index = public_assignment.add_selector(j);
                         auto lookup_constraint_1 = bp.add_lookup_constraint({var(W1, +1)* 16}, {{0, 0, false, var::column_type::constant}});
                         auto lookup_constraint_2 = bp.add_lookup_constraint({var(W1, +1), var(W1, 0)}, {{0, 0, false, var::column_type::constant}, {1, 0, false, var::column_type::constant}});
                         auto lookup_constraint_3 = bp.add_lookup_constraint({var(W2, +1)* 128}, {{0, 0, false, var::column_type::constant}});
@@ -530,7 +530,7 @@ namespace nil {
                             {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3,
                                           lookup_constraint_4, lookup_constraint_5, lookup_constraint_6,
                                           lookup_constraint_7, lookup_constraint_8,
-                                          lookup_constraint_9, lookup_constraint_10, lookup_constraint_11});*/
+                                          lookup_constraint_9, lookup_constraint_10, lookup_constraint_11});
                     }
 
                     static void generate_message_scheduling_gates(blueprint<ArithmetizationType> &bp,
@@ -590,7 +590,7 @@ namespace nil {
                         if (!allocated_data.previously_allocated) {bp.add_gate(selector_index,
                             {constraint_1, constraint_2, constraint_3,
                                           constraint_4, constraint_5, constraint_6});}
-                        /*std::size_t selector_lookup_index = public_assignment.add_selector(j);
+                        std::size_t selector_lookup_index = public_assignment.add_selector(j);
                         auto lookup_constraint_1 = bp.add_lookup_constraint({var(W3, +1)* 8}, {{0, 0, false, var::column_type::constant}});
                         auto lookup_constraint_2 = bp.add_lookup_constraint({var(W2, +1), var(W2, 0)}, {{0, 0, false, var::column_type::constant}, {1, 0, false, var::column_type::constant}});
                         auto lookup_constraint_3 = bp.add_lookup_constraint({var(W4, +1)* 32}, {{0, 0, false, var::column_type::constant}});
@@ -606,7 +606,7 @@ namespace nil {
                             {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3,
                                           lookup_constraint_4, lookup_constraint_5, lookup_constraint_6,
                                           lookup_constraint_7, lookup_constraint_8,
-                                          lookup_constraint_9, lookup_constraint_10, lookup_constraint_11});*/
+                                          lookup_constraint_9, lookup_constraint_10, lookup_constraint_11});
                     }
 
                     static void generate_Sigma1_gates(blueprint<ArithmetizationType> &bp,
@@ -641,7 +641,7 @@ namespace nil {
                                 {constraint_1, constraint_2, constraint_3,
                                             constraint_4, constraint_5});
                          }
-                        /*std::size_t selector_lookup_index = public_assignment.add_selector(j);
+                        std::size_t selector_lookup_index = public_assignment.add_selector(j);
                         auto lookup_constraint_1 = bp.add_lookup_constraint({var(W3, -1)* 256}, {{2, 0, false, var::column_type::constant}});
                         auto lookup_constraint_2 = bp.add_lookup_constraint({var(W2, -1), var(W1, -1)}, {{2, 0, false, var::column_type::constant}, {3, 0, false, var::column_type::constant}});
                         auto lookup_constraint_3 = bp.add_lookup_constraint({var(W4, -1)* 512}, {{2, 0, false, var::column_type::constant}});
@@ -657,7 +657,7 @@ namespace nil {
                             {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3,
                                           lookup_constraint_4, lookup_constraint_5, lookup_constraint_6,
                                           lookup_constraint_7, lookup_constraint_8,
-                                          lookup_constraint_9, lookup_constraint_10, lookup_constraint_11});*/
+                                          lookup_constraint_9, lookup_constraint_10, lookup_constraint_11});
                     }
 
                     static void generate_Maj_gates(blueprint<ArithmetizationType> &bp,
@@ -679,14 +679,14 @@ namespace nil {
                             bp.add_gate(selector_index,
                             {constraint_1});
                         }
-                        /*std::size_t selector_lookup_index = public_assignment.add_selector(j);
+                        std::size_t selector_lookup_index = public_assignment.add_selector(j);
                         auto lookup_constraint_1 = bp.add_lookup_constraint({var(W5, 0), var(W0, 0)}, {{4, 0, false, var::column_type::constant}, {5, 0, false, var::column_type::constant}});
                         auto lookup_constraint_2 = bp.add_lookup_constraint({var(W6, 0), var(W1, 0)}, {{4, 0, false, var::column_type::constant}, {5, 0, false, var::column_type::constant}});
                         auto lookup_constraint_3 = bp.add_lookup_constraint({var(W7, 0), var(W2, 0)}, {{4, 0, false, var::column_type::constant}, {5, 0, false, var::column_type::constant}});
                         auto lookup_constraint_4 = bp.add_lookup_constraint({var(W8, 0), var(W3, 0)}, {{4, 0, false, var::column_type::constant}, {5, 0, false, var::column_type::constant}});
                         bp.add_lookup_gate(selector_lookup_index,
                             {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3,
-                                          lookup_constraint_4});*/
+                                          lookup_constraint_4});
 
                     }
 
@@ -709,14 +709,14 @@ namespace nil {
                         + var(W3, 0) * base7_value.pow(24) - (var(W0, -1) + 2 * var(W1, - 1) + 3 * var(W1, + 1)));
                         if (!allocated_data.previously_allocated) { bp.add_gate(selector_index,
                             {constraint_1});}
-                        /*std::size_t selector_lookup_index = public_assignment.add_selector(j);
+                        std::size_t selector_lookup_index = public_assignment.add_selector(j);
                         auto lookup_constraint_1 = bp.add_lookup_constraint({var(W5, +1), var(W0, 0)}, {{6, 0, false, var::column_type::constant}, {7, 0, false, var::column_type::constant}});
                         auto lookup_constraint_2 = bp.add_lookup_constraint({var(W6, +1), var(W1, 0)}, {{6, 0, false, var::column_type::constant}, {7, 0, false, var::column_type::constant}});
                         auto lookup_constraint_3 = bp.add_lookup_constraint({var(W7, +1), var(W2, 0)}, {{6, 0, false, var::column_type::constant}, {7, 0, false, var::column_type::constant}});
                         auto lookup_constraint_4 = bp.add_lookup_constraint({var(W8, +1), var(W3, 0)}, {{6, 0, false, var::column_type::constant}, {7, 0, false, var::column_type::constant}});
                         bp.add_lookup_gate(selector_lookup_index,
                             {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3,
-                                          lookup_constraint_4});*/
+                                          lookup_constraint_4});
 
                     }
 
