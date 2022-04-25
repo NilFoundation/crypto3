@@ -76,7 +76,7 @@ namespace nil {
                         ArithmetizationParams> ArithmetizationType;
 
                 public:
-                    constexpr static const std::size_t required_rows_amount = ;
+                    constexpr static const std::size_t rows_amount = ;
 
                     struct init_params_type {
                         typename CurveType::template g1_type<>::value_type B;
@@ -89,7 +89,7 @@ namespace nil {
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                        return bp.allocate_rows(rows_amount);
                     }
 
                     static void generate_gates(

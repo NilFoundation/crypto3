@@ -101,7 +101,7 @@ namespace nil {
                         poseidon_component::generate_assignments(assignment,
                             params, component_start_row);
                         
-                        component_start_row += poseidon_component::required_rows_amount;
+                        component_start_row += poseidon_component::rows_amount;
 
                         for (std::size_t i = 0; i < poseidon_component::state_size; i++) {
                             state[i] = var(W0 + i, component_start_row - 1, false);
@@ -141,7 +141,7 @@ namespace nil {
                     }
 
                 public:
-                    constexpr static const std::size_t required_rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = 1;
 
                     struct params_type {
                     };
@@ -237,7 +237,7 @@ namespace nil {
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp,
                         std::size_t components_amount = 1){
-                        return bp.allocate_rows(required_rows_amount *
+                        return bp.allocate_rows(rows_amount *
                             components_amount);
                     }
                 };

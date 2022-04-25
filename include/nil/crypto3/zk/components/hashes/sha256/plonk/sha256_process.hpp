@@ -87,7 +87,7 @@ namespace nil {
                         };
                 public:
 
-                    constexpr static const std::size_t required_rows_amount = 755;
+                    constexpr static const std::size_t rows_amount = 755;
 
                     struct params_type {
                         std::array<var, 8> input_state;
@@ -109,16 +109,16 @@ namespace nil {
                          var(0, 0, false), var(0, 0, false), var(0, 0, false), var(0, 0, false)};
 
                         result_type(const std::size_t &component_start_row) {
-                            std::array<var, 8> output_state = {var(W0, component_start_row + required_rows_amount - 3, false),
-                            var(W1, component_start_row + required_rows_amount - 3, false), var(W2, component_start_row + required_rows_amount - 3, false), 
-                            var(W3, component_start_row + required_rows_amount - 3, false), var(W4, component_start_row + required_rows_amount - 3, false),
-                            var(W5, component_start_row + required_rows_amount - 3, false), var(W0, component_start_row + required_rows_amount - 1, false)
-                            , var(W1, component_start_row + required_rows_amount - 1, false)};
+                            std::array<var, 8> output_state = {var(W0, component_start_row + rows_amount - 3, false),
+                            var(W1, component_start_row + rows_amount - 3, false), var(W2, component_start_row + rows_amount - 3, false), 
+                            var(W3, component_start_row + rows_amount - 3, false), var(W4, component_start_row + rows_amount - 3, false),
+                            var(W5, component_start_row + rows_amount - 3, false), var(W0, component_start_row + rows_amount - 1, false)
+                            , var(W1, component_start_row + rows_amount - 1, false)};
                         }
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                        return bp.allocate_rows(rows_amount);
                     }
 
                     static result_type generate_circuit(

@@ -59,7 +59,7 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
                 public:
-                    constexpr static const std::size_t required_rows_amount = 0;
+                    constexpr static const std::size_t rows_amount = 0;
 
                     static snark::plonk_constraint<BlueprintFieldType> generate(
                         blueprint<ArithmetizationType> &bp,
@@ -93,7 +93,7 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
                 public:
-                    constexpr static const std::size_t required_rows_amount = 0;
+                    constexpr static const std::size_t rows_amount = 0;
 
                     static snark::plonk_constraint<BlueprintFieldType> generate(
                         blueprint<ArithmetizationType> &bp,
@@ -157,7 +157,7 @@ namespace nil {
 
                 public:
 
-                    constexpr static const std::size_t required_rows_amount = 43;
+                    constexpr static const std::size_t rows_amount = 43;
 
                     struct public_params_type {
                         typename CurveType::template g1_type<>::value_type B;
@@ -179,7 +179,7 @@ namespace nil {
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                        return bp.allocate_rows(rows_amount);
                     }
 
                 private:

@@ -80,8 +80,8 @@ namespace nil {
 
                 public:
 
-                    constexpr static const std::size_t required_rows_amount = sha256_process_component::required_rows_amount * 2 
-                    + decomposition_component::required_rows_amount * 2 + 1;
+                    constexpr static const std::size_t rows_amount = sha256_process_component::rows_amount * 2 
+                    + decomposition_component::rows_amount * 2 + 1;
 
                     struct params_type {
                         std::array<var, 4> block_data;
@@ -100,13 +100,13 @@ namespace nil {
                         std::array<var, 2> output = {var(0, 0, false), var(0, 0, false)};
 
                         result_type(const std::size_t &component_start_row) {
-                            std::array<var, 2> output = {var(W0, component_start_row + required_rows_amount - 1, false),
-                            var(W1, component_start_row + required_rows_amount - 1, false)};
+                            std::array<var, 2> output = {var(W0, component_start_row + rows_amount - 1, false),
+                            var(W1, component_start_row + rows_amount - 1, false)};
                         }
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                        return bp.allocate_rows(rows_amount);
                     }
 
                     static result_type generate_circuit(
@@ -131,12 +131,12 @@ namespace nil {
                         typename decomposition_component::params_type decomposition_params = {input_params_1};
                         auto sha_block_part_1 = decomposition_component::generate_assignments(assignment, 
                             decomposition_params, row);
-                        row += decomposition_component::required_rows_amount;
+                        row += decomposition_component::rows_amount;
                         std::array<var, 2> input_params_2 = {params.block_data[2], params.block_data[3]};
                         decomposition_params = {input_params_2};
                         auto sha_block_part_2 = decomposition_component::generate_assignments(assignment, 
                             decomposition_params, row);
-                        row += decomposition_component::required_rows_amount;
+                        row += decomposition_component::rows_amount;
                         std::vector<var> input_words(16);
                         for (int i = 0; i<8 ; i++) {
                             input_words[i] = sha_block_part_1.output_state[i];
@@ -154,7 +154,7 @@ namespace nil {
                         typename sha256_process_component::params_type sha_params = {constants_var, input_words};
                         auto sha_output = sha256_process_component::generate_assignments(assignment, 
                             sha_params, row);
-                        row += sha256_process_component::required_rows_amount;
+                        row += sha256_process_component::rows_amount;
 
                         std::array<typename ArithmetizationType::field_type::value_type, 16> input_words2 = {1<<31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1<<9};
                         for (int i = 0; i < 16; i++){

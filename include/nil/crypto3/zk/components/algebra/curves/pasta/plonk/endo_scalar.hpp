@@ -79,7 +79,7 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                 public:
-                    constexpr static const std::size_t required_rows_amount = 8;
+                    constexpr static const std::size_t rows_amount = 8;
 
                     struct params_type {
                         var scalar;
@@ -90,7 +90,7 @@ namespace nil {
                     struct result_type {
                         var endo_scalar = var(0, 0, false);
                         result_type(const std::size_t &component_start_row) {
-                            endo_scalar = var(W6, component_start_row + required_rows_amount - 1, false, var::column_type::witness);
+                            endo_scalar = var(W6, component_start_row + rows_amount - 1, false, var::column_type::witness);
                         }
                     };
 
@@ -106,7 +106,7 @@ namespace nil {
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
-                        return in_bp.allocate_rows(required_rows_amount);
+                        return in_bp.allocate_rows(rows_amount);
                     }
 
                     static result_type generate_circuit(
@@ -197,15 +197,15 @@ namespace nil {
                         std::size_t selector_index_1;
                         std::size_t selector_index_2;
                         if (!allocated_data.previously_allocated) {
-                            selector_index_1 = assignment.add_selector(j, j + required_rows_amount - 1);
-                            selector_index_2 = assignment.add_selector(j + required_rows_amount - 1);
+                            selector_index_1 = assignment.add_selector(j, j + rows_amount - 1);
+                            selector_index_2 = assignment.add_selector(j + rows_amount - 1);
                             allocated_data.selector_1 = selector_index_1;
                             allocated_data.selector_2 = selector_index_2;
                         } else {
                             selector_index_1 = allocated_data.selector_1;
                             selector_index_2 = allocated_data.selector_2;
-                            assignment.enable_selector(selector_index_1, j, j + required_rows_amount - 1); 
-                            assignment.enable_selector(selector_index_2, j + required_rows_amount - 1); 
+                            assignment.enable_selector(selector_index_1, j, j + rows_amount - 1); 
+                            assignment.enable_selector(selector_index_2, j + rows_amount - 1); 
                         }
 
                         auto c_f = [](var x) {
@@ -271,14 +271,14 @@ namespace nil {
 
                         const std::size_t &j = component_start_row;
 
-                        for (std::size_t z = 1; z < required_rows_amount; z++){
+                        for (std::size_t z = 1; z < rows_amount; z++){
                             bp.add_copy_constraint({{W0, static_cast<int>(j + z), false}, {W1, static_cast<int>(j + z - 1), false}});
                             bp.add_copy_constraint({{W2, static_cast<int>(j + z), false}, {W4, static_cast<int>(j + z - 1), false}});
                             bp.add_copy_constraint({{W3, static_cast<int>(j + z), false}, {W5, static_cast<int>(j + z - 1), false}});
                         }
 
                         // check that the recalculated n is equal to the input challenge
-                        bp.add_copy_constraint({{W1, static_cast<int>(j + required_rows_amount - 1), false}, params.scalar});
+                        bp.add_copy_constraint({{W1, static_cast<int>(j + rows_amount - 1), false}, params.scalar});
                     }
                 };
             }    // namespace components

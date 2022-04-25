@@ -76,7 +76,7 @@ namespace nil {
                 public:
                     // Addition Component takes only one row in the table
                     // More complex components may contain more rows
-                    constexpr static const std::size_t required_rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = 1;
 
                     // params_type defines input data for the component
                     // it constains either variables allocated on the table (var) or some auxiliary data
@@ -110,7 +110,7 @@ namespace nil {
                     // Allocate rows in the table required for Addition Component
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp,
                         std::size_t components_amount = 1){
-                        return bp.allocate_rows(required_rows_amount *
+                        return bp.allocate_rows(rows_amount *
                             components_amount);
                     }
 

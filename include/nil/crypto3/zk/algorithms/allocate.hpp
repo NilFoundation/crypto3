@@ -1,7 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
+// Copyright (c) 2022 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2022 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -24,38 +23,26 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PROOF_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PROOF_HPP
-
-#include <nil/marshalling/algorithms/pack.hpp>
-
-#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
+#ifndef CRYPTO3_ZK_COMPONENTS_ALGORITHMS_ALLOCATE_HPP
+#define CRYPTO3_ZK_COMPONENTS_ALGORITHMS_ALLOCATE_HPP
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/component.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-                
-                template<typename CurveType>
-                struct kimchi_proof_evaluations {
 
-                };
+                template<typename ComponentType, typename ArithmetizationType>
+                std::size_t allocate(blueprint<ArithmetizationType> &bp,
+                            const std::size_t components_amount = 1) {    
 
-                template<typename CurveType>
-                struct kimchi_proof_scalar {
-                    using FieldType = typename CurveType::scalar_field_type;
-                    using var = snark::plonk_variable<FieldType>;
+                    return bp.allocate_rows(ComponentType::rows_amount * components_amount);
+                }
 
-                    std::array<kimchi_proof_evaluations<CurveType>, 2> proof_evals;
-                    var ft_eval = var(0, 0);
-                    std::vector<var> public;
-                };
             }    // namespace components
-        }        // namespace zk
-    }            // namespace crypto3
+        }    // namespace zk
+    }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PROOF_HPP
+#endif    // CRYPTO3_ZK_COMPONENTS_ALGORITHMS_ALLOCATE_HPP

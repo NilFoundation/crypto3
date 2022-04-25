@@ -76,9 +76,16 @@ namespace nil {
                     
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
+                    constexpr static const std::size_t selector_seed = 0xff03;
+
+                    template<typename ComponentType, typename ArithmetizationType>
+                    friend void generate_circuit(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const typename ComponentType::params_type params,
+                        const std::size_t start_row_index);
                 public:
 
-                    constexpr static const std::size_t required_rows_amount = 102;
+                    constexpr static const std::size_t rows_amount = 102;
 
                     struct params_type {
                         struct var_ec_point {
@@ -94,8 +101,8 @@ namespace nil {
                         var X = var(0, 0, false);
                         var Y = var(0, 0, false);
                         result_type(const std::size_t &component_start_row) {
-                            X = var(W0, component_start_row + required_rows_amount, false, var::column_type::witness);
-                            Y = var(W1, component_start_row + required_rows_amount, false, var::column_type::witness);
+                            X = var(W0, component_start_row + rows_amount, false, var::column_type::witness);
+                            Y = var(W1, component_start_row + rows_amount, false, var::column_type::witness);
                         }
                     };
 
@@ -110,7 +117,7 @@ namespace nil {
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                        return bp.allocate_rows(rows_amount);
                     }
 
                     static result_type generate_circuit(
@@ -149,7 +156,7 @@ namespace nil {
                             }
                             typename ArithmetizationType::field_type::value_type n = 0;
                             typename ArithmetizationType::field_type::value_type n_next = 0;
-                            for (std::size_t i = j; i < j + required_rows_amount; i= i + 2) {
+                            for (std::size_t i = j; i < j + rows_amount; i= i + 2) {
                                 assignment.witness(W0)[i] = T.X;
                                 assignment.witness(W1)[i] = T.Y;
                                 if (i == j) {
@@ -215,11 +222,11 @@ namespace nil {
 
                         std::size_t vbsm_selector_index;
                         if (!allocated_data.previously_allocated) {
-                            vbsm_selector_index = assignment.add_selector(j, j + required_rows_amount - 1, 2);
+                            vbsm_selector_index = assignment.add_selector(j, j + rows_amount - 1, 2);
                             allocated_data.vbsm_selector_index = vbsm_selector_index;
                         } else {
                             vbsm_selector_index = allocated_data.vbsm_selector_index;
-                            assignment.enable_selector(vbsm_selector_index, j, j + required_rows_amount - 1, 2); 
+                            assignment.enable_selector(vbsm_selector_index, j, j + rows_amount - 1, 2); 
                         }
 
                         auto bit_check_1 = bp.add_bit_check(var(W2, +1));
@@ -307,7 +314,7 @@ namespace nil {
                         const std::size_t &component_start_row) {
                         const std::size_t &j = component_start_row;
 
-                        for (int z = 0; z < required_rows_amount - 2; z += 2) {
+                        for (int z = 0; z < rows_amount - 2; z += 2) {
                             bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 2, false}});
                             bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 2, false}});
                         }
@@ -316,12 +323,12 @@ namespace nil {
 
                         // TODO: (x0, y0) in row i are copy constrained with values from the first doubling circuit
 
-                        for (int z = 2; z < required_rows_amount; z += 2) {
+                        for (int z = 2; z < rows_amount; z += 2) {
                             bp.add_copy_constraint({{W2, j + z, false}, {W0, j + z - 1, false}});
                             bp.add_copy_constraint({{W3, j + z, false}, {W1, j + z - 1, false}});
                         }
 
-                         for (int z = 2; z < required_rows_amount; z += 2) {
+                         for (int z = 2; z < rows_amount; z += 2) {
                             bp.add_copy_constraint({{W4, j + z, false}, {W5, j + z - 2, false}});
                         }
 
