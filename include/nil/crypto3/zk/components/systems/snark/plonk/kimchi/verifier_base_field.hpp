@@ -81,7 +81,7 @@ namespace nil {
 
                 public:
 
-                    constexpr static const std::size_t required_rows_amount = 1 + endo_mul::required_rows_amount;
+                    constexpr static const std::size_t rows_amount = 1 + endo_mul::rows_amount;
 
                     struct params_type {
                         typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type base_point;
@@ -89,7 +89,7 @@ namespace nil {
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                        return bp.allocate_rows(rows_amount);
                     }
 
                     static void generate_circuit(

@@ -55,7 +55,7 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
                 public:
-                    constexpr static const std::size_t required_rows_amount = 0;
+                    constexpr static const std::size_t rows_amount = 0;
 
                     static snark::plonk_constraint<BlueprintFieldType> generate(
                         blueprint<ArithmetizationType> &bp,

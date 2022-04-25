@@ -65,7 +65,7 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                 public:
-                    constexpr static const std::size_t required_rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = 1;
 
                     struct params_type {
                         std::array<var, 2> scalar_limbs_var;
@@ -92,7 +92,7 @@ namespace nil {
                     
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
-                        return in_bp.allocate_rows(required_rows_amount);
+                        return in_bp.allocate_rows(rows_amount);
                     }
 
                     static result_type generate_circuit(
@@ -137,12 +137,12 @@ namespace nil {
 
                         std::size_t selector_index_1;
                         if (!allocated_data.previously_allocated) {
-                            selector_index_1 = assignment.add_selector(row, row + required_rows_amount - 1);
+                            selector_index_1 = assignment.add_selector(row, row + rows_amount - 1);
                             allocated_data.previously_allocated = true;
                             allocated_data.selector_1 = selector_index_1;
                         } else {
                             selector_index_1 = allocated_data.selector_1;
-                            assignment.enable_selector(selector_index_1, row, row + required_rows_amount - 1);
+                            assignment.enable_selector(selector_index_1, row, row + rows_amount - 1);
                         }
 
                         // TODO constraints

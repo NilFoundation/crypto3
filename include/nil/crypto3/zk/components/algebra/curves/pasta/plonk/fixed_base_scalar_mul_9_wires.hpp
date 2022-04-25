@@ -35,7 +35,6 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/component.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -73,7 +72,7 @@ namespace nil {
 
                 public:
 
-                    constexpr static const std::size_t required_rows_amount = 85;
+                    constexpr static const std::size_t rows_amount = 85;
 
                     struct init_params_type {
                         typename CurveType::template g1_type<>::value_type B;
@@ -86,7 +85,7 @@ namespace nil {
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                        return bp.allocate_rows(rows_amount);
                     }
 
                 private:

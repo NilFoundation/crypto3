@@ -34,7 +34,6 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/component.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -76,7 +75,7 @@ namespace nil {
                         ArithmetizationParams> ArithmetizationType;
 
                 public:
-                    constexpr static const std::size_t required_rows_amount = ;
+                    constexpr static const std::size_t rows_amount = ;
 
                     struct init_params_type {
                         typename CurveType::template g1_type<>::value_type B;
@@ -87,10 +86,6 @@ namespace nil {
                         typename CurveType::scalar_field_type::value_type s;
                         typename CurveType::template g1_type<>::value_type P;
                     };
-
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
-                    }
 
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,

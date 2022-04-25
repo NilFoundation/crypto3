@@ -75,7 +75,7 @@ namespace nil {
 
                 public:
 
-                    constexpr static const std::size_t required_rows_amount = 4;
+                    constexpr static const std::size_t rows_amount = 4;
 
                     struct params_type {
                         std::array<var, 7> k;
@@ -95,12 +95,12 @@ namespace nil {
                         var output = var(0, 0, false);
 
                         result_type(const std::size_t &component_start_row) {
-                            var(W0, component_start_row + required_rows_amount - 1, false);
+                            var(W0, component_start_row + rows_amount - 1, false);
                         }
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                        return bp.allocate_rows(rows_amount);
                     }
 
                     static result_type generate_circuit(

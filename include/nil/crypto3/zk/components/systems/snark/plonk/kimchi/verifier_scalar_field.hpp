@@ -82,14 +82,14 @@ namespace nil {
 
                 public:
 
-                    constexpr static const std::size_t required_rows_amount = 1 + poseidon_component::required_rows_amount;
+                    constexpr static const std::size_t rows_amount = 1 + poseidon_component::rows_amount;
 
                     struct params_type {
                         std::array<typename ArithmetizationType::field_type::value_type, 3> input_data;
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                        return bp.allocate_rows(rows_amount);
                     }
 
                     static void generate_circuit(
@@ -145,7 +145,7 @@ namespace nil {
                         typename poseidon_component::params_type poseidon_params = {};
                         poseidon_component::generate_copy_constraints(bp, assignment,
                             poseidon_params, row);
-                        bp.add_copy_constraint({{W1, row + required_rows_amount - 1, false}, {0, row - 1, false, snark::plonk_variable<BlueprintFieldType>::column_type::public_input}});
+                        bp.add_copy_constraint({{W1, row + rows_amount - 1, false}, {0, row - 1, false, snark::plonk_variable<BlueprintFieldType>::column_type::public_input}});
 
                     }
                 };

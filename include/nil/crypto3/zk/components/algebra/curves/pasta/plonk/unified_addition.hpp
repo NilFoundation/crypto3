@@ -30,13 +30,11 @@
 
 #include <cmath>
 
-#include <nil/marshalling/algorithms/pack.hpp>
-
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/component.hpp>
+#include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -75,8 +73,17 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
+                    constexpr static const std::size_t selector_seed = 0xff01;
+
+                    template<typename ComponentType, typename ArithmetizationType>
+                    friend void generate_circuit(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const typename ComponentType::params_type params,
+                        const std::size_t start_row_index);
+                    
                 public:
-                    constexpr static const std::size_t required_rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
                         struct var_ec_point {
@@ -100,98 +107,61 @@ namespace nil {
                         }
                     };
 
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-
-                        return bp.allocate_rows(required_rows_amount);
-                    }
-
-                    static std::vector<std::size_t> allocate_rows (blueprint<ArithmetizationType> &bp,
-                        std::size_t components_amount){
-
-                        std::vector<std::size_t> rows(components_amount);
-
-                        for (std::size_t i = 0; i < components_amount; i++) {
-                            rows[i] = bp.allocate_rows(required_rows_amount);;
-                        }
-
-                        return rows;
-                    }
-
-                    static void generate_circuit(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const std::vector<params_type> params,
-                        const std::vector<std::size_t> row_start_indices){
-
-                        assert(params.size() == row_start_indices.size());
-
-                        generate_gates(bp, assignment, params, row_start_indices);
-                        generate_copy_constraints(bp, assignment, params, row_start_indices);
-                    }
-
                     static void generate_assignments(
                             blueprint_assignment_table<ArithmetizationType>
                                 &assignment,
-                            const std::vector<params_type> params,
-                            const std::vector<std::size_t> row_start_indices){
+                            const params_type params,
+                            const std::size_t start_row_index){
 
-                        assert(params.size() == row_start_indices.size());
+                        const std::size_t j = start_row_index;
 
-                        for (std::size_t component_index = 0;
-                            component_index < row_start_indices.size();
-                            component_index++){
+                        assignment.public_input(0)[0] = ArithmetizationType::field_type::value_type::zero();
 
-                            const std::size_t j = row_start_indices[component_index];
-                            const params_type cur_params = params[component_index];
+                        typename BlueprintFieldType::value_type p_x = assignment.var_value(params.P.x);
+                        typename BlueprintFieldType::value_type p_y = assignment.var_value(params.P.y);
+                        typename CurveType::template 
+                            g1_type<algebra::curves::coordinates::affine>::value_type P(p_x, p_y);
 
-                            assignment.public_input(0)[0] = ArithmetizationType::field_type::value_type::zero();
+                        typename BlueprintFieldType::value_type q_x = assignment.var_value(params.Q.x);
+                        typename BlueprintFieldType::value_type q_y = assignment.var_value(params.Q.y);  
+                        typename CurveType::template 
+                            g1_type<algebra::curves::coordinates::affine>::value_type Q(q_x, q_y);
 
-                            typename BlueprintFieldType::value_type p_x = assignment.var_value(cur_params.P.x);
-                            typename BlueprintFieldType::value_type p_y = assignment.var_value(cur_params.P.y);
-                            typename CurveType::template 
-                                g1_type<algebra::curves::coordinates::affine>::value_type P(p_x, p_y);
+                        const typename CurveType::template
+                            g1_type<algebra::curves::coordinates::affine>::value_type R = P + Q;
+                        
+                        assignment.witness(W0)[j] = P.X;
+                        assignment.witness(W1)[j] = P.Y;
+                        assignment.witness(W2)[j] = Q.X;
+                        assignment.witness(W3)[j] = Q.Y;
+                        assignment.witness(W4)[j] = R.X;
+                        assignment.witness(W5)[j] = R.Y;
 
-                            typename BlueprintFieldType::value_type q_x = assignment.var_value(cur_params.Q.x);
-                            typename BlueprintFieldType::value_type q_y = assignment.var_value(cur_params.Q.y);  
-                            typename CurveType::template 
-                                g1_type<algebra::curves::coordinates::affine>::value_type Q(q_x, q_y);
+                        assignment.witness(W6)[j] = 0;
 
-                            const typename CurveType::template
-                                g1_type<algebra::curves::coordinates::affine>::value_type R = P + Q;
-                            
-                            assignment.witness(W0)[j] = P.X;
-                            assignment.witness(W1)[j] = P.Y;
-                            assignment.witness(W2)[j] = Q.X;
-                            assignment.witness(W3)[j] = Q.Y;
-                            assignment.witness(W4)[j] = R.X;
-                            assignment.witness(W5)[j] = R.Y;
+                        if (P.X != Q.X){
+                            assignment.witness(W7)[j] = 0;
+                            assignment.witness(W8)[j] = (P.Y - Q.Y)/(P.X - Q.X);
 
-                            assignment.witness(W6)[j] = 0;
+                            assignment.witness(W9)[j] = 0;
 
-                            if (P.X != Q.X){
-                                assignment.witness(W7)[j] = 0;
-                                assignment.witness(W8)[j] = (P.Y - Q.Y)/(P.X - Q.X);
+                            assignment.witness(W10)[j] = (Q.X - P.X).inversed();
+                        } else {
+                            assignment.witness(W7)[j] = 1;
 
-                                assignment.witness(W9)[j] = 0;
-
-                                assignment.witness(W10)[j] = (Q.X - P.X).inversed();
-                            } else {
-                                assignment.witness(W7)[j] = 1;
-
-                                if (P.Y != Q.Y) { 
-                                    assignment.witness(W9)[j] = (Q.Y - P.Y).inversed();
-                                } else { // doubling
-                                    if (P.Y != 0) {
-                                        assignment.witness(W8)[j] = (3 * (P.X * P.X))/(2 * P.Y);
-                                    } else {
-                                        assignment.witness(W8)[j] = 0;
-                                    }
-                                    
-                                    assignment.witness(W9)[j] = 0;
+                            if (P.Y != Q.Y) { 
+                                assignment.witness(W9)[j] = (Q.Y - P.Y).inversed();
+                            } else { // doubling
+                                if (P.Y != 0) {
+                                    assignment.witness(W8)[j] = (3 * (P.X * P.X))/(2 * P.Y);
+                                } else {
+                                    assignment.witness(W8)[j] = 0;
                                 }
-
-                                assignment.witness(W10)[j] = 0;
+                                
+                                assignment.witness(W9)[j] = 0;
                             }
+
+                            assignment.witness(W10)[j] = 0;
                         }
                     }
 
@@ -199,12 +169,8 @@ namespace nil {
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment, 
-                        const std::vector<params_type> params,
-                        const std::vector<std::size_t> row_start_indices) {
-
-                        assert(params.size() == row_start_indices.size());
-
-                        std::size_t selector_index = assignment.add_selector(row_start_indices);
+                        const params_type params,
+                        const std::size_t first_selector_index) {
 
                         auto constraint_1 = bp.add_constraint(
                             var(W7, 0) * (var(W2, 0) - var(W0, 0)));
@@ -226,7 +192,7 @@ namespace nil {
                         auto constraint_7 = bp.add_constraint(
                             (var(W3, 0) - var(W1, 0)) * var(W9, 0) - var(W6, 0));
                         
-                        bp.add_gate(selector_index, 
+                        bp.add_gate(first_selector_index, 
                             { constraint_1, constraint_2, constraint_3,
                             constraint_4, constraint_5, constraint_6,
                             constraint_7
@@ -236,21 +202,17 @@ namespace nil {
                     static void generate_copy_constraints(
                             blueprint<ArithmetizationType> &bp,
                             blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                            const std::vector<params_type> params,
-                            const std::vector<std::size_t> row_start_indices){
+                            const params_type params,
+                            const std::size_t row_start_index){
 
                         std::size_t public_input_column_index = 0;
-                        for (std::size_t component_index = 0;
-                            component_index < row_start_indices.size();
-                            component_index++){
 
-                            const std::size_t j = row_start_indices[component_index];
+                        const std::size_t j = row_start_index;
 
-                            bp.add_copy_constraint({{W6, static_cast<int>(j), false},
-                                {public_input_column_index, 0, false, var::column_type::public_input}});
+                        bp.add_copy_constraint({{W6, static_cast<int>(j), false},
+                            {public_input_column_index, 0, false, var::column_type::public_input}});
 
-                            assignment.public_input(public_input_column_index)[0] = 0;
-                        }
+                        assignment.public_input(public_input_column_index)[0] = 0;
                     }
                 };
             }    // namespace components

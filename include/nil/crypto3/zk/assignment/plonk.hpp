@@ -115,6 +115,9 @@ namespace nil {
                 : public snark::plonk_public_assignment_table<BlueprintFieldType,
                                                               ArithmetizationParams> {
 
+                using zk_type = snark::plonk_public_assignment_table<BlueprintFieldType,
+                                                              ArithmetizationParams>;
+
                 typedef snark::plonk_constraint_system<BlueprintFieldType,
                     ArithmetizationParams> ArithmetizationType;
 
@@ -123,7 +126,12 @@ namespace nil {
                 snark::plonk_table_description<BlueprintFieldType,
                         ArithmetizationParams> &_table_description;
 
+                std::map<std::size_t, std::size_t> selector_map;
+
+                std::size_t next_selector_index = 0;
+
             public:
+
                 blueprint_public_assignment_table(
                     snark::plonk_table_description<BlueprintFieldType,
                         ArithmetizationParams> &table_description) :
@@ -133,11 +141,33 @@ namespace nil {
                 }
 
                 snark::plonk_column<BlueprintFieldType> &selector(std::size_t selector_index) {
-                    if (selector_index >= this->selector_columns.size()) {
-                        this->selector_columns.resize(selector_index + 1);
-                    }
+                    assert(selector_index < this->selector_columns.size());
                     this->selector_columns[selector_index].resize(_table_description.rows_amount);
                     return this->selector_columns[selector_index];
+                }
+
+                std::map<std::size_t, std::size_t>::iterator selectors_end(){
+                    return selector_map.end();
+                }
+
+                std::map<std::size_t, std::size_t>::iterator find_selector(std::size_t selector_seed){
+
+                    return selector_map.find(selector_seed);
+                }
+
+                std::size_t allocate_selector(std::size_t selector_seed,
+                    std::size_t selectors_amount){
+
+                    std::size_t selector_index = next_selector_index;
+                    selector_map[selector_seed] = selector_index;
+                    next_selector_index += selectors_amount;
+                    return selector_index;
+                }
+
+                void enable_selector(const std::size_t selector_index,
+                    const std::size_t row_index) {
+
+                    selector(selector_index)[row_index] = 1;
                 }
 
                 std::size_t add_selector(const std::vector<std::size_t> row_indices) {
@@ -245,7 +275,6 @@ namespace nil {
                     for (std::size_t pi_index = 0; pi_index <
                         this->public_input_columns.size(); pi_index++) {
 
-                        std::cout << "Resize: " << _table_description.rows_amount << std::endl;
                         this->public_input_columns[pi_index].resize(_table_description.rows_amount,
                             decltype(this->public_input_columns)::value_type::value_type::zero());
                     }

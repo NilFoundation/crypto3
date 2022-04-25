@@ -34,7 +34,6 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/chips/plonk/bit_check.hpp>
 
 namespace nil {
@@ -58,8 +57,16 @@ namespace nil {
                         ArithmetizationParams> ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
+
+                    constexpr static const std::size_t selector_seed = 0xff07;
+
+                    template<typename ComponentType, typename ArithmetizationType>
+                    friend void generate_circuit(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const typename ComponentType::params_type params,
+                        const std::size_t start_row_index);
                 public:
-                    constexpr static const std::size_t required_rows_amount = 0;
+                    constexpr static const std::size_t rows_amount = 0;
 
                     static snark::plonk_constraint<BlueprintFieldType> generate(
                         blueprint<ArithmetizationType> &bp,
@@ -93,7 +100,7 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
                 public:
-                    constexpr static const std::size_t required_rows_amount = 0;
+                    constexpr static const std::size_t rows_amount = 0;
 
                     static snark::plonk_constraint<BlueprintFieldType> generate(
                         blueprint<ArithmetizationType> &bp,
@@ -157,7 +164,7 @@ namespace nil {
 
                 public:
 
-                    constexpr static const std::size_t required_rows_amount = 43;
+                    constexpr static const std::size_t rows_amount = 43;
 
                     struct public_params_type {
                         typename CurveType::template g1_type<>::value_type B;
@@ -179,7 +186,7 @@ namespace nil {
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                        return bp.allocate_rows(rows_amount);
                     }
 
                 private:

@@ -46,6 +46,8 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/algorithms/allocate.hpp>
+#include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
 
@@ -81,7 +83,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     constexpr std::size_t WitnessColumns = 11;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 2;
+    constexpr std::size_t SelectorColumns = 1;
 
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -107,30 +109,31 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
     zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
 
-    std::vector<std::size_t> rows = component_type::allocate_rows(bp, complexity);
+    std::size_t start_row = zk::components::allocate<component_type>(bp, complexity);
 
     std::vector<component_type::result_type> result(complexity);
-    std::vector<component_type::params_type> component_params(complexity);
 
     bp.allocate_rows(public_input.size());
-    component_type::params_type tmp_params = {
+    component_type::params_type component_params = {
         {
-            assignment_bp.allocate_public_input(public_input[0]),
-            assignment_bp.allocate_public_input(public_input[1])
+            assignment_bp.allocate_public_input(public_input[1]),
+            assignment_bp.allocate_public_input(public_input[2])
         },
         {
-            assignment_bp.allocate_public_input(public_input[2]),
-            assignment_bp.allocate_public_input(public_input[3])
+            assignment_bp.allocate_public_input(public_input[3]),
+            assignment_bp.allocate_public_input(public_input[4])
         }
     };
 
     for (std::size_t i = 0; i < complexity; i++) {
-        result[i] = component_type::result_type(rows[i]);
-        component_params[i] = tmp_params;
-    }
 
-    component_type::generate_circuit(bp, public_assignment, component_params, rows);
-    component_type::generate_assignments(assignment_bp, component_params, rows);
+        std::size_t row = start_row + i*component_type::rows_amount;
+        result[i] = component_type::result_type(row);
+
+        zk::components::generate_circuit<component_type>(bp, public_assignment, component_params, row);
+
+        component_type::generate_assignments(assignment_bp, component_params, row);
+    }
 
     std::cout << "actual result: " << std::endl;
     for (std::size_t i = 0; i < complexity; i++) {

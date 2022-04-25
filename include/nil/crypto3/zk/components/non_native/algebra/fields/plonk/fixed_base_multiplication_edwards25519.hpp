@@ -26,12 +26,18 @@
 // @file Declaration of interfaces for auxiliary components for the MERKLE_TREE component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_HPP
-#define CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_FIXED_BASE_MULTIPLICATION_EDWARD25519_HPP
+#define CRYPTO3_ZK_BLUEPRINT_FIXED_BASE_MULTIPLICATION_EDWARD25519_HPP
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha256.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/multiplication.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/addition.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/sum_multiplication.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/c_multiplication.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/multiplication_add_c.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/sum_of_squares.hpp>
+
 
 namespace nil {
     namespace crypto3 {
@@ -41,7 +47,7 @@ namespace nil {
                 template<typename ArithmetizationType,
                          typename CurveType,
                          std::size_t... WireIndexes>
-                class merkle_tree;
+                class fixed_base_multiplication;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
@@ -55,7 +61,7 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class merkle_tree<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class fixed_base_multiplication<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                                        CurveType,
                                                        W0,
                                                        W1,
@@ -70,17 +76,34 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using multiplication_component = multiplication<ArithmetizationType, BlueprintFieldType,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using c_multiplication_component = c_multiplication<ArithmetizationType, BlueprintFieldType,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using addition_component = addition<ArithmetizationType, BlueprintFieldType,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using multiplication_add_c_component = multiplication_add_c<ArithmetizationType, BlueprintFieldType,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using sum_multiplication_component = sum_multiplication<ArithmetizationType, BlueprintFieldType,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using sum_of_squares_and_c_component = sum_of_squares_and_c<ArithmetizationType, BlueprintFieldType,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 
-                    using sha256_component = sha256<ArithmetizationType, BlueprintFieldType,
-                                W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    
 
                 public:
 
-                    constexpr static const std::size_t rows_amount = 1023 * sha256_component::rows_amount;
+                    constexpr static const std::size_t required_rows_amount = 10880;
 
                     struct params_type {
-                        std::array<var, 2048> data;
+                        struct var_ec_point {
+                            var x;
+                            var y;
+                        };
+                        
+                        var_ec_point T;
+                        var k;
                     };
 
                     struct allocated_data_type {
@@ -97,13 +120,13 @@ namespace nil {
                         std::array<var, 2> output = {var(0, 0, false), var(0, 0, false)};
 
                         result_type(const std::size_t &component_start_row) {
-                            std::array<var, 2> output = {var(W0, component_start_row + rows_amount - 1, false),
-                            var(W1, component_start_row + rows_amount - 1, false)};
+                            std::array<var, 2> output = {var(W0, component_start_row + required_rows_amount - 1, false),
+                            var(W1, component_start_row + required_rows_amount - 1, false)};
                         }
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(rows_amount);
+                        return bp.allocate_rows(required_rows_amount);
                     }
 
                     static result_type generate_circuit(
@@ -124,23 +147,23 @@ namespace nil {
                         const params_type &params,
                         const std::size_t &component_start_row) {
                         std::size_t row = component_start_row;
-                        std::array<var, 2048> data; 
-                        for (std::size_t i = 0; i < 2048; i++) {
-                            data[i] = params.data[i];
+                        std::array<bool, 253> bits = {false};
+                        typename BlueprintFieldType::value_type k = assignment.var_value(params.k);
+                        typename CurveType::scalar_field_type::integral_type integral_k = typename CurveType::scalar_field_type::integral_type(k.data);
+                        var T_x = params.T.x;
+                        var T_y = params.T.y;
+                        typename BlueprintFieldType::value_type T_x_value = assignment.var_value(params.T.x);
+                        typename BlueprintFieldType::value_type T_y_value = assignment.var_value(params.T.y);
+                        typename CurveType::template 
+                        g1_type<algebra::curves::coordinates::affine>::value_type T(T_x_value, T_y_value);
+                        g1_type<algebra::curves::coordinates::affine>::value_type P = T;
+                        for (std::size_t i = 0; i < 253; i++) {
+                            b = multiprecision::bit_test(integral_k, i);
+
+                            row+=sum_of_squares_and_c_component::required_rows_amount;
+
                         }
-                        int k;
-                        for(std::size_t i = 11; i > -1; i-=2) {
-                            k = 0;
-                            for (std::size_t j = 0; j < (1 << i); j +=4) {
-                                std::array<var, 4> sha_blocks = {data[j], data[j + 1], data[j + 2], data[j + 3]};
-                                typename sha256_component::params_type sha_params = {sha_blocks};
-                                auto sha_output = sha256_component::generate_assignments(assignment, 
-                                sha_params, row);
-                                data[k] = sha_output.output[0];
-                                data[k + 1] = sha_output.output[0];
-                            }
-                            k +=2;    
-                        }
+                        
                         return result_type(component_start_row);
                     }
 
@@ -153,12 +176,8 @@ namespace nil {
                         allocated_data_type &allocated_data,
                         const std::size_t &component_start_row) {
                         std::size_t row = component_start_row;
-                        for(std::size_t i = 11; i > -1; i-=2) {
-                            for (std::size_t j = 0; j < (1 << i); j +=4) {
-                                sha256_component::generate_gates(bp, assignment,
-                                allocated_data, row);
-                            }
-                        }
+                        
+                        
                         
                     }
 
@@ -168,12 +187,8 @@ namespace nil {
                         const params_type &params,
                         const std::size_t &component_start_row) {
                         std::size_t row = component_start_row;
-                        for(std::size_t i = 11; i > -1; i-=2) {
-                            for (std::size_t j = 0; j < (1 << i); j +=4) {
-                                sha256_component::generate_copy_constraints(bp, assignment,
-                                allocated_data, row);
-                            }
-                        }
+                        
+                        
                     }
 
                     
@@ -184,4 +199,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_MERKLE_TREE_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_VARIABLE_BASE_MULTIPLICATION_EDWARD25519_HPP
