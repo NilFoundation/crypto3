@@ -73,6 +73,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 }*/
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
+    auto start = std::chrono::high_resolution_clock::now();
 
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
@@ -101,6 +102,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     std::vector<typename BlueprintFieldType::value_type> public_input = {0, P.X, P.Y, Q.X, Q.Y};
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input);
+
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    std::cout << "unified_addition: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

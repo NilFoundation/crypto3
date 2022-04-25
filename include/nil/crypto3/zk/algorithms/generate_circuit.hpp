@@ -26,6 +26,9 @@
 #ifndef CRYPTO3_ZK_COMPONENTS_ALGORITHMS_GENERATE_CIRCUIT_HPP
 #define CRYPTO3_ZK_COMPONENTS_ALGORITHMS_GENERATE_CIRCUIT_HPP
 
+#include <boost/type_traits.hpp>
+#include <boost/tti/tti.hpp>
+
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 
@@ -34,11 +37,20 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                BOOST_TTI_HAS_STATIC_MEMBER_FUNCTION(generate_circuit)
+
                 template<typename ComponentType, typename ArithmetizationType>
-                void generate_circuit(blueprint<ArithmetizationType> &bp,
-                    blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                    const typename ComponentType::params_type params,
-                    const std::size_t start_row_index){
+                typename std::enable_if<
+                    (!(has_static_member_function_generate_circuit<ComponentType, void,
+                        boost::mpl::vector<blueprint<ArithmetizationType> &,
+                            blueprint_public_assignment_table<ArithmetizationType> &,
+                            const typename ComponentType::params_type,
+                            const std::size_t>>::value)), void>::type
+                    generate_circuit(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const typename ComponentType::params_type params,
+                        const std::size_t start_row_index){
 
                     auto selector_iterator = assignment.find_selector(ComponentType::selector_seed);
                     std::size_t first_selector_index;
@@ -54,6 +66,22 @@ namespace nil {
                     assignment.enable_selector(first_selector_index, start_row_index);
 
                     ComponentType::generate_copy_constraints(bp, assignment, params, start_row_index);
+                }
+
+                template<typename ComponentType, typename ArithmetizationType>
+                typename std::enable_if<
+                    (has_static_member_function_generate_circuit<ComponentType, void,
+                        boost::mpl::vector<blueprint<ArithmetizationType> &,
+                            blueprint_public_assignment_table<ArithmetizationType> &,
+                            const typename ComponentType::params_type,
+                            const std::size_t>>::value), void>::type
+                    generate_circuit(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const typename ComponentType::params_type params,
+                        const std::size_t start_row_index){
+
+                    ComponentType::generate_circuit(bp, assignment, params, start_row_index);
                 }
 
             }    // namespace components

@@ -202,12 +202,6 @@ namespace nil {
             bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, placeholder_params>::process(
                 public_preprocessed_data, proof, bp, fri_params);
             profiling(assignments);
-            std::ofstream gate_argument_mono;
-            gate_argument_mono.open("gate_argument_mono.txt");
-            profiling_plonk_circuit<BlueprintFieldType, ArithmetizationParams, Hash, Lambda>::process(
-                gate_argument_mono, bp, public_preprocessed_data);
-            profiling_plonk_circuit<BlueprintFieldType, ArithmetizationParams, Hash, Lambda>::process_split(
-                bp, public_preprocessed_data);
             BOOST_CHECK(verifier_res);
         }
 

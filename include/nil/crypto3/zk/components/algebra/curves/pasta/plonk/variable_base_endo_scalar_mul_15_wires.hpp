@@ -90,10 +90,17 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0xff02;
 
                     template<typename ComponentType, typename ArithmetizationType>
-                    friend void generate_circuit(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const typename ComponentType::params_type params,
-                        const std::size_t start_row_index);
+                    friend typename std::enable_if<
+                        (!(has_static_member_function_generate_circuit<ComponentType, void,
+                            boost::mpl::vector<blueprint<ArithmetizationType> &,
+                                blueprint_public_assignment_table<ArithmetizationType> &,
+                                const typename ComponentType::params_type,
+                                const std::size_t>>::value)), void>::type
+                        generate_circuit(
+                            blueprint<ArithmetizationType> &bp,
+                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                            const typename ComponentType::params_type params,
+                            const std::size_t start_row_index);
                 public:
 
                     constexpr static const typename BlueprintFieldType::value_type endo = typename BlueprintFieldType::value_type(algebra::fields::arithmetic_params<BlueprintFieldType>::multiplicative_generator).pow(typename BlueprintFieldType::integral_type( ( (BlueprintFieldType::value_type::zero() - BlueprintFieldType::value_type::one()) * ( typename BlueprintFieldType::value_type(3) ).inversed() ).data));
@@ -257,10 +264,10 @@ namespace nil {
                         const std::size_t &j = start_row_index;
 
                         for (int z = 0; z < rows_amount - 2; z++) {
-                            bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 1, false}});
-                            bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 1, false}});
+                            bp.add_copy_constraint({{W0, (std::int32_t)(j + z), false}, {W0, (std::int32_t)(j + z + 1), false}});
+                            bp.add_copy_constraint({{W1, (std::int32_t)(j + z), false}, {W1, (std::int32_t)(j + z + 1), false}});
                         }
-                        bp.add_copy_constraint({{W6, j + 0, false}, {0, 0, false, var::column_type::public_input}});
+                        bp.add_copy_constraint({{W6, (std::int32_t)(j + 0), false}, {0, 0, false, var::column_type::public_input}});
 
                         //TODO link to params.b
 

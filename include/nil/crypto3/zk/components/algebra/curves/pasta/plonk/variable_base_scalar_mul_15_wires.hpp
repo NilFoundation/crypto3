@@ -79,10 +79,17 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0xff03;
 
                     template<typename ComponentType, typename ArithmetizationType>
-                    friend void generate_circuit(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const typename ComponentType::params_type params,
-                        const std::size_t start_row_index);
+                    friend typename std::enable_if<
+                        (!(has_static_member_function_generate_circuit<ComponentType, void,
+                            boost::mpl::vector<blueprint<ArithmetizationType> &,
+                                blueprint_public_assignment_table<ArithmetizationType> &,
+                                const typename ComponentType::params_type,
+                                const std::size_t>>::value)), void>::type
+                        generate_circuit(
+                            blueprint<ArithmetizationType> &bp,
+                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                            const typename ComponentType::params_type params,
+                            const std::size_t start_row_index);
                 public:
                     constexpr static const std::size_t rows_amount = 102;
                     constexpr static const std::size_t gates_amount = 1;
@@ -268,13 +275,13 @@ namespace nil {
                             blueprint<ArithmetizationType> &bp,
                             blueprint_public_assignment_table<ArithmetizationType> &assignment,
                             const params_type params,
-                            const std::size_t row_start_index){
+                            const std::size_t start_row_index){
 
-                        const std::size_t &j = row_start_index;
+                        const std::size_t &j = start_row_index;
 
                         for (int z = 0; z < rows_amount - 2; z += 2) {
-                            bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 2, false}});
-                            bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 2, false}});
+                            bp.add_copy_constraint({{W0, (std::int32_t)(j + z), false}, {W0, (std::int32_t)(j + z + 2), false}});
+                            bp.add_copy_constraint({{W1, (std::int32_t)(j + z), false}, {W1, (std::int32_t)(j + z + 2), false}});
                         }
 
                         //TODO link to params.b
@@ -282,17 +289,17 @@ namespace nil {
                         // TODO: (x0, y0) in row i are copy constrained with values from the first doubling circuit
 
                         for (int z = 2; z < rows_amount; z += 2) {
-                            bp.add_copy_constraint({{W2, j + z, false}, {W0, j + z - 1, false}});
-                            bp.add_copy_constraint({{W3, j + z, false}, {W1, j + z - 1, false}});
+                            bp.add_copy_constraint({{W2, (std::int32_t)(j + z), false}, {W0, (std::int32_t)(j + z - 1), false}});
+                            bp.add_copy_constraint({{W3, (std::int32_t)(j + z), false}, {W1, (std::int32_t)(j + z - 1), false}});
                         }
 
                          for (int z = 2; z < rows_amount; z += 2) {
-                            bp.add_copy_constraint({{W4, j + z, false}, {W5, j + z - 2, false}});
+                            bp.add_copy_constraint({{W4, (std::int32_t)(j + z), false}, {W5, (std::int32_t)(j + z - 2), false}});
                         }
 
                         std::size_t public_input_column_index = 0;
                         bp.add_copy_constraint(
-                            {{W4, j, false}, {public_input_column_index, j, false, var::column_type::public_input}});
+                            {{W4, (std::int32_t)(j), false}, {public_input_column_index, (std::int32_t)(j), false, var::column_type::public_input}});
                     }
                 };
             }    // namespace components

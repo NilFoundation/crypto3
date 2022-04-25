@@ -170,6 +170,17 @@ namespace nil {
                     selector(selector_index)[row_index] = 1;
                 }
 
+                void enable_selector(const std::size_t selector_index,
+                    const std::size_t begin_row_index,
+                    const std::size_t end_row_index,
+                    const std::size_t index_step = 1) {
+
+                    for (std::size_t row_index = begin_row_index; row_index <= end_row_index; row_index += index_step) {
+
+                        enable_selector(selector_index, row_index);
+                    }
+                }
+
                 std::size_t add_selector(const std::vector<std::size_t> row_indices) {
                     static std::size_t selector_index = 0;
                     std::size_t max_row_index = *std::max_element(row_indices.begin(), row_indices.end());
@@ -194,9 +205,9 @@ namespace nil {
                         offsets.size());
                     std::vector<std::size_t>::iterator row_indices_iterator = row_indices.begin();
 
-                    for(std::size_t row_start_index: row_start_indices){
+                    for(std::size_t start_row_index: row_start_indices){
                         for(std::size_t offset: offsets){
-                            *row_indices_iterator = row_start_index + offset;
+                            *row_indices_iterator = start_row_index + offset;
                             row_indices_iterator++;
                         }
                     }
