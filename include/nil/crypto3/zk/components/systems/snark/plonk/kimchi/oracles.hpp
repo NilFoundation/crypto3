@@ -321,6 +321,12 @@ namespace nil {
                         return res;
                     }
 
+                    static var assignment_prev_chal_evals(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                
+                                std::size_t &component_start_row) {
+
+                    }
+
                     // let init = (evals[0].w[PERMUTS - 1] + gamma) * evals[1].z * alpha0 * zkp;
                     static var ft_eval_1(blueprint_assignment_table<ArithmetizationType> &assignment,
                                 var eval_w,
@@ -478,7 +484,11 @@ namespace nil {
                             assignment_exponentiation(assignment, zeta_omega, verifier_index.max_poly_size, row),
                         };
 
-                        std::vector<var> polys = ?;
+                        std::vector<var> prev_challenges_evals = assignment_prev_chal_evals(assignment,
+                            max_poly_size,
+                            std::array<var, 2> {zeta, zeta_omega},
+                            powers_of_eval_points_for_chunks
+                            );
 
                         std::array<kimchi_proof_evaluations, 2> evals = {
                             assignment_combine_evaluations(assignment, params.proof.proof_evals[0],
