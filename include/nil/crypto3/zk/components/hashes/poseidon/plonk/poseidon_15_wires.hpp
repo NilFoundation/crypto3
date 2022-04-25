@@ -386,7 +386,7 @@ namespace nil {
                  public:
                     constexpr static const std::size_t rate = 2;
 
-                    constexpr static const std::size_t required_rows_amount = 12;
+                    constexpr static const std::size_t rows_amount = 12;
 
                     struct params_type {
                         std::array<var, state_size> input_state;
@@ -406,13 +406,13 @@ namespace nil {
                         std::array<var, state_size> output_state = {var(0, 0, false), var(0, 0, false), var(0, 0, false)};
 
                         result_type(const std::size_t &component_start_row) {
-                            std::array<var, state_size> output_state = {var(W0, component_start_row + required_rows_amount - 1, false),
-                            var(W1, component_start_row + required_rows_amount - 1, false), var(W2, component_start_row + required_rows_amount - 1, false)};
+                            std::array<var, state_size> output_state = {var(W0, component_start_row + rows_amount - 1, false),
+                            var(W1, component_start_row + rows_amount - 1, false), var(W2, component_start_row + rows_amount - 1, false)};
                         }
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                        return bp.allocate_rows(rows_amount);
                     }
 
                     static result_type generate_circuit(
@@ -443,7 +443,7 @@ namespace nil {
                         assignment.witness(W1)[row] = state[1];
                         assignment.witness(W2)[row] = state[2];
 
-                        for (std::size_t i = row; i < row + required_rows_amount - 1; i++) {
+                        for (std::size_t i = row; i < row + rows_amount - 1; i++) {
                             for (int j = 0; j < state_size; j++) {
                                 next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] + state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row)*5][j];
                             }

@@ -77,7 +77,7 @@ namespace nil {
 
                 public:
 
-                    constexpr static const std::size_t required_rows_amount = 1023 * sha256_component::required_rows_amount;
+                    constexpr static const std::size_t rows_amount = 1023 * sha256_component::rows_amount;
 
                     struct params_type {
                         std::array<var, 2048> data;
@@ -97,13 +97,13 @@ namespace nil {
                         std::array<var, 2> output = {var(0, 0, false), var(0, 0, false)};
 
                         result_type(const std::size_t &component_start_row) {
-                            std::array<var, 2> output = {var(W0, component_start_row + required_rows_amount - 1, false),
-                            var(W1, component_start_row + required_rows_amount - 1, false)};
+                            std::array<var, 2> output = {var(W0, component_start_row + rows_amount - 1, false),
+                            var(W1, component_start_row + rows_amount - 1, false)};
                         }
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                        return bp.allocate_rows(rows_amount);
                     }
 
                     static result_type generate_circuit(

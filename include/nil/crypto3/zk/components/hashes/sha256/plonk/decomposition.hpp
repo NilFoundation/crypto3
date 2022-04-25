@@ -73,7 +73,7 @@ namespace nil {
 
                 public:
 
-                    constexpr static const std::size_t required_rows_amount = 3;
+                    constexpr static const std::size_t rows_amount = 3;
 
                     struct params_type {
                         std::array<var, 2> data;
@@ -103,7 +103,7 @@ namespace nil {
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
-                        return bp.allocate_rows(required_rows_amount);
+                        return bp.allocate_rows(rows_amount);
                     }
 
                     static result_type generate_circuit(

@@ -37,9 +37,11 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/blueprint/profiling_plonk_circuit.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/algorithms/allocate.hpp>
+#include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
+#include "profiling_plonk_circuit.hpp"
 #include "profiling.hpp"
 
 #include <nil/marshalling/status_type.hpp>
@@ -86,15 +88,14 @@ namespace nil {
             zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
             zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
 
-            std::size_t start_row = component_type::allocate_rows(bp);
+            std::size_t start_row = zk::components::allocate<component_type>(bp);
             bp.allocate_rows(public_input.size());
 
             for (std::size_t i = 0; i < public_input.size(); i++) {
                 auto allocated_pi = assignment_bp.allocate_public_input(public_input[i]);
             }
 
-            typename component_type::allocated_data_type allocated_data;
-            component_type::generate_circuit(bp, assignment_bp, params, allocated_data, start_row);
+            zk::components::generate_circuit<component_type>(bp, public_assignment, params, start_row);
             component_type::generate_assignments(assignment_bp, params, start_row);
 
             assignment_bp.padding();

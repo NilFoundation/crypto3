@@ -109,7 +109,7 @@ namespace nil {
                         typename from_limbs::result_type res = from_limbs::generate_assignments(assignment, 
                             typename from_limbs::params_type {scalar_limbs_var}, component_start_row);
 
-                        component_start_row += from_limbs::required_rows_amount;
+                        component_start_row += from_limbs::rows_amount;
                         return res.result;
                     }
 
@@ -135,7 +135,7 @@ namespace nil {
                         typename endo_scalar_component::params_type params = {scalar, endo_factor, num_bits};
                         typename endo_scalar_component::result_type endo_scalar_res = endo_scalar_component::generate_assignments(assignment,
                             params, component_start_row);
-                        component_start_row += endo_scalar_component::required_rows_amount;
+                        component_start_row += endo_scalar_component::rows_amount;
                         return endo_scalar_res.endo_scalar;
                     }
 
@@ -146,7 +146,7 @@ namespace nil {
                         typename exponentiation_component::params_type params = {base, power};
                         typename exponentiation_component::result_type res = 
                             exponentiation_component::generate_assignments(assignment, params, component_start_row);
-                        component_start_row += exponentiation_component::required_rows_amount;
+                        component_start_row += exponentiation_component::rows_amount;
                         return res.result;
                     }
 
@@ -157,7 +157,7 @@ namespace nil {
                         typename multiplication_component::params_type params = {x, y};
                         typename multiplication_component::result_type res = 
                             multiplication_component::generate_assignments(assignment, params, component_start_row);
-                        component_start_row += multiplication_component::required_rows_amount;
+                        component_start_row += multiplication_component::rows_amount;
                         return res.result;
                     }
 
@@ -333,7 +333,7 @@ namespace nil {
                     }
 
                 public:
-                    constexpr static const std::size_t required_rows_amount = 32;
+                    constexpr static const std::size_t rows_amount = 32;
 
                     struct params_type {
                         kimchi_verifier_index_scalar<CurveType> verifier_index;
@@ -386,7 +386,7 @@ namespace nil {
                     };
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
-                        return in_bp.allocate_rows(required_rows_amount);
+                        return in_bp.allocate_rows(rows_amount);
                     }
 
                     static result_type generate_circuit(
@@ -529,7 +529,7 @@ namespace nil {
                         const std::size_t &j = component_start_row;
                         using F = typename BlueprintFieldType::value_type;
 
-                        std::size_t selector_index_1 = assignment.add_selector(j, j + required_rows_amount - 1);
+                        std::size_t selector_index_1 = assignment.add_selector(j, j + rows_amount - 1);
 
                         bp.add_gate(selector_index_1, 
                             {});
@@ -552,12 +552,12 @@ namespace nil {
                         copy_constraints_from_limbs(bp, assignment, alpha_pub_limbs, row);
                         row++;
                         // copy endo-scalar
-                        row += endo_scalar_component::required_rows_amount;
+                        row += endo_scalar_component::rows_amount;
                         
                         copy_constraints_from_limbs(bp, assignment, zeta_pub_limbs, row);
                         row++;
                         // copy endo-scalar
-                        row += endo_scalar_component::required_rows_amount;
+                        row += endo_scalar_component::rows_amount;
                         
                     }
                 };

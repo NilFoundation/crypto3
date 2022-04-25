@@ -83,7 +83,7 @@ namespace nil {
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> sponge;
 
                 public:
-                    constexpr static const std::size_t required_rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = 1;
 
                     struct params_type {
                         
@@ -91,7 +91,7 @@ namespace nil {
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp,
                         std::size_t components_amount = 1) {
-                        return bp.allocate_rows(required_rows_amount *
+                        return bp.allocate_rows(rows_amount *
                             components_amount);
                     }
 

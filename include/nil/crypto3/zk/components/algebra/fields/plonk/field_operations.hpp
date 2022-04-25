@@ -65,7 +65,7 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                 public:
-                    constexpr static const std::size_t required_rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = 1;
 
                     struct params_type {
                         var x;
@@ -93,7 +93,7 @@ namespace nil {
 
                     static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp,
                         std::size_t components_amount = 1){
-                        return bp.allocate_rows(required_rows_amount *
+                        return bp.allocate_rows(rows_amount *
                             components_amount);
                     }
 
