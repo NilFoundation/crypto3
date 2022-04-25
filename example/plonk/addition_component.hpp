@@ -154,16 +154,16 @@ namespace nil {
                         blueprint_assignment_table<ArithmetizationType> &assignment, 
                         const params_type &params,
                         allocated_data_type &allocated_data,
-                        const std::size_t row_start_index) {
+                        const std::size_t start_row_index) {
 
                         // selectors define on which rows which constraints are avaiable
                         std::size_t selector_index;
                         if (!allocated_data.previously_allocated) {
-                            selector_index = assignment.add_selector(row_start_index);
+                            selector_index = assignment.add_selector(start_row_index);
                             allocated_data.add_selector = selector_index;
                         } else {
                             selector_index = allocated_data.add_selector;
-                            assignment.enable_selector(selector_index, row_start_index); 
+                            assignment.enable_selector(selector_index, start_row_index); 
                         }
 
                         // var(i, 0) defines cell at the column i with rotation 0 (we'll elaborate rotation in the next examples)

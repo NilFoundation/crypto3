@@ -268,9 +268,9 @@ namespace nil {
                             blueprint<ArithmetizationType> &bp,
                             blueprint_public_assignment_table<ArithmetizationType> &assignment,
                             const params_type params,
-                            const std::size_t row_start_index){
+                            const std::size_t start_row_index){
 
-                        const std::size_t &j = row_start_index;
+                        const std::size_t &j = start_row_index;
 
                         for (int z = 0; z < rows_amount - 2; z += 2) {
                             bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 2, false}});

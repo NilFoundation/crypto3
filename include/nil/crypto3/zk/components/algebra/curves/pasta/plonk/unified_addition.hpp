@@ -101,9 +101,9 @@ namespace nil {
                     struct result_type {
                         var X = var(0, 0, false);
                         var Y = var(0, 0, false);
-                        result_type(const std::size_t row_start_index = 0) {
-                            X = var(W4, row_start_index, false, var::column_type::witness);
-                            Y = var(W5, row_start_index, false, var::column_type::witness);
+                        result_type(const std::size_t start_row_index = 0) {
+                            X = var(W4, start_row_index, false, var::column_type::witness);
+                            Y = var(W5, start_row_index, false, var::column_type::witness);
                         }
                     };
 
@@ -203,11 +203,11 @@ namespace nil {
                             blueprint<ArithmetizationType> &bp,
                             blueprint_public_assignment_table<ArithmetizationType> &assignment,
                             const params_type params,
-                            const std::size_t row_start_index){
+                            const std::size_t start_row_index){
 
                         std::size_t public_input_column_index = 0;
 
-                        const std::size_t j = row_start_index;
+                        const std::size_t j = start_row_index;
 
                         bp.add_copy_constraint({{W6, static_cast<int>(j), false},
                             {public_input_column_index, 0, false, var::column_type::public_input}});

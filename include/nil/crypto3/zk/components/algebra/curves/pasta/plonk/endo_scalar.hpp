@@ -35,6 +35,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -79,14 +80,9 @@ namespace nil {
 
                     constexpr static const std::size_t selector_seed = 0xff06;
 
-                    template<typename ComponentType, typename ArithmetizationType>
-                    friend void generate_circuit(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const typename ComponentType::params_type params,
-                        const std::size_t start_row_index);
-
                 public:
                     constexpr static const std::size_t rows_amount = 8;
+                    constexpr static const std::size_t gates_amount = 2;
 
                     struct params_type {
                         var scalar;
@@ -96,124 +92,106 @@ namespace nil {
 
                     struct result_type {
                         var endo_scalar = var(0, 0, false);
-                        result_type(const std::size_t &component_start_row) {
-                            endo_scalar = var(W6, component_start_row + rows_amount - 1, false, var::column_type::witness);
+                        result_type(const std::size_t &start_row_index) {
+                            endo_scalar = var(W6, start_row_index + rows_amount - 1, false, var::column_type::witness);
                         }
                     };
 
-                    struct allocated_data_type {
-                        allocated_data_type() {
-                            previously_allocated = false;
+                    static void generate_circuit(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type params,
+                        const std::size_t start_row_index){
+
+                        auto selector_iterator = assignment.find_selector(selector_seed);
+                        std::size_t first_selector_index;
+
+                        if (selector_iterator == assignment.selectors_end()){
+                            first_selector_index = assignment.allocate_selector(selector_seed,
+                                gates_amount);
+                            generate_gates(bp, assignment, params, first_selector_index);
+                        } else {
+                            first_selector_index = selector_iterator->second;
                         }
 
-                        // TODO access modifiers
-                        bool previously_allocated;
-                        std::size_t selector_1;
-                        std::size_t selector_2;
-                    };
+                        std::size_t j = start_row_index;
+                        assignment.enable_selector(first_selector_index, j, j + rows_amount - 1);
+                        assignment.enable_selector(first_selector_index+1, j + rows_amount - 1);
 
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
-                        return in_bp.allocate_rows(rows_amount);
+                        generate_copy_constraints(bp, assignment, params, start_row_index);
                     }
 
-                    static result_type generate_circuit(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        allocated_data_type &allocated_data,
-                        const std::size_t &component_start_row) {
-
-                        generate_gates(bp, assignment, params, allocated_data, component_start_row);
-                        generate_copy_constraints(bp, assignment, params, component_start_row);
-                        return result_type(component_start_row);
-                    }
-
-                    static result_type generate_assignments(
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                                        const params_type &params,
-                                        const std::size_t &component_start_row) {
+                    static void generate_assignments(
+                            blueprint_assignment_table<ArithmetizationType>
+                                &assignment,
+                            const params_type params,
+                            const std::size_t start_row_index){
                             
-                            std::size_t row = component_start_row;
-                            
-                            std::size_t crumbs_per_row = 8;
-                            std::size_t bits_per_crumb = 2;
-                            std::size_t bits_per_row = bits_per_crumb * crumbs_per_row; // we suppose that params.num_bits % bits_per_row = 0
+                        std::size_t row = start_row_index;
+                        
+                        std::size_t crumbs_per_row = 8;
+                        std::size_t bits_per_crumb = 2;
+                        std::size_t bits_per_row = bits_per_crumb * crumbs_per_row; // we suppose that params.num_bits % bits_per_row = 0
 
-                            std::vector<typename BlueprintFieldType::value_type> bits_msb(params.num_bits);
-                            typename BlueprintFieldType::value_type scalar = assignment.var_value(params.scalar);
-                            typename BlueprintFieldType::integral_type integral_scalar = typename  BlueprintFieldType::integral_type(scalar.data);
-                            for (std::size_t i = 0; i < params.num_bits; i++) {
-                                bits_msb[params.num_bits - 1 - i] = multiprecision::bit_test(integral_scalar, i);
-                            }
+                        std::vector<typename BlueprintFieldType::value_type> bits_msb(params.num_bits);
+                        typename BlueprintFieldType::value_type scalar = assignment.var_value(params.scalar);
+                        typename BlueprintFieldType::integral_type integral_scalar = typename  BlueprintFieldType::integral_type(scalar.data);
+                        for (std::size_t i = 0; i < params.num_bits; i++) {
+                            bits_msb[params.num_bits - 1 - i] = multiprecision::bit_test(integral_scalar, i);
+                        }
 
-                            typename BlueprintFieldType::value_type a = 2;
-                            typename BlueprintFieldType::value_type b = 2;
-                            typename BlueprintFieldType::value_type n = 0;
+                        typename BlueprintFieldType::value_type a = 2;
+                        typename BlueprintFieldType::value_type b = 2;
+                        typename BlueprintFieldType::value_type n = 0;
 
-                            for (std::size_t chunk_start = 0; chunk_start < bits_msb.size(); chunk_start += bits_per_row) {
-                                assignment.witness(W0)[row] = n;
-                                assignment.witness(W2)[row] = a;
-                                assignment.witness(W3)[row] = b;
+                        for (std::size_t chunk_start = 0; chunk_start < bits_msb.size(); chunk_start += bits_per_row) {
+                            assignment.witness(W0)[row] = n;
+                            assignment.witness(W2)[row] = a;
+                            assignment.witness(W3)[row] = b;
 
-                                for (std::size_t j = 0; j < crumbs_per_row; j++) {
-                                    std::size_t crumb = chunk_start + j * bits_per_crumb;
-                                    typename BlueprintFieldType::value_type b0 = bits_msb[crumb + 1];
-                                    typename BlueprintFieldType::value_type b1 = bits_msb[crumb + 0];
+                            for (std::size_t j = 0; j < crumbs_per_row; j++) {
+                                std::size_t crumb = chunk_start + j * bits_per_crumb;
+                                typename BlueprintFieldType::value_type b0 = bits_msb[crumb + 1];
+                                typename BlueprintFieldType::value_type b1 = bits_msb[crumb + 0];
 
-                                    typename BlueprintFieldType::value_type crumb_value = b0 + b1.doubled();
-                                    assignment.witness(W7 + j)[row] = crumb_value;
+                                typename BlueprintFieldType::value_type crumb_value = b0 + b1.doubled();
+                                assignment.witness(W7 + j)[row] = crumb_value;
 
-                                    a = a.doubled();
-                                    b = b.doubled();
+                                a = a.doubled();
+                                b = b.doubled();
 
-                                    typename BlueprintFieldType::value_type s = 
-                                        (b0 == BlueprintFieldType::value_type::one()) ? 1 : -1;
+                                typename BlueprintFieldType::value_type s = 
+                                    (b0 == BlueprintFieldType::value_type::one()) ? 1 : -1;
 
-                                    if (b1 == BlueprintFieldType::value_type::zero()) {
-                                        b += s;
-                                    } else {
-                                        a += s;
-                                    }
-
-                                    n = (n.doubled()).doubled();
-                                    n += crumb_value;
+                                if (b1 == BlueprintFieldType::value_type::zero()) {
+                                    b += s;
+                                } else {
+                                    a += s;
                                 }
 
-                                assignment.witness(W1)[row] = n;
-                                assignment.witness(W4)[row] = a;
-                                assignment.witness(W5)[row] = b;
-                                row++;
+                                n = (n.doubled()).doubled();
+                                n += crumb_value;
                             }
-                            auto res = a * params.endo_factor + b;
-                            assignment.witness(W6)[row - 1] = res;
 
-                            std::cout<<"circuit result "<<res.data<<std::endl;
-                            return result_type(component_start_row);
+                            assignment.witness(W1)[row] = n;
+                            assignment.witness(W4)[row] = a;
+                            assignment.witness(W5)[row] = b;
+                            row++;
+                        }
+                        auto res = a * params.endo_factor + b;
+                        assignment.witness(W6)[row - 1] = res;
                     }
 
-                    private:
-                    static void generate_gates(blueprint<ArithmetizationType> &bp,
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const params_type &params,
-                            allocated_data_type &allocated_data,
-                        const std::size_t &component_start_row = 0) {
+                private:
+                    static void generate_gates(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment, 
+                        const params_type params,
+                        const std::size_t first_selector_index) {
 
-                        const std::size_t &j = component_start_row;
                         using F = typename BlueprintFieldType::value_type;
 
-                        std::size_t selector_index_1;
-                        std::size_t selector_index_2;
-                        if (!allocated_data.previously_allocated) {
-                            selector_index_1 = assignment.add_selector(j, j + rows_amount - 1);
-                            selector_index_2 = assignment.add_selector(j + rows_amount - 1);
-                            allocated_data.selector_1 = selector_index_1;
-                            allocated_data.selector_2 = selector_index_2;
-                        } else {
-                            selector_index_1 = allocated_data.selector_1;
-                            selector_index_2 = allocated_data.selector_2;
-                            assignment.enable_selector(selector_index_1, j, j + rows_amount - 1); 
-                            assignment.enable_selector(selector_index_2, j + rows_amount - 1); 
-                        }
+                        std::size_t selector_index_1 = first_selector_index;
+                        std::size_t selector_index_2 = first_selector_index + 1;
 
                         auto c_f = [](var x) {
                             return (F(11) * F(6).inversed()) * x 
@@ -261,22 +239,22 @@ namespace nil {
 
                         auto constraint_12 = bp.add_constraint(var(W6, 0) - 
                             (params.endo_factor * var(W4, 0) + var(W5, 0)));
-                        if (!allocated_data.previously_allocated) {
+                        
                             bp.add_gate(selector_index_2, {constraint_12});
+
                             bp.add_gate(selector_index_1, 
                             {constraint_1, constraint_2, constraint_3, constraint_4,
                             constraint_5, constraint_6, constraint_7, constraint_8,
                             constraint_9, constraint_10, constraint_11});
-                        }
-                        allocated_data.previously_allocated = true;
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const params_type &params,
-                            const std::size_t &component_start_row = 0){
+                    static void generate_copy_constraints(
+                            blueprint<ArithmetizationType> &bp,
+                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                            const params_type params,
+                            const std::size_t start_row_index){
 
-                        const std::size_t &j = component_start_row;
+                        const std::size_t &j = start_row_index;
 
                         for (std::size_t z = 1; z < rows_amount; z++){
                             bp.add_copy_constraint({{W0, static_cast<int>(j + z), false}, {W1, static_cast<int>(j + z - 1), false}});

@@ -132,7 +132,7 @@ namespace nil {
                         blueprint_assignment_table<ArithmetizationType> &assignment, 
                         const params_type &params,
                         allocated_data_type &allocated_data,
-                        const std::size_t row_start_index) {
+                        const std::size_t start_row_index) {
 
                         if (!allocated_data.previously_allocated) {
                         } else { 
