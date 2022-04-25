@@ -37,11 +37,6 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                size_t const CHALLENGE_LENGTH_IN_LIMBS = 2;
-                size_t const PERMUTS = 7;
-                size_t const CONSTRAINTS = 3;
-                size_t const COLUMNS = 15;
-
                 //                template<typename CurveType>
                 //                typename commitments::kimchi_pedersen<CurveType>::proof combine(typename
                 //                commitments::kimchi_pedersen<CurveType>::proof eval, typename
