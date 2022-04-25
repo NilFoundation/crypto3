@@ -51,6 +51,7 @@ namespace nil {
 
                     std::array<kimchi_proof_evaluations<CurveType>, 2> proof_evals;
                     var ft_eval = var(0, 0);
+                    std::vector<var> public;
                 };
             }    // namespace components
         }        // namespace zk

@@ -199,14 +199,6 @@ namespace nil {
                             var zeta_omega_var,
                             std::vector<var> omega_powers,
                             std::size_t &row) {
-
-                        /*
-                        let mut lagrange = w.iter().map(|w| zeta - w).collect::<Vec<_>>();
-                        (0..self.public.len())
-                            .zip(w.iter())
-                            .for_each(|(_, w)| lagrange.push(zetaw - w));
-                        ark_ff::fields::batch_inversion::<Fr<G>>(&mut lagrange);
-                        */
                         // TODO: the naive method for batch inversion is not the optimal one, we can use
                         // Montgomery’s Trick and Fast Implementation of Masked AES
                         // Genelle, Prouff and Quisquater, Section 3.2
@@ -260,11 +252,72 @@ namespace nil {
                     }
 
                     static std::array<var, 2> assignment_puiblic_eval(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                var zeta,
-                                var zeta_omega,
-                                std::vector<var> &lagrange_base,
-                                std::size_t &component_start_row) {
+                            std::vector<var> public_input,
+                            var zeta_pow_n,
+                            var zeta_omega,
+                            std::vector<var> &lagrange_base,
+                            std::vector<var> &omega_powers,
+                            typename BlueprintFieldType::value_type domain_size_inv,
+                            std::size_t &row) {
+                        // TODO: set public input max size
+                        // TODO: we can 
+                        // SUM(-l * p * w) where l from lagrange, p from public, w from omega_powers
+                        // W0   | W1   | W2   | W3   | W4   | W5   | W6 | W7                 | W8                 | W9      | W10               | W11 | W12 | W13          | W14 | W15 |
+                        // l[0] | p[0] | w[0] | l[1] | p[1] | w[1] |    | z1=-l[0]*p[0]*w[0] | z2=-l[1]*p[1]*w[1] | z1 + z2 |                   |
+                        // l[2] | p[2] | w[2] | l[3] | p[3] | w[3] |    | z3=-l[2]*p[2]*w[2] | z4=-l[3]*p[3]*w[3] | z3 + z4 | z1 + z2 + z3 + z4 |
+                        // ...
                         std::array<var, 2> res = {var(0, 0), var(0, 0)};
+
+                        std::size_t component_instances = public_input.size() / 2;
+                        if (public_input.size() % 2 > 0) {
+                            component_instances += 1;
+                        }
+                        auto assignment_fill = [&assignment, &row
+                            component_instances, &lagrange_base,
+                            &public_input, &omega_powers, &res] 
+                            (std::size_t lagrange_start_idx, 
+                            std::size_t res_idx) {
+                            
+                            std::size_t idx = 0;
+                            for (std::size_t i = 0; i < component_instances; i++) {
+                                assignment.witness(W0)[row] = lagrange_base[lagrange_start_idx + idx];
+                                assignment.witness(W1)[row] = public_input[idx];
+                                assignment.witness(W2)[row] = omega_powers[idx];
+                                assignment.witness(W7)[row] = -lagrange_base[idx] * public_input[idx] * omega_powers[idx];
+                                idx++;
+                                bool full_row = i < component_instances - 1 || public_input.size() % 2 == 0;
+                                if (full_row) {
+                                    assignment.witness(W3)[row] = lagrange_base[lagrange_start_idx + idx];
+                                    assignment.witness(W4)[row] = public_input[idx];
+                                    assignment.witness(W5)[row] = omega_powers[idx];
+                                    assignment.witness(W8)[row] = -lagrange_base[idx] * public_input[idx] * omega_powers[idx];
+                                    assignment.witness(W9)[row] = assignment.witness(W7)[row] + assignment.witness(W8)[row];
+                                    idx++;
+                                }
+                                if (i > 0) {
+                                    typename BlueprintFieldType::value_type row_res = full_row ? 
+                                        assignment.witness(W9)[row] : assignment.witness(W7)[row];
+                                    assignment.witness(W10)[row] = row_res + assignment.witness(W9)[row - 1];
+                                }
+                                if (i == component_instances - 1) {
+                                    assignment.witness(W6)[row] = assignment.witness(W10)[row];
+                                    res[res_idx] = var(W6, row, false);
+                                }
+                                row++;
+                            }
+                        }
+
+                        assignment_fill(0, 0);
+                        assignment_fill(public_input.size(), 1);
+
+                        // res[0] * (zeta_pow_n - 1) * domain.size_inv
+                        assignment.witness(W0)[row] = assignment.var_value(res[0]) * (assignment.var_value(zeta_pow_n) - 1) * domain_size_inv;
+                        res[0] = var(W0, row, false);
+                        // res[1] * (zeta_omega.pow(n) - 1) * index.domain.size_inv
+                        assignment.witness(W1)[row] = assignment.var_value(res[1]) * (assignment.var_value(zeta_omega_pow_n) - 1) * domain_size_inv;
+                        res[1] = var(W1, row, false);
+                        row++;
+
                         return res;
                     }
 
@@ -393,7 +446,8 @@ namespace nil {
                         std::vector<var> omega_powers = assigment_element_powers(assignment, alpha, params.verifier_index.public_input_size, row);
                         std::vector<var> lagrange_base = assignment_lagrange(assignment, zeta, zeta_omega, omega_powers, row);
 
-                        std::array<var, 2> public_eval = assignment_puiblic_eval(assignment, zeta, zeta_omega, lagrange_base, row);
+                        // TODO: check on empty public_input
+                        std::array<var, 2> public_eval = assignment_puiblic_eval(assignment, params.proof.public, zeta, zeta_omega, lagrange_base, row);
                         transcript.absorb_evaluations_assignment(
                             assignment,
                             public_eval[0],
