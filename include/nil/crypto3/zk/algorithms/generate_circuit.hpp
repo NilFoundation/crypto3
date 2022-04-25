@@ -26,6 +26,9 @@
 #ifndef CRYPTO3_ZK_COMPONENTS_ALGORITHMS_GENERATE_CIRCUIT_HPP
 #define CRYPTO3_ZK_COMPONENTS_ALGORITHMS_GENERATE_CIRCUIT_HPP
 
+#include <boost/type_traits.hpp>
+#include <boost/tti/tti.hpp>
+
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 
@@ -42,7 +45,7 @@ namespace nil {
                         template<typename C>
                         static void test(std::nullptr_t) {
                             struct t{
-                                using C::commit;
+                                using C::generate_circuit;
                             };
                         }
 
@@ -54,9 +57,12 @@ namespace nil {
                     };
                 }    // namespace detail
 
+                BOOST_TTI_HAS_STATIC_MEMBER_FUNCTION(generate_circuit)
+
                 template<typename ComponentType, typename ArithmetizationType>
-                typename std::enable_if<
-                    !detail::has_available_static_member_function_generate_circuit<ComponentType>::value, void>::type
+                // typename std::enable_if<
+                //     !has_static_member_function_generate_circuit<ComponentType, void>::value, void>::type
+                void
                     generate_circuit(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
@@ -79,17 +85,17 @@ namespace nil {
                     ComponentType::generate_copy_constraints(bp, assignment, params, start_row_index);
                 }
 
-                template<typename ComponentType, typename ArithmetizationType>
-                typename std::enable_if<
-                    detail::has_available_static_member_function_generate_circuit<ComponentType>::value, void>::type
-                    generate_circuit(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const typename ComponentType::params_type params,
-                        const std::size_t start_row_index){
+                // template<typename ComponentType, typename ArithmetizationType>
+                // typename std::enable_if<
+                //     has_static_member_function_generate_circuit<ComponentType, void>::value, void>::type
+                //     generate_circuit(
+                //         blueprint<ArithmetizationType> &bp,
+                //         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                //         const typename ComponentType::params_type params,
+                //         const std::size_t start_row_index){
 
-                    ComponentType::generate_circuit(bp, assignment, params, start_row_index);
-                }
+                //     ComponentType::generate_circuit(bp, assignment, params, start_row_index);
+                // }
 
             }    // namespace components
         }    // namespace zk
