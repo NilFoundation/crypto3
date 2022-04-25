@@ -35,7 +35,6 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/component.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -77,6 +76,14 @@ namespace nil {
                         ArithmetizationParams> ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
+
+                    constexpr static const std::size_t selector_seed = 0xff06;
+
+                    template<typename ComponentType, typename ArithmetizationType>
+                    friend void generate_circuit(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const typename ComponentType::params_type params,
+                        const std::size_t start_row_index);
 
                 public:
                     constexpr static const std::size_t rows_amount = 8;

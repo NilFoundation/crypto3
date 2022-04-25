@@ -35,7 +35,6 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/component.hpp>
 
 namespace nil {
     namespace crypto3 {
