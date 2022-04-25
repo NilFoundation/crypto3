@@ -90,10 +90,17 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0xff02;
 
                     template<typename ComponentType, typename ArithmetizationType>
-                    friend void generate_circuit(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const typename ComponentType::params_type params,
-                        const std::size_t start_row_index);
+                    friend typename std::enable_if<
+                        (!(has_static_member_function_generate_circuit<ComponentType, void,
+                            boost::mpl::vector<blueprint<ArithmetizationType> &,
+                                blueprint_public_assignment_table<ArithmetizationType> &,
+                                const typename ComponentType::params_type,
+                                const std::size_t>>::value)), void>::type
+                        generate_circuit(
+                            blueprint<ArithmetizationType> &bp,
+                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                            const typename ComponentType::params_type params,
+                            const std::size_t start_row_index);
                 public:
 
                     constexpr static const typename BlueprintFieldType::value_type endo = typename BlueprintFieldType::value_type(algebra::fields::arithmetic_params<BlueprintFieldType>::multiplicative_generator).pow(typename BlueprintFieldType::integral_type( ( (BlueprintFieldType::value_type::zero() - BlueprintFieldType::value_type::one()) * ( typename BlueprintFieldType::value_type(3) ).inversed() ).data));
