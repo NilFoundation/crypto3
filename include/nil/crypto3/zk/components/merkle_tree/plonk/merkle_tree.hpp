@@ -23,16 +23,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for auxiliary components for the SHA256 component.
+// @file Declaration of interfaces for auxiliary components for the MERKLE_TREE component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_SHA256_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_SHA256_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_HPP
+#define CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_HPP
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha256_process.hpp>
-#include <nil/crypto3/zk/components/hashes/sha256/plonk/decomposition.hpp>
+#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha256.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -42,7 +41,7 @@ namespace nil {
                 template<typename ArithmetizationType,
                          typename CurveType,
                          std::size_t... WireIndexes>
-                class sha256;
+                class merkle_tree;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
@@ -56,7 +55,7 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class sha256<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class merkle_tree<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                                        CurveType,
                                                        W0,
                                                        W1,
@@ -73,18 +72,15 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    using sha256_process_component = sha256_process<ArithmetizationType, BlueprintFieldType,
-                                W0, W1, W2, W3, W4, W5, W6, W7, W8>;
-                    using decomposition_component = decomposition<ArithmetizationType, BlueprintFieldType,
+                    using sha256_component = sha256<ArithmetizationType, BlueprintFieldType,
                                 W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 
                 public:
 
-                    constexpr static const std::size_t required_rows_amount = sha256_process_component::required_rows_amount * 2 
-                    + decomposition_component::required_rows_amount * 2 + 1;
+                    constexpr static const std::size_t required_rows_amount = 1023 * sha256_component::required_rows_amount;
 
                     struct params_type {
-                        std::array<var, 4> block_data;
+                        std::array<var, 2048> data;
                     };
 
                     struct allocated_data_type {
@@ -94,6 +90,7 @@ namespace nil {
 
                         // TODO access modifiers
                         bool previously_allocated;
+                        std::array<std::size_t, 1> selectors;
                     };
 
                     struct result_type {
@@ -127,49 +124,23 @@ namespace nil {
                         const params_type &params,
                         const std::size_t &component_start_row) {
                         std::size_t row = component_start_row;
-                        std::array<var, 2> input_params_1 = {params.block_data[0], params.block_data[1]};
-                        typename decomposition_component::params_type decomposition_params = {input_params_1};
-                        auto sha_block_part_1 = decomposition_component::generate_assignments(assignment, 
-                            decomposition_params, row);
-                        row += decomposition_component::required_rows_amount;
-                        std::array<var, 2> input_params_2 = {params.block_data[2], params.block_data[3]};
-                        decomposition_params = {input_params_2};
-                        auto sha_block_part_2 = decomposition_component::generate_assignments(assignment, 
-                            decomposition_params, row);
-                        row += decomposition_component::required_rows_amount;
-                        std::vector<var> input_words(16);
-                        for (int i = 0; i<8 ; i++) {
-                            input_words[i] = sha_block_part_1.output_state[i];
-                            input_words[8 + i] = sha_block_part_2.output_state[i];
+                        std::array<var, 2048> data; 
+                        for (std::size_t i = 0; i < 2048; i++) {
+                            data[i] = params.data[i];
                         }
-                        std::array<typename ArithmetizationType::field_type::value_type, 8> constants = {0x6a09e667, 0xbb67ae85,
-                        0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c,0x1f83d9ab, 0x5be0cd19};
-                        for (int i = 0; i < 8; i++){
-                            assignment.constant(0)[component_start_row + i] = constants[i];
+                        int k;
+                        for(std::size_t i = 11; i > -1; i-=2) {
+                            k = 0;
+                            for (std::size_t j = 0; j < (1 << i); j +=4) {
+                                std::array<var, 4> sha_blocks = {data[j], data[j + 1], data[j + 2], data[j + 3]};
+                                typename sha256_component::params_type sha_params = {sha_blocks};
+                                auto sha_output = sha256_component::generate_assignments(assignment, 
+                                sha_params, row);
+                                data[k] = sha_output.output[0];
+                                data[k + 1] = sha_output.output[0];
+                            }
+                            k +=2;    
                         }
-                        std::array<var, 8> constants_var = {var(0, row, false, var::column_type::constant),
-                        var(0, row + 1, false, var::column_type::constant), var(0, row + 2, false, var::column_type::constant), var(0, row + 3, false, var::column_type::constant),
-                        var(0, row + 4, false, var::column_type::constant), var(0, row + 5, false, var::column_type::constant), var(0, row + 6, false, var::column_type::constant),
-                        var(0, row + 7, false, var::column_type::constant)};
-                        typename sha256_process_component::params_type sha_params = {constants_var, input_words};
-                        auto sha_output = sha256_process_component::generate_assignments(assignment, 
-                            sha_params, row);
-                        row += sha256_process_component::required_rows_amount;
-
-                        std::array<typename ArithmetizationType::field_type::value_type, 16> input_words2 = {1<<31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1<<9};
-                        for (int i = 0; i < 16; i++){
-                            assignment.constant(0)[component_start_row + 8 + i] = input_words2[i];
-                        }
-                        std::vector<var> input_words2_var = {var(0, row + 8, false, var::column_type::constant),
-                        var(0, row + 9, false, var::column_type::constant), var(0, row + 10, false, var::column_type::constant), var(0, row + 11, false, var::column_type::constant),
-                        var(0, row + 12, false, var::column_type::constant), var(0, row + 13, false, var::column_type::constant), var(0, row + 14, false, var::column_type::constant),
-                        var(0, row + 15, false, var::column_type::constant), var(0, row + 16, false, var::column_type::constant),
-                        var(0, row + 17, false, var::column_type::constant), var(0, row + 18, false, var::column_type::constant), var(0, row + 19, false, var::column_type::constant),
-                        var(0, row + 20, false, var::column_type::constant), var(0, row + 21, false, var::column_type::constant), var(0, row + 22, false, var::column_type::constant),
-                        var(0, row + 23, false, var::column_type::constant)};
-                        typename sha256_process_component::params_type sha_params2 = {sha_output.output_state, input_words2_var};
-                        sha256_process_component::generate_assignments(assignment, 
-                            sha_params2, row);
                         return result_type(component_start_row);
                     }
 
@@ -182,14 +153,13 @@ namespace nil {
                         allocated_data_type &allocated_data,
                         const std::size_t &component_start_row) {
                         std::size_t row = component_start_row;
-                        decomposition_component::generate_gates(bp, assignment,
-                            allocated_data, row);
-                        decomposition_component::generate_gates(bp, assignment,
-                            allocated_data, row);
-                        sha256_process_component::generate_gates(bp, assignment,
-                            allocated_data, row);
-                        sha256_process_component::generate_gates(bp, assignment,
-                            allocated_data, row);
+                        for(std::size_t i = 11; i > -1; i-=2) {
+                            for (std::size_t j = 0; j < (1 << i); j +=4) {
+                                sha256_component::generate_gates(bp, assignment,
+                                allocated_data, row);
+                            }
+                        }
+                        
                     }
 
                     static void generate_copy_constraints(
@@ -197,15 +167,13 @@ namespace nil {
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
                         const std::size_t &component_start_row) {
-                        std::size_t j = component_start_row;  
-                        decomposition_component::generate_copy_constraints(bp, assignment,
-                             j);
-                        decomposition_component::generate_copy_constraints(bp, assignment,
-                             j); 
-                        sha256_process_component::generate_copy_constraints(bp, assignment,
-                             j);
-                        sha256_process_component::generate_copy_constraints(bp, assignment,
-                             j);
+                        std::size_t row = component_start_row;
+                        for(std::size_t i = 11; i > -1; i-=2) {
+                            for (std::size_t j = 0; j < (1 << i); j +=4) {
+                                sha256_component::generate_copy_constraints(bp, assignment,
+                                allocated_data, row);
+                            }
+                        }
                     }
 
                     
@@ -216,4 +184,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_SHA256_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_MERKLE_TREE_HPP
