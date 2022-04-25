@@ -273,8 +273,8 @@ namespace nil {
                         const std::size_t &j = start_row_index;
 
                         for (int z = 0; z < rows_amount - 2; z += 2) {
-                            bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 2, false}});
-                            bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 2, false}});
+                            bp.add_copy_constraint({{W0, (std::int32_t)(j + z), false}, {W0, (std::int32_t)(j + z + 2), false}});
+                            bp.add_copy_constraint({{W1, (std::int32_t)(j + z), false}, {W1, (std::int32_t)(j + z + 2), false}});
                         }
 
                         //TODO link to params.b
@@ -282,17 +282,17 @@ namespace nil {
                         // TODO: (x0, y0) in row i are copy constrained with values from the first doubling circuit
 
                         for (int z = 2; z < rows_amount; z += 2) {
-                            bp.add_copy_constraint({{W2, j + z, false}, {W0, j + z - 1, false}});
-                            bp.add_copy_constraint({{W3, j + z, false}, {W1, j + z - 1, false}});
+                            bp.add_copy_constraint({{W2, (std::int32_t)(j + z), false}, {W0, (std::int32_t)(j + z - 1), false}});
+                            bp.add_copy_constraint({{W3, (std::int32_t)(j + z), false}, {W1, (std::int32_t)(j + z - 1), false}});
                         }
 
                          for (int z = 2; z < rows_amount; z += 2) {
-                            bp.add_copy_constraint({{W4, j + z, false}, {W5, j + z - 2, false}});
+                            bp.add_copy_constraint({{W4, (std::int32_t)(j + z), false}, {W5, (std::int32_t)(j + z - 2), false}});
                         }
 
                         std::size_t public_input_column_index = 0;
                         bp.add_copy_constraint(
-                            {{W4, j, false}, {public_input_column_index, j, false, var::column_type::public_input}});
+                            {{W4, (std::int32_t)(j), false}, {public_input_column_index, (std::int32_t)(j), false, var::column_type::public_input}});
                     }
                 };
             }    // namespace components

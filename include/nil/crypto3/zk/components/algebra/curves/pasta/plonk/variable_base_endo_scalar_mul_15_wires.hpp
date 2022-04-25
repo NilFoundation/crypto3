@@ -257,10 +257,10 @@ namespace nil {
                         const std::size_t &j = start_row_index;
 
                         for (int z = 0; z < rows_amount - 2; z++) {
-                            bp.add_copy_constraint({{W0, j + z, false}, {W0, j + z + 1, false}});
-                            bp.add_copy_constraint({{W1, j + z, false}, {W1, j + z + 1, false}});
+                            bp.add_copy_constraint({{W0, (std::int32_t)(j + z), false}, {W0, (std::int32_t)(j + z + 1), false}});
+                            bp.add_copy_constraint({{W1, (std::int32_t)(j + z), false}, {W1, (std::int32_t)(j + z + 1), false}});
                         }
-                        bp.add_copy_constraint({{W6, j + 0, false}, {0, 0, false, var::column_type::public_input}});
+                        bp.add_copy_constraint({{W6, (std::int32_t)(j + 0), false}, {0, 0, false, var::column_type::public_input}});
 
                         //TODO link to params.b
 

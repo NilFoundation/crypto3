@@ -112,6 +112,7 @@ BOOST_AUTO_TEST_CASE(variable_base_scalar_mul_9_wires_test_case) {
 }*/
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul) {
+    auto start = std::chrono::high_resolution_clock::now();
 
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
@@ -146,6 +147,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul) {
 	curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type acc = c*T;
     std::cout<<"Expected result: "<<acc.X.data<<" "<< acc.Y.data<<std::endl;
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (assignment_params, public_input);
+
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    std::cout << "base_scalar_mul: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
