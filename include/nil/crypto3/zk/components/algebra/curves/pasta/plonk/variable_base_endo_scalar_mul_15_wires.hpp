@@ -87,7 +87,7 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    constexpr static const std::size_t selector_seed = 0xff02;
+                    constexpr static const std::size_t selector_seed = 0x0f02;
 
                     template<typename ComponentType, typename ArithmetizationType>
                     friend typename std::enable_if<

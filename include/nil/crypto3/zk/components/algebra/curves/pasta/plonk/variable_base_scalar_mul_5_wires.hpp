@@ -60,7 +60,7 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
-                    constexpr static const std::size_t selector_seed = 0xff04;
+                    constexpr static const std::size_t selector_seed = 0x0f04;
 
                     template<typename ComponentType, typename ArithmetizationType>
                     friend void generate_circuit(blueprint<ArithmetizationType> &bp,

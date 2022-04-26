@@ -84,6 +84,8 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
+                    constexpr static const std::size_t selector_seed = 0x0f00;
+
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using endo_scalar_component = zk::components::endo_scalar<ArithmetizationType, CurveType,
                                                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
