@@ -87,8 +87,6 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    constexpr static const std::size_t selector_seed = 0xff02;
-
                     template<typename ComponentType, typename ArithmetizationType>
                     friend typename std::enable_if<
                         (!(has_static_member_function_generate_circuit<ComponentType, void,
@@ -104,7 +102,7 @@ namespace nil {
                 public:
 
                     constexpr static const typename BlueprintFieldType::value_type endo = typename BlueprintFieldType::value_type(algebra::fields::arithmetic_params<BlueprintFieldType>::multiplicative_generator).pow(typename BlueprintFieldType::integral_type( ( (BlueprintFieldType::value_type::zero() - BlueprintFieldType::value_type::one()) * ( typename BlueprintFieldType::value_type(3) ).inversed() ).data));
-
+                    constexpr static const std::size_t selector_seed = 0x0f02;
                     constexpr static const std::size_t rows_amount = 33;
                     constexpr static const std::size_t gates_amount = 1;
 

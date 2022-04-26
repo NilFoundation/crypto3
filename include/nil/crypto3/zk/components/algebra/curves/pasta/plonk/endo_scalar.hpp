@@ -78,9 +78,8 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    constexpr static const std::size_t selector_seed = 0xff06;
-
                 public:
+                    constexpr static const std::size_t selector_seed = 0x0f00;
                     constexpr static const std::size_t rows_amount = 8;
                     constexpr static const std::size_t gates_amount = 2;
 
@@ -92,12 +91,12 @@ namespace nil {
 
                     struct result_type {
                         var endo_scalar = var(0, 0, false);
-                        result_type(const std::size_t &start_row_index) {
+                        result_type(const params_type &params, const std::size_t &start_row_index) {
                             endo_scalar = var(W6, start_row_index + rows_amount - 1, false, var::column_type::witness);
                         }
                     };
 
-                    static void generate_circuit(blueprint<ArithmetizationType> &bp,
+                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type params,
                         const std::size_t start_row_index){
@@ -118,9 +117,10 @@ namespace nil {
                         assignment.enable_selector(first_selector_index+1, j + rows_amount - 1);
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
+                        return result_type(params, start_row_index);
                     }
 
-                    static void generate_assignments(
+                    static result_type generate_assignments(
                             blueprint_assignment_table<ArithmetizationType>
                                 &assignment,
                             const params_type params,
@@ -179,9 +179,9 @@ namespace nil {
                         }
                         auto res = a * params.endo_factor + b;
                         assignment.witness(W6)[row - 1] = res;
+                        return result_type(params, start_row_index);
                     }
 
-                private:
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment, 

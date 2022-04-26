@@ -61,8 +61,6 @@ namespace nil {
                     W5, W6, W7, W8> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
-                    
-                    constexpr static const std::size_t selector_seed = 0xff05;
 
                     template<typename ComponentType, typename ArithmetizationType>
                     friend void generate_circuit(blueprint<ArithmetizationType> &bp,
@@ -70,7 +68,7 @@ namespace nil {
                         const typename ComponentType::params_type params,
                         const std::size_t start_row_index);
                 public:
-                    
+                    constexpr static const std::size_t selector_seed = 0xff05;
                     constexpr static const std::size_t rows_amount = 213;
 
                     struct init_params_type {

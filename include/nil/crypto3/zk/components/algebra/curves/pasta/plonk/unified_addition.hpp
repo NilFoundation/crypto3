@@ -73,7 +73,7 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    constexpr static const std::size_t selector_seed = 0xff01;
+                    constexpr static const std::size_t selector_seed = 0x0f01;
 
                     template<typename ComponentType, typename ArithmetizationType>
                     friend typename std::enable_if<
@@ -108,13 +108,13 @@ namespace nil {
                     struct result_type {
                         var X = var(0, 0, false);
                         var Y = var(0, 0, false);
-                        result_type(const std::size_t start_row_index = 0) {
+                        result_type(const params_type &params, const std::size_t start_row_index = 0) {
                             X = var(W4, start_row_index, false, var::column_type::witness);
                             Y = var(W5, start_row_index, false, var::column_type::witness);
                         }
                     };
 
-                    static void generate_assignments(
+                    static result_type generate_assignments(
                             blueprint_assignment_table<ArithmetizationType>
                                 &assignment,
                             const params_type params,
@@ -170,6 +170,8 @@ namespace nil {
 
                             assignment.witness(W10)[j] = 0;
                         }
+
+                        return result_type(params, start_row_index);
                     }
 
                 private:

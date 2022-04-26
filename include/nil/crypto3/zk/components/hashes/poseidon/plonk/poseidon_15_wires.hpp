@@ -385,7 +385,7 @@ namespace nil {
 
                  public:
                     constexpr static const std::size_t rate = 2;
-
+                    constexpr static const std::size_t selector_seed = 0x0f05;
                     constexpr static const std::size_t rows_amount = 12;
 
                     struct params_type {
