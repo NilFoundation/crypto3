@@ -195,60 +195,15 @@ namespace nil {
                     }
 
                     static std::vector<var> assignment_lagrange(blueprint_assignment_table<ArithmetizationType> &assignment,
-                            var zeta_var,
-                            var zeta_omega_var,
+                            var zeta,
+                            var zeta_omega,
                             std::vector<var> omega_powers,
                             std::size_t &row) {
-                        // TODO: the naive method for batch inversion is not the optimal one, we can use
-                        // Montgomery’s Trick and Fast Implementation of Masked AES
-                        // Genelle, Prouff and Quisquater, Section 3.2
-                        // result = [(zeta - omega^(i))^(-1)] concat. [(zeta_omega - omega^(i))^(-1)] for i in (0..public_input_size)
-                        // * omega = w in the table
-                        // W0     | W1                | W2  | W3  | W4  | W5  | W6  | W7           | W8         | W9  | W10 | W11 | W12 | W13          | W14 | W15 |
-                        // zeta   | w^0               | w^1 | w^2 | w^3 | w^4 | w^5 | zeta - w^0   | zeta - w^1 | ... | ... | ... | ... | zeta - w^5   |     |     |
-                        // zeta_w | (zeta - w^0)^(-1) | ... | ... | ... | ... | ... | zeta_w = w^0 | ...        | ... | ... | ... | ... | zeta_w - w^5 |     |     |
-                        //        | (zeta_w - w^0)^(-1) | ..| ... | ... | ... | ... | ...
-                        // ....
-                        std::vector<var> res(omega_powers.size() * 2);
-                        std::size_t omega_idx = 0;
-                        std::size_t component_instances = omega_powers.size() / 6;
-                        if (omega_powers.size() % 6 > 0) {
-                            component_instances += 1;
-                        }
-
-                        typename BlueprintFieldType::value_type zeta = assignment.var_value(zeta_var);
-                        typename BlueprintFieldType::value_type zeta_omega = assignment.var_value(zeta_omega_var);
-                        std::vector<BlueprintFieldType::value_type> omegas(omega_powers.size());
-                        for (std::size_t i = 0; i < omega_powers.size(); i++) {
-                            omegas[i] = assignment.var_value(omega_powers[i]);
-                        }
-
-                        for (std::size_t i = 0; i < component_instances; i++) {
-                            assignment.witness(W0)[row] = zeta;
-                            std::size_t row_limit = omega_idx + 6 >= omega_powers.size() ? 
-                                omega_powers.size() - omega_idx :
-                                6;
-
-                            for (std::size_t j = 0; j < row_limit; j++) {
-                                assignment.witness(W1 + j)[row] = omegas[omega_idx];
-                                assignment.witness(W7 + j)[row] = zeta - omegas[omega_idx];
-                                assignment.witness(W7 + j)[row + 1] = zeta_omega - omegas[omega_idx];
-                                omega_idx++;
-                            }
-                            row++;
-
-                            assignment.witness(W0)[row] = zeta_omega;
-                            for (std::size_t j = 0; j < row_limit; j++) {
-                                assignment.witness(W1 + j)[row] = (assignment.witness(W7 + j)[row - 1]).inversed();
-                                res[i + j] = var(W1 + j, row, false);
-                                assignment.witness(W1 + j)[row + 1] = (assignment.witness(W7 + j)[row]).inversed();
-                                res[omega_powers.size() + i + j] = var(W1 + j, row, false);
-                            }
-                            row++;
-                        }
-
-
-                        return res;
+                        using lagrange_base_component = zk::components::kimchi_oracles_lagrange<ArithmetizationType,
+                                                            W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                        auto res = lagrange_base_component::generate_assignments(assignment_bp, {zeta, zeta_omega, omega_powers} , row);
+                        row += lagrange_base_component::required_rows_amount;
+                        return res.lagrange_base;
                     }
 
                     static std::array<var, 2> assignment_puiblic_eval(blueprint_assignment_table<ArithmetizationType> &assignment,

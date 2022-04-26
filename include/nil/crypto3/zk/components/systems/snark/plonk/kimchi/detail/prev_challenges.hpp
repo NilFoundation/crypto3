@@ -185,6 +185,8 @@ namespace nil {
                         }
                        */
 
+                        std::cout<<"prev_challenges is not implemented"<<std::endl;
+
                         return result_type(params, component_start_row);
                     }
 
