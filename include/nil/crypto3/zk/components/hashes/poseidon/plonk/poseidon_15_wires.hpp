@@ -79,8 +79,6 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    constexpr static const std::size_t selector_seed = 0x0f05;
-
                     constexpr static const std::size_t rounds_per_row = 5;
 
                     constexpr static const std::size_t sbox_alpha = 7;
@@ -387,7 +385,7 @@ namespace nil {
 
                  public:
                     constexpr static const std::size_t rate = 2;
-
+                    constexpr static const std::size_t selector_seed = 0x0f05;
                     constexpr static const std::size_t rows_amount = 12;
 
                     struct params_type {

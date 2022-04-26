@@ -78,9 +78,8 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    constexpr static const std::size_t selector_seed = 0x0f00;
-
                 public:
+                    constexpr static const std::size_t selector_seed = 0x0f00;
                     constexpr static const std::size_t rows_amount = 8;
                     constexpr static const std::size_t gates_amount = 2;
 
@@ -121,7 +120,7 @@ namespace nil {
                         return result_type(params, start_row_index);
                     }
 
-                    static void generate_assignments(
+                    static result_type generate_assignments(
                             blueprint_assignment_table<ArithmetizationType>
                                 &assignment,
                             const params_type params,
@@ -183,7 +182,6 @@ namespace nil {
                         return result_type(params, start_row_index);
                     }
 
-                private:
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment, 
