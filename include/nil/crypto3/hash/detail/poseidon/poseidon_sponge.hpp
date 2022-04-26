@@ -70,9 +70,7 @@ namespace nil {
 
                                 return this->state[0];
                             } else {
-                                this->state_count++;
-
-                                return this->state[this->state_count];
+                                return this->state[this->state_count++];
                             }
                         } else {
                             poseidon_functions::permute(this->state);
