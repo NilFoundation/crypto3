@@ -89,11 +89,13 @@ namespace nil {
 
                     template<typename ComponentType, typename ArithmetizationType>
                     friend typename std::enable_if<
-                        (!(has_static_member_function_generate_circuit<ComponentType, void,
+                        (!(has_static_member_function_generate_circuit<ComponentType,
+                                typename ComponentType::result_type,
                             boost::mpl::vector<blueprint<ArithmetizationType> &,
                                 blueprint_public_assignment_table<ArithmetizationType> &,
                                 const typename ComponentType::params_type,
-                                const std::size_t>>::value)), void>::type
+                                const std::size_t>>::value)),
+                            typename ComponentType::result_type>::type
                         generate_circuit(
                             blueprint<ArithmetizationType> &bp,
                             blueprint_public_assignment_table<ArithmetizationType> &assignment,
