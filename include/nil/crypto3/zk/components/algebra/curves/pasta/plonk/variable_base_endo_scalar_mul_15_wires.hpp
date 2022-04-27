@@ -95,7 +95,7 @@ namespace nil {
 
                     constexpr static const typename BlueprintFieldType::value_type endo = typename BlueprintFieldType::value_type(algebra::fields::arithmetic_params<BlueprintFieldType>::multiplicative_generator).pow(typename BlueprintFieldType::integral_type( ( (BlueprintFieldType::value_type::zero() - BlueprintFieldType::value_type::one()) * ( typename BlueprintFieldType::value_type(3) ).inversed() ).data));
                     constexpr static const std::size_t selector_seed = 0x0f02;
-                    constexpr static const std::size_t rows_amount = unified_addition_component::rows_amount + 33;
+                    constexpr static const std::size_t rows_amount = 33;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
@@ -274,7 +274,7 @@ namespace nil {
                             const params_type params,
                             const std::size_t start_row_index){
 
-                        std::size_t j = start_row_index;
+                        std::size_t j = start_row_index + unified_addition_component::rows_amount;
                         typename unified_addition_component::params_type unified_addition_params = {{params.T.x, params.T.y}, {params.T.x, params.T.y}};
                         zk::components::generate_circuit<unified_addition_component>(bp, assignment, unified_addition_params, start_row_index);
                         typename unified_addition_component::result_type double_result(unified_addition_params, j - 1);
