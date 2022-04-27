@@ -59,10 +59,19 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     template<typename ComponentType, typename ArithmetizationType>
-                    friend void generate_circuit(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const typename ComponentType::params_type params,
-                        const std::size_t start_row_index);
+                    friend typename std::enable_if<
+                        (!(has_static_member_function_generate_circuit<ComponentType,
+                                typename ComponentType::result_type,
+                            boost::mpl::vector<blueprint<ArithmetizationType> &,
+                                blueprint_public_assignment_table<ArithmetizationType> &,
+                                const typename ComponentType::params_type,
+                                const std::size_t>>::value)),
+                            typename ComponentType::result_type>::type
+                        generate_circuit(
+                            blueprint<ArithmetizationType> &bp,
+                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                            const typename ComponentType::params_type params,
+                            const std::size_t start_row_index);
                 public:
                     constexpr static const std::size_t selector_seed = 0xff07;
                     constexpr static const std::size_t rows_amount = 0;

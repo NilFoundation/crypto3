@@ -62,6 +62,7 @@ endmacro()
 
 set(NON_NATIVE_TESTS_FILES
     "non_native/plonk/field_mul"
+    "non_native/plonk/non_native_range"
     )
 
 set(BLUEPRINT_TESTS_FILES

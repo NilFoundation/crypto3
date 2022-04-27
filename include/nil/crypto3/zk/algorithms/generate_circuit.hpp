@@ -41,11 +41,13 @@ namespace nil {
 
                 template<typename ComponentType, typename ArithmetizationType>
                 typename std::enable_if<
-                    (!(has_static_member_function_generate_circuit<ComponentType, void,
+                    (!(has_static_member_function_generate_circuit<ComponentType,
+                            typename ComponentType::result_type,
                         boost::mpl::vector<blueprint<ArithmetizationType> &,
                             blueprint_public_assignment_table<ArithmetizationType> &,
                             const typename ComponentType::params_type,
-                            const std::size_t>>::value)), void>::type
+                            const std::size_t>>::value)),
+                        typename ComponentType::result_type>::type
                     generate_circuit(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
@@ -66,22 +68,26 @@ namespace nil {
                     assignment.enable_selector(first_selector_index, start_row_index);
 
                     ComponentType::generate_copy_constraints(bp, assignment, params, start_row_index);
+
+                    return typename ComponentType::result_type(start_row_index);
                 }
 
                 template<typename ComponentType, typename ArithmetizationType>
                 typename std::enable_if<
-                    (has_static_member_function_generate_circuit<ComponentType, void,
+                    (has_static_member_function_generate_circuit<ComponentType,
+                            typename ComponentType::result_type,
                         boost::mpl::vector<blueprint<ArithmetizationType> &,
                             blueprint_public_assignment_table<ArithmetizationType> &,
                             const typename ComponentType::params_type,
-                            const std::size_t>>::value), void>::type
+                            const std::size_t>>::value),
+                        typename ComponentType::result_type>::type
                     generate_circuit(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const typename ComponentType::params_type params,
                         const std::size_t start_row_index){
 
-                    ComponentType::generate_circuit(bp, assignment, params, start_row_index);
+                    return ComponentType::generate_circuit(bp, assignment, params, start_row_index);
                 }
 
             }    // namespace components
