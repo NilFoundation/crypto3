@@ -112,6 +112,8 @@ namespace nil {
                             X = var(W4, start_row_index, false, var::column_type::witness);
                             Y = var(W5, start_row_index, false, var::column_type::witness);
                         }
+
+                        result_type() {}
                     };
 
                     static result_type generate_assignments(
