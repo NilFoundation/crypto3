@@ -69,7 +69,7 @@ namespace nil {
 
                     ComponentType::generate_copy_constraints(bp, assignment, params, start_row_index);
 
-                    return typename ComponentType::result_type(start_row_index);
+                    return typename ComponentType::result_type(params, start_row_index);
                 }
 
                 template<typename ComponentType, typename ArithmetizationType>
