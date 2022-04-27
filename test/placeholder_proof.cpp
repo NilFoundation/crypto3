@@ -69,12 +69,22 @@
 #include <../test/test_plonk_component.hpp>
 
 template<typename TIter>
-void print_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end) {
+void print_hex_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end, bool endl) {
     os << std::hex;
     for (TIter it = iter_begin; it != iter_end; it++) {
         os << std::setfill('0') << std::setw(2) << std::right << int(*it);
     }
-    os << std::endl << std::dec;
+    os << std::dec;
+    if (endl) {
+        os << std::endl;
+    }
+}
+
+template<typename ProofIterator>
+void print_placeholder_proof(ProofIterator proof_begin, ProofIterator proof_end, bool endl) {
+    std::ofstream out;
+    out.open("placeholder_proof.txt");
+    print_hex_byteblob(out, proof_begin, proof_end, endl);
 }
 
 template<typename FieldParams>
@@ -353,10 +363,6 @@ void test_placeholder_proof_marshalling(const Proof &proof) {
     cv.resize(filled_placeholder_proof.length(), 0x00);
     auto write_iter = cv.begin();
     nil::marshalling::status_type status = filled_placeholder_proof.write(write_iter, cv.size());
-    std::cout << "proof (" << cv.size() << " bytes) = " << std::endl;
-    std::ofstream proof_file;
-    proof_file.open("placeholder_proof.txt");
-    print_byteblob(proof_file, cv.cbegin(), cv.cend());
 
     proof_marshalling_type test_val_read;
     auto read_iter = cv.begin();
@@ -379,7 +385,7 @@ BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
-    constexpr std::size_t Lambda = 40;
+    constexpr std::size_t Lambda = 2;
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
@@ -388,6 +394,8 @@ BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {
 
     auto P = algebra::random_element<curve_type::template g1_type<>>().to_affine();
     auto Q = algebra::random_element<curve_type::template g1_type<>>().to_affine();
+    // auto P = curve_type::template g1_type<>::value_type::one().to_affine();
+    // auto Q = curve_type::template g1_type<>::value_type::one().to_affine();
 
     typename component_type::params_type params = {
         {var(0, 1, false, var::column_type::public_input), var(0, 2, false, var::column_type::public_input)},
