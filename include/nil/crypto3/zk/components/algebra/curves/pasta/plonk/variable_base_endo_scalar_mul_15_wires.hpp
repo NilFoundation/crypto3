@@ -23,7 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for auxiliary components for the SHA256 component.
+// @file Declaration of interfaces for auxiliary components for the VARIABLE_BASE_ENDO_SCALAR_MUL component.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_15_WIRES_HPP
@@ -37,7 +37,9 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
+
+
 
 namespace nil {
     namespace crypto3 {
@@ -87,23 +89,13 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    template<typename ComponentType, typename ArithmetizationType>
-                    friend typename std::enable_if<
-                        (!(has_static_member_function_generate_circuit<ComponentType, void,
-                            boost::mpl::vector<blueprint<ArithmetizationType> &,
-                                blueprint_public_assignment_table<ArithmetizationType> &,
-                                const typename ComponentType::params_type,
-                                const std::size_t>>::value)), void>::type
-                        generate_circuit(
-                            blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                            const typename ComponentType::params_type params,
-                            const std::size_t start_row_index);
+                    using unified_addition_component = zk::components::curve_element_unified_addition<ArithmetizationType, CurveType, 0, 1, 2, 3,
+                                                                          4, 5, 6, 7, 8, 9, 10>;
                 public:
 
                     constexpr static const typename BlueprintFieldType::value_type endo = typename BlueprintFieldType::value_type(algebra::fields::arithmetic_params<BlueprintFieldType>::multiplicative_generator).pow(typename BlueprintFieldType::integral_type( ( (BlueprintFieldType::value_type::zero() - BlueprintFieldType::value_type::one()) * ( typename BlueprintFieldType::value_type(3) ).inversed() ).data));
                     constexpr static const std::size_t selector_seed = 0x0f02;
-                    constexpr static const std::size_t rows_amount = 33;
+                    constexpr static const std::size_t rows_amount = unified_addition_component::rows_amount + 33;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
@@ -123,15 +115,18 @@ namespace nil {
                                 X =  var(W4, start_row_index + 32, false);
                                 Y =  var(W5, start_row_index + 32, false);
                             }
-                    };
+                    };                
 
-                    static void generate_assignments(
+                    static result_type generate_assignments(
                         blueprint_assignment_table<ArithmetizationType>
                             &assignment,
                         const params_type params,
                         const std::size_t start_row_index){
 
-                        const std::size_t &j = start_row_index;
+                        std::size_t j = start_row_index;
+                        typename unified_addition_component::params_type unified_addition_params = {{params.T.x, params.T.y}, {params.T.x, params.T.y}};
+                        unified_addition_component::generate_assignments(assignment, unified_addition_params, j);
+                        j++;
                         assignment.public_input(0)[0] = ArithmetizationType::field_type::value_type::zero();
 
                         typename BlueprintFieldType::value_type b = assignment.var_value(params.b);
@@ -211,7 +206,27 @@ namespace nil {
                         assignment.witness(W6)[j + 32] = n_next;
                     }
 
-                private:
+                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type params,
+                        const std::size_t start_row_index){
+
+                        auto selector_iterator = assignment.find_selector(selector_seed);
+                        std::size_t first_selector_index;
+                        if (selector_iterator == assignment.selectors_end()){
+                            first_selector_index = assignment.allocate_selector(selector_seed,
+                                gates_amount);
+                            generate_gates(bp, assignment, params, first_selector_index);
+                        } else {
+                            first_selector_index = selector_iterator->second; 
+                        }
+                        std::size_t j = start_row_index;
+                        assignment.enable_selector(first_selector_index, j + 1, j + rows_amount - 1, 1);
+
+                        generate_copy_constraints(bp, assignment, params, start_row_index);
+                        return result_type(start_row_index);
+                    }
+
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment, 
@@ -259,7 +274,11 @@ namespace nil {
                             const params_type params,
                             const std::size_t start_row_index){
 
-                        const std::size_t &j = start_row_index;
+                        std::size_t j = start_row_index;
+                        typename unified_addition_component::params_type unified_addition_params = {{params.T.x, params.T.y}, {params.T.x, params.T.y}};
+                        zk::components::generate_circuit<unified_addition_component>(bp, assignment, unified_addition_params, start_row_index);
+                        typename unified_addition_component::result_type double_result(unified_addition_params, j - 1);
+                        j++;
 
                         for (int z = 0; z < rows_amount - 2; z++) {
                             bp.add_copy_constraint({{W0, (std::int32_t)(j + z), false}, {W0, (std::int32_t)(j + z + 1), false}});
@@ -269,7 +288,12 @@ namespace nil {
 
                         //TODO link to params.b
 
+                        bp.add_copy_constraint({{W6, (std::int32_t)(j + rows_amount - 1), false}, params.b});
+
                         // TODO: (xP , yP ) in row i are copy constrained with values from the first doubling circuit
+
+                        bp.add_copy_constraint({{W4, (std::int32_t)(j), false}, double_result.X});
+                        bp.add_copy_constraint({{W5, (std::int32_t)(j), false}, double_result.Y});
                     }
                 };
             }    // namespace components
