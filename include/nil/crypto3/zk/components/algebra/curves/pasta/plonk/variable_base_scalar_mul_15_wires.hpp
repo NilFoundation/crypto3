@@ -37,6 +37,8 @@
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -75,22 +77,11 @@ namespace nil {
                         ArithmetizationParams> ArithmetizationType;
                     
                     using var = snark::plonk_variable<BlueprintFieldType>;
-
-                    constexpr static const std::size_t selector_seed = 0x0f03;
-
-                    template<typename ComponentType, typename ArithmetizationType>
-                    friend typename std::enable_if<
-                        (!(has_static_member_function_generate_circuit<ComponentType, void,
-                            boost::mpl::vector<blueprint<ArithmetizationType> &,
-                                blueprint_public_assignment_table<ArithmetizationType> &,
-                                const typename ComponentType::params_type,
-                                const std::size_t>>::value)), void>::type
-                        generate_circuit(
-                            blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                            const typename ComponentType::params_type params,
-                            const std::size_t start_row_index);
+                    using add_component = zk::components::curve_element_unified_addition<ArithmetizationType,
+                                                            CurveType,
+                                                            W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10>;
                 public:
+                    constexpr static const std::size_t selector_seed = 0x0f03;
                     constexpr static const std::size_t rows_amount = 102;
                     constexpr static const std::size_t gates_amount = 1;
 
@@ -107,7 +98,7 @@ namespace nil {
                     struct result_type {
                         var X = var(0, 0, false);
                         var Y = var(0, 0, false);
-                        result_type(const std::size_t &start_row_index) {
+                        result_type(const params_type &params, const std::size_t &start_row_index) {
                             X = var(W0, start_row_index + rows_amount, false, var::column_type::witness);
                             Y = var(W1, start_row_index + rows_amount, false, var::column_type::witness);
                         }
@@ -118,9 +109,6 @@ namespace nil {
                                 &assignment,
                             const params_type params,
                             const std::size_t start_row_index){
-
-                        const std::size_t &j = start_row_index;
-                        assignment.public_input(0)[j] = ArithmetizationType::field_type::value_type::zero();
                         typename BlueprintFieldType::value_type b = assignment.var_value(params.b);
                         typename BlueprintFieldType::value_type T_x = assignment.var_value(params.T.x);
                         typename BlueprintFieldType::value_type T_y = assignment.var_value(params.T.y);
@@ -137,11 +125,23 @@ namespace nil {
                         }
                         typename ArithmetizationType::field_type::value_type n = 0;
                         typename ArithmetizationType::field_type::value_type n_next = 0;
+
+                        auto addition_res = add_component::generate_assignments(assignment, {{params.T.x, params.T.y}, {params.T.x, params.T.y}}, 
+                            start_row_index);
+                        
+                        typename CurveType::template 
+                            g1_type<algebra::curves::coordinates::affine>::value_type T_doubled(
+                            assignment.var_value(addition_res.X),
+                            assignment.var_value(addition_res.Y) );
+                        
+                        const std::size_t &j = start_row_index + add_component::rows_amount;
+                        assignment.constant(0)[j] = ArithmetizationType::field_type::value_type::zero();
+
                         for (std::size_t i = j; i < j + rows_amount; i= i + 2) {
                             assignment.witness(W0)[i] = T.X;
                             assignment.witness(W1)[i] = T.Y;
                             if (i == j) {
-                                P[0] = 2*T;
+                                P[0] = T_doubled;
                             }
                             else {
                                 P[0] = P[5];
@@ -188,7 +188,28 @@ namespace nil {
                         }
                     }
 
-                private:
+                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type params,
+                        const std::size_t start_row_index){
+
+                        auto selector_iterator = assignment.find_selector(selector_seed);
+                        std::size_t first_selector_index;
+
+                        if (selector_iterator == assignment.selectors_end()){
+                            first_selector_index = assignment.allocate_selector(selector_seed,
+                                gates_amount);
+                            generate_gates(bp, assignment, params, first_selector_index);
+                        } else {
+                            first_selector_index = selector_iterator->second;
+                        }
+
+                        assignment.enable_selector(first_selector_index, start_row_index, start_row_index + rows_amount - 1, 2);
+
+                        generate_copy_constraints(bp, assignment, params, start_row_index);
+                        return result_type(params, start_row_index);
+                    }
+
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment, 
@@ -277,16 +298,23 @@ namespace nil {
                             const params_type params,
                             const std::size_t start_row_index){
 
-                        const std::size_t &j = start_row_index;
+                        // first doulbing check
+                        typename add_component::params_type addition_params = {{params.T.x, params.T.y}, {params.T.x, params.T.y}};
+                        //zk::components::generate_circuit<add_component>(bp, assignment, addition_params, start_row_index);
+                        typename add_component::result_type addition_res(addition_params, start_row_index);
+
+                        //const std::size_t &j = start_row_index + add_component::rows_amount;
+                        const std::size_t &j = start_row_index + add_component::rows_amount;
+
+                        //bp.add_copy_constraint({{W2, (std::int32_t)(j), false}, addition_res.X});
+                        //bp.add_copy_constraint({{W3, (std::int32_t)(j), false}, addition_res.Y});
+
+                        // main algorithm
 
                         for (int z = 0; z < rows_amount - 2; z += 2) {
                             bp.add_copy_constraint({{W0, (std::int32_t)(j + z), false}, {W0, (std::int32_t)(j + z + 2), false}});
                             bp.add_copy_constraint({{W1, (std::int32_t)(j + z), false}, {W1, (std::int32_t)(j + z + 2), false}});
                         }
-
-                        //TODO link to params.b
-
-                        // TODO: (x0, y0) in row i are copy constrained with values from the first doubling circuit
 
                         for (int z = 2; z < rows_amount; z += 2) {
                             bp.add_copy_constraint({{W2, (std::int32_t)(j + z), false}, {W0, (std::int32_t)(j + z - 1), false}});
@@ -300,6 +328,8 @@ namespace nil {
                         std::size_t public_input_column_index = 0;
                         bp.add_copy_constraint(
                             {{W4, (std::int32_t)(j), false}, {public_input_column_index, (std::int32_t)(j), false, var::column_type::public_input}});
+
+                        bp.add_copy_constraint({params.b, {W5, (std::int32_t)(j + rows_amount - 2), false}}); // scalar check
                     }
                 };
             }    // namespace components

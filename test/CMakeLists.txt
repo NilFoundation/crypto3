@@ -75,6 +75,7 @@ set(PLONK_TESTS_FILES
     "algebra/curves/plonk/unified_addition"
     "algebra/curves/plonk/variable_base_endo_scalar_mul"
     "algebra/curves/plonk/endo_scalar"
+    "algebra/curves/plonk/multi_scalar_multiplication"
     "hashes/plonk/poseidon"
     "hashes/plonk/sha256"
     "merkle_tree/plonk/merkle_tree"
