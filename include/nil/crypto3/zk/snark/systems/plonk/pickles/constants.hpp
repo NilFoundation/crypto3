@@ -24,17 +24,17 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PROOF_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PROOF_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_CONSTANTS_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_CONSTANTS_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace components {
+            namespace snark {
                 
                 struct kimchi_constant {
                     constexpr static const std::size_t CHALLENGE_LENGTH_IN_LIMBS = 2;
-                    constexpr static const std::size_t PERMUTS = 7;
+                    constexpr static const std::size_t PERMUTES = 7;
                     constexpr static const std::size_t CONSTRAINTS = 3;
                     constexpr static const std::size_t COLUMNS = 15;
                 };
@@ -43,4 +43,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PROOF_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_CONSTANTS_HPP
