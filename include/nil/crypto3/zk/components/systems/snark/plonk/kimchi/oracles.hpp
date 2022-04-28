@@ -167,7 +167,10 @@ namespace nil {
                             std::size_t n,
                             std::size_t &row) {
 
-                        std::vector<var> res(n); 
+                        std::vector<var> res(n);
+                        if (n < 2) {
+                            res.resize(2);
+                        }
                         assignment.witness(W0)[row] = 1;
                         res[0] = var(0, row, false);
                         typename BlueprintFieldType::value_type base_value =
@@ -285,7 +288,7 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t selector_seed = 0x0f08;
-                    constexpr static const std::size_t rows_amount = 200;
+                    constexpr static const std::size_t rows_amount = 50;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {

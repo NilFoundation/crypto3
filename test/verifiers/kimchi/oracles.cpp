@@ -80,7 +80,15 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     std::cout<<"Expected: "<<expected_result.data<<std::endl;
 
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
-    verifier_index.n = 1;
+    verifier_index.w = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
+    verifier_index.max_poly_size = 512;
+    verifier_index.zkpm = {0x2C46205451F6C3BBEA4BABACBEE609ECF1039A903C42BFF639EDC5BA33356332_cppui256,
+        0x1764D9CB4C64EBA9A150920807637D458919CB6948821F4D15EB1994EADF9CE3_cppui256,
+        0x0140117C8BBC4CE4644A58F7007148577782213065BB9699BF5C391FBE1B3E6D_cppui256,
+        0x0000000000000000000000000000000000000000000000000000000000000001_cppui256};
+    verifier_index.n = 512;
+    verifier_index.public_input_size = 0;
+    verifier_index.alpha_powers = 1;
 
     zk::components::kimchi_proof_scalar<curve_type> proof;
 

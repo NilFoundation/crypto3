@@ -133,7 +133,8 @@ namespace nil {
                     var challenge_assignment(
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             std::size_t &component_start_row) {
-
+                        component_start_row++;
+                        return var(W0, component_start_row - 1);
                     }
 
                     void challenge_generate_constraints(blueprint<ArithmetizationType> &bp,
