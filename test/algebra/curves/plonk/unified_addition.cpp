@@ -50,6 +50,8 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 /*BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_double) {
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 11;
@@ -62,14 +64,24 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using component_type = zk::components::
-        curve_element_unified_addition<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10>;
+    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+
+    using component_type = zk::components::curve_element_unified_addition<ArithmetizationType, curve_type, 0, 1, 2, 3,
+                                                                          4, 5, 6, 7, 8, 9, 10>;
+
+    auto P = algebra::random_element<curve_type::template g1_type<>>().to_affine();
+    auto Q(P);
 
     typename component_type::params_type params = {
-        curve_type::template g1_type<>::value_type::one(),
-        curve_type::template g1_type<>::value_type::one()};
+        {var(0, 1, false, var::column_type::public_input), var(0, 2, false, var::column_type::public_input)},
+        {var(0, 3, false, var::column_type::public_input), var(0, 4, false, var::column_type::public_input)}};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params);
+    std::vector<typename BlueprintFieldType::value_type> public_input = {0, P.X, P.Y, Q.X, Q.Y};
+
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input);
+
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    std::cout << "unified_addition: " << duration.count() << "ms" << std::endl;
 }*/
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {

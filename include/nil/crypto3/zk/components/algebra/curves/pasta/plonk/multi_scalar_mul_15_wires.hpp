@@ -35,6 +35,10 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
+
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/variable_base_scalar_mul_15_wires.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -77,10 +81,12 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
-                    using scalar_mul_component = zk::components::curve_element_variable_base_scalar_mul<ArithmetizationType,
+                    using scalar_mul_component = zk::components::curve_element_variable_base_scalar_mul<ArithmetizationType, CurveType,
                                                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                    using add_component = zk::components::curve_element_unified_addition<ArithmetizationType,
+                    using add_component = zk::components::curve_element_unified_addition<ArithmetizationType, CurveType,
                                                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10>;
+
+                    using var = snark::plonk_variable<BlueprintFieldType>;
 
                 public:
                     constexpr static const std::size_t selector_seed = 0x0f07;
@@ -89,8 +95,8 @@ namespace nil {
 
                     struct params_type {
                         struct var_ec_point {
-                            var x;
-                            var y;
+                            var X;
+                            var Y;
                         };
 
                         std::vector<var> scalars; 
@@ -98,73 +104,96 @@ namespace nil {
                     };
 
                     struct result_type {
-                        var sum;
-                    }
+                        struct var_ec_point {
+                            var X;
+                            var Y;
+                        };
+                        
+                        var_ec_point sum;
+
+                        result_type(const params_type &params, const std::size_t &start_row_index) {
+                        }
+                    };
 
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type params,
                         const std::size_t start_row_index){
 
-                        /*auto selector_iterator = assignment.find_selector(selector_seed);
-                        std::size_t first_selector_index;
-
-                        if (selector_iterator == assignment.selectors_end()){
-                            first_selector_index = assignment.allocate_selector(selector_seed,
-                                gates_amount);
-                            generate_gates(bp, assignment, params, first_selector_index);
-                        } else {
-                            first_selector_index = selector_iterator->second;
+                        std::size_t row = start_row_index;
+                        std::array<var, 2> res;
+                        for (std::size_t i = 0; i < PointsAmount; i++) {
+                            auto multiplied = scalar_mul_component::generate_circuit(bp,
+                                assignment, {{params.bases[i].X, params.bases[i].Y}, params.scalars[i]},
+                                row);
+                            row += scalar_mul_component::rows_amount;
+                            if (i == 0) {
+                                res[0] = multiplied.X;
+                                res[1] = multiplied.Y;
+                            } else {
+                                components::generate_circuit<add_component>(bp,
+                                    assignment, {{res[0], res[1]}, {multiplied.X, multiplied.Y}},
+                                    row);
+                                typename add_component::result_type added({{res[0], res[1]}, {multiplied.X, multiplied.Y}}, row);
+                                res[0] = added.X;
+                                res[1] = added.Y;
+                                row += add_component::rows_amount;
+                            }
                         }
-
-                        std::size_t j = start_row_index;
-                        assignment.enable_selector(first_selector_index, j, j + rows_amount - 1);
-                        assignment.enable_selector(first_selector_index+1, j + rows_amount - 1);*/
-
-                        generate_copy_constraints(bp, assignment, params, start_row_index);
-                        return result_type(params, start_row_index);
+                        
+                        auto result = result_type(params, start_row_index);
+                        result.sum.X = res[0];
+                        result.sum.Y = res[1];
+                        return result;
                     }
 
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
 
-                        const std::size_t &j = component_start_row;
                     }
 
                     static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
+                        const params_type &params,
                         const std::size_t &component_start_row) {
-
+                        
                     }
 
-                    static void generate_assignments(
+                    static result_type generate_assignments(
                         blueprint_assignment_table<ArithmetizationType>
                             &assignment,
                         const params_type params,
                         const std::size_t start_row_index) {
                         
                         std::size_t row = start_row_index;
-                        var res;
-                        for (std::size_t i = 0; i < params.scalars.size(); i++) {
-                            var multiplied = scalar_mul_component::generate_assignments(
+                        std::array<var, 2> res;
+                        for (std::size_t i = 0; i < PointsAmount; i++) {
+                            auto multiplied = scalar_mul_component::generate_assignments(
                                 assignment, {{params.bases[i].X, params.bases[i].Y}, params.scalars[i]},
                                 row);
                             row += scalar_mul_component::rows_amount;
                             if (i == 0) {
-                                res = multiplied;
+                                res[0] = multiplied.X;
+                                res[1] = multiplied.Y;
                             } else {
-                                res = add_component::generate_assignments(
-                                    assignment, {{res.X, res.Y}, {multiplied.X, multiplied.Y}},
+                                auto added = add_component::generate_assignments(
+                                    assignment, {{res[0], res[1]}, {multiplied.X, multiplied.Y}},
                                     row);
+                                res[0] = added.X;
+                                res[1] = added.Y;
                                 row += add_component::rows_amount;
                             }
                         }
-                        return result_type { res };
+                        std::cout<<"X: "<<assignment.var_value(res[0]).data<<" Y: "<<assignment.var_value(res[1]).data<<std::endl;
+                        
+                        auto result = result_type(params, start_row_index);
+                        result.sum.X = res[0];
+                        result.sum.Y = res[1];
+                        return result;
                     }
                 };
             }    // namespace components
