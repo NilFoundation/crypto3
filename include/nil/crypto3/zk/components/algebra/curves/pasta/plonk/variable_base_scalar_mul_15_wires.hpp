@@ -2,6 +2,7 @@
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
+// Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 //
 // MIT License
 //
@@ -22,8 +23,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-//---------------------------------------------------------------------------//
-// @file Declaration of interfaces for auxiliary components for the SHA256 component.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_15_WIRES_HPP
@@ -80,9 +79,11 @@ namespace nil {
                     using add_component = zk::components::curve_element_unified_addition<ArithmetizationType,
                                                             CurveType,
                                                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10>;
+                                                        
+                    constexpr static const std::size_t mul_rows_amount = 102;
                 public:
                     constexpr static const std::size_t selector_seed = 0x0f03;
-                    constexpr static const std::size_t rows_amount = 102;
+                    constexpr static const std::size_t rows_amount = add_component::rows_amount + mul_rows_amount;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
@@ -99,12 +100,12 @@ namespace nil {
                         var X = var(0, 0, false);
                         var Y = var(0, 0, false);
                         result_type(const params_type &params, const std::size_t &start_row_index) {
-                            X = var(W0, start_row_index + rows_amount, false, var::column_type::witness);
-                            Y = var(W1, start_row_index + rows_amount, false, var::column_type::witness);
+                            X = var(W0, start_row_index + rows_amount - 1, false, var::column_type::witness);
+                            Y = var(W1, start_row_index + rows_amount - 1, false, var::column_type::witness);
                         }
                     };
 
-                    static void generate_assignments(
+                    static result_type generate_assignments(
                             blueprint_assignment_table<ArithmetizationType>
                                 &assignment,
                             const params_type params,
@@ -118,10 +119,11 @@ namespace nil {
                         std::array<typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type, 6> P;
                         typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type Q;
 
-                        std::array<bool, CurveType::scalar_field_type::modulus_bits + 1> bits = {false};
+                        const std::size_t scalar_size = 255;
+                        std::array<bool, scalar_size> bits = {false};
                         typename CurveType::scalar_field_type::integral_type integral_b = typename CurveType::scalar_field_type::integral_type(b.data);
-                        for (std::size_t i = 0; i < CurveType::scalar_field_type::modulus_bits; i++) {
-                            bits[CurveType::scalar_field_type::modulus_bits - i - 1] = multiprecision::bit_test(integral_b, i);
+                        for (std::size_t i = 0; i < scalar_size; i++) {
+                            bits[scalar_size - i - 1] = multiprecision::bit_test(integral_b, i);
                         }
                         typename ArithmetizationType::field_type::value_type n = 0;
                         typename ArithmetizationType::field_type::value_type n_next = 0;
@@ -137,7 +139,8 @@ namespace nil {
                         const std::size_t &j = start_row_index + add_component::rows_amount;
                         assignment.constant(0)[j] = ArithmetizationType::field_type::value_type::zero();
 
-                        for (std::size_t i = j; i < j + rows_amount; i= i + 2) {
+
+                        for (std::size_t i = j; i < j + rows_amount - 1; i = i + 2) {
                             assignment.witness(W0)[i] = T.X;
                             assignment.witness(W1)[i] = T.Y;
                             if (i == j) {
@@ -185,7 +188,9 @@ namespace nil {
                             assignment.witness(W4)[i + 1] = bits[((i - j) / 2)*5 + 2];
                             assignment.witness(W5)[i + 1] = bits[((i - j) / 2)*5 + 3];
                             assignment.witness(W6)[i + 1] = bits[((i - j) / 2)*5 + 4];
-                        }
+                        }            
+
+                        return result_type(params, start_row_index);
                     }
 
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
@@ -204,7 +209,8 @@ namespace nil {
                             first_selector_index = selector_iterator->second;
                         }
 
-                        assignment.enable_selector(first_selector_index, start_row_index, start_row_index + rows_amount - 1, 2);
+                        assignment.enable_selector(first_selector_index, start_row_index + add_component::rows_amount, 
+                            start_row_index + rows_amount - 1, 2);
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(params, start_row_index);
@@ -300,36 +306,35 @@ namespace nil {
 
                         // first doulbing check
                         typename add_component::params_type addition_params = {{params.T.x, params.T.y}, {params.T.x, params.T.y}};
-                        //zk::components::generate_circuit<add_component>(bp, assignment, addition_params, start_row_index);
+                        zk::components::generate_circuit<add_component>(bp, assignment, addition_params, start_row_index);
                         typename add_component::result_type addition_res(addition_params, start_row_index);
 
-                        //const std::size_t &j = start_row_index + add_component::rows_amount;
                         const std::size_t &j = start_row_index + add_component::rows_amount;
 
-                        //bp.add_copy_constraint({{W2, (std::int32_t)(j), false}, addition_res.X});
-                        //bp.add_copy_constraint({{W3, (std::int32_t)(j), false}, addition_res.Y});
+                        bp.add_copy_constraint({{W2, (std::int32_t)(j), false}, addition_res.X});
+                        bp.add_copy_constraint({{W3, (std::int32_t)(j), false}, addition_res.Y});
 
                         // main algorithm
 
-                        for (int z = 0; z < rows_amount - 2; z += 2) {
+                        for (int z = 0; z < mul_rows_amount - 2; z += 2) {
                             bp.add_copy_constraint({{W0, (std::int32_t)(j + z), false}, {W0, (std::int32_t)(j + z + 2), false}});
                             bp.add_copy_constraint({{W1, (std::int32_t)(j + z), false}, {W1, (std::int32_t)(j + z + 2), false}});
                         }
 
-                        for (int z = 2; z < rows_amount; z += 2) {
+                        for (int z = 2; z < mul_rows_amount; z += 2) {
                             bp.add_copy_constraint({{W2, (std::int32_t)(j + z), false}, {W0, (std::int32_t)(j + z - 1), false}});
                             bp.add_copy_constraint({{W3, (std::int32_t)(j + z), false}, {W1, (std::int32_t)(j + z - 1), false}});
                         }
 
-                         for (int z = 2; z < rows_amount; z += 2) {
+                         for (int z = 2; z < mul_rows_amount; z += 2) {
                             bp.add_copy_constraint({{W4, (std::int32_t)(j + z), false}, {W5, (std::int32_t)(j + z - 2), false}});
                         }
 
-                        std::size_t public_input_column_index = 0;
+                        std::size_t constant_column_index = 0;
                         bp.add_copy_constraint(
-                            {{W4, (std::int32_t)(j), false}, {public_input_column_index, (std::int32_t)(j), false, var::column_type::public_input}});
+                            {{W4, (std::int32_t)(j), false}, {constant_column_index, (std::int32_t)(j), false, var::column_type::constant}});
 
-                        bp.add_copy_constraint({params.b, {W5, (std::int32_t)(j + rows_amount - 2), false}}); // scalar check
+                        bp.add_copy_constraint({params.b, {W5, (std::int32_t)(j + rows_amount - 3), false}}); // scalar value check
                     }
                 };
             }    // namespace components
