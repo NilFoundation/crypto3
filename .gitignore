@@ -441,3 +441,6 @@ TSWLatexianTemp*
 ### TeX Patch ###
 # glossaries
 *.glstex
+
+# vim swap files #
+*.*.swp
