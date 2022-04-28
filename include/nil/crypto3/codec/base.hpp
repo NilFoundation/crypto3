@@ -264,6 +264,7 @@ namespace nil {
                 std::size_t remaining_bits;
             };
 
+#ifdef CRYPTO3_CODEC_BASE58
             /*!
              * @brief Base codec implements Base-family encoding. Meets the requirements of Codec.
              * @ingroup codec
@@ -330,6 +331,8 @@ namespace nil {
                     typedef varlength_block_stream_processor<ProcessingMode, StateAccumulator, params_type> type;
                 };
             };
+
+#endif
 
             /*!
              * @brief Base codec implements Base-family encoding. Meets the requirements of Codec.
