@@ -67,8 +67,6 @@ namespace nil {
                             nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
-                    constexpr static const integral_type mul_generator = 0x02;    // ?
-
                     typedef typename detail::element_fp<params<ed25519<modulus_bits>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -77,7 +75,6 @@ namespace nil {
 
                 constexpr typename ed25519<255>::integral_type const ed25519<255>::modulus;
                 constexpr typename ed25519<255>::modular_params_type const ed25519<255>::modulus_params;
-                constexpr typename ed25519<255>::integral_type const ed25519<255>::mul_generator;
 
             }    // namespace fields
         }        // namespace algebra
