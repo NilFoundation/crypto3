@@ -302,7 +302,7 @@ namespace nil {
                         }
 
 
-                        return result_type { res } ;
+                        return result_type(params, component_start_row);
                     }
 
                     private:
@@ -372,7 +372,7 @@ namespace nil {
 
                     struct params_type {
                         var zeta_pow_n;
-                        var zeta_omega;
+                        var zeta_omega_pow_n;
                         std::vector<var> public_input;
                         std::vector<var> &lagrange_base;
                         std::vector<var> &omega_powers;
@@ -443,7 +443,7 @@ namespace nil {
                         }
                         std::vector<typename BlueprintFieldType::value_type> omega_powers(params.omega_powers.size());
                         for (std::size_t i = 0; i < omega_powers.size(); i++) {
-                            omega_powers[i] = omega_powers.var_value(params.omega_powers[i]);
+                            omega_powers[i] = assignment.var_value(params.omega_powers[i]);
                         }
 
                         auto assignment_fill = [&assignment, &row,
@@ -492,7 +492,7 @@ namespace nil {
                         res[1] = var(W1, row, false);
                         row++;
 
-                        return result_type {res};
+                        return result_type(params, component_start_row);
                     }
 
                     private:

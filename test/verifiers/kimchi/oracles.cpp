@@ -56,8 +56,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     using BlueprintFieldType = typename curve_type::scalar_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 2;
+    constexpr std::size_t ConstantColumns = 1;
+    constexpr std::size_t SelectorColumns = 10;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -71,7 +71,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 
     zk::components::kimchi_scalar_limbs alpha_limbs = {7388568927873460733U, 2067855711556196027U}; // 000000000000000000000000000000001CB27FD04E11D6BB6689784B2862E9FD
+    typename BlueprintFieldType::value_type alpha = 0x000000000000000000000000000000001CB27FD04E11D6BB6689784B2862E9FD_cppui256;
     zk::components::kimchi_scalar_limbs zeta_limbs = {13556945131955241727U, 14838652236930703881U}; // 00000000000000000000000000000000CDED7B9747CF6209BC23F1C50DA742FF
+    typename BlueprintFieldType::value_type zeta = 0x00000000000000000000000000000000CDED7B9747CF6209BC23F1C50DA742FF_cppui256;
     //zk::components::kimchi_scalar_limbs fq_digest_limbs = {16614720608214505662U, 1222931729118221428U};
     typename BlueprintFieldType::value_type fq_digest = 0x01D4E77CCD66755BDDFDBB6E4E8D8D17A6708B9CB56654D12070BD7BF4A5B33B_cppui256;
     typename BlueprintFieldType::value_type expected_result = 0x0000000000000000000000000000000010F8B9EDA2A55474E693585D56FCD8BE_cppui256;
@@ -82,7 +84,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
 
     zk::components::kimchi_proof_scalar<curve_type> proof;
 
-    typename component_type::params_type params = {verifier_index, proof, alpha_limbs, zeta_limbs, fq_digest};
+    typename component_type::params_type params = {verifier_index, proof, alpha, zeta, fq_digest};
     std::vector<typename BlueprintFieldType::value_type> public_input = {};
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input);

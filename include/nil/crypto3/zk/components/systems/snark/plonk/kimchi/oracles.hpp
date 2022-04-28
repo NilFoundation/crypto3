@@ -94,6 +94,7 @@ namespace nil {
                     struct field_op_component {
                         using mul = zk::components::multiplication<ArithmetizationType,
                                                             W0, W1, W2>;
+                        // TODO: change to add / sub
                         using add = zk::components::multiplication<ArithmetizationType,
                                                             W0, W1, W2>;
                         using sub = zk::components::multiplication<ArithmetizationType,
@@ -154,10 +155,10 @@ namespace nil {
                             var x,
                             var y,
                             std::size_t &component_start_row) {
-                        typename multiplication_component::params_type params = {x, y};
-                        typename multiplication_component::result_type res = 
-                            multiplication_component::generate_assignments(assignment, params, component_start_row);
-                        component_start_row += multiplication_component::rows_amount;
+                        typename field_op_component::mul::params_type params = {x, y};
+                        typename field_op_component::mul::result_type res = 
+                            field_op_component::mul::generate_assignments(assignment, params, component_start_row);
+                        component_start_row += field_op_component::mul::rows_amount;
                         return res.result;
                     }
 
@@ -180,12 +181,12 @@ namespace nil {
                         for (std::size_t i = 2; i < n; i++) {
                             // we need to copy any power of the element
                             // so we place them only on copy-constrainted columns
-                            if (column_idx >= kimchi_constant::PERMUTE) {
+                            if (column_idx >= zk::snark::kimchi_constant::PERMUTES) {
                                 column_idx = 0;
                                 row++;
                             }
                             typename BlueprintFieldType::value_type new_value =
-                                prev_value * base_value
+                                prev_value * base_value;
                             assignment.witness(W0 + column_idx)[row] = new_value;
                             res[i] = var(W0 + i, row, false);
                             prev_value = new_value;
@@ -202,30 +203,40 @@ namespace nil {
                         using lagrange_base_component = zk::components::kimchi_oracles_lagrange<ArithmetizationType, CurveType,
                                                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
                         auto res = lagrange_base_component::generate_assignments(assignment, {zeta, zeta_omega, omega_powers} , row);
-                        row += lagrange_base_component::required_rows_amount;
+                        row += lagrange_base_component::rows_amount;
                         return res.lagrange_base;
                     }
 
                     static std::array<var, 2> assignment_puiblic_eval(blueprint_assignment_table<ArithmetizationType> &assignment,
-                            std::vector<var> public_input,
+                            const std::vector<var> &public_input,
                             var zeta_pow_n,
-                            var zeta_omega,
+                            var zeta_omega_pow_n,
                             std::vector<var> &lagrange_base,
                             std::vector<var> &omega_powers,
                             typename BlueprintFieldType::value_type domain_size_inv,
                             std::size_t &row) {
                         using public_eval_component = zk::components::kimchi_oracles_public_eval<ArithmetizationType, CurveType,
                                                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                        auto res = public_eval_component::generate_assignments(assignment, {zeta_pow_n, zeta_omega, 
+                        auto res = public_eval_component::generate_assignments(assignment, {zeta_pow_n, zeta_omega_pow_n, 
                                 public_input, lagrange_base, omega_powers} , row);
-                        row += public_eval_component::required_rows_amount;
+                        row += public_eval_component::rows_amount;
                         return res.public_evaluations;
                     }
 
-                    static var assignment_prev_chal_evals(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                
+                    static std::vector<var> assignment_prev_chal_evals(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                var max_poly_size,
+                                std::array<var, 2> eval_points,
+                                std::array<var, 2> powers_of_eval_points_for_chunks,
                                 std::size_t &component_start_row) {
+                        return std::vector<var>(0);
+                    }
 
+                    static kimchi_proof_evaluations<CurveType> assignment_combine_evaluations(blueprint_assignment_table<ArithmetizationType> &assignment,
+                        const kimchi_proof_evaluations<CurveType> &proof_eval,
+                        const var &proof_eval_for_chunk,
+                        std::size_t &row) {
+                        
+                        return kimchi_proof_evaluations<CurveType>();
                     }
 
                     // let init = (evals[0].w[PERMUTS - 1] + gamma) * evals[1].z * alpha0 * zkp;
@@ -238,10 +249,44 @@ namespace nil {
                                 std::size_t &component_start_row) {
 
                     }
+                    
+                    static var ft_eval_at_zeta(blueprint_assignment_table<ArithmetizationType> &assignment,
+                        std::size_t &row) {
+                        
+                        /*var zkpm_at_zeta = assignment_evaluate_polynomial(
+                            assignment, zkpm, zeta, row);
+                        var zeta1m1 = assignment_add(assignment, zeta_pow_n, -1, row);
+
+                        // (evals[0].w[PERMUTS - 1] + gamma) * evals[1].z * alphas[0] * zkpm_at_zeta;
+                        var init = ft_eval_1(evals[0].w[zk::snark::kimchi_constant::PERMUTES - 1],
+                            gamma,
+                            evals[1].z,
+                            alpha_powers[0],
+                            zkpm_at_zeta);
+                        var ft_eval0 = permutation_fold(
+
+                        );
+                        var nominator;
+                        var denominator;
+                        ft_eval0 = assignment_add(assignment,
+                            ft_eval0,
+                            assignment_mul(assignment, nominator, denominator, row),
+                            row);
+                        var tmp = ft_eval_2(
+
+                        );
+                        ft_eval0 = assignment_sub(
+                            assignment,
+                            ft_eval0,
+                            tmp,
+                            row);*/
+                        return var(0, row, false);
+                    }
 
                 public:
-                    constexpr static const std::size_t selector_seed = 0x0f6;
-                    constexpr static const std::size_t rows_amount = 32;
+                    constexpr static const std::size_t selector_seed = 0x0f08;
+                    constexpr static const std::size_t rows_amount = 200;
+                    constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
                         kimchi_verifier_index_scalar<CurveType> verifier_index;
@@ -255,7 +300,7 @@ namespace nil {
                     };
 
                     struct result_type {
-                        struct random_orcales {
+                        struct random_oracles {
                             var joint_combiner;
                             var beta;
                             var gamma;
@@ -267,44 +312,30 @@ namespace nil {
                             var zeta_chal;
                             var v_chal;
                             var u_chal;
-                        }
+                        };
 
                         var digest;
                         random_oracles oracles;
                         std::vector<var> alpha_powers;
                         std::vector<std::vector<var>> p_eval;
                         std::array<var, 2> zeta_powers;
-                        ??? polys;
+                        //??? polys;
                         var zeta1;
-                        vat ft_eval0;
+                        var ft_eval0;
 
 
                         result_type(const params_type &params,
                             const std::size_t &component_start_row) {
                         }
                     };
-
-                    struct allocated_data_type {
-                        allocated_data_type() {
-                            previously_allocated = false;
-                        }
-
-                        // TODO access modifiers
-                        bool previously_allocated;
-                    };
-
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
-                        return in_bp.allocate_rows(rows_amount);
-                    }
-
+                    
                     static result_type generate_circuit(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
-                        allocated_data_type &allocated_data,
                         const std::size_t &component_start_row) {
 
-                        generate_gates(bp, assignment, params, allocated_data, component_start_row);
+                        generate_gates(bp, assignment, params, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
 
                         return result_type(params, component_start_row);
@@ -319,12 +350,13 @@ namespace nil {
 
                         // copy public input
                         var alpha = assignment.allocate_public_input(params.alpha);
-                        var zeta = assignment.allocate_public_input(params.zetas);
+                        var zeta = assignment.allocate_public_input(params.zeta);
                         var fq_digest = assignment.allocate_public_input(params.fq_digest);
                         var omega = assignment.allocate_public_input(params.verifier_index.omega);
                         var beta = assignment.allocate_public_input(params.beta);
                         var gamma = assignment.allocate_public_input(params.gamma);
                         var joint_combiner = assignment.allocate_public_input(params.joint_combiner);
+                        var max_poly_size = assignment.allocate_public_input(params.verifier_index.max_poly_size);
 
                         std::vector<var> zkpm(params.verifier_index.zkpm.size());
                         for (std::size_t i = 0; i < zkpm.size(); i++) {
@@ -355,7 +387,8 @@ namespace nil {
                         std::vector<var> lagrange_base = assignment_lagrange(assignment, zeta, zeta_omega, omega_powers, row);
 
                         // TODO: check on empty public_input
-                        std::array<var, 2> public_eval = assignment_puiblic_eval(assignment, params.proof.public, zeta, zeta_omega, lagrange_base, row);
+                        std::array<var, 2> public_eval = assignment_puiblic_eval(assignment, params.proof.public_input, zeta_pow_n, 
+                            zeta_omega_pow_n, lagrange_base, omega_powers, params.verifier_index.domain_size_inv, row);
                         transcript.absorb_evaluations_assignment(
                             assignment,
                             public_eval[0],
@@ -382,17 +415,17 @@ namespace nil {
                             u_challenge, row);
 
                         std::array<var, 2> powers_of_eval_points_for_chunks = {
-                            assignment_exponentiation(assignment, zeta, verifier_index.max_poly_size, row),
-                            assignment_exponentiation(assignment, zeta_omega, verifier_index.max_poly_size, row),
+                            assignment_exponentiation(assignment, zeta, max_poly_size, row),
+                            assignment_exponentiation(assignment, zeta_omega, max_poly_size, row),
                         };
 
                         std::vector<var> prev_challenges_evals = assignment_prev_chal_evals(assignment,
                             max_poly_size,
                             std::array<var, 2> {zeta, zeta_omega},
-                            powers_of_eval_points_for_chunks
-                            );
+                            powers_of_eval_points_for_chunks,
+                            row);
 
-                        std::array<kimchi_proof_evaluations, 2> evals = {
+                        std::array<kimchi_proof_evaluations<CurveType>, 2> evals = {
                             assignment_combine_evaluations(assignment, params.proof.proof_evals[0],
                                 powers_of_eval_points_for_chunks[0], row),
                             assignment_combine_evaluations(assignment, params.proof.proof_evals[1],
@@ -400,61 +433,25 @@ namespace nil {
                         };
 
                         // ft(zeta)
-                        var zkpm_at_zeta = assignment_evaluate_polynomial(
-                            assignment, zkpm, zeta, row);
-                        var zeta1m1 = assignment_add(assignment, zeta_pow_n, -1, row);
-
-                        // (evals[0].w[PERMUTS - 1] + gamma) * evals[1].z * alphas[0] * zkpm_at_zeta;
-                        var init = ft_eval_1(evals[0].w[kimchi_constant::PERMUTE - 1],
-                            gamma,
-                            evals[1].z,
-                            alpha_powers[0],
-                            zkpm_at_zeta);
-                        var ft_eval0 = permutation_fold(
-
-                        );
-                        var nominator;
-                        var denominator;
-                        ft_eval0 = assignment_add(assignment,
-                            ft_eval0,
-                            assignment_mul(assignment, nominator, denominator, row),
-                            row);
-                        var tmp = ft_eval_2(
-
-                        );
-                        ft_eval0 = assignment_sub(
-                            assignment,
-                            ft_eval0,
-                            tmp,
-                            row);
+                        var ft_at_zeta = ft_eval_at_zeta(assignment, row);
                         
                         return result_type(params, component_start_row);
                     }
 
-                    private:
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                            blueprint_public_assignment_table<ArithmetizationType> &assignment, 
                             const params_type &params,
-                            allocated_data_type &allocated_data,
                         const std::size_t &component_start_row = 0) {
-
-                        const std::size_t &j = component_start_row;
-                        using F = typename BlueprintFieldType::value_type;
-
-                        std::size_t selector_index_1 = assignment.add_selector(j, j + rows_amount - 1);
-
-                        bp.add_gate(selector_index_1, 
-                            {});
                     }
 
                     static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                            blueprint_public_assignment_table<ArithmetizationType> &assignment, 
                             const params_type &params,
                             const std::size_t &component_start_row = 0){
 
                         std::size_t row = component_start_row;
 
-                        std::array<var, 2> alpha_pub_limbs = {var(0, row, false, var::column_type::public_input), 
+                        /*std::array<var, 2> alpha_pub_limbs = {var(0, row, false, var::column_type::public_input), 
                                 var(0, row + 1, false, var::column_type::public_input)};
                         std::array<var, 2> zeta_pub_limbs = {var(0, row + 2, false, var::column_type::public_input), 
                                 var(0, row + 3, false, var::column_type::public_input)};
@@ -469,7 +466,7 @@ namespace nil {
                         copy_constraints_from_limbs(bp, assignment, zeta_pub_limbs, row);
                         row++;
                         // copy endo-scalar
-                        row += endo_scalar_component::rows_amount;
+                        row += endo_scalar_component::rows_amount;*/
                         
                     }
                 };
