@@ -46,7 +46,7 @@ namespace nil {
                     typedef typename policy_type::scalar_field_type scalar_field_type;
 
                     template<typename Coordinates = coordinates::extended_with_a_minus_1,
-                             typename Form = forms::twisted_edwards>
+                             typename Form = forms::montgomery>
                     using g1_type = typename detail::curve25519_g1<Form, Coordinates>;
                 };
             }    // namespace curves
