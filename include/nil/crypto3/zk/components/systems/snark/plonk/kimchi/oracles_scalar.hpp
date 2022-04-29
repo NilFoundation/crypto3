@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_ORACLES_COMPONENT_15_WIRES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_ORACLES_COMPONENT_15_WIRES_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_ORACLES_SCALAR_COMPONENT_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_ORACLES_SCALAR_COMPONENT_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -100,8 +100,6 @@ namespace nil {
                         using sub = zk::components::multiplication<ArithmetizationType,
                                                             W0, W1, W2>;
                     };
-
-                    constexpr static const std::size_t permute_size = 7;
 
                     static var assignments_from_limbs(blueprint_assignment_table<ArithmetizationType> &assignment,
                             std::array<var, 2> scalar_limbs_var,
@@ -478,4 +476,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_ORACLES_COMPONENT_15_WIRES_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_ORACLES_SCALAR_COMPONENT_HPP
