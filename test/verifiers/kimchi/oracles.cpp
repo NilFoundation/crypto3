@@ -40,7 +40,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/oracles.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/oracles_scalar.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
 
 #include "test_plonk_component.hpp"
@@ -67,17 +67,20 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
 
     using component_type = zk::components::oracles_scalar<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+    using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
     zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 
-    zk::components::kimchi_scalar_limbs alpha_limbs = {7388568927873460733U, 2067855711556196027U}; // 000000000000000000000000000000001CB27FD04E11D6BB6689784B2862E9FD
-    typename BlueprintFieldType::value_type alpha = 0x000000000000000000000000000000001CB27FD04E11D6BB6689784B2862E9FD_cppui256;
-    zk::components::kimchi_scalar_limbs zeta_limbs = {13556945131955241727U, 14838652236930703881U}; // 00000000000000000000000000000000CDED7B9747CF6209BC23F1C50DA742FF
-    typename BlueprintFieldType::value_type zeta = 0x00000000000000000000000000000000CDED7B9747CF6209BC23F1C50DA742FF_cppui256;
-    //zk::components::kimchi_scalar_limbs fq_digest_limbs = {16614720608214505662U, 1222931729118221428U};
+    typename BlueprintFieldType::value_type joint_combiner = 0;
+    typename BlueprintFieldType::value_type beta = 0;
+    typename BlueprintFieldType::value_type gamma = 0;
+    typename BlueprintFieldType::value_type alpha = 0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
+    typename BlueprintFieldType::value_type zeta = 0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
     typename BlueprintFieldType::value_type fq_digest = 0x01D4E77CCD66755BDDFDBB6E4E8D8D17A6708B9CB56654D12070BD7BF4A5B33B_cppui256;
-    typename BlueprintFieldType::value_type expected_result = 0x0000000000000000000000000000000010F8B9EDA2A55474E693585D56FCD8BE_cppui256;
-    std::cout<<"Expected: "<<expected_result.data<<std::endl;
+    typename BlueprintFieldType::value_type expected_alpha = 0x23A8600917236F0E644D49DD5E6CA89537CE3047DA7E29D2A7B8CA6006616092_cppui256;
+    std::cout<<"Expected alpha: "<<expected_alpha.data<<std::endl;
+    typename BlueprintFieldType::value_type expected_zeta = 0x3D0F1F3A3D07DC73FBDF3718FFE270122AA367FB5BA667AD4A4AB81167D21BE4_cppui256;
+    std::cout<<"Expected zeta: "<<expected_zeta.data<<std::endl;
 
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
     verifier_index.w = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
@@ -91,9 +94,15 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     verifier_index.alpha_powers = 1;
 
     zk::components::kimchi_proof_scalar<curve_type> proof;
+    typename component_type::params_type::fq_sponge_output fq_output = {
+        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input), 
+        var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input),
+        var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input) 
+    };
 
-    typename component_type::params_type params = {verifier_index, proof, alpha, zeta, fq_digest};
-    std::vector<typename BlueprintFieldType::value_type> public_input = {};
+    typename component_type::params_type params = {verifier_index, proof, fq_output};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {joint_combiner, beta, gamma, 
+        alpha, zeta, fq_digest};
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input);
 }

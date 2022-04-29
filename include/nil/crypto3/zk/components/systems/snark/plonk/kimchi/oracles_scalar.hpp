@@ -290,14 +290,37 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
+                        struct fq_sponge_output {
+                            var joint_combiner;
+                            var beta; // beta and gamma can be combined from limbs in the base circuit
+                            var gamma;
+                            var alpha;
+                            var zeta;
+                            var fq_digest; // TODO overflow check
+
+                            static fq_sponge_output allocate_fq_output(
+                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                typename BlueprintFieldType::value_type joint_combiner,
+                                typename BlueprintFieldType::value_type beta,
+                                typename BlueprintFieldType::value_type gamma,
+                                typename BlueprintFieldType::value_type alpha,
+                                typename BlueprintFieldType::value_type zeta,
+                                typename BlueprintFieldType::value_type fq_digest) {
+                                
+                                return fq_sponge_output {
+                                    assignment.allocate_public_input(joint_combiner),
+                                    assignment.allocate_public_input(beta),
+                                    assignment.allocate_public_input(gamma),
+                                    assignment.allocate_public_input(alpha),
+                                    assignment.allocate_public_input(zeta),
+                                    assignment.allocate_public_input(fq_digest),
+                                };
+                            }
+                        };
+
                         kimchi_verifier_index_scalar<CurveType> verifier_index;
                         kimchi_proof_scalar<CurveType> proof;
-                        typename BlueprintFieldType::value_type joint_combiner;
-                        typename BlueprintFieldType::value_type beta; // beta and gamma can be combined from limbs in the base circuit
-                        typename BlueprintFieldType::value_type gamma;
-                        typename BlueprintFieldType::value_type alpha;
-                        typename BlueprintFieldType::value_type zeta;
-                        typename BlueprintFieldType::value_type fq_digest; // TODO overflow check
+                        fq_sponge_output fq_output;
                     };
 
                     struct result_type {
@@ -334,12 +357,35 @@ namespace nil {
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
-                        const std::size_t &component_start_row) {
+                        const std::size_t &start_row_index) {
 
-                        generate_gates(bp, assignment, params, component_start_row);
-                        generate_copy_constraints(bp, assignment, params, component_start_row);
+                        auto selector_iterator = assignment.find_selector(selector_seed);
+                        std::size_t first_selector_index;
 
-                        return result_type(params, component_start_row);
+                        if (selector_iterator == assignment.selectors_end()){
+                            first_selector_index = assignment.allocate_selector(selector_seed,
+                                gates_amount);
+                            generate_gates(bp, assignment, params, first_selector_index);
+                        } else {
+                            first_selector_index = selector_iterator->second;
+                        }
+
+                        std::size_t row = start_row_index;
+
+                        typename BlueprintFieldType::value_type endo_factor =
+                            0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
+                        std::size_t endo_num_bits = 128;
+                        // alpha = phi(alpha_challenge)
+                        endo_scalar_component::generate_circuit(bp, assignment,
+                            {params.fq_output.alpha, endo_factor, endo_num_bits}, row);
+                        row += endo_scalar_component::rows_amount;
+                        // zeta = phi(zeta_challenge)
+                        endo_scalar_component::generate_circuit(bp, assignment,
+                            {params.fq_output.zeta, endo_factor, endo_num_bits}, row);
+                        row += endo_scalar_component::rows_amount;
+
+                        generate_copy_constraints(bp, assignment, params, start_row_index);
+                        return result_type(params, start_row_index);
                     }
 
                     static result_type generate_assignments(
@@ -350,26 +396,27 @@ namespace nil {
                         std::size_t row = component_start_row;
 
                         // copy public input
-                        var alpha = assignment.allocate_public_input(params.alpha);
-                        var zeta = assignment.allocate_public_input(params.zeta);
-                        var fq_digest = assignment.allocate_public_input(params.fq_digest);
                         var omega = assignment.allocate_public_input(params.verifier_index.omega);
-                        var beta = assignment.allocate_public_input(params.beta);
-                        var gamma = assignment.allocate_public_input(params.gamma);
-                        var joint_combiner = assignment.allocate_public_input(params.joint_combiner);
                         var max_poly_size = assignment.allocate_public_input(params.verifier_index.max_poly_size);
-
                         std::vector<var> zkpm(params.verifier_index.zkpm.size());
                         for (std::size_t i = 0; i < zkpm.size(); i++) {
                             zkpm[i] = assignment.allocate_public_input(
                                 params.verifier_index.zkpm[i]);
                         }
 
+                        var alpha = params.fq_output.alpha;
+                        var zeta = params.fq_output.zeta;
+                        var fq_digest = params.fq_output.fq_digest;
+                        var beta = params.fq_output.beta;
+                        var gamma = params.fq_output.gamma;
+                        var joint_combiner = params.fq_output.joint_combiner;
+
                         var alpha_endo = assignments_endo_scalar(assignment,
                             alpha, row);
-                        
+                        std::cout<<"alpha: "<<assignment.var_value(alpha_endo).data<<std::endl;
                         var zeta_endo = assignments_endo_scalar(assignment,
                             zeta, row);
+                        std::cout<<"zeta: "<<assignment.var_value(zeta_endo).data<<std::endl;
 
                         kimchi_transcript<ArithmetizationType, CurveType,
                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> transcript;
