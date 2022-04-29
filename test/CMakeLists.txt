@@ -82,6 +82,7 @@ set(TESTS_NAMES
     "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity"
 
     "transcript/transcript"
+    "transcript/sponge_transcript"
 
     "systems/plonk/plonk_constraint")
 
