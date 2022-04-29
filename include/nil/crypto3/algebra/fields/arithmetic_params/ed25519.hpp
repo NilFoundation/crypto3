@@ -29,7 +29,7 @@
 
 #include <nil/crypto3/algebra/fields/params.hpp>
 
-#include <nil/crypto3/algebra/fields/ed25519.hpp>
+#include <nil/crypto3/algebra/fields/curve25519/base_field.hpp>
 
 #include <nil/crypto3/detail/literals.hpp>
 
