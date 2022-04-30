@@ -66,12 +66,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multi_scalar_mul) {
     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
-    constexpr std::size_t msm_size = 1;
+    constexpr std::size_t msm_size = 2;
     using component_type = zk::components::element_g1_multi_scalar_mul<ArithmetizationType, curve_type, msm_size,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 	using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    std::vector<typename BlueprintFieldType::value_type> public_input;
+    std::vector<typename BlueprintFieldType::value_type> public_input = { 0 };
     typename component_type::params_type assignment_params = {{}, {}};
 
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type sum = 
@@ -88,9 +88,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multi_scalar_mul) {
         public_input.push_back(b_scalar);
         public_input.push_back(T.X);
         public_input.push_back(T.Y);
-        var scalar_var = {0, (std::int32_t)(3 * i), false, var::column_type::public_input};
-        var T_X_var = {0, (std::int32_t)(3 * i + 1), false, var::column_type::public_input};
-        var T_Y_var = {0, (std::int32_t)(3 * i + 2), false, var::column_type::public_input};
+        var scalar_var = {0, 1 + (std::int32_t)(3 * i), false, var::column_type::public_input};
+        var T_X_var = {0, 1 + (std::int32_t)(3 * i + 1), false, var::column_type::public_input};
+        var T_Y_var = {0, 1 + (std::int32_t)(3 * i + 2), false, var::column_type::public_input};
         assignment_params.scalars.push_back(scalar_var);
         assignment_params.bases.push_back({T_X_var, T_Y_var});
         sum = sum + x * T;
