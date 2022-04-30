@@ -62,6 +62,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
+    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
@@ -104,7 +105,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     std::vector<typename BlueprintFieldType::value_type> public_input = {joint_combiner, beta, gamma, 
         alpha, zeta, fq_digest};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input);
+    auto result_check = [](AssignmentType &assignment, 
+        component_type::result_type &real_res) {
+    };
+
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

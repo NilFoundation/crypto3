@@ -22,7 +22,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE blueprint_plonk_unified_addition_test
+#define BOOST_TEST_MODULE blueprint_plonk_field_operations_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -44,7 +44,7 @@
 
 using namespace nil::crypto3;
 
-BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
+BOOST_AUTO_TEST_SUITE(blueprint_plonk_field_operations_test_suite)
 
 // BOOST_AUTO_TEST_CASE(blueprint_plonk_multiplication) {
 //     auto start = std::chrono::high_resolution_clock::now();

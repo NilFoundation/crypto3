@@ -61,6 +61,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case1) {
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 
     using component_type =
         zk::components::poseidon<ArithmetizationType, FieldType, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
@@ -78,8 +79,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case1) {
         0x273C6EE50F9A2970162F5D4503596175C6D3FB4C0BF6C269BCD1DFEFB4F50D47_cppui255};
     std::cout << "Expected result: " << output_state[0].data << " " << output_state[1].data << " "
               << output_state[2].data << std::endl;
+    
+    auto result_check = [](AssignmentType &assignment, 
+        component_type::result_type &real_res) {
+    };
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params,
-                                                                                                 input_state);
+                                                                                                 input_state, result_check);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

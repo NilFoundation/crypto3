@@ -71,12 +71,13 @@ namespace nil {
         }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
-                 std::size_t Lambda, typename PublicInput,
+                 std::size_t Lambda, typename FunctorResultCheck, typename PublicInput,
                  typename std::enable_if<
                      std::is_same<typename BlueprintFieldType::value_type,
                                   typename std::iterator_traits<typename PublicInput::iterator>::value_type>::value,
                      bool>::type = true>
-        auto prepare_component(typename ComponentType::params_type params, const PublicInput &public_input) {
+        auto prepare_component(typename ComponentType::params_type params, const PublicInput &public_input,
+                const FunctorResultCheck &result_check) {
 
             using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
             using component_type = ComponentType;
@@ -96,7 +97,8 @@ namespace nil {
             }
 
             zk::components::generate_circuit<component_type>(bp, public_assignment, params, start_row);
-            component_type::generate_assignments(assignment_bp, params, start_row);
+            typename component_type::result_type component_result = component_type::generate_assignments(assignment_bp, params, start_row);
+            result_check(assignment_bp, component_result);
 
             assignment_bp.padding();
             std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
@@ -180,18 +182,19 @@ namespace nil {
         }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
-                 std::size_t Lambda, typename PublicInput>
+                 std::size_t Lambda, typename PublicInput, typename FunctorResultCheck>
         typename std::enable_if<
             std::is_same<typename BlueprintFieldType::value_type,
                          typename std::iterator_traits<typename PublicInput::iterator>::value_type>::value>::type
-            test_component(typename ComponentType::params_type params, const PublicInput &public_input) {
+            test_component(typename ComponentType::params_type params, const PublicInput &public_input,
+                FunctorResultCheck result_check) {
 
             using placeholder_params =
                 zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
 
             auto [desc, bp, fri_params, assignments, public_preprocessed_data, private_preprocessed_data] =
-                prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda>(params,
-                                                                                                          public_input);
+                prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda, FunctorResultCheck>(params,
+                                                                                                          public_input, result_check);
 
             auto proof = zk::snark::placeholder_prover<BlueprintFieldType, placeholder_params>::process(
                 public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
@@ -206,19 +209,20 @@ namespace nil {
         }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
-                 std::size_t Lambda, typename PublicInput,
+                 std::size_t Lambda, typename PublicInput, typename FunctorResultCheck,
                  typename std::enable_if<
                      std::is_same<typename BlueprintFieldType::value_type,
                                   typename std::iterator_traits<typename PublicInput::iterator>::value_type>::value,
                      bool>::type = true>
-        auto create_component_proof(typename ComponentType::params_type params, const PublicInput &public_input) {
+        auto create_component_proof(typename ComponentType::params_type params, const PublicInput &public_input,
+            const FunctorResultCheck &result_check) {
 
             using placeholder_params =
                 zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
 
             auto [desc, bp, fri_params, assignments, public_preprocessed_data, private_preprocessed_data] =
                 prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda>(params,
-                                                                                                          public_input);
+                                                                            public_input, result_check);
 
             auto proof = zk::snark::placeholder_prover<BlueprintFieldType, placeholder_params>::process(
                 public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
