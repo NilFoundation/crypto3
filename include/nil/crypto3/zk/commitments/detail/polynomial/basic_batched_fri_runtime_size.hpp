@@ -377,11 +377,12 @@ namespace nil {
 
                         static bool verify_eval(proof_type &proof,
                                                 params_type &fri_params,
-                                                const math::polynomial<typename FieldType::value_type> U,
+                                                const std::vector<
+                                                    math::polynomial<typename FieldType::value_type>> U,
                                                 const math::polynomial<typename FieldType::value_type> V,
                                                 transcript_type &transcript = transcript_type()) {
 
-                            std::size_t leaf_size = proof.final_polynomials.size();
+                            std::size_t leaf_size = U.size();
 
                             std::size_t idx = transcript.template int_challenge<std::size_t>();
                             typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(idx);
@@ -403,7 +404,7 @@ namespace nil {
                                 }
 
                                 for (std::size_t j = 0; j < m; j++) {
-                                    std::vector<std::uint8_t> leaf_data(field_element_type::length() * leaf_size);
+                                    std::vector<std::uint8_t> leaf_data (field_element_type::length() * leaf_size);
 
                                     for (std::size_t polynom_index = 0; polynom_index < leaf_size;
                                         polynom_index++){
@@ -421,7 +422,7 @@ namespace nil {
                                     }
                                 }
 
-                                std::vector<std::uint8_t> leaf_data(field_element_type::length() * leaf_size);
+                                std::vector<std::uint8_t> leaf_data (field_element_type::length() * leaf_size);
 
                                 for (std::size_t polynom_index = 0; polynom_index < leaf_size;
                                     polynom_index++){
@@ -432,7 +433,7 @@ namespace nil {
                                         if (i == 0) {
                                             y[j] = 
                                                 (proof.round_proofs[i].y[polynom_index][j] - 
-                                                    U.evaluate(s[j])) / V.evaluate(s[j]);
+                                                    U[polynom_index].evaluate(s[j])) / V.evaluate(s[j]);
                                         } else {
                                             y[j] = proof.round_proofs[i].y[polynom_index][j];
                                         }

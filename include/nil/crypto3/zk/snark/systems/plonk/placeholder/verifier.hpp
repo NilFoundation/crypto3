@@ -58,19 +58,22 @@ namespace nil {
                     constexpr static const std::size_t r = ParamsType::commitment_params_type::r;
                     constexpr static const std::size_t m = ParamsType::commitment_params_type::m;
 
-                    typedef commitments::batched_list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type, witness_columns>
-                        commitment_scheme_witness_type;
-                    typedef commitments::list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type>
-                        commitment_scheme_permutation_type;
-                    typedef commitments::list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type>
-                        commitment_scheme_quotient_type;
-
-                    typedef commitments::list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type>
-                        commitment_scheme_public_input_type;
+                    using runtime_size_commitment_scheme_type =
+                        typename ParamsType::runtime_size_commitment_scheme_type;
+                    using witness_commitment_scheme_type =
+                        typename ParamsType::witness_commitment_scheme_type;
+                    using public_input_commitment_scheme_type =
+                        typename ParamsType::public_input_commitment_scheme_type;
+                    using constant_commitment_scheme_type =
+                        typename ParamsType::constant_commitment_scheme_type;
+                    using selector_commitment_scheme_type =
+                        typename ParamsType::selector_commitment_scheme_type;
+                    using special_commitment_scheme_type =
+                        typename ParamsType::special_commitment_scheme_type;
+                    using permutation_commitment_scheme_type =
+                        typename ParamsType::permutation_commitment_scheme_type;
+                    using quotient_commitment_scheme_type =
+                        typename ParamsType::quotient_commitment_scheme_type;
 
                     using public_preprocessor_type = placeholder_public_preprocessor<FieldType, ParamsType>;
 
@@ -82,9 +85,7 @@ namespace nil {
                 public:
                     static inline bool
                         process(const typename public_preprocessor_type::preprocessed_data_type preprocessed_public_data,
-                                typename policy_type::template proof_type<
-                                    commitment_scheme_witness_type, commitment_scheme_permutation_type,
-                                    commitment_scheme_quotient_type, commitment_scheme_public_input_type> &proof,
+                                placeholder_proof<FieldType, ParamsType> &proof,
                                 typename policy_type::constraint_system_type &constraint_system,
                                 const typename commitment_scheme_witness_type::params_type &fri_params) {
 

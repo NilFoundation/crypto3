@@ -33,29 +33,40 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, typename CommitmentSchemeTypeWitness,
-                         typename CommitmentSchemeTypePermutation, typename CommitmentSchemeTypeQuotient,
-                         typename CommitmentSchemeTypePublic>
+                template<typename FieldType, typename ParamsType>
                 struct placeholder_proof {
                     typedef FieldType field_type;
-                    typedef CommitmentSchemeTypeWitness commitment_scheme_type_witness;
-                    typedef CommitmentSchemeTypePermutation commitment_scheme_type_permutation;
-                    typedef CommitmentSchemeTypeQuotient commitment_scheme_type_quotient;
-                    typedef CommitmentSchemeTypePublic commitment_scheme_type_public;
+                    
+                    using runtime_size_commitment_scheme_type =
+                        typename ParamsType::runtime_size_commitment_scheme_type;
+                    using witness_commitment_scheme_type =
+                        typename ParamsType::witness_commitment_scheme_type;
+                    using public_input_commitment_scheme_type =
+                        typename ParamsType::public_input_commitment_scheme_type;
+                    using constant_commitment_scheme_type =
+                        typename ParamsType::constant_commitment_scheme_type;
+                    using selector_commitment_scheme_type =
+                        typename ParamsType::selector_commitment_scheme_type;
+                    using special_commitment_scheme_type =
+                        typename ParamsType::special_commitment_scheme_type;
+                    using permutation_commitment_scheme_type =
+                        typename ParamsType::permutation_commitment_scheme_type;
+                    using quotient_commitment_scheme_type =
+                        typename ParamsType::quotient_commitment_scheme_type;
 
                     struct evaluation_proof {
                         typename FieldType::value_type challenge;
-                        typename CommitmentSchemeTypeWitness::proof_type witness;
-                        std::vector<typename CommitmentSchemeTypePermutation::proof_type> permutation;
-                        std::vector<typename CommitmentSchemeTypeQuotient::proof_type> quotient;
-                        std::vector<typename CommitmentSchemeTypeQuotient::proof_type> lookups;
+                        typename witness_commitment_scheme_type::proof_type witness;
+                        std::vector<typename permutation_commitment_scheme_type::proof_type> permutation;
+                        std::vector<typename quotient_commitment_scheme_type::proof_type> quotient;
+                        std::vector<typename quotient_commitment_scheme_type::proof_type> lookups;
 
-                        std::vector<typename commitment_scheme_type_public::proof_type> id_permutation;
-                        std::vector<typename commitment_scheme_type_public::proof_type> sigma_permutation;
-                        std::vector<typename commitment_scheme_type_public::proof_type> public_input;
-                        std::vector<typename commitment_scheme_type_public::proof_type> constant;
-                        std::vector<typename commitment_scheme_type_public::proof_type> selector;
-                        std::vector<typename commitment_scheme_type_public::proof_type> special_selectors;
+                        typename runtime_size_commitment_scheme_type::precommitment_type id_permutation;
+                        typename runtime_size_commitment_scheme_type::precommitment_type sigma_permutation;
+                        typename public_input_commitment_scheme_type::precommitment_type public_input;
+                        typename constant_commitment_scheme_type::precommitment_type constant;
+                        typename selector_commitment_scheme_type::precommitment_type selector;
+                        typename special_commitment_scheme_type::precommitment_type special_selectors;
 
                         bool operator==(const evaluation_proof &rhs) const {
                             return challenge == rhs.challenge && witness == rhs.witness &&
@@ -73,17 +84,17 @@ namespace nil {
                     placeholder_proof() {
                     }
 
-                    typename CommitmentSchemeTypeWitness::commitment_type witness_commitment;
+                    typename witness_commitment_scheme_type::commitment_type witness_commitment;
 
-                    typename CommitmentSchemeTypePermutation::commitment_type v_perm_commitment;
+                    typename permutation_commitment_scheme_type::commitment_type v_perm_commitment;
 
-                    typename CommitmentSchemeTypePermutation::commitment_type input_perm_commitment;
+                    typename permutation_commitment_scheme_type::commitment_type input_perm_commitment;
 
-                    typename CommitmentSchemeTypePermutation::commitment_type value_perm_commitment;
+                    typename permutation_commitment_scheme_type::commitment_type value_perm_commitment;
 
-                    typename CommitmentSchemeTypePermutation::commitment_type v_l_perm_commitment;
+                    typename permutation_commitment_scheme_type::commitment_type v_l_perm_commitment;
 
-                    std::vector<typename CommitmentSchemeTypeQuotient::commitment_type> T_commitments;
+                    typename runtime_size_commitment_scheme_type::commitment_type T_commitment;
 
                     evaluation_proof eval_proof;
 
@@ -92,7 +103,7 @@ namespace nil {
                                v_perm_commitment == rhs.v_perm_commitment &&
                                input_perm_commitment == rhs.input_perm_commitment &&
                                value_perm_commitment == rhs.value_perm_commitment &&
-                               v_l_perm_commitment == rhs.v_l_perm_commitment && T_commitments == rhs.T_commitments &&
+                               v_l_perm_commitment == rhs.v_l_perm_commitment && T_commitment == rhs.T_commitment &&
                                eval_proof == rhs.eval_proof;
                     }
                     bool operator!=(const placeholder_proof &rhs) const {

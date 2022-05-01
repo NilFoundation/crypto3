@@ -78,20 +78,22 @@ namespace nil {
                     constexpr static const std::size_t r = ParamsType::commitment_params_type::r;
                     constexpr static const std::size_t m = ParamsType::commitment_params_type::m;
 
-                    typedef commitments::batched_list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type,
-                                                                    witness_columns,
-                                                                    false>
-                        commitment_scheme_witness_type;
-                    typedef commitments::list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type>
-                        commitment_scheme_permutation_type;
-                    typedef commitments::list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type>
-                        commitment_scheme_quotient_type;
-                    typedef commitments::list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type>
-                        commitment_scheme_public_input_type;
+                    using runtime_size_commitment_scheme_type =
+                        typename ParamsType::runtime_size_commitment_scheme_type;
+                    using witness_commitment_scheme_type =
+                        typename ParamsType::witness_commitment_scheme_type;
+                    using public_input_commitment_scheme_type =
+                        typename ParamsType::public_input_commitment_scheme_type;
+                    using constant_commitment_scheme_type =
+                        typename ParamsType::constant_commitment_scheme_type;
+                    using selector_commitment_scheme_type =
+                        typename ParamsType::selector_commitment_scheme_type;
+                    using special_commitment_scheme_type =
+                        typename ParamsType::special_commitment_scheme_type;
+                    using permutation_commitment_scheme_type =
+                        typename ParamsType::permutation_commitment_scheme_type;
+                    using quotient_commitment_scheme_type =
+                        typename ParamsType::quotient_commitment_scheme_type;
 
                     using public_preprocessor_type = placeholder_public_preprocessor<FieldType, ParamsType>;
                     using private_preprocessor_type = placeholder_private_preprocessor<FieldType, ParamsType>;
@@ -122,10 +124,7 @@ namespace nil {
                     }
 
                 public:
-                    static inline typename policy_type::template proof_type<commitment_scheme_witness_type,
-                                                                            commitment_scheme_permutation_type,
-                                                                            commitment_scheme_quotient_type, 
-                                                                            commitment_scheme_public_input_type>
+                    static inline placeholder_proof<FieldType, ParamsType>
                         process(typename public_preprocessor_type::preprocessed_data_type preprocessed_public_data,
                                 const typename private_preprocessor_type::preprocessed_data_type preprocessed_private_data,
                                 const plonk_table_description<FieldType,
@@ -135,11 +134,7 @@ namespace nil {
                                 const typename commitment_scheme_witness_type::params_type
                                     &fri_params) {    // TODO: fri_type are the same for each lpc_type here
 
-                        typename policy_type::template proof_type<commitment_scheme_witness_type,
-                                                                  commitment_scheme_permutation_type,
-                                                                  commitment_scheme_quotient_type,
-                                                                  commitment_scheme_public_input_type>
-                            proof;
+                        placeholder_proof<FieldType, ParamsType> proof;
 
                         plonk_polynomial_table<FieldType, typename ParamsType::arithmetization_params>
                             polynomial_table =
@@ -153,16 +148,16 @@ namespace nil {
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(transcript_init);
 
                         // 2. Commit witness columns
-                        std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_poly =
+                        std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_polynomials =
                             preprocessed_private_data.private_polynomial_table.witnesses();
 
                         typename commitment_scheme_witness_type::precommitment_type witness_precommitment =
-                                commitment_scheme_witness_type::template precommit<witness_columns>(witness_poly,
+                                commitment_scheme_witness_type::template precommit<witness_columns>(witness_polynomials,
                                                                                                     fri_params.D[0]);
 
                         proof.witness_commitment =
                                 commitment_scheme_witness_type::commit(witness_precommitment);
-                            transcript(proof.witness_commitment);
+                        transcript(proof.witness_commitment);
 
                         // 4. permutation_argument
                         auto permutation_argument =
@@ -249,14 +244,10 @@ namespace nil {
                         
                         std::vector<math::polynomial<typename FieldType::value_type>> T_splitted =
                             detail::split_polynomial<FieldType>(T, fri_params.max_degree);
-                        std::vector<typename commitment_scheme_quotient_type::precommitment_type> T_precommitments(
-                            T_splitted.size());
-                        for (std::size_t i = 0; i < T_splitted.size(); i++) {
-                            T_precommitments[i] =
-                                commitment_scheme_quotient_type::precommit(T_splitted[i], fri_params.D[0]);
-                            proof.T_commitments.push_back(commitment_scheme_quotient_type::commit(T_precommitments[i]));
-                            transcript(proof.T_commitments[i]);
-                        }
+                        typename runtime_size_commitment_scheme_type::precommitment_type T_precommitment =
+                            runtime_size_commitment_scheme_type::precommit(T_splitted, fri_params.D[0]);
+                        proof.T_commitment = runtime_size_commitment_scheme_type::commit(T_precommitment);
+                        transcript(proof.T_commitment);
 
                         // 8. Run evaluation proofs
                         typename FieldType::value_type challenge = transcript.template challenge<FieldType>();
@@ -280,7 +271,7 @@ namespace nil {
 
                         proof.eval_proof.witness = commitment_scheme_witness_type::proof_eval(witness_evaluation_points,
                                                                        witness_precommitment,
-                                                                       witness_poly,
+                                                                       witness_polynomials,
                                                                        fri_params,
                                                                        transcript);
 
@@ -333,65 +324,44 @@ namespace nil {
 
                         // quotient
                         std::vector<typename FieldType::value_type> evaluation_points_quotient = {challenge};
-                        std::vector<typename commitment_scheme_quotient_type::proof_type> quotient_evaluation(
-                            T_splitted.size());
-                        for (std::size_t i = 0; i < T_splitted.size(); i++) {
-                            quotient_evaluation[i] = commitment_scheme_quotient_type::proof_eval(
-                                evaluation_points_quotient, T_precommitments[i], T_splitted[i], fri_params, transcript);
-                            proof.eval_proof.quotient.push_back(quotient_evaluation[i]);
-                        }
+                        proof.eval_proof.quotient =
+                            runtime_size_commitment_scheme_type::proof_eval(
+                                {challenge}, T_precommitments, T_splitted, fri_params, transcript);
 
                         // public
-                        std::vector<typename FieldType::value_type> evaluation_points_public = {challenge};
+                        std::vector<typename FieldType::value_type> &evaluation_points_public =
+                            evaluation_points_quotient;
 
-                        std::vector<typename commitment_scheme_public_input_type::proof_type> id_evals(preprocessed_public_data.identity_polynomials.size());
-                        for (std::size_t i = 0; i < id_evals.size(); i++) {
-                            id_evals[i] = commitment_scheme_quotient_type::proof_eval(
-                                evaluation_points_public, preprocessed_public_data.precommitments.id_permutation[i], 
-                                    preprocessed_public_data.identity_polynomials[i], fri_params, transcript);
-                        }
-                        proof.eval_proof.id_permutation = id_evals;
+                        proof.eval_proof.id_permutation =
+                            runtime_size_commitment_scheme_type::proof_eval(
+                                evaluation_points_public, preprocessed_public_data.precommitments.id_permutation, 
+                                    preprocessed_public_data.identity_polynomials, fri_params, transcript);
 
-                        std::vector<typename commitment_scheme_public_input_type::proof_type> sigma_evals(preprocessed_public_data.permutation_polynomials.size());
-                        for (std::size_t i = 0; i < sigma_evals.size(); i++) {
-                            sigma_evals[i] = commitment_scheme_quotient_type::proof_eval(
-                                evaluation_points_public, preprocessed_public_data.precommitments.sigma_permutation[i], 
-                                    preprocessed_public_data.permutation_polynomials[i], fri_params, transcript);
-                        }
-                        proof.eval_proof.sigma_permutation = sigma_evals;
+                        proof.eval_proof.sigma_permutation =
+                            runtime_size_commitment_scheme_type::proof_eval(
+                                evaluation_points_public, preprocessed_public_data.precommitments.sigma_permutation, 
+                                    preprocessed_public_data.permutation_polynomials, fri_params, transcript);
 
-                        std::vector<typename commitment_scheme_public_input_type::proof_type> public_input_evals(preprocessed_public_data.public_polynomial_table.public_inputs().size());
-                        for (std::size_t i = 0; i < public_input_evals.size(); i++) {
-                            public_input_evals[i] = commitment_scheme_quotient_type::proof_eval(
-                                evaluation_points_public, preprocessed_public_data.precommitments.public_input[i], 
-                                    preprocessed_public_data.public_polynomial_table.public_inputs()[i], fri_params, transcript);
-                        }
-                        proof.eval_proof.public_input = public_input_evals;
+                        proof.eval_proof.public_input =
+                            public_input_commitment_scheme_type::proof_eval(
+                                evaluation_points_public, preprocessed_public_data.precommitments.public_input, 
+                                    preprocessed_public_data.public_polynomial_table.public_inputs(), fri_params, transcript);
 
-                        std::vector<typename commitment_scheme_public_input_type::proof_type> constant_evals(preprocessed_public_data.public_polynomial_table.constants().size());
-                        for (std::size_t i = 0; i < constant_evals.size(); i++) {
-                            constant_evals[i] = commitment_scheme_quotient_type::proof_eval(
-                                evaluation_points_public, preprocessed_public_data.precommitments.constant[i], 
-                                    preprocessed_public_data.public_polynomial_table.constants()[i], fri_params, transcript);
-                        }
-                        proof.eval_proof.constant = constant_evals;
+                        proof.eval_proof.constant =
+                            constant_commitment_scheme_type::proof_eval(
+                                evaluation_points_public, preprocessed_public_data.precommitments.constant, 
+                                    preprocessed_public_data.public_polynomial_table.constants(), fri_params, transcript);
 
-                        std::vector<typename commitment_scheme_public_input_type::proof_type> selector_evals(preprocessed_public_data.public_polynomial_table.selectors().size());
-                        for (std::size_t i = 0; i < selector_evals.size(); i++) {
-                            selector_evals[i] = commitment_scheme_quotient_type::proof_eval(
-                                evaluation_points_public, preprocessed_public_data.precommitments.selector[i], 
-                                    preprocessed_public_data.public_polynomial_table.selectors()[i], fri_params, transcript);
-                        }
-                        proof.eval_proof.selector = selector_evals;
+                        proof.eval_proof.selector =
+                            selector_commitment_scheme_type::proof_eval(
+                                evaluation_points_public, preprocessed_public_data.precommitments.selector, 
+                                    preprocessed_public_data.public_polynomial_table.selectors(), fri_params, transcript);
 
-                        std::vector<typename commitment_scheme_public_input_type::proof_type> special_selector_evals(2);
-                        special_selector_evals[0] = commitment_scheme_quotient_type::proof_eval(
-                                evaluation_points_public, preprocessed_public_data.precommitments.special_selectors[0], 
-                                    preprocessed_public_data.q_last, fri_params, transcript);
-                        special_selector_evals[1] = commitment_scheme_quotient_type::proof_eval(
-                                evaluation_points_public, preprocessed_public_data.precommitments.special_selectors[1], 
-                                    preprocessed_public_data.q_blind, fri_params, transcript);
-                        proof.eval_proof.special_selectors = special_selector_evals;
+                        proof.eval_proof.special_selectors =
+                            special_commitment_scheme_type::proof_eval(
+                                evaluation_points_public, preprocessed_public_data.precommitments.special_selectors, 
+                                {{preprocessed_public_data.q_last, preprocessed_public_data.q_blind}},
+                                fri_params, transcript);
 
                         return proof;
                     }

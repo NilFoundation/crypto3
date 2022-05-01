@@ -368,6 +368,115 @@ namespace nil {
                             return true;
                         }
 
+                        static bool
+                            verify_eval(proof_type &proof,
+                                        params_type &fri_params,
+                                        const std::array<math::polynomial<typename FieldType::value_type>, leaf_size>
+                                            U,
+                                        const math::polynomial<typename FieldType::value_type> V,
+                                        transcript_type &transcript = transcript_type()) {
+
+                            std::uint64_t idx = transcript.template int_challenge<std::uint64_t>();
+                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(idx);
+
+                            std::size_t r = fri_params.r;
+
+                            for (std::size_t i = 0; i < r; i++) {
+                                typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
+
+                                typename FieldType::value_type x_next = fri_params.q.evaluate(x);
+
+                                // m = 2, so:
+                                std::array<typename FieldType::value_type, m> s;
+                                if constexpr (m == 2) {
+                                    s[0] = x;
+                                    s[1] = -x;
+                                } else {
+                                    return false;
+                                }
+
+                                for (std::size_t j = 0; j < m; j++) {
+                                    std::array<std::uint8_t, field_element_type::length() * leaf_size> leaf_data;
+
+                                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+
+                                        typename FieldType::value_type leaf = proof.round_proofs[i].y[polynom_index][j];
+
+                                        field_element_type leaf_val(leaf);
+                                        auto write_iter =
+                                            leaf_data.begin() + field_element_type::length() * polynom_index;
+                                        leaf_val.write(write_iter, field_element_type::length());
+                                    }
+
+                                    if (!proof.round_proofs[i].p[j].validate(leaf_data)) {
+                                        return false;
+                                    }
+                                }
+
+                                std::array<std::uint8_t, field_element_type::length() * leaf_size> leaf_data;
+
+                                for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+
+                                    std::array<typename FieldType::value_type, m> y;
+
+                                    for (std::size_t j = 0; j < m; j++) {
+                                        if (i == 0) {
+                                            y[j] = (proof.round_proofs[i].y[polynom_index][j] -
+                                                    U[polynom_index].evaluate(s[j])) /
+                                                   V.evaluate(s[j]);
+                                        } else {
+                                            y[j] = proof.round_proofs[i].y[polynom_index][j];
+                                        }
+                                    }
+
+                                    std::vector<
+                                        std::pair<typename FieldType::value_type, typename FieldType::value_type>>
+                                        interpolation_points {
+                                            std::make_pair(s[0], y[0]),
+                                            std::make_pair(s[1], y[1]),
+                                        };
+
+                                    math::polynomial<typename FieldType::value_type> interpolant =
+                                        math::lagrange_interpolation(interpolation_points);
+
+                                    typename FieldType::value_type leaf =
+                                        proof.round_proofs[i].colinear_value[polynom_index];
+
+                                    field_element_type leaf_val(leaf);
+                                    auto write_iter = leaf_data.begin() + field_element_type::length() * polynom_index;
+                                    leaf_val.write(write_iter, field_element_type::length());
+
+                                    if (interpolant.evaluate(alpha) !=
+                                        proof.round_proofs[i].colinear_value[polynom_index]) {
+                                        return false;
+                                    }
+                                }
+
+                                if (i < r - 1) {
+                                    transcript(proof.round_proofs[i + 1].T_root);
+                                    if (!proof.round_proofs[i].colinear_path.validate(leaf_data)) {
+                                        return false;
+                                    }
+                                }
+                                x = x_next;
+                            }
+
+                            for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+
+                                if (proof.final_polynomials[polynom_index].degree() >
+                                    std::pow(2, std::log2(fri_params.max_degree + 1) - r) - 1) {
+                                    return false;
+                                }
+                                if (proof.final_polynomials[polynom_index].evaluate(x) !=
+                                    proof.round_proofs[r - 1].colinear_value[polynom_index]) {
+                                    return false;
+                                }
+
+                            }
+
+                            return true;
+                        }
+
                         static bool verify_eval(proof_type &proof,
                                                 params_type &fri_params,
                                                 const math::polynomial<typename FieldType::value_type> U,

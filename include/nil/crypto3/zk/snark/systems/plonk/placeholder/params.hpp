@@ -60,9 +60,25 @@ namespace nil {
                     typedef commitments::list_polynomial_commitment_params<MerkleTreeHashType, TranscriptHashType, Lambda, R, M>
                             commitment_params_type;
                     
-                    typedef commitments::list_polynomial_commitment<FieldType,
-                                                              commitment_params_type>
-                        commitment_scheme_public_type;
+                    using runtime_size_commitment_scheme_type =
+                        typename commitments::batched_lpc<FieldType, commitment_params_type, 0, true>;
+                    using public_input_commitment_scheme_type =
+                        typename commitments::batched_lpc<FieldType, commitment_params_type, ParamsType::public_input_columns>;
+                    using constant_commitment_scheme_type =
+                        typename commitments::batched_lpc<FieldType, commitment_params_type, ParamsType::constant_columns>;
+                    using selector_commitment_scheme_type =
+                        typename commitments::batched_lpc<FieldType, commitment_params_type, ParamsType::selector_columns>;
+                    using special_commitment_scheme_type =
+                        typename commitments::batched_lpc<FieldType, commitment_params_type, 2>;
+                    using permutation_commitment_scheme_type =
+                        typedef commitments::list_polynomial_commitment<FieldType,
+                            typename ParamsType::commitment_params_type>;
+                    using quotient_commitment_scheme_type =
+                        typedef commitments::list_polynomial_commitment<FieldType,
+                            typename ParamsType::commitment_params_type>;
+                    using public_input_commitment_scheme_type =
+                        typedef commitments::list_polynomial_commitment<FieldType,
+                            typename ParamsType::commitment_params_type>;
                 };
             }    // namespace snark
         }        // namespace zk

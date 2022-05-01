@@ -49,24 +49,20 @@ namespace nil {
                 class placeholder_public_preprocessor {
                     typedef detail::placeholder_policy<FieldType, ParamsType> policy_type;
 
-                    typedef typename ParamsType::commitment_scheme_public_type commitment_scheme_public_type;
-
                     using runtime_size_commitment_scheme_type =
-                        typename batched_lpc<FieldType, ParamsType::lpc_params, 0, true>;
+                        typename ParamsType::runtime_size_commitment_scheme_type;
                     using public_input_commitment_scheme_type =
-                        typename batched_lpc<FieldType, ParamsType::lpc_params, ParamsType::public_input_columns>;
+                        typename ParamsType::public_input_commitment_scheme_type;
                     using constant_commitment_scheme_type =
-                        typename batched_lpc<FieldType, ParamsType::lpc_params, ParamsType::constant_columns>;
+                        typename ParamsType::constant_commitment_scheme_type;
                     using selector_commitment_scheme_type =
-                        typename batched_lpc<FieldType, ParamsType::lpc_params, ParamsType::selector_columns>;
+                        typename ParamsType::selector_commitment_scheme_type;
                     using special_commitment_scheme_type =
-                        typename batched_lpc<FieldType, ParamsType::lpc_params, 2>;
+                        typename ParamsType::special_commitment_scheme_type;
 
                 public:
 
                     struct preprocessed_data_type {
-                        typedef typename ParamsType::commitment_scheme_public_type
-                            commitment_scheme_public_type;
 
                         struct public_precommitments_type {
                             typename runtime_size_commitment_scheme_type::precommitment_type id_permutation;
@@ -378,15 +374,15 @@ namespace nil {
                         std::vector<math::polynomial<typename FieldType::value_type>> &sigma_perm_polys,
                         math::polynomial<typename FieldType::value_type> &q_last,
                         math::polynomial<typename FieldType::value_type> &q_blind,
-                        const typename commitment_scheme_public_type::params_type &commitment_params) {
+                        const typename ParamsType::commitment_params_type &commitment_params) {
 
                         typename runtime_size_commitment_scheme_type::precommitment_type id_permutation =
                             runtime_size_commitment_scheme_type::precommit(id_perm_polys, commitment_params.D[0]);
 
-                        typename commitment_scheme_public_type::precommitment_type sigma_permutation =
+                        typename runtime_size_commitment_scheme_type::precommitment_type sigma_permutation =
                             runtime_size_commitment_scheme_type::precommit(sigma_perm_polys, commitment_params.D[0]);
 
-                        typename commitment_scheme_public_type::precommitment_type public_input_precommitment =
+                        typename public_input_commitment_scheme_type::precommitment_type public_input_precommitment =
                             public_input_commitment_scheme_type::precommit(
                                 public_table.public_inputs(), commitment_params.D[0]);
 
@@ -438,7 +434,7 @@ namespace nil {
                         const typename policy_type::variable_assignment_type::public_table_type &public_assignment,
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
                             &table_description,
-                        const typename commitment_scheme_public_type::params_type &commitment_params,
+                        const typename ParamsType::commitment_params_type &commitment_params,
                         std::size_t columns_with_copy_constraints) {
 
                         std::size_t N_rows = table_description.rows_amount;
