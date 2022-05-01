@@ -37,26 +37,25 @@
 #include <nil/crypto3/container/merkle/tree.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
                 template<typename FieldType,
-                         typename CommitmentSchemeTypePublic,
-                         typename CommitmentSchemeTypePermutation,
                          typename ParamsType>
                 class placeholder_permutation_argument {
 
                     using transcript_hash_type = typename ParamsType::transcript_hash_type;
                     using transcript_type = transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
 
-                    typedef detail::placeholder_policy<FieldType, ParamsType> policy_type;
-
                     static constexpr std::size_t argument_size = 3;
+
+                    using permutation_commitment_scheme_type =
+                        typename ParamsType::permutation_commitment_scheme_type;
 
                 public:
                     struct prover_result_type {
@@ -64,17 +63,20 @@ namespace nil {
 
                         math::polynomial<typename FieldType::value_type> permutation_polynomial;
 
-                        typename CommitmentSchemeTypePermutation::precommitment_type permutation_poly_precommitment;
+                        typename permutation_commitment_scheme_type::precommitment_type
+                            permutation_poly_precommitment;
                     };
 
                     static inline prover_result_type prove_eval(
-                        typename policy_type::constraint_system_type &constraint_system,
-                        const typename policy_type::preprocessed_public_data_type preprocessed_data,
+                        plonk_constraint_system<FieldType,
+                            typename ParamsType::arithmetization_params> &constraint_system,
+                        const typename placeholder_public_preprocessor<FieldType, ParamsType>::
+                                    preprocessed_data_type preprocessed_data,
                         const plonk_table_description<FieldType,
                                 typename ParamsType::arithmetization_params> &table_description,
                         const plonk_polynomial_table<FieldType,
                             typename ParamsType::arithmetization_params> &column_polynomials,
-                        typename CommitmentSchemeTypePermutation::params_type fri_params,
+                        typename ParamsType::commitment_params_type fri_params,
                         transcript_type &transcript = transcript_type()) {
 
                         const std::size_t table_rows = table_description.rows_amount;
@@ -121,10 +123,10 @@ namespace nil {
                                                                              V_P_interpolation_points.end());
 
                         // 4. Compute and add commitment to $V_P$ to $\text{transcript}$.
-                        typename CommitmentSchemeTypePermutation::precommitment_type V_P_tree =
-                            CommitmentSchemeTypePermutation::precommit(V_P, fri_params.D[0]);
-                        typename CommitmentSchemeTypePermutation::commitment_type V_P_commitment =
-                            CommitmentSchemeTypePermutation::commit(V_P_tree);
+                        typename permutation_commitment_scheme_type::precommitment_type V_P_tree =
+                            permutation_commitment_scheme_type::precommit(V_P, fri_params.D[0]);
+                        typename permutation_commitment_scheme_type::commitment_type V_P_commitment =
+                            permutation_commitment_scheme_type::commit(V_P_tree);
                         transcript(V_P_commitment);
 
                         // 5. Calculate g_perm, h_perm
@@ -154,7 +156,8 @@ namespace nil {
                     }
 
                     static inline std::array<typename FieldType::value_type, argument_size>
-                        verify_eval(const typename policy_type::preprocessed_public_data_type preprocessed_data,
+                        verify_eval(const typename placeholder_public_preprocessor<FieldType, ParamsType>::
+                                        preprocessed_data_type preprocessed_data,
                                     // y
                                     const typename FieldType::value_type &challenge,
                                     // f(y):
@@ -163,7 +166,7 @@ namespace nil {
                                     const typename FieldType::value_type &perm_polynomial_value,
                                     // V_P(omega * y):
                                     const typename FieldType::value_type &perm_polynomial_shifted_value,
-                                    const typename CommitmentSchemeTypePermutation::commitment_type &V_P_commitment,
+                                    const typename permutation_commitment_scheme_type::commitment_type &V_P_commitment,
                                     transcript_type &transcript = transcript_type()) {
 
                         const std::vector<math::polynomial<typename FieldType::value_type>> &S_sigma =

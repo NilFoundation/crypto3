@@ -72,21 +72,6 @@ namespace nil {
 
                         typedef detail::plonk_evaluation_map<plonk_variable<FieldType>> evaluation_map;
 
-                        /*********************************** Proof ***********************************/
-
-                        /**
-                         * A proof for the Placeholder cheme.
-                         *
-                         * While the proof has a structure, externally one merely opaquely produces,
-                         * serializes/deserializes, and verifies proofs. We only expose some information
-                         * about the structure for statistics purposes.
-                         */
-                        template<typename CommitmentSchemeTypeWitness, typename CommitmentSchemeTypePermutation,
-                                 typename CommitmentSchemeTypeQuotient, typename CommitmentSchemeTypePublic>
-                        using proof_type =
-                            placeholder_proof<FieldType, CommitmentSchemeTypeWitness, CommitmentSchemeTypePermutation,
-                                           CommitmentSchemeTypeQuotient, CommitmentSchemeTypePublic>;
-
                     };
                 }    // namespace detail
             }        // namespace snark

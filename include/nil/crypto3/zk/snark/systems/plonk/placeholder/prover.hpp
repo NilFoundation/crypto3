@@ -35,12 +35,13 @@
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/batched_lpc.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/permutation_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/lookup_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/gates_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
-#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -67,8 +68,8 @@ namespace nil {
 
                     constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
                     constexpr static const std::size_t public_columns = ParamsType::public_columns;
-                    using merkle_hash_type = typename ParamsType::commitment_params_type::merkle_hash_type;
-                    using transcript_hash_type = typename ParamsType::commitment_params_type::transcript_hash_type;
+                    using merkle_hash_type = typename ParamsType::merkle_hash_type;
+                    using transcript_hash_type = typename ParamsType::transcript_hash_type;
 
                     using policy_type = detail::placeholder_policy<FieldType, ParamsType>;
 
@@ -129,9 +130,10 @@ namespace nil {
                                 const typename private_preprocessor_type::preprocessed_data_type preprocessed_private_data,
                                 const plonk_table_description<FieldType,
                                     typename ParamsType::arithmetization_params> &table_description,
-                                typename policy_type::constraint_system_type &constraint_system,
+                                plonk_constraint_system<FieldType,
+                                    typename ParamsType::arithmetization_params> &constraint_system,
                                 const typename policy_type::variable_assignment_type &assignments,
-                                const typename commitment_scheme_witness_type::params_type
+                                const typename ParamsType::commitment_params_type
                                     &fri_params) {    // TODO: fri_type are the same for each lpc_type here
 
                         placeholder_proof<FieldType, ParamsType> proof;
@@ -151,25 +153,22 @@ namespace nil {
                         std::array<math::polynomial<typename FieldType::value_type>, witness_columns> witness_polynomials =
                             preprocessed_private_data.private_polynomial_table.witnesses();
 
-                        typename commitment_scheme_witness_type::precommitment_type witness_precommitment =
-                                commitment_scheme_witness_type::template precommit<witness_columns>(witness_polynomials,
+                        typename witness_commitment_scheme_type::precommitment_type witness_precommitment =
+                                witness_commitment_scheme_type::template precommit<witness_columns>(witness_polynomials,
                                                                                                     fri_params.D[0]);
 
-                        proof.witness_commitment =
-                                commitment_scheme_witness_type::commit(witness_precommitment);
+                        proof.witness_commitment = witness_commitment_scheme_type::commit(witness_precommitment);
                         transcript(proof.witness_commitment);
 
                         // 4. permutation_argument
                         auto permutation_argument =
-                                placeholder_permutation_argument<FieldType,
-                                                          commitment_scheme_public_input_type,
-                                                          commitment_scheme_permutation_type,
-                                                          ParamsType>::prove_eval(constraint_system,
-                                                                                  preprocessed_public_data,
-                                                                                  table_description,
-                                                                                  polynomial_table,
-                                                                                  fri_params,
-                                                                                  transcript);
+                                placeholder_permutation_argument<FieldType, ParamsType>::
+                                    prove_eval(constraint_system,
+                                               preprocessed_public_data,
+                                               table_description,
+                                               polynomial_table,
+                                               fri_params,
+                                               transcript);
 
                         proof.v_perm_commitment = permutation_argument.permutation_poly_precommitment.root();
 
@@ -182,12 +181,12 @@ namespace nil {
                         // 5. lookup_argument
                         bool use_lookup = constraint_system.lookup_gates().size() > 0;
                         typename placeholder_lookup_argument<FieldType,
-                                                          commitment_scheme_permutation_type,
+                                                          permutation_commitment_scheme_type,
                                                           ParamsType>::prover_lookup_result lookup_argument;
                         if (use_lookup) {
                             lookup_argument =
                                 placeholder_lookup_argument<FieldType,
-                                                          commitment_scheme_permutation_type,
+                                                          permutation_commitment_scheme_type,
                                                           ParamsType>::prove_eval(constraint_system,
                                                                                   preprocessed_public_data,
                                                                                   assignments,
@@ -269,7 +268,7 @@ namespace nil {
                             }
                         }
 
-                        proof.eval_proof.witness = commitment_scheme_witness_type::proof_eval(witness_evaluation_points,
+                        proof.eval_proof.witness = witness_commitment_scheme_type::proof_eval(witness_evaluation_points,
                                                                        witness_precommitment,
                                                                        witness_polynomials,
                                                                        fri_params,
@@ -278,21 +277,20 @@ namespace nil {
                         // permutation polynomial evaluation
                         std::vector<typename FieldType::value_type> evaluation_points_v_p = {challenge,
                                                                                                challenge * omega};
-                        typename commitment_scheme_permutation_type::proof_type v_p_evaluation =
-                            commitment_scheme_permutation_type::proof_eval(
+                        proof.eval_proof.permutation =
+                            permutation_commitment_scheme_type::proof_eval(
                                 evaluation_points_v_p,
                                 permutation_argument.permutation_poly_precommitment,
                                 permutation_argument.permutation_polynomial,
                                 fri_params,
                                 transcript);
-                        proof.eval_proof.permutation.push_back(v_p_evaluation);
 
                         // lookup polynomials evaluation
                         if (use_lookup) {
                             std::vector<typename FieldType::value_type> evaluation_points_v_l = {challenge,
                                                                                                 challenge * omega};
-                            typename commitment_scheme_permutation_type::proof_type v_l_evaluation =
-                                commitment_scheme_permutation_type::proof_eval(
+                            typename permutation_commitment_scheme_type::proof_type v_l_evaluation =
+                                permutation_commitment_scheme_type::proof_eval(
                                     evaluation_points_v_l,
                                     lookup_argument.V_L_precommitment,
                                     lookup_argument.V_L_polynomial,
@@ -302,8 +300,8 @@ namespace nil {
 
                             std::vector<typename FieldType::value_type> evaluation_points_input = {challenge,
                                                                                                 challenge * omega.inversed()};
-                            typename commitment_scheme_permutation_type::proof_type input_evaluation =
-                                commitment_scheme_permutation_type::proof_eval(
+                            typename permutation_commitment_scheme_type::proof_type input_evaluation =
+                                permutation_commitment_scheme_type::proof_eval(
                                     evaluation_points_input,
                                     lookup_argument.input_precommitment,
                                     lookup_argument.input_polynomial,
@@ -312,8 +310,8 @@ namespace nil {
                             proof.eval_proof.lookups.push_back(input_evaluation);
 
                             std::vector<typename FieldType::value_type> evaluation_points_value = {challenge};
-                            typename commitment_scheme_permutation_type::proof_type value_evaluation =
-                                commitment_scheme_permutation_type::proof_eval(
+                            typename permutation_commitment_scheme_type::proof_type value_evaluation =
+                                permutation_commitment_scheme_type::proof_eval(
                                     evaluation_points_value,
                                     lookup_argument.value_precommitment,
                                     lookup_argument.value_polynomial,
@@ -326,7 +324,7 @@ namespace nil {
                         std::vector<typename FieldType::value_type> evaluation_points_quotient = {challenge};
                         proof.eval_proof.quotient =
                             runtime_size_commitment_scheme_type::proof_eval(
-                                {challenge}, T_precommitments, T_splitted, fri_params, transcript);
+                                {challenge}, T_precommitment, T_splitted, fri_params, transcript);
 
                         // public
                         std::vector<typename FieldType::value_type> &evaluation_points_public =

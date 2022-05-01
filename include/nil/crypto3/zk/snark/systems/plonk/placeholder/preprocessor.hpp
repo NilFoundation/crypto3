@@ -93,7 +93,7 @@ namespace nil {
                             public_commitments_type commitments;
 
                             std::array<std::vector<int>,
-                                typename ParamsType::arithmetization_params::TotalColumns> columns_rotations;
+                                ParamsType::arithmetization_params::TotalColumns> columns_rotations;
 
                             std::size_t rows_amount;
                         };
@@ -116,7 +116,7 @@ namespace nil {
 
                 private:
 
-                    typedef typename preprocessed_data_type::public_precommitments
+                    typedef typename preprocessed_data_type::public_precommitments_type
                         public_precommitments_type;
 
                     static math::polynomial<typename FieldType::value_type>
@@ -143,7 +143,8 @@ namespace nil {
                         std::map<key_type, std::size_t> _sizes;
 
                         cycle_representation(
-                            typename policy_type::constraint_system_type &constraint_system,
+                            plonk_constraint_system<FieldType,
+                                typename ParamsType::arithmetization_params> &constraint_system,
                             const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
                                 &table_description) {
 
@@ -238,8 +239,10 @@ namespace nil {
                     static inline std::array<std::vector<int>,
                         ParamsType::arithmetization_params::TotalColumns>
                         columns_rotations(
-                            typename policy_type::constraint_system_type &constraint_system,
-                            const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
+                            plonk_constraint_system<FieldType,
+                                typename ParamsType::arithmetization_params> &constraint_system,
+                            const plonk_table_description<FieldType,
+                                typename ParamsType::arithmetization_params>
                                 &table_description) {
 
                         std::array<std::vector<int>,
@@ -372,8 +375,7 @@ namespace nil {
                             &public_table,
                         std::vector<math::polynomial<typename FieldType::value_type>> &id_perm_polys,
                         std::vector<math::polynomial<typename FieldType::value_type>> &sigma_perm_polys,
-                        math::polynomial<typename FieldType::value_type> &q_last,
-                        math::polynomial<typename FieldType::value_type> &q_blind,
+                        std::array<math::polynomial<typename FieldType::value_type>, 2> &q_last_q_blind,
                         const typename ParamsType::commitment_params_type &commitment_params) {
 
                         typename runtime_size_commitment_scheme_type::precommitment_type id_permutation =
@@ -390,12 +392,13 @@ namespace nil {
                             constant_commitment_scheme_type::precommit(
                                 public_table.constants(), commitment_params.D[0]);
 
-                        typename selector_commitment_scheme_type::precommitment_type, selector_precommitment =
+                        typename selector_commitment_scheme_type::precommitment_type selector_precommitment =
                             selector_commitment_scheme_type::precommit(
                                 public_table.selectors(), commitment_params.D[0]);
 
                         typename special_commitment_scheme_type::precommitment_type special_selector_precommitment =
-                            special_commitment_scheme_type::precommit({{q_last, q_blind}}, commitment_params.D[0]);
+                            special_commitment_scheme_type::precommit(
+                                q_last_q_blind, commitment_params.D[0]);
 
                         return typename preprocessed_data_type::public_precommitments_type {
                             id_permutation,          sigma_permutation,       public_input_precommitment,
@@ -429,8 +432,9 @@ namespace nil {
                                                         selector_commitment,     special_selector_commitment};
                     }
 
-                    static inline typename preprocessed_data_type process(
-                        typename policy_type::constraint_system_type &constraint_system,
+                    static inline preprocessed_data_type process(
+                        plonk_constraint_system<FieldType,
+                            typename ParamsType::arithmetization_params> &constraint_system,
                         const typename policy_type::variable_assignment_type::public_table_type &public_assignment,
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
                             &table_description,
@@ -449,19 +453,20 @@ namespace nil {
                         std::vector<math::polynomial<typename FieldType::value_type>> _permutation_polynomials =
                             permutation_polynomials(
                                 columns_with_copy_constraints, N_rows, basic_domain->get_domain_element(1),
-                                policy_type::placeholder_params_type::delta, permutation, basic_domain);
+                                ParamsType::delta, permutation, basic_domain);
 
                         std::vector<math::polynomial<typename FieldType::value_type>> _identity_polynomials =
                             identity_polynomials(columns_with_copy_constraints, N_rows,
                                                  basic_domain->get_domain_element(1),
-                                                 policy_type::placeholder_params_type::delta, basic_domain);
+                                                 ParamsType::delta, basic_domain);
 
                         math::polynomial<typename FieldType::value_type> lagrange_0 =
                             lagrange_polynomial(basic_domain, 0);
 
-                        math::polynomial<typename FieldType::value_type> q_last =
+                        std::array<math::polynomial<typename FieldType::value_type>, 2> q_last_q_blind;
+                        q_last_q_blind[0] =
                             selector_last(N_rows, usable_rows, basic_domain);
-                        math::polynomial<typename FieldType::value_type> q_blind =
+                        q_last_q_blind[1] =
                             selector_blind(N_rows, usable_rows, basic_domain);
 
                         plonk_public_polynomial_table<FieldType, typename ParamsType::arithmetization_params>
@@ -481,20 +486,21 @@ namespace nil {
                         // prepare commitments for short verifier
                         typename preprocessed_data_type::public_precommitments_type public_precommitments =
                             precommitments(public_polynomial_table, _identity_polynomials, _permutation_polynomials,
-                                           q_last, q_blind, commitment_params);
+                                           q_last_q_blind, commitment_params);
 
                         typename preprocessed_data_type::public_commitments_type public_commitments = commitments(public_precommitments);
 
                         std::array<std::vector<int>,
-                        ParamsType::arithmetization_params::TotalColumns> c_rotations =
+                            ParamsType::arithmetization_params::TotalColumns> c_rotations =
                             columns_rotations(constraint_system, table_description);
 
                         typename preprocessed_data_type::common_data_type common_data {
                             basic_domain, nil::crypto3::math::polynomial<typename FieldType::value_type> {Z},
                             lagrange_0, public_commitments, c_rotations, N_rows};
 
-                        return typename preprocessed_data_type(
-                            {public_polynomial_table, _permutation_polynomials, _identity_polynomials, q_last, q_blind,
+                        return preprocessed_data_type(
+                            {public_polynomial_table, _permutation_polynomials, _identity_polynomials, q_last_q_blind[0],
+                                q_last_q_blind[1],
                              public_precommitments, common_data});
                     }
                 };
@@ -513,8 +519,9 @@ namespace nil {
                             typename ParamsType::arithmetization_params> private_polynomial_table;
                     };
 
-                    static inline typename preprocessed_data_type process(
-                        const typename policy_type::constraint_system_type &constraint_system,
+                    static inline preprocessed_data_type process(
+                        const plonk_constraint_system<FieldType,
+                            typename ParamsType::arithmetization_params> &constraint_system,
                         const typename policy_type::variable_assignment_type::private_table_type &private_assignment,
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
                             &table_description) {
@@ -529,7 +536,7 @@ namespace nil {
                                 plonk_private_polynomial_table<FieldType, typename ParamsType::arithmetization_params>(
                                     detail::column_range_polynomials<FieldType>(private_assignment.witnesses(),
                                                                                 basic_domain));
-                        return typename preprocessed_data_type({basic_domain, private_polynomial_table});
+                        return preprocessed_data_type({basic_domain, private_polynomial_table});
                     }
                 };
 

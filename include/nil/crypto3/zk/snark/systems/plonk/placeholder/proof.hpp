@@ -33,6 +33,13 @@ namespace nil {
         namespace zk {
             namespace snark {
 
+                /**
+                 * A proof for the Placeholder cheme.
+                 *
+                 * While the proof has a structure, externally one merely opaquely produces,
+                 * serializes/deserializes, and verifies proofs. We only expose some information
+                 * about the structure for marshalling purposes.
+                 */
                 template<typename FieldType, typename ParamsType>
                 struct placeholder_proof {
                     typedef FieldType field_type;
@@ -57,16 +64,17 @@ namespace nil {
                     struct evaluation_proof {
                         typename FieldType::value_type challenge;
                         typename witness_commitment_scheme_type::proof_type witness;
-                        std::vector<typename permutation_commitment_scheme_type::proof_type> permutation;
-                        std::vector<typename quotient_commitment_scheme_type::proof_type> quotient;
+                        
+                        typename permutation_commitment_scheme_type::proof_type permutation;
+                        typename runtime_size_commitment_scheme_type::proof_type quotient;
                         std::vector<typename quotient_commitment_scheme_type::proof_type> lookups;
 
-                        typename runtime_size_commitment_scheme_type::precommitment_type id_permutation;
-                        typename runtime_size_commitment_scheme_type::precommitment_type sigma_permutation;
-                        typename public_input_commitment_scheme_type::precommitment_type public_input;
-                        typename constant_commitment_scheme_type::precommitment_type constant;
-                        typename selector_commitment_scheme_type::precommitment_type selector;
-                        typename special_commitment_scheme_type::precommitment_type special_selectors;
+                        typename runtime_size_commitment_scheme_type::proof_type id_permutation;
+                        typename runtime_size_commitment_scheme_type::proof_type sigma_permutation;
+                        typename public_input_commitment_scheme_type::proof_type public_input;
+                        typename constant_commitment_scheme_type::proof_type constant;
+                        typename selector_commitment_scheme_type::proof_type selector;
+                        typename special_commitment_scheme_type::proof_type special_selectors;
 
                         bool operator==(const evaluation_proof &rhs) const {
                             return challenge == rhs.challenge && witness == rhs.witness &&
