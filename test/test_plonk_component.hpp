@@ -47,7 +47,7 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
-#include <nil/crypto3/marshalling/zk/types/placeholder/proof.hpp>
+// #include <nil/crypto3/marshalling/zk/types/placeholder/proof.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -132,54 +132,54 @@ namespace nil {
                                    private_preprocessed_data);
         }
 
-        template<typename PlaceholderParams, typename FieldType, typename Proof, typename FRIParams,
-                 typename CommonData>
-        void print_test_data(const Proof &proof, const FRIParams &fri_params, const CommonData &common_data) {
-            using Endianness = nil::marshalling::option::big_endian;
-            using TTypeBase = nil::marshalling::field_type<Endianness>;
-            using proof_marshalling_type = nil::crypto3::marshalling::types::placeholder_proof<TTypeBase, Proof>;
-            auto filled_placeholder_proof =
-                nil::crypto3::marshalling::types::fill_placeholder_proof<Proof, Endianness>(proof);
-            std::vector<std::uint8_t> cv;
-            cv.resize(filled_placeholder_proof.length(), 0x00);
-            auto write_iter = cv.begin();
-            nil::marshalling::status_type status = filled_placeholder_proof.write(write_iter, cv.size());
-            std::cout << "proof (" << cv.size() << " bytes) = " << std::endl;
-            std::ofstream proof_file;
-            proof_file.open("placeholder_proof.txt");
-            print_hex_byteblob(proof_file, cv.cbegin(), cv.cend(), false);
+        // template<typename PlaceholderParams, typename FieldType, typename Proof, typename FRIParams,
+        //          typename CommonData>
+        // void print_test_data(const Proof &proof, const FRIParams &fri_params, const CommonData &common_data) {
+        //     using Endianness = nil::marshalling::option::big_endian;
+        //     using TTypeBase = nil::marshalling::field_type<Endianness>;
+        //     using proof_marshalling_type = nil::crypto3::marshalling::types::placeholder_proof<TTypeBase, Proof>;
+        //     auto filled_placeholder_proof =
+        //         nil::crypto3::marshalling::types::fill_placeholder_proof<Proof, Endianness>(proof);
+        //     std::vector<std::uint8_t> cv;
+        //     cv.resize(filled_placeholder_proof.length(), 0x00);
+        //     auto write_iter = cv.begin();
+        //     nil::marshalling::status_type status = filled_placeholder_proof.write(write_iter, cv.size());
+        //     std::cout << "proof (" << cv.size() << " bytes) = " << std::endl;
+        //     std::ofstream proof_file;
+        //     proof_file.open("placeholder_proof.txt");
+        //     print_hex_byteblob(proof_file, cv.cbegin(), cv.cend(), false);
 
-            std::cout << "modulus = " << FieldType::modulus << std::endl;
-            std::cout << "fri_params.r = " << fri_params.r << std::endl;
-            std::cout << "fri_params.max_degree = " << fri_params.max_degree << std::endl;
-            std::cout << "fri_params.q = ";
-            for (const auto &coeff : fri_params.q) {
-                std::cout << coeff.data << ", ";
-            }
-            std::cout << std::endl;
-            std::cout << "fri_params.D_omegas = ";
-            for (const auto &dom : fri_params.D) {
-                std::cout << static_cast<nil::crypto3::math::basic_radix2_domain<FieldType> &>(*dom).omega.data << ", ";
-            }
-            std::cout << std::endl;
-            std::cout << "lpc_params.lambda = " << PlaceholderParams::commitment_params_type::lambda << std::endl;
-            std::cout << "lpc_params.m = " << PlaceholderParams::commitment_params_type::m << std::endl;
-            std::cout << "lpc_params.r = " << PlaceholderParams::commitment_params_type::r << std::endl;
-            std::cout << "common_data.rows_amount = " << common_data.rows_amount << std::endl;
-            std::cout << "common_data.omega = "
-                      << static_cast<nil::crypto3::math::basic_radix2_domain<FieldType> &>(*common_data.basic_domain)
-                             .omega.data
-                      << std::endl;
-            std::cout << "columns_rotations (" << common_data.columns_rotations.size() << " number) = {" << std::endl;
-            for (const auto &column_rotations : common_data.columns_rotations) {
-                std::cout << "[";
-                for (auto rot : column_rotations) {
-                    std::cout << int(rot) << ", ";
-                }
-                std::cout << "]," << std::endl;
-            }
-            std::cout << "}" << std::endl;
-        }
+        //     std::cout << "modulus = " << FieldType::modulus << std::endl;
+        //     std::cout << "fri_params.r = " << fri_params.r << std::endl;
+        //     std::cout << "fri_params.max_degree = " << fri_params.max_degree << std::endl;
+        //     std::cout << "fri_params.q = ";
+        //     for (const auto &coeff : fri_params.q) {
+        //         std::cout << coeff.data << ", ";
+        //     }
+        //     std::cout << std::endl;
+        //     std::cout << "fri_params.D_omegas = ";
+        //     for (const auto &dom : fri_params.D) {
+        //         std::cout << static_cast<nil::crypto3::math::basic_radix2_domain<FieldType> &>(*dom).omega.data << ", ";
+        //     }
+        //     std::cout << std::endl;
+        //     std::cout << "lpc_params.lambda = " << PlaceholderParams::commitment_params_type::lambda << std::endl;
+        //     std::cout << "lpc_params.m = " << PlaceholderParams::commitment_params_type::m << std::endl;
+        //     std::cout << "lpc_params.r = " << PlaceholderParams::commitment_params_type::r << std::endl;
+        //     std::cout << "common_data.rows_amount = " << common_data.rows_amount << std::endl;
+        //     std::cout << "common_data.omega = "
+        //               << static_cast<nil::crypto3::math::basic_radix2_domain<FieldType> &>(*common_data.basic_domain)
+        //                      .omega.data
+        //               << std::endl;
+        //     std::cout << "columns_rotations (" << common_data.columns_rotations.size() << " number) = {" << std::endl;
+        //     for (const auto &column_rotations : common_data.columns_rotations) {
+        //         std::cout << "[";
+        //         for (auto rot : column_rotations) {
+        //             std::cout << int(rot) << ", ";
+        //         }
+        //         std::cout << "]," << std::endl;
+        //     }
+        //     std::cout << "}" << std::endl;
+        // }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
                  std::size_t Lambda, typename PublicInput, typename FunctorResultCheck>

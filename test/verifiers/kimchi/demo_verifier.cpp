@@ -51,11 +51,6 @@
 
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
 
-#include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/field_type.hpp>
-#include <nil/marshalling/endianness.hpp>
-#include <nil/crypto3/marshalling/zk/types/placeholder/proof.hpp>
-
 #include "test_plonk_component.hpp"
 #include "proof_data.hpp"
 
@@ -73,7 +68,7 @@ void print_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end) {
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_demo_verifier_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
-    constexpr std::size_t complexity = 10;
+    constexpr std::size_t complexity = 200;
 
     using curve_type = algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::base_field_type;
@@ -159,10 +154,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
 
     std::size_t permutation_size = desc.witness_columns + desc.public_input_columns + desc.constant_columns;
 
-    typename types::preprocessed_public_data_type public_preprocessed_data =
+    typename zk::snark::placeholder_public_preprocessor<BlueprintFieldType, params>::preprocessed_data_type public_preprocessed_data =
         zk::snark::placeholder_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, desc,
                                                                                      fri_params, permutation_size);
-    typename types::preprocessed_private_data_type private_preprocessed_data =
+    typename zk::snark::placeholder_private_preprocessor<BlueprintFieldType, params>::preprocessed_data_type private_preprocessed_data =
         zk::snark::placeholder_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment, desc);
 
     auto placeholder_proof = zk::snark::placeholder_prover<BlueprintFieldType, params>::process(
