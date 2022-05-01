@@ -27,8 +27,9 @@
 #ifndef CRYPTO3_ZK_PLONK_PLACEHOLDER_PARAMS_HPP
 #define CRYPTO3_ZK_PLONK_PLACEHOLDER_PARAMS_HPP
 
-#include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/batched_lpc.hpp>
 
 namespace nil {
     namespace crypto3 {
