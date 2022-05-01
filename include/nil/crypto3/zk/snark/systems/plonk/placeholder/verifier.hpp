@@ -72,6 +72,8 @@ namespace nil {
                                                                     typename ParamsType::commitment_params_type>
                         commitment_scheme_public_input_type;
 
+                    using public_preprocessor_type = placeholder_public_preprocessor<FieldType, ParamsType>;
+
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
                     constexpr static const std::size_t lookup_parts = 5;
@@ -79,7 +81,7 @@ namespace nil {
 
                 public:
                     static inline bool
-                        process(const typename policy_type::preprocessed_public_data_type preprocessed_public_data,
+                        process(const typename public_preprocessor_type::preprocessed_data_type preprocessed_public_data,
                                 typename policy_type::template proof_type<
                                     commitment_scheme_witness_type, commitment_scheme_permutation_type,
                                     commitment_scheme_quotient_type, commitment_scheme_public_input_type> &proof,

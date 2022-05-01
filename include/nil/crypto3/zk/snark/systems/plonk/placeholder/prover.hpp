@@ -79,7 +79,9 @@ namespace nil {
                     constexpr static const std::size_t m = ParamsType::commitment_params_type::m;
 
                     typedef commitments::batched_list_polynomial_commitment<FieldType,
-                                                                    typename ParamsType::commitment_params_type, witness_columns>
+                                                                    typename ParamsType::commitment_params_type,
+                                                                    witness_columns,
+                                                                    false>
                         commitment_scheme_witness_type;
                     typedef commitments::list_polynomial_commitment<FieldType,
                                                                     typename ParamsType::commitment_params_type>
@@ -91,12 +93,15 @@ namespace nil {
                                                                     typename ParamsType::commitment_params_type>
                         commitment_scheme_public_input_type;
 
+                    using public_preprocessor_type = placeholder_public_preprocessor<FieldType, ParamsType>;
+                    using private_preprocessor_type = placeholder_private_preprocessor<FieldType, ParamsType>;
+
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
                     constexpr static const std::size_t f_parts = 9;
 
                     static inline math::polynomial<typename FieldType::value_type> quotient_polynomial(
-                        const typename policy_type::preprocessed_public_data_type preprocessed_public_data,
+                        const typename public_preprocessor_type::preprocessed_data_type preprocessed_public_data,
                         std::array<math::polynomial<typename FieldType::value_type>, f_parts>
                             F,
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript) {
@@ -121,8 +126,8 @@ namespace nil {
                                                                             commitment_scheme_permutation_type,
                                                                             commitment_scheme_quotient_type, 
                                                                             commitment_scheme_public_input_type>
-                        process(typename policy_type::preprocessed_public_data_type preprocessed_public_data,
-                                const typename policy_type::preprocessed_private_data_type preprocessed_private_data,
+                        process(typename public_preprocessor_type::preprocessed_data_type preprocessed_public_data,
+                                const typename private_preprocessor_type::preprocessed_data_type preprocessed_private_data,
                                 const plonk_table_description<FieldType,
                                     typename ParamsType::arithmetization_params> &table_description,
                                 typename policy_type::constraint_system_type &constraint_system,
