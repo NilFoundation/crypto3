@@ -60,12 +60,12 @@ set(TESTS_NAMES
     "relations/numeric/sap"
     "relations/numeric/ssp"
 
-    "systems/plonk/pickles/pickles_struct_test"
+    "systems/plonk/pickles/pickles"
     "systems/plonk/pickles/kimchi"
     "systems/plonk/pickles/oracles"
     "systems/plonk/pickles/to_field"
     
-    "systems/plonk/redshift/redshift"
+    "systems/plonk/placeholder/placeholder"
 
     "systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
     "systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"
@@ -82,6 +82,7 @@ set(TESTS_NAMES
     "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity"
 
     "transcript/transcript"
+    "transcript/sponge_transcript"
 
     "systems/plonk/plonk_constraint")
 

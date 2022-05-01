@@ -2,6 +2,7 @@
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
+// Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
 //
 // MIT License
 //
@@ -24,25 +25,24 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_REDSHIFT_VERIFIER_HPP
-#define CRYPTO3_ZK_PLONK_REDSHIFT_VERIFIER_HPP
+#ifndef CRYPTO3_ZK_PLONK_PLACEHOLDER_VERIFIER_HPP
+#define CRYPTO3_ZK_PLONK_PLACEHOLDER_VERIFIER_HPP
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/batched_lpc.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/permutation_argument.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/permutation_argument.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
                 template<typename FieldType, typename ParamsType>
-                class redshift_verifier {
+                class placeholder_verifier {
 
                     constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
                     constexpr static const std::size_t public_input_columns = ParamsType::public_input_columns;
@@ -52,7 +52,7 @@ namespace nil {
                     using merkle_hash_type = typename ParamsType::commitment_params_type::merkle_hash_type;
                     using transcript_hash_type = typename ParamsType::commitment_params_type::transcript_hash_type;
 
-                    using policy_type = detail::redshift_policy<FieldType, ParamsType>;
+                    using policy_type = detail::placeholder_policy<FieldType, ParamsType>;
 
                     constexpr static const std::size_t lambda = ParamsType::commitment_params_type::lambda;
                     constexpr static const std::size_t r = ParamsType::commitment_params_type::r;
@@ -121,7 +121,7 @@ namespace nil {
 
                         // 5. permutation argument
                         std::array<typename FieldType::value_type, permutation_parts> permutation_argument =
-                            redshift_permutation_argument<FieldType, commitment_scheme_public_input_type,
+                            placeholder_permutation_argument<FieldType, commitment_scheme_public_input_type,
                                                           commitment_scheme_permutation_type,
                                                           ParamsType>::verify_eval(preprocessed_public_data,
                                                                                    proof.eval_proof.challenge, f,
@@ -193,7 +193,7 @@ namespace nil {
                         std::array<typename FieldType::value_type, lookup_parts> lookup_argument;
                         if (use_lookup) {
                             lookup_argument =
-                                redshift_lookup_argument<FieldType, commitment_scheme_public_input_type, ParamsType>::
+                                placeholder_lookup_argument<FieldType, commitment_scheme_public_input_type, ParamsType>::
                                     verify_eval(preprocessed_public_data, constraint_system.lookup_gates(),
                                                 proof.eval_proof.challenge, columns_at_y,
                                                 proof.eval_proof.lookups[1].z[0], proof.eval_proof.lookups[1].z[1],
@@ -208,7 +208,7 @@ namespace nil {
 
                         // 7. gate argument
                         std::array<typename FieldType::value_type, 1> gate_argument =
-                            redshift_gates_argument<FieldType, ParamsType>::verify_eval(
+                            placeholder_gates_argument<FieldType, ParamsType>::verify_eval(
                                 constraint_system.gates(), columns_at_y, proof.eval_proof.challenge, transcript);
 
                         // 8. alphas computations
@@ -236,8 +236,8 @@ namespace nil {
 
                             std::vector<int> witness_rotation = preprocessed_public_data.common_data.columns_rotations[witness_index];
 
-                            for (std::size_t rotation_index = 0; rotation_index < witness_rotation.size(); rotation_index++) {
-                                witness_evaluation_points[witness_index].push_back(challenge * omega.pow(witness_rotation[rotation_index]));
+                            for (int & rotation_index : witness_rotation) {
+                                witness_evaluation_points[witness_index].push_back(challenge * omega.pow(rotation_index));
                             }
                         }
                         if (!commitment_scheme_witness_type::verify_eval(
@@ -374,4 +374,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_VERIFIER_HPP
+#endif    // CRYPTO3_ZK_PLONK_PLACEHOLDER_VERIFIER_HPP

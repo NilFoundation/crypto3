@@ -39,6 +39,7 @@
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri_compile_time_size.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/batched_fri.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,11 +49,11 @@ namespace nil {
                 /**
                  * @brief Based on the FRI Commitment description from \[ResShift].
                  * @tparam d ...
-                 * @tparam Rounds Denoted by r in \[RedShift].
+                 * @tparam Rounds Denoted by r in \[Placeholder].
                  *
                  * References:
-                 * \[RedShift]:
-                 * "REDSHIFT: Transparent SNARKs from List
+                 * \[Placeholder]:
+                 * "PLACEHOLDER: Transparent SNARKs from List
                  * Polynomial Commitment IOPs",
                  * Assimakis Kattis, Konstantin Panarin, Alexander Vlasov,
                  * Matter Labs,
@@ -105,55 +106,51 @@ namespace nil {
                     };
 
                     static proof_type proof_eval(
-                        const std::array<std::vector<typename FieldType::value_type>, leaf_size>
-                            &evaluation_points,
+                        const std::array<std::vector<typename FieldType::value_type>, leaf_size> &evaluation_points,
                         precommitment_type &T,
                         const std::array<math::polynomial<typename FieldType::value_type>, leaf_size> &g,
                         const typename basic_fri::params_type &fri_params,
                         typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {
 
                         std::array<std::vector<typename FieldType::value_type>, leaf_size> z;
-                        std::array<std::vector<std::pair<
-                            typename FieldType::value_type, typename FieldType::value_type>>, leaf_size>
+                        std::array<
+                            std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>>,
+                            leaf_size>
                             U_interpolation_points;
 
-                        for (std::size_t polynom_index = 0; polynom_index < leaf_size;
-                                            polynom_index++){
-                            U_interpolation_points[polynom_index].resize(
-                                evaluation_points[polynom_index].size());
-                            z[polynom_index].resize(
-                                evaluation_points[polynom_index].size());
+                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                            U_interpolation_points[polynom_index].resize(evaluation_points[polynom_index].size());
+                            z[polynom_index].resize(evaluation_points[polynom_index].size());
 
-                            for (std::size_t point_index = 0;
-                                point_index < evaluation_points[polynom_index].size(); point_index++) {
-                                
-                                z[polynom_index][point_index] =
-                                    g[polynom_index].evaluate(evaluation_points[polynom_index][point_index]);    // transform to point-representation
+                            for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                                 point_index++) {
 
-                                U_interpolation_points[polynom_index][point_index] =
-                                    std::make_pair(evaluation_points[polynom_index][point_index],
-                                        z[polynom_index][point_index]);    // prepare points for interpolation
+                                z[polynom_index][point_index] = g[polynom_index].evaluate(
+                                    evaluation_points[polynom_index]
+                                                     [point_index]);    // transform to point-representation
+
+                                U_interpolation_points[polynom_index][point_index] = std::make_pair(
+                                    evaluation_points[polynom_index][point_index],
+                                    z[polynom_index][point_index]);    // prepare points for interpolation
                             }
                         }
 
                         std::array<math::polynomial<typename FieldType::value_type>, leaf_size> Q;
-                        for (std::size_t polynom_index = 0; polynom_index < leaf_size;
-                                            polynom_index++){
+                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
 
-                            math::polynomial<typename FieldType::value_type> U = math::lagrange_interpolation(
-                                U_interpolation_points[polynom_index]);
+                            math::polynomial<typename FieldType::value_type> U =
+                                math::lagrange_interpolation(U_interpolation_points[polynom_index]);
 
                             Q[polynom_index] = (g[polynom_index] - U);
                         }
 
-                        for (std::size_t polynom_index = 0; polynom_index < leaf_size;
-                                            polynom_index++){
+                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                             math::polynomial<typename FieldType::value_type> denominator_polynom = {1};
-                            for (std::size_t point_index = 0;
-                                point_index < evaluation_points[polynom_index].size(); point_index++) {
-                                denominator_polynom = denominator_polynom * 
-                                    math::polynomial<typename FieldType::value_type>{
-                                        -evaluation_points[polynom_index][point_index], 1};
+                            for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                                 point_index++) {
+                                denominator_polynom =
+                                    denominator_polynom * math::polynomial<typename FieldType::value_type> {
+                                                              -evaluation_points[polynom_index][point_index], 1};
                             }
                             Q[polynom_index] = Q[polynom_index] / denominator_polynom;
                         }
@@ -168,49 +165,43 @@ namespace nil {
                     }
 
                     static bool verify_eval(
-                        const std::array<std::vector<typename FieldType::value_type>, leaf_size>
-                            &evaluation_points,
+                        const std::array<std::vector<typename FieldType::value_type>, leaf_size> &evaluation_points,
                         proof_type &proof,
                         typename basic_fri::params_type fri_params,
                         typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {
 
-                        std::array<std::vector<std::pair<
-                            typename FieldType::value_type, typename FieldType::value_type>>, leaf_size>
+                        std::array<
+                            std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>>,
+                            leaf_size>
                             U_interpolation_points;
 
-                        for (std::size_t polynom_index = 0; polynom_index < leaf_size;
-                                            polynom_index++){
+                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
 
-                            U_interpolation_points[polynom_index].resize(
-                                evaluation_points[polynom_index].size());
+                            U_interpolation_points[polynom_index].resize(evaluation_points[polynom_index].size());
 
-                            for (std::size_t point_index = 0;
-                                point_index < evaluation_points[polynom_index].size(); point_index++) {
+                            for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                                 point_index++) {
 
-                                U_interpolation_points[polynom_index][point_index] =
-                                    std::make_pair(evaluation_points[polynom_index][point_index],
-                                        proof.z[polynom_index][point_index]);
+                                U_interpolation_points[polynom_index][point_index] = std::make_pair(
+                                    evaluation_points[polynom_index][point_index], proof.z[polynom_index][point_index]);
                             }
                         }
 
                         std::array<math::polynomial<typename FieldType::value_type>, leaf_size> U;
 
-                        for (std::size_t polynom_index = 0; polynom_index < leaf_size;
-                                            polynom_index++){
-                            U[polynom_index] =
-                                math::lagrange_interpolation(U_interpolation_points[polynom_index]);
+                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                            U[polynom_index] = math::lagrange_interpolation(U_interpolation_points[polynom_index]);
                         }
 
                         std::array<math::polynomial<typename FieldType::value_type>, leaf_size> V;
 
-                        for (std::size_t polynom_index = 0; polynom_index < leaf_size;
-                                            polynom_index++){
+                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                             V[polynom_index] = {1};
-                            for (std::size_t point_index = 0;
-                                point_index < evaluation_points[polynom_index].size(); point_index++) {
-                                V[polynom_index] = V[polynom_index] *
-                                    (math::polynomial<typename FieldType::value_type>(
-                                        {-evaluation_points[polynom_index][point_index], 1}));
+                            for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                                 point_index++) {
+                                V[polynom_index] =
+                                    V[polynom_index] * (math::polynomial<typename FieldType::value_type>(
+                                                           {-evaluation_points[polynom_index][point_index], 1}));
                             }
                         }
 

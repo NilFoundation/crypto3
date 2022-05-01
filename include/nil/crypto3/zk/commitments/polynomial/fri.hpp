@@ -48,11 +48,11 @@ namespace nil {
                 /**
                  * @brief Based on the FRI Commitment description from \[ResShift].
                  * @tparam d ...
-                 * @tparam Rounds Denoted by r in \[RedShift].
+                 * @tparam Rounds Denoted by r in \[Placeholder].
                  *
                  * References:
-                 * \[RedShift]:
-                 * "REDSHIFT: Transparent SNARKs from List
+                 * \[Placeholder]:
+                 * "PLACEHOLDER: Transparent SNARKs from List
                  * Polynomial Commitment IOPs",
                  * Assimakis Kattis, Konstantin Panarin, Alexander Vlasov,
                  * Matter Labs,
@@ -62,16 +62,17 @@ namespace nil {
                          typename MerkleTreeHashType,
                          typename TranscriptHashType,
                          std::size_t M = 2>
-                class fri : public detail::basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M> {
+                struct fri : public detail::basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M> {
 
                     using basic_fri = detail::basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M>;
-
-                public:
                     constexpr static const std::size_t m = basic_fri::m;
 
                     using field_type = typename basic_fri::field_type;
                     using merkle_tree_hash_type = typename basic_fri::merkle_tree_hash_type;
                     using transcript_hash_type = typename basic_fri::transcript_hash_type;
+                    using merkle_tree_type = typename basic_fri::merkle_tree_type;
+                    using merkle_proof_type = typename basic_fri::merkle_proof_type;
+                    using round_proof_type = typename basic_fri::round_proof_type;
                     using proof_type = typename basic_fri::proof_type;
                     using params_type = typename basic_fri::params_type;
                     using transcript_type = typename basic_fri::transcript_type;

@@ -46,7 +46,7 @@
 #include <nil/crypto3/zk/commitments/polynomial/batched_lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/batched_fri.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
 
 using namespace nil::crypto3;

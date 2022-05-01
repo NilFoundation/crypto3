@@ -2,6 +2,7 @@
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
+// Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
 //
 // MIT License
 //
@@ -24,8 +25,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_REDSHIFT_PREPROCESSOR_HPP
-#define CRYPTO3_ZK_PLONK_REDSHIFT_PREPROCESSOR_HPP
+#ifndef CRYPTO3_ZK_PLONK_PLACEHOLDER_PREPROCESSOR_HPP
+#define CRYPTO3_ZK_PLONK_PLACEHOLDER_PREPROCESSOR_HPP
 
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/detail/field_utils.hpp>
@@ -33,7 +34,7 @@
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/math/permutation.hpp>
-#include "nil/crypto3/zk/snark/systems/plonk/redshift/detail/redshift_policy.hpp"
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
@@ -95,8 +96,8 @@ namespace nil {
                 }    // namespace detail
 
                 template<typename FieldType, typename ParamsType>
-                class redshift_public_preprocessor {
-                    typedef detail::redshift_policy<FieldType, ParamsType> policy_type;
+                class placeholder_public_preprocessor {
+                    typedef detail::placeholder_policy<FieldType, ParamsType> policy_type;
 
                     typedef typename ParamsType::commitment_scheme_public_type commitment_scheme_public_type;
 
@@ -479,12 +480,12 @@ namespace nil {
                         std::vector<math::polynomial<typename FieldType::value_type>> _permutation_polynomials =
                             permutation_polynomials(
                                 columns_with_copy_constraints, N_rows, basic_domain->get_domain_element(1),
-                                policy_type::redshift_params_type::delta, permutation, basic_domain);
+                                policy_type::placeholder_params_type::delta, permutation, basic_domain);
 
                         std::vector<math::polynomial<typename FieldType::value_type>> _identity_polynomials =
                             identity_polynomials(columns_with_copy_constraints, N_rows,
                                                  basic_domain->get_domain_element(1),
-                                                 policy_type::redshift_params_type::delta, basic_domain);
+                                                 policy_type::placeholder_params_type::delta, basic_domain);
 
                         math::polynomial<typename FieldType::value_type> lagrange_0 =
                             lagrange_polynomial(basic_domain, 0);
@@ -530,8 +531,8 @@ namespace nil {
                 };
 
                 template<typename FieldType, typename ParamsType>
-                class redshift_private_preprocessor {
-                    using policy_type = detail::redshift_policy<FieldType, ParamsType>;
+                class placeholder_private_preprocessor {
+                    using policy_type = detail::placeholder_policy<FieldType, ParamsType>;
 
                 public:
                     static inline typename policy_type::preprocessed_private_data_type process(
@@ -560,4 +561,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_PREPROCESSOR_HPP
+#endif    // CRYPTO3_ZK_PLONK_PLACEHOLDER_PREPROCESSOR_HPP

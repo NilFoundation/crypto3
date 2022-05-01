@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_HPP
-#define CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_HPP
+#ifndef CRYPTO3_ZK_PLONK_PLACEHOLDER_TABLE_HPP
+#define CRYPTO3_ZK_PLONK_PLACEHOLDER_TABLE_HPP
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 
@@ -241,4 +241,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_HPP
+#endif    // CRYPTO3_ZK_PLONK_PLACEHOLDER_TABLE_HPP

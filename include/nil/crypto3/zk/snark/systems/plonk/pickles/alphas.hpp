@@ -42,7 +42,7 @@ namespace nil {
                     /// the end result will be [1, alpha^{next_power - 1}]
                     uint32_t next_power;
                     /// The mapping between constraint types and powers of alpha
-                    //                    std::map<ArgumentType, std::pair<uint32_t, uint32_t>> mapping;
+                    //                    std::map<argument_type, std::pair<uint32_t, uint32_t>> mapping;
                     /// The powers of alpha: 1, alpha, alpha^2, etc.
                     /// If set to [Some], you can't register new constraints.
                     std::vector<FieldType> alphas;

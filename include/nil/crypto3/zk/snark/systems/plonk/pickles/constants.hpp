@@ -2,7 +2,6 @@
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
-// Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
 //
 // MIT License
 //
@@ -25,41 +24,23 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_GATE_HPP
-#define CRYPTO3_ZK_PLONK_GATE_HPP
-
-#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
-#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_CONSTANTS_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_CONSTANTS_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
-                template<typename FieldType, typename ConstraintType>
-                struct plonk_gate {
-                    typedef FieldType field_type;
-                    typedef ConstraintType constraint_type;
-
-                    std::size_t selector_index;
-                    std::vector<ConstraintType> constraints;
-
-                    plonk_gate(std::size_t selector_index, const ConstraintType &constraint) :
-                        constraints(std::vector<ConstraintType>({constraint})), selector_index(selector_index) {
-                    }
-
-                    plonk_gate(std::size_t selector_index, const std::initializer_list<ConstraintType> &&constraints) :
-                        constraints(constraints), selector_index(selector_index) {
-                    }
-
-                    plonk_gate(std::size_t selector_index, const std::vector<ConstraintType> &constraints) :
-                        constraints(constraints), selector_index(selector_index) {
-                    }
+                
+                struct kimchi_constant {
+                    constexpr static const std::size_t CHALLENGE_LENGTH_IN_LIMBS = 2;
+                    constexpr static const std::size_t PERMUTES = 7;
+                    constexpr static const std::size_t CONSTRAINTS = 3;
+                    constexpr static const std::size_t COLUMNS = 15;
                 };
-
-            }    // namespace snark
+            }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_GATE_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_CONSTANTS_HPP

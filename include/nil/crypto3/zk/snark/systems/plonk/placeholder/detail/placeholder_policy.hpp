@@ -23,12 +23,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of types for Redshift PLONK scheme.
+// @file Declaration of types for Placeholder PLONK scheme.
 //
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PLONK_REDSHIFT_TYPES_POLICY_HPP
-#define CRYPTO3_PLONK_REDSHIFT_TYPES_POLICY_HPP
+#ifndef CRYPTO3_PLONK_PLACEHOLDER_TYPES_POLICY_HPP
+#define CRYPTO3_PLONK_PLACEHOLDER_TYPES_POLICY_HPP
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
@@ -37,24 +37,24 @@
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/proof.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
                 namespace detail {
-                    template<typename FieldType, typename RedshiftParams>
-                    struct redshift_policy {
+                    template<typename FieldType, typename PlaceholderParams>
+                    struct placeholder_policy {
 
-                        constexpr static const std::size_t witness_columns = RedshiftParams::witness_columns;
+                        constexpr static const std::size_t witness_columns = PlaceholderParams::witness_columns;
                         constexpr static const std::size_t public_input_columns = 
-                            RedshiftParams::public_input_columns;
-                        constexpr static const std::size_t constant_columns = RedshiftParams::constant_columns;
-                        constexpr static const std::size_t selector_columns = RedshiftParams::selector_columns;                       
+                            PlaceholderParams::public_input_columns;
+                        constexpr static const std::size_t constant_columns = PlaceholderParams::constant_columns;
+                        constexpr static const std::size_t selector_columns = PlaceholderParams::selector_columns;                       
 
-                        using arithmetization_params = typename RedshiftParams::arithmetization_params;
+                        using arithmetization_params = typename PlaceholderParams::arithmetization_params;
                         /******************************** Params ********************************/
 
                         /**
@@ -65,7 +65,7 @@ namespace nil {
                             constraint_system_type;
 
                         typedef FieldType field_type;
-                        typedef RedshiftParams redshift_params_type;
+                        typedef PlaceholderParams placeholder_params_type;
 
                         typedef plonk_assignment_table<FieldType, arithmetization_params>
                             variable_assignment_type;
@@ -75,7 +75,7 @@ namespace nil {
                         /*********************************** Proof ***********************************/
 
                         /**
-                         * A proof for the Redshift cheme.
+                         * A proof for the Placeholder cheme.
                          *
                          * While the proof has a structure, externally one merely opaquely produces,
                          * serializes/deserializes, and verifies proofs. We only expose some information
@@ -84,11 +84,11 @@ namespace nil {
                         template<typename CommitmentSchemeTypeWitness, typename CommitmentSchemeTypePermutation,
                                  typename CommitmentSchemeTypeQuotient, typename CommitmentSchemeTypePublic>
                         using proof_type =
-                            redshift_proof<FieldType, CommitmentSchemeTypeWitness, CommitmentSchemeTypePermutation,
+                            placeholder_proof<FieldType, CommitmentSchemeTypeWitness, CommitmentSchemeTypePermutation,
                                            CommitmentSchemeTypeQuotient, CommitmentSchemeTypePublic>;
 
                         struct preprocessed_public_data_type {
-                            typedef typename RedshiftParams::commitment_scheme_public_type
+                            typedef typename PlaceholderParams::commitment_scheme_public_type
                                 commitment_scheme_public_type;
 
                             struct public_precommitments {
@@ -100,7 +100,7 @@ namespace nil {
                                 std::array<typename commitment_scheme_public_type::precommitment_type, 2> special_selectors;
                             };
 
-                            struct public_commitments {
+                            struct public_commitments { // TODO: verifier needs this data
                                 std::vector<typename commitment_scheme_public_type::commitment_type> id_permutation;
                                 std::vector<typename commitment_scheme_public_type::commitment_type> sigma_permutation;
                                 std::array<typename commitment_scheme_public_type::commitment_type, public_input_columns> public_input;
@@ -153,4 +153,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PLONK_REDSHIFT_TYPES_POLICY_HPP
+#endif    // CRYPTO3_PLONK_PLACEHOLDER_TYPES_POLICY_HPP
