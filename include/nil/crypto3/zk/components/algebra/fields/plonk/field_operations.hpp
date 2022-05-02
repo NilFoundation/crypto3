@@ -87,12 +87,15 @@ namespace nil {
                     struct params_type {
                         var x = var(0, 0, false);
                         var y = var(0, 0, false);
-                        var mult = var(0, 0, false);
                     };
 
                     struct result_type {
+                        var res = var(0, 0, false);
                         result_type(const params_type &params,
-                            const std::size_t &component_start_row) {}
+                            const std::size_t &start_row_index) {
+                            res = var(W2, start_row_index, false, var::column_type::witness);
+                        }
+                        result_type() {}
                     };
 
                     static result_type generate_assignments(
@@ -105,7 +108,7 @@ namespace nil {
                         
                         assignment.witness(W0)[j] = assignment.var_value(params.x);
                         assignment.witness(W1)[j] = assignment.var_value(params.y);
-                        assignment.witness(W2)[j] = assignment.var_value(params.mult);
+                        assignment.witness(W2)[j] = assignment.var_value(params.x) * assignment.var_value(params.y);
 
                         return result_type(params, start_row_index);
                     }
@@ -133,10 +136,8 @@ namespace nil {
                         const std::size_t j = start_row_index;
                         var component_x = var(W0, static_cast<int>(j), false);
                         var component_y = var(W1, static_cast<int>(j), false);
-                        var component_mult = var(W2, static_cast<int>(j), false);
                         bp.add_copy_constraint({component_x, params.x});
                         bp.add_copy_constraint({component_y, params.y});
-                        bp.add_copy_constraint({component_mult, params.mult});
                     }
                 };
 
@@ -184,12 +185,15 @@ namespace nil {
                     struct params_type {
                         var x = var(0, 0, false);
                         var y = var(0, 0, false);
-                        var mult = var(0, 0, false);
                     };
 
                     struct result_type {
+                        var res = var(0, 0, false);
                         result_type(const params_type &params,
-                            const std::size_t &component_start_row) {}
+                            const std::size_t &start_row_index) {
+                            res = var(W2, start_row_index, false, var::column_type::witness);
+                        }
+                        result_type() {}
                     };
 
                     static result_type generate_assignments(
@@ -202,7 +206,7 @@ namespace nil {
                         
                         assignment.witness(W0)[j] = assignment.var_value(params.x);
                         assignment.witness(W1)[j] = assignment.var_value(params.y);
-                        assignment.witness(W2)[j] = assignment.var_value(params.mult);
+                        assignment.witness(W2)[j] = assignment.var_value(params.x) + assignment.var_value(params.y);
 
                         return result_type(params, start_row_index);
                     }
@@ -230,10 +234,8 @@ namespace nil {
                         const std::size_t j = start_row_index;
                         var component_x = var(W0, static_cast<int>(j), false);
                         var component_y = var(W1, static_cast<int>(j), false);
-                        var component_sum = var(W2, static_cast<int>(j), false);
                         bp.add_copy_constraint({component_x, params.x});
                         bp.add_copy_constraint({component_y, params.y});
-                        bp.add_copy_constraint({component_sum, params.mult});
                     }
                 };
 
@@ -281,12 +283,15 @@ namespace nil {
                     struct params_type {
                         var x = var(0, 0, false);
                         var y = var(0, 0, false);
-                        var mult = var(0, 0, false);
                     };
 
                     struct result_type {
+                        var res = var(0, 0, false);
                         result_type(const params_type &params,
-                            const std::size_t &component_start_row) {}
+                            const std::size_t &start_row_index) {
+                            res = var(W2, start_row_index, false, var::column_type::witness);
+                        }
+                        result_type() {}
                     };
 
                     static result_type generate_assignments(
@@ -299,7 +304,7 @@ namespace nil {
                         
                         assignment.witness(W0)[j] = assignment.var_value(params.x);
                         assignment.witness(W1)[j] = assignment.var_value(params.y);
-                        assignment.witness(W2)[j] = assignment.var_value(params.mult);
+                        assignment.witness(W2)[j] = assignment.var_value(params.x) / assignment.var_value(params.y);
 
                         return result_type(params, start_row_index);
                     }
@@ -327,12 +332,8 @@ namespace nil {
                         const std::size_t j = start_row_index;
                         var component_x = var(W0, static_cast<int>(j), false);
                         var component_y = var(W1, static_cast<int>(j), false);
-                        var component_mult = var(W2, static_cast<int>(j), false);
                         bp.add_copy_constraint({component_x, params.x});
                         bp.add_copy_constraint({component_y, params.y});
-                        bp.add_copy_constraint({component_mult, params.mult});
-
-                        // assignment.public_input(public_input_column_index)[0] = 0;
                     }
                 };
 
@@ -380,12 +381,15 @@ namespace nil {
                     struct params_type {
                         var x = var(0, 0, false);
                         var y = var(0, 0, false);
-                        var mult = var(0, 0, false);
                     };
 
                     struct result_type {
+                        var res = var(0, 0, false);
                         result_type(const params_type &params,
-                            const std::size_t &component_start_row) {}
+                            const std::size_t &start_row_index) {
+                            res = var(W2, start_row_index, false, var::column_type::witness);
+                        }
+                        result_type() {}
                     };
 
                     static result_type generate_assignments(
@@ -398,7 +402,7 @@ namespace nil {
                         
                         assignment.witness(W0)[j] = assignment.var_value(params.x);
                         assignment.witness(W1)[j] = assignment.var_value(params.y);
-                        assignment.witness(W2)[j] = assignment.var_value(params.mult);
+                        assignment.witness(W2)[j] = assignment.var_value(params.x) - assignment.var_value(params.y);
 
                         return result_type(params, start_row_index);
                     }
@@ -426,10 +430,8 @@ namespace nil {
                         const std::size_t j = start_row_index;
                         var component_x = var(W0, static_cast<int>(j), false);
                         var component_y = var(W1, static_cast<int>(j), false);
-                        var component_mult = var(W2, static_cast<int>(j), false);
                         bp.add_copy_constraint({component_x, params.x});
                         bp.add_copy_constraint({component_y, params.y});
-                        bp.add_copy_constraint({component_mult, params.mult});
                     }
                 };
             }    // namespace components
@@ -437,4 +439,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_FIELD_OPERATIONS_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_UNIFIED_ADDITION_COMPONENT_11_WIRES_HPP
