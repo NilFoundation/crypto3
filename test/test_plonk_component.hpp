@@ -47,7 +47,7 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
-#include <nil/crypto3/marshalling/zk/types/placeholder/proof.hpp>
+// #include <nil/crypto3/marshalling/zk/types/placeholder/proof.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -71,12 +71,13 @@ namespace nil {
         }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
-                 std::size_t Lambda, typename PublicInput,
+                 std::size_t Lambda, typename FunctorResultCheck, typename PublicInput,
                  typename std::enable_if<
                      std::is_same<typename BlueprintFieldType::value_type,
                                   typename std::iterator_traits<typename PublicInput::iterator>::value_type>::value,
                      bool>::type = true>
-        auto prepare_component(typename ComponentType::params_type params, const PublicInput &public_input) {
+        auto prepare_component(typename ComponentType::params_type params, const PublicInput &public_input,
+                const FunctorResultCheck &result_check) {
 
             using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
             using component_type = ComponentType;
@@ -96,7 +97,8 @@ namespace nil {
             }
 
             zk::components::generate_circuit<component_type>(bp, public_assignment, params, start_row);
-            component_type::generate_assignments(assignment_bp, params, start_row);
+            typename component_type::result_type component_result = component_type::generate_assignments(assignment_bp, params, start_row);
+            result_check(assignment_bp, component_result);
 
             assignment_bp.padding();
             std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
@@ -119,10 +121,12 @@ namespace nil {
 
             std::size_t permutation_size = desc.witness_columns + desc.public_input_columns + desc.constant_columns;
 
-            typename types::preprocessed_public_data_type public_preprocessed_data =
+            typename zk::snark::placeholder_public_preprocessor<BlueprintFieldType, placeholder_params>::
+                preprocessed_data_type public_preprocessed_data =
                 zk::snark::placeholder_public_preprocessor<BlueprintFieldType, placeholder_params>::process(
                     bp, public_assignment, desc, fri_params, permutation_size);
-            typename types::preprocessed_private_data_type private_preprocessed_data =
+            typename zk::snark::placeholder_private_preprocessor<BlueprintFieldType, placeholder_params>::
+                preprocessed_data_type private_preprocessed_data =
                 zk::snark::placeholder_private_preprocessor<BlueprintFieldType, placeholder_params>::process(
                     bp, private_assignment, desc);
 
@@ -130,68 +134,69 @@ namespace nil {
                                    private_preprocessed_data);
         }
 
-        template<typename PlaceholderParams, typename FieldType, typename Proof, typename FRIParams,
-                 typename CommonData>
-        void print_test_data(const Proof &proof, const FRIParams &fri_params, const CommonData &common_data) {
-            using Endianness = nil::marshalling::option::big_endian;
-            using TTypeBase = nil::marshalling::field_type<Endianness>;
-            using proof_marshalling_type = nil::crypto3::marshalling::types::placeholder_proof<TTypeBase, Proof>;
-            auto filled_placeholder_proof =
-                nil::crypto3::marshalling::types::fill_placeholder_proof<Proof, Endianness>(proof);
-            std::vector<std::uint8_t> cv;
-            cv.resize(filled_placeholder_proof.length(), 0x00);
-            auto write_iter = cv.begin();
-            nil::marshalling::status_type status = filled_placeholder_proof.write(write_iter, cv.size());
-            std::cout << "proof (" << cv.size() << " bytes) = " << std::endl;
-            std::ofstream proof_file;
-            proof_file.open("placeholder_proof.txt");
-            print_hex_byteblob(proof_file, cv.cbegin(), cv.cend(), false);
+        // template<typename PlaceholderParams, typename FieldType, typename Proof, typename FRIParams,
+        //          typename CommonData>
+        // void print_test_data(const Proof &proof, const FRIParams &fri_params, const CommonData &common_data) {
+        //     using Endianness = nil::marshalling::option::big_endian;
+        //     using TTypeBase = nil::marshalling::field_type<Endianness>;
+        //     using proof_marshalling_type = nil::crypto3::marshalling::types::placeholder_proof<TTypeBase, Proof>;
+        //     auto filled_placeholder_proof =
+        //         nil::crypto3::marshalling::types::fill_placeholder_proof<Proof, Endianness>(proof);
+        //     std::vector<std::uint8_t> cv;
+        //     cv.resize(filled_placeholder_proof.length(), 0x00);
+        //     auto write_iter = cv.begin();
+        //     nil::marshalling::status_type status = filled_placeholder_proof.write(write_iter, cv.size());
+        //     std::cout << "proof (" << cv.size() << " bytes) = " << std::endl;
+        //     std::ofstream proof_file;
+        //     proof_file.open("placeholder_proof.txt");
+        //     print_hex_byteblob(proof_file, cv.cbegin(), cv.cend(), false);
 
-            std::cout << "modulus = " << FieldType::modulus << std::endl;
-            std::cout << "fri_params.r = " << fri_params.r << std::endl;
-            std::cout << "fri_params.max_degree = " << fri_params.max_degree << std::endl;
-            std::cout << "fri_params.q = ";
-            for (const auto &coeff : fri_params.q) {
-                std::cout << coeff.data << ", ";
-            }
-            std::cout << std::endl;
-            std::cout << "fri_params.D_omegas = ";
-            for (const auto &dom : fri_params.D) {
-                std::cout << static_cast<nil::crypto3::math::basic_radix2_domain<FieldType> &>(*dom).omega.data << ", ";
-            }
-            std::cout << std::endl;
-            std::cout << "lpc_params.lambda = " << PlaceholderParams::commitment_params_type::lambda << std::endl;
-            std::cout << "lpc_params.m = " << PlaceholderParams::commitment_params_type::m << std::endl;
-            std::cout << "lpc_params.r = " << PlaceholderParams::commitment_params_type::r << std::endl;
-            std::cout << "common_data.rows_amount = " << common_data.rows_amount << std::endl;
-            std::cout << "common_data.omega = "
-                      << static_cast<nil::crypto3::math::basic_radix2_domain<FieldType> &>(*common_data.basic_domain)
-                             .omega.data
-                      << std::endl;
-            std::cout << "columns_rotations (" << common_data.columns_rotations.size() << " number) = {" << std::endl;
-            for (const auto &column_rotations : common_data.columns_rotations) {
-                std::cout << "[";
-                for (auto rot : column_rotations) {
-                    std::cout << int(rot) << ", ";
-                }
-                std::cout << "]," << std::endl;
-            }
-            std::cout << "}" << std::endl;
-        }
+        //     std::cout << "modulus = " << FieldType::modulus << std::endl;
+        //     std::cout << "fri_params.r = " << fri_params.r << std::endl;
+        //     std::cout << "fri_params.max_degree = " << fri_params.max_degree << std::endl;
+        //     std::cout << "fri_params.q = ";
+        //     for (const auto &coeff : fri_params.q) {
+        //         std::cout << coeff.data << ", ";
+        //     }
+        //     std::cout << std::endl;
+        //     std::cout << "fri_params.D_omegas = ";
+        //     for (const auto &dom : fri_params.D) {
+        //         std::cout << static_cast<nil::crypto3::math::basic_radix2_domain<FieldType> &>(*dom).omega.data << ", ";
+        //     }
+        //     std::cout << std::endl;
+        //     std::cout << "lpc_params.lambda = " << PlaceholderParams::commitment_params_type::lambda << std::endl;
+        //     std::cout << "lpc_params.m = " << PlaceholderParams::commitment_params_type::m << std::endl;
+        //     std::cout << "lpc_params.r = " << PlaceholderParams::commitment_params_type::r << std::endl;
+        //     std::cout << "common_data.rows_amount = " << common_data.rows_amount << std::endl;
+        //     std::cout << "common_data.omega = "
+        //               << static_cast<nil::crypto3::math::basic_radix2_domain<FieldType> &>(*common_data.basic_domain)
+        //                      .omega.data
+        //               << std::endl;
+        //     std::cout << "columns_rotations (" << common_data.columns_rotations.size() << " number) = {" << std::endl;
+        //     for (const auto &column_rotations : common_data.columns_rotations) {
+        //         std::cout << "[";
+        //         for (auto rot : column_rotations) {
+        //             std::cout << int(rot) << ", ";
+        //         }
+        //         std::cout << "]," << std::endl;
+        //     }
+        //     std::cout << "}" << std::endl;
+        // }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
-                 std::size_t Lambda, typename PublicInput>
+                 std::size_t Lambda, typename PublicInput, typename FunctorResultCheck>
         typename std::enable_if<
             std::is_same<typename BlueprintFieldType::value_type,
                          typename std::iterator_traits<typename PublicInput::iterator>::value_type>::value>::type
-            test_component(typename ComponentType::params_type params, const PublicInput &public_input) {
+            test_component(typename ComponentType::params_type params, const PublicInput &public_input,
+                FunctorResultCheck result_check) {
 
             using placeholder_params =
                 zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
 
             auto [desc, bp, fri_params, assignments, public_preprocessed_data, private_preprocessed_data] =
-                prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda>(params,
-                                                                                                          public_input);
+                prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda, FunctorResultCheck>(params,
+                                                                                                          public_input, result_check);
 
             auto proof = zk::snark::placeholder_prover<BlueprintFieldType, placeholder_params>::process(
                 public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
@@ -206,19 +211,20 @@ namespace nil {
         }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
-                 std::size_t Lambda, typename PublicInput,
+                 std::size_t Lambda, typename PublicInput, typename FunctorResultCheck,
                  typename std::enable_if<
                      std::is_same<typename BlueprintFieldType::value_type,
                                   typename std::iterator_traits<typename PublicInput::iterator>::value_type>::value,
                      bool>::type = true>
-        auto create_component_proof(typename ComponentType::params_type params, const PublicInput &public_input) {
+        auto create_component_proof(typename ComponentType::params_type params, const PublicInput &public_input,
+            const FunctorResultCheck &result_check) {
 
             using placeholder_params =
                 zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
 
             auto [desc, bp, fri_params, assignments, public_preprocessed_data, private_preprocessed_data] =
                 prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda>(params,
-                                                                                                          public_input);
+                                                                            public_input, result_check);
 
             auto proof = zk::snark::placeholder_prover<BlueprintFieldType, placeholder_params>::process(
                 public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);

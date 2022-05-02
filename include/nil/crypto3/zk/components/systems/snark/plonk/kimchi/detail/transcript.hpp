@@ -101,10 +101,10 @@ namespace nil {
                         
                     }
 
-                    void init_generate_constraints(blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                    void init_circuit(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const var &zero,
-                        const std::size_t &component_start_row) {
+                        std::size_t &component_start_row) {
                             
                     }
 
@@ -123,17 +123,18 @@ namespace nil {
 
                     }
 
-                    void absorb_generate_constraints(blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const var &zero,
-                        const std::size_t &component_start_row) {
+                    void absorb_circuit(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const var &input,
+                        std::size_t &start_row_index) {
                             
                     }
 
                     var challenge_assignment(
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             std::size_t &component_start_row) {
-
+                        component_start_row++;
+                        return var(W0, component_start_row - 1);
                     }
 
                     void challenge_generate_constraints(blueprint<ArithmetizationType> &bp,

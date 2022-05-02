@@ -57,12 +57,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_base_endo_scalar_mul) {
     using BlueprintScalarType = typename curve_type::scalar_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 2;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
+    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
     constexpr std::size_t Lambda = 40;
@@ -74,12 +75,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_base_endo_scalar_mul) {
     typename curve_type::scalar_field_type::integral_type integral_b = typename curve_type::scalar_field_type::integral_type(b.data);
 	BlueprintFieldType::value_type b_scalar = integral_b;
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
-    var scalar_var = {0, 0, false, var::column_type::public_input};
     var T_X_var = {0, 0, false, var::column_type::public_input};
-    var T_Y_var = {0, 0, false, var::column_type::public_input};
+    var T_Y_var = {0, 1, false, var::column_type::public_input};
+    var scalar_var = {0, 2, false, var::column_type::public_input};
 
     typename component_type::params_type assignment_params = {{T_X_var, T_Y_var},scalar_var};
-    std::vector<typename BlueprintFieldType::value_type> public_input = {0, T.X, T.Y, b_scalar};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {T.X, T.Y, b_scalar};
 
     constexpr static const typename BlueprintFieldType::value_type endo  = component_type::endo;
     typename BlueprintFieldType::value_type endo_scalar = 0x244630A7EE5033DA383B3677B4C5CA94A3EBE4156FC4FA4E08B35974929CA2C5_cppui255;
@@ -110,7 +111,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_base_endo_scalar_mul) {
         acc = acc + testQ + acc;
     }
     std::cout<<"Expected result: "<<acc.X.data<<" "<< acc.Y.data<<std::endl;
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (assignment_params, public_input);
+
+    auto result_check = [](AssignmentType &assignment, 
+        component_type::result_type &real_res) {
+    };
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (assignment_params, public_input, result_check);
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "base_endo_scalar_mul: " << duration.count() << "ms" << std::endl;
 }

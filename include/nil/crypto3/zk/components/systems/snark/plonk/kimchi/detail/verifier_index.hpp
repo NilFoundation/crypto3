@@ -43,10 +43,12 @@ namespace nil {
                 template<typename CurveType, std::size_t Permuts = 7>
                 struct kimchi_verifier_index_scalar {
                     using Fr = typename CurveType::scalar_field_type::value_type;
+                    using FieldType = typename CurveType::scalar_field_type;
+                    using var = snark::plonk_variable<FieldType>;
 
                     //nil::crypto3::math::evaluation_domain<Fr> domain;
-                    size_t max_poly_size;
-                    size_t max_quot_size;
+                    std::size_t max_poly_size;
+                    std::size_t max_quot_size;
                     std::size_t alpha_powers;
                     std::size_t public_input_size;
                     std::array<Fr, Permuts> shift;
@@ -55,8 +57,9 @@ namespace nil {
                     nil::crypto3::math::polynomial<Fr> zkpm;
                     Fr w;
                     Fr endo;
-                    Fr n;
+                    var domain_size;
                     Fr omega;
+                    Fr domain_size_inv;
                     //linearization_t linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
                     //Alphas<Fr> powers_of_alpha;
                     //ArithmeticSpongeParams<Fr> fr_sponge_params;

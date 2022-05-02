@@ -79,6 +79,7 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
                         var base;
@@ -94,29 +95,13 @@ namespace nil {
                         }
                     };
 
-                    struct allocated_data_type {
-                        allocated_data_type() {
-                            previously_allocated = false;
-                        }
-
-                        // TODO access modifiers
-                        bool previously_allocated;
-                    };
-
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp,
-                        std::size_t components_amount = 1){
-                        return bp.allocate_rows(rows_amount *
-                            components_amount);
-                    }
-
                     static result_type generate_circuit(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
-                        allocated_data_type &allocated_data,
                         const std::size_t &component_start_row) {
 
-                        generate_gates(bp, assignment, params, allocated_data, component_start_row);
+                        generate_gates(bp, assignment, params, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
 
                         return result_type(params, component_start_row);
@@ -134,20 +119,15 @@ namespace nil {
                     private:
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment, 
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
-                        allocated_data_type &allocated_data,
                         const std::size_t start_row_index) {
-
-                        if (!allocated_data.previously_allocated) {
-                        } else { 
-                        }
 
                     }
 
                     static void generate_copy_constraints(
                             blueprint<ArithmetizationType> &bp,
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
+                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
                             const params_type &params,
                             const std::size_t &component_start_row){
 

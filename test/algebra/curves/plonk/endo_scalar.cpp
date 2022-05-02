@@ -61,6 +61,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
+    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 
     using component_type = zk::components::endo_scalar<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
@@ -78,7 +79,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     typename component_type::params_type params = {challenge_var, endo_factor, num_bits};
     std::vector<typename BlueprintFieldType::value_type> public_input = {challenge};
     std::cout<<"Expected result: "<<result.data<<std::endl;
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input);
+    auto result_check = [&result](AssignmentType &assignment, 
+        component_type::result_type &real_res) {
+        assert(result == assignment.var_value(real_res.endo_scalar));
+    };
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

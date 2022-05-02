@@ -43,6 +43,8 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/proof.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/prover.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/verifier.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
@@ -51,12 +53,6 @@
 
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
 
-#include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/field_type.hpp>
-#include <nil/marshalling/endianness.hpp>
-#include <nil/crypto3/marshalling/zk/types/placeholder/proof.hpp>
-
-#include "test_plonk_component.hpp"
 #include "proof_data.hpp"
 
 using namespace nil::crypto3;
@@ -68,6 +64,25 @@ void print_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end) {
         os << std::setfill('0') << std::setw(2) << std::right << int(*it);
     }
     os << std::endl << std::dec;
+}
+
+template<typename fri_type, typename FieldType>
+    typename fri_type::params_type create_fri_params(std::size_t degree_log) {
+        typename fri_type::params_type params;
+        math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+
+        constexpr std::size_t expand_factor = 0;
+        std::size_t r = degree_log - 1;
+
+        std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
+            zk::commitments::detail::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
+
+        params.r = r;
+        params.D = domain_set;
+        params.q = q;
+        params.max_degree = (1 << degree_log) - 1;
+
+        return params;
 }
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_demo_verifier_test_suite)
@@ -82,7 +97,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
 
     constexpr std::size_t WitnessColumns = 11;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 1;
 
     using ArithmetizationParams =
@@ -97,7 +112,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
 
     auto P = kimchi_proof.commitments.w_comm[0].unshifted[0];
     auto Q = kimchi_proof.commitments.w_comm[1].unshifted[0];
-    std::vector<BlueprintFieldType::value_type> public_input = {0, P.X, P.Y, Q.X, Q.Y};
+    std::vector<BlueprintFieldType::value_type> public_input = {P.X, P.Y, Q.X, Q.Y};
 
     auto expected_result = P + Q;
     std::cout << "exprected result: (" << expected_result.X.data << ", " << expected_result.Y.data << ")" << std::endl;
@@ -116,12 +131,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     bp.allocate_rows(public_input.size());
     component_type::params_type component_params = {
         {
-            assignment_bp.allocate_public_input(public_input[1]),
-            assignment_bp.allocate_public_input(public_input[2])
+            assignment_bp.allocate_public_input(public_input[0]),
+            assignment_bp.allocate_public_input(public_input[1])
         },
         {
-            assignment_bp.allocate_public_input(public_input[3]),
-            assignment_bp.allocate_public_input(public_input[4])
+            assignment_bp.allocate_public_input(public_input[2]),
+            assignment_bp.allocate_public_input(public_input[3])
         }
     };
 
@@ -146,9 +161,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(private_assignment,
                                                                                              public_assignment);
 
-    profiling(assignments);
+    //profiling(assignments);
     using params = zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, hash_type, hash_type, Lambda>;
-    using types = zk::snark::detail::placeholder_policy<BlueprintFieldType, params>;
 
     using fri_type = typename zk::commitments::fri<BlueprintFieldType, typename params::merkle_hash_type,
                                                    typename params::transcript_hash_type, 2>;
@@ -159,10 +173,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
 
     std::size_t permutation_size = desc.witness_columns + desc.public_input_columns + desc.constant_columns;
 
-    typename types::preprocessed_public_data_type public_preprocessed_data =
+    typename zk::snark::placeholder_public_preprocessor<BlueprintFieldType, params>::preprocessed_data_type public_preprocessed_data =
         zk::snark::placeholder_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, desc,
                                                                                      fri_params, permutation_size);
-    typename types::preprocessed_private_data_type private_preprocessed_data =
+    typename zk::snark::placeholder_private_preprocessor<BlueprintFieldType, params>::preprocessed_data_type private_preprocessed_data =
         zk::snark::placeholder_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment, desc);
 
     auto placeholder_proof = zk::snark::placeholder_prover<BlueprintFieldType, params>::process(

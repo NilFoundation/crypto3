@@ -41,7 +41,9 @@ namespace nil {
                 
                 template<typename CurveType>
                 struct kimchi_proof_evaluations {
-
+                    kimchi_proof_evaluations() {
+                        
+                    }
                 };
 
                 template<typename CurveType>

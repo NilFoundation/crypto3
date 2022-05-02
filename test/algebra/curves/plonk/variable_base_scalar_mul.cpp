@@ -120,33 +120,38 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul) {
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 2;
+    constexpr std::size_t SelectorColumns = 3;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
+    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
     using component_type = zk::components::curve_element_variable_base_scalar_mul<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 	using var = zk::snark::plonk_variable<BlueprintFieldType>;
-    BlueprintScalarType::value_type b = algebra::random_element<BlueprintScalarType>();
+    typename BlueprintScalarType::value_type x = algebra::random_element<BlueprintScalarType>();
+	typename curve_type::scalar_field_type::value_type shift = 2;
+	shift = shift.pow(255) + 1;
+	typename BlueprintScalarType::value_type b = (x - shift) / 2;
 	typename curve_type::scalar_field_type::integral_type integral_b = typename curve_type::scalar_field_type::integral_type(b.data);
 	BlueprintFieldType::value_type b_scalar = integral_b;
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
-	var scalar_var = {0, 3, false, var::column_type::public_input};
-    var T_X_var = {0, 1, false, var::column_type::public_input};
-    var T_Y_var = {0, 2, false, var::column_type::public_input};
+	var scalar_var = {0, 2, false, var::column_type::public_input};
+    var T_X_var = {0, 0, false, var::column_type::public_input};
+    var T_Y_var = {0, 1, false, var::column_type::public_input};
 
     typename component_type::params_type assignment_params = {{T_X_var, T_Y_var},scalar_var};
-    std::vector<typename BlueprintFieldType::value_type> public_input = {0, T.X, T.Y, b_scalar};
-	typename curve_type::scalar_field_type::value_type tmp = 2;
-	tmp = tmp.pow(255);
-	tmp = (1 + tmp + 2*b);
-	curve_type::scalar_field_type::value_type c = tmp;
-	curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type acc = c*T;
-    std::cout<<"Expected result: "<<acc.X.data<<" "<< acc.Y.data<<std::endl;
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (assignment_params, public_input);
+    std::vector<typename BlueprintFieldType::value_type> public_input = {T.X, T.Y, b_scalar};
+	std::cout<<"Expected result: "<< (x * T).X.data <<" " << (x * T).Y.data<<std::endl;
+	auto expected = x * T;
+	auto result_check = [&expected](AssignmentType &assignment, 
+        component_type::result_type &real_res) {
+			assert(expected.X == assignment.var_value(real_res.X));
+			assert(expected.Y == assignment.var_value(real_res.Y));
+    };
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (assignment_params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "base_scalar_mul: " << duration.count() << "ms" << std::endl;

@@ -57,38 +57,55 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multi_scalar_mul) {
     using BlueprintScalarType = typename curve_type::scalar_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 2;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
+    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
-    using component_type = zk::components::element_g1_multi_scalar_mul<ArithmetizationType, curve_type,
+    constexpr std::size_t msm_size = 2;
+    using component_type = zk::components::element_g1_multi_scalar_mul<ArithmetizationType, curve_type, msm_size,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 	using var = zk::snark::plonk_variable<BlueprintFieldType>;
-    std::size_t msm_size = 3;
 
-    std::vector<typename BlueprintFieldType::value_type> public_input;
-    typename component_type::params_type assignment_params;
+    std::vector<typename BlueprintFieldType::value_type> public_input = { };
+    typename component_type::params_type assignment_params = {{}, {}};
 
+    curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type sum = 
+        curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type::zero();
     for (std::size_t i = 0; i < msm_size; i++) {
-        BlueprintScalarType::value_type b = algebra::random_element<BlueprintScalarType>();
+        typename curve_type::scalar_field_type::value_type x = algebra::random_element<BlueprintScalarType>();
+        typename curve_type::scalar_field_type::value_type shift = 2;
+        shift = shift.pow(255) + 1;
+        typename curve_type::scalar_field_type::value_type b = (x - shift) / 2;
         typename curve_type::scalar_field_type::integral_type integral_b = typename curve_type::scalar_field_type::integral_type(b.data);
         BlueprintFieldType::value_type b_scalar = integral_b;
+
         curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
         public_input.push_back(b_scalar);
         public_input.push_back(T.X);
         public_input.push_back(T.Y);
-        var scalar_var = {0, msm_size * i, false, var::column_type::public_input};
-        var T_X_var = {0, msm_size * i + 1, false, var::column_type::public_input};
-        var T_Y_var = {0, msm_size * i + 2, false, var::column_type::public_input};
+        var scalar_var = {0, (std::int32_t)(3 * i), false, var::column_type::public_input};
+        var T_X_var = {0, (std::int32_t)(3 * i + 1), false, var::column_type::public_input};
+        var T_Y_var = {0, (std::int32_t)(3 * i + 2), false, var::column_type::public_input};
         assignment_params.scalars.push_back(scalar_var);
         assignment_params.bases.push_back({T_X_var, T_Y_var});
+        sum = sum + x * T;
     }
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (assignment_params, public_input);
+    std::cout<<"expected recult: "<<sum.X.data<<" "<<sum.Y.data<<std::endl;
+
+    auto result_check = [&sum](AssignmentType &assignment, 
+        component_type::result_type &real_res) {
+        assert(sum.X == assignment.var_value(real_res.sum.X));
+        assert(sum.Y == assignment.var_value(real_res.sum.Y));
+    };
+
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (assignment_params, 
+        public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "base_scalar_mul: " << duration.count() << "ms" << std::endl;
