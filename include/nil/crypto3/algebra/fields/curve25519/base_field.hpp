@@ -43,11 +43,7 @@ namespace nil {
                  * https://neuromancer.sk/std/other/Curve25519#
                  * https://neuromancer.sk/std/other/Ed25519#
                  */
-                template<std::size_t Version>
-                struct curve25519_base_field;
-
-                template<>
-                struct curve25519_base_field<255> : public field<255> {
+                struct curve25519_base_field : public field<255> {
                     typedef field<255> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -81,11 +77,9 @@ namespace nil {
                 constexpr
                     typename curve25519_base_field::modular_params_type const curve25519_base_field::modulus_params;
 
-                template<std::size_t Version = 255>
-                using curve25519_fq = curve25519_base_field<Version>;
+                using curve25519_fq = curve25519_base_field;
 
-                template<std::size_t Version = 255>
-                using ed25519 = curve25519_base_field<Version>;
+                using ed25519 = curve25519_base_field;
 
             }    // namespace fields
         }        // namespace algebra
