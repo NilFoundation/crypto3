@@ -203,14 +203,14 @@ namespace nil {
                         const params_type &params,
                         const std::size_t &component_start_row) {
                         std::size_t row = component_start_row;
-                        bp.add_copy_constraint({{W0, static_cast<int>(row), false},
+                        /*bp.add_copy_constraint({{W0, static_cast<int>(row), false},
                             params.input[0]});
                         bp.add_copy_constraint({{W1, static_cast<int>(row), false},
                             params.input[1]});
                         bp.add_copy_constraint({{W2, static_cast<int>(row), false},
                             params.input[2]});
                         bp.add_copy_constraint({{W3, static_cast<int>(row), false},
-                            params.input[0]});
+                            params.input[0]});*/
                     }
 
                     

@@ -42,7 +42,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/multiplication.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/addition.hpp>
 
 #include "../../test_plonk_component.hpp"
 
@@ -50,7 +50,7 @@ using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_multiplication) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_addition) {
     auto start = std::chrono::high_resolution_clock::now();
 
     using curve_type = algebra::curves::pallas;
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_multiplication) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::non_native_field_element_multiplication<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3,
+    using component_type = zk::components::non_native_field_element_addition<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8>;
 
     std::array<var, 4> input_var_a = {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),

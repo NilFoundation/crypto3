@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_FIELDS_EDDSA_ADDITION_COMPONENT_9_WIRES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_FIELDS_EDDSA_ADDITION_COMPONENT_9_WIRES_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_FIELDS_EDDSA_SUBTRACTION_COMPONENT_9_WIRES_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_FIELDS_EDDSA_SUBTRACTION_COMPONENT_9_WIRES_HPP
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/non_native_range.hpp>
@@ -44,7 +44,7 @@ namespace nil {
                          typename CurveType,
                          typename Ed25519Type,
                          std::size_t... WireIndexes>
-                class non_native_field_element_addition;
+                class non_native_field_element_subtraction;
 
                 /*
                 1 non_native range for q
@@ -70,7 +70,7 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class non_native_field_element_addition<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class non_native_field_element_subtraction<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                                        CurveType,
                                                        Ed25519Type,
                                                        W0,
@@ -90,7 +90,7 @@ namespace nil {
                     using non_native_range_component = zk::components::non_native_range<ArithmetizationType, CurveType, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8>;
 
-                    constexpr static const std::size_t selector_seed = 0xff84;
+                    constexpr static const std::size_t selector_seed = 0xff85;
 
                     constexpr static const std::size_t T = 257;
 
@@ -146,7 +146,7 @@ namespace nil {
                         typename Ed25519Type::base_field_type::integral_type integral_eddsa_r = typename Ed25519Type::base_field_type::integral_type(eddsa_r.data);
                         typename Ed25519Type::base_field_type::extended_integral_type eddsa_p =  Ed25519Type::base_field_type::modulus;
                         typename Ed25519Type::base_field_type::extended_integral_type integral_eddsa_q = (typename Ed25519Type::base_field_type::extended_integral_type(eddsa_a.data)
-                         + typename Ed25519Type::base_field_type::extended_integral_type(eddsa_b.data) - typename Ed25519Type::base_field_type::extended_integral_type(eddsa_r.data)) / 
+                         - typename Ed25519Type::base_field_type::extended_integral_type(eddsa_b.data) - typename Ed25519Type::base_field_type::extended_integral_type(eddsa_r.data)) / 
                         eddsa_p;
                         std::cout<<"q = "<<integral_eddsa_q<<std::endl;
                         typename Ed25519Type::base_field_type::extended_integral_type pow = extended_base << 257;
@@ -162,7 +162,7 @@ namespace nil {
                         for (std::size_t i = 1; i<4; i++) {
                             r[i] = (integral_eddsa_r >> (66*i)) & (mask);
                         }
-                        typename CurveType::base_field_type::value_type t =  a[0] + b[0]  + p[0] * q[0];
+                        typename CurveType::base_field_type::value_type t =  a[0] - b[0]  + p[0] * q[0];
 
                         typename CurveType::base_field_type::value_type u0 = t - r[0];
                         
@@ -237,7 +237,7 @@ namespace nil {
                         p[0] = minus_eddsa_p & mask;
 
                         
-                        snark::plonk_constraint<BlueprintFieldType> t =  var(W0, 0) + var(W1, 0)  + p[0] * var(W2, 0);
+                        snark::plonk_constraint<BlueprintFieldType> t =  var(W0, 0) - var(W1, 0)  + p[0] * var(W2, 0);
                         auto constraint_1 = bp.add_constraint(
                             var(W7, 0) * (base << 66) - (t - var(W0, +1)));
 
