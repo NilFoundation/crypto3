@@ -121,10 +121,12 @@ namespace nil {
 
             std::size_t permutation_size = desc.witness_columns + desc.public_input_columns + desc.constant_columns;
 
-            typename types::preprocessed_public_data_type public_preprocessed_data =
+            typename zk::snark::placeholder_public_preprocessor<BlueprintFieldType, placeholder_params>::
+                preprocessed_data_type public_preprocessed_data =
                 zk::snark::placeholder_public_preprocessor<BlueprintFieldType, placeholder_params>::process(
                     bp, public_assignment, desc, fri_params, permutation_size);
-            typename types::preprocessed_private_data_type private_preprocessed_data =
+            typename zk::snark::placeholder_private_preprocessor<BlueprintFieldType, placeholder_params>::
+                preprocessed_data_type private_preprocessed_data =
                 zk::snark::placeholder_private_preprocessor<BlueprintFieldType, placeholder_params>::process(
                     bp, private_assignment, desc);
 
