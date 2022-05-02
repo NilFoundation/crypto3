@@ -24,7 +24,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE blueprint_plonk_unified_addition_test
+#define BOOST_TEST_MODULE blueprint_plonk_non_native_range_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_range) {
 
     typename component_type::params_type params = {input_var};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {455245, 523543, 687689, 54351};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {455245345345345, 523553453454343, 68753453534534689, 543553453453453534};
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input);
 

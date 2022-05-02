@@ -79,26 +79,13 @@ namespace nil {
 
                     constexpr static const std::size_t selector_seed = 0xff80;
 
-                    template<typename ComponentType, typename ArithmetizationType>
-                    friend typename std::enable_if<
-                        (!(has_static_member_function_generate_circuit<ComponentType, void,
-                            boost::mpl::vector<blueprint<ArithmetizationType> &,
-                                blueprint_public_assignment_table<ArithmetizationType> &,
-                                const typename ComponentType::params_type,
-                                const std::size_t>>::value)), void>::type
-                        generate_circuit(
-                            blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                            const typename ComponentType::params_type params,
-                            const std::size_t start_row_index);
-
                     public:
 
                     constexpr static const std::size_t rows_amount = 2;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
-                        std::array<var, 4> input; //66,63,63,63 bits
+                        std::array<var, 4> input; //66,66,66,63 bits
                     };
 
                     struct result_type {
@@ -111,6 +98,7 @@ namespace nil {
                         const params_type &params,
                         const std::size_t &component_start_row) {
                         std::size_t row = component_start_row;
+                        typename BlueprintFieldType::integral_type base = 1;
                         std::array<typename BlueprintFieldType::integral_type, 4> ed25519_value = 
                         {typename BlueprintFieldType::integral_type(assignment.var_value(params.input[0]).data),
                          typename BlueprintFieldType::integral_type(assignment.var_value(params.input[1]).data), 
@@ -121,28 +109,20 @@ namespace nil {
                         assignment.witness(W2)[row] = ed25519_value[2];
                         assignment.witness(W3)[row] = ed25519_value[3];
                         std::array<typename BlueprintFieldType::value_type, 12> range_chunks; 
-                        std::size_t mask = 0;
+                        typename BlueprintFieldType::integral_type mask = 0;
                         typename BlueprintFieldType::value_type xi = 0;
                         for (std::size_t i = 0; i < 4; i++) {
                             for(std::size_t j = 0; j < 3; j++) {
-                                 if (i == 0) {
-                                     mask = (1 << 22) - 1;
-                                     if (j != 0) {
-                                        range_chunks[j] = (ed25519_value[i]>> (1 << (22 * j))) & mask;
-                                     } else {
-                                        range_chunks[j] = ed25519_value[i] & mask;
-                                     }
-                                     if (i+j != 0) {
-                                        xi += range_chunks[j] - (1<<22) + 1;
-                                     }
+                                 if (i == 3) {
+                                     mask = (base << 21) - 1;
+                                     range_chunks[9 + j] = (ed25519_value[i]>> (21 * j)) & mask;
+                                     xi += range_chunks[i*3 + j] - (base<<21) + 1;
                                  } else {
-                                     mask = (1 << 21) - 1;
-                                    if (j != 0) {
-                                        range_chunks[i*3 + j] = (ed25519_value[i]>> (1 << (21 * j))) & mask;
-                                     } else {
-                                        range_chunks[i*3 + j] = ed25519_value[i] & mask;
+                                     mask = (1 << 22) - 1;
+                                     range_chunks[i*3 + j] = (ed25519_value[i]>> (22 * j)) & mask;
+                                     if (i+j != 0) {
+                                        xi += range_chunks[i*3 + j] - (base<<22) + 1;
                                      }
-                                        xi += range_chunks[i*3 + j] - (1<<21) + 1;
                                  }
                             }
                         }
@@ -162,10 +142,30 @@ namespace nil {
                         assignment.witness(W6)[row] = range_chunks[10];
                         assignment.witness(W7)[row] = range_chunks[11];
                         bool c = 0;
-                        if (range_chunks[11] > (1<<21) - 20) {
+                        if (range_chunks[11] > (base<<22) - 20) {
                             c = 1;
                         }
                         assignment.witness(W8)[row] = c;
+                    }
+
+                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type params,
+                        const std::size_t start_row_index){
+
+                        auto selector_iterator = assignment.find_selector(selector_seed);
+                        std::size_t first_selector_index;
+                        if (selector_iterator == assignment.selectors_end()){
+                            first_selector_index = assignment.allocate_selector(selector_seed,
+                                gates_amount);
+                            generate_gates(bp, assignment, params, first_selector_index);
+                        } else {
+                            first_selector_index = selector_iterator->second; 
+                        }
+                        std::size_t j = start_row_index;
+                        assignment.enable_selector(first_selector_index, j);
+                        generate_copy_constraints(bp, assignment, params, j);
+                        return result_type(start_row_index);
                     }
 
                     static void generate_gates(
@@ -173,18 +173,19 @@ namespace nil {
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
                         const std::size_t first_selector_index) {
+                         typename BlueprintFieldType::integral_type base = 1;
                         auto constraint_1 = bp.add_constraint(
-                            var(W0, 0)  -  (var(W4, 0) + var(W5, 0) * (1 << 23) + var(W6, 0)*(1 << 46)));
+                            var(W0, 0)  -  (var(W4, 0) + var(W5, 0) * (base << 22) + var(W6, 0)*(base << 44)));
                         auto constraint_2 = bp.add_constraint(
-                            var(W1, 0)  -  (var(W7, 0) + var(W0, +1) * (1 << 21) + var(W1, +1)*(1 << 42)));
+                            var(W1, 0)  -  (var(W7, 0) + var(W0, +1) * (base << 22) + var(W1, +1)*(base << 44)));
                         auto constraint_3 = bp.add_constraint(
-                            var(W2, 0)  -  (var(W2, +1) + var(W3, +1) * (1 << 21) + var(W4, +1)*(1 << 42)));
+                            var(W2, 0)  -  (var(W2, +1) + var(W3, +1) * (base << 22) + var(W4, +1)*(base << 44)));
                         auto constraint_4 = bp.add_constraint(
-                            var(W3, 0)  -  (var(W5, +1) + var(W6, +1) * (1 << 21) + var(W7, +1)*(1 << 42)));
+                            var(W3, 0)  -  (var(W5, +1) + var(W6, +1) * (base << 21) + var(W7, +1)*(base << 42)));
                         
                         snark::plonk_constraint<BlueprintFieldType> sum = var(W5, 0) + var(W6, 0)
                         + var(W7, 0) + var(W0, +1) + var(W1, +1) + var(W2, +1) + var(W3, +1) + var(W4, + 1) +var(W5, + 1)
-                        + var(W6, +1) + var(W7, +1) - 2*(1 << 22) - 9*(1<<21) + 11;
+                        + var(W6, +1) + var(W7, +1) - 3*(base << 21) - 8*(base<<22) + 11;
                         auto constraint_5 = bp.add_constraint(
                             sum * (var(W8, 0)* sum - 1));
                         auto constraint_6 = bp.add_constraint(
