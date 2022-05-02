@@ -126,7 +126,7 @@ namespace nil {
 
                         const std::size_t j = start_row_index;
 
-                        assignment.public_input(0)[0] = ArithmetizationType::field_type::value_type::zero();
+                        assignment.constant(0)[0] = ArithmetizationType::field_type::value_type::zero();
 
                         typename BlueprintFieldType::value_type p_x = assignment.var_value(params.P.x);
                         typename BlueprintFieldType::value_type p_y = assignment.var_value(params.P.y);
@@ -216,14 +216,8 @@ namespace nil {
                             const params_type params,
                             const std::size_t start_row_index){
 
-                        std::size_t public_input_column_index = 0;
-
-                        const std::size_t j = start_row_index;
-
-                        bp.add_copy_constraint({{W6, static_cast<int>(j), false},
-                            {public_input_column_index, 0, false, var::column_type::public_input}});
-
-                        assignment.public_input(public_input_column_index)[0] = 0;
+                        bp.add_copy_constraint({{W6, static_cast<int>(start_row_index), false},
+                            {0, 0, false, var::column_type::constant}});
                     }
                 };
             }    // namespace components
