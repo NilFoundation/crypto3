@@ -157,7 +157,7 @@ namespace nil {
                         typename field_op_component::mul::result_type res = 
                             field_op_component::mul::generate_assignments(assignment, params, component_start_row);
                         component_start_row += field_op_component::mul::rows_amount;
-                        return res.result;
+                        return res.res;
                     }
 
                     static std::vector<var> assigment_element_powers(blueprint_assignment_table<ArithmetizationType> &assignment,
@@ -384,6 +384,19 @@ namespace nil {
                             {params.fq_output.zeta, endo_factor, endo_num_bits}, row);
                         row += endo_scalar_component::rows_amount;
 
+                        // fr_transcript.absorb(fq_digest)
+                        var zero = var(0, 0, false, var::column_type::constant);
+                        kimchi_transcript<ArithmetizationType, CurveType,
+                            W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> transcript;
+                        transcript.init_circuit(bp, assignment, zero, row);
+                        transcript.absorb_circuit(bp, assignment, params.fq_output.fq_digest, row);
+
+                        // zeta_pow_n = zeta**n
+                        var zeta_pow_n = 
+                            exponentiation_component::generate_circuit(bp, assignment, 
+                            {params.fq_output.zeta, params.verifier_index.domain_size}, row).result;
+                        row += exponentiation_component::rows_amount;
+
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(params, start_row_index);
                     }
@@ -418,13 +431,14 @@ namespace nil {
                             zeta, row);
                         std::cout<<"zeta: "<<assignment.var_value(zeta_endo).data<<std::endl;
 
+                        assignment.constant(0)[0] = 0; // set zero constant
                         kimchi_transcript<ArithmetizationType, CurveType,
                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> transcript;
                         transcript.init_assignment(assignment, row);
                         transcript.absorb_assignment(assignment,
                             fq_digest, row);
 
-                        var n = assignment.allocate_public_input(params.verifier_index.n);
+                        var n = params.verifier_index.domain_size;
                         var zeta_pow_n = assignment_exponentiation(assignment, zeta, n, row);
 
                         var zeta_omega = assigment_multiplication(assignment, zeta, omega, row);

@@ -90,7 +90,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
         0x1764D9CB4C64EBA9A150920807637D458919CB6948821F4D15EB1994EADF9CE3_cppui256,
         0x0140117C8BBC4CE4644A58F7007148577782213065BB9699BF5C391FBE1B3E6D_cppui256,
         0x0000000000000000000000000000000000000000000000000000000000000001_cppui256};
-    verifier_index.n = 512;
+    std::size_t domain_size = 512;
+    verifier_index.domain_size = var(0, 6, false, var::column_type::public_input);
     verifier_index.public_input_size = 0;
     verifier_index.alpha_powers = 1;
 
@@ -103,7 +104,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
 
     typename component_type::params_type params = {verifier_index, proof, fq_output};
     std::vector<typename BlueprintFieldType::value_type> public_input = {joint_combiner, beta, gamma, 
-        alpha, zeta, fq_digest};
+        alpha, zeta, fq_digest,
+        //verifier_index (6+)
+        domain_size};
 
     auto result_check = [](AssignmentType &assignment, 
         component_type::result_type &real_res) {
