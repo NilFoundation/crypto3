@@ -173,8 +173,8 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_polynomials_test) {
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
 
-    constexpr static const std::size_t r = table_rows_log - 1;
-    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type> lpc_type;
+    typedef commitments::list_polynomial_commitment<FieldType,
+        circuit_2_params::batched_commitment_params_type> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -189,11 +189,14 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_polynomials_test) {
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-    typename policy_type::preprocessed_public_data_type preprocessed_public_data =
+    typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_public_data =
         placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
+            constraint_system, assignments.public_table(), desc,
+            fri_params, columns_with_copy_constraints.size());
 
-    typename policy_type::preprocessed_private_data_type preprocessed_private_data =
+    typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_private_data =
         placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
                                                                                assignments.private_table(), desc);
 
@@ -248,8 +251,8 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
 
-    constexpr static const std::size_t r = table_rows_log - 1;
-    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type> lpc_type;
+    typedef commitments::list_polynomial_commitment<FieldType,
+        circuit_2_params::batched_commitment_params_type> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -264,11 +267,14 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-    typename policy_type::preprocessed_public_data_type preprocessed_public_data =
+    typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_public_data =
         placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
+            constraint_system, assignments.public_table(), desc,
+            fri_params, columns_with_copy_constraints.size());
 
-    typename policy_type::preprocessed_private_data_type preprocessed_private_data =
+    typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_private_data =
         placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
                                                                                assignments.private_table(), desc);
 
@@ -281,9 +287,10 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
     transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> verifier_transcript(
         init_blob);
 
-    typename placeholder_permutation_argument<FieldType, lpc_type, lpc_type, circuit_2_params>::prover_result_type
-        prover_res = placeholder_permutation_argument<FieldType, lpc_type, lpc_type, circuit_2_params>::prove_eval(
-            constraint_system, preprocessed_public_data, desc, polynomial_table, fri_params, prover_transcript);
+    typename placeholder_permutation_argument<FieldType, circuit_2_params>::prover_result_type
+        prover_res = placeholder_permutation_argument<FieldType, circuit_2_params>::prove_eval(
+            constraint_system, preprocessed_public_data, desc, polynomial_table,
+            fri_params, prover_transcript);
 
     // Challenge phase
     typename FieldType::value_type y = algebra::random_element<FieldType>();
@@ -296,7 +303,7 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
     typename FieldType::value_type v_p_at_y_shifted = prover_res.permutation_polynomial.evaluate(circuit.omega * y);
 
     std::array<typename FieldType::value_type, 3> verifier_res =
-        placeholder_permutation_argument<FieldType, lpc_type, lpc_type, circuit_2_params>::verify_eval(
+        placeholder_permutation_argument<FieldType, circuit_2_params>::verify_eval(
             preprocessed_public_data, y, f_at_y, v_p_at_y, v_p_at_y_shifted,
             prover_res.permutation_poly_precommitment.root(), verifier_transcript);
 
@@ -317,8 +324,8 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
 
-    constexpr static const std::size_t r = table_rows_log - 1;
-    typedef commitments::list_polynomial_commitment<FieldType, circuit_3_params::commitment_params_type> lpc_type;
+    typedef commitments::list_polynomial_commitment<FieldType,
+        circuit_3_params::batched_commitment_params_type> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -331,11 +338,13 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
                                                                    circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    typename policy_type::preprocessed_public_data_type preprocessed_public_data =
+    typename placeholder_public_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
+        preprocessed_public_data =
         placeholder_public_preprocessor<FieldType, circuit_3_params>::process(
             constraint_system, assignments.public_table(), desc, fri_params, 0);
 
-    typename policy_type::preprocessed_private_data_type preprocessed_private_data =
+    typename placeholder_private_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
+        preprocessed_private_data =
         placeholder_private_preprocessor<FieldType, circuit_3_params>::process(constraint_system,
                                                                                assignments.private_table(), desc);
 
@@ -351,7 +360,8 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
 
     typename placeholder_lookup_argument<FieldType, lpc_type, circuit_3_params>::prover_lookup_result prover_res =
         placeholder_lookup_argument<FieldType, lpc_type, circuit_3_params>::prove_eval(
-            constraint_system, preprocessed_public_data, assignments, fri_params, prover_transcript);
+            constraint_system, preprocessed_public_data, assignments,
+            fri_params, prover_transcript);
 
     // Challenge phase
     typename FieldType::value_type y = algebra::random_element<FieldType>();
@@ -420,7 +430,6 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
 
-    constexpr static const std::size_t r = table_rows_log - 1;
     typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
@@ -436,11 +445,14 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-    typename policy_type::preprocessed_public_data_type preprocessed_public_data =
+    typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_public_data =
         placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
+            constraint_system, assignments.public_table(), desc,
+            fri_params, columns_with_copy_constraints.size());
 
-    typename policy_type::preprocessed_private_data_type preprocessed_private_data =
+    typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_private_data =
         placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
                                                                                assignments.private_table(), desc);
 
@@ -524,7 +536,8 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
 
-    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type> lpc_type;
+    typedef commitments::list_polynomial_commitment<FieldType,
+        circuit_2_params::batched_commitment_params_type> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -539,11 +552,14 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-    typename policy_type::preprocessed_public_data_type preprocessed_public_data =
+    typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_public_data =
         placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
+            constraint_system, assignments.public_table(), desc,
+            fri_params, columns_with_copy_constraints.size());
 
-    typename policy_type::preprocessed_private_data_type preprocessed_private_data =
+    typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_private_data =
         placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
                                                                                assignments.private_table(), desc);
 

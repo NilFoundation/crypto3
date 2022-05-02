@@ -38,10 +38,10 @@
 #include <nil/crypto3/container/merkle/tree.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
-#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -68,8 +68,10 @@ namespace nil {
                         typename CommitmentSchemeTypePermutation::precommitment_type V_L_precommitment;
                     };
                     static inline prover_lookup_result
-                        prove_eval(typename policy_type::constraint_system_type &constraint_system,
-                                   const typename policy_type::preprocessed_public_data_type preprocessed_data,
+                        prove_eval(plonk_constraint_system<FieldType,
+                                        typename ParamsType::arithmetization_params> &constraint_system,
+                                   const typename placeholder_public_preprocessor<FieldType, ParamsType>::
+                                        preprocessed_data_type preprocessed_data,
                                    const plonk_assignment_table<FieldType, typename ParamsType::arithmetization_params>
                                        &plonk_columns,
                                    typename CommitmentSchemeTypePermutation::params_type fri_params,
@@ -254,7 +256,8 @@ namespace nil {
                     }
 
                     static inline std::array<typename FieldType::value_type, argument_size> verify_eval(
-                        const typename policy_type::preprocessed_public_data_type preprocessed_data,
+                        const typename placeholder_public_preprocessor<FieldType, ParamsType>::
+                                    preprocessed_data_type preprocessed_data,
                         const std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> &lookup_gates,
                         // y
                         const typename FieldType::value_type &challenge,

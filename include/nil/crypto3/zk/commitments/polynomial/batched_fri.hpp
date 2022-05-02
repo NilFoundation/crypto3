@@ -38,7 +38,7 @@
 #include <nil/crypto3/container/merkle/proof.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri_compile_time_size.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -63,12 +63,10 @@ namespace nil {
                          typename TranscriptHashType,
                          std::size_t M = 2,
                          std::size_t BatchSize = 1>
-                struct batched_fri
-                    : public detail::
-                          basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize> {
+                struct batched_fri : public detail::basic_batched_fri_compile_time_size<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize> {
 
-                    using basic_fri =
-                        detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize>;
+                    using basic_fri = detail::basic_batched_fri_compile_time_size<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize>;
+
                     constexpr static const std::size_t m = basic_fri::m;
                     constexpr static const std::size_t leaf_size = BatchSize;
 
