@@ -138,12 +138,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul) {
 	typename curve_type::scalar_field_type::integral_type integral_b = typename curve_type::scalar_field_type::integral_type(b.data);
 	BlueprintFieldType::value_type b_scalar = integral_b;
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
-	var scalar_var = {0, 3, false, var::column_type::public_input};
-    var T_X_var = {0, 1, false, var::column_type::public_input};
-    var T_Y_var = {0, 2, false, var::column_type::public_input};
+	var scalar_var = {0, 2, false, var::column_type::public_input};
+    var T_X_var = {0, 0, false, var::column_type::public_input};
+    var T_Y_var = {0, 1, false, var::column_type::public_input};
 
     typename component_type::params_type assignment_params = {{T_X_var, T_Y_var},scalar_var};
-    std::vector<typename BlueprintFieldType::value_type> public_input = {0, T.X, T.Y, b_scalar};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {T.X, T.Y, b_scalar};
 	std::cout<<"Expected result: "<< (x * T).X.data <<" " << (x * T).Y.data<<std::endl;
 	auto expected = x * T;
 	auto result_check = [&expected](AssignmentType &assignment, 

@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 11;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 1;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -112,10 +112,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     auto expected_res = P + Q;
 
     typename component_type::params_type params = {
-        {var(0, 1, false, var::column_type::public_input), var(0, 2, false, var::column_type::public_input)},
-        {var(0, 3, false, var::column_type::public_input), var(0, 4, false, var::column_type::public_input)}};
+        {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)},
+        {var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)}};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {0, P.X, P.Y, Q.X, Q.Y};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {P.X, P.Y, Q.X, Q.Y};
 
     auto result_check = [&expected_res](AssignmentType &assignment, 
         component_type::result_type &real_res) {

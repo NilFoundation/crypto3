@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_base_endo_scalar_mul) {
     using BlueprintScalarType = typename curve_type::scalar_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 2;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -75,12 +75,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_base_endo_scalar_mul) {
     typename curve_type::scalar_field_type::integral_type integral_b = typename curve_type::scalar_field_type::integral_type(b.data);
 	BlueprintFieldType::value_type b_scalar = integral_b;
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
-    var scalar_var = {0, 0, false, var::column_type::public_input};
     var T_X_var = {0, 0, false, var::column_type::public_input};
-    var T_Y_var = {0, 0, false, var::column_type::public_input};
+    var T_Y_var = {0, 1, false, var::column_type::public_input};
+    var scalar_var = {0, 2, false, var::column_type::public_input};
 
     typename component_type::params_type assignment_params = {{T_X_var, T_Y_var},scalar_var};
-    std::vector<typename BlueprintFieldType::value_type> public_input = {0, T.X, T.Y, b_scalar};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {T.X, T.Y, b_scalar};
 
     constexpr static const typename BlueprintFieldType::value_type endo  = component_type::endo;
     typename BlueprintFieldType::value_type endo_scalar = 0x244630A7EE5033DA383B3677B4C5CA94A3EBE4156FC4FA4E08B35974929CA2C5_cppui255;
