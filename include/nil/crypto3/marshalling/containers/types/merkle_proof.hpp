@@ -46,23 +46,43 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                template<typename TTypeBase, typename MerkleProof, typename = void>
+                template<typename TTypeBase, typename T, typename = void>
                 struct merkle_node_value;
 
-                template<typename TTypeBase, typename MerkleProof>
+                template<typename TTypeBase, typename ValueType>
                 struct merkle_node_value<
                     TTypeBase,
-                    MerkleProof,
+                    ValueType,
                     typename std::enable_if<std::is_same<
                         std::uint8_t,
-                        typename std::iterator_traits<typename MerkleProof::value_type::iterator>::value_type>::value>::
-                        type> {
+                        typename std::iterator_traits<typename ValueType::iterator>::value_type>::value>::type> {
                     // TODO: use option::fixed_size_storage instead of option::sequence_size_field_prefix
                     using type = nil::marshalling::types::array_list<
                         TTypeBase,
                         nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
                         nil::marshalling::option::sequence_size_field_prefix<
                             nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>;
+                };
+
+                template<typename TTypeBase, typename MerkleProof>
+                struct merkle_node_value<
+                    TTypeBase,
+                    MerkleProof,
+                    typename std::enable_if<
+                        std::is_same<MerkleProof,
+                                     nil::crypto3::containers::merkle_proof<typename MerkleProof::hash_type,
+                                                                            MerkleProof::arity>>::value>::type> {
+                    using type = typename merkle_node_value<TTypeBase, typename MerkleProof::value_type>::type;
+                };
+
+                template<typename TTypeBase, typename MerkleTree>
+                struct merkle_node_value<TTypeBase,
+                                         MerkleTree,
+                                         typename std::enable_if<std::is_same<
+                                             MerkleTree,
+                                             nil::crypto3::containers::merkle_tree<typename MerkleTree::hash_type,
+                                                                                   MerkleTree::arity>>::value>::type> {
+                    using type = typename merkle_node_value<TTypeBase, typename MerkleTree::value_type>::type;
                 };
 
                 template<typename TTypeBase, typename MerkleProof, typename = void>
@@ -115,14 +135,20 @@ namespace nil {
                                                         // path_type _path
                                                         typename merkle_proof_path<TTypeBase, MerkleProof>::type>>;
 
-                template<typename MerkleProof, typename Endianness>
-                typename merkle_node_value<nil::marshalling::field_type<Endianness>, MerkleProof>::type
-                    fill_merkle_node_value(const typename MerkleProof::value_type &node_value) {
+                template<
+                    typename ValueType,
+                    typename Endianness,
+                    typename std::enable_if<
+                        std::is_same<std::uint8_t,
+                                     typename std::iterator_traits<typename ValueType::iterator>::value_type>::value,
+                        bool>::type = true>
+                typename merkle_node_value<nil::marshalling::field_type<Endianness>, ValueType>::type
+                    fill_merkle_node_value(const ValueType &node_value) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using octet_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint8_t>;
 
-                    typename merkle_node_value<nil::marshalling::field_type<Endianness>, MerkleProof>::type
+                    typename merkle_node_value<nil::marshalling::field_type<Endianness>, ValueType>::type
                         filled_node_value;
                     for (const auto c : node_value) {
                         filled_node_value.value().push_back(octet_marshalling_type(c));
@@ -130,16 +156,47 @@ namespace nil {
                     return filled_node_value;
                 }
 
-                template<typename MerkleProof, typename Endianness>
-                typename MerkleProof::value_type
+                template<typename MerkleProof,
+                         typename Endianness,
+                         typename std::enable_if<
+                             std::is_same<MerkleProof,
+                                          nil::crypto3::containers::merkle_proof<typename MerkleProof::hash_type,
+                                                                                 MerkleProof::arity>>::value,
+                             bool>::type = true>
+                typename merkle_node_value<nil::marshalling::field_type<Endianness>, MerkleProof>::type
+                    fill_merkle_node_value(const typename MerkleProof::value_type &node_value) {
+                    return fill_merkle_node_value<typename MerkleProof::value_type, Endianness>(node_value);
+                }
+
+                template<
+                    typename ValueType,
+                    typename Endianness,
+                    typename std::enable_if<
+                        std::is_same<std::uint8_t,
+                                     typename std::iterator_traits<typename ValueType::iterator>::value_type>::value,
+                        bool>::type = true>
+                ValueType
                     make_merkle_node_value(const typename merkle_node_value<nil::marshalling::field_type<Endianness>,
-                                                                            MerkleProof>::type &filled_node_value) {
-                    typename MerkleProof::value_type node_value;
+                                                                            ValueType>::type &filled_node_value) {
+                    ValueType node_value;
                     BOOST_ASSERT(node_value.size() == filled_node_value.value().size());
                     for (std::size_t i = 0; i < filled_node_value.value().size(); ++i) {
                         node_value.at(i) = filled_node_value.value().at(i).value();
                     }
                     return node_value;
+                }
+
+                template<typename MerkleProof,
+                         typename Endianness,
+                         typename std::enable_if<
+                             std::is_same<MerkleProof,
+                                          nil::crypto3::containers::merkle_proof<typename MerkleProof::hash_type,
+                                                                                 MerkleProof::arity>>::value,
+                             bool>::type = true>
+                typename MerkleProof::value_type
+                    make_merkle_node_value(const typename merkle_node_value<nil::marshalling::field_type<Endianness>,
+                                                                            MerkleProof>::type &filled_node_value) {
+                    return make_merkle_node_value<typename MerkleProof::value_type, Endianness>(filled_node_value);
                 }
 
                 template<typename MerkleProof, typename Endianness>

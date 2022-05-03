@@ -50,12 +50,8 @@ namespace nil {
             namespace types {
                 template<typename TTypeBase, typename Proof,
                          typename = typename std::enable_if<
-                             std::is_same<
-                                 Proof, nil::crypto3::zk::snark::placeholder_proof<
-                                            typename Proof::field_type, typename Proof::commitment_scheme_type_witness,
-                                            typename Proof::commitment_scheme_type_permutation,
-                                            typename Proof::commitment_scheme_type_quotient,
-                                            typename Proof::commitment_scheme_type_public>>::value,
+                             std::is_same<Proof, nil::crypto3::zk::snark::placeholder_proof<
+                                                     typename Proof::field_type, typename Proof::params_type>>::value,
                              bool>::type,
                          typename... TOptions>
                 using placeholder_evaluation_proof = nil::marshalling::types::bundle<
@@ -63,112 +59,58 @@ namespace nil {
                     std::tuple<
                         // typename FieldType::value_type challenge
                         field_element<TTypeBase, typename Proof::field_type::value_type>,
-                        // typename CommitmentSchemeTypeWitness::proof_type witness
-                        typename lpc_proof<TTypeBase, typename Proof::commitment_scheme_type_witness>::type,
-                        // std::vector<typename CommitmentSchemeTypePermutation::proof_type> permutation
+                        // typename witness_commitment_scheme_type::proof_type witness
+                        typename lpc_proof<TTypeBase, typename Proof::witness_commitment_scheme_type>::type,
+                        // typename permutation_commitment_scheme_type::proof_type permutation
+                        typename lpc_proof<TTypeBase, typename Proof::permutation_commitment_scheme_type>::type,
+                        // typename runtime_size_commitment_scheme_type::proof_type quotient
+                        typename lpc_proof<TTypeBase, typename Proof::runtime_size_commitment_scheme_type>::type,
+                        // std::vector<typename quotient_commitment_scheme_type::proof_type> lookups
                         nil::marshalling::types::array_list<
                             TTypeBase,
-                            typename lpc_proof<TTypeBase, typename Proof::commitment_scheme_type_permutation>::type,
+                            typename lpc_proof<TTypeBase, typename Proof::quotient_commitment_scheme_type>::type,
                             nil::marshalling::option::sequence_size_field_prefix<
                                 nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
-                        // std::vector<typename CommitmentSchemeTypeQuotient::proof_type> quotient
-                        nil::marshalling::types::array_list<
-                            TTypeBase,
-                            typename lpc_proof<TTypeBase, typename Proof::commitment_scheme_type_quotient>::type,
-                            nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
-                        // std::vector<typename CommitmentSchemeTypeQuotient::proof_type> lookups
-                        nil::marshalling::types::array_list<
-                            TTypeBase,
-                            typename lpc_proof<TTypeBase, typename Proof::commitment_scheme_type_quotient>::type,
-                            nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
-                        // std::vector<typename commitment_scheme_type_public::proof_type> id_permutation
-                        nil::marshalling::types::array_list<
-                            TTypeBase,
-                            typename lpc_proof<TTypeBase, typename Proof::commitment_scheme_type_public>::type,
-                            nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
-                        // std::vector<typename commitment_scheme_type_public::proof_type> sigma_permutation
-                        nil::marshalling::types::array_list<
-                            TTypeBase,
-                            typename lpc_proof<TTypeBase, typename Proof::commitment_scheme_type_public>::type,
-                            nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
-                        // std::vector<typename commitment_scheme_type_public::proof_type> public_input
-                        nil::marshalling::types::array_list<
-                            TTypeBase,
-                            typename lpc_proof<TTypeBase, typename Proof::commitment_scheme_type_public>::type,
-                            nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
-                        // std::vector<typename commitment_scheme_type_public::proof_type> constant
-                        nil::marshalling::types::array_list<
-                            TTypeBase,
-                            typename lpc_proof<TTypeBase, typename Proof::commitment_scheme_type_public>::type,
-                            nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
-                        // std::vector<typename commitment_scheme_type_public::proof_type> selector
-                        nil::marshalling::types::array_list<
-                            TTypeBase,
-                            typename lpc_proof<TTypeBase, typename Proof::commitment_scheme_type_public>::type,
-                            nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
-                        // std::vector<typename commitment_scheme_type_public::proof_type> special_selectors
-                        nil::marshalling::types::array_list<
-                            TTypeBase,
-                            typename lpc_proof<TTypeBase, typename Proof::commitment_scheme_type_public>::type,
-                            nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>>>;
+                        // typename runtime_size_commitment_scheme_type::proof_type id_permutation
+                        typename lpc_proof<TTypeBase, typename Proof::runtime_size_commitment_scheme_type>::type,
+                        // typename runtime_size_commitment_scheme_type::proof_type sigma_permutation
+                        typename lpc_proof<TTypeBase, typename Proof::runtime_size_commitment_scheme_type>::type,
+                        // typename public_input_commitment_scheme_type::proof_type public_input
+                        typename lpc_proof<TTypeBase, typename Proof::public_input_commitment_scheme_type>::type,
+                        // typename constant_commitment_scheme_type::proof_type constant
+                        typename lpc_proof<TTypeBase, typename Proof::constant_commitment_scheme_type>::type,
+                        // typename selector_commitment_scheme_type::proof_type selector
+                        typename lpc_proof<TTypeBase, typename Proof::selector_commitment_scheme_type>::type,
+                        // typename special_commitment_scheme_type::proof_type special_selectors
+                        typename lpc_proof<TTypeBase, typename Proof::special_commitment_scheme_type>::type>>;
 
                 template<typename TTypeBase, typename Proof,
                          typename = typename std::enable_if<
-                             std::is_same<
-                                 Proof, nil::crypto3::zk::snark::placeholder_proof<
-                                            typename Proof::field_type, typename Proof::commitment_scheme_type_witness,
-                                            typename Proof::commitment_scheme_type_permutation,
-                                            typename Proof::commitment_scheme_type_quotient,
-                                            typename Proof::commitment_scheme_type_public>>::value,
+                             std::is_same<Proof, nil::crypto3::zk::snark::placeholder_proof<
+                                                     typename Proof::field_type, typename Proof::params_type>>::value,
                              bool>::type,
                          typename... TOptions>
                 using placeholder_proof = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
-                        // TODO: use nil::marshalling::option::fixed_size_storage with hash_type::digest_size
-                        // TODO: review std::uint8_t type usage (for example, pedersen outputs array of bits)
-                        // typename CommitmentSchemeTypeWitness::commitment_type witness_commitment
-                        nil::marshalling::types::array_list<
-                            TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
-                            nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
-                        // typename CommitmentSchemeTypePermutation::commitment_type v_perm_commitment
-                        nil::marshalling::types::array_list<
-                            TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
-                            nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
-                        // typename CommitmentSchemeTypePermutation::commitment_type input_perm_commitment
-                        nil::marshalling::types::array_list<
-                            TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
-                            nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
-                        // typename CommitmentSchemeTypePermutation::commitment_type value_perm_commitment
-                        nil::marshalling::types::array_list<
-                            TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
-                            nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
-                        // typename CommitmentSchemeTypePermutation::commitment_type v_l_perm_commitment
-                        nil::marshalling::types::array_list<
-                            TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
-                            nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
-                        // std::vector<typename CommitmentSchemeTypeQuotient::commitment_type> T_commitments
-                        nil::marshalling::types::array_list<
-                            TTypeBase,
-                            nil::marshalling::types::array_list<
-                                TTypeBase, nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
-                                nil::marshalling::option::sequence_size_field_prefix<
-                                    nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
-                            nil::marshalling::option::sequence_size_field_prefix<
-                                nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
+                        // typename witness_commitment_scheme_type::commitment_type witness_commitment
+                        typename merkle_node_value<
+                            TTypeBase, typename Proof::witness_commitment_scheme_type::commitment_type>::type,
+                        // typename permutation_commitment_scheme_type::commitment_type v_perm_commitment
+                        typename merkle_node_value<
+                            TTypeBase, typename Proof::permutation_commitment_scheme_type::commitment_type>::type,
+                        // typename permutation_commitment_scheme_type::commitment_type input_perm_commitment
+                        typename merkle_node_value<
+                            TTypeBase, typename Proof::permutation_commitment_scheme_type::commitment_type>::type,
+                        // typename permutation_commitment_scheme_type::commitment_type value_perm_commitment
+                        typename merkle_node_value<
+                            TTypeBase, typename Proof::permutation_commitment_scheme_type::commitment_type>::type,
+                        // typename permutation_commitment_scheme_type::commitment_type v_l_perm_commitment
+                        typename merkle_node_value<
+                            TTypeBase, typename Proof::permutation_commitment_scheme_type::commitment_type>::type,
+                        // typename runtime_size_commitment_scheme_type::commitment_type T_commitment
+                        typename merkle_node_value<
+                            TTypeBase, typename Proof::runtime_size_commitment_scheme_type::commitment_type>::type,
                         // evaluation_proof eval_proof
                         placeholder_evaluation_proof<TTypeBase, Proof>>>;
 
@@ -180,95 +122,75 @@ namespace nil {
                     using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
                     using field_marhsalling_type = field_element<TTypeBase, typename Proof::field_type::value_type>;
                     using lpc_witness_proof_marshalling_type =
-                        typename lpc_proof<TTypeBase, typename Proof::commitment_scheme_type_witness>::type;
-                    using lpc_witness_proof_vector_marshalling_type = nil::marshalling::types::array_list<
-                        TTypeBase, lpc_witness_proof_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
+                        typename lpc_proof<TTypeBase, typename Proof::witness_commitment_scheme_type>::type;
                     using lpc_permutation_proof_marshalling_type =
-                        typename lpc_proof<TTypeBase, typename Proof::commitment_scheme_type_permutation>::type;
-                    using lpc_permutation_proof_vector_marshalling_type = nil::marshalling::types::array_list<
-                        TTypeBase, lpc_permutation_proof_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
+                        typename lpc_proof<TTypeBase, typename Proof::permutation_commitment_scheme_type>::type;
                     using lpc_quotient_proof_marshalling_type =
-                        typename lpc_proof<TTypeBase, typename Proof::commitment_scheme_type_quotient>::type;
+                        typename lpc_proof<TTypeBase, typename Proof::quotient_commitment_scheme_type>::type;
                     using lpc_quotient_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, lpc_quotient_proof_marshalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
-                    using lpc_public_proof_marshalling_type =
-                        typename lpc_proof<TTypeBase, typename Proof::commitment_scheme_type_public>::type;
-                    using lpc_public_proof_vector_marshalling_type = nil::marshalling::types::array_list<
-                        TTypeBase, lpc_public_proof_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
+                    using lpc_runtime_size_proof_marshalling_type =
+                        typename lpc_proof<TTypeBase, typename Proof::runtime_size_commitment_scheme_type>::type;
+                    using lpc_public_input_proof_marshalling_type =
+                        typename lpc_proof<TTypeBase, typename Proof::public_input_commitment_scheme_type>::type;
+                    using lpc_constant_proof_marshalling_type =
+                        typename lpc_proof<TTypeBase, typename Proof::constant_commitment_scheme_type>::type;
+                    using lpc_selector_proof_marshalling_type =
+                        typename lpc_proof<TTypeBase, typename Proof::selector_commitment_scheme_type>::type;
+                    using lpc_special_proof_marshalling_type =
+                        typename lpc_proof<TTypeBase, typename Proof::special_commitment_scheme_type>::type;
 
                     // typename FieldType::value_type challenge
                     field_marhsalling_type filled_challenge = field_marhsalling_type(proof.challenge);
 
                     // typename CommitmentSchemeTypeWitness::proof_type witness
                     lpc_witness_proof_marshalling_type filled_witness =
-                        fill_lpc_proof<typename Proof::commitment_scheme_type_witness, Endianness>(proof.witness);
+                        fill_lpc_proof<typename Proof::witness_commitment_scheme_type, Endianness>(proof.witness);
 
-                    // std::vector<typename CommitmentSchemeTypePermutation::proof_type> permutation
-                    lpc_permutation_proof_vector_marshalling_type filled_permutation;
-                    for (const auto &p : proof.permutation) {
-                        filled_permutation.value().push_back(
-                            fill_lpc_proof<typename Proof::commitment_scheme_type_permutation, Endianness>(p));
-                    }
+                    // typename permutation_commitment_scheme_type::proof_type permutation
+                    lpc_permutation_proof_marshalling_type filled_permutation =
+                        fill_lpc_proof<typename Proof::permutation_commitment_scheme_type, Endianness>(
+                            proof.permutation);
 
-                    // std::vector<typename CommitmentSchemeTypeQuotient::proof_type> quotient
-                    lpc_quotient_proof_vector_marshalling_type filled_quotient;
-                    for (const auto &p : proof.quotient) {
-                        filled_quotient.value().push_back(
-                            fill_lpc_proof<typename Proof::commitment_scheme_type_quotient, Endianness>(p));
-                    }
+                    // typename runtime_size_commitment_scheme_type::proof_type quotient
+                    lpc_runtime_size_proof_marshalling_type filled_quotient =
+                        fill_lpc_proof<typename Proof::runtime_size_commitment_scheme_type, Endianness>(proof.quotient);
 
-                    // std::vector<typename CommitmentSchemeTypeQuotient::proof_type> lookups
+                    // std::vector<typename quotient_commitment_scheme_type::proof_type> lookups
                     lpc_quotient_proof_vector_marshalling_type filled_lookups;
                     for (const auto &p : proof.lookups) {
                         filled_lookups.value().push_back(
-                            fill_lpc_proof<typename Proof::commitment_scheme_type_quotient, Endianness>(p));
+                            fill_lpc_proof<typename Proof::quotient_commitment_scheme_type, Endianness>(p));
                     }
 
-                    // std::vector<typename commitment_scheme_type_public::proof_type> id_permutation
-                    lpc_public_proof_vector_marshalling_type filled_id_permutation;
-                    for (const auto &p : proof.id_permutation) {
-                        filled_id_permutation.value().push_back(
-                            fill_lpc_proof<typename Proof::commitment_scheme_type_public, Endianness>(p));
-                    }
+                    // typename runtime_size_commitment_scheme_type::proof_type id_permutation
+                    lpc_runtime_size_proof_marshalling_type filled_id_permutation =
+                        fill_lpc_proof<typename Proof::runtime_size_commitment_scheme_type, Endianness>(
+                            proof.id_permutation);
 
-                    // std::vector<typename commitment_scheme_type_public::proof_type> sigma_permutation
-                    lpc_public_proof_vector_marshalling_type filled_sigma_permutation;
-                    for (const auto &p : proof.sigma_permutation) {
-                        filled_sigma_permutation.value().push_back(
-                            fill_lpc_proof<typename Proof::commitment_scheme_type_public, Endianness>(p));
-                    }
+                    // typename runtime_size_commitment_scheme_type::proof_type sigma_permutation
+                    lpc_runtime_size_proof_marshalling_type filled_sigma_permutation =
+                        fill_lpc_proof<typename Proof::runtime_size_commitment_scheme_type, Endianness>(
+                            proof.sigma_permutation);
 
-                    // std::vector<typename commitment_scheme_type_public::proof_type> public_input
-                    lpc_public_proof_vector_marshalling_type filled_public_input;
-                    for (const auto &p : proof.public_input) {
-                        filled_public_input.value().push_back(
-                            fill_lpc_proof<typename Proof::commitment_scheme_type_public, Endianness>(p));
-                    }
+                    // typename public_input_commitment_scheme_type::proof_type public_input
+                    lpc_public_input_proof_marshalling_type filled_public_input =
+                        fill_lpc_proof<typename Proof::public_input_commitment_scheme_type, Endianness>(
+                            proof.public_input);
 
-                    // std::vector<typename commitment_scheme_type_public::proof_type> constant
-                    lpc_public_proof_vector_marshalling_type filled_constant;
-                    for (const auto &p : proof.constant) {
-                        filled_constant.value().push_back(
-                            fill_lpc_proof<typename Proof::commitment_scheme_type_public, Endianness>(p));
-                    }
+                    // typename constant_commitment_scheme_type::proof_type constant
+                    lpc_constant_proof_marshalling_type filled_constant =
+                        fill_lpc_proof<typename Proof::constant_commitment_scheme_type, Endianness>(proof.constant);
 
-                    // std::vector<typename commitment_scheme_type_public::proof_type> selector
-                    lpc_public_proof_vector_marshalling_type filled_selector;
-                    for (const auto &p : proof.selector) {
-                        filled_selector.value().push_back(
-                            fill_lpc_proof<typename Proof::commitment_scheme_type_public, Endianness>(p));
-                    }
+                    // typename selector_commitment_scheme_type::proof_type selector
+                    lpc_selector_proof_marshalling_type filled_selector =
+                        fill_lpc_proof<typename Proof::selector_commitment_scheme_type, Endianness>(proof.selector);
 
-                    // std::vector<typename commitment_scheme_type_public::proof_type> special_selectors
-                    lpc_public_proof_vector_marshalling_type filled_special_selectors;
-                    for (const auto &p : proof.special_selectors) {
-                        filled_special_selectors.value().push_back(
-                            fill_lpc_proof<typename Proof::commitment_scheme_type_public, Endianness>(p));
-                    }
+                    // typename special_commitment_scheme_type::proof_type special_selectors
+                    lpc_special_proof_marshalling_type filled_special_selectors =
+                        fill_lpc_proof<typename Proof::special_commitment_scheme_type, Endianness>(
+                            proof.special_selectors);
 
                     return placeholder_evaluation_proof<nil::marshalling::field_type<Endianness>, Proof>(
                         std::make_tuple(filled_challenge, filled_witness, filled_permutation, filled_quotient,
@@ -286,72 +208,53 @@ namespace nil {
                     // typename FieldType::value_type challenge
                     proof.challenge = std::get<0>(filled_proof.value()).value();
 
-                    // typename CommitmentSchemeTypeWitness::proof_type witness
-                    proof.witness = make_lpc_proof<typename Proof::commitment_scheme_type_witness, Endianness>(
+                    // typename witness_commitment_scheme_type::proof_type witness
+                    proof.witness = make_lpc_proof<typename Proof::witness_commitment_scheme_type, Endianness>(
                         std::get<1>(filled_proof.value()));
 
-                    // std::vector<typename CommitmentSchemeTypePermutation::proof_type> permutation
-                    for (std::size_t i = 0; i < std::get<2>(filled_proof.value()).value().size(); ++i) {
-                        proof.permutation.emplace_back(
-                            make_lpc_proof<typename Proof::commitment_scheme_type_permutation, Endianness>(
-                                std::get<2>(filled_proof.value()).value().at(i)));
-                    }
+                    // typename permutation_commitment_scheme_type::proof_type permutation
+                    proof.permutation = make_lpc_proof<typename Proof::permutation_commitment_scheme_type, Endianness>(
+                        std::get<2>(filled_proof.value()));
 
-                    // std::vector<typename CommitmentSchemeTypeQuotient::proof_type> quotient
-                    for (std::size_t i = 0; i < std::get<3>(filled_proof.value()).value().size(); ++i) {
-                        proof.quotient.emplace_back(
-                            make_lpc_proof<typename Proof::commitment_scheme_type_quotient, Endianness>(
-                                std::get<3>(filled_proof.value()).value().at(i)));
-                    }
+                    // typename runtime_size_commitment_scheme_type::proof_type quotient
+                    proof.quotient = make_lpc_proof<typename Proof::runtime_size_commitment_scheme_type, Endianness>(
+                        std::get<3>(filled_proof.value()));
 
-                    // std::vector<typename CommitmentSchemeTypeQuotient::proof_type> lookups
+                    // std::vector<typename quotient_commitment_scheme_type::proof_type> lookups
+                    proof.lookups.reserve(std::get<4>(filled_proof.value()).value().size());
                     for (std::size_t i = 0; i < std::get<4>(filled_proof.value()).value().size(); ++i) {
                         proof.lookups.emplace_back(
-                            make_lpc_proof<typename Proof::commitment_scheme_type_quotient, Endianness>(
+                            make_lpc_proof<typename Proof::quotient_commitment_scheme_type, Endianness>(
                                 std::get<4>(filled_proof.value()).value().at(i)));
                     }
 
-                    // std::vector<typename commitment_scheme_type_public::proof_type> id_permutation
-                    for (std::size_t i = 0; i < std::get<5>(filled_proof.value()).value().size(); ++i) {
-                        proof.id_permutation.emplace_back(
-                            make_lpc_proof<typename Proof::commitment_scheme_type_public, Endianness>(
-                                std::get<5>(filled_proof.value()).value().at(i)));
-                    }
+                    // typename runtime_size_commitment_scheme_type::proof_type id_permutation
+                    proof.id_permutation =
+                        make_lpc_proof<typename Proof::runtime_size_commitment_scheme_type, Endianness>(
+                            std::get<5>(filled_proof.value()));
 
-                    // std::vector<typename commitment_scheme_type_public::proof_type> sigma_permutation
-                    for (std::size_t i = 0; i < std::get<6>(filled_proof.value()).value().size(); ++i) {
-                        proof.sigma_permutation.emplace_back(
-                            make_lpc_proof<typename Proof::commitment_scheme_type_public, Endianness>(
-                                std::get<6>(filled_proof.value()).value().at(i)));
-                    }
+                    // typename runtime_size_commitment_scheme_type::proof_type sigma_permutation
+                    proof.sigma_permutation =
+                        make_lpc_proof<typename Proof::runtime_size_commitment_scheme_type, Endianness>(
+                            std::get<6>(filled_proof.value()));
 
-                    // std::vector<typename commitment_scheme_type_public::proof_type> public_input
-                    for (std::size_t i = 0; i < std::get<7>(filled_proof.value()).value().size(); ++i) {
-                        proof.public_input.emplace_back(
-                            make_lpc_proof<typename Proof::commitment_scheme_type_public, Endianness>(
-                                std::get<7>(filled_proof.value()).value().at(i)));
-                    }
+                    // typename public_input_commitment_scheme_type::proof_type public_input
+                    proof.public_input =
+                        make_lpc_proof<typename Proof::public_input_commitment_scheme_type, Endianness>(
+                            std::get<7>(filled_proof.value()));
 
-                    // std::vector<typename commitment_scheme_type_public::proof_type> constant
-                    for (std::size_t i = 0; i < std::get<8>(filled_proof.value()).value().size(); ++i) {
-                        proof.constant.emplace_back(
-                            make_lpc_proof<typename Proof::commitment_scheme_type_public, Endianness>(
-                                std::get<8>(filled_proof.value()).value().at(i)));
-                    }
+                    // typename constant_commitment_scheme_type::proof_type constant
+                    proof.constant = make_lpc_proof<typename Proof::constant_commitment_scheme_type, Endianness>(
+                        std::get<8>(filled_proof.value()));
 
-                    // std::vector<typename commitment_scheme_type_public::proof_type> selector
-                    for (std::size_t i = 0; i < std::get<9>(filled_proof.value()).value().size(); ++i) {
-                        proof.selector.emplace_back(
-                            make_lpc_proof<typename Proof::commitment_scheme_type_public, Endianness>(
-                                std::get<9>(filled_proof.value()).value().at(i)));
-                    }
+                    // typename selector_commitment_scheme_type::proof_type selector
+                    proof.selector = make_lpc_proof<typename Proof::selector_commitment_scheme_type, Endianness>(
+                        std::get<9>(filled_proof.value()));
 
-                    // std::vector<typename commitment_scheme_type_public::proof_type> special_selectors
-                    for (std::size_t i = 0; i < std::get<10>(filled_proof.value()).value().size(); ++i) {
-                        proof.special_selectors.emplace_back(
-                            make_lpc_proof<typename Proof::commitment_scheme_type_public, Endianness>(
-                                std::get<10>(filled_proof.value()).value().at(i)));
-                    }
+                    // typename special_commitment_scheme_type::proof_type special_selectors
+                    proof.special_selectors =
+                        make_lpc_proof<typename Proof::special_commitment_scheme_type, Endianness>(
+                            std::get<10>(filled_proof.value()));
 
                     return proof;
                 }
@@ -361,59 +264,40 @@ namespace nil {
                     fill_placeholder_proof(const Proof &proof) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
-                    using octet_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint8_t>;
-                    using digest_marshalling_type = nil::marshalling::types::array_list<
-                        TTypeBase, octet_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
-                    using commitment_marshalling_type = digest_marshalling_type;
-                    using commitment_vector_marshalling_type = nil::marshalling::types::array_list<
-                        TTypeBase, commitment_marshalling_type,
-                        nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
 
-                    // typename CommitmentSchemeTypeWitness::commitment_type witness_commitment
-                    commitment_marshalling_type filled_witness_commitment;
-                    for (const auto c : proof.witness_commitment) {
-                        filled_witness_commitment.value().push_back(octet_marshalling_type(c));
-                    }
+                    // typename witness_commitment_scheme_type::commitment_type witness_commitment
+                    auto filled_witness_commitment =
+                        fill_merkle_node_value<typename Proof::witness_commitment_scheme_type::commitment_type,
+                                               Endianness>(proof.witness_commitment);
 
-                    // typename CommitmentSchemeTypePermutation::commitment_type v_perm_commitment
-                    commitment_marshalling_type filled_v_perm_commitment;
-                    for (const auto c : proof.v_perm_commitment) {
-                        filled_v_perm_commitment.value().push_back(octet_marshalling_type(c));
-                    }
+                    // typename permutation_commitment_scheme_type::commitment_type v_perm_commitment
+                    auto filled_v_perm_commitment =
+                        fill_merkle_node_value<typename Proof::permutation_commitment_scheme_type::commitment_type,
+                                               Endianness>(proof.v_perm_commitment);
 
-                    // typename CommitmentSchemeTypePermutation::commitment_type input_perm_commitment
-                    commitment_marshalling_type filled_input_perm_commitment;
-                    for (const auto c : proof.input_perm_commitment) {
-                        filled_input_perm_commitment.value().push_back(octet_marshalling_type(c));
-                    }
+                    // typename permutation_commitment_scheme_type::commitment_type input_perm_commitment
+                    auto filled_input_perm_commitment =
+                        fill_merkle_node_value<typename Proof::permutation_commitment_scheme_type::commitment_type,
+                                               Endianness>(proof.input_perm_commitment);
 
-                    // typename CommitmentSchemeTypePermutation::commitment_type value_perm_commitment
-                    commitment_marshalling_type filled_value_perm_commitment;
-                    for (const auto c : proof.value_perm_commitment) {
-                        filled_value_perm_commitment.value().push_back(octet_marshalling_type(c));
-                    }
+                    // typename permutation_commitment_scheme_type::commitment_type value_perm_commitment
+                    auto filled_value_perm_commitment =
+                        fill_merkle_node_value<typename Proof::permutation_commitment_scheme_type::commitment_type,
+                                               Endianness>(proof.value_perm_commitment);
 
-                    // typename CommitmentSchemeTypePermutation::commitment_type v_l_perm_commitment
-                    commitment_marshalling_type filled_v_l_perm_commitment;
-                    for (const auto c : proof.v_l_perm_commitment) {
-                        filled_v_l_perm_commitment.value().push_back(octet_marshalling_type(c));
-                    }
+                    // typename permutation_commitment_scheme_type::commitment_type v_l_perm_commitment
+                    auto filled_v_l_perm_commitment =
+                        fill_merkle_node_value<typename Proof::permutation_commitment_scheme_type::commitment_type,
+                                               Endianness>(proof.v_l_perm_commitment);
 
-                    // std::vector<typename CommitmentSchemeTypeQuotient::commitment_type> T_commitments
-                    commitment_vector_marshalling_type filled_T_commitments;
-                    for (const auto &comm : proof.T_commitments) {
-                        commitment_marshalling_type filled_c;
-                        for (const auto c : comm) {
-                            filled_c.value().push_back(octet_marshalling_type(c));
-                        }
-                        filled_T_commitments.value().push_back(filled_c);
-                    }
+                    // typename runtime_size_commitment_scheme_type::commitment_type T_commitment
+                    auto filled_T_commitment =
+                        fill_merkle_node_value<typename Proof::runtime_size_commitment_scheme_type::commitment_type,
+                                               Endianness>(proof.T_commitment);
 
                     return placeholder_proof<TTypeBase, Proof>(std::make_tuple(
                         filled_witness_commitment, filled_v_perm_commitment, filled_input_perm_commitment,
-                        filled_value_perm_commitment, filled_v_l_perm_commitment, filled_T_commitments,
+                        filled_value_perm_commitment, filled_v_l_perm_commitment, filled_T_commitment,
                         fill_placeholder_evaluation_proof<Proof, Endianness>(proof.eval_proof)));
                 }
 
@@ -423,48 +307,35 @@ namespace nil {
 
                     Proof proof;
 
-                    // typename CommitmentSchemeTypeWitness::commitment_type witness_commitment
-                    BOOST_ASSERT(proof.witness_commitment.size() == std::get<0>(filled_proof.value()).value().size());
-                    for (std::size_t i = 0; i < std::get<0>(filled_proof.value()).value().size(); ++i) {
-                        proof.witness_commitment.at(i) = std::get<0>(filled_proof.value()).value().at(i).value();
-                    }
+                    // typename witness_commitment_scheme_type::commitment_type witness_commitment
+                    proof.witness_commitment =
+                        make_merkle_node_value<typename Proof::witness_commitment_scheme_type::commitment_type,
+                                               Endianness>(std::get<0>(filled_proof.value()));
 
-                    // typename CommitmentSchemeTypePermutation::commitment_type v_perm_commitment
-                    BOOST_ASSERT(proof.v_perm_commitment.size() == std::get<1>(filled_proof.value()).value().size());
-                    for (std::size_t i = 0; i < std::get<1>(filled_proof.value()).value().size(); ++i) {
-                        proof.v_perm_commitment.at(i) = std::get<1>(filled_proof.value()).value().at(i).value();
-                    }
+                    // typename permutation_commitment_scheme_type::commitment_type v_perm_commitment
+                    proof.v_perm_commitment =
+                        make_merkle_node_value<typename Proof::permutation_commitment_scheme_type::commitment_type,
+                                               Endianness>(std::get<1>(filled_proof.value()));
 
-                    // typename CommitmentSchemeTypePermutation::commitment_type input_perm_commitment
-                    BOOST_ASSERT(proof.input_perm_commitment.size() ==
-                                 std::get<2>(filled_proof.value()).value().size());
-                    for (std::size_t i = 0; i < std::get<2>(filled_proof.value()).value().size(); ++i) {
-                        proof.input_perm_commitment.at(i) = std::get<2>(filled_proof.value()).value().at(i).value();
-                    }
+                    // typename permutation_commitment_scheme_type::commitment_type input_perm_commitment
+                    proof.input_perm_commitment =
+                        make_merkle_node_value<typename Proof::permutation_commitment_scheme_type::commitment_type,
+                                               Endianness>(std::get<2>(filled_proof.value()));
 
-                    // typename CommitmentSchemeTypePermutation::commitment_type value_perm_commitment
-                    BOOST_ASSERT(proof.value_perm_commitment.size() ==
-                                 std::get<3>(filled_proof.value()).value().size());
-                    for (std::size_t i = 0; i < std::get<3>(filled_proof.value()).value().size(); ++i) {
-                        proof.value_perm_commitment.at(i) = std::get<3>(filled_proof.value()).value().at(i).value();
-                    }
+                    // typename permutation_commitment_scheme_type::commitment_type value_perm_commitment
+                    proof.value_perm_commitment =
+                        make_merkle_node_value<typename Proof::permutation_commitment_scheme_type::commitment_type,
+                                               Endianness>(std::get<3>(filled_proof.value()));
 
-                    // typename CommitmentSchemeTypePermutation::commitment_type v_l_perm_commitment
-                    BOOST_ASSERT(proof.v_l_perm_commitment.size() == std::get<4>(filled_proof.value()).value().size());
-                    for (std::size_t i = 0; i < std::get<4>(filled_proof.value()).value().size(); ++i) {
-                        proof.v_l_perm_commitment.at(i) = std::get<4>(filled_proof.value()).value().at(i).value();
-                    }
+                    // typename permutation_commitment_scheme_type::commitment_type v_l_perm_commitment
+                    proof.v_l_perm_commitment =
+                        make_merkle_node_value<typename Proof::permutation_commitment_scheme_type::commitment_type,
+                                               Endianness>(std::get<4>(filled_proof.value()));
 
-                    // std::vector<typename CommitmentSchemeTypeQuotient::commitment_type> T_commitments
-                    for (std::size_t i = 0; i < std::get<5>(filled_proof.value()).value().size(); ++i) {
-                        typename Proof::commitment_scheme_type_quotient::commitment_type comm;
-                        BOOST_ASSERT(comm.size() == std::get<5>(filled_proof.value()).value().at(i).value().size());
-                        for (std::size_t j = 0; j < std::get<5>(filled_proof.value()).value().at(i).value().size();
-                             ++j) {
-                            comm.at(j) = std::get<5>(filled_proof.value()).value().at(i).value().at(j).value();
-                        }
-                        proof.T_commitments.push_back(comm);
-                    }
+                    // typename runtime_size_commitment_scheme_type::commitment_type T_commitment
+                    proof.T_commitment =
+                        make_merkle_node_value<typename Proof::runtime_size_commitment_scheme_type::commitment_type,
+                                               Endianness>(std::get<5>(filled_proof.value()));
 
                     // evaluation_proof eval_proof
                     proof.eval_proof =

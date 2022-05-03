@@ -52,6 +52,7 @@
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
 
+#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/fri.hpp>
 
 template<typename TIter>
@@ -168,7 +169,7 @@ template<typename Field, typename Hash, typename Endianness>
 void test_fri_round_proof(std::size_t tree_depth) {
     using namespace nil::crypto3::marshalling;
 
-    using commitment_scheme_type = nil::crypto3::zk::commitments::fri<Field, Hash, Hash>;
+    using commitment_scheme_type = typename nil::crypto3::zk::commitments::fri<Field, Hash, Hash>::basic_fri;
     using proof_marshalling_type =
         typename types::fri_round_proof<nil::marshalling::field_type<Endianness>, commitment_scheme_type>::type;
 
@@ -202,7 +203,7 @@ template<typename Field, typename Hash, typename Endianness>
 void test_fri_proof(std::size_t tree_depth, std::size_t round_proofs_n, std::size_t degree) {
     using namespace nil::crypto3::marshalling;
 
-    using commitment_scheme_type = nil::crypto3::zk::commitments::fri<Field, Hash, Hash>;
+    using commitment_scheme_type = typename nil::crypto3::zk::commitments::fri<Field, Hash, Hash>::basic_fri;
     using proof_marshalling_type =
         typename types::fri_proof<nil::marshalling::field_type<Endianness>, commitment_scheme_type>::type;
 

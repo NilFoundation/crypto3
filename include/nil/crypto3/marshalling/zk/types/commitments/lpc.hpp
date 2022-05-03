@@ -79,7 +79,7 @@ namespace nil {
                             // std::array<typename fri_type::proof_type, lambda> fri_proof;
                             nil::marshalling::types::array_list<
                                 TTypeBase,
-                                typename fri_proof<TTypeBase, typename LPCScheme::fri_type>::type,
+                                typename fri_proof<TTypeBase, typename LPCScheme::basic_fri>::type,
                                 nil::marshalling::option::sequence_size_field_prefix<
                                     nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>>>;
                 };
@@ -92,7 +92,8 @@ namespace nil {
                                                   nil::crypto3::zk::commitments::batched_list_polynomial_commitment<
                                                       typename LPCScheme::field_type,
                                                       typename LPCScheme::lpc_params,
-                                                      LPCScheme::leaf_size>>::value>::type> {
+                                                      LPCScheme::leaf_size,
+                                                      LPCScheme::is_run_time_size>>::value>::type> {
                     using type = nil::marshalling::types::bundle<
                         TTypeBase,
                         std::tuple<
@@ -115,7 +116,7 @@ namespace nil {
                             // std::array<typename fri_type::proof_type, lambda> fri_proof;
                             nil::marshalling::types::array_list<
                                 TTypeBase,
-                                typename fri_proof<TTypeBase, typename LPCScheme::fri_type>::type,
+                                typename fri_proof<TTypeBase, typename LPCScheme::basic_fri>::type,
                                 nil::marshalling::option::sequence_size_field_prefix<
                                     nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>>>;
                 };
@@ -138,7 +139,7 @@ namespace nil {
                         field_marhsalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using fri_proof_marshalling_type =
-                        typename fri_proof<TTypeBase, typename LPCScheme::fri_type>::type;
+                        typename fri_proof<TTypeBase, typename LPCScheme::basic_fri>::type;
                     using fri_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase,
                         fri_proof_marshalling_type,
@@ -157,7 +158,8 @@ namespace nil {
                     // std::array<typename fri_type::proof_type, lambda> fri_proof;
                     fri_proof_vector_marshalling_type filled_fri_proof;
                     for (const auto &p : proof.fri_proof) {
-                        filled_fri_proof.value().push_back(fill_fri_proof<typename LPCScheme::fri_type, Endianness>(p));
+                        filled_fri_proof.value().push_back(
+                            fill_fri_proof<typename LPCScheme::basic_fri, Endianness>(p));
                     }
 
                     return typename lpc_proof<nil::marshalling::field_type<Endianness>, LPCScheme>::type(
@@ -188,7 +190,7 @@ namespace nil {
                     // std::array<typename fri_type::proof_type, lambda> fri_proof;
                     BOOST_ASSERT(proof.fri_proof.size() == std::get<2>(filled_proof.value()).value().size());
                     for (std::size_t i = 0; i < std::get<2>(filled_proof.value()).value().size(); ++i) {
-                        proof.fri_proof.at(i) = make_fri_proof<typename LPCScheme::fri_type, Endianness>(
+                        proof.fri_proof.at(i) = make_fri_proof<typename LPCScheme::basic_fri, Endianness>(
                             std::get<2>(filled_proof.value()).value().at(i));
                     }
 
@@ -202,7 +204,8 @@ namespace nil {
                                           nil::crypto3::zk::commitments::batched_list_polynomial_commitment<
                                               typename LPCScheme::field_type,
                                               typename LPCScheme::lpc_params,
-                                              LPCScheme::leaf_size>>::value,
+                                              LPCScheme::leaf_size,
+                                              LPCScheme::is_run_time_size>>::value,
                              bool>::type = true>
                 typename lpc_proof<nil::marshalling::field_type<Endianness>, LPCScheme>::type
                     fill_lpc_proof(const typename LPCScheme::proof_type &proof) {
@@ -219,7 +222,7 @@ namespace nil {
                         field_vector_marshalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<uint64_t_marshalling_type>>;
                     using fri_proof_marshalling_type =
-                        typename fri_proof<TTypeBase, typename LPCScheme::fri_type>::type;
+                        typename fri_proof<TTypeBase, typename LPCScheme::basic_fri>::type;
                     using fri_proof_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase,
                         fri_proof_marshalling_type,
@@ -242,7 +245,8 @@ namespace nil {
                     // std::array<typename fri_type::proof_type, lambda> fri_proof;
                     fri_proof_vector_marshalling_type filled_fri_proof;
                     for (const auto &p : proof.fri_proof) {
-                        filled_fri_proof.value().push_back(fill_fri_proof<typename LPCScheme::fri_type, Endianness>(p));
+                        filled_fri_proof.value().push_back(
+                            fill_fri_proof<typename LPCScheme::basic_fri, Endianness>(p));
                     }
 
                     return typename lpc_proof<nil::marshalling::field_type<Endianness>, LPCScheme>::type(
@@ -256,7 +260,8 @@ namespace nil {
                                           nil::crypto3::zk::commitments::batched_list_polynomial_commitment<
                                               typename LPCScheme::field_type,
                                               typename LPCScheme::lpc_params,
-                                              LPCScheme::leaf_size>>::value,
+                                              LPCScheme::leaf_size,
+                                              false>>::value,
                              bool>::type = true>
                 typename LPCScheme::proof_type make_lpc_proof(
                     const typename lpc_proof<nil::marshalling::field_type<Endianness>, LPCScheme>::type &filled_proof) {
@@ -267,7 +272,8 @@ namespace nil {
                     proof.T_root = make_merkle_node_value<typename LPCScheme::merkle_proof_type, Endianness>(
                         std::get<0>(filled_proof.value()));
 
-                    // std::vector<typename FieldType::value_type> z;
+                    // std::array<std::vector<typename FieldType::value_type>, leaf_size> z
+                    BOOST_ASSERT(proof.z.size() == std::get<1>(filled_proof.value()).value().size());
                     for (std::size_t i = 0; i < std::get<1>(filled_proof.value()).value().size(); ++i) {
                         for (std::size_t j = 0; j < std::get<1>(filled_proof.value()).value().at(i).value().size();
                              ++j) {
@@ -279,7 +285,46 @@ namespace nil {
                     // std::array<typename fri_type::proof_type, lambda> fri_proof;
                     BOOST_ASSERT(proof.fri_proof.size() == std::get<2>(filled_proof.value()).value().size());
                     for (std::size_t i = 0; i < std::get<2>(filled_proof.value()).value().size(); ++i) {
-                        proof.fri_proof.at(i) = make_fri_proof<typename LPCScheme::fri_type, Endianness>(
+                        proof.fri_proof.at(i) = make_fri_proof<typename LPCScheme::basic_fri, Endianness>(
+                            std::get<2>(filled_proof.value()).value().at(i));
+                    }
+
+                    return proof;
+                }
+
+                template<typename LPCScheme,
+                         typename Endianness,
+                         typename std::enable_if<
+                             std::is_same<LPCScheme,
+                                          nil::crypto3::zk::commitments::batched_list_polynomial_commitment<
+                                              typename LPCScheme::field_type,
+                                              typename LPCScheme::lpc_params,
+                                              0,
+                                              true>>::value,
+                             bool>::type = true>
+                typename LPCScheme::proof_type make_lpc_proof(
+                    const typename lpc_proof<nil::marshalling::field_type<Endianness>, LPCScheme>::type &filled_proof) {
+
+                    typename LPCScheme::proof_type proof;
+
+                    // typename merkle_tree_type::value_type T_root;
+                    proof.T_root = make_merkle_node_value<typename LPCScheme::merkle_proof_type, Endianness>(
+                        std::get<0>(filled_proof.value()));
+
+                    // std::vector<std::vector<typename FieldType::value_type>> z
+                    proof.z.resize(std::get<1>(filled_proof.value()).value().size());
+                    for (std::size_t i = 0; i < std::get<1>(filled_proof.value()).value().size(); ++i) {
+                        for (std::size_t j = 0; j < std::get<1>(filled_proof.value()).value().at(i).value().size();
+                             ++j) {
+                            proof.z.at(i).push_back(
+                                std::get<1>(filled_proof.value()).value().at(i).value().at(j).value());
+                        }
+                    }
+
+                    // std::array<typename fri_type::proof_type, lambda> fri_proof;
+                    BOOST_ASSERT(proof.fri_proof.size() == std::get<2>(filled_proof.value()).value().size());
+                    for (std::size_t i = 0; i < std::get<2>(filled_proof.value()).value().size(); ++i) {
+                        proof.fri_proof.at(i) = make_fri_proof<typename LPCScheme::basic_fri, Endianness>(
                             std::get<2>(filled_proof.value()).value().at(i));
                     }
 

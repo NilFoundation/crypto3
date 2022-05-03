@@ -41,8 +41,10 @@
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
 
-#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/batched_fri.hpp>
+#include <nil/crypto3/zk/commitments/type_traits.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri_compile_time_size.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri_runtime_size.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -58,7 +60,7 @@ namespace nil {
                 struct fri_round_proof<
                     TTypeBase, FRIScheme,
                     typename std::enable_if<std::is_same<
-                        FRIScheme, nil::crypto3::zk::commitments::fri<
+                        FRIScheme, nil::crypto3::zk::commitments::detail::basic_fri<
                                        typename FRIScheme::field_type, typename FRIScheme::merkle_tree_hash_type,
                                        typename FRIScheme::transcript_hash_type, FRIScheme::m>>::value>::type> {
                     using type = nil::marshalling::types::bundle<
@@ -88,7 +90,7 @@ namespace nil {
                 struct fri_proof<
                     TTypeBase, FRIScheme,
                     typename std::enable_if<std::is_same<
-                        FRIScheme, nil::crypto3::zk::commitments::fri<
+                        FRIScheme, nil::crypto3::zk::commitments::detail::basic_fri<
                                        typename FRIScheme::field_type, typename FRIScheme::merkle_tree_hash_type,
                                        typename FRIScheme::transcript_hash_type, FRIScheme::m>>::value>::type> {
                     using type = nil::marshalling::types::bundle<
@@ -109,24 +111,18 @@ namespace nil {
                 template<typename TTypeBase, typename FRIScheme>
                 struct fri_round_proof<
                     TTypeBase, FRIScheme,
-                    typename std::enable_if<std::is_same<
-                        FRIScheme, nil::crypto3::zk::commitments::batched_fri<
-                                       typename FRIScheme::field_type, typename FRIScheme::merkle_tree_hash_type,
-                                       typename FRIScheme::transcript_hash_type, FRIScheme::m,
-                                       FRIScheme::leaf_size>>::value>::type> {
+                    typename std::enable_if<nil::crypto3::zk::is_batched_fri<FRIScheme>::value>::type> {
                     using type = nil::marshalling::types::bundle<
                         TTypeBase,
                         std::tuple<
-                            // std::array<typename FieldType::value_type, leaf_size> colinear_value
-                            // TODO: use nil::marshalling::option::fixed_size_storage with std::array
+                            // std::vector<typename FieldType::value_type> colinear_value
                             nil::marshalling::types::array_list<
                                 TTypeBase, field_element<TTypeBase, typename FRIScheme::field_type::value_type>,
                                 nil::marshalling::option::sequence_size_field_prefix<
                                     nil::marshalling::types::integral<TTypeBase, std::uint64_t>>>,
                             // typename merkle_tree_type::value_type T_root
                             typename merkle_node_value<TTypeBase, typename FRIScheme::merkle_proof_type>::type,
-                            // std::array<std::array<typename FieldType::value_type, m>, leaf_size> y
-                            // TODO: use nil::marshalling::option::fixed_size_storage with std::array
+                            // std::vector<std::array<typename FieldType::value_type, m>> y
                             nil::marshalling::types::array_list<
                                 TTypeBase,
                                 nil::marshalling::types::array_list<
@@ -145,18 +141,12 @@ namespace nil {
                 };
 
                 template<typename TTypeBase, typename FRIScheme>
-                struct fri_proof<
-                    TTypeBase, FRIScheme,
-                    typename std::enable_if<std::is_same<
-                        FRIScheme, nil::crypto3::zk::commitments::batched_fri<
-                                       typename FRIScheme::field_type, typename FRIScheme::merkle_tree_hash_type,
-                                       typename FRIScheme::transcript_hash_type, FRIScheme::m,
-                                       FRIScheme::leaf_size>>::value>::type> {
+                struct fri_proof<TTypeBase, FRIScheme,
+                                 typename std::enable_if<nil::crypto3::zk::is_batched_fri<FRIScheme>::value>::type> {
                     using type = nil::marshalling::types::bundle<
                         TTypeBase,
                         std::tuple<
-                            // std::array<math::polynomial<typename FieldType::value_type>, leaf_size>
-                            // TODO: use nil::marshalling::option::fixed_size_storage with std::array
+                            // std::vector<math::polynomial<typename FieldType::value_type>> final_polynomials
                             nil::marshalling::types::array_list<
                                 TTypeBase,
                                 nil::marshalling::types::array_list<
@@ -175,7 +165,7 @@ namespace nil {
                 template<typename FRIScheme, typename Endianness,
                          typename std::enable_if<
                              std::is_same<FRIScheme,
-                                          nil::crypto3::zk::commitments::fri<
+                                          nil::crypto3::zk::commitments::detail::basic_fri<
                                               typename FRIScheme::field_type, typename FRIScheme::merkle_tree_hash_type,
                                               typename FRIScheme::transcript_hash_type, FRIScheme::m>>::value,
                              bool>::type = true>
@@ -228,7 +218,7 @@ namespace nil {
                 template<typename FRIScheme, typename Endianness,
                          typename std::enable_if<
                              std::is_same<FRIScheme,
-                                          nil::crypto3::zk::commitments::fri<
+                                          nil::crypto3::zk::commitments::detail::basic_fri<
                                               typename FRIScheme::field_type, typename FRIScheme::merkle_tree_hash_type,
                                               typename FRIScheme::transcript_hash_type, FRIScheme::m>>::value,
                              bool>::type = true>
@@ -268,7 +258,7 @@ namespace nil {
                 template<typename FRIScheme, typename Endianness,
                          typename std::enable_if<
                              std::is_same<FRIScheme,
-                                          nil::crypto3::zk::commitments::fri<
+                                          nil::crypto3::zk::commitments::detail::basic_fri<
                                               typename FRIScheme::field_type, typename FRIScheme::merkle_tree_hash_type,
                                               typename FRIScheme::transcript_hash_type, FRIScheme::m>>::value,
                              bool>::type = true>
@@ -307,7 +297,7 @@ namespace nil {
                 template<typename FRIScheme, typename Endianness,
                          typename std::enable_if<
                              std::is_same<FRIScheme,
-                                          nil::crypto3::zk::commitments::fri<
+                                          nil::crypto3::zk::commitments::detail::basic_fri<
                                               typename FRIScheme::field_type, typename FRIScheme::merkle_tree_hash_type,
                                               typename FRIScheme::transcript_hash_type, FRIScheme::m>>::value,
                              bool>::type = true>
@@ -332,14 +322,8 @@ namespace nil {
                         nil::crypto3::math::polynomial<typename FRIScheme::field_type::value_type>(final_polynomial)};
                 }
 
-                template<
-                    typename FRIScheme, typename Endianness,
-                    typename std::enable_if<std::is_same<FRIScheme, nil::crypto3::zk::commitments::batched_fri<
-                                                                        typename FRIScheme::field_type,
-                                                                        typename FRIScheme::merkle_tree_hash_type,
-                                                                        typename FRIScheme::transcript_hash_type,
-                                                                        FRIScheme::m, FRIScheme::leaf_size>>::value,
-                                            bool>::type = true>
+                template<typename FRIScheme, typename Endianness,
+                         typename std::enable_if<nil::crypto3::zk::is_batched_fri<FRIScheme>::value, bool>::type = true>
                 typename fri_round_proof<nil::marshalling::field_type<Endianness>, FRIScheme>::type
                     fill_fri_round_proof(const typename FRIScheme::round_proof_type &proof) {
 
@@ -396,14 +380,14 @@ namespace nil {
                                         filled_p));
                 }
 
-                template<
-                    typename FRIScheme, typename Endianness,
-                    typename std::enable_if<std::is_same<FRIScheme, nil::crypto3::zk::commitments::batched_fri<
-                                                                        typename FRIScheme::field_type,
-                                                                        typename FRIScheme::merkle_tree_hash_type,
-                                                                        typename FRIScheme::transcript_hash_type,
-                                                                        FRIScheme::m, FRIScheme::leaf_size>>::value,
-                                            bool>::type = true>
+                template<typename FRIScheme, typename Endianness,
+                         typename std::enable_if<
+                             std::is_same<FRIScheme,
+                                          nil::crypto3::zk::commitments::detail::basic_batched_fri_compile_time_size<
+                                              typename FRIScheme::field_type, typename FRIScheme::merkle_tree_hash_type,
+                                              typename FRIScheme::transcript_hash_type, FRIScheme::m,
+                                              FRIScheme::leaf_size>>::value,
+                             bool>::type = true>
                 typename FRIScheme::round_proof_type
                     make_fri_round_proof(const typename fri_round_proof<nil::marshalling::field_type<Endianness>,
                                                                         FRIScheme>::type &filled_proof) {
@@ -445,14 +429,56 @@ namespace nil {
                     return proof;
                 }
 
-                template<
-                    typename FRIScheme, typename Endianness,
-                    typename std::enable_if<std::is_same<FRIScheme, nil::crypto3::zk::commitments::batched_fri<
-                                                                        typename FRIScheme::field_type,
-                                                                        typename FRIScheme::merkle_tree_hash_type,
-                                                                        typename FRIScheme::transcript_hash_type,
-                                                                        FRIScheme::m, FRIScheme::leaf_size>>::value,
-                                            bool>::type = true>
+                template<typename FRIScheme, typename Endianness,
+                         typename std::enable_if<
+                             std::is_same<FRIScheme,
+                                          nil::crypto3::zk::commitments::detail::basic_batched_fri_runtime_size<
+                                              typename FRIScheme::field_type, typename FRIScheme::merkle_tree_hash_type,
+                                              typename FRIScheme::transcript_hash_type, FRIScheme::m>>::value,
+                             bool>::type = true>
+                typename FRIScheme::round_proof_type
+                    make_fri_round_proof(const typename fri_round_proof<nil::marshalling::field_type<Endianness>,
+                                                                        FRIScheme>::type &filled_proof) {
+
+                    typename FRIScheme::round_proof_type proof;
+
+                    // std::vector<typename FieldType::value_type> colinear_value
+                    proof.colinear_value.resize(std::get<0>(filled_proof.value()).value().size());
+                    for (std::size_t i = 0; i < std::get<0>(filled_proof.value()).value().size(); ++i) {
+                        proof.colinear_value.at(i) = std::get<0>(filled_proof.value()).value().at(i).value();
+                    }
+
+                    // typename merkle_tree_type::value_type T_root;
+                    proof.T_root = make_merkle_node_value<typename FRIScheme::merkle_proof_type, Endianness>(
+                        std::get<1>(filled_proof.value()));
+
+                    // std::vector<std::array<typename FieldType::value_type, m>> y
+                    proof.y.resize(std::get<2>(filled_proof.value()).value().size());
+                    for (std::size_t i = 0; i < std::get<2>(filled_proof.value()).value().size(); ++i) {
+                        BOOST_ASSERT(proof.y.at(i).size() ==
+                                     std::get<2>(filled_proof.value()).value().at(i).value().size());
+                        for (std::size_t j = 0; j < std::get<2>(filled_proof.value()).value().at(i).value().size();
+                             ++j) {
+                            proof.y.at(i).at(j) = std::get<2>(filled_proof.value()).value().at(i).value().at(j).value();
+                        }
+                    }
+
+                    // merkle_proof_type colinear_path;
+                    proof.colinear_path = make_merkle_proof<typename FRIScheme::merkle_proof_type, Endianness>(
+                        std::get<3>(filled_proof.value()));
+
+                    // std::array<merkle_proof_type, m> p;
+                    BOOST_ASSERT(proof.p.size() == std::get<4>(filled_proof.value()).value().size());
+                    for (std::size_t i = 0; i < std::get<4>(filled_proof.value()).value().size(); ++i) {
+                        proof.p.at(i) = make_merkle_proof<typename FRIScheme::merkle_proof_type, Endianness>(
+                            std::get<4>(filled_proof.value()).value().at(i));
+                    }
+
+                    return proof;
+                }
+
+                template<typename FRIScheme, typename Endianness,
+                         typename std::enable_if<nil::crypto3::zk::is_batched_fri<FRIScheme>::value, bool>::type = true>
                 typename fri_proof<nil::marshalling::field_type<Endianness>, FRIScheme>::type
                     fill_fri_proof(const typename FRIScheme::proof_type &proof) {
 
@@ -474,7 +500,7 @@ namespace nil {
 
                     // std::array<math::polynomial<typename FieldType::value_type>, leaf_size> final_polynomial
                     field_poly_vector_marshalling_type filled_final_polynomial;
-                    for (const auto &poly : proof.final_polynomial) {
+                    for (const auto &poly : proof.final_polynomials) {
                         field_poly_marshalling_type filled_poly;
                         for (const auto &c : poly) {
                             filled_poly.value().push_back(field_marhsalling_type(c));
@@ -492,24 +518,56 @@ namespace nil {
                         std::make_tuple(filled_final_polynomial, filled_round_proofs));
                 }
 
-                template<
-                    typename FRIScheme, typename Endianness,
-                    typename std::enable_if<std::is_same<FRIScheme, nil::crypto3::zk::commitments::batched_fri<
-                                                                        typename FRIScheme::field_type,
-                                                                        typename FRIScheme::merkle_tree_hash_type,
-                                                                        typename FRIScheme::transcript_hash_type,
-                                                                        FRIScheme::m, FRIScheme::leaf_size>>::value,
-                                            bool>::type = true>
+                template<typename FRIScheme, typename Endianness,
+                         typename std::enable_if<
+                             std::is_same<FRIScheme,
+                                          nil::crypto3::zk::commitments::detail::basic_batched_fri_compile_time_size<
+                                              typename FRIScheme::field_type, typename FRIScheme::merkle_tree_hash_type,
+                                              typename FRIScheme::transcript_hash_type, FRIScheme::m,
+                                              FRIScheme::leaf_size>>::value,
+                             bool>::type = true>
                 typename FRIScheme::proof_type make_fri_proof(
                     const typename fri_proof<nil::marshalling::field_type<Endianness>, FRIScheme>::type &filled_proof) {
 
                     typename FRIScheme::proof_type proof;
 
                     // std::array<math::polynomial<typename FieldType::value_type>, leaf_size> final_polynomial;
+                    BOOST_ASSERT(proof.final_polynomials.size() == std::get<0>(filled_proof.value()).value().size());
                     for (std::size_t i = 0; i < std::get<0>(filled_proof.value()).value().size(); ++i) {
                         for (std::size_t j = 0; j < std::get<0>(filled_proof.value()).value().at(i).value().size();
                              ++j) {
-                            proof.final_polynomial.at(i).emplace_back(
+                            proof.final_polynomials.at(i).emplace_back(
+                                std::get<0>(filled_proof.value()).value().at(i).value().at(j).value());
+                        }
+                    }
+
+                    // std::vector<round_proof_type> round_proofs;
+                    for (std::size_t i = 0; i < std::get<1>(filled_proof.value()).value().size(); ++i) {
+                        proof.round_proofs.emplace_back(make_fri_round_proof<FRIScheme, Endianness>(
+                            std::get<1>(filled_proof.value()).value().at(i)));
+                    }
+
+                    return proof;
+                }
+
+                template<typename FRIScheme, typename Endianness,
+                         typename std::enable_if<
+                             std::is_same<FRIScheme,
+                                          nil::crypto3::zk::commitments::detail::basic_batched_fri_runtime_size<
+                                              typename FRIScheme::field_type, typename FRIScheme::merkle_tree_hash_type,
+                                              typename FRIScheme::transcript_hash_type, FRIScheme::m>>::value,
+                             bool>::type = true>
+                typename FRIScheme::proof_type make_fri_proof(
+                    const typename fri_proof<nil::marshalling::field_type<Endianness>, FRIScheme>::type &filled_proof) {
+
+                    typename FRIScheme::proof_type proof;
+
+                    // std::vector<math::polynomial<typename FieldType::value_type>> final_polynomials
+                    proof.final_polynomials.resize(std::get<0>(filled_proof.value()).value().size());
+                    for (std::size_t i = 0; i < std::get<0>(filled_proof.value()).value().size(); ++i) {
+                        for (std::size_t j = 0; j < std::get<0>(filled_proof.value()).value().at(i).value().size();
+                             ++j) {
+                            proof.final_polynomials.at(i).emplace_back(
                                 std::get<0>(filled_proof.value()).value().at(i).value().at(j).value());
                         }
                     }
