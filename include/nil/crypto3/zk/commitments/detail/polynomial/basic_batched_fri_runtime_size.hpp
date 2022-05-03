@@ -103,12 +103,12 @@ namespace nil {
                         };
 
                         struct proof_type {
-                            // bool operator==(const proof_type &rhs) const {
-                            //     return round_proofs == rhs.round_proofs && final_polynomials == rhs.final_polynomials;
-                            // }
-                            // bool operator!=(const proof_type &rhs) const {
-                            //     return !(rhs == *this);
-                            // }
+                            bool operator==(const proof_type &rhs) const {
+                                return round_proofs == rhs.round_proofs && final_polynomials == rhs.final_polynomials;
+                            }
+                            bool operator!=(const proof_type &rhs) const {
+                                return !(rhs == *this);
+                            }
 
                             std::vector<round_proof_type> round_proofs;    // 0..r-2
 
