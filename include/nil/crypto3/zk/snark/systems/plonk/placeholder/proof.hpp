@@ -43,6 +43,7 @@ namespace nil {
                 template<typename FieldType, typename ParamsType>
                 struct placeholder_proof {
                     typedef FieldType field_type;
+                    typedef ParamsType params_type;
                     
                     using runtime_size_commitment_scheme_type =
                         typename ParamsType::runtime_size_commitment_scheme_type;
