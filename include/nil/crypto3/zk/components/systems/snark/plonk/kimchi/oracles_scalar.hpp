@@ -35,7 +35,6 @@
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/sponge.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
@@ -88,7 +87,7 @@ namespace nil {
                     using endo_scalar_component = zk::components::endo_scalar<ArithmetizationType, CurveType,
                                                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
                     using from_limbs = zk::components::from_limbs<ArithmetizationType, CurveType, W0, W1, W2>;
-                    using exponentiation_component = zk::components::exponentiation<ArithmetizationType,
+                    using exponentiation_component = zk::components::exponentiation<ArithmetizationType, 60,
                                                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
                     
                     struct field_op_component {
@@ -100,28 +99,6 @@ namespace nil {
                         using sub = zk::components::multiplication<ArithmetizationType,
                                                             W0, W1, W2>;
                     };
-
-                    static var assignments_from_limbs(blueprint_assignment_table<ArithmetizationType> &assignment,
-                            std::array<var, 2> scalar_limbs_var,
-                            std::size_t &component_start_row) {
-
-                        typename from_limbs::result_type res = from_limbs::generate_assignments(assignment, 
-                            typename from_limbs::params_type {scalar_limbs_var}, component_start_row);
-
-                        component_start_row += from_limbs::rows_amount;
-                        return res.result;
-                    }
-
-                    static void copy_constraints_from_limbs(blueprint<ArithmetizationType> &bp,
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            std::array<var, 2> scalar_limbs_var,
-                            const std::size_t &component_start_row = 0) {
-
-                        bp.add_copy_constraint({{W0, static_cast<int>(component_start_row), false}, 
-                            {scalar_limbs_var[0].index, scalar_limbs_var[0].rotation, false, scalar_limbs_var[0].type}});
-                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false}, 
-                            {scalar_limbs_var[1].index, scalar_limbs_var[1].rotation, false, scalar_limbs_var[1].type}});
-                    }
 
                     static var assignments_endo_scalar(blueprint_assignment_table<ArithmetizationType> &assignment,
                             var scalar,
@@ -286,8 +263,8 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t selector_seed = 0x0f08;
-                    constexpr static const std::size_t rows_amount = 50;
-                    constexpr static const std::size_t gates_amount = 0;
+                    constexpr static const std::size_t rows_amount = 100;
+                    constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
                         struct fq_sponge_output {
@@ -353,12 +330,11 @@ namespace nil {
                         }
                     };
                     
-                    static result_type generate_circuit(
-                        blueprint<ArithmetizationType> &bp,
+                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t &start_row_index) {
-
+                        const params_type params,
+                        const std::size_t start_row_index) {
+                        std::cout<<"CITCUIT"<<std::endl;
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
 
@@ -499,6 +475,8 @@ namespace nil {
                         
                         return result_type(params, component_start_row);
                     }
+
+                    private:
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
                             blueprint_public_assignment_table<ArithmetizationType> &assignment, 

@@ -45,11 +45,19 @@ namespace nil {
             namespace components {
 
                 template<typename ArithmetizationType,
-                         std::size_t... WireIndexes>
+                        std::size_t ExponentSize,
+                        std::size_t... WireIndexes>
                 class exponentiation;
 
+                // res = base.pow(scalar)
+                // W0     | W1          | W2                                   | W3  | W4  | W5  | W6  | W7  | W8  | W9  | W10 | W11 | W12 | W13  | W14  |
+                // base   | a = base^n  | n = [b_0 ... b_11]                   | b_0 | b_1 | b_2 | b_3 | b_4 | b_5 | b_6 | b_7 | b_8 | b_9 | b_10 | b_11 |
+                // ...    | ...         | n = (n_prev << 12) || [b_0 ... b_11] | ... | ... | ... | ... | ...
+                // base   | res         | n = scalar                           | ... | ... | ... | ... | ...
+                // ....
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
+                         std::size_t ExponentSize,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -68,6 +76,7 @@ namespace nil {
                 class exponentiation<
                     snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams>,
+                    ExponentSize,
                     W0, W1, W2, W3, W4,
                     W5, W6, W7, W8, W9,
                     W10, W11, W12, W13, W14>{
@@ -77,13 +86,19 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
+                    constexpr static const std::size_t bits_per_row = 12;
+                    constexpr static const std::size_t padded_exponent_size = ExponentSize + 
+                            ((bits_per_row - ExponentSize % bits_per_row) 
+                                % bits_per_row); // for ExponentSize % bits_per_row = 0
+
                 public:
-                    constexpr static const std::size_t rows_amount = 1;
-                    constexpr static const std::size_t gates_amount = 1;
+                    constexpr static const std::size_t rows_amount = (ExponentSize % bits_per_row == 0) ?
+                        (ExponentSize / bits_per_row) : (ExponentSize / bits_per_row) + 1;
+                    constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
                         var base;
-                        var power;
+                        var exponent;
                     };
 
                     struct result_type {
@@ -91,7 +106,7 @@ namespace nil {
 
                         result_type(const params_type &params,
                             const std::size_t &component_start_row) {
-
+                                result = var(W1, component_start_row + rows_amount - 1, false);
                         }
                     };
 
@@ -111,9 +126,39 @@ namespace nil {
                             blueprint_assignment_table<ArithmetizationType>
                                 &assignment,
                             const params_type &params,
-                            const std::size_t &component_start_row) {
+                            const std::size_t &start_row_index) {
 
-                        return result_type(params, component_start_row);
+                        typename BlueprintFieldType::value_type base = assignment.var_value(params.base);
+                        typename BlueprintFieldType::value_type exponent = assignment.var_value(params.exponent);
+
+                        std::array<bool, padded_exponent_size> bits;
+                        typename BlueprintFieldType::integral_type integral_exp = typename BlueprintFieldType::integral_type(exponent.data);
+                        for (std::size_t i = 0; i < padded_exponent_size; i++) {
+                            bits[padded_exponent_size - i - 1] = multiprecision::bit_test(integral_exp, i);
+                        }
+
+                        typename ArithmetizationType::field_type::value_type accumulated_n = 0;
+
+                        std::size_t current_bit = 0;
+                        for (std::size_t row = start_row_index; row < start_row_index + rows_amount; row++) {
+                            assignment.witness(W0)[row] = base;
+
+                            typename ArithmetizationType::field_type::value_type row_exponent = 0;
+
+                            for (std::size_t bit_column = W3; bit_column < W3 + bits_per_row; bit_column++) {
+                                assignment.witness(bit_column)[row] = bits[current_bit];
+
+                                row_exponent = 2 * row_exponent + bits[current_bit];
+
+                                current_bit++;
+                            }
+
+                            accumulated_n = (accumulated_n * (1 << bits_per_row)) + row_exponent;
+                            assignment.witness(W1)[row] = power(base, accumulated_n.data);
+                            assignment.witness(W2)[row] = accumulated_n;
+                        }    
+
+                        return result_type(params, start_row_index);
                     }
 
                     private:
