@@ -2,6 +2,7 @@
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
+// Copyright (c) 2022 Polina Chernyshova <pockvokhbtra@nil.foundation>
 //
 // MIT License
 //
@@ -407,37 +408,18 @@ namespace nil {
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
-                        const std::size_t &component_start_row) {
+                        const std::size_t component_start_row) {
 
-                        auto selector_iterator = assignment.find_selector(selector_seed);
-                        std::size_t first_selector_index;
-
-                        if (selector_iterator == assignment.selectors_end()){
-                            first_selector_index = assignment.allocate_selector(selector_seed,
-                                gates_amount);
-                            generate_gates(bp, assignment, params, first_selector_index);
-                        } else {
-                            first_selector_index = selector_iterator->second;
-                        }
-
-                        std::size_t j = component_start_row;
-                        for (std::size_t z = 0; z < rounds_amount; z += rounds_per_row) {
-                            assignment.enable_selector(first_selector_index + z, component_start_row + z);
-                        }
-
+                        generate_gates(bp, assignment, params, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
                         return result_type(params, component_start_row);
-
-                        // generate_gates(bp, assignment, params, component_start_row);
-                        // generate_copy_constraints(bp, assignment, params, component_start_row);
-                        // return result_type(params, component_start_row);
                     }
 
                     static result_type generate_assignments(
                         blueprint_assignment_table<ArithmetizationType>
                             &assignment,
                         const params_type &params,
-                        const std::size_t &component_start_row) {
+                        const std::size_t component_start_row) {
 
                         std::array<typename ArithmetizationType::field_type::value_type, state_size> state = {assignment.var_value(params.input_state[0]),
                         assignment.var_value(params.input_state[1]), assignment.var_value(params.input_state[2])};
@@ -492,13 +474,12 @@ namespace nil {
 
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> assignment,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
-                        const std::size_t &component_start_row) {
+                        const std::size_t component_start_row) {
                         std::size_t j = component_start_row;
                         for (std::size_t z = 0; z < rounds_amount; z += rounds_per_row){
-                            // assignment.enable_selector(j - component_start_row, j);
-                            // std::size_t selector_index = assignment.add_selector(j);
+                            std::size_t selector_index = assignment.add_selector(j);
                             auto constraint_1 = bp.add_constraint(var(W3, 0) -
                                 (var(W0, 0).pow(sbox_alpha) * mds[0][0] +
                                 var(W1, 0).pow(sbox_alpha) * mds[0][1] +
@@ -563,7 +544,7 @@ namespace nil {
                                 (var(W12, 0).pow(sbox_alpha) * mds[2][0] +
                                  var(W13, 0).pow(sbox_alpha) * mds[2][1] +
                                  var(W14, 0).pow(sbox_alpha) * mds[2][2] + round_constant[z + 4][2]));
-                            bp.add_gate(j - component_start_row,
+                            bp.add_gate(selector_index,
                             {constraint_1, constraint_2, constraint_3,
                                         constraint_4, constraint_5, constraint_6, constraint_7, constraint_8, constraint_9, constraint_10,
                                         constraint_11, constraint_12, constraint_13, constraint_14, constraint_15});
@@ -573,9 +554,9 @@ namespace nil {
 
                     static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> assignment,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
-                        const std::size_t &component_start_row) {
+                        const std::size_t component_start_row) {
 
                     }
                 };
