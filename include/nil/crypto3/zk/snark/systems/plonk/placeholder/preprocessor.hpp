@@ -98,7 +98,7 @@ namespace nil {
                             std::size_t rows_amount;
                         };
 
-                        plonk_public_polynomial_table<FieldType,
+                        plonk_public_polynomial_dfs_table<FieldType,
                             typename ParamsType::arithmetization_params> public_polynomial_table;
 
                         // S_sigma
@@ -364,7 +364,7 @@ namespace nil {
                     }
 
                     static inline typename preprocessed_data_type::public_precommitments_type precommitments(
-                        const plonk_public_polynomial_table<FieldType, typename ParamsType::arithmetization_params>
+                        const plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                             &public_table,
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> &id_perm_polys,
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> &sigma_perm_polys,
@@ -462,9 +462,9 @@ namespace nil {
                         q_last_q_blind[1] =
                             selector_blind(N_rows, usable_rows, basic_domain);
 
-                        plonk_public_polynomial_table<FieldType, typename ParamsType::arithmetization_params>
+                        plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                             public_polynomial_table =
-                                plonk_public_polynomial_table<FieldType, typename ParamsType::arithmetization_params>(
+                                plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>(
                                     detail::column_range_polynomials<FieldType>(public_assignment.public_inputs(),
                                                                                 basic_domain),
                                     detail::column_range_polynomials<FieldType>(public_assignment.constants(),

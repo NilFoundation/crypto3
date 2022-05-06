@@ -236,6 +236,21 @@ namespace nil {
                     plonk_table<FieldType, ArithmetizationParams,
                         math::polynomial<typename FieldType::value_type>>;
 
+                template<typename FieldType, typename ArithmetizationParams>
+                using plonk_private_polynomial_dfs_table =
+                    plonk_private_table<FieldType, ArithmetizationParams,
+                        math::polynomial_dfs<typename FieldType::value_type>>;
+
+                template<typename FieldType, typename ArithmetizationParams>
+                using plonk_public_polynomial_dfs_table =
+                    plonk_public_table<FieldType, ArithmetizationParams,
+                        math::polynomial_dfs<typename FieldType::value_type>>;
+
+                template<typename FieldType, typename ArithmetizationParams>
+                using plonk_polynomial_dfs_table =
+                    plonk_table<FieldType, ArithmetizationParams,
+                        math::polynomial_dfs<typename FieldType::value_type>>;
+
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

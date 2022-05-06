@@ -130,8 +130,7 @@ namespace nil {
                         std::array<math::polynomial_dfs<typename FieldType::value_type>, argument_size> F;
 
                         math::polynomial_dfs<typename FieldType::value_type> V_P_shifted =
-                            math::polynomial_shift<FieldType>(V_P, 1);
-
+                            math::polynomial_dfs_shift<FieldType>(V_P, 1);
 
                         F[0] = preprocessed_data.common_data.lagrange_0 * (one_polynomial - V_P);
                         F[1] = (one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
