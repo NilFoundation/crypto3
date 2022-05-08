@@ -84,6 +84,9 @@ namespace nil {
                         ArithmetizationParams> ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
+
+                    constexpr static const std::size_t selector_seed = 0x0f08;
+
                     using endo_scalar_component = zk::components::endo_scalar<ArithmetizationType, CurveType,
                                                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
                     using from_limbs = zk::components::from_limbs<ArithmetizationType, CurveType, W0, W1, W2>;
@@ -118,8 +121,10 @@ namespace nil {
                     static var assignment_exponentiation(blueprint_assignment_table<ArithmetizationType> &assignment,
                             var base,
                             var power,
+                            var zero,
+                            var one,
                             std::size_t &component_start_row) {
-                        typename exponentiation_component::params_type params = {base, power};
+                        typename exponentiation_component::params_type params = {base, power, zero, one};
                         typename exponentiation_component::result_type res = 
                             exponentiation_component::generate_assignments(assignment, params, component_start_row);
                         component_start_row += exponentiation_component::rows_amount;
@@ -262,7 +267,6 @@ namespace nil {
                     }
 
                 public:
-                    constexpr static const std::size_t selector_seed = 0x0f08;
                     constexpr static const std::size_t rows_amount = 100;
                     constexpr static const std::size_t gates_amount = 1;
 
@@ -334,7 +338,6 @@ namespace nil {
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type params,
                         const std::size_t start_row_index) {
-                        std::cout<<"CITCUIT"<<std::endl;
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
 
@@ -362,6 +365,7 @@ namespace nil {
 
                         // fr_transcript.absorb(fq_digest)
                         var zero = var(0, 0, false, var::column_type::constant);
+                        var one = var(0, 1, false, var::column_type::constant);
                         kimchi_transcript<ArithmetizationType, CurveType,
                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> transcript;
                         transcript.init_circuit(bp, assignment, zero, row);
@@ -370,7 +374,7 @@ namespace nil {
                         // zeta_pow_n = zeta**n
                         var zeta_pow_n = 
                             exponentiation_component::generate_circuit(bp, assignment, 
-                            {params.fq_output.zeta, params.verifier_index.domain_size}, row).result;
+                            {params.fq_output.zeta, params.verifier_index.domain_size, zero, one}, row).result;
                         row += exponentiation_component::rows_amount;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
@@ -407,7 +411,12 @@ namespace nil {
                             zeta, row);
                         std::cout<<"zeta: "<<assignment.var_value(zeta_endo).data<<std::endl;
 
+                        var zero = var(0, 0, false, var::column_type::constant);
+                        var one = var(0, 1, false, var::column_type::constant);
                         assignment.constant(0)[0] = 0; // set zero constant
+                        assignment.constant(0)[1] = 1; // set one constant
+
+
                         kimchi_transcript<ArithmetizationType, CurveType,
                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> transcript;
                         transcript.init_assignment(assignment, row);
@@ -415,10 +424,10 @@ namespace nil {
                             fq_digest, row);
 
                         var n = params.verifier_index.domain_size;
-                        var zeta_pow_n = assignment_exponentiation(assignment, zeta, n, row);
+                        var zeta_pow_n = assignment_exponentiation(assignment, zeta, n, zero, one, row);
 
                         var zeta_omega = assigment_multiplication(assignment, zeta, omega, row);
-                        var zeta_omega_pow_n = assignment_exponentiation(assignment, zeta_omega, n, row);
+                        var zeta_omega_pow_n = assignment_exponentiation(assignment, zeta_omega, n, zero, one, row);
 
                         std::vector<var> alpha_powers = assigment_element_powers(assignment, alpha, params.verifier_index.alpha_powers, row);
                         std::vector<var> omega_powers = assigment_element_powers(assignment, alpha, params.verifier_index.public_input_size, row);
@@ -453,8 +462,8 @@ namespace nil {
                             u_challenge, row);
 
                         std::array<var, 2> powers_of_eval_points_for_chunks = {
-                            assignment_exponentiation(assignment, zeta, max_poly_size, row),
-                            assignment_exponentiation(assignment, zeta_omega, max_poly_size, row),
+                            assignment_exponentiation(assignment, zeta, max_poly_size, zero, one, row),
+                            assignment_exponentiation(assignment, zeta_omega, max_poly_size, zero, one, row),
                         };
 
                         std::vector<var> prev_challenges_evals = assignment_prev_chal_evals(assignment,
