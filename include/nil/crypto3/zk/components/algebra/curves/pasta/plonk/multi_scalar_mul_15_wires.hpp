@@ -117,7 +117,7 @@ namespace nil {
 
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const params_type params,
+                        const params_type &params,
                         const std::size_t start_row_index){
 
                         std::size_t row = start_row_index;
@@ -166,7 +166,7 @@ namespace nil {
                     static result_type generate_assignments(
                         blueprint_assignment_table<ArithmetizationType>
                             &assignment,
-                        const params_type params,
+                        const params_type &params,
                         const std::size_t start_row_index) {
                         
                         std::size_t row = start_row_index;

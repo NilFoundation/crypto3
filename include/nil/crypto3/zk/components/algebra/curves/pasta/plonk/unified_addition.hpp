@@ -81,13 +81,13 @@ namespace nil {
                                 typename ComponentType::result_type,
                             boost::mpl::vector<blueprint<ArithmetizationType> &,
                                 blueprint_public_assignment_table<ArithmetizationType> &,
-                                const typename ComponentType::params_type,
+                                const typename ComponentType::params_type &,
                                 const std::size_t>>::value)),
                             typename ComponentType::result_type>::type
                         generate_circuit(
                             blueprint<ArithmetizationType> &bp,
                             blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                            const typename ComponentType::params_type params,
+                            const typename ComponentType::params_type &params,
                             const std::size_t start_row_index);
                     
                 public:
