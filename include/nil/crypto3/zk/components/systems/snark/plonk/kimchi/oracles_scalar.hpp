@@ -336,7 +336,7 @@ namespace nil {
                     
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const params_type params,
+                        const params_type &params,
                         const std::size_t start_row_index) {
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
