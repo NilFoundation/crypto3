@@ -79,7 +79,7 @@ namespace nil {
 
                     constexpr static const std::size_t selector_seed = 0xff80;
 
-                    public:
+                public:
 
                     constexpr static const std::size_t rows_amount = 2;
                     constexpr static const std::size_t gates_amount = 1;
@@ -91,6 +91,26 @@ namespace nil {
                     struct result_type {
                         result_type(const std::size_t &component_start_row) {}
                     };
+
+                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t start_row_index){
+
+                        auto selector_iterator = assignment.find_selector(selector_seed);
+                        std::size_t first_selector_index;
+                        if (selector_iterator == assignment.selectors_end()){
+                            first_selector_index = assignment.allocate_selector(selector_seed,
+                                gates_amount);
+                            generate_gates(bp, assignment, params, first_selector_index);
+                        } else {
+                            first_selector_index = selector_iterator->second; 
+                        }
+                        std::size_t j = start_row_index;
+                        assignment.enable_selector(first_selector_index, j);
+                        generate_copy_constraints(bp, assignment, params, j);
+                        return result_type(start_row_index);
+                    }
 
                     static result_type generate_assignments(
                         blueprint_assignment_table<ArithmetizationType>
@@ -148,25 +168,7 @@ namespace nil {
                         assignment.witness(W8)[row] = c;
                     }
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const params_type params,
-                        const std::size_t start_row_index){
-
-                        auto selector_iterator = assignment.find_selector(selector_seed);
-                        std::size_t first_selector_index;
-                        if (selector_iterator == assignment.selectors_end()){
-                            first_selector_index = assignment.allocate_selector(selector_seed,
-                                gates_amount);
-                            generate_gates(bp, assignment, params, first_selector_index);
-                        } else {
-                            first_selector_index = selector_iterator->second; 
-                        }
-                        std::size_t j = start_row_index;
-                        assignment.enable_selector(first_selector_index, j);
-                        generate_copy_constraints(bp, assignment, params, j);
-                        return result_type(start_row_index);
-                    }
+                private:
 
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,

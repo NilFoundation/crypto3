@@ -75,7 +75,7 @@ namespace nil {
 
                 public:
 
-                constexpr static const std::size_t rows_amount = 9;
+                    constexpr static const std::size_t rows_amount = 9;
 
                    struct params_type {
                         typename FieldType::value_type A;
