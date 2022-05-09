@@ -76,6 +76,7 @@ namespace nil {
                                        &plonk_columns,
                                    typename CommitmentSchemeTypePermutation::params_type fri_params,
                                    transcript_type &transcript = transcript_type()) {
+                            
                         // $/theta = \challenge$
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
                         // Construct lookup gates
@@ -193,15 +194,15 @@ namespace nil {
 
                         // Compute $V_L(X)$
                         typename FieldType::value_type beta = transcript.template challenge<FieldType>();
-
                         typename FieldType::value_type gamma = transcript.template challenge<FieldType>();
-                        std::vector<typename FieldType::value_type> V_L_interpolation_points(
-                            preprocessed_data.common_data.rows_amount);
 
-                        V_L_interpolation_points[0] = FieldType::value_type::one();
+                        math::polynomial_dfs<typename FieldType::value_type> V_L
+                        V_L.resize(preprocessed_data.common_data.rows_amount);
+
+                        V_L[0] = FieldType::value_type::one();
                         for (std::size_t j = 1; j < preprocessed_data.common_data.rows_amount; j++) {
-                            V_L_interpolation_points[j] =
-                                (V_L_interpolation_points[j - 1] * (F_compr_input[j - 1] + beta) *
+                            V_L[j] =
+                                (V_L[j - 1] * (F_compr_input[j - 1] + beta) *
                                  (F_compr_value[j - 1] + gamma)) *
                                 ((F_perm_input[j - 1] + beta) * (F_perm_value[j - 1] + gamma)).inversed();
                         }

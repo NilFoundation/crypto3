@@ -127,12 +127,17 @@ namespace nil {
                         transcript(V_P_commitment);
 
                         // 5. Calculate g_perm, h_perm
-                        math::polynomial_dfs<typename FieldType::value_type> g = {1};
-                        math::polynomial_dfs<typename FieldType::value_type> h = {1};
+                        math::polynomial_dfs<typename FieldType::value_type> g;
+                        math::polynomial_dfs<typename FieldType::value_type> h;
 
                         for (std::size_t i = 0; i < S_id.size(); i++) {
-                            g = g * (column_polynomials[i] + beta * S_id[i] + gamma);
-                            h = h * (column_polynomials[i] + beta * S_sigma[i] + gamma);
+                            if (i == 0) {
+                                g = (column_polynomials[0] + beta * S_id[0] + gamma);
+                                h = (column_polynomials[0] + beta * S_sigma[0] + gamma);
+                            } else {
+                                g = g * (column_polynomials[i] + beta * S_id[i] + gamma);
+                                h = h * (column_polynomials[i] + beta * S_sigma[i] + gamma);
+                            }
                         }
 
                         math::polynomial_dfs<typename FieldType::value_type> one_polynomial(
