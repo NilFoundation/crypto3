@@ -120,7 +120,8 @@ namespace nil {
                     }
 
                     bool operator==(const plonk_variable &other) const {
-                        return ((this->index == other.index) && (this->rotation == other.rotation));
+                        return ((this->index == other.index) && (this->rotation == other.rotation)
+                            && this->type == other.type);
                     }
 
                     bool operator<(const plonk_variable &other) const {
