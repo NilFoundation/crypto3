@@ -195,7 +195,7 @@ namespace nil {
 
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const params_type params,
+                        const params_type &params,
                         const std::size_t start_row_index){
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
@@ -212,9 +212,14 @@ namespace nil {
                         assignment.enable_selector(first_selector_index, start_row_index + add_component::rows_amount, 
                             start_row_index + rows_amount - 1, 2);
 
+                        typename add_component::params_type addition_params = {{params.T.x, params.T.y}, {params.T.x, params.T.y}};
+                        zk::components::generate_circuit<add_component>(bp, assignment, addition_params, start_row_index);
+
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(params, start_row_index);
                     }
+
+                    private:
 
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
@@ -304,12 +309,10 @@ namespace nil {
                             const params_type params,
                             const std::size_t start_row_index){
 
-                        // first doulbing check
-                        typename add_component::params_type addition_params = {{params.T.x, params.T.y}, {params.T.x, params.T.y}};
-                        zk::components::generate_circuit<add_component>(bp, assignment, addition_params, start_row_index);
-                        typename add_component::result_type addition_res(addition_params, start_row_index);
-
                         const std::size_t &j = start_row_index + add_component::rows_amount;
+
+                        typename add_component::params_type addition_params = {{params.T.x, params.T.y}, {params.T.x, params.T.y}};
+                        typename add_component::result_type addition_res(addition_params, start_row_index);
 
                         bp.add_copy_constraint({{W2, (std::int32_t)(j), false}, addition_res.X});
                         bp.add_copy_constraint({{W3, (std::int32_t)(j), false}, addition_res.Y});
