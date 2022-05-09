@@ -166,7 +166,7 @@ namespace nil {
                             c = 1;
                         }
                         assignment.witness(W8)[row] = c;
-                        return result_type(start_row_index);
+                        return result_type(component_start_row);
                     }
 
                 private:
