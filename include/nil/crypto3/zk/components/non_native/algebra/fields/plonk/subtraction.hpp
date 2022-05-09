@@ -89,14 +89,12 @@ namespace nil {
 
                     using non_native_range_component = zk::components::non_native_range<ArithmetizationType, CurveType, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8>;
-
                     constexpr static const std::size_t selector_seed = 0xff85;
-
+                    
                     constexpr static const std::size_t T = 257;
 
 
                 public:
-
                     constexpr static const std::size_t rows_amount = 1 + non_native_range_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 1;
 

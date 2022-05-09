@@ -24,13 +24,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE blueprint_plonk_non_native_range_test
+#define BOOST_TEST_MODULE blueprint_plonk_non_native_field_test
 
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
-#include <nil/crypto3/algebra/random_element.hpp>
+
+#include <nil/crypto3/algebra/curves/curve25519.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/ed25519.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
@@ -40,7 +42,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/non_native_range.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/subtraction.hpp>
 
 #include "../../test_plonk_component.hpp"
 
@@ -48,15 +50,16 @@ using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_range) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_addition) {
     auto start = std::chrono::high_resolution_clock::now();
 
     using curve_type = algebra::curves::pallas;
+    using ed25519_type = algebra::curves::curve25519;
     using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 1;
+    constexpr std::size_t SelectorColumns = 2;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
@@ -66,25 +69,27 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_range) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::non_native_range<ArithmetizationType, curve_type, 0, 1, 2, 3,
+    using component_type = zk::components::non_native_field_element_subtraction<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8>;
 
-    std::array<var, 4> input_var = {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
+    std::array<var, 4> input_var_a = {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
+    std::array<var, 4> input_var_b = {var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
+        var(0, 6, false, var::column_type::public_input), var(0, 7, false, var::column_type::public_input)};
 
-    typename component_type::params_type params = {input_var};
+    typename component_type::params_type params = {input_var_a, input_var_b};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {455245345345345, 523553453454343, 68753453534534689, 543553453453453534};
-    
+    std::vector<typename BlueprintFieldType::value_type> public_input = {45524, 52353, 68769, 5431, 3724, 342453, 5425, 54222};
+    //std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0, 0, 0, 1, 0, 0, 0};
+
     auto result_check = [](AssignmentType &assignment, 
         component_type::result_type &real_res) {
     };
 
-
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "range component : " << duration.count() << "ms" << std::endl;
+    std::cout << "multiplication component : " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

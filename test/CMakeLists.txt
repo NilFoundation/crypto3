@@ -63,6 +63,7 @@ endmacro()
 set(NON_NATIVE_TESTS_FILES
     "non_native/plonk/field_mul"
     "non_native/plonk/field_add"
+    "non_native/plonk/field_sub"
     "non_native/plonk/var_base_mul_per_bit"
     "non_native/plonk/non_native_range"
     )
