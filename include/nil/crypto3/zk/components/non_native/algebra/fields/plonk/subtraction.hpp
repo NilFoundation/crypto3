@@ -136,15 +136,17 @@ namespace nil {
                          typename CurveType::base_field_type::integral_type(assignment.var_value(params.B[1]).data),
                         typename CurveType::base_field_type::integral_type(assignment.var_value(params.B[2]).data),
                         typename CurveType::base_field_type::integral_type(assignment.var_value(params.B[3]).data)};
-                        typename Ed25519Type::base_field_type::value_type eddsa_b = typename Ed25519Type::base_field_type::integral_type(b[0].data) + 
+                        typename Ed25519Type::base_field_type::extended_integral_type eddsa_p =  Ed25519Type::base_field_type::modulus;
+                        typename Ed25519Type::base_field_type::value_type eddsa_b = eddsa_p  - (typename Ed25519Type::base_field_type::integral_type(b[0].data) + 
                         typename Ed25519Type::base_field_type::integral_type(b[1].data) * (base<<66) +
-                        typename Ed25519Type::base_field_type::integral_type(b[2].data)* (base<<132) + typename Ed25519Type::base_field_type::integral_type(b[3].data) * (base<<198);
+                        typename Ed25519Type::base_field_type::integral_type(b[2].data)* (base<<132) + typename Ed25519Type::base_field_type::integral_type(b[3].data) * (base<<198));
+
+
 
                         typename Ed25519Type::base_field_type::value_type eddsa_r = eddsa_a + eddsa_b;
                         typename Ed25519Type::base_field_type::integral_type integral_eddsa_r = typename Ed25519Type::base_field_type::integral_type(eddsa_r.data);
-                        typename Ed25519Type::base_field_type::extended_integral_type eddsa_p =  Ed25519Type::base_field_type::modulus;
                         typename Ed25519Type::base_field_type::extended_integral_type integral_eddsa_q = (typename Ed25519Type::base_field_type::extended_integral_type(eddsa_a.data)
-                         - typename Ed25519Type::base_field_type::extended_integral_type(eddsa_b.data) - typename Ed25519Type::base_field_type::extended_integral_type(eddsa_r.data)) / 
+                        + typename Ed25519Type::base_field_type::extended_integral_type(eddsa_b.data) - typename Ed25519Type::base_field_type::extended_integral_type(eddsa_r.data)) / 
                         eddsa_p;
                         std::cout<<"q = "<<integral_eddsa_q<<std::endl;
                         typename Ed25519Type::base_field_type::extended_integral_type pow = extended_base << 257;
@@ -160,7 +162,7 @@ namespace nil {
                         for (std::size_t i = 1; i<4; i++) {
                             r[i] = (integral_eddsa_r >> (66*i)) & (mask);
                         }
-                        typename CurveType::base_field_type::value_type t =  a[0] - b[0]  + p[0] * q[0];
+                        typename CurveType::base_field_type::value_type t =  a[0] + (typename Ed25519Type::base_field_type::extended_integral_type(eddsa_b.data) & mask)  + p[0] * q[0];
 
                         typename CurveType::base_field_type::value_type u0 = t - r[0];
                         
@@ -173,7 +175,7 @@ namespace nil {
                         u0_chunks[3] = (u0_integral >> 66) & (1);
 
                         assignment.witness(W0)[row] = a[0];
-                        assignment.witness(W1)[row] = b[0];
+                        assignment.witness(W1)[row] = (typename Ed25519Type::base_field_type::extended_integral_type(eddsa_b.data) & mask);
                         assignment.witness(W2)[row] = integral_eddsa_q;
                         assignment.witness(W3)[row] = u0_chunks[0];
                         assignment.witness(W4)[row] = u0_chunks[1];
@@ -195,7 +197,7 @@ namespace nil {
 
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const params_type params,
+                        const params_type &params,
                         const std::size_t start_row_index){
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
@@ -232,10 +234,11 @@ namespace nil {
                         typename Ed25519Type::base_field_type::extended_integral_type minus_eddsa_p =  pow - eddsa_p;
                         std::array<typename CurveType::base_field_type::value_type, 4> p;
                         typename CurveType::base_field_type::integral_type mask = (base << 66) - 1;
+                        typename Ed25519Type::base_field_type::extended_integral_type eddsa_p0 = eddsa_p & mask;
                         p[0] = minus_eddsa_p & mask;
 
                         
-                        snark::plonk_constraint<BlueprintFieldType> t =  var(W0, 0) - var(W1, 0)  + p[0] * var(W2, 0);
+                        snark::plonk_constraint<BlueprintFieldType> t =  var(W0, 0) + var(W1, 0)  + p[0] * var(W2, 0);
                         auto constraint_1 = bp.add_constraint(
                             var(W7, 0) * (base << 66) - (t - var(W0, +1)));
 
