@@ -88,7 +88,7 @@ namespace nil {
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
                             math::polynomial<typename FieldType::value_type> Z;
-                            math::polynomial<typename FieldType::value_type> lagrange_0;
+                            math::polynomial_dfs<typename FieldType::value_type> lagrange_0;
 
                             public_commitments_type commitments;
 
@@ -119,18 +119,17 @@ namespace nil {
                     typedef typename preprocessed_data_type::public_precommitments_type
                         public_precommitments_type;
 
-                    static math::polynomial<typename FieldType::value_type>
+                    static math::polynomial_dfs<typename FieldType::value_type>
                         lagrange_polynomial(std::shared_ptr<math::evaluation_domain<FieldType>> domain,
                                             std::size_t number) {
-                        std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>>
-                            evaluation_points;
-                        for (std::size_t i = 0; i < domain->m; i++) {
-                            evaluation_points.push_back(std::make_pair(domain->get_domain_element(i),
-                                                                       (i != number) ? FieldType::value_type::zero() :
-                                                                                       FieldType::value_type::one()));
+                        assert(number < domain->m);
+
+                        math::polynomial_dfs<typename FieldType::value_type> f (
+                            0, domian->m, FieldType::value_type::zero());
+                        
+                        if (number < domain->m) {
+                            f[number] = FieldType::value_type::one();
                         }
-                        math::polynomial<typename FieldType::value_type> f =
-                            math::lagrange_interpolation(evaluation_points);
 
                         return f;
                     }
@@ -453,7 +452,7 @@ namespace nil {
                                 columns_with_copy_constraints, N_rows, basic_domain->get_domain_element(1),
                                 ParamsType::delta, permutation, basic_domain);
 
-                        math::polynomial<typename FieldType::value_type> lagrange_0 =
+                        math::polynomial_dfs<typename FieldType::value_type> lagrange_0 =
                             lagrange_polynomial(basic_domain, 0);
 
                         std::array<math::polynomial_dfs<typename FieldType::value_type>, 2> q_last_q_blind;
