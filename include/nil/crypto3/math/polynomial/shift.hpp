@@ -27,6 +27,7 @@
 #define CRYPTO3_MATH_POLYNOMIAL_SHIFT_HPP
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
+#include <nil/crypto3/math/polynomial/polynomial_dfs.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -40,6 +41,26 @@ namespace nil {
                 for (int i = 1; i < f.size(); i++) {
                     f_shifted[i] = f_shifted[i] * x_power;
                     x_power *= x;
+                }
+
+                return f_shifted;
+            }
+
+            template<typename FieldType>
+            static inline polynomial_dfs<typename FieldType::value_type>
+                polynomial_shift(const polynomial_dfs<typename FieldType::value_type> &f,
+                                 const std::size_t shift,
+                                 std::size_t domain_size = 0) {
+                if ((domain_size == 0) && (f.size() > 0)) {
+                    domain_size = f.size() - 1;
+                }
+
+                assert(domain_size + 1 <= f.size());
+
+                polynomial_dfs<typename FieldType::value_type> f_shifted(domain_size + 1);
+
+                for (std::size_t index = 0; index < f.size(); index++){
+                    f_shifted[index] = f[index*(shift + 1) % domain_size];
                 }
 
                 return f_shifted;
