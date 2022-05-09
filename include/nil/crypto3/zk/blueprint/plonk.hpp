@@ -98,6 +98,9 @@ namespace nil {
                 }
 
                 void add_copy_constraint(const snark::plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {
+                    if (copy_constraint.first == copy_constraint.second) {
+                        return;
+                    }
                     this->_copy_constraints.emplace_back(copy_constraint);
                 }
 
