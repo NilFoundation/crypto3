@@ -39,9 +39,9 @@ namespace nil {
             namespace fields {
                 
                 template<>
-                struct arithmetic_params<ed25519<255>> : public params<ed25519<255>> {
+                struct arithmetic_params<ed25519> : public params<ed25519> {
                 private:
-                    typedef params<ed25519<255>> policy_type;
+                    typedef params<ed25519> policy_type;
 
                 public:
                     typedef typename policy_type::modular_type modular_type;
@@ -50,8 +50,8 @@ namespace nil {
                     constexpr static const integral_type multiplicative_generator = 0x02;
                 };
 
-                constexpr typename arithmetic_params<ed25519<255>>::integral_type const
-                    arithmetic_params<ed25519<255>>::multiplicative_generator;
+                constexpr typename arithmetic_params<ed25519>::integral_type const
+                    arithmetic_params<ed25519>::multiplicative_generator;
            
             }    // namespace fields
         }        // namespace algebra
