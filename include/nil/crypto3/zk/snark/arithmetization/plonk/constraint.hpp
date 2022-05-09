@@ -143,6 +143,43 @@ namespace nil {
                         return acc;
                     }
 
+                    template<typename ArithmetizationParams>
+                    math::polynomial_dfs<typename VariableType::assignment_type>
+                        evaluate(const plonk_polynomial_dfs_table<FieldType, ArithmetizationParams> &assignments,
+                            std::shared_ptr<math::evaluation_domain<FieldType>> domain) const {
+                        math::polynomial_dfs<typename VariableType::assignment_type> acc (0, domain->m + 1);
+                        for (const math::non_linear_term<VariableType> &nlt : this->terms) {
+                            math::polynomial_dfs<typename VariableType::assignment_type> term_value = {nlt.coeff};
+
+                            for (const VariableType &var : nlt.vars) {
+
+                                math::polynomial_dfs<typename VariableType::assignment_type> assignment;
+                                switch (var.type) {
+                                    case VariableType::column_type::witness:
+                                        assignment = assignments.witness(var.index);
+                                        break;
+                                    case VariableType::column_type::public_input:
+                                        assignment = assignments.public_input(var.index);
+                                        break;
+                                    case VariableType::column_type::constant:
+                                        assignment = assignments.constant(var.index);
+                                        break;
+                                    case VariableType::column_type::selector:
+                                        assignment = assignments.selector(var.index);
+                                        break;
+                                }
+
+                                if (var.rotation != 0) {
+                                    assignment = math::polynomial_shift<FieldType>(assignment, var.rotation);
+                                }
+
+                                term_value = term_value * assignment;
+                            }
+                            acc = acc + term_value;
+                        }
+                        return acc;
+                    }
+
                     typename VariableType::assignment_type evaluate(detail::plonk_evaluation_map<VariableType> &assignments) const {
                         typename VariableType::assignment_type acc = VariableType::assignment_type::zero();
                         for (const math::non_linear_term<VariableType> &nlt : this->terms) {

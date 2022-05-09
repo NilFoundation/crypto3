@@ -138,9 +138,9 @@ namespace nil {
 
                         placeholder_proof<FieldType, ParamsType> proof;
 
-                        plonk_polynomial_table<FieldType, typename ParamsType::arithmetization_params>
+                        plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                             polynomial_table =
-                            plonk_polynomial_table<FieldType, typename ParamsType::arithmetization_params>(
+                            plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>(
                                 preprocessed_private_data.private_polynomial_table,
                                 preprocessed_public_data.public_polynomial_table);
 

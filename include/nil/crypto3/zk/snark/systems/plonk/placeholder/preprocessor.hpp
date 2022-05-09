@@ -125,7 +125,7 @@ namespace nil {
                         assert(number < domain->m);
 
                         math::polynomial_dfs<typename FieldType::value_type> f (
-                            0, domian->m, FieldType::value_type::zero());
+                            0, domain->m + 1, FieldType::value_type::zero());
                         
                         if (number < domain->m) {
                             f[number] = FieldType::value_type::one();
@@ -464,11 +464,11 @@ namespace nil {
                         plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                             public_polynomial_table =
                                 plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>(
-                                    detail::column_range_polynomials<FieldType>(public_assignment.public_inputs(),
+                                    detail::column_range_polynomial_dfs<FieldType>(public_assignment.public_inputs(),
                                                                                 basic_domain),
-                                    detail::column_range_polynomials<FieldType>(public_assignment.constants(),
+                                    detail::column_range_polynomial_dfs<FieldType>(public_assignment.constants(),
                                                                                 basic_domain),
-                                    detail::column_range_polynomials<FieldType>(public_assignment.selectors(),
+                                    detail::column_range_polynomial_dfs<FieldType>(public_assignment.selectors(),
                                                                                 basic_domain));
 
                         std::vector<typename FieldType::value_type> Z(N_rows + 1);
@@ -507,7 +507,7 @@ namespace nil {
 
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
-                        plonk_private_polynomial_table<FieldType,
+                        plonk_private_polynomial_dfs_table<FieldType,
                             typename ParamsType::arithmetization_params> private_polynomial_table;
                     };
 
@@ -523,10 +523,10 @@ namespace nil {
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
                             math::make_evaluation_domain<FieldType>(N_rows);
 
-                        plonk_private_polynomial_table<FieldType, typename ParamsType::arithmetization_params>
+                        plonk_private_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                             private_polynomial_table =
-                                plonk_private_polynomial_table<FieldType, typename ParamsType::arithmetization_params>(
-                                    detail::column_range_polynomials<FieldType>(private_assignment.witnesses(),
+                                plonk_private_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>(
+                                    detail::column_range_polynomial_dfs<FieldType>(private_assignment.witnesses(),
                                                                                 basic_domain));
                         return preprocessed_data_type({basic_domain, private_polynomial_table});
                     }

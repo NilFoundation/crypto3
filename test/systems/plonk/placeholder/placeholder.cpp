@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_polynomials_test) {
         placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
                                                                                assignments.private_table(), desc);
 
-    auto polynomial_table = plonk_polynomial_table<FieldType, typename placeholder_test_params::arithmetization_params>(
+    auto polynomial_table = plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params::arithmetization_params>(
         preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
     std::shared_ptr<math::evaluation_domain<FieldType>> domain = preprocessed_public_data.common_data.basic_domain;
@@ -278,7 +278,7 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
         placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
                                                                                assignments.private_table(), desc);
 
-    auto polynomial_table = plonk_polynomial_table<FieldType, typename placeholder_test_params::arithmetization_params>(
+    auto polynomial_table = plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params::arithmetization_params>(
         preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -349,7 +349,7 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
                                                                                assignments.private_table(), desc);
 
     auto polynomial_table =
-        plonk_polynomial_table<FieldType, typename placeholder_test_params_lookups::arithmetization_params>(
+        plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params_lookups::arithmetization_params>(
             preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -456,7 +456,7 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
         placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
                                                                                assignments.private_table(), desc);
 
-    auto polynomial_table = plonk_polynomial_table<FieldType, typename placeholder_test_params::arithmetization_params>(
+    auto polynomial_table = plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params::arithmetization_params>(
         preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};

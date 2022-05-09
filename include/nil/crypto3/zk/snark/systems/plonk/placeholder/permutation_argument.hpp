@@ -75,7 +75,7 @@ namespace nil {
                                     preprocessed_data_type preprocessed_data,
                         const plonk_table_description<FieldType,
                                 typename ParamsType::arithmetization_params> &table_description,
-                        const plonk_polynomial_table<FieldType,
+                        const plonk_polynomial_dfs_table<FieldType,
                             typename ParamsType::arithmetization_params> &column_polynomials,
                         typename ParamsType::commitment_params_type fri_params,
                         transcript_type &transcript = transcript_type()) {
@@ -139,8 +139,8 @@ namespace nil {
                             0, V_P.size(), FieldType::value_type::one());
                         std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
 
-                        math::polynomial<typename FieldType::value_type> V_P_shifted =
-                            math::polynomial_dfs_shift<FieldType>(V_P_normal, 1);
+                        math::polynomial_dfs<typename FieldType::value_type> V_P_shifted =
+                            math::polynomial_shift<FieldType>(V_P, 1);
 
                         F[0] = math::polynomial<typename FieldType::value_type>(
                             (preprocessed_data.common_data.lagrange_0 * (one_polynomial - V_P)).coefficients());

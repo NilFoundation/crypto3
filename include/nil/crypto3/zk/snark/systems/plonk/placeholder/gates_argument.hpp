@@ -63,7 +63,7 @@ namespace nil {
 
                     static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
                         prove_eval(typename policy_type::constraint_system_type &constraint_system,
-                                   const plonk_polynomial_table<FieldType,
+                                   const plonk_polynomial_dfs_table<FieldType,
                                         typename ParamsType::arithmetization_params> &column_polynomials,
                                         std::shared_ptr<math::evaluation_domain<FieldType>> domain,
                                    transcript_type &transcript = transcript_type()) { //TODO: remove domain 
